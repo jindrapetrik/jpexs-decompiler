@@ -1,39 +1,69 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true" accName="Movie name" description="Movie description" forceSimple="true" autoLabeling="false" hasAccessibleData="true">
      <symbols>
-          <Include href="Symbol 1.xml" loadImmediate="false" itemID="6741f93d-000006ed" lastModified="1732384072"/>
-          <Include href="Symbol 2.xml" loadImmediate="false" itemID="67420f0e-000006f2" lastModified="1732382478"/>
+          <Include href="Symbol 1.xml" loadImmediate="false" itemID="6741f93d-000006ed" lastModified="1732471559"/>
+          <Include href="Symbol 2.xml" loadImmediate="false" itemID="67420f0e-000006f2" lastModified="1732471545"/>
+          <Include href="Symbol 3.xml" loadImmediate="false" itemID="6742d77a-0000072c" lastModified="1732471547"/>
+          <Include href="Symbol 4.xml" loadImmediate="false" itemID="67430691-00000735" lastModified="1732471548"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="1">
+          <DOMTimeline name="Scene 1" currentFrame="2">
                <layers>
-                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                    <DOMLayer name="Layer 6" color="#808080" current="true" isSelected="true">
                          <frames>
-                              <DOMFrame index="0" duration="3" keyMode="9728">
+                              <DOMFrame index="0" duration="2" keyMode="9728">
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="3" keyMode="9728">
+                              <DOMFrame index="2" duration="5" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="Symbol 1" name="MovieClip2" accName="My sprite name" description="My sprite description" shortcut="My shortcut" tabIndex="27" forceSimple="true" hasAccessibleData="true" centerPoint3DX="240.45" centerPoint3DY="187.5">
+                                        <DOMSymbolInstance libraryItemName="Symbol 4" name="MovieClip12" selected="true" accName="frame 3-7 name" description="frame 3-7 desc" shortcut="frame 3-7 shortcut" tabIndex="3" hasAccessibleData="true" centerPoint3DX="399.3" centerPoint3DY="259">
                                              <matrix>
-                                                  <Matrix tx="178.95" ty="141"/>
+                                                  <Matrix tx="343.3" ty="208"/>
                                              </matrix>
                                              <transformationPoint>
-                                                  <Point x="61.5" y="46.5"/>
+                                                  <Point x="56" y="51"/>
                                              </transformationPoint>
                                         </DOMSymbolInstance>
-                                        <DOMInputText name="Text5" fontRenderingMode="standard" width="147" height="22.15" lineType="multiline" accName="My text" description="My text description" shortcut="text shortcut" tabIndex="4" hasAccessibleData="true">
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="7" duration="3" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 5" color="#4FFFFF">
+                         <frames>
+                              <DOMFrame index="0" duration="4" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="4" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 3" name="MovieClip11" accName="frame 5 name" description="frame 5 desc" shortcut="frame 5 shortcut" tabIndex="2" forceSimple="true" hasAccessibleData="true" centerPoint3DX="179.95" centerPoint3DY="318">
                                              <matrix>
-                                                  <Matrix tx="238.95" ty="48.2"/>
+                                                  <Matrix tx="128.95" ty="283.5"/>
                                              </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
-                                                       <characters>abc</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs alignment="center" aliasText="false" rotation="true" size="20" bitmapSize="400" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMInputText>
+                                             <transformationPoint>
+                                                  <Point x="51" y="34.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="5" duration="5" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" duration="10" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 2" name="MovieClip10" accName="all frames name" description="all frames desc" shortcut="all frames shortcut" tabIndex="1" hasAccessibleData="true" centerPoint3DX="241.3" centerPoint3DY="180.35">
+                                             <matrix>
+                                                  <Matrix tx="222.8" ty="158.85"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="18.5" y="21.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -43,6 +73,18 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="2218" publishTime="1732471757"/>
+          <PublishItem publishSize="7448" publishTime="1732460502"/>
+          <PublishItem publishSize="7316" publishTime="1732445858"/>
+          <PublishItem publishSize="7162" publishTime="1732436855"/>
+          <PublishItem publishSize="6484" publishTime="1732436236"/>
+          <PublishItem publishSize="6378" publishTime="1732434469"/>
+          <PublishItem publishSize="6354" publishTime="1732434214"/>
+          <PublishItem publishSize="6425" publishTime="1732434171"/>
+          <PublishItem publishSize="6355" publishTime="1732434049"/>
+          <PublishItem publishSize="6372" publishTime="1732433952"/>
+          <PublishItem publishSize="6023" publishTime="1732433798"/>
+          <PublishItem publishSize="5904" publishTime="1732433701"/>
           <PublishItem publishSize="5424" publishTime="1732396187"/>
           <PublishItem publishSize="1485" publishTime="1732384077"/>
           <PublishItem publishSize="1462" publishTime="1732383422"/>

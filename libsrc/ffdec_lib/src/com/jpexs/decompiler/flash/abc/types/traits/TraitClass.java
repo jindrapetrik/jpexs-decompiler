@@ -80,12 +80,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     /**
      * Frame trait names
      */
-    private final List<String> frameTraitNames = new ArrayList<>();
-    
-    /**
-     * Accesibility trait names
-     */
-    private final List<String> accessibilityTraitNames = new ArrayList<>();
+    private final List<String> frameTraitNames = new ArrayList<>();  
 
     /**
      * Deletes this trait.
@@ -285,8 +280,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
             //"/*classInitializer*/";
         }
 
+        List<String> ignoredInstanceVariableNames = new ArrayList<>();
+        if (convertData.ignoreAccessibility) {
+            ignoredInstanceVariableNames.add("__setAccDict");
+            ignoredInstanceVariableNames.add("__setTabDict");
+            ignoredInstanceVariableNames.add("__lastFrameAcc");
+            ignoredInstanceVariableNames.add("__lastFrameTab");
+        }
+        
         //instance variables
-        instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, ignoredInstanceVariableNames, isInterface);
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
@@ -327,8 +330,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (convertData.ignoreFrameScripts) {
             ignoredInstanceTraitNames.addAll(frameTraitNames);         
         }
-        if (convertData.ignoreAccessibility) {
-            ignoredInstanceTraitNames.addAll(accessibilityTraitNames);
+        if (convertData.ignoreAccessibility) {            
+            for (Trait t : instanceInfo.instance_traits.traits) {
+                String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);                        ;
+                if (traitName.startsWith("__setAcc_")
+                        || traitName.startsWith("__setTab_")) {
+                    ignoredInstanceTraitNames.add(traitName);
+                }
+            }            
         }
         
         //instance methods
@@ -423,7 +432,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                             if (ti instanceof CallPropertyAVM2Item) {
                                 CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
                                 if (callProp.propertyName instanceof FullMultinameAVM2Item) {
-                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;                                    
                                     if ("addFrameScript".equals(propName.resolvedMultinameName)) {
                                         for (int i = 0; i < callProp.arguments.size(); i += 2) {
                                             if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
@@ -452,7 +461,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                             )
                                             && callProp.arguments.isEmpty()
                                             ) {
-                                        accessibilityTraitNames.add(propName.resolvedMultinameName);
+                                        //accessibilityTraitNames.add(propName.resolvedMultinameName);
                                         constructorBody.convertedItems.remove(j);
                                         j--;
                                     }
@@ -462,14 +471,47 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 }
                 
-                if (convertData.ignoreAccessibility && false /*WIP*/) {
+                if (convertData.ignoreAccessibility) {
                     if (constructorBody.convertedItems != null) {
                         for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
                             GraphTargetItem ti = constructorBody.convertedItems.get(j);
                             if (ti instanceof CallPropertyAVM2Item) {
                                 CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
+                                
                                 if (callProp.propertyName instanceof FullMultinameAVM2Item) {
                                     FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                    if ("addEventListener".equals(propName.resolvedMultinameName)) {
+                                        //addEventListener(Event.FRAME_CONSTRUCTED,this.__setAcc_handler,false,0,true);
+                                        if (callProp.arguments.size() != 5) {
+                                            continue;
+                                        }
+                                        if (!(callProp.arguments.get(0) instanceof GetPropertyAVM2Item)) {
+                                            continue;
+                                        }
+                                        GetPropertyAVM2Item gp = (GetPropertyAVM2Item) callProp.arguments.get(0);
+                                        if (!(gp.propertyName instanceof FullMultinameAVM2Item)) {
+                                            continue;
+                                        }
+                                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) gp.propertyName;
+                                        if (!"FRAME_CONSTRUCTED".equals(fm.resolvedMultinameName)) {
+                                            continue;
+                                        }
+                                        if (!(callProp.arguments.get(1) instanceof GetPropertyAVM2Item)) {
+                                            continue;
+                                        }
+                                        gp = (GetPropertyAVM2Item) callProp.arguments.get(1);
+                                        if (!(gp.propertyName instanceof FullMultinameAVM2Item)) {
+                                            continue;
+                                        }
+                                        fm = (FullMultinameAVM2Item) gp.propertyName;
+                                        if (!("__setAcc_handler".equals(fm.resolvedMultinameName)
+                                              || "__setTab_handler".equals(fm.resolvedMultinameName))) {
+                                            continue;
+                                        }
+                                        constructorBody.convertedItems.remove(j);
+                                        j--;
+                                    }
+                                
                                     if (
                                         propName.resolvedMultinameName != null
                                         && (
@@ -478,7 +520,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                         )
                                         && callProp.arguments.isEmpty()
                                         ) {
-                                        accessibilityTraitNames.add(propName.resolvedMultinameName);
+                                        //accessibilityTraitNames.add(propName.resolvedMultinameName);
                                         constructorBody.convertedItems.remove(j);
                                         j--;
                                     }
