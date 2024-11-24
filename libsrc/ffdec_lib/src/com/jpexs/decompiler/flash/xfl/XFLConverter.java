@@ -1298,11 +1298,11 @@ public class XFLConverter {
         writer.writeStartElement("DOMSymbolInstance", new String[]{"libraryItemName", getSymbolName(lastImportedId, characterNameMap, swf, tag)});
         if (name != null) {
             writer.writeAttribute("name", name);
-            Map<String, String> accesibilityMap = accessibility.getAttributes(name, frame + 1);
-            if (!accesibilityMap.isEmpty()) {
+            Map<String, String> accessibilityMap = accessibility.getAttributes(name, frame + 1);
+            if (!accessibilityMap.isEmpty()) {
                 writer.writeAttribute("hasAccessibleData", "true");
-                for (String acKey : accesibilityMap.keySet()) {
-                    writer.writeAttribute(acKey, accesibilityMap.get(acKey));
+                for (String acKey : accessibilityMap.keySet()) {
+                    writer.writeAttribute(acKey, accessibilityMap.get(acKey));
                 }
             }
         }
@@ -3156,9 +3156,9 @@ public class XFLConverter {
                                     if (traitBody.convertedItems.get(0) instanceof IfItem) {
                                         IfItem ifi = (IfItem) traitBody.convertedItems.get(0);
                                         if (ifi.expression instanceof OrItem) {
-                                            OrItem ori = (OrItem) ifi.expression;
-                                            if (ori.rightSide instanceof NeqAVM2Item) {
-                                                NeqAVM2Item neq = (NeqAVM2Item) ori.rightSide;
+                                            OrItem orItem = (OrItem) ifi.expression;
+                                            if (orItem.rightSide instanceof NeqAVM2Item) {
+                                                NeqAVM2Item neq = (NeqAVM2Item) orItem.rightSide;
                                                 if (neq.rightSide instanceof IntegerValueAVM2Item) {
                                                     IntegerValueAVM2Item iv = (IntegerValueAVM2Item) neq.rightSide;
                                                     int frame = (Integer) iv.getResult();
