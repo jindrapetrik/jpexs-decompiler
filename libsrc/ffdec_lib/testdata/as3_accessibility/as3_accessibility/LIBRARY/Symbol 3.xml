@@ -1,6 +1,6 @@
-<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 2" itemID="67420f0e-000006f2" lastModified="1732471545">
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 3" itemID="6742d77a-0000072c" lastModified="1732471547">
   <timeline>
-    <DOMTimeline name="Symbol 2">
+    <DOMTimeline name="Symbol 3">
       <layers>
         <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
           <frames>
@@ -9,7 +9,7 @@
                 <DOMShape>
                   <fills>
                     <FillStyle index="1">
-                      <SolidColor color="#FF0000"/>
+                      <SolidColor color="#0099FF"/>
                     </FillStyle>
                   </fills>
                   <strokes>
@@ -22,7 +22,7 @@
                     </StrokeStyle>
                   </strokes>
                   <edges>
-                    <Edge fillStyle1="1" strokeStyle="1" edges="!370 860S6[217 860 108 734!108 734[0 608 0 430!0 430[0 252 108 126!108 126[217 0 370 0!370 0[523 0 631 126!631 126[740 252 740 430!740 430[740 608 631 734!631 734[523 860 370 860"/>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!2040 1380S6|0 1380!0 1380|0 0!0 0|2040 0!2040 0|2040 1380"/>
                   </edges>
                 </DOMShape>
               </elements>
