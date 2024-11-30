@@ -88,6 +88,14 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private boolean active = false;
 
+    private static int totalInstances = 0;
+
+    private int instanceId = totalInstances++;
+
+    public int getInstanceId() {
+        return instanceId;
+    }
+
     private boolean getActiveFlag() {
         synchronized (playLock) {
             return active;
@@ -189,6 +197,8 @@ public class SoundTagPlayer implements MediaDisplay {
                 try {
                     playLoop();
                 } catch (LineUnavailableException ex) {
+                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
                     Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -376,6 +386,9 @@ public class SoundTagPlayer implements MediaDisplay {
                     firePlayingFinished();
 
                     if (getClosedFlag()) {
+                        sourceLine.drain();
+                        sourceLine.stop();
+                        sourceLine.close();
                         return;
                     }
                     synchronized (thread) {
@@ -400,6 +413,8 @@ public class SoundTagPlayer implements MediaDisplay {
                         Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+            } else {
+                firePlayingFinished();
             }
             break;
         }
@@ -453,6 +468,10 @@ public class SoundTagPlayer implements MediaDisplay {
     @Override
     public Zoom getZoom() {
         return null;
+    }
+
+    public SoundTag getTag() {
+        return tag;
     }
 
     @Override
