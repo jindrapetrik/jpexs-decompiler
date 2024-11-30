@@ -1701,9 +1701,11 @@ public class Timeline {
      */
     public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
         Frame fr = getFrame(frame);
-        sounds.addAll(fr.sounds);
-        soundClasses.addAll(fr.soundClasses);
-        soundInfos.addAll(fr.soundInfos);
+        if (time == 0) {
+            sounds.addAll(fr.sounds);
+            soundClasses.addAll(fr.soundClasses);
+            soundInfos.addAll(fr.soundInfos);
+        }
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
@@ -1724,7 +1726,7 @@ public class Timeline {
                             }
                         }
                     }
-                    ((Timelined) c).getTimeline().getSounds(dframe, time, mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
+                    ((Timelined) c).getTimeline().getSounds(dframe, 0, mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
                 }
             }
         }
@@ -1848,6 +1850,9 @@ public class Timeline {
             CharacterTag character = layer.getCharacter();
             if (character == null) {
                 continue;
+            }
+            if (!frameObj.sounds.isEmpty()) { //consider timelines with sound as not singleframe
+                return false;
             }
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;

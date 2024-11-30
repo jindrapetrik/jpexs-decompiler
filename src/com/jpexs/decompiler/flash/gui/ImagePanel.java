@@ -132,6 +132,9 @@ import org.pushingpixels.substance.api.SubstanceSkin;
  */
 public final class ImagePanel extends JPanel implements MediaDisplay {
 
+    
+    private static final int MAX_SOUND_CHANNELS = 8; //TODO: Maybe add to Advanced settings
+    
     private static final Logger logger = Logger.getLogger(ImagePanel.class.getName());
 
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
@@ -3689,7 +3692,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            if (!shownAgain && autoPlayed) {
+            if (autoPlayed) { //!shownAgain
                 if (!muted) {
                     List<Integer> sounds = new ArrayList<>();
                     List<String> soundClasses = new ArrayList<>();
@@ -3870,13 +3873,37 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void playSound(SoundTag st, SOUNDINFO soundInfo, Timer thisTimer) {
+        synchronized (ImagePanel.this) {
+            if (soundInfo.syncNoMultiple || soundInfo.syncStop) {
+                for (int s = soundPlayers.size() - 1; s >= 0; s--) {
+                    SoundTagPlayer sp = soundPlayers.get(s);
+                    if (sp.getTag() == st) {
+                        if (soundInfo.syncNoMultiple) {
+                            //already playing same sound, return
+                            return;
+                        }
+                        if (soundInfo.syncStop) {
+                            sp.stop();
+                        }
+                    }
+                }
+                
+                if (soundInfo.syncStop) {
+                    return;
+                }                
+            }
+            
+            if (soundPlayers.size() > MAX_SOUND_CHANNELS) {
+                return;
+            }            
+        }
         final SoundTagPlayer sp;
         try {
             int loopCount = 1;
             if (soundInfo != null && soundInfo.hasLoops) {
                 loopCount = Math.max(1, soundInfo.loopCount);
             }
-
+            
             sp = new SoundTagPlayer(soundInfo, st, loopCount, false, resample);
             sp.addEventListener(new MediaDisplayListener() {
                 @Override
@@ -4009,13 +4036,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
                         drawFrame(thisTimer, true);
-                        /*synchronized (ImagePanel.this) {
-                            thisTimer.cancel();
-                            if (timer == thisTimer) {
-                                timer = null;
-                            }
-                        }*/
-
+                        
                         fireMediaDisplayStateChanged();
                     } else {
                         //Time before drawing current frame

@@ -3,6 +3,7 @@
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
+          <DOMSoundItem name="19_20.wav" itemID="674b53d9-00000826" sourceExternalFilepath="./LIBRARY/19_20.wav" sourceLastImported="1732989848" externalFileSize="363600" href="19_20.wav" soundDataHRef="M 9 1732989871.dat" format="44kHz 16bit Stereo" sampleCount="90879"/>
           <DOMSoundItem name="203066__enjoypa__counting-from-1-to-20.mp3" itemID="63aa97da-00000200" sourceExternalFilepath="./LIBRARY/203066__enjoypa__counting-from-1-to-20.mp3" sourceLastImported="1672124292" externalFileSize="320619" href="203066__enjoypa__counting-from-1-to-20.mp3" soundDataHRef="M 4 1672124303.dat" format="44kHz 16bit Stereo" sampleCount="881280" exportFormat="1" exportBits="7" dataLength="319739" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="110160"/>
           <DOMSoundItem name="514508_gis-sweden_background-techno-loop131bpm_part.mp3" itemID="63aa96ed-000001f2" sourceExternalFilepath="Y:/sounds/sounds/LIBRARY/514508_gis-sweden_background-techno-loop131bpm_part.mp3" sourceLastImported="1672095296" externalFileSize="964275" href="514508_gis-sweden_background-techno-loop131bpm_part.mp3" soundDataHRef="M 3 1672066332.dat" format="44kHz 16bit Stereo" sampleCount="2626560" exportFormat="1" exportBits="7" dataLength="952947" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="328320"/>
           <DOMSoundItem name="four.wav" itemID="656a2b47-0000021d" sourceExternalFilepath="./LIBRARY/four.wav" sourceLastImported="1701452860" externalFileSize="70740" href="four.wav" soundDataHRef="M 8 1701456682.dat" format="44kHz 16bit Stereo" sampleCount="17664"/>
@@ -18,9 +19,10 @@
           <Include href="Symbol 1.xml" loadImmediate="false" itemID="63a9b1e8-000001df" lastModified="1672066786"/>
           <Include href="Symbol 2.xml" loadImmediate="false" itemID="63aa96f3-000001f4" lastModified="1672124690"/>
           <Include href="Symbol 3.xml" loadImmediate="false" itemID="656a2a12-00000207" lastModified="1701457078"/>
+          <Include href="Symbol 4.xml" loadImmediate="false" itemID="674b49dd-0000081e" lastModified="1732989887"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="14">
+          <DOMTimeline name="Scene 1" currentFrame="16">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -85,7 +87,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="16" keyMode="9728">
+                              <DOMFrame index="0" duration="17" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -349,19 +351,44 @@
                               </DOMFrame>
                               <DOMFrame index="15" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>Stop</characters>
+                                                       <characters>009 Stop</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="16" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>010 Sync</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Symbol 4" selected="true" centerPoint3DX="227.95" centerPoint3DY="165">
+                                             <matrix>
+                                                  <Matrix tx="128.95" ty="99"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="99" y="66"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -371,6 +398,15 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="2350918" publishTime="1732989691"/>
+          <PublishItem publishSize="2350795" publishTime="1732989464"/>
+          <PublishItem publishSize="2351941" publishTime="1732988997"/>
+          <PublishItem publishSize="2351946" publishTime="1732988949"/>
+          <PublishItem publishSize="2350796" publishTime="1732987972"/>
+          <PublishItem publishSize="2350799" publishTime="1732987952"/>
+          <PublishItem publishSize="2350796" publishTime="1732987887"/>
+          <PublishItem publishSize="2350640" publishTime="1732987816"/>
+          <PublishItem publishSize="2668301" publishTime="1732987673"/>
           <PublishItem publishSize="2349467" publishTime="1701459083"/>
           <PublishItem publishSize="2274335" publishTime="1701458989"/>
           <PublishItem publishSize="2349466" publishTime="1701457906"/>
@@ -382,14 +418,5 @@
           <PublishItem publishSize="2309682" publishTime="1672124695" publishDebug="true"/>
           <PublishItem publishSize="2309682" publishTime="1672124676" publishDebug="true"/>
           <PublishItem publishSize="2309682" publishTime="1672124659" publishDebug="true"/>
-          <PublishItem publishSize="2309682" publishTime="1672124621" publishDebug="true"/>
-          <PublishItem publishSize="2309634" publishTime="1672124607"/>
-          <PublishItem publishSize="2309677" publishTime="1672124588" publishDebug="true"/>
-          <PublishItem publishSize="2309679" publishTime="1672124562" publishDebug="true"/>
-          <PublishItem publishSize="2309681" publishTime="1672124532" publishDebug="true"/>
-          <PublishItem publishSize="2309658" publishTime="1672124466" publishDebug="true"/>
-          <PublishItem publishSize="2309608" publishTime="1672124456"/>
-          <PublishItem publishSize="2309671" publishTime="1672124395" publishDebug="true"/>
-          <PublishItem publishSize="2275411" publishTime="1672069975"/>
      </publishHistory>
 </DOMDocument>
