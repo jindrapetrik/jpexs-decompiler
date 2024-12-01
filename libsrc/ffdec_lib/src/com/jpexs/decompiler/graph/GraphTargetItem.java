@@ -131,6 +131,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * Line start item
      */
     public GraphSourceItem lineStartItem;
+    
+    /**
+     * ASM Position
+     */
+    protected int pos = 0;
 
     /**
      * Gets the line start item
@@ -362,8 +367,16 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      *
      * @return Position
      */
-    protected int getPos() {
-        return 0;
+    public int getPos() {
+        return pos;
+    }
+    
+    /**
+     * Sets position
+     * @param pos Position
+     */
+    public void setPos(int pos) {
+        this.pos = pos;
     }
 
     /**

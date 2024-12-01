@@ -45,11 +45,6 @@ public class UnresolvedConstantActionItem extends ActionItem implements SimpleVa
     public GraphTargetItem computedRegValue;
 
     /**
-     * Position
-     */
-    public final int pos;
-
-    /**
      * Index
      */
     private int index;
@@ -76,11 +71,7 @@ public class UnresolvedConstantActionItem extends ActionItem implements SimpleVa
         this.index = index;
         this.pos = instructionPos;
     }
-
-    @Override
-    protected int getPos() {
-        return pos;
-    }
+    
 
     @Override
     public boolean isVariableComputed() {

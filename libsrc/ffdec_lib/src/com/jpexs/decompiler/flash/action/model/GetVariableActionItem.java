@@ -109,7 +109,7 @@ public class GetVariableActionItem extends ActionItem {
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
             return stripQuotes(name, localData, writer);
-        } else {
+        } else {            
             writer.append("eval(");
             name.appendTry(writer, localData);
             return writer.append(")");

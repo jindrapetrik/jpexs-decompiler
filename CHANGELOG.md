@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2375] Added limit of simultaneously played sounds
+- AS1/2 - Push action hilighting, GetProperty, Call action hilighting
 
 ## [22.0.1] - 2024-11-20
 ### Added

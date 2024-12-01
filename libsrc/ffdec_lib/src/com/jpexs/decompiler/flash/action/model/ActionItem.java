@@ -96,7 +96,10 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
     protected GraphTextWriter stripQuotes(GraphTargetItem target, LocalData localData, GraphTextWriter writer) throws InterruptedException {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
-                return writer.append((String) ((DirectValueActionItem) target).value);
+                DirectValueActionItem dv = (DirectValueActionItem) target;
+
+                //dv.toStringNoQuotes(writer, localData);
+                return writer.append((String) dv.value);                
             }
         }
         if (target == null) {
