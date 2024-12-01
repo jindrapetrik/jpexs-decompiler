@@ -1199,6 +1199,7 @@ fntttf
 focalgradient
 focusrect
 folderopen
+folderscripts
 foldersounds
 foldersprites
 followsymlinks
