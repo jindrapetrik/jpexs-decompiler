@@ -768,7 +768,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void fireMediaDisplayStateChanged() {
-        for (MediaDisplayListener l : listeners) {
+        List<MediaDisplayListener> ls = new ArrayList<>(listeners);
+        for (MediaDisplayListener l : ls) {
             l.mediaDisplayStateChanged(this);
         }
     }
