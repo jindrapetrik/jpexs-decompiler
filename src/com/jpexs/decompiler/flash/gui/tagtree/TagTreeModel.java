@@ -55,10 +55,13 @@ import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -70,7 +73,7 @@ import javax.swing.tree.TreePath;
 public class TagTreeModel extends AbstractTagTreeModel {
 
     public static final String FOLDER_COOKIES = "cookies";
-    
+
     public static final String FOLDER_SHAPES = "shapes";
 
     public static final String FOLDER_MORPHSHAPES = "morphshapes";
@@ -98,6 +101,25 @@ public class TagTreeModel extends AbstractTagTreeModel {
     public static final String FOLDER_SCRIPTS = "scripts";
 
     public static final String FOLDER_SCENES = "scenes";
+
+    public static final List<String> FOLDERS_ORDER = Arrays.asList(
+            "header",
+            "cookies",
+            "shapes",
+            "morphshapes",
+            "sprites",
+            "texts",
+            "images",
+            "movies",
+            "sounds",
+            "buttons",
+            "fonts",
+            "binaryData",
+            "frames",
+            "scenes",
+            "others",
+            "scripts"
+    );
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 
@@ -282,7 +304,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
         }
-        
+
         List<TreeItem> cookies = new ArrayList<>();
         if (swf.getFile() != null) {
             List<File> solFiles = SharedObjectsStorage.getSolFilesForLocalFile(new File(swf.getFile()));
@@ -291,34 +313,69 @@ public class TagTreeModel extends AbstractTagTreeModel {
             }
         }
 
-        nodeList.add(new HeaderItem(swf, translate("node.header")));
-
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.cookies"), FOLDER_COOKIES, swf, cookies);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf, morphShapes);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.sprites"), FOLDER_SPRITES, swf, sprites);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.texts"), FOLDER_TEXTS, swf, texts);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.images"), FOLDER_IMAGES, swf, images);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.movies"), FOLDER_MOVIES, swf, movies);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.sounds"), FOLDER_SOUNDS, swf, sounds);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.buttons"), FOLDER_BUTTONS, swf, buttons);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.fonts"), FOLDER_FONTS, swf, fonts);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.binaryData"), FOLDER_BINARY_DATA, swf, binaryData);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.frames"), FOLDER_FRAMES, swf, frames);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.scenes"), FOLDER_SCENES, swf, scenes);
-        addFolderItem(nodeList, emptyFolders, true /*always add*/, translate("node.others"), FOLDER_OTHERS, swf, others);
-
         Map<Tag, TagScript> currentTagScriptCache = new HashMap<>();
-        if (swf.isAS3()) {
-            if (!swf.getAbcList().isEmpty()) {
-                nodeList.add(new ClassesListTreeModel(swf, Configuration.flattenASPackages.get()));
-            }
-        } else {
-            List<TreeItem> subNodes = swf.getFirstLevelASMNodes(currentTagScriptCache);
 
-            if (subNodes.size() > 0) {
-                TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);
-                nodeList.add(actionScriptNode);
+        for (String key : FOLDERS_ORDER) {
+            switch (key) {
+                case "header":
+                    nodeList.add(new HeaderItem(swf, translate("node.header")));
+                    break;
+                case "cookies":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.cookies"), FOLDER_COOKIES, swf, cookies);
+                    break;
+                case "shapes":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
+                    break;
+                case "morphshapes":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf, morphShapes);
+                    break;
+                case "sprites":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.sprites"), FOLDER_SPRITES, swf, sprites);
+                    break;
+                case "texts":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.texts"), FOLDER_TEXTS, swf, texts);
+                    break;
+                case "images":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.images"), FOLDER_IMAGES, swf, images);
+                    break;
+                case "movies":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.movies"), FOLDER_MOVIES, swf, movies);
+                    break;
+                case "sounds":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.sounds"), FOLDER_SOUNDS, swf, sounds);
+                    break;
+                case "buttons":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.buttons"), FOLDER_BUTTONS, swf, buttons);
+                    break;
+                case "fonts":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.fonts"), FOLDER_FONTS, swf, fonts);
+                    break;
+                case "binaryData":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.binaryData"), FOLDER_BINARY_DATA, swf, binaryData);
+                    break;
+                case "frames":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.frames"), FOLDER_FRAMES, swf, frames);
+                    break;
+                case "scenes":
+                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.scenes"), FOLDER_SCENES, swf, scenes);
+                    break;
+                case "others":
+                    addFolderItem(nodeList, emptyFolders, true /*always add*/, translate("node.others"), FOLDER_OTHERS, swf, others);
+                    break;
+                case "scripts":
+                    if (swf.isAS3()) {
+                        if (!swf.getAbcList().isEmpty()) {
+                            nodeList.add(new ClassesListTreeModel(swf, Configuration.flattenASPackages.get()));
+                        }
+                    } else {
+                        List<TreeItem> subNodes = swf.getFirstLevelASMNodes(currentTagScriptCache);
+
+                        if (subNodes.size() > 0) {
+                            TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);
+                            nodeList.add(actionScriptNode);
+                        }
+                    }
+                    break;
             }
         }
 
@@ -328,6 +385,31 @@ public class TagTreeModel extends AbstractTagTreeModel {
         swfInfo.mappedTags = mappedTags;
         swfInfo.tagScriptCache = currentTagScriptCache;
         swfInfos.put(swf, swfInfo);
+    }
+
+    public List<String> getAvailableFolders() {
+        Set<String> folderNames = new LinkedHashSet<>();
+        folderNames.add("header");
+        for (TagTreeSwfInfo swfInfo : swfInfos.values()) {
+            for (TreeItem item : swfInfo.folders) {
+                if (item instanceof FolderItem) {
+                    FolderItem f = (FolderItem) item;
+                    folderNames.add(f.getName());
+                }
+                if (item instanceof ClassesListTreeModel) {
+                    folderNames.add("scripts");
+                }
+            }
+        }
+        
+        List<String> ret = new ArrayList<>();
+        for (String f : FOLDERS_ORDER) {
+            if (folderNames.contains(f)) {
+                ret.add(f);
+            }
+        }
+        
+        return ret;
     }
 
     private void addFolderItem(List<TreeItem> nodeList, List<FolderItem> emptyList, boolean addAllFolders, String title, String folderName, SWF swf, List<TreeItem> items) {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
+import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -37,6 +38,8 @@ import javax.swing.tree.TreePath;
 public class FilteredTreeModel implements TreeModel {
 
     private String filter;
+    
+    private List<String> foldersFilter;
 
     private TreeItem root;
     private Map<TreeItem, List<TreeItem>> subItems = new WeakHashMap<>();
@@ -49,8 +52,13 @@ public class FilteredTreeModel implements TreeModel {
         return filter;
     }
 
-    public FilteredTreeModel(String filter, AbstractTagTreeModel fullModel, JTree tree) {
+    public List<String> getFoldersFilter() {
+        return foldersFilter;
+    }
+        
+    public FilteredTreeModel(String filter, List<String> foldersFilter, AbstractTagTreeModel fullModel, JTree tree) {
         this.filter = filter;
+        this.foldersFilter = foldersFilter;
         this.tree = tree;
 
         fullModel.addTreeModelListener(new TreeModelListener() {
@@ -114,13 +122,34 @@ public class FilteredTreeModel implements TreeModel {
     private void buildTree(AbstractTagTreeModel fullModel, TreeItem item, String path, String searchPath, List<String> selectionPaths) {
         List<? extends TreeItem> items = fullModel.getAllChildren(item);
         List<TreeItem> newSubItems = new ArrayList<>();
-        if (filter.trim().isEmpty()) {
+        if (filter.trim().isEmpty() && foldersFilter.isEmpty()) {
             newSubItems.addAll(items);
         } else {
             for (TreeItem ti : items) {
                 String subPath = path + "." + ti.toString();
                 String searchSubPath = isItemSearchable(ti) ? searchPath + "." + ti.toString() : searchPath;
                 boolean matches = searchSubPath.toLowerCase().contains(filter.toLowerCase());
+                
+                if (!foldersFilter.isEmpty()) {                
+                    if (ti instanceof ClassesListTreeModel) {
+                        if (!foldersFilter.contains("scripts")) {
+                            continue;
+                        }
+                    }
+                    if (ti instanceof FolderItem) {
+                        FolderItem f = (FolderItem) ti;
+                        if (!foldersFilter.contains(f.getName())) {
+                            continue;
+                        }
+                    }
+                    if (ti instanceof HeaderItem) {
+                        HeaderItem h = (HeaderItem) ti;
+                        if (!foldersFilter.contains("header")) {
+                            continue;
+                        }
+                    }
+                }
+                
                 if (fullModel.isLeaf(ti)) {
                     if (matches || selectionPaths.contains(subPath)) {
                         newSubItems.add(ti);

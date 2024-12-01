@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - FLA export - accessibility for AS3 files
 - [#2375] Sound sync event/start/stop handling (for playback in FFDec)
+- [#2374] Quick filter by folder type (Ctrl+F on Resources view tag tree)
 
 ### Fixed
 - [#2375] Added limit of simultaneously played sounds
@@ -3677,6 +3678,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
+[#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2366]: https://www.free-decompiler.com/flash/issues/2366
 [#2367]: https://www.free-decompiler.com/flash/issues/2367
 [#2372]: https://www.free-decompiler.com/flash/issues/2372

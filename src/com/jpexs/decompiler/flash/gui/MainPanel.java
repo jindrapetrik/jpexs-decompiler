@@ -405,7 +405,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final JTabbedPane detailPanel;
 
-    private QuickTreeFindPanel quickTreeFindPanel;
+    private QuickTreeFilterPanel quickTreeFindPanel;
 
     private QuickTreeFindPanel quickTagListFindPanel;
 
@@ -1827,7 +1827,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         mainMenu.updateComponents(null);
         previewPanel.clear();
-        dumpPreviewPanel.clear();
+        dumpPreviewPanel.clear();   
+        doFilter();
         return true;
     }
 
@@ -1883,30 +1884,37 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return filter.trim().length() < 3;
     }
 
-    private void doFilter(AbstractTagTree tree, QuickTreeFindPanel findPanel, List<List<String>> unfilteredExpandedNodes) {
+    private void doFilter(AbstractTagTree tree, QuickTreeFilterInterface findPanel, List<List<String>> unfilteredExpandedNodes) {
         TreeModel model = tree.getModel();
         String oldFilter = "";
+        List<String> oldFoldersFilter = new ArrayList<>();
         if (model instanceof FilteredTreeModel) {
             oldFilter = ((FilteredTreeModel) model).getFilter();
+            oldFoldersFilter = ((FilteredTreeModel) model).getFoldersFilter();
         }
         String newFilter = findPanel.getFilter();
+        List<String> newFoldersFilter = findPanel.getFolders();
 
-        if (isFilterEmpty(oldFilter)) {
-            unfilteredExpandedNodes.clear();
-            ;
+        if (isFilterEmpty(oldFilter) && oldFoldersFilter.isEmpty()) {
+            unfilteredExpandedNodes.clear();          
             unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree));
         }
 
-        if (oldFilter.trim().equals(newFilter.trim())) {
+        if (
+                oldFilter.trim().equals(newFilter.trim())
+                && oldFoldersFilter.equals(newFoldersFilter)
+                ) {
             return;
         }
 
         TreePath[] selectionPaths = tree.getSelectionPaths();
-        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel(), tree));
+        tree.setModel(new FilteredTreeModel(newFilter, newFoldersFilter, tree.getFullModel(), tree));
         if (!isFilterEmpty(newFilter)) {
             for (int i = 0; i < tree.getRowCount(); i++) {
                 tree.expandRow(i);
             }
+        } else if (!newFoldersFilter.isEmpty()) {
+            View.expandTreeNodes(tree, unfilteredExpandedNodes);
         } else {
             tree.setModel(tree.getFullModel());
             View.expandTreeNodes(tree, unfilteredExpandedNodes);
@@ -1916,6 +1924,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void doFilter() {
         View.checkAccess();
+        quickTreeFindPanel.updateFolders();
         doFilter(tagTree, quickTreeFindPanel, unfilteredTreeExpandedNodes);
         doFilter(tagListTree, quickTagListFindPanel, unfilteredTagListExpandedNodes);
     }
@@ -5647,7 +5656,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         JPanel r = new JPanel(new BorderLayout());
         r.add(resourcesClipboardPanel, BorderLayout.NORTH);
         r.add(tagTreeScrollPanel = new FasterScrollPane(tagTree), BorderLayout.CENTER);
-        quickTreeFindPanel = new QuickTreeFindPanel();
+        quickTreeFindPanel = new QuickTreeFilterPanel(tagTree);
         quickTreeFindPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -33,7 +33,7 @@ import javax.swing.event.DocumentListener;
 /**
  * @author JPEXS
  */
-public class QuickTreeFindPanel extends JPanel {
+public class QuickTreeFindPanel extends JPanel implements QuickTreeFilterInterface {
 
     private List<ActionListener> listeners = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class QuickTreeFindPanel extends JPanel {
             }
         });
 
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(4, 0));
         add(filterField, BorderLayout.CENTER);
         add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
         JLabel closeSearchButton = new JLabel(View.getIcon("cancel16"));
@@ -107,4 +107,8 @@ public class QuickTreeFindPanel extends JPanel {
         }
     }
 
+    @Override
+    public List<String> getFolders() {
+        return new ArrayList<>();
+    }    
 }
