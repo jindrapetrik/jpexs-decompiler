@@ -4266,8 +4266,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);
                 }
-                if (pu.replacement.get(it.getKey().pos) instanceof ConstantIndex) {
-                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(it.getKey().pos);
+                if (pu.replacement.get(it.getKey().getPos()) instanceof ConstantIndex) {
+                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(it.getKey().getPos());
                     ConstantPool pool = it.getValue();
                     if (pool == null) {
                         continue;
@@ -4286,7 +4286,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         }
                     }
                 } else {
-                    pu.replacement.set(it.getKey().pos, changed);
+                    pu.replacement.set(it.getKey().getPos(), changed);
                 }
                 ret++;
             }

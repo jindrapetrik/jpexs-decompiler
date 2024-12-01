@@ -417,7 +417,7 @@ public class ActionPush extends Action {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
-            writer.append(toString(i), getAddress() + i + 1, getFileOffset());
+            writer.append(toString(i), getAddress() + i, getFileOffset());
         }
         return writer;
     }
@@ -489,47 +489,51 @@ public class ActionPush extends Action {
     public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
+            GraphTargetItem toPush = null;
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    stack.push(new UnresolvedConstantActionItem(((ConstantIndex) o).index));
-                    continue;
+                    toPush = new UnresolvedConstantActionItem(((ConstantIndex) o).index);
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
             }
-            if (o instanceof Boolean) {
-                Boolean b = (Boolean) o;
-                if (b) {
-                    stack.push(new TrueItem(this, lineStartAction));
-                } else {
-                    stack.push(new FalseItem(this, lineStartAction));
-                }
-            } else {
-                DirectValueActionItem dvt = new DirectValueActionItem(this, lineStartAction, pos, o, constantPool);
-
-                if (o instanceof RegisterNumber) { //TemporaryRegister
-                    dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
-                    if (regNames.containsKey(((RegisterNumber) o).number)) {
-                        ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
+            if (toPush == null) {
+                if (o instanceof Boolean) {
+                    Boolean b = (Boolean) o;
+                    if (b) {
+                        toPush = new TrueItem(this, lineStartAction);
+                    } else {
+                        toPush = new FalseItem(this, lineStartAction);
                     }
-                }
-                if (dvt.computedRegValue instanceof TemporaryRegister) {
-                    ((TemporaryRegister) dvt.computedRegValue).used = true;
-                    for (int i = 0; i < output.size(); i++) {
-                        if (output.get(i) instanceof TemporaryRegisterMark) {
-                            TemporaryRegisterMark trm = (TemporaryRegisterMark) output.get(i);
-                            if (trm.tempReg == dvt.computedRegValue) {
-                                output.remove(i);
-                                break;
-                            }
+                } else {
+                    DirectValueActionItem dvt = new DirectValueActionItem(this, lineStartAction, pos, o, constantPool);
+
+                    if (o instanceof RegisterNumber) { //TemporaryRegister
+                        dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
+                        if (regNames.containsKey(((RegisterNumber) o).number)) {
+                            ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
                         }
                     }
-                    stack.push(new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value));
-                } else {
-                    stack.push(dvt);
+                    if (dvt.computedRegValue instanceof TemporaryRegister) {
+                        ((TemporaryRegister) dvt.computedRegValue).used = true;
+                        for (int i = 0; i < output.size(); i++) {
+                            if (output.get(i) instanceof TemporaryRegisterMark) {
+                                TemporaryRegisterMark trm = (TemporaryRegisterMark) output.get(i);
+                                if (trm.tempReg == dvt.computedRegValue) {
+                                    output.remove(i);
+                                    break;
+                                }
+                            }
+                        }
+                        toPush = new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value);
+                    } else {
+                        toPush = dvt;
+                    }
                 }
             }
-            pos++;
+            toPush.setPos(pos);
+            stack.push(toPush);
+            pos++;            
         }
     }
 

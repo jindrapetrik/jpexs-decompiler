@@ -50,7 +50,7 @@ public class CallActionItem extends ActionItem {
         writer.append("call");
         writer.spaceBeforeCallParenthesis(1);
         writer.append("(");
-        value.appendTo(writer, localData);
+        value.toString(writer, localData);
         return writer.append(")");
     }
 

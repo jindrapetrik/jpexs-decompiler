@@ -61,10 +61,6 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
      */
     public GraphTargetItem computedRegValue;
 
-    /**
-     * Position.
-     */
-    public final int pos;
 
     /**
      * Constructor.
@@ -89,11 +85,6 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         this.constants = constants;
         this.value = value;
         this.pos = instructionPos;
-    }
-
-    @Override
-    protected int getPos() {
-        return pos;
     }
 
     @Override
@@ -224,7 +215,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             HighlightData srcData = getSrcData();
             srcData.localName = ((RegisterNumber) value).translate();
             srcData.regIndex = ((RegisterNumber) value).number;
-
+            
             return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate()), srcData);
         }
         return writer.append(EcmaScript.toString(value));
