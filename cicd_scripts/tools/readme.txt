@@ -1,1 +1,0 @@
-These archives are tools needed for successful CICD build on GitHub.
