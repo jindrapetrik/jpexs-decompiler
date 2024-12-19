@@ -8,24 +8,13 @@ apt-get install -y curl
 
 tools_dir=$CICD_TEMP/tools
 
-if [ ! -f "$tools_dir/cached.txt" ]; then        
-    # create directory where tools will be downloaded and installed
-    mkdir -p $tools_dir
-
-    echo "cached">$tools_dir/cached.txt  
-
-    #Extract launch4j - tool for creating EXE file from Java
-    cp ./cicd_scripts/tools/launch4j-3.14-linux-x64.tgz ./
-    tar zxvf launch4j-3.14-linux-x64.tgz -C "$tools_dir" >/dev/null     
-fi
-
 #Create tools.properties with paths to NSIS and launch4j
 
 MAKENSIS_FULLPATH=`which makensis`
 MAKENSIS_PATH=`dirname "$MAKENSIS_FULLPATH"`
 
 echo "nsis.path = $MAKENSIS_PATH" > tools.properties
-echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
+echo "launch4j.path = -" >> tools.properties
 
 cat tools.properties
 
