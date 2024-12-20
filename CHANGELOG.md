@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2375] Added limit of simultaneously played sounds
 - AS1/2 - Push action hilighting, GetProperty, Call action hilighting
+- [#2381] Font color values with alpha allowed in html edittext, but alpha ignored
 
 ## [22.0.1] - 2024-11-20
 ### Added
@@ -3680,6 +3681,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
+[#2381]: https://www.free-decompiler.com/flash/issues/2381
 [#2366]: https://www.free-decompiler.com/flash/issues/2366
 [#2367]: https://www.free-decompiler.com/flash/issues/2367
 [#2372]: https://www.free-decompiler.com/flash/issues/2372

@@ -436,7 +436,17 @@ public class DefineEditTextTag extends TextTag {
                                 String color = unescape(attributes.getValue("color"));
                                 if (color != null) {
                                     if (color.startsWith("#")) {
-                                        style.textColor = new RGBA(Color.decode(color));
+                                        try {
+                                            if (color.length() == 7) { //#rrggbb
+                                                style.textColor = new RGBA(Color.decode(color));
+                                            } else if (color.length() == 9) { //#aarrggbb                                            
+                                                style.textColor = RGBA.fromHexARGB(color);
+                                                style.textColor.alpha = 255; //no alpha is allowed
+                                            }
+                                        } catch (NumberFormatException ex) {
+                                            //do not change textColor
+                                        }
+                                        
                                     }
                                 }
                                 String size = unescape(attributes.getValue("size"));
