@@ -6393,8 +6393,14 @@ public class XFLConverter {
                     }
                     String c = attributes.getValue("color");
                     if (c != null) {
-                        color = c;
-                        colorAlpha = 255;
+                        if (c.matches("^#[0-9a-fA-F]{8}$")) {
+                            color = "#" + c.substring(3);
+                        } else if (c.matches("^#[0-9a-fA-F]{6}$")) {
+                            color = c;
+                            colorAlpha = 255;
+                        } else {
+                            //wrong format, do not change color
+                        }
                     }
                     String f = attributes.getValue("face");
                     if (f != null) {

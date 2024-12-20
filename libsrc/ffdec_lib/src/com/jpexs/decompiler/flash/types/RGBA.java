@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 32-bit red, green, blue and alpha value.
@@ -47,9 +49,9 @@ public class RGBA extends RGB implements Serializable {
      * @return Hex string in format #AARRGGBB
      */
     public String toHexARGB() {
-        String ra = Integer.toHexString(alpha);
-        if (ra.length() < 2) {
-            ra = "0" + ra;
+        String ah = Integer.toHexString(alpha);
+        if (ah.length() < 2) {
+            ah = "0" + ah;
         }
         String rh = Integer.toHexString(red);
         if (rh.length() < 2) {
@@ -63,7 +65,7 @@ public class RGBA extends RGB implements Serializable {
         if (bh.length() < 2) {
             bh = "0" + bh;
         }
-        return "#" + ra + rh + gh + bh;
+        return "#" + ah + rh + gh + bh;
     }
 
     /**
@@ -107,6 +109,25 @@ public class RGBA extends RGB implements Serializable {
         } else {
             alpha = 255;
         }
+    }
+    
+    /**
+     * Converts hex ARGB to RGBA color
+     * @param hex Hex color in format #aarrggbb
+     * @return RGBA color
+     */
+    public static RGBA fromHexARGB(String hex) {
+        Pattern hexPat = Pattern.compile("^#(?<a>[0-9a-fA-F]{2})(?<r>[0-9a-fA-F]{2})(?<g>[0-9a-fA-F]{2})(?<b>[0-9a-fA-F]{2})$");
+        Matcher m = hexPat.matcher(hex);
+        if (!m.matches()) {
+            throw new NumberFormatException("Not a valid color code with alpha");
+        }
+        int a = Integer.parseInt(m.group("a"), 16);
+        int r = Integer.parseInt(m.group("r"), 16);
+        int g = Integer.parseInt(m.group("g"), 16);
+        int b = Integer.parseInt(m.group("b"), 16);
+        
+        return new RGBA(r, g, b, a);
     }
 
     /**
