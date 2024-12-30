@@ -1734,6 +1734,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             if (oldSp != null) {
                 hilightScript(localAbc.getOpenable(), oldSp, scriptNode);
+                TreeItem sel = mainPanel.getCurrentTree().getCurrentTreeItem();
+                if ((sel instanceof ScriptPack) && (sel != pack)) {
+                    mainPanel.replaceItemPin(pack, sel);
+                }
             }
             reload();
             mainPanel.clearEditingStatus();
