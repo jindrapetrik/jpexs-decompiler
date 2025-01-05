@@ -63,7 +63,6 @@ addexport
 addfunction
 additionalmodules
 additionalparam
-addplugindir
 addproperty
 addressproperty
 addrfix
@@ -176,7 +175,7 @@ asv
 ata
 atags
 Atclause
-atext
+AText
 ati
 atleast
 atmax
@@ -196,7 +195,6 @@ audiosamplesize
 auds
 aufgerufen
 aufruft
-aurl
 Authenticode
 autoboxing
 Autobuild
@@ -863,7 +861,6 @@ doubletype
 Doubrovkine
 dowhile
 downloadnow
-downloadsuccessful
 downmix
 downmixing
 DOWNRESULT
@@ -1446,7 +1443,6 @@ hiliter
 hinst
 HITTEST
 HIWORD
-HKCR
 HKCU
 HKEYBy
 HKLM
@@ -1511,7 +1507,6 @@ icns
 icoimage
 iconifying
 iconinfo
-ICONSTOP
 ict
 icting
 ictx
@@ -1521,8 +1516,6 @@ Iddle
 IDecoder
 idelay
 identifierdeobfuscation
-IDIGNORE
-IDRETRY
 idscan
 Idtags
 IDTYPE
@@ -1606,7 +1599,6 @@ includeemptydirs
 includesfile
 Indexnumber
 ine
-inetc
 inexpr
 infinally
 infoflags
@@ -1659,7 +1651,6 @@ insv
 intag
 intbias
 intbiasshift
-intcmp
 Intelli
 intellij
 interdomain
@@ -1737,7 +1728,6 @@ javac
 Javactive
 javactivex
 javagl
-Javahome
 javalayer
 javaresource
 javascriptsyntaxkit
@@ -1755,7 +1745,6 @@ JCommand
 jctb
 JDKs
 JDOC
-jdone
 jdwp
 Jef
 Jelliffe
@@ -1776,7 +1765,6 @@ jlayer
 jlc
 jletter
 jletterdigit
-jloop
 jlp
 jmf
 jmods
@@ -1793,8 +1781,6 @@ JPGA
 JPGB
 JPGC
 JPGD
-jpghtml
-jpos
 jpproxy
 jpt
 jrb
@@ -1820,7 +1806,6 @@ JTrackable
 JTri
 jtt
 jttdata
-jtxt
 junindent
 JUunit
 JVER
@@ -3195,7 +3180,7 @@ setsuper
 settarget
 SETUPAPI
 SETUPFILE
-setupfinished
+SETUPFINISHED
 SETUPOUTCOME
 setvariable
 setzen
@@ -3524,7 +3509,6 @@ techsmith
 tellcmds
 tellist
 telltarget
-telse
 tempdatastream
 temporaire
 temporaryreg
@@ -3573,7 +3557,6 @@ TGet
 Tgl
 TGoto
 TGUID
-tgz
 thebuffer
 thel
 thepic
@@ -3798,8 +3781,6 @@ UPDATEREQUIRED
 upgrademodulepath
 upravit
 URIEx
-urlcheckfailed
-urlgetsuccessfull
 urshift
 URSHIFTEQ
 usb
