@@ -22,21 +22,8 @@ Unicode true
 
 !define APP_EXENAME "ffdec.exe"
 
-;!addplugindir "nsis_plugins\ansi\"
-;!addplugindir "nsis_plugins\unicode\"
-
-
 SetCompressor /SOLID lzma
 !include "StrFunc.nsh"
-;!include "nsis_plugins\JREDyna_Inetc.nsh"
-
-;Old not working
-;!define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
-
-;Not working too since 2021
-;!define FLASH_URL "http://fpdownload.macromedia.com/pub/flashplayer/latest/help/install_flash_player_ax.exe"
-
-;!include "nsis_plugins\Flash_Inetc.nsh"
 !include x64.nsh
 
 
