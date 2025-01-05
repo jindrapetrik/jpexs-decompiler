@@ -112,6 +112,7 @@ public class ZippedBundle implements Bundle {
 
         while ((entry = zip.getNextEntry()) != null) {
             if (entry.getName().toLowerCase().endsWith(".swf")
+                    || entry.getName().toLowerCase().endsWith(".spl")
                     || entry.getName().toLowerCase().endsWith(".gfx")
                     || entry.getName().toLowerCase().endsWith(".abc")) {
                 keySet.add(entry.getName());

@@ -81,7 +81,7 @@ public class ContextMenuTools {
     }
 
     private static boolean addToContextMenu(boolean add, boolean fromCommandLine, String exeName) {
-        final String[] extensions = new String[]{"swf", "gfx"};
+        final String[] extensions = new String[]{"swf", "spl", "gfx"};
 
         final WinReg.HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
         final String REG_CLASSES_PATH = "Software\\Classes\\";

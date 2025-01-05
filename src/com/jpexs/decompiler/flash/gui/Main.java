@@ -1320,7 +1320,7 @@ public class Main {
                                             JFileChooser fc = new JFileChooser();
                                             fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                                             FileFilter allSupportedFilter = new FileFilter() {
-                                                private final String[] supportedExtensions = new String[]{".swf", ".gfx"};
+                                                private final String[] supportedExtensions = new String[]{".swf", ".spl", ".gfx"};
 
                                                 @Override
                                                 public boolean accept(File f) {
@@ -1343,12 +1343,14 @@ public class Main {
                                             FileFilter swfFilter = new FileFilter() {
                                                 @Override
                                                 public boolean accept(File f) {
-                                                    return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
+                                                    return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
+                                                            || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))                                                           
+                                                            || (f.isDirectory());
                                                 }
 
                                                 @Override
                                                 public String getDescription() {
-                                                    return AppStrings.translate("filter.swf");
+                                                    return AppStrings.translate("filter.swf_spl");
                                                 }
                                             };
                                             fc.addChoosableFileFilter(swfFilter);
@@ -2149,12 +2151,14 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) 
+                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl")) 
+                        || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter.swf");
+                return AppStrings.translate("filter.swf_spl");
             }
         };
 
@@ -2273,7 +2277,8 @@ public class Main {
             try {
                 String fileName = file.getAbsolutePath();
                 if (selFilter == swfFilter) {
-                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)
+                            && !fileName.toLowerCase(Locale.ENGLISH).endsWith(".spl")) {
                         fileName += extension;
                     }
                     ((SWF) openable).gfx = false;
@@ -2368,7 +2373,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy", ".abc"};
+            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".gfx", ".swc", ".zip", ".iggy", ".abc"};
 
             @Override
             public boolean accept(File f) {
@@ -2391,12 +2396,14 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) 
+                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl")) 
+                        || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter.swf");
+                return AppStrings.translate("filter.swf_spl");
             }
         };
         fc.addChoosableFileFilter(swfFilter);
