@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2375] Added limit of simultaneously played sounds
 - AS1/2 - Push action hilighting, GetProperty, Call action hilighting
 - [#2381] Font color values with alpha allowed in html edittext, but alpha ignored
-- [#2384] Vanishing pins on AS3 code editing save
+- [#2384] Vanishing pins on AS3 code editing save, on script deletion and few other cases
 
 ## [22.0.1] - 2024-11-20
 ### Added

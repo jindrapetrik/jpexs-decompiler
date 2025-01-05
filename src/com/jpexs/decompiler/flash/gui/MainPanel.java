@@ -500,6 +500,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void replaceItemPin(TreeItem oldItem, TreeItem newItem) {
         pinsPanel.replaceItem(oldItem, newItem);
     }
+    
+    public void refreshPinnedScriptPacks() {
+        pinsPanel.refreshScriptPacks();
+    }
 
     private void handleKeyReleased(KeyEvent e) {
         if (checkEdited()) {
@@ -1878,6 +1882,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (tp != null) {
             getCurrentTree().setSelectionPath(tp);
         }
+        refreshPinnedScriptPacks();
     }
 
     private boolean isFilterEmpty(String filter) {
