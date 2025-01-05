@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
 import com.jpexs.decompiler.flash.timeline.TagScript;
@@ -25,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -446,6 +448,22 @@ public class PinsPanel extends JPanel {
         }
         if (currentUnpinnedButton != null) {
             currentUnpinnedButton.refresh();
+        }
+    }
+    
+    public void refreshScriptPacks() {
+        for (int b = 0; b < buttons.size(); b++) {
+            PinButton button = buttons.get(b);
+            if (button.getItem() instanceof ScriptPack) {
+                ScriptPack sp = (ScriptPack) button.getItem();                
+                List<ScriptPack> packs = sp.abc.getScriptPacks(null, sp.allABCs);
+                for (ScriptPack sp2 : packs) {
+                    if (Objects.equals(sp.getClassPath(), sp2.getClassPath())) {
+                        replaceItem(sp, sp2);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

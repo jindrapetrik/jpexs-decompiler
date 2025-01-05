@@ -1737,7 +1737,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 TreeItem sel = mainPanel.getCurrentTree().getCurrentTreeItem();
                 if ((sel instanceof ScriptPack) && (sel != pack)) {
                     mainPanel.replaceItemPin(pack, sel);
-                }
+                }               
             }
             reload();
             mainPanel.clearEditingStatus();
