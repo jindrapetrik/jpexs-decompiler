@@ -201,7 +201,16 @@ public class OpenableSourceInfo {
                 return false;
             }
             String extension = Path.getExtension(fileObj);
-            return (detectBundle) && (extension == null || !(extension.equals(".swf") || extension.equals(".gfx") || extension.equals(".abc")));
+            return detectBundle 
+                    && (
+                        extension == null 
+                        || !(
+                            extension.equals(".swf")
+                            || extension.equals(".spl")
+                            || extension.equals(".gfx") 
+                            || extension.equals(".abc")
+                            )
+                    );
         }
         return false;
     }

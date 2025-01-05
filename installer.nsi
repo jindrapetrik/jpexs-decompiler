@@ -680,12 +680,16 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     SetRegView 64
     Push "swf"
     Call AddToExtContextMenu
+    Push "spl"
+    Call AddToExtContextMenu
     Push "gfx"
     Call AddToExtContextMenu
     
     SetRegView 32
     Push "swf"
     Call AddToExtContextMenu
+    Push "spl"
+    Call AddToExtContextMenu    
     Push "gfx"
     Call AddToExtContextMenu
 
@@ -751,11 +755,15 @@ Section "Uninstall"
   SetRegView 64
   Push "swf"
   Call un.RemoveExtContextMenu
+  Push "spl"
+  Call un.RemoveExtContextMenu
   Push "gfx"
   Call un.RemoveExtContextMenu
   
   SetRegView 32
   Push "swf"
+  Call un.RemoveExtContextMenu
+  Push "spl"
   Call un.RemoveExtContextMenu
   Push "gfx"
   Call un.RemoveExtContextMenu
