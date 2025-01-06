@@ -441,15 +441,6 @@ public class PinsPanel extends JPanel {
             }
         }
     }
-
-    public void refresh() {
-        for (PinButton button : buttons) {
-            button.refresh();
-        }
-        if (currentUnpinnedButton != null) {
-            currentUnpinnedButton.refresh();
-        }
-    }
     
     public void refreshScriptPacks() {
         for (int b = 0; b < buttons.size(); b++) {
