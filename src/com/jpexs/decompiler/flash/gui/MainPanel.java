@@ -470,7 +470,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void refreshPins() {
-        pinsPanel.refresh();
+        pinsPanel.load();
     }
 
     public void destroyPins() {
@@ -4796,7 +4796,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         reload(true);
-        pinsPanel.refresh();
+        refreshPins();
     }
 
     public void refreshTree() {
@@ -4825,7 +4825,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         reload(true);
         updateMissingNeededCharacters();
-        pinsPanel.refresh();
+        refreshPins();
         updateUiWithCurrentOpenable();
     }
 
