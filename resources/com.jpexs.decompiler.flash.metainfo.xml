@@ -65,6 +65,27 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="22.0.2" date="2025-01-17">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>FLA export - accessibility for AS3 files</li>
+					<li>#2375 Sound sync event/start/stop handling (for playback in FFDec)</li>
+					<li>#2374 Quick filter by folder type (Ctrl+F on Resources view tag tree)</li>
+					<li>#2389 Support for SPL file extension (Flash version 1 - Future Splash Animator)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2375 Added limit of simultaneously played sounds</li>
+					<li>AS1/2 - Push action hilighting, GetProperty, Call action hilighting</li>
+					<li>#2381 Font color values with alpha allowed in html edittext, but alpha ignored</li>
+					<li>#2384 Vanishing pins on AS3 code editing save, on script deletion and few other cases</li>
+					<li>#2394 Broken AS1/2 deobfuscation on incorrect length of ActionStrictMode,</li>
+					<li>#2394 AS1/2 ActionStrictMode with mode larger than 1 now ignored</li>
+					<li>#2393 AS1/2 ActionGotoFrame2 P-code trailing comma</li>
+				</ul>
+			</description>
+		</release>
 		<release version="22.0.1" date="2024-11-20">
 			<description>
 				<p>Added</p>
