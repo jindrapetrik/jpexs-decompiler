@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [22.0.2] - 2025-01-17
 ### Added
 - FLA export - accessibility for AS3 files
@@ -3517,6 +3519,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.2...dev
 [22.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.1...version22.0.2
 [22.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.0...version22.0.1
 [22.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...version22.0.0
