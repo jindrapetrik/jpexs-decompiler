@@ -13,8 +13,9 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - Push action hilighting, GetProperty, Call action hilighting
 - [#2381] Font color values with alpha allowed in html edittext, but alpha ignored
 - [#2384] Vanishing pins on AS3 code editing save, on script deletion and few other cases
-- [#2394] Broken deobfuscation on incorrect length of ActionStrictMode,
-- [#2394] ActionStrictMode with mode larger than 1 now ignored
+- [#2394] Broken AS1/2 deobfuscation on incorrect length of ActionStrictMode,
+- [#2394] AS1/2 ActionStrictMode with mode larger than 1 now ignored
+- [#2393] AS1/2 ActionGotoFrame2 P-code trailing comma
 
 ## [22.0.1] - 2024-11-20
 ### Added
@@ -3689,6 +3690,7 @@ Major version of SWF to XML export changed to 2.
 [#2381]: https://www.free-decompiler.com/flash/issues/2381
 [#2384]: https://www.free-decompiler.com/flash/issues/2384
 [#2394]: https://www.free-decompiler.com/flash/issues/2394
+[#2393]: https://www.free-decompiler.com/flash/issues/2393
 [#2366]: https://www.free-decompiler.com/flash/issues/2366
 [#2367]: https://www.free-decompiler.com/flash/issues/2367
 [#2372]: https://www.free-decompiler.com/flash/issues/2372

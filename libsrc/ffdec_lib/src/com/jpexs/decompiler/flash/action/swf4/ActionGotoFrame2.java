@@ -121,7 +121,7 @@ public class ActionGotoFrame2 extends Action {
 
     @Override
     public String toString() {
-        return "GotoFrame2 " + sceneBiasFlag + ", " + playFlag + ", " + (sceneBiasFlag ? ", " + sceneBias : "");
+        return "GotoFrame2 " + sceneBiasFlag + ", " + playFlag + (sceneBiasFlag ? ", " + sceneBias : "");
     }
 
     /**
