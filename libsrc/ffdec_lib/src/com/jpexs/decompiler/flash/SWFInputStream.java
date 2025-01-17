@@ -1942,7 +1942,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x2D:
                     return new ActionFSCommand2(getCharset());
                 case 0x89:
-                    return new ActionStrictMode(this);
+                    return new ActionStrictMode(actionLength, this);
                 // SWF3 Actions
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);
