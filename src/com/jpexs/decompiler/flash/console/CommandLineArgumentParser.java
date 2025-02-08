@@ -3042,7 +3042,7 @@ public class CommandLineArgumentParser {
                             System.exit(1);
                         }
                     } else {
-                        Map<String, ASMSource> asms = swf.getASMs(false);
+                        Map<String, ASMSource> asms = swf.getASMs(true);
                         boolean found = false;
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
