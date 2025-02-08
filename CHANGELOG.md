@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2394] Broken AS1/2 deobfuscation on incorrect length of ActionStrictMode,
 - [#2394] AS1/2 ActionStrictMode with mode larger than 1 now ignored
 - [#2393] AS1/2 ActionGotoFrame2 P-code trailing comma
+- [#2407] Replace commandline command for AS1/2 scripts must use export names
 
 ## [22.0.1] - 2024-11-20
 ### Added
@@ -3694,6 +3695,7 @@ Major version of SWF to XML export changed to 2.
 [#2384]: https://www.free-decompiler.com/flash/issues/2384
 [#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2393]: https://www.free-decompiler.com/flash/issues/2393
+[#2407]: https://www.free-decompiler.com/flash/issues/2407
 [#2366]: https://www.free-decompiler.com/flash/issues/2366
 [#2367]: https://www.free-decompiler.com/flash/issues/2367
 [#2372]: https://www.free-decompiler.com/flash/issues/2372
