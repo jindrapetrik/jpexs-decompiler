@@ -77,7 +77,7 @@ public class TernarOpItem extends GraphTargetItem {
         if (expression.getPrecedence() >= precedence) {
             writer.append("(");
         }
-        expression.toString(writer, localData);
+        expression.toStringBoolean(writer, localData);
         if (expression.getPrecedence() >= precedence) {
             writer.append(")");
         }
