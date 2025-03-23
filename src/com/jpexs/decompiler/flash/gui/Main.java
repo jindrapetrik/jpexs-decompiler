@@ -1235,7 +1235,7 @@ public class Main {
                             }
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
                             @Override
-                            public SWF resolveUrl(final String url) {
+                            public SWF resolveUrl(String file, final String url) {
                                 loadedUrls.add(url);
                                 File selFile = null;
                                 int opt = -1;

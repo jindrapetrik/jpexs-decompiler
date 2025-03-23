@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#2427] Commandline export with use of imported SWFs (importAssets tag)
+
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
 - [#2391] Double not operator in ternar operator expression
@@ -3691,6 +3694,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2375]: https://www.free-decompiler.com/flash/issues/2375

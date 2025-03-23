@@ -2330,7 +2330,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 if (importedSwfs.containsKey(url)) {
                     iSwf = importedSwfs.get(url);
                 } else {
-                    iSwf = resolver.resolveUrl(url);
+                    iSwf = resolver.resolveUrl(this.file, url);
                     importedSwfs.put(url, iSwf);
                 }
                 if (iSwf != null) {
