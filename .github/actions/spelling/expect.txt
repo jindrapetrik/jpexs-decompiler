@@ -462,6 +462,7 @@ CGJ
 CGMS
 CGMSA
 chainedmapper
+changeimport
 changeinplace
 changeslog
 channelnumber
@@ -3806,6 +3807,7 @@ USETHUMBS
 USHIFT
 USHOR
 usre
+ustom
 UWORD
 uwyn
 vaact
