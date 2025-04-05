@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
 - [#2391] Double not operator in ternar operator expression
+- [#2436] PDF export clipping - missing colors / text
 
 ## [22.0.2] - 2025-01-17
 ### Added
