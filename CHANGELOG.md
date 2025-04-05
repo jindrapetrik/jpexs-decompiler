@@ -3698,6 +3698,7 @@ Major version of SWF to XML export changed to 2.
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
+[#2436]: https://www.free-decompiler.com/flash/issues/2436
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
