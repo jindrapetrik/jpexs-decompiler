@@ -600,9 +600,9 @@ Section "FFDec" SecDummy
   File "dist\icon.ico"
   File "dist\license.txt"
   File "dist\soleditor.bat"
-  File "dist\soleditor.lnk"
+  ;File "dist\soleditor.lnk"
   File "dist\translator.bat"
-  File "dist\translator.lnk"
+  ;File "dist\translator.lnk"
   
   SetOutPath "$INSTDIR"  
   File /r "dist\flashlib"
