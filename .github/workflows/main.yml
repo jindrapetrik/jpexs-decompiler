@@ -48,8 +48,8 @@ jobs:
     - name: Set up NSis
       run: |
         apt-get -y update
-        apt-get -y install nsis
-        makensis -VERSION
+        apt-get -y install nsis=3.08-3
+        makensis -VERSION        
     - name: Set up ant
       run: |
         apt install -y -qq ant 
