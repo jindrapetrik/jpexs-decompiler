@@ -109,3 +109,5 @@ exported1.all.bin
 /libsrc/decimal/nbproject/private/
 /libsrc/decimal/dist/
 /libsrc/decimal/build/
+/libsrc/gnujpdf/nbproject/private/
+/libsrc/gnujpdf/build/
