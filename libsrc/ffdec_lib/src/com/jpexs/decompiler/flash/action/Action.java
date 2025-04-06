@@ -728,20 +728,14 @@ public abstract class Action implements GraphSourceItem {
                 }
             } else {
                 //if (!(a instanceof ActionNop)) {
-                String add = "";
-                // honfika: commented out the following lines, because it makes no sense
-                /*if (a instanceof ActionIf) {
-                 add = " change: " + ((ActionIf) a).getJumpOffset();
-                 }
-                 if (a instanceof ActionJump) {
-                 add = " change: " + ((ActionJump) a).getJumpOffset();
-                 }
-                 add = "; ofs" + Helper.formatAddress(offset) + add;
-                 add = "";*/
-                if ((a instanceof ActionPush) && lastPush) {
+                String add = "";                
+                //Flash player 4 does not allow more than 1 item in ActionPush, so I commented this out
+                /*if ((a instanceof ActionPush) && lastPush) {
                     writer.appendNoHilight(", ");
                     ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, exportMode, writer);
-                } else {
+                } else 
+                */
+                {
                     if (lastPush) {
                         writer.newLine();
                         //lastPush = false;

@@ -135,11 +135,35 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @return List of Action
      */
     public List<Action> toActionList(List<GraphSourceItem> items) {
+        items = groupPushes(items);
         List<Action> ret = new ArrayList<>();
-        for (GraphSourceItem s : items) {
+        for (GraphSourceItem s : items) {            
             if (s instanceof Action) {
-                ret.add((Action) s);
+                ret.add((Action) s);                    
             }
+        }                      
+        return ret;
+    }
+    
+    private List<GraphSourceItem> groupPushes(List<GraphSourceItem> items) {
+        if (swfVersion <= 4) {
+            return items;
+        }
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ActionPush prevPush = null;
+        for (GraphSourceItem s : items) {            
+            if (s instanceof ActionPush) {
+                if (prevPush == null) {
+                    prevPush = (ActionPush) s;
+                    ret.add(prevPush);                    
+                } else {
+                    prevPush.values.addAll(((ActionPush) s).values);
+                    ((ActionPush) s).values.clear();
+                }
+            } else {
+                ret.add(s);
+                prevPush = null;
+            }                      
         }
         return ret;
     }
@@ -988,6 +1012,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         for (GraphTargetItem item : commands) {
             ret.addAll(item.toSourceIgnoreReturnValue(localData, this));
         }
+        ret = groupPushes(ret);        
         return ret;
     }
 

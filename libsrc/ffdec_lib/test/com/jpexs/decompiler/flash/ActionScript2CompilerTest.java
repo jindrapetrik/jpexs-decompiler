@@ -171,8 +171,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
 
     @Test
     public void stopUndefined() {
-        testCompilation("trace(stop());", "ConstantPool\n"
-                + "Stop\n"
+        testCompilation("trace(stop());", "Stop\n"
                 + "Push undefined, undefined\n"
                 + "Trace");
     }

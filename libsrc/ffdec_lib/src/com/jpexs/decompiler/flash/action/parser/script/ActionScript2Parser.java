@@ -2147,6 +2147,12 @@ public class ActionScript2Parser {
     }
 
     private DirectValueActionItem pushConst(String s) throws IOException, ActionParseException {
+        
+        //ActionConstantPool was introduced in SWF 5
+        if (swfVersion < 5) {
+            return new DirectValueActionItem(null, null, 0, s, constantPool);
+        }
+        
         int index = constantPool.indexOf(s);
         if (index == -1) {
             if (ActionConstantPool.calculateSize(constantPool) + ActionConstantPool.calculateSize(s) <= 0xffff) {
@@ -2467,7 +2473,9 @@ public class ActionScript2Parser {
                 ret.add((Action) s);
             }
         }
-        ret.add(0, new ActionConstantPool(constantPool, charset));
+        if (!constantPool.isEmpty()) {
+            ret.add(0, new ActionConstantPool(constantPool, charset));
+        }
         return ret;
     }
 
