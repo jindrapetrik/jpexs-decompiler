@@ -112,7 +112,8 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
                 + "DefineFunction \"outfunc\", 0 {\n"
                 + "Push \"v1\"\n"
                 + "DefineFunction2 \"\", 0, 3, false, false, true, false, true, false, true, false, false {\n"
-                + "Push \"a\", 1\n"
+                + "Push \"a\"\n"
+                + "Push 1\n"
                 + "DefineLocal\n" //critical
                 + "Push 2\n"
                 + "StoreRegister 1\n"
