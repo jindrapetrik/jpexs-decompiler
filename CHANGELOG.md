@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2436] PDF export clipping - missing colors / text
 - [#2437] AS1 P-code - do not group pushes automatically
 - [#2437] AS1 - use Constant pool only on FP5+
+- [#2430] AS1/2/3 - Missing syntax hilighting of "new" keyword and few others
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3702,6 +3703,7 @@ Major version of SWF to XML export changed to 2.
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2436]: https://www.free-decompiler.com/flash/issues/2436
 [#2437]: https://www.free-decompiler.com/flash/issues/2437
+[#2430]: https://www.free-decompiler.com/flash/issues/2430
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
