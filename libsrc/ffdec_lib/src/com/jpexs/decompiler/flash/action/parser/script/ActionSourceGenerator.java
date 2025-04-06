@@ -146,7 +146,23 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
     
     private List<GraphSourceItem> groupPushes(List<GraphSourceItem> items) {
-        if (swfVersion <= 4) {
+        
+        //TODO: This should take in account important offsets (jumps)
+        //And not group Pushes over different parts of code
+        /*Like:
+           If locA
+             Push "A"
+             Push "B"
+           locA:
+           Push "C"
+        
+           Should not be grouped to Push "A","B","C"
+        */
+        
+        
+        return items;
+        //Commented out for now...
+        /*if (swfVersion <= 4) {
             return items;
         }
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -165,7 +181,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 prevPush = null;
             }                      
         }
-        return ret;
+        return ret;*/
     }
 
     private List<Action> nonempty(List<Action> list) {

@@ -10,7 +10,6 @@ All notable changes to this project will be documented in this file.
 - [#2391] Double not operator in ternar operator expression
 - [#2436] PDF export clipping - missing colors / text
 - [#2437] AS1 P-code - do not group pushes automatically
-- [#2437] AS1 Direct editation - group pushes on FP5+
 - [#2437] AS1 - use Constant pool only on FP5+
 
 ## [22.0.2] - 2025-01-17
