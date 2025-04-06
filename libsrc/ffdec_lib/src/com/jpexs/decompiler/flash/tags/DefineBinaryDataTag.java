@@ -133,7 +133,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     public void loadEmbeddedSwf() {
         String path = getSwf().getShortPathTitle() + "/DefineBinaryData (" + getCharacterId() + ")";
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
-        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+        String charset = conf == null ? "WINDOWS-1252" : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
 
         try {
             InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());

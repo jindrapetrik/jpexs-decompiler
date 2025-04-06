@@ -523,7 +523,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Charset for SWF files with version 5 and lower which do not use UTF-8.
      */
     @Internal
-    private String charset = "UTF-8";
+    private String charset = "WINDOWS-1252";
 
     /**
      * Map of characterId to imported class sets.
@@ -797,7 +797,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getPlayerSWC() != null) {
                 SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
                 //set allowRenameIdentifiers parameter to FALSE otherwise there will be an infinite loop
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, Charset.defaultCharset().name(), false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
                 playerGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
@@ -805,7 +805,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getAirSWC() != null) {
                 SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
                 //set allowRenameIdentifiers to FALSE
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, Charset.defaultCharset().name(), false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
                 airGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
@@ -1966,6 +1966,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         version = SWF.DEFAULT_VERSION;
         displayRect = new RECT(0, 1, 0, 1);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
+        charset = Utf8Helper.charsetName;
     }
 
     /**
@@ -2164,7 +2165,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Charset.defaultCharset().name(), true);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, "WINDOWS-1252", true);
     }
 
     /**
@@ -2182,7 +2183,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Charset.defaultCharset().name(), true);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, "WINDOWS-1252", true);
     }
 
     /**

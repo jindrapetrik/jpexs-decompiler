@@ -6022,7 +6022,7 @@ public class XFLConverter {
                 InputStorageInterface inputStorage = new ZippedInputStorage(new File(zipfile));
                 OutputStorageInterface outputStorage = new CfbOutputStorage(new File(outfile));
 
-                FlaConverter contentsGenerator = new FlaConverter(cbfFlaVersion);
+                FlaConverter contentsGenerator = new FlaConverter(cbfFlaVersion, swf.getCharset());
                 contentsGenerator.convert(inputStorage, outputStorage);
                 inputStorage.close();
                 outputStorage.close();

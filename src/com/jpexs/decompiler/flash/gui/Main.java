@@ -1201,7 +1201,7 @@ public class Main {
                         String shortName = fileTitle != null ? fileTitle : file;
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
-                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
                         List<String> loadedUrls = new ArrayList<>();
                         List<String> loadedStatus = new ArrayList<>();
 
