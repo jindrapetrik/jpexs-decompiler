@@ -540,7 +540,6 @@ clonesprite
 closeall
 clpbrd
 CLSIDs
-clsname
 clt
 cmap
 Cmb
@@ -1403,7 +1402,7 @@ hasnext
 HASPARENT
 Hausmatt
 Hauspie
-Haxe
+haxe
 hbitmap
 hbm
 hbmp
@@ -1444,7 +1443,6 @@ hiliter
 hinst
 HITTEST
 HIWORD
-HKCU
 HKEYBy
 HKLM
 HLayout
@@ -1493,6 +1491,7 @@ HWNDFIRST
 HWNDLAST
 HWNDNEXT
 HWNDPREV
+hxml
 Hzre
 iae
 iai
@@ -3835,7 +3834,6 @@ VCP
 vdata
 vdir
 velikost
-VERBNAME
 VERDATE
 verifyop
 verifypass
