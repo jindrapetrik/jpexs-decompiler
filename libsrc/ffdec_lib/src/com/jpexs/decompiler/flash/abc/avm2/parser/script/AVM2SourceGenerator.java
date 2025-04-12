@@ -706,7 +706,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         List<MethodBody> callStack = new ArrayList<>();
                         callStack.add(pcinit);
                         try {
-                            pcinit.convert(-1 /*FIXME??*/, callStack, null, d, "-", ScriptExportMode.AS, true, mi, -1, ci.index, ci.abc, null, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, new NulWriter(), new ArrayList<>(), ci.abc.class_info.get(ci.index).static_traits, false, new HashSet<>());
+                            pcinit.convert(-1 /*FIXME??*/, callStack, null, d, "-", ScriptExportMode.AS, true, mi, -1, ci.index, ci.abc, null, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, new NulWriter(), new ArrayList<>(), ci.abc.class_info.get(ci.index).static_traits, false, new HashSet<>(), new ArrayList<>());
                             //FIXME! Add skinparts from _skinParts attribute of parent class!!!
                         } catch (InterruptedException ex) {
                             Logger.getLogger(AVM2SourceGenerator.class.getName()).log(Level.SEVERE, "Getting parent skinparts interrupted", ex);

@@ -2845,7 +2845,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                 if (constructorBody.convertedItems != null) {
                     for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
                         GraphTargetItem ti = constructorBody.convertedItems.get(j);
@@ -3039,7 +3039,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                 List<String> allFramesAccessibilityTraitNames = new ArrayList<>();
                 List<String> frameTraitNames = new ArrayList<>();
                 if (constructorBody.convertedItems != null) {
@@ -3093,7 +3093,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                             if (traitBody.convertedItems == null) {
                                 continue;
                             }
@@ -3120,7 +3120,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                             if (traitBody.convertedItems != null) {
                                 for (int j = 0; j < traitBody.convertedItems.size(); j++) {
                                     GraphTargetItem ti = traitBody.convertedItems.get(j);
@@ -3150,7 +3150,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                             if (traitBody.convertedItems != null) {
                                 if (!traitBody.convertedItems.isEmpty()) {
                                     if (traitBody.convertedItems.get(0) instanceof IfItem) {
@@ -3252,7 +3252,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                             if (traitBody.convertedItems != null) {
                                 if (!traitBody.convertedItems.isEmpty()) {
                                     if (traitBody.convertedItems.get(0) instanceof IfItem) {
@@ -3373,7 +3373,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                             if (traitBody.convertedItems != null) {
                                 for (int j = 0; j < traitBody.convertedItems.size(); j++) {
                                     GraphTargetItem ti = traitBody.convertedItems.get(j);
@@ -3479,7 +3479,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
 
                 Map<Integer, String> frameToTraitName = new HashMap<>();
 
@@ -3547,7 +3547,7 @@ public class XFLConverter {
                         callStack = new ArrayList<>();
                         callStack.add(frameBody);
 
-                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
                         
                         if (frameBody.convertedItems != null) {                        
                             for (int i = 0; i < frameBody.convertedItems.size(); i++) {

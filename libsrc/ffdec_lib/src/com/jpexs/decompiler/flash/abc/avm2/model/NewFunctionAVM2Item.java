@@ -130,7 +130,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         if (body != null) {
             List<MethodBody> callStack = new ArrayList<>(localData.callStack);
             callStack.add(body);
-            body.convert(localData.swfVersion, callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, scopeStack, 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods));
+            body.convert(localData.swfVersion, callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, scopeStack, 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods), new ArrayList<>());
             body.toString(localData.swfVersion, callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods));
         }
         writer.endBlock();

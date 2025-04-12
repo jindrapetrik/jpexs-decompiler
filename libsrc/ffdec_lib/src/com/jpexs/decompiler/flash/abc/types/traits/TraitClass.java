@@ -395,7 +395,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 }
             }
 
-            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, classInfo.static_traits, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, classInfo.static_traits, true, new HashSet<>(), new ArrayList<>());
 
             newScopeStack.push(new ClassAVM2Item(abc.instance_info.get(class_info).getName(abc.constants)));
             classInitializerIsEmpty = !writer.getMark();
@@ -408,7 +408,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 MethodBody constructorBody = abc.bodies.get(bodyIndex);
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, convertData, path + "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, instanceInfo.instance_traits, true, new HashSet<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, convertData, path + "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, instanceInfo.instance_traits, true, new HashSet<>(), new ArrayList<>());
 
                 if (convertData.ignoreFrameScripts) {
                     //find all addFrameScript(xx,this.method) in constructor

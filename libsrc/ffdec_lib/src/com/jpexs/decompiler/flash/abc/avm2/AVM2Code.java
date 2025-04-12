@@ -2542,10 +2542,11 @@ public class AVM2Code implements Cloneable {
      * @param initTraits Initialized traits
      * @param staticOperation Static operation
      * @param localRegAssignmentIps Local register assignment IPs
+     * @param initTraitClasses Class ids which traits to init
      * @return List of GraphTargetItems
      * @throws InterruptedException On interrupt
      */
-    public List<GraphTargetItem> toGraphTargetItems(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, List<Integer> initTraitClasses) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -2564,7 +2565,18 @@ public class AVM2Code implements Cloneable {
         } catch (SecondPassException spe) {
             list = AVM2Graph.translateViaGraph(swfVersion, spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
         }
-        if (initTraits != null) {            
+        if (initTraits != null) {
+            
+            
+            Map<Integer, Traits> initClassMultinames = new LinkedHashMap<>();
+            if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {            
+                for (int c : initTraitClasses) {
+                    initClassMultinames.put(abc.instance_info.get(c).name_index, abc.class_info.get(c).static_traits);
+                }
+            }
+            initClassMultinames.put(-1, initTraits);
+            
+            
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -2600,71 +2612,87 @@ public class AVM2Code implements Cloneable {
                 if ((ti instanceof InitPropertyAVM2Item) || (ti instanceof SetPropertyAVM2Item)) {
                     int multinameIndex = 0;
                     GraphTargetItem value = null;
-                    if (ti instanceof InitPropertyAVM2Item) {
+                    GraphTargetItem obj = null;
+                    if (ti instanceof InitPropertyAVM2Item) {                        
                         multinameIndex = ((InitPropertyAVM2Item) ti).propertyName.multinameIndex;
                         value = ((InitPropertyAVM2Item) ti).value;
+                        obj = ((InitPropertyAVM2Item) ti).object;
                     }
                     if (ti instanceof SetPropertyAVM2Item) {
                         multinameIndex = ((FullMultinameAVM2Item) ((SetPropertyAVM2Item) ti).propertyName).multinameIndex;
                         value = ((SetPropertyAVM2Item) ti).value;
+                        obj = ((SetPropertyAVM2Item) ti).object;
                     }
                     Multiname m = abc.constants.getMultiname(multinameIndex);
-                    for (int j = 0; j < initTraits.traits.size(); j++) {
-                        Trait t = initTraits.traits.get(j);
-                        Multiname tm = abc.constants.getMultiname(t.name_index);
-                        if (tm != null && tm.equals(m)) {
-                            if ((t instanceof TraitSlotConst)) {
-                                //if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) 
-                                {
-                                    TraitSlotConst tsc = (TraitSlotConst) t;
-                                    if (value != null && !convertData.assignedValues.containsKey(tsc)) {
+                             
+                    Multiname om = null;
+                    if (obj instanceof GetPropertyAVM2Item) {
+                        om = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) obj).propertyName).multinameIndex);
+                    }
+                    if (obj instanceof GetLexAVM2Item) {
+                        om = ((GetLexAVM2Item) obj).propertyName;
+                    }
+                    
+                    for (int classMultiname : initClassMultinames.keySet()) {
+                        Traits ts = initClassMultinames.get(classMultiname);
+                        Multiname cm = classMultiname == -1 ? null : abc.constants.getMultiname(classMultiname);
+                        for (int j = 0; j < ts.traits.size(); j++) {
+                            Trait t = ts.traits.get(j);
+                            Multiname tm = abc.constants.getMultiname(t.name_index);
+                            if (tm != null && tm.equals(m) && (classMultiname == -1 || Objects.equals(om, cm))) {
+                                if ((t instanceof TraitSlotConst)) {
+                                    //if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) 
+                                    {
+                                        TraitSlotConst tsc = (TraitSlotConst) t;
+                                        if (value != null && !convertData.assignedValues.containsKey(tsc)) {
 
-                                        if (!isStatic) {
-                                            Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
-                                            subItems.add(value);
-                                            List<Multiname> laterMultinames = new ArrayList<>();
-                                            for (int k = j + 1; k < initTraits.traits.size(); k++) {
-                                                int tMultinameIndex = initTraits.traits.get(k).name_index;
-                                                if (tMultinameIndex > 0) {
-                                                    Multiname tMultiname = abc.constants.getMultiname(tMultinameIndex);
-                                                    laterMultinames.add(tMultiname);
+                                            if (!isStatic) {
+                                                Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
+                                                subItems.add(value);
+                                                List<Multiname> laterMultinames = new ArrayList<>();
+                                                for (int k = j + 1; k < initTraits.traits.size(); k++) {
+                                                    int tMultinameIndex = initTraits.traits.get(k).name_index;
+                                                    if (tMultinameIndex > 0) {
+                                                        Multiname tMultiname = abc.constants.getMultiname(tMultinameIndex);
+                                                        laterMultinames.add(tMultiname);
+                                                    }
                                                 }
+                                                for (GraphTargetItem item : subItems) {
+
+                                                    //if later slot is referenced, we must add it in constructor instead of direct assignment
+                                                    if (item instanceof GetPropertyAVM2Item) {
+                                                        Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
+                                                        if (laterMultinames.contains(multiName)) {
+                                                            continue loopi;
+                                                        }
+                                                    }
+                                                    if (item instanceof GetLexAVM2Item) {
+                                                        Multiname multiName = ((GetLexAVM2Item) item).propertyName;
+                                                        if (laterMultinames.contains(multiName)) {
+                                                            continue loopi;
+                                                        }
+                                                    }
+
+                                                    if (item instanceof LocalRegAVM2Item) { //it is surely in constructor block, not in slot/const
+                                                        continue loopi;
+                                                    }
+                                                }                                            
                                             }
-                                            for (GraphTargetItem item : subItems) {
-
-                                                //if later slot is referenced, we must add it in constructor instead of direct assignment
-                                                if (item instanceof GetPropertyAVM2Item) {
-                                                    Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
-                                                    if (laterMultinames.contains(multiName)) {
-                                                        continue loopi;
-                                                    }
-                                                }
-                                                if (item instanceof GetLexAVM2Item) {
-                                                    Multiname multiName = ((GetLexAVM2Item) item).propertyName;
-                                                    if (laterMultinames.contains(multiName)) {
-                                                        continue loopi;
-                                                    }
-                                                }
-
-                                                if (item instanceof LocalRegAVM2Item) { //it is surely in constructor block, not in slot/const
-                                                    continue loopi;
-                                                }
-                                            }                                            
+                                            if (value instanceof NewFunctionAVM2Item) {
+                                                NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
+                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
+                                            }
+                                            AssignedValue av = new AssignedValue(classMultiname == -1 ? ti : null, value, initializerType, methodIndex);
+                                            convertData.assignedValues.put(tsc, av);
+                                            if (!isStatic) {
+                                                list.remove(i);
+                                                i--;
+                                            }
+                                            continue loopi;
                                         }
-                                        if (value instanceof NewFunctionAVM2Item) {
-                                            NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                            f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
-                                        }
-                                        AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
-                                        convertData.assignedValues.put(tsc, av);
-                                        if (!isStatic) {
-                                            list.remove(i);
-                                            i--;
-                                        }
-                                        continue loopi;
                                     }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
@@ -2700,14 +2728,34 @@ public class AVM2Code implements Cloneable {
 
             }
         }
-
+                
         if (initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             Map<GraphTargetItem, AssignedValue> commandToAssigned = new IdentityHashMap<>();
             Map<GraphTargetItem, TraitSlotConst> commandToTrait = new IdentityHashMap<>();
             for (TraitSlotConst tsc : convertData.assignedValues.keySet()) {
+                //if on script, do not use traits that belong to class and vice-versa
+                if (initTraits != null && !initTraits.traits.contains(tsc)) {
+                    continue;
+                }
                 AssignedValue asv = convertData.assignedValues.get(tsc);
-                commandToAssigned.put(asv.command, asv);
-                commandToTrait.put(asv.command, tsc);
+                if (asv.command == null) {
+                    TraitSlotConstAVM2Item item = new TraitSlotConstAVM2Item(
+                            null,
+                            null,
+                            tsc,
+                            asv.value,
+                            true,
+                            scriptIndex,
+                            classIndex,
+                            GraphTextWriter.TRAIT_SCRIPT_INITIALIZER,
+                            abc.script_info.get(scriptIndex).init_index,
+                            initTraits.traits.indexOf(tsc)
+                    );
+                    list.add(item);
+                } else {
+                    commandToAssigned.put(asv.command, asv);
+                    commandToTrait.put(asv.command, tsc);
+                }
             }
 
             for (int i = 0; i < list.size(); i++) {
