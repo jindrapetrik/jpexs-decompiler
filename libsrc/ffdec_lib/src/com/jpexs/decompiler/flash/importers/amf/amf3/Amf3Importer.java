@@ -16,9 +16,6 @@
  */
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
-import com.jpexs.decompiler.flash.importers.amf.AmfLexer;
-import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
-import com.jpexs.decompiler.flash.importers.amf.SymbolType;
 import com.jpexs.decompiler.flash.amf.amf3.ListMap;
 import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
@@ -33,7 +30,10 @@ import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorUIntType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
+import com.jpexs.decompiler.flash.importers.amf.AmfLexer;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.importers.amf.ParsedSymbol;
+import com.jpexs.decompiler.flash.importers.amf.SymbolType;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.StringReader;
@@ -451,7 +451,7 @@ public class Amf3Importer {
                                 JsObject entryJso = (JsObject) entry;
                                 entryJso.resolve("key", objectTable, true);
                                 entryJso.resolve("value", objectTable, true);
-                                
+
                                 Object key = entryJso.get("key");
                                 Object value = entryJso.get("value");
                                 entries.put(key, value);
@@ -484,8 +484,8 @@ public class Amf3Importer {
             }
         }
         return resultObject;
-    }   
-    
+    }
+
     private Map<String, Object> map(Map<String, Object> objectTable) throws IOException, AmfParseException {
         Map<String, Object> result = new LinkedHashMap<>();
         expectedType(SymbolType.CURLY_OPEN);
@@ -499,12 +499,12 @@ public class Amf3Importer {
             expectedType(SymbolType.COLON);
             result.put(key, value(objectTable));
             s = lex();
-        } while(s.type == SymbolType.COMMA);
-        
+        } while (s.type == SymbolType.COMMA);
+
         expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
         return result;
     }
-    
+
     private Object value(Map<String, Object> objectTable) throws IOException, AmfParseException {
         ParsedSymbol s = lex();
         switch (s.type) {
@@ -613,7 +613,7 @@ public class Amf3Importer {
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws AmfParseException On parse error    
+     * @throws AmfParseException On parse error
      */
     public Object stringToAmf(String val) throws IOException, AmfParseException {
         lexer = new AmfLexer(new StringReader(val));
@@ -624,30 +624,30 @@ public class Amf3Importer {
         Object resultNoRef = replaceReferences(resultResolved, objectsTable);
         return resultNoRef;
     }
-    
+
     /**
      * Convert AMF3 map string to object
      *
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws AmfParseException On parse error    
+     * @throws AmfParseException On parse error
      */
     public Map<String, Object> stringToAmfMap(String val) throws IOException, AmfParseException {
         lexer = new AmfLexer(new StringReader(val));
         Map<String, Object> objectsTable = new LinkedHashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Map<String, Object> result = map(objectsTable);
-        for (String key: result.keySet()) {
+        for (String key : result.keySet()) {
             Object resultResolved = resolveObjects(result.get(key), objectsTable, true);
             result.put(key, resultResolved);
         }
-        
-        for (String key: result.keySet()) {
+
+        for (String key : result.keySet()) {
             Object resultNoRef = replaceReferences(result.get(key), objectsTable);
             result.put(key, resultNoRef);
         }
-            
+
         return result;
     }
 }

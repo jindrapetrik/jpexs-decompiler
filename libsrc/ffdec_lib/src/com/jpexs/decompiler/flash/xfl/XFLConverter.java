@@ -2914,12 +2914,14 @@ public class XFLConverter {
         return ret;
     }
 
-    
     private static class AccessibilityBag {
+
         private List<AccessibilityItem> items = new ArrayList<>();
+
         public void add(AccessibilityItem item) {
             items.add(item);
         }
+
         public Map<String, String> getAttributes(String instanceName, int frame) {
             Map<String, String> ret = new LinkedHashMap<>();
             for (AccessibilityItem item : items) {
@@ -2942,10 +2944,11 @@ public class XFLConverter {
                 sb.append(item.toString());
             }
             return sb.toString();
-        }                        
+        }
     }
-    
+
     private static class AccessibilityItem {
+
         int startFrame;
         int endFrame;
         String instanceName;
@@ -2955,19 +2958,18 @@ public class XFLConverter {
         public AccessibilityItem(String instanceName, String attributeKey, String attributeValue) {
             this(instanceName, attributeKey, attributeValue, 1, Integer.MAX_VALUE);
         }
-        
+
         public AccessibilityItem(String instanceName, String attributeKey, String attributeValue, int frame) {
             this(instanceName, attributeKey, attributeValue, frame, frame);
         }
-        
+
         public AccessibilityItem(String instanceName, String attributeKey, String attributeValue, int startFrame, int endFrame) {
             this.startFrame = startFrame;
             this.endFrame = endFrame;
             this.instanceName = instanceName;
             this.attributeKey = attributeKey;
             this.attributeValue = attributeValue;
-        }     
-       
+        }
 
         public boolean contains(String instanceName, int frame) {
             if (!Objects.equals(instanceName, this.instanceName)) {
@@ -2978,7 +2980,7 @@ public class XFLConverter {
 
         @Override
         public String toString() {
-            return "[instance: " + instanceName+" key: \"" + attributeKey+"\" value: \"" + attributeValue +"\" frames: " + startFrame + " to " + (endFrame == Integer.MAX_VALUE ? "end" : endFrame) + "]";
+            return "[instance: " + instanceName + " key: \"" + attributeKey + "\" value: \"" + attributeValue + "\" frames: " + startFrame + " to " + (endFrame == Integer.MAX_VALUE ? "end" : endFrame) + "]";
         }
 
         @Override
@@ -3019,10 +3021,7 @@ public class XFLConverter {
             return Objects.equals(this.attributeValue, other.attributeValue);
         }
 
-           
     }
-    
-    
 
     private static AccessibilityBag getAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
         int swfVersion = -1;
@@ -3089,7 +3088,7 @@ public class XFLConverter {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             if (abc.method_info.get(tm.method_info).param_types.length != 1) {
                                 continue;
-                            }                                   
+                            }
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
@@ -3112,8 +3111,8 @@ public class XFLConverter {
                                         || propName.resolvedMultinameName.startsWith("__setTab_"))
                                         && callProp.arguments.size() == 1) {
                                     frameRangeAccessibilityTraitNames.add(propName.resolvedMultinameName);
-                                }                                                    
-                            }                           
+                                }
+                            }
                         }
                         if (frameTraitNames.contains(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
@@ -3144,7 +3143,7 @@ public class XFLConverter {
 
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);                        
+                        String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);
                         if (frameAccessibilityTraitNames.contains(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
@@ -3246,7 +3245,7 @@ public class XFLConverter {
                                 }
                             }
                         }
-                        
+
                         if (frameRangeAccessibilityTraitNames.contains(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
@@ -3351,21 +3350,21 @@ public class XFLConverter {
                                                                             }
                                                                         }
                                                                     }
-                                                                    
+
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }                                        
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-                
+
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (allFramesAccessibilityTraitNames.contains(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false))) {
                         if (t instanceof TraitMethodGetterSetter) {
@@ -3440,7 +3439,7 @@ public class XFLConverter {
                                                                             if (setProp.value instanceof FalseItem) {
                                                                                 val = invert ? "true" : "false";
                                                                             }
-                                                                            ret.add(new AccessibilityItem(parentParentProp.resolvedMultinameName, acProp, val));                                                                            
+                                                                            ret.add(new AccessibilityItem(parentParentProp.resolvedMultinameName, acProp, val));
                                                                         }
                                                                     }
                                                                 }
@@ -3548,8 +3547,8 @@ public class XFLConverter {
                         callStack.add(frameBody);
 
                         frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
-                        
-                        if (frameBody.convertedItems != null) {                        
+
+                        if (frameBody.convertedItems != null) {
                             for (int i = 0; i < frameBody.convertedItems.size(); i++) {
                                 GraphTargetItem ti = frameBody.convertedItems.get(i);
                                 if (ti instanceof CallPropertyAVM2Item) {
@@ -3567,7 +3566,7 @@ public class XFLConverter {
                                 }
                             }
                         }
-                        
+
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
                         frameBody.toString(swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 

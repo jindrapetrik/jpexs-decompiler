@@ -94,6 +94,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Constructor.
+     *
      * @param swfVersion SWF version
      * @param constantPool Constant pool
      * @param charset Charset
@@ -106,6 +107,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Generates unique ID.
+     *
      * @return Unique ID
      */
     public String uniqId() {
@@ -115,6 +117,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets charset.
+     *
      * @return Charset
      */
     public String getCharset() {
@@ -131,22 +134,23 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Converts list of GraphSourceItem to list of Action.
+     *
      * @param items List of GraphSourceItem
      * @return List of Action
      */
     public List<Action> toActionList(List<GraphSourceItem> items) {
         items = groupPushes(items);
         List<Action> ret = new ArrayList<>();
-        for (GraphSourceItem s : items) {            
+        for (GraphSourceItem s : items) {
             if (s instanceof Action) {
-                ret.add((Action) s);                    
+                ret.add((Action) s);
             }
-        }                      
+        }
         return ret;
     }
-    
+
     private List<GraphSourceItem> groupPushes(List<GraphSourceItem> items) {
-        
+
         //TODO: This should take in account important offsets (jumps)
         //And not group Pushes over different parts of code
         /*Like:
@@ -157,9 +161,7 @@ public class ActionSourceGenerator implements SourceGenerator {
            Push "C"
         
            Should not be grouped to Push "A","B","C"
-        */
-        
-        
+         */
         return items;
         //Commented out for now...
         /*if (swfVersion <= 4) {
@@ -223,10 +225,9 @@ public class ActionSourceGenerator implements SourceGenerator {
         ifaif.setJumpOffset(onTrueLen);
         ActionJump ajmp = null;
         if (onFalse != null) {
-            if (onTrueCmds.isEmpty() || 
-                    !((onTrueCmds.get(onTrueCmds.size() - 1) instanceof ContinueItem)
-                    || (onTrueCmds.get(onTrueCmds.size() - 1) instanceof BreakItem))
-                    ) {
+            if (onTrueCmds.isEmpty()
+                    || !((onTrueCmds.get(onTrueCmds.size() - 1) instanceof ContinueItem)
+                    || (onTrueCmds.get(onTrueCmds.size() - 1) instanceof BreakItem))) {
                 ajmp = new ActionJump(0, charset);
                 ret.add(ajmp);
                 onTrueLen += ajmp.getTotalActionLength();
@@ -266,6 +267,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets register variables.
+     *
      * @param localData Local data
      * @return Register variables
      */
@@ -275,6 +277,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Sets register variables.
+     *
      * @param localData Local data
      * @param value Register variables
      */
@@ -284,6 +287,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Sets in function.
+     *
      * @param localData Local data
      * @param value Value
      */
@@ -293,6 +297,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets in function.
+     *
      * @param localData Local data
      * @return Value
      */
@@ -302,6 +307,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Checks if in method.
+     *
      * @param localData Local data
      * @return True if in method
      */
@@ -311,6 +317,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Sets in method.
+     *
      * @param localData Local data
      * @param value Value
      */
@@ -320,6 +327,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets for in level.
+     *
      * @param localData Local data
      * @return For in level
      */
@@ -329,6 +337,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Sets for in level.
+     *
      * @param localData Local data
      * @param value Value
      */
@@ -338,6 +347,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets temp register.
+     *
      * @param localData Local data
      * @return Temp register
      */
@@ -354,6 +364,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Releases temp register.
+     *
      * @param localData Local data
      * @param tmp Temp register
      */
@@ -467,6 +478,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets SWF version.
+     *
      * @return SWF version
      */
     public int getSwfVersion() {
@@ -475,6 +487,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets constant pool.
+     *
      * @return Constant pool
      */
     public List<String> getConstantPool() {
@@ -483,6 +496,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets Push constant item.
+     *
      * @param s Constant
      * @return Push constant item
      */
@@ -497,6 +511,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Gets Push constant action.
+     *
      * @param s Constant
      * @return Push constant action
      */
@@ -518,6 +533,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     /**
      * Generates traits.
+     *
      * @param localData Local data
      * @param isInterface Is interface
      * @param name Name
@@ -1028,7 +1044,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         for (GraphTargetItem item : commands) {
             ret.addAll(item.toSourceIgnoreReturnValue(localData, this));
         }
-        ret = groupPushes(ret);        
+        ret = groupPushes(ret);
         return ret;
     }
 

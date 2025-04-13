@@ -132,8 +132,8 @@ import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -361,7 +361,7 @@ public class CommandLineArgumentParser {
         if (filter == null) {
             out.println(PREFIX + "myfile.swf");
             exampleFound = true;
-        }      
+        }
 
         if (filter == null || filter.equals("export") || filter.equals("format") || filter.equals("selectclass") || filter.equals("onerror")) {
             out.println(PREFIX + "-export script \"C:\\decompiled\" myfile.swf");
@@ -1741,7 +1741,7 @@ public class CommandLineArgumentParser {
             System.err.println("Process affinity setting is only available on Windows platform.");
         }
     }
-    
+
     private static void parseChangeImport(Stack<String> args, Map<String, String> changedImports) {
         if (args.size() < 2) {
             System.err.println("source and target of import expected");
@@ -1749,7 +1749,7 @@ public class CommandLineArgumentParser {
         }
         changedImports.put(args.pop(), args.pop());
     }
-    
+
     private static UrlResolver parseImportAssets(Stack<String> args, Map<String, String> changedImports) {
         if (args.isEmpty()) {
             System.err.println("importassets options expected");
@@ -1760,7 +1760,7 @@ public class CommandLineArgumentParser {
         boolean doResolve = false;
         boolean doAsk = false;
         boolean localOnly = false;
-        for (String impOption:impOptionsArr) {
+        for (String impOption : impOptionsArr) {
             switch (impOption) {
                 case "yes":
                     doResolve = true;
@@ -2068,7 +2068,7 @@ public class CommandLineArgumentParser {
                     startTimeSwf = System.currentTimeMillis();
                     System.out.println("Start exporting " + inFile.getName());
                 }
-                                              
+
                 OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
@@ -2247,7 +2247,7 @@ public class CommandLineArgumentParser {
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
                 if (exportAs2Script || exportAs3Script) {
                     System.out.println("Exporting scripts...");
-                    
+
                     String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
                     Path.createDirectorySafe(new File(scriptsFolder));
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -3516,7 +3516,7 @@ public class CommandLineArgumentParser {
         if (format == null) {
             format = "html";
         }
-        
+
         if (!format.equals("html")) {
             badArguments("doc");
         }

@@ -100,7 +100,7 @@ public class EasySwfPanel extends JPanel {
     private JLabel timelineLabel;
     private JButton closeTimelineButton;
     private JPanel propertiesPanel;
-    
+
     private static final String PROPERTIES_DOCUMENT = "Document";
     private static final String PROPERTIES_INSTANCE = "Instance";
     private DocumentPropertiesPanel documentPropertiesPanel;
@@ -115,7 +115,7 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
         stagePanel.setMultiSelect(true);
-        
+
         stagePanel.addEventListener(new MediaDisplayListener() {
             @Override
             public void mediaDisplayStateChanged(MediaDisplay source) {
@@ -124,9 +124,9 @@ public class EasySwfPanel extends JPanel {
                         @Override
                         public void run() {
                             setTimelined(stagePanel.getTimelined(), false);
-                        }                        
+                        }
                     });
-                    
+
                 }
             }
 
@@ -136,9 +136,9 @@ public class EasySwfPanel extends JPanel {
 
             @Override
             public void statusChanged(String status) {
-            }            
+            }
         });
-        
+
         stagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,24 +160,24 @@ public class EasySwfPanel extends JPanel {
                 final RegistrationPointPosition regPointPos = stagePanel.getRegistrationPointPosition();
 
                 final List<MATRIX> fpreviousMatrices = new ArrayList<>();
+
                 
-                {
-                    List<DepthState> dss = getSelectedDepthStates();
-                    for (DepthState ds : dss) {
-                        if (ds == null) {
-                            fpreviousMatrices.add(null);
-                        } else {
-                            fpreviousMatrices.add(ds.matrix);
-                        }
+                List<DepthState> dss = getSelectedDepthStates();
+                for (DepthState ds : dss) {
+                    if (ds == null) {
+                        fpreviousMatrices.add(null);
+                    } else {
+                        fpreviousMatrices.add(ds.matrix);
                     }
                 }
+                
 
                 final boolean transformEnabled = transformEnabled();
                 undoManager.doOperation(new DoableOperation() {
 
                     private final List<Boolean> wasModified = new ArrayList<>();
                     Timelined timelined = stagePanel.getTimelined();
-                    
+
                     @Override
                     public void doOperation() {
                         if (timelined != EasySwfPanel.this.timelined) {
@@ -187,13 +187,13 @@ public class EasySwfPanel extends JPanel {
                         for (int i = 0; i < depths.size(); i++) {
                             int depth = depths.get(i);
                             DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                            wasModified.add(ds.placeObjectTag.isModified());                                                        
-                            
+                            wasModified.add(ds.placeObjectTag.isModified());
+
                             Matrix contMat = newMatrix.concatenate(new Matrix(fpreviousMatrices.get(i)));
-                            
+
                             ds.placeObjectTag.setMatrix(contMat.toMATRIX());
                             ds.placeObjectTag.setPlaceFlagHasMatrix(newMatrix != null);
-                            ds.placeObjectTag.setModified(true);    
+                            ds.placeObjectTag.setModified(true);
                         }
                         timelined.resetTimeline();
                         stagePanel.repaint();
@@ -260,24 +260,23 @@ public class EasySwfPanel extends JPanel {
                     if ((tag instanceof DefineSpriteTag)
                             || (tag instanceof ShapeTag)
                             || (tag instanceof TextTag)
-                            || (tag instanceof ButtonTag)
-                            ) {
+                            || (tag instanceof ButtonTag)) {
 
                         undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, stagePanel.getTimelined()) {
-                            
+
                             private List<Tag> swfTags;
-                                                        
+
                             @Override
                             public void doOperation() {
                                 super.doOperation();
                                 CharacterTag ch = (CharacterTag) tag;
                                 int maxDepth = timelined.getTimeline().getMaxDepth();
                                 int newDepth = maxDepth + 1;
-                                
+
                                 if (timelined.getSwf() != timelined) {
                                     swfTags = timelined.getSwf().getTags().toArrayList();
                                 }
-                                
+
                                 ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(fframe).showFrameTag;
                                 PlaceObject2Tag place = new PlaceObject2Tag(timelined.getSwf());
                                 place.depth = newDepth;
@@ -290,21 +289,20 @@ public class EasySwfPanel extends JPanel {
                                     timelined.addTag(place);
                                 } else {
                                     timelined.addTag(timelined.indexOfTag(showFrameTag), place);
-                                    
+
                                     RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
                                     remove.depth = newDepth;
-                                    timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);                                    
+                                    timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
                                 }
-                                
-                                
+
                                 DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
                                 boolean tagOrderChanged = fixer.fixDefineBeforeUsage(timelined.getSwf());
                                 if (!tagOrderChanged) {
                                     swfTags = null;
                                 }
-                                
+
                                 timelined.resetTimeline();
-                                stagePanel.repaint();                                
+                                stagePanel.repaint();
                                 timelinePanel.refresh();
                                 timelinePanel.setDepth(newDepth);
                             }
@@ -313,7 +311,7 @@ public class EasySwfPanel extends JPanel {
                             public void undoOperation() {
                                 super.undoOperation();
                                 timelined.resetTimeline();
-                                
+
                                 //Tag order changed, put the original tags back
                                 if (swfTags != null) {
                                     SWF swf = timelined.getSwf();
@@ -322,11 +320,11 @@ public class EasySwfPanel extends JPanel {
                                     for (int i = 0; i < size; i++) {
                                         swf.removeTag(0);
                                     }
-                                    for (int i = 0; i < swfTags.size(); i++) {                                        
+                                    for (int i = 0; i < swfTags.size(); i++) {
                                         swf.addTag(swfTags.get(i));
                                     }
                                     swf.resetTimeline();
-                                }                                
+                                }
                                 stagePanel.repaint();
                                 timelinePanel.refresh();
                                 timelinePanel.setFrame(fframe, fdepths);
@@ -354,8 +352,6 @@ public class EasySwfPanel extends JPanel {
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        
-
         undoButton = new JButton(View.getIcon("rotateanticlockwise16"));
         //undoButton.setToolTipText("Undo");
         undoButton.setMargin(new Insets(5, 5, 5, 5));
@@ -380,7 +376,7 @@ public class EasySwfPanel extends JPanel {
         redoButton.setEnabled(false);
         undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
         redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
-        
+
         Runnable undoChangeListener = new Runnable() {
             @Override
             public void run() {
@@ -390,7 +386,6 @@ public class EasySwfPanel extends JPanel {
 
         undoManager.addChangeListener(undoChangeListener);
 
-        
         JPanel toolbarPanel = new JPanel(new BorderLayout());
         JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         leftToolbar.add(undoButton);
@@ -400,31 +395,31 @@ public class EasySwfPanel extends JPanel {
         leftToolbar.add(timelineLabel);
         leftToolbar.add(Box.createHorizontalStrut(5));
         closeTimelineButton = new JButton(View.getIcon("cancel16"));
-        closeTimelineButton.setMargin(new Insets(5, 5, 5, 5));        
+        closeTimelineButton.setMargin(new Insets(5, 5, 5, 5));
         leftToolbar.add(closeTimelineButton);
         closeTimelineButton.setToolTipText(EasyStrings.translate("timeline.item.cancel"));
         closeTimelineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTimelined(timelined.getSwf());
-            }            
+            }
         });
-        
+
         toolbarPanel.add(leftToolbar, BorderLayout.WEST);
-        
+
         ZoomPanel zoomPanel = new ZoomPanel(stagePanel);
         toolbarPanel.add(zoomPanel, BorderLayout.EAST);
-        
+
         topPanel.add(toolbarPanel, BorderLayout.NORTH);
         topPanel.add(stagePanel, BorderLayout.CENTER);
 
         timelinePanel = new TimelinePanel(this, undoManager);
-        
+
         timelinePanel.addChangeListener(new Runnable() {
             @Override
             public void run() {
                 stagePanel.repaint();
-            }            
+            }
         });
         timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
             @Override
@@ -435,12 +430,12 @@ public class EasySwfPanel extends JPanel {
                 if (transformEnabled()) {
                     stagePanel.freeTransformDepths(depths);
                 }
-                
+
                 transformPanel.setVisible(!depths.isEmpty());
                 updatePropertiesPanel();
             }
         });
-        
+
         verticalSplitPane = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel, Configuration.guiSplitPaneEasyVerticalDividerLocationPercent);
 
         libraryTreeTable = new LibraryTreeTable(this);
@@ -457,17 +452,15 @@ public class EasySwfPanel extends JPanel {
         libraryPreviewPanel.setPreferredSize(new Dimension(200, 200));
 
         rightTabbedPane = new JTabbedPane();
-        
-        
+
         propertiesPanel = new JPanel();
         documentPropertiesPanel = new DocumentPropertiesPanel(undoManager);
         propertiesPanel.setLayout(new CardLayout());
-        
+
         instancePropertiesPanel = new InstancePropertiesPanel(this, undoManager);
         propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
         propertiesPanel.add(instancePropertiesPanel, PROPERTIES_INSTANCE);
-        
-        
+
         rightTabbedPane.addTab(EasyStrings.translate("properties"), propertiesPanel);
 
         rightTabbedPane.addTab(EasyStrings.translate("library"), libraryPanel);
@@ -482,12 +475,12 @@ public class EasySwfPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 if (stagePanel.getTimelined() == null) {
                     return;
-                }                        
+                }
                 List<Integer> depths = stagePanel.getSelectedDepths();
                 if (stagePanel.getFrame() >= stagePanel.getTimelined().getFrameCount()) {
                     depths.clear();
                 }
-                if (!depths.isEmpty()) {  
+                if (!depths.isEmpty()) {
                     Frame frame = stagePanel.getTimelined().getTimeline().getFrame(stagePanel.getFrame());
                     if (frame == null) {
                         depths.clear();
@@ -498,7 +491,7 @@ public class EasySwfPanel extends JPanel {
                                 depths.remove(i);
                                 i--;
                             }
-                        }                        
+                        }
                     }
                 }
                 transformPanel.setVisible(!depths.isEmpty());
@@ -552,17 +545,18 @@ public class EasySwfPanel extends JPanel {
             return;
         }
         instancePropertiesPanel.update();
-        cl.show(propertiesPanel, PROPERTIES_INSTANCE);        
+        cl.show(propertiesPanel, PROPERTIES_INSTANCE);
     }
-    
+
     private boolean transformEnabled() {
         return rightTabbedPane.getSelectedIndex() == 2;
     }
-    
-    public void setTimelined(Timelined timelined) {        
+
+    public void setTimelined(Timelined timelined) {
         setTimelined(timelined, true);
     }
-    private void setTimelined(Timelined timelined, boolean updateStage) {        
+
+    private void setTimelined(Timelined timelined, boolean updateStage) {
         if (this.timelined == timelined) {
             return;
         }
@@ -589,7 +583,7 @@ public class EasySwfPanel extends JPanel {
                 stagePanel.pause();
                 stagePanel.gotoFrame(0);
             }
-            timelinePanel.setTimelined(timelined);  
+            timelinePanel.setTimelined(timelined);
             if (timelined instanceof SWF) {
                 timelineLabel.setText(EasyStrings.translate("timeline.main"));
                 closeTimelineButton.setVisible(false);
@@ -606,16 +600,16 @@ public class EasySwfPanel extends JPanel {
     public Openable getOpenable() {
         return timelined.getSwf();
     }
-    
+
     public void clearUndos() {
         undoManager.clear();
     }
-    
+
     private void updateUndos() {
         undoButton.setEnabled(timelined != null && undoManager.canUndo(timelined.getSwf()));
         redoButton.setEnabled(timelined != null && undoManager.canRedo(timelined.getSwf()));
         if (timelined != null && undoManager.canUndo(timelined.getSwf())) {
-            undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%",undoManager.getUndoName(timelined.getSwf())));
+            undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%", undoManager.getUndoName(timelined.getSwf())));
         } else {
             undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
         }
@@ -629,28 +623,28 @@ public class EasySwfPanel extends JPanel {
         }
         Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();
     }
-    
+
     public void dispose() {
         setTimelined(null);
         undoManager.clear();
     }
-    
+
     public List<Integer> getDepths() {
         return stagePanel.getSelectedDepths();
     }
-    
+
     public int getFrame() {
         return stagePanel.getFrame();
     }
 
     public ImagePanel getStagePanel() {
         return stagePanel;
-    }        
-    
+    }
+
     public SWF getSwf() {
         return timelined == null ? null : timelined.getSwf();
     }
-    
+
     public List<DepthState> getSelectedDepthStates() {
         if (timelined == null) {
             return null;
@@ -663,6 +657,7 @@ public class EasySwfPanel extends JPanel {
         }
         return ret;
     }
+
     public List<PlaceObjectTypeTag> getSelectedPlaceTags() {
         List<DepthState> dss = getSelectedDepthStates();
         if (dss == null) {
@@ -675,15 +670,15 @@ public class EasySwfPanel extends JPanel {
             } else {
                 ret.add(ds.placeObjectTag);
             }
-        }        
+        }
         return ret;
     }
 
     public Timelined getTimelined() {
         return timelined;
-    }        
-    
+    }
+
     public void setFrame(int frame, List<Integer> depths) {
         timelinePanel.setFrame(frame, depths);
-    }       
+    }
 }

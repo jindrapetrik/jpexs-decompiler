@@ -17,14 +17,8 @@
 package com.jpexs.decompiler.flash.easygui.properties;
 
 import java.awt.AWTEvent;
-import java.awt.BasicStroke;
 import java.awt.CardLayout;
 import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.FocusAdapter;
@@ -33,7 +27,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,71 +42,72 @@ import javax.swing.event.ChangeListener;
  * @author JPEXS
  */
 public abstract class AbstractPropertyField<E> extends JPanel {
+
     private static final String CARD_READ = "Read";
     private static final String CARD_WRITE = "Write";
-    
+
     protected JLabel readLabel;
     protected JTextField writeField;
-    
+
     private final List<PropertyValidationInterface<E>> validations = new ArrayList<>();
     private final List<ChangeListener> changeListeners = new ArrayList<>();
-    
+
     private AWTEventListener aeListener;
-    
+
     private boolean undetermined = false;
     private boolean editing = false;
-    
+
     public void addValidation(PropertyValidationInterface<E> validation) {
         validations.add(validation);
     }
-    
+
     public void removeValidation(PropertyValidationInterface<E> validation) {
         validations.remove(validation);
     }
-    
+
     public void addChangeListener(ChangeListener changeListener) {
         changeListeners.add(changeListener);
     }
-    
+
     public void removeChangeListener(ChangeListener changeListener) {
         changeListeners.remove(changeListener);
     }
-    
+
     private void fireChange() {
         for (ChangeListener listener : changeListeners) {
             listener.stateChanged(new ChangeEvent(this));
         }
     }
-    
-    @SuppressWarnings("unchecked")        
+
+    @SuppressWarnings("unchecked")
     public AbstractPropertyField(String text) {
         setLayout(new CardLayout());
-        readLabel = new DottedUnderlineLabel(text);        
-               
+        readLabel = new DottedUnderlineLabel(text);
+
         readLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         writeField = new JTextField(text);
         add(readLabel, CARD_READ);
         add(writeField, CARD_WRITE);
-        
+
         readLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {                    
-                    ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_WRITE);
+                if (e.getClickCount() == 1) {
+                    ((CardLayout) AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_WRITE);
                     writeField.requestFocus();
                     writeField.selectAll();
-                    
+
                     Toolkit.getDefaultToolkit().addAWTEventListener(aeListener, AWTEvent.MOUSE_EVENT_MASK);
                     editing = true;
                 }
-            }            
+            }
         });
-        
+
         writeField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 finishEdit();
-            }            
+            }
         });
         writeField.addKeyListener(new KeyAdapter() {
             @Override
@@ -121,14 +115,14 @@ public abstract class AbstractPropertyField<E> extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     e.consume();
                     finishEdit();
-                }    
+                }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     e.consume();
                     cancelEdit();
                 }
             }
-        });  
-        
+        });
+
         aeListener = new AWTEventListener() {
             @Override
             public void eventDispatched(AWTEvent event) {
@@ -142,33 +136,33 @@ public abstract class AbstractPropertyField<E> extends JPanel {
                 }
             }
         };
-        
-        
+
     }
-    
+
     protected abstract E textToValue(String text);
+
     protected abstract String valueToText(E value);
-    
+
     private synchronized void finishEdit() {
         if (!editing) {
             return;
         }
-        
+
         String textBefore = readLabel.getText();
         String textAfter = writeField.getText();
-        
+
         if (textBefore.equals(textAfter)) {
             cancelEdit();
             return;
         }
-        
+
         Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);
-        
+
         boolean ok = true;
         E value = textToValue(textAfter);
         if (value == null) {
             ok = false;
-        } else {  
+        } else {
             for (PropertyValidationInterface<E> validation : validations) {
                 if (!validation.validate(value)) {
                     ok = false;
@@ -176,42 +170,43 @@ public abstract class AbstractPropertyField<E> extends JPanel {
                 }
             }
         }
-        
+
         if (!ok) {
             cancelEdit();
             return;
         }
         undetermined = false;
         readLabel.setText(valueToText(value));
-        ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
-        editing = false;        
+        ((CardLayout) AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+        editing = false;
         fireChange();
     }
-    
+
     private void cancelEdit() {
         if (!editing) {
             return;
         }
-        Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);        
+        Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);
         if (undetermined) {
             writeField.setText("");
         } else {
             writeField.setText(readLabel.getText());
         }
-        ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+        ((CardLayout) AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
         editing = false;
     }
-    
-    public E getValue() {        
+
+    public E getValue() {
         if (undetermined) {
             return null;
         }
         return textToValue(writeField.getText());
     }
-    
+
     public void setValue(Set<E> value) {
         setValue(value, false);
     }
+
     public void setValue(Set<E> value, boolean silent) {
         if (value.size() != 1) {
             setValue((E) null, silent);
@@ -219,11 +214,11 @@ public abstract class AbstractPropertyField<E> extends JPanel {
             setValue(value.iterator().next(), silent);
         }
     }
-    
+
     public void setValue(E value) {
         setValue(value, false);
     }
-    
+
     public void setValue(E value, boolean silent) {
         if (value == null) {
             readLabel.setText("-");
@@ -240,35 +235,5 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         if (!silent) {
             fireChange();
         }
-    }
-}
-
-class DottedUnderlineLabel extends JLabel {
-
-    public DottedUnderlineLabel(String text) {
-        super(text);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        Font font = getFont();
-        FontMetrics metrics = getFontMetrics(font);
-        String text = getText();
-
-        int x = 0;
-        int y = metrics.getAscent();
-               
-        g2d.setPaint(getForeground());
-        
-        int textWidth = metrics.stringWidth(text);
-        int underlineY = y + 6;
-
-        float[] dash = {1f, 1f};
-        Stroke dotted = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1f, dash, 0f);
-        g2d.setStroke(dotted);
-
-        g2d.draw(new Line2D.Float(x, underlineY, x + textWidth, underlineY));
     }
 }

@@ -42,7 +42,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class HarmanSwfEncrypt {
 
-
     private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";
 
     /**
@@ -107,6 +106,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Encrypts data.
+     *
      * @param data Data to encrypt
      * @return Encrypted data
      * @throws IOException On I/O error
@@ -123,6 +123,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Encrypts data.
+     *
      * @param is Data to encrypt
      * @return Encrypted data
      * @throws IOException On I/O error
@@ -142,6 +143,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Encrypts data.
+     *
      * @param is Data to encrypt
      * @param header Header
      * @return Encrypted data
@@ -216,6 +218,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Decrypts data.
+     *
      * @param data Data to decrypt
      * @return Decrypted data
      * @throws IOException On I/O error
@@ -232,6 +235,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Decrypts data.
+     *
      * @param is Data to decrypt
      * @return Decrypted data
      * @throws IOException On I/O error
@@ -255,6 +259,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Decrypts data.
+     *
      * @param is Data to decrypt
      * @param header Header
      * @return Decrypted data
@@ -324,6 +329,7 @@ public class HarmanSwfEncrypt {
 
     /**
      * Encrypts/decrypts data.
+     *
      * @param args Command line arguments
      * @throws Exception On error
      */

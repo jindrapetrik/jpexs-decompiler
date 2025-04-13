@@ -96,7 +96,7 @@ public class Graph {
      * Exceptions in the graph
      */
     private final List<GraphException> exceptions;
-    
+
     /**
      * Debug flag to print all parts
      */
@@ -2692,6 +2692,19 @@ public class Graph {
         }
         return true;
     }
+    
+
+    /**
+     * Gets if expression from stack. Can be overridden for custom handling
+     *
+     * @param localData Local data
+     * @param stack Stack
+     * @param output Output
+     * @return Expression
+     */
+    protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
+        return stack.pop();
+    }
 
     /**
      * Walks graph parts and converts them to target items.
@@ -2716,18 +2729,6 @@ public class Graph {
      */
     protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
         return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
-    }
-
-    /**
-     * Gets if expression from stack.
-     * Can be overridden for custom handling
-     * @param localData Local data
-     * @param stack Stack
-     * @param output Output
-     * @return Expression
-     */
-    protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
-        return stack.pop();
     }
     
     /**
@@ -2964,7 +2965,7 @@ public class Graph {
                     List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
                     stopPartKind2.add(StopPartKind.OTHER);
                     Set<GraphPart> subVisited = new HashSet<>();
-                    
+
                     /*
                      * Save loop phases to be able to walk precontinue block again.
                      */
@@ -3003,8 +3004,8 @@ public class Graph {
                         }
                         if (currentLoop.loopPreContinue == null) {
                             precontinueCommands.clear();
-                            
-                            /**
+
+                            /*
                              * Restore loop phases
                              */
                             for (int i = 0; i < loopPhases.size(); i++) {
@@ -3352,7 +3353,7 @@ public class Graph {
                             } else {
                                 ternarOnFalse = filteredOnFalse.get(0).value;
                             }
-                            TernarOpItem top = new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);                            
+                            TernarOpItem top = new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);
                             stack.push(handleTernar(top, localData));
                         } else {
                             boolean isIf = true;
@@ -3887,7 +3888,7 @@ public class Graph {
                 if (ti.hasSingleNewLineAround() && !lastNewLine) {
                     writer.newLine();
                 }
-                ti.toStringSemicoloned(writer, localData);       
+                ti.toStringSemicoloned(writer, localData);
                 if (!ti.handlesNewLine()) {
                     writer.newLine();
                 }
@@ -4293,9 +4294,10 @@ public class Graph {
     protected boolean partIsSwitch(GraphPart part) {
         return false;
     }
-    
+
     /**
      * Replaces ternar with custom value
+     *
      * @param ternar Ternar
      * @param localData Local data
      * @return Custom item

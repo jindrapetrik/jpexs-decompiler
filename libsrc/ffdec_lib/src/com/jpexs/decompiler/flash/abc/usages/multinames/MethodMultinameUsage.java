@@ -38,6 +38,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     /**
      * Constructor.
+     *
      * @param abc ABC
      * @param multinameIndex Multiname index
      * @param scriptIndex Script index
@@ -55,6 +56,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     /**
      * Is initializer.
+     *
      * @return Is initializer
      */
     public boolean isInitializer() {
@@ -102,7 +104,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
                 if (traitsType == TRAITS_TYPE_CLASS) {
                     ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 } else {
-                    ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/,convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                    ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 }
                 writer.appendNoHilight(" ");
             }
@@ -142,6 +144,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     /**
      * Is static.
+     *
      * @return Is static
      */
     public boolean isStatic() {

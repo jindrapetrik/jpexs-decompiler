@@ -184,7 +184,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private final MainPanel mainPanel;
 
     private JMenuItem gotoDocumentClassMenuItem;
-    
+
     private JMenuItem configurePathResolvingMenuItem;
 
     private JMenuItem setAsLinkageMenuItem;
@@ -224,7 +224,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem exportFlashDevelopMenuItem;
 
     private JMenuItem exportIdeaMenuItem;
-    
+
     private JMenuItem exportVsCodeMenuItem;
 
     private JMenuItem exportSwfXmlMenuItem;
@@ -342,9 +342,9 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem replaceWithGifMenuItem;
 
     private JMenuItem collectDepthAsSpritesMenuItem;
-    
+
     private JMenuItem convertShapeTypeMenuItem;
-    
+
     private JMenuItem convertPlaceObjectTypeMenuItem;
 
     private List<TreeItem> items = new ArrayList<>();
@@ -405,7 +405,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
         add(configurePathResolvingMenuItem);
 
-        addSeparator();                        
+        addSeparator();
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
@@ -467,7 +467,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportIdeaMenuItem.addActionListener(this::exportIdeaActionPerformed);
         exportIdeaMenuItem.setIcon(View.getIcon("exportidea16"));
         add(exportIdeaMenuItem);
-        
+
         exportVsCodeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportVsCode"));
         exportVsCodeMenuItem.addActionListener(this::exportVsCodeActionPerformed);
         exportVsCodeMenuItem.setIcon(View.getIcon("exportvscode16"));
@@ -544,19 +544,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
-        
+
         convertShapeTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertShapeType"));
         convertShapeTypeMenuItem.addActionListener(this::convertShapeTypeActionPerformed);
         convertShapeTypeMenuItem.setIcon(View.getIcon("shape16"));
         add(convertShapeTypeMenuItem);
-        
+
         convertPlaceObjectTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertPlaceObjectType"));
         convertPlaceObjectTypeMenuItem.addActionListener(this::convertPlaceObjectTypeActionPerformed);
         convertPlaceObjectTypeMenuItem.setIcon(View.getIcon("placeobject16"));
         add(convertPlaceObjectTypeMenuItem);
 
         addSeparator();
-        
+
         gotoDocumentClassMenuItem = new JMenuItem(mainPanel.translate("menu.tools.gotoDocumentClass"));
         gotoDocumentClassMenuItem.addActionListener(this::gotoDocumentClassActionPerformed);
         gotoDocumentClassMenuItem.setIcon(View.getIcon("gotomainclass16"));
@@ -920,7 +920,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (item instanceof Cookie) {
                 if (wasFrame) {
                     return false;
-                }            
+                }
                 wasNotFrame = true;
             } else if (item instanceof Tag) {
                 if (wasFrame) {
@@ -1089,24 +1089,24 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             tim = fr.timeline.timelined;
         }
-        
+
         boolean allSelectedIsShape = true;
         boolean allSelectedIsPlaceObject = true;
-        
+
         if (items.isEmpty()) {
             allSelectedIsShape = false;
             allSelectedIsPlaceObject = false;
         }
-        
+
         for (TreeItem item : items) {
-            
+
             if (!(item instanceof ShapeTag)) {
                 allSelectedIsShape = false;
             }
             if (!(item instanceof PlaceObjectTypeTag)) {
                 allSelectedIsPlaceObject = false;
             }
-            
+
             if (item instanceof Tag) {
                 Tag tag = (Tag) item;
                 if (tag.isReadOnly()) {
@@ -1424,13 +1424,13 @@ public class TagTreeContextMenu extends JPopupMenu {
                 exportABCMenuItem.setVisible(true);
                 gotoDocumentClassMenuItem.setVisible(true);
             }
-            
+
             if (firstItem instanceof ScriptPack) {
                 if (firstItem.getOpenable() instanceof SWF) {
                     gotoDocumentClassMenuItem.setVisible(true);
                 }
             }
-            
+
             if (firstItem instanceof SWF) {
                 if (((SWF) firstItem).isAS3()) {
                     gotoDocumentClassMenuItem.setVisible(true);
@@ -1455,7 +1455,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     replaceRefsWithTagMenuItem.setVisible(true);
                 }
             }
-                        
+
             if (firstItem instanceof DefineSpriteTag) {
                 replaceWithGifMenuItem.setVisible(true);
             }
@@ -1481,7 +1481,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     addInsideAddAllTags = true;
                 }
             }
-            
+
             boolean isCookie = firstItem instanceof Cookie;
 
             addTagInsideMenu.removeAll();
@@ -1682,11 +1682,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-        
+
         if (allSelectedIsShape) {
             convertShapeTypeMenuItem.setVisible(true);
         }
-        
+
         if (allSelectedIsPlaceObject) {
             convertPlaceObjectTypeMenuItem.setVisible(true);
         }
@@ -2600,7 +2600,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.refreshTree(swf);
         }
     }
-    
+
     private void convertShapeTypeActionPerformed(ActionEvent evt) {
         List<TreeItem> itemr = getSelectedItems();
         if (itemr.isEmpty()) {
@@ -2609,25 +2609,24 @@ public class TagTreeContextMenu extends JPopupMenu {
         int currentShapeNum = 0;
         int min = 0;
         int minForced = 0;
-        
+
         ShapeTypeConverter converter = new ShapeTypeConverter();
-        
-        
+
         if (itemr.size() == 1) {
             ShapeTag sh = (ShapeTag) itemr.get(0);
             currentShapeNum = sh.getShapeNum();
             min = converter.getMinShapeNum(sh);
             minForced = converter.getForcedMinShapeNum(sh);
-        }                
-        
+        }
+
         ConvertShapeTypeDialog dialog = new ConvertShapeTypeDialog(Main.getDefaultDialogsOwner(), currentShapeNum, minForced, min);
-        
+
         int shapeNum = dialog.showDialog();
-        
+
         if (shapeNum == 0) {
             return;
         }
-        
+
         for (TreeItem item : itemr) {
             ShapeTag sh = (ShapeTag) item;
             int newShapeNum = shapeNum;
@@ -2640,14 +2639,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             converter.convertCharacter(sh.getSwf(), sh.getCharacterId(), newShapeNum);
         }
-        
+
         mainPanel.refreshTree();
         if (itemr.size() == 1) {
             ShapeTag sh = (ShapeTag) itemr.get(0);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), sh.getSwf().getCharacter(sh.getCharacterId()));
-        }        
+        }
     }
-    
+
     private void convertPlaceObjectTypeActionPerformed(ActionEvent evt) {
         List<TreeItem> itemr = getSelectedItems();
         if (itemr.isEmpty()) {
@@ -2655,37 +2654,36 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         int currentPlaceObjectNum = 0;
         int min = 0;
-        
+
         PlaceObjectTypeConverter converter = new PlaceObjectTypeConverter();
-        
-        
+
         if (itemr.size() == 1) {
             PlaceObjectTypeTag sh = (PlaceObjectTypeTag) itemr.get(0);
             currentPlaceObjectNum = sh.getPlaceObjectNum();
             min = converter.getMinPlaceNum(sh);
-        }                
-        
+        }
+
         ConvertPlaceObjectTypeDialog dialog = new ConvertPlaceObjectTypeDialog(Main.getDefaultDialogsOwner(), currentPlaceObjectNum, min);
-        
+
         int placeNum = dialog.showDialog();
-        
+
         if (placeNum == 0) {
             return;
         }
-        
+
         PlaceObjectTypeTag lastConverted = null;
         for (TreeItem item : itemr) {
             PlaceObjectTypeTag pl = (PlaceObjectTypeTag) item;
-            if (pl.getPlaceObjectNum()== placeNum) {
+            if (pl.getPlaceObjectNum() == placeNum) {
                 continue;
             }
             lastConverted = converter.convertTagType(pl, placeNum);
         }
-        
+
         mainPanel.refreshTree();
         if (itemr.size() == 1) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), lastConverted);
-        }        
+        }
     }
 
     private void replaceRefsWithTagActionPerformed(ActionEvent evt) {
@@ -2828,7 +2826,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         item.getOpenable();
         mainPanel.gotoDocumentClass((SWF) item.getOpenable());
     }
-    
+
     private void jumpToCharacterActionPerformed(ActionEvent evt) {
         TreeItem itemj = getCurrentItem();
         if (itemj == null || !(itemj instanceof HasCharacterId)) {
@@ -2988,7 +2986,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         if (!identifier.isEmpty() && !found) {
             ea.tags.add(ch.getCharacterId());
-            ea.names.add(identifier);           
+            ea.names.add(identifier);
         }
         ea.setModified(true);
         if (ea.names.isEmpty()) {
@@ -4046,7 +4044,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 Cookie cookie = (Cookie) item;
                                 ((Cookie) item).getSolFile().delete();
                             }
-                            
+
                             if (item instanceof BUTTONRECORD) {
                                 ButtonTag button = (ButtonTag) parent;
                                 button.getRecords().remove((BUTTONRECORD) item);
@@ -5708,7 +5706,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         SWF swf = (SWF) getCurrentItem().getOpenable();
         mainPanel.exportIdea(swf);
     }
-    
+
     public void exportVsCodeActionPerformed(ActionEvent evt) {
         SWF swf = (SWF) getCurrentItem().getOpenable();
         mainPanel.exportVsCode(swf);

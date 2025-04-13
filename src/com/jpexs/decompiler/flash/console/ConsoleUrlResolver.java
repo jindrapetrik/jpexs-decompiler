@@ -32,6 +32,7 @@ import java.util.Scanner;
 
 /**
  * Console Url resolver
+ *
  * @author JPEXS
  */
 public class ConsoleUrlResolver implements UrlResolver {
@@ -42,7 +43,7 @@ public class ConsoleUrlResolver implements UrlResolver {
 
     private boolean ignoredInfoPrinted = false;
     private Character toAll = null;
-    
+
     private Map<String, String> importSources = new HashMap<>();
 
     /**
@@ -64,14 +65,14 @@ public class ConsoleUrlResolver implements UrlResolver {
 
         Character choice = toAll;
         String currentUrl = url;
-        
+
         if (importSources.containsKey(url)) {
             currentUrl = importSources.get(url);
             if (currentUrl.isEmpty()) {
                 return null;
             }
             choice = 'y';
-        } else {        
+        } else {
             if (choice == null && doResolve) {
                 choice = 'y';
             }
@@ -86,9 +87,8 @@ public class ConsoleUrlResolver implements UrlResolver {
                 choice = ask(url);
             }
         }
-                
-        
-        while(choice != 'n') {       
+
+        while (choice != 'n') {
             if (choice == 'c') {
                 System.out.println("Enter new location instead (empty to cancel):");
                 Scanner sc = new Scanner(System.in);
@@ -115,7 +115,7 @@ public class ConsoleUrlResolver implements UrlResolver {
                 File swf = new File(new File(basePath).getParentFile(), currentUrl);
                 if (swf.exists()) {
                     try {
-                        SWF ret = open(new FileInputStream(swf), swf.getAbsolutePath(), swf.getName());                    
+                        SWF ret = open(new FileInputStream(swf), swf.getAbsolutePath(), swf.getName());
                         return ret;
                     } catch (Exception ex) {
                         //ignore
@@ -144,10 +144,10 @@ public class ConsoleUrlResolver implements UrlResolver {
         }
         return null;
     }
-    
+
     private SWF open(InputStream is, String file, String fileTitle) throws Exception {
         OpenableSourceInfo sourceInfo = new OpenableSourceInfo(is, file, fileTitle);
-        return new SWF(new BufferedInputStream(is), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, this, null /*??*/);        
+        return new SWF(new BufferedInputStream(is), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, this, null /*??*/);
     }
 
     private String prompt() {

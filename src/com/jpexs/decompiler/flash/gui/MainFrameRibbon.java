@@ -158,11 +158,11 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                     SWF easySwf = panel.getEasyPanel().getSwf();
                     if (easySwf != null) {
-                        Configuration.lastSessionEasySwf.set(easySwf.getFile()+ "|" + easySwf.getFileTitle());
+                        Configuration.lastSessionEasySwf.set(easySwf.getFile() + "|" + easySwf.getFileTitle());
                     } else {
                         Configuration.lastSessionEasySwf.set("");
                     }
-                    
+
                     String pathResources = panel.tagTree.getSelectionPathString();
                     if (pathResources != null) {
                         Configuration.lastSessionSelection.set(pathResources);

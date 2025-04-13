@@ -500,7 +500,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void replaceItemPin(TreeItem oldItem, TreeItem newItem) {
         pinsPanel.replaceItem(oldItem, newItem);
     }
-    
+
     public void refreshPinnedScriptPacks() {
         pinsPanel.refreshScriptPacks();
     }
@@ -1473,7 +1473,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);        
+        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
         previewPanel.clear();
         openables.set(index, newSwfs);
 
@@ -1482,7 +1482,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Main.searchResultsStorage.destroySwf(s);
         }
         Openable openable = newSwfs.size() > 0 ? newSwfs.get(0) : null;
-        
+
         easyPanel.setSwfs(new ArrayList<>(getAllSwfs()));
         if (openable instanceof SWF) {
             easyPanel.setSwf((SWF) openable);
@@ -1505,9 +1505,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
 
         openables.add(newOpenables);
-        
+
         easyPanel.setSwfs(new ArrayList<>(getAllSwfs()));
-        
+
         Openable openable = newOpenables.size() > 0 ? newOpenables.get(0) : null;
         if (openable != null) {
             updateUi(openable);
@@ -1831,7 +1831,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         mainMenu.updateComponents(null);
         previewPanel.clear();
-        dumpPreviewPanel.clear();   
+        dumpPreviewPanel.clear();
         doFilter();
         return true;
     }
@@ -1901,14 +1901,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<String> newFoldersFilter = findPanel.getFolders();
 
         if (isFilterEmpty(oldFilter) && oldFoldersFilter.isEmpty()) {
-            unfilteredExpandedNodes.clear();          
+            unfilteredExpandedNodes.clear();
             unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree));
         }
 
-        if (
-                oldFilter.trim().equals(newFilter.trim())
-                && oldFoldersFilter.equals(newFoldersFilter)
-                ) {
+        if (oldFilter.trim().equals(newFilter.trim())
+                && oldFoldersFilter.equals(newFoldersFilter)) {
             return;
         }
 
@@ -3161,7 +3159,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
         List<TreeItem> items = getSelected();
-        
+
         String selected;
         if (scopeTextTags.isEmpty()) {
             selected = null;
@@ -5043,6 +5041,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean replace(List<TreeItem> items, boolean create) {
         return replace(items, create, true);
     }
+
     public boolean replace(List<TreeItem> items, boolean create, boolean fill) {
         if (items.isEmpty()) {
             return false;
@@ -5250,14 +5249,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void replaceNoFillButtonActionPerformed(List<TreeItem> items) {
         replace(items, false, false);
-    }   
+    }
 
     public boolean replaceNoFill(TreeItem item) {
         List<TreeItem> items = new ArrayList<>();
         items.add(item);
         return replace(items, false, false);
     }
-    
+
     private void showSvgImportWarning() {
         ViewMessages.showMessageDialog(this, AppStrings.translate("message.warning.svgImportExperimental"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningSvgImport);
     }
@@ -5684,11 +5683,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean showView(int view) {
         View.checkAccess();
-        
+
         if (view == VIEW_EASY && !EasyPanel.EASY_AVAILABLE) {
             view = VIEW_RESOURCES;
-        }            
-        
+        }
+
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
@@ -5731,8 +5730,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
                 updateUiWithCurrentOpenable();
                 return true;
-            case VIEW_EASY:                
-                SWF swf = getCurrentSwf();                
+            case VIEW_EASY:
+                SWF swf = getCurrentSwf();
                 pinsPanel.setVisible(false);
                 currentView = view;
                 Configuration.lastView.set(currentView);
@@ -5741,7 +5740,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 easyPanel.setSwf(swf);
                 if (!isWelcomeScreen) {
                     showContentPanelCard(EASY_PANEL);
-                }                
+                }
                 return true;
             case VIEW_TAGLIST:
                 easyPanel.setNoSwf();
@@ -5978,7 +5977,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 public boolean isModified() {
                     return false;
-                }                                
+                }
 
                 @Override
                 public ReadOnlyTagList getTags() {
@@ -6097,7 +6096,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (currentView == VIEW_DUMP) {
             dumpViewReload(forceReload);
             return;
-        }       
+        }
         /*else if (currentView == VIEW_TAGLIST) {
             tagListViewReload(forceReload);
             return;
@@ -6109,7 +6108,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treePath != null && tree.getFullModel().treePathExists(treePath)) {
             treeItem = (TreeItem) treePath.getLastPathComponent();
         }
-        
+
         if (currentView == VIEW_EASY) {
             if (treeItem != null) {
                 Openable op = treeItem.getOpenable();
@@ -6512,8 +6511,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void setErrorState(ErrorState errorState) {
         statusPanel.setErrorState(errorState);
-    }  
-    
+    }
+
     private void disposeInner(Container container) {
         for (Component c : container.getComponents()) {
             if (c instanceof Container) {
@@ -6736,5 +6735,5 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public EasyPanel getEasyPanel() {
         return easyPanel;
-    }        
+    }
 }

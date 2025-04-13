@@ -29,15 +29,16 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class EasyPanel extends JPanel {
-    
+
     /**
-     * TODO: switch to true when Easy mode is released.
-     * I think it's not production ready yet.
+     * TODO: switch to true when Easy mode is released. I think it's not
+     * production ready yet.
      */
     public static final boolean EASY_AVAILABLE = true;
-    
+
     private TabSwitcher<SWF> tabSwitcher;
     private EasySwfPanel easySwfPanel;
+
     public EasyPanel(MainPanel mainPanel) {
         easySwfPanel = new EasySwfPanel(mainPanel);
         tabSwitcher = new TabSwitcher<>(easySwfPanel);
@@ -47,30 +48,30 @@ public class EasyPanel extends JPanel {
             @Override
             public void tabSwitched(SWF value) {
                 easySwfPanel.setTimelined(value);
-            }            
+            }
         });
     }
-    
+
     public void setSwfs(List<SWF> swfs) {
         tabSwitcher.clear();
         for (SWF swf : swfs) {
             tabSwitcher.addTab(swf, swf.getShortPathTitle(), View.getIcon("flash16"));
-        }   
+        }
         easySwfPanel.clearUndos();
     }
-    
+
     public void setSwf(SWF swf) {
         tabSwitcher.setValue(swf);
     }
-    
+
     public void setNoSwf() {
         easySwfPanel.setTimelined(null);
     }
-    
+
     public SWF getSwf() {
         return tabSwitcher.getSelectedValue();
     }
-    
+
     public void dispose() {
         setSwfs(new ArrayList<>());
         easySwfPanel.dispose();

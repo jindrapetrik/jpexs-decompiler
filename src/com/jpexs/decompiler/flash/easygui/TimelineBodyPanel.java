@@ -119,7 +119,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private int depth = 0;
 
     private int endDepth = 0;*/
-
     private final UndoManager undoManager;
 
     private boolean ctrlDown = false;
@@ -390,19 +389,17 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         /*if (cursor != null && cursor.contains(frame, depth) && !cursor.contains(frame + num_frames, depth)) {//frame <= cursor.x && (frame + num_frames) > cursor.x && depth == cursor.y) {
             selected = true;
         }*/
-
         for (int n = frame + 1; n < frame + num_frames; n++) {
             g.setColor(getSelectedColor());
             if (cursor.contains(new Point(n, depth))) {
                 g.fillRect(n * frameWidth + 1, depth * frameHeight + 1, frameWidth, frameHeight);
             }
         }
-        
+
         /*if (selected) {
             g.setColor(getSelectedColor());
             g.fillRect(cursor.x * frameWidth + 1, depth * frameHeight + 1, (cursor.width * frameWidth) - 1, frameHeight - 1);
         }*/
-
         boolean isTween = blockType == BlockType.MOTION_TWEEN || blockType == BlockType.SHAPE_TWEEN;
 
         g.setColor(KEY_COLOR);
@@ -468,11 +465,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public void depthSelect(int depth) {
         frameSelect(getFirstFrame(), Arrays.asList(depth));
     }
-    
+
     public void depthsSelect(List<Integer> depths) {
         frameSelect(getFirstFrame(), depths);
     }
-    
+
     public int getFirstFrame() {
         if (cursor.isEmpty()) {
             return 0;
@@ -487,7 +484,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return cursor.iterator().next().y;
     }
 
-    
     public void rectSelect(int frame, int depth, int endFrame, int endDepth) {
         int x1 = Math.min(frame, endFrame);
         int x2 = Math.max(frame, endFrame);
@@ -504,7 +500,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         cursor.clear();
         cursor.addAll(newCursor);
-        
+
         /*cursor = new Rectangle(
                 x1,
                 y1,
@@ -523,11 +519,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         fireFrameSelected(frame, depths);
     }
 
-    public void frameSelect(int frame, int depth) {    
+    public void frameSelect(int frame, int depth) {
         frameSelect(frame, Arrays.asList(depth));
     }
-    
-    public void frameSelect(int frame, List<Integer> depths) {                
+
+    public void frameSelect(int frame, List<Integer> depths) {
         /*if (cursor != null && cursor.width == 1 && cursor.height == 1 && (cursor.contains(frame, depth) || (depth == -1 && cursor.contains(frame, cursor.y)))) {
             return;
         }
@@ -535,27 +531,26 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             depth = cursor.y;
         }*/
         //rectSelect(frame, depth, frame, depth);
-        
+
         Set<Point> newCursor = new LinkedHashSet<>();
-        
+
         for (int d : depths) {
             newCursor.add(new Point(frame, d));
         }
         if (depths.isEmpty()) {
             newCursor.add(new Point(frame, 0));
         }
-        
+
         cursor.clear();
         cursor.addAll(newCursor);
-        
+
         repaint();
-        
+
         /*
         this.frame = frame;
         this.depth = depths.isEmpty() ? 0 : depths.get(0);
         this.endFrame = frame;
-        */
-        
+         */
         fireFrameSelected(frame, depths);
     }
 
@@ -585,7 +580,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         } else if (ctrlDown) {
             int frame = getFirstFrame();
             if (cursor.contains(p)) {
-                cursor.remove(p);                
+                cursor.remove(p);
             } else {
                 cursor.add(p);
             }
@@ -594,8 +589,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 if (t.x == frame) {
                     newDepths.add(t.y);
                 }
-            }            
-            
+            }
+
             repaint();
             fireFrameSelected(frame, newDepths);
         } else {
@@ -610,7 +605,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             int frame = getFirstFrame();
             int depth = getFirstDepth();
-            
+
             Frame fr = timeline.getFrame(frame);
             DepthState ds = fr == null ? null : fr.layers.get(depth);
             boolean thisEmpty = ds == null || ds.getCharacter() == null;
@@ -676,7 +671,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private Set<Point> getBackOrderedCursor() {
-         Set<Point> orderedCursor = new TreeSet<>(new Comparator<Point>() {
+        Set<Point> orderedCursor = new TreeSet<>(new Comparator<Point>() {
             @Override
             public int compare(Point o1, Point o2) {
                 int dx = o2.x - o1.x; //later frames first
@@ -684,14 +679,14 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     return dx;
                 }
                 return o1.y - o2.y;
-            }            
+            }
         });
         orderedCursor.addAll(cursor);
         return orderedCursor;
     }
-    
-    private void removeFrame(ActionEvent e) {        
-       
+
+    private void removeFrame(ActionEvent e) {
+
         Set<Point> orderedCursor = getBackOrderedCursor();
         undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timeline.timelined) {
 
@@ -703,7 +698,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                 for (Point p : orderedCursor) {
                     int nf = p.x;
-                    int nd = p.y;                    
+                    int nd = p.y;
 
                     int f = timelined.getFrameCount();
                     List<Tag> lastFrameDepthTags = new ArrayList<>();
@@ -786,7 +781,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                             timelined.addTag(lt);
                         }
                     }
-                }                
+                }
 
                 timelined.resetTimeline();
 
@@ -878,7 +873,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     //timelined.addTag(pos++, rm);
 
                     timelined.addTag(pos++, place);
-                }                
+                }
 
                 timelined.resetTimeline();
                 timeline = timelined.getTimeline();
@@ -911,11 +906,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             @Override
             public void doOperation() {
                 super.doOperation();
-                Timelined timelined = timeline.timelined;                                                                    
-                
-                
+                Timelined timelined = timeline.timelined;
+
                 DepthState ds = null;
-                
+
                 if (fframe >= timelined.getFrameCount()) {
                     int lastFrame = timelined.getFrameCount() - 1;
                     for (int d = 1; d <= timeline.maxDepth; d++) {
@@ -924,10 +918,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                             RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
                             rt.setTimelined(timelined);
                             rt.setDepth(d);
-                            timelined.addTag(rt);                            
+                            timelined.addTag(rt);
                         }
                     }
-                    
+
                     for (int f = timelined.getFrameCount(); f <= fframe; f++) {
                         ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
                         sf.setTimelined(timelined);
@@ -936,8 +930,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     }
                     timelined.resetTimeline();
                 }
-                
-                
+
                 for (int f = fframe - 1; f >= 0; f--) {
                     ds = timeline.getDepthState(f, fdepth);
                     if (ds != null && ds.getCharacter() != null) {
@@ -996,14 +989,13 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 super.doOperation();
                 DepthState ds;
                 Timelined timelined = timeline.timelined;
-               
 
                 //for (int nf = 0; nf < fendFrame - fframe + 1; nf++) {
                 //    for (int nd = fdepth; nd <= fendDepth; nd++) 
                 for (Point p : orderedCursor) {
                     int nf = p.x;
                     int nd = p.y;
-                    
+
                     if (nf >= timelined.getFrameCount()) {
 
                         ReadOnlyTagList tags = timelined.getTags();
@@ -1022,8 +1014,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                     break;
                                 }
                             }
-                        }                                     
-                       
+                        }
+
                         int lastFrame = timelined.getFrameCount() - 1;
                         //Add removeTag to other layers
                         for (int d = 1; d <= timeline.maxDepth; d++) {
@@ -1035,7 +1027,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                 RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
                                 rt.setTimelined(timelined);
                                 rt.setDepth(d);
-                                timelined.addTag(rt);                                    
+                                timelined.addTag(rt);
                             }
                         }
 
@@ -1047,8 +1039,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         }
                         timelined.resetTimeline();
                         continue;
-                    }      
-
+                    }
 
                     boolean somethingAfter = false;
                     for (int f = nf + 1; f < timeline.getFrameCount(); f++) {
@@ -1063,7 +1054,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     for (int f = nf; f >= 0; f--) {
                         ds = timeline.getDepthState(f, nd);
                         boolean empty = ds == null || ds.getCharacter() == null;
-                        if (!empty || somethingAfter) {                                
+                        if (!empty || somethingAfter) {
                             int moveFrameCount = somethingAfter ? 1 : nf - f;
                             for (int mf = 0; mf < moveFrameCount; mf++) {
                                 int pos = timelined.indexOfTag(timeline.getFrame(f).showFrameTag);
@@ -1121,7 +1112,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                         f2++;
                                     }
                                 }
-                                
+
                                 if ((!removeOnly && !lastFrameDepthTags.isEmpty()) || !endsWithRemove) {
                                     //Add removeTag to other layers
                                     for (int d = 1; d <= timeline.maxDepth; d++) {
@@ -1142,11 +1133,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                     timelined.addTag(sf);
                                     timelined.setFrameCount(timelined.getFrameCount() + 1);
                                 }
-                            }                            
+                            }
                             break;
                         }
                     }
-                }                
+                }
 
                 timelined.resetTimeline();
                 timelined.setFrameCount(timelined.getTimeline().getFrameCount());
@@ -1192,8 +1183,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     @Override
-    public void keyPressed(KeyEvent e) { 
-        Point firstCursorItem = cursor.isEmpty() ? new Point(1,1) : cursor.iterator().next();
+    public void keyPressed(KeyEvent e) {
+        Point firstCursorItem = cursor.isEmpty() ? new Point(1, 1) : cursor.iterator().next();
         switch (e.getKeyCode()) {
             case 37: //left
                 if (firstCursorItem.x > 0) {
@@ -1246,5 +1237,5 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
         refresh();
-    }        
+    }
 }

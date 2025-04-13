@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StringAddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
@@ -49,6 +48,7 @@ public class FSCommandActionItem extends ActionItem {
      * Parameter
      */
     private final GraphTargetItem parameter;
+
     /**
      * Constructor.
      *
@@ -89,10 +89,12 @@ public class FSCommandActionItem extends ActionItem {
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         String charset = asGenerator.getCharset();
-        if ((command instanceof DirectValueActionItem) 
+        if ((command instanceof DirectValueActionItem)
                 && ((DirectValueActionItem) command).isString()
-                && (parameter == null || 
-                ((parameter instanceof DirectValueActionItem) && ((DirectValueActionItem) parameter).isString()))) {
+                && (
+                parameter == null
+                || ((parameter instanceof DirectValueActionItem) && ((DirectValueActionItem) parameter).isString())
+                )) {
             return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + ((DirectValueActionItem) command).getAsString(), parameter == null ? "" : ((DirectValueActionItem) parameter).getAsString(), charset));
         }
         return toSourceMerge(localData, generator, new StringAddActionItem(null, null, asGenerator.pushConstTargetItem("FSCommand:"), command), parameter == null ? asGenerator.pushConstTargetItem("") : parameter, new ActionGetURL2(1/*GET*/, false, false, charset), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset) : null);

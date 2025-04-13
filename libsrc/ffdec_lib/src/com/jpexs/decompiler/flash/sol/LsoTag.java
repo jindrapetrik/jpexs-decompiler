@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 public class LsoTag extends Tag {
 
     public static final int ID = 2;
-    
+
     public String fileName;
     public int amfVersion;
     public Map<String, Object> amfValues = new LinkedHashMap<>();
@@ -49,7 +49,7 @@ public class LsoTag extends Tag {
     public LsoTag(byte[] data, boolean forceWriteAsLong) {
         super(ID, "DefineLso", data, forceWriteAsLong);
     }
-    
+
     public LsoTag(String fileName, int amfVersion, Map<String, Object> amfValues) {
         super(ID, "DefineLso", new byte[0], true);
         this.fileName = fileName;
@@ -81,7 +81,7 @@ public class LsoTag extends Tag {
             while (ais.available() > 0) {
                 String varName = ais.readUtf8("varName");
                 try {
-                    Object varValue = ais.readValue("varValue");                    
+                    Object varValue = ais.readValue("varValue");
                     amfValues.put(varName, varValue);
                 } catch (NoSerializerExistsException ex) {
                     throw new IllegalArgumentException("Serializer for class " + ex.getClassName() + " not found");
@@ -89,7 +89,7 @@ public class LsoTag extends Tag {
                 ais.read(); //ending byte
             }
             ais.resolveMapReferences(amfValues);
-        }        
+        }
 
         if (amfVersion == 3) {
             Amf3InputStream ais = new Amf3InputStream(new MemoryInputStream(amfData));
@@ -114,18 +114,18 @@ public class LsoTag extends Tag {
     @Override
     public void writeData(OutputStream os) throws IOException {
         Amf0OutputStream aos = new Amf0OutputStream(os);
-        aos.write(new byte[] {'T', 'C', 'S', 'O'});
-        aos.write(new byte[] {0x00,0x04,0x00,0x00,0x00,0x00});
+        aos.write(new byte[]{'T', 'C', 'S', 'O'});
+        aos.write(new byte[]{0x00, 0x04, 0x00, 0x00, 0x00, 0x00});
         byte[] fileNameData = fileName.getBytes("UTF-8");
         aos.writeU16(fileNameData.length);
         aos.write(fileNameData);
         aos.writeU32(amfVersion);
-        
+
         if (amfVersion == 0) {
             List<Object> complexObjects = new ArrayList<>();
-            for(String key: amfValues.keySet()) {
+            for (String key : amfValues.keySet()) {
                 aos.writeUtf8(key);
-                aos.writeValue(amfValues.get(key), complexObjects);                
+                aos.writeValue(amfValues.get(key), complexObjects);
                 aos.write(0);
             }
         }
@@ -134,7 +134,7 @@ public class LsoTag extends Tag {
             List<String> stringTable = new ArrayList<>();
             List<Traits> traitTable = new ArrayList<>();
             List<Object> objectTable = new ArrayList<>();
-            for(String key: amfValues.keySet()) {
+            for (String key : amfValues.keySet()) {
                 try {
                     a3os.writeUtf8Vr(key, stringTable);
                     a3os.writeValue(amfValues.get(key), new HashMap<>(), stringTable, traitTable, objectTable);
@@ -144,6 +144,6 @@ public class LsoTag extends Tag {
                 aos.write(0);
             }
         }
-        
+
     }
 }

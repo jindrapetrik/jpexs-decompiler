@@ -41,24 +41,24 @@ import javax.swing.border.BevelBorder;
  * @author JPEXS
  */
 public abstract class AbstractPropertiesPanel extends JPanel {
-    
+
     protected String titleIdentifier;
-    
+
     private final Map<String, JPanel> cardContents = new LinkedHashMap<>();
     private final Map<String, JLabel> cardPlusMinusLabels = new LinkedHashMap<>();
-    
+
     private static final char PLUS_CHAR = '\u2BC8';
     private static final char MINUS_CHAR = '\u2BC6';
-   
+
     public AbstractPropertiesPanel(String titleIdentifier) {
-        this.titleIdentifier =  titleIdentifier;
+        this.titleIdentifier = titleIdentifier;
     }
-    
+
     protected String formatPropertyName(String id) {
-        String item = EasyStrings.translate("property."+titleIdentifier+"." + id);
+        String item = EasyStrings.translate("property." + titleIdentifier + "." + id);
         return EasyStrings.translate("property.label").replace("%item%", item);
     }
-    
+
     protected JPanel makeCard(String id, String icon, JPanel contents) {
         JPanel cardPanel = new JPanel();
 
@@ -118,9 +118,7 @@ public abstract class AbstractPropertiesPanel extends JPanel {
             plusMinusLabel.setText("" + PLUS_CHAR);
         }
     }
-    
-    
-    
+
     protected void addToGrid(GridBagLayout layout, Container parent, Component component, int x, int y) {
         addToGrid(layout, parent, component, x, y, 1, 1);
     }

@@ -80,7 +80,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     /**
      * Frame trait names
      */
-    private final List<String> frameTraitNames = new ArrayList<>();  
+    private final List<String> frameTraitNames = new ArrayList<>();
 
     /**
      * Deletes this trait.
@@ -147,13 +147,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance initializer
         DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNamespace, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
-    
+
     @Override
     public GraphTextWriter toStringHeader(int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         abc.instance_info.get(class_info).getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, false /*??*/);
         return writer;
     }
-  
+
     @Override
     public void convertHeader(int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
@@ -198,13 +198,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
         //DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
-        
-        Reference<Boolean> first = new Reference<>(true);                              
-        
+
+        Reference<Boolean> first = new Reference<>(true);
+
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
         getMetaData(this, convertData, abc, writer);
-        
+
         boolean allowEmbed = true;
 
         if (convertData.exportEmbedFlaMode) {
@@ -235,7 +235,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 }
             }
         }
-        
+
         //class header
         instanceInfo.getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, allowEmbed);
         writer.endTrait();
@@ -243,7 +243,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.startClass(class_info);
 
         first.setVal(true);
-        
+
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
         classInfo.static_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
@@ -257,7 +257,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 if (!classInitializerIsEmpty) {
                     //writer.startBlock();
                     if (!first.getVal()) {
-                        writer.newLine();     
+                        writer.newLine();
                     }
                     first.setVal(false);
                     List<MethodBody> callStack = new ArrayList<>();
@@ -287,7 +287,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             ignoredInstanceVariableNames.add("__lastFrameAcc");
             ignoredInstanceVariableNames.add("__lastFrameTab");
         }
-        
+
         //instance variables
         instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, ignoredInstanceVariableNames, isInterface);
 
@@ -297,7 +297,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             Multiname m = abc.constants.getMultiname(instanceInfo.name_index);
 
             if (!first.getVal()) {
-                writer.newLine();     
+                writer.newLine();
             }
             first.setVal(false);
             writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
@@ -328,18 +328,18 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         List<String> ignoredInstanceTraitNames = new ArrayList<>();
         if (convertData.ignoreFrameScripts) {
-            ignoredInstanceTraitNames.addAll(frameTraitNames);         
+            ignoredInstanceTraitNames.addAll(frameTraitNames);
         }
-        if (convertData.ignoreAccessibility) {            
+        if (convertData.ignoreAccessibility) {
             for (Trait t : instanceInfo.instance_traits.traits) {
-                String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);                        ;
+                String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);;
                 if (traitName.startsWith("__setAcc_")
                         || traitName.startsWith("__setTab_")) {
                     ignoredInstanceTraitNames.add(traitName);
                 }
-            }            
+            }
         }
-        
+
         //instance methods
         instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, ignoredInstanceTraitNames, isInterface);
 
@@ -351,7 +351,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.newLine();
         return writer;
     }
-    
+
     @Override
     public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
 
@@ -432,7 +432,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                             if (ti instanceof CallPropertyAVM2Item) {
                                 CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
                                 if (callProp.propertyName instanceof FullMultinameAVM2Item) {
-                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;                                    
+                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
                                     if ("addFrameScript".equals(propName.resolvedMultinameName)) {
                                         for (int i = 0; i < callProp.arguments.size(); i += 2) {
                                             if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
@@ -453,14 +453,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                         }
                                         constructorBody.convertedItems.remove(j);
                                         j--;
-                                    } else if (
-                                            propName.resolvedMultinameName != null
-                                            && (
-                                                propName.resolvedMultinameName.startsWith("__setAcc_")
-                                                || propName.resolvedMultinameName.startsWith("__setTab_")
-                                            )
-                                            && callProp.arguments.isEmpty()
-                                            ) {
+                                    } else if (propName.resolvedMultinameName != null
+                                            && (propName.resolvedMultinameName.startsWith("__setAcc_")
+                                            || propName.resolvedMultinameName.startsWith("__setTab_"))
+                                            && callProp.arguments.isEmpty()) {
                                         //accessibilityTraitNames.add(propName.resolvedMultinameName);
                                         constructorBody.convertedItems.remove(j);
                                         j--;
@@ -470,14 +466,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         }
                     }
                 }
-                
+
                 if (convertData.ignoreAccessibility) {
                     if (constructorBody.convertedItems != null) {
                         for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
                             GraphTargetItem ti = constructorBody.convertedItems.get(j);
                             if (ti instanceof CallPropertyAVM2Item) {
                                 CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
-                                
+
                                 if (callProp.propertyName instanceof FullMultinameAVM2Item) {
                                     FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
                                     if ("addEventListener".equals(propName.resolvedMultinameName)) {
@@ -505,21 +501,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                         }
                                         fm = (FullMultinameAVM2Item) gp.propertyName;
                                         if (!("__setAcc_handler".equals(fm.resolvedMultinameName)
-                                              || "__setTab_handler".equals(fm.resolvedMultinameName))) {
+                                                || "__setTab_handler".equals(fm.resolvedMultinameName))) {
                                             continue;
                                         }
                                         constructorBody.convertedItems.remove(j);
                                         j--;
                                     }
-                                
-                                    if (
-                                        propName.resolvedMultinameName != null
-                                        && (
-                                            propName.resolvedMultinameName.startsWith("__setAcc_")
-                                            || propName.resolvedMultinameName.startsWith("__setTab_")
-                                        )
-                                        && callProp.arguments.isEmpty()
-                                        ) {
+
+                                    if (propName.resolvedMultinameName != null
+                                            && (propName.resolvedMultinameName.startsWith("__setAcc_")
+                                            || propName.resolvedMultinameName.startsWith("__setTab_"))
+                                            && callProp.arguments.isEmpty()) {
                                         //accessibilityTraitNames.add(propName.resolvedMultinameName);
                                         constructorBody.convertedItems.remove(j);
                                         j--;

@@ -657,7 +657,7 @@ public class ActionScript3Parser {
         openedNamespaces.add(privateNs);
         openedNamespaces.add(protectedNs);
         openedNamespaces.add(staticProtectedNs);
-        
+
         Stack<Loop> cinitLoops = new Stack<>();
         Map<Loop, String> cinitLoopLabels = new HashMap<>();
         HashMap<String, Integer> cinitRegisterVars = new HashMap<>();
@@ -686,15 +686,15 @@ public class ActionScript3Parser {
             }*/
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
             //s = lex();
-            
-            ParsedSymbol s = lex();            
+
+            ParsedSymbol s = lex();
             while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     preSymbols.add(s);
-                    isFinal = true;                    
+                    isFinal = true;
                 } else if (s.type == SymbolType.OVERRIDE) {
                     if (isOverride) {
                         throw new AVM2ParseException("Only one override keyword allowed", lexer.yyline());
@@ -723,7 +723,7 @@ public class ActionScript3Parser {
                     preSymbols.add(s);
                     isNative = true;
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
-                    customNs = s.value.toString();                    
+                    customNs = s.value.toString();
                     if (isInterface) {
                         throw new AVM2ParseException("Namespace attributes are not permitted on interface methods", lexer.yyline());
                     }
@@ -767,14 +767,14 @@ public class ActionScript3Parser {
                             s = lex();
                             expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
                             preSymbols.add(s);
-                            s = lex();                            
+                            s = lex();
                             expected(s, lexer.yyline(), SymbolType.STRING);
-                            preSymbols.add(s);                            
+                            preSymbols.add(s);
                             namespace = new NamespaceItem((String) s.value, Namespace.KIND_NAMESPACE);
                             s = lex();
                             expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
-                            preSymbols.add(s);                            
-                            
+                            preSymbols.add(s);
+
                         } else {
                             lexer.pushback(s);
                         }
@@ -971,7 +971,7 @@ public class ActionScript3Parser {
                     for (int i = preSymbols.size() - 1; i >= 0; i--) {
                         lexer.pushback(preSymbols.get(i));
                     }
-                    
+
                     GraphTargetItem cmd = command(allOpenedNamespaces, null, publicNs, cinitNeedsActivation, importedClasses, openedNamespaces, cinitLoops, cinitLoopLabels, cinitRegisterVars, true, false, 0, false, cinitVariables, abc);
                     if (cmd != null) {
                         traits.add(cmd);
@@ -988,28 +988,28 @@ public class ActionScript3Parser {
             List<List<NamespaceItem>> allOpenedNamespaces,
             int scriptIndex,
             String scriptName,
-            List<GraphTargetItem> traits, 
-            Reference<Integer> numberUsageRef, 
-            Reference<Integer> numberRoundingRef, 
+            List<GraphTargetItem> traits,
+            Reference<Integer> numberUsageRef,
+            Reference<Integer> numberRoundingRef,
             Reference<Integer> numberPrecisionRef,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
-            List<AssignableAVM2Item> sinitVariables            
-            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+            List<AssignableAVM2Item> sinitVariables
+    ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
 
         Stack<Loop> sinitLoops = new Stack<>();
         Map<Loop, String> sinitLoopLabels = new HashMap<>();
-            
+
         HashMap<String, Integer> sinitRegisterVars = new HashMap<>();
         while (scriptTraitsBlock(
                 importedClasses,
                 openedNamespaces,
-                allOpenedNamespaces, 
+                allOpenedNamespaces,
                 scriptIndex,
-                scriptName, 
-                traits, 
+                scriptName,
+                traits,
                 numberUsageRef,
-                numberRoundingRef, 
+                numberRoundingRef,
                 numberPrecisionRef,
                 abc,
                 sinitNeedsActivation,
@@ -1017,7 +1017,7 @@ public class ActionScript3Parser {
                 sinitLoopLabels,
                 sinitRegisterVars,
                 sinitVariables
-                )) {
+        )) {
             //empty
         }
     }
@@ -1029,7 +1029,7 @@ public class ActionScript3Parser {
             int scriptIndex,
             String scriptName,
             List<GraphTargetItem> traits,
-            Reference<Integer> numberUsageRef, 
+            Reference<Integer> numberUsageRef,
             Reference<Integer> numberRoundingRef,
             Reference<Integer> numberPrecisionRef,
             ABC abc,
@@ -1037,8 +1037,8 @@ public class ActionScript3Parser {
             Stack<Loop> sinitLoops,
             Map<Loop, String> sinitLoopLabels,
             HashMap<String, Integer> sinitRegisterVars,
-            List<AssignableAVM2Item> sinitVariables        
-            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+            List<AssignableAVM2Item> sinitVariables
+    ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         ParsedSymbol s;
         boolean inPackage = false;
         s = lex();
@@ -1105,7 +1105,7 @@ public class ActionScript3Parser {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     isFinal = true;
-                    preSymbols.add(s);                    
+                    preSymbols.add(s);
                 }
                 if (s.type == SymbolType.PUBLIC) {
                     if (!inPackage) {
@@ -1153,16 +1153,16 @@ public class ActionScript3Parser {
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     subNameStr = s.value.toString();
                     s = lex();
-                    
+
                     boolean nullable = true;
-                    
+
                     if (s.type == SymbolType.NOT) {
                         s = lex();
                         nullable = false;
                     } else if (s.type == SymbolType.TERNAR) {
                         s = lex();
                     }
-                    
+
                     if (!isInterface) {
 
                         if (s.type == SymbolType.EXTENDS) {
@@ -1297,11 +1297,11 @@ public class ActionScript3Parser {
                     break;
                 default:
                     lexer.pushback(s);
-                    
+
                     for (int i = preSymbols.size() - 1; i >= 0; i--) {
                         lexer.pushback(preSymbols.get(i));
                     }
-                    
+
                     if (parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc)) {
                         break;
                     }
@@ -1309,7 +1309,7 @@ public class ActionScript3Parser {
                     if (cmd != null) {
                         traits.add(cmd);
                         isEmpty = false;
-                    } else {                        
+                    } else {
                         break looptrait;
                     }
             }
@@ -2465,7 +2465,7 @@ public class ActionScript3Parser {
 
                 break;
             case PLUS:
-                GraphTargetItem nump = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables, abc);                    
+                GraphTargetItem nump = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables, abc);
                 if (abc.hasFloatSupport()) {
                     ret = new UnPlusAVM2Item(null, null, nump);
                 } else {
@@ -2480,7 +2480,7 @@ public class ActionScript3Parser {
                     ret = new IntegerValueAVM2Item(null, null, -(Integer) s.value);
                 } else if (s.isType(SymbolType.DECIMAL)) {
                     ret = new DecimalValueAVM2Item(null, null, ((Decimal128) s.value).multiply(Decimal128.NEG1));
-                            } else if (s.isType(SymbolType.FLOAT)) {
+                } else if (s.isType(SymbolType.FLOAT)) {
                     ret = new FloatValueAVM2Item(null, null, -(Float) s.value);
                 } else {
                     lexer.pushback(s);
@@ -2586,7 +2586,7 @@ public class ActionScript3Parser {
             case DOUBLE:
                 ret = new DoubleValueAVM2Item(null, null, (Double) s.value);
                 allowMemberOrCall = true; // 5.2.toString();
-                break;           
+                break;
             case DECIMAL:
                 if (!abc.hasDecimalSupport()) {
                     throw new AVM2ParseException("The ABC has no decimal support", lexer.yyline());
@@ -2604,11 +2604,11 @@ public class ActionScript3Parser {
             case FLOAT4:
                 if (!abc.hasFloat4Support()) {
                     //parse again as method call
-                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()));                                        
+                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()));
                     lexer.pushback(new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
-                    ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);                    
+                    ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);
                 } else {
-                    ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);                    
+                    ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);
                 }
                 allowMemberOrCall = true;
                 break;
@@ -2723,11 +2723,11 @@ public class ActionScript3Parser {
     private boolean parseImportsUsages(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
 
         boolean isEmpty = true;
-        ParsedSymbol s;        
+        ParsedSymbol s;
 
         s = lex();
         while (s.isType(SymbolType.IMPORT, SymbolType.USE)) {
-            
+
             if (s.isType(SymbolType.IMPORT)) {
                 isEmpty = false;
                 s = lex();
@@ -2757,7 +2757,7 @@ public class ActionScript3Parser {
                 } else {
                     importedClasses.add(fullName);
                 }
-                expected(s, lexer.yyline(), SymbolType.SEMICOLON);                
+                expected(s, lexer.yyline(), SymbolType.SEMICOLON);
             } else if (s.isType(SymbolType.USE)) {
                 isEmpty = false;
                 do {
@@ -2785,7 +2785,7 @@ public class ActionScript3Parser {
                         if (!abc.hasDecimalSupport()) {
                             throw new AVM2ParseException("Invalid use kind", lexer.yyline());
                         }
-                        
+
                         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                         String pragmaItemName = (String) s.value;
                         switch (pragmaItemName) {
@@ -2848,9 +2848,9 @@ public class ActionScript3Parser {
                             default:
                                 throw new AVM2ParseException("Invalid use kind", lexer.yyline());
                         }
-                    }                    
+                    }
                     s = lex();
-                }while(s.isType(SymbolType.COMMA));
+                } while (s.isType(SymbolType.COMMA));
                 expected(s, lexer.yyline(), SymbolType.SEMICOLON);
             }
             /*boolean isUse = s.type == SymbolType.USE;
@@ -2858,7 +2858,7 @@ public class ActionScript3Parser {
                 
                 expectedType(SymbolType.NAMESPACE);
             }*/
-            
+
             s = lex();
         }
         lexer.pushback(s);
@@ -2869,13 +2869,13 @@ public class ActionScript3Parser {
             List<DottedChain> importedClasses,
             List<NamespaceItem> openedNamespaces,
             List<List<NamespaceItem>> allOpenedNamespaces,
-            int scriptIndex, 
-            String fileName, 
+            int scriptIndex,
+            String fileName,
             Reference<Integer> numberContextRef,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
             List<AssignableAVM2Item> sinitVariables
-            ) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
+    ) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
 
         //int scriptPrivateNs;
         if (fileName.contains("/")) {
@@ -2889,7 +2889,7 @@ public class ActionScript3Parser {
         Reference<Integer> numberRoundingRef = new Reference<>(NumberContext.ROUND_HALF_EVEN);
         Reference<Integer> numberPrecisionRef = new Reference<>(34);
         scriptTraits(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, items, numberUsageRef, numberRoundingRef, numberPrecisionRef, abc, sinitNeedsActivation, sinitVariables);
-        
+
         NumberContext nc = new NumberContext(numberUsageRef.getVal(), numberPrecisionRef.getVal(), numberRoundingRef.getVal());
         if (!nc.isDefault()) {
             numberContextRef.setVal(nc.toParam());
@@ -2899,6 +2899,7 @@ public class ActionScript3Parser {
 
     /**
      * Converts string to script traits.
+     *
      * @param importedClasses Imported classes
      * @param openedNamespaces Opened namespaces
      * @param allOpenedNamespaces All opened namespaces
@@ -2918,15 +2919,15 @@ public class ActionScript3Parser {
     public List<GraphTargetItem> scriptTraitsFromString(
             List<DottedChain> importedClasses,
             List<NamespaceItem> openedNamespaces,
-            List<List<NamespaceItem>> allOpenedNamespaces, 
-            String str, 
-            String fileName, 
-            int scriptIndex, 
-            Reference<Integer> numberContextRef, 
+            List<List<NamespaceItem>> allOpenedNamespaces,
+            String str,
+            String fileName,
+            int scriptIndex,
+            Reference<Integer> numberContextRef,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
             List<AssignableAVM2Item> sinitVariables
-            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         lexer = new ActionScriptLexer(str);
 
         List<GraphTargetItem> ret = parseScript(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, numberContextRef, abc, sinitNeedsActivation, sinitVariables);
@@ -2938,6 +2939,7 @@ public class ActionScript3Parser {
 
     /**
      * Adds script from tree.
+     *
      * @param sinitVariables Script initializer variables
      * @param sinitNeedsActivation Script initializer needs activation
      * @param importedClasses Imported classes
@@ -2972,6 +2974,7 @@ public class ActionScript3Parser {
 
     /**
      * Adds script.
+     *
      * @param s Source code
      * @param fileName File name
      * @param classPos Class position
@@ -2996,6 +2999,7 @@ public class ActionScript3Parser {
 
     /**
      * Constructor.
+     *
      * @param abcIndex ABC index
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
@@ -3008,6 +3012,7 @@ public class ActionScript3Parser {
 
     /**
      * Compiles AS3 source code.
+     *
      * @param src Source code
      * @param abc ABC
      * @param abcIndex ABC index
@@ -3027,7 +3032,7 @@ public class ActionScript3Parser {
         ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
-        Set<Integer> modifiedScripts = new HashSet<>();        
+        Set<Integer> modifiedScripts = new HashSet<>();
         for (int i = 0; i < abc.script_info.size(); i++) {
             if (abc.script_info.get(i).isModified()) {
                 modifiedScripts.add(i);
@@ -3047,7 +3052,7 @@ public class ActionScript3Parser {
                 abc.script_info = originalAbc.script_info;
                 abc.bodies = originalAbc.bodies;
                 abc.resetMethodIndexing();
-                
+
                 for (int i = 0; i < abc.script_info.size(); i++) {
                     if (modifiedScripts.contains(i)) {
                         abc.script_info.get(i).setModified(true);
@@ -3059,6 +3064,7 @@ public class ActionScript3Parser {
 
     /**
      * Compiles AS3 source code.
+     *
      * @param swf SWF
      * @param srcFile Source file
      * @param destFile Target file

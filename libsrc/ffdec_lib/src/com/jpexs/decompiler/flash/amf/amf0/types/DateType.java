@@ -16,8 +16,7 @@
  */
 package com.jpexs.decompiler.flash.amf.amf0.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.types.*;
-import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.amf.amf3.types.Amf3ValueType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

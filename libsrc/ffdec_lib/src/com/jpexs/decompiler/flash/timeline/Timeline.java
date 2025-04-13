@@ -1088,7 +1088,7 @@ public class Timeline {
                 double y = filter.getDeltaY();
                 deltaXMax = Math.max(x, deltaXMax);
                 deltaYMax = Math.max(y, deltaYMax);
-            }            
+            }
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
             rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
@@ -1096,9 +1096,9 @@ public class Timeline {
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
             viewRect2.yMin -= deltaYMax * SWF.unitDivisor;
-            viewRect2.yMax += deltaYMax * SWF.unitDivisor;   
+            viewRect2.yMax += deltaYMax * SWF.unitDivisor;
         }
-                    
+
         drawMatrix.translate(rect.xMin, rect.yMin);
         drawMatrix.translateX /= SWF.unitDivisor;
         drawMatrix.translateY /= SWF.unitDivisor;
@@ -1111,7 +1111,6 @@ public class Timeline {
             int deltaY = (int) Math.ceil(rect.yMin / SWF.unitDivisor);
             newWidth = Math.min(image.getWidth() - deltaX, newWidth);
             newHeight = Math.min(image.getHeight() - deltaY, newHeight);
-            
 
             if (newWidth <= 0 || newHeight <= 0) {
                 return;
@@ -1190,17 +1189,17 @@ public class Timeline {
             } else {
                 // todo: show one time warning
             }
-            
+
             if (cacheAsBitmap && layer.backGroundColor != null && (blendMode <= 1 || (filters != null && !filters.isEmpty()))) {
                 Graphics2D g2 = (Graphics2D) img.getGraphics();
                 g2.setComposite(AlphaComposite.DstOver);
                 Color bgColor = layer.backGroundColor.toColor();
-                g2.setColor(bgColor);                
+                g2.setColor(bgColor);
                 g2.fillRect((int) Math.round(deltaXMax * unzoom),
-                        (int) Math.round(deltaYMax * unzoom),                        
-                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
-                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
-                );                        
+                        (int) Math.round(deltaYMax * unzoom),
+                        (int) Math.round(rect.getWidth() / SWF.unitDivisor - 2 * deltaXMax * unzoom),
+                        (int) Math.round(rect.getHeight() / SWF.unitDivisor - 2 * deltaYMax * unzoom)
+                );
             }
 
             if (filters != null) {
@@ -1213,7 +1212,7 @@ public class Timeline {
                     img = colorTransForm.apply(img);
                 }
             }
-            
+
             if (!sameImage && cacheAsBitmap && renderContext.displayObjectCache != null) {
                 renderContext.clearPlaceObjectCache(layer.placeObjectTag);
                 renderContext.displayObjectCache.put(new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect), img);
@@ -1315,20 +1314,20 @@ public class Timeline {
                 g.setTransform(drawMatrix.toTransform());
 
                 if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && mergedColorTransform != null) {
-                    img = mergedColorTransform.apply(img);                   
+                    img = mergedColorTransform.apply(img);
                 }
-                
+
                 if (blendMode > 1 && (filters == null || filters.isEmpty()) && cacheAsBitmap && layer.backGroundColor != null) {
                     Graphics2D g2 = (Graphics2D) img.getGraphics();
                     g2.setComposite(AlphaComposite.DstOver);
                     Color bgColor = layer.backGroundColor.toColor();
                     g2.setColor(bgColor);
                     g2.fillRect((int) Math.round(deltaXMax * unzoom),
-                        (int) Math.round(deltaYMax * unzoom),                        
-                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
-                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
+                            (int) Math.round(deltaYMax * unzoom),
+                            (int) Math.round(rect.getWidth() / SWF.unitDivisor - 2 * deltaXMax * unzoom),
+                            (int) Math.round(rect.getHeight() / SWF.unitDivisor - 2 * deltaYMax * unzoom)
                     );
-                }                
+                }
 
                 if (!((blendMode == 11 || blendMode == 12) && parentBlendMode <= 1)) { //alpha and erase modes require parent blendmode not normal
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
@@ -1386,7 +1385,7 @@ public class Timeline {
 
         int maxDepth = getMaxDepth();
         int clipCount = 0;
-        for (int i = 0; i <= maxDepth; i++) {                        
+        for (int i = 0; i <= maxDepth; i++) {
             boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
@@ -1449,11 +1448,11 @@ public class Timeline {
             if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SHAPES && (character instanceof ShapeTag)) {
                 continue;
             }
-            
+
             if (ignoreDepths.contains(i)) {
                 continue;
             }
-            
+
             if (character instanceof DrawableTag) {
 
                 RECT scalingRect = null;

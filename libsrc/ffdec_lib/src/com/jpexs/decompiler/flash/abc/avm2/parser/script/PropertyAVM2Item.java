@@ -545,7 +545,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             return result;
         }
     }
-
+    
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+    
     private int getBytesLen(List<GraphSourceItem> code) {
         int len = 0;
         for (GraphSourceItem instruction : code) {
@@ -555,10 +560,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return len;        
     }
     
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, true);
-    }
+
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

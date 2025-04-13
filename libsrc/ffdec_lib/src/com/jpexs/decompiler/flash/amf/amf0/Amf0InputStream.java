@@ -279,6 +279,7 @@ public class Amf0InputStream extends InputStream {
 
     /**
      * Reads UTF-8 value
+     *
      * @param name Name
      * @return UTF-8 value
      * @throws IOException On I/O error
@@ -294,6 +295,7 @@ public class Amf0InputStream extends InputStream {
 
     /**
      * Reads UTF-8-long value
+     *
      * @param name Name
      * @return UTF-8-long value
      * @throws IOException On I/O error
@@ -314,13 +316,15 @@ public class Amf0InputStream extends InputStream {
         populateComplexObjects(value, complexObjects);
         return resolveReferences(value, complexObjects);
     }
-    
+
     /**
      * Reads AMF0 value
+     *
      * @param name Name
      * @return AMF0 value
      * @throws IOException On I/O error
-     * @throws NoSerializerExistsException When reading is switched to AMF3 and no serializer found for an object
+     * @throws NoSerializerExistsException When reading is switched to AMF3 and
+     * no serializer found for an object
      */
     public Object readValue(String name) throws IOException, NoSerializerExistsException {
         newDumpLevel(name, "value-type");
@@ -328,7 +332,7 @@ public class Amf0InputStream extends InputStream {
         int marker = readInternal();
         //System.err.println("marker " + Integer.toHexString(marker));
         switch (marker) {
-            case Marker.NUMBER:                    
+            case Marker.NUMBER:
                 result = readDouble("DOUBLE");
                 break;
             case Marker.BOOLEAN:
@@ -352,7 +356,7 @@ public class Amf0InputStream extends InputStream {
                         break;
                     }
                     object.properties.put(propName, val);
-                }                    
+                }
                 result = object;
                 break;
             case Marker.MOVIECLIP:
@@ -370,7 +374,7 @@ public class Amf0InputStream extends InputStream {
                 int associativeCount = (int) readU32("associative-count");
                 EcmaArrayType ea = new EcmaArrayType();
                 for (int a = 0; a < associativeCount; a++) {
-                    String eaKey = readUtf8("key");                        
+                    String eaKey = readUtf8("key");
                     Object eaVal = readValue("value");
                     ea.denseValues.put(eaKey, eaVal);
                 }
@@ -413,7 +417,7 @@ public class Amf0InputStream extends InputStream {
                 typedObject.className = className;
 
                 while (true) {
-                    propName = readUtf8("propertyName");                            
+                    propName = readUtf8("propertyName");
                     val = readValue("propertyValue");
                     if (propName.equals("")) {
                         break;
@@ -424,28 +428,28 @@ public class Amf0InputStream extends InputStream {
                 break;
             case Marker.AVMPLUS_OBJECT:
                 Amf3InputStream amf3 = new Amf3InputStream(is);
-                result = amf3.readValue("avm-plus-object");                    
+                result = amf3.readValue("avm-plus-object");
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported type");
         }
-        
+
         /*if (result != null) {
             System.err.println("Read: " + Amf0Exporter.amfToString(result, 0, "\r\n", new ArrayList<>(), new HashMap<>(), new HashMap<>()));
         }*/
         endDumpLevel();
         return result;
     }
-    
-    public void resolveMapReferences(Map<String, Object> map) {        
+
+    public void resolveMapReferences(Map<String, Object> map) {
         List<Object> complexObjects = new ArrayList<>();
-        populateComplexObjects((List<Object>)new ArrayList<>(map.values()), complexObjects);
-        
+        populateComplexObjects((List<Object>) new ArrayList<>(map.values()), complexObjects);
+
         for (String key : map.keySet()) {
-            map.put(key, resolveReferences(map.get(key), complexObjects));            
-        }        
+            map.put(key, resolveReferences(map.get(key), complexObjects));
+        }
     }
-    
+
     public Object resolveReferences(Object value, List<Object> complexObjects) {
         if (value instanceof ReferenceType) {
             ReferenceType rt = (ReferenceType) value;
@@ -454,19 +458,19 @@ public class Amf0InputStream extends InputStream {
         if (value instanceof ObjectType) {
             ObjectType ot = (ObjectType) value;
             for (String key : ot.properties.keySet()) {
-                ot.properties.put(key, resolveReferences(ot.properties.get(key), complexObjects));                
+                ot.properties.put(key, resolveReferences(ot.properties.get(key), complexObjects));
             }
         }
         if (value instanceof TypedObjectType) {
             TypedObjectType tot = (TypedObjectType) value;
             for (String key : tot.properties.keySet()) {
-                tot.properties.put(key, resolveReferences(tot.properties.get(key), complexObjects));                
+                tot.properties.put(key, resolveReferences(tot.properties.get(key), complexObjects));
             }
         }
         if (value instanceof EcmaArrayType) {
             EcmaArrayType eat = (EcmaArrayType) value;
             for (String key : eat.denseValues.keySet()) {
-                eat.denseValues.put(key, resolveReferences(eat.denseValues.get(key), complexObjects));                
+                eat.denseValues.put(key, resolveReferences(eat.denseValues.get(key), complexObjects));
             }
             for (String key : eat.associativeValues.keySet()) {
                 eat.associativeValues.put(key, resolveReferences(eat.associativeValues.get(key), complexObjects));
@@ -480,13 +484,13 @@ public class Amf0InputStream extends InputStream {
         }
         return value;
     }
-    
+
     public void populateComplexObjects(List<Object> values, List<Object> result) {
         for (Object value : values) {
             populateComplexObjects(value, result);
         }
     }
-    
+
     public void populateComplexObjects(Object value, List<Object> result) {
         if (result.contains(value)) {
             return;
@@ -502,5 +506,5 @@ public class Amf0InputStream extends InputStream {
     @Override
     public long skip(long n) throws IOException {
         return is.skip(n);
-    }        
+    }
 }

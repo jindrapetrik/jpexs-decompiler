@@ -132,9 +132,8 @@ import org.pushingpixels.substance.api.SubstanceSkin;
  */
 public final class ImagePanel extends JPanel implements MediaDisplay {
 
-    
     private static final int MAX_SOUND_CHANNELS = 8; //TODO: Maybe add to Advanced settings
-    
+
     private static final Logger logger = Logger.getLogger(ImagePanel.class.getName());
 
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
@@ -182,7 +181,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int time = 0;
 
     //private int selectedDepth = -1;
-
     //private int freeTransformDepth = -1;
     private boolean doFreeTransform = false;
 
@@ -208,10 +206,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Point2D registrationPoint = null;
     private Point2D registrationPointUpdated = null;
-    
+
     private int mode = Cursor.DEFAULT_CURSOR;
     private Rectangle2D bounds;
-    
+
     private Matrix transform;
     private AffineTransform transformUpdated;
 
@@ -262,7 +260,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean autoPlayed = false;
 
     private boolean frozen = false;
-    
+
     private boolean frozenButtons = false;
 
     private boolean muted = false;
@@ -308,57 +306,57 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<java.awt.Point> showPoints2 = new ArrayList<>();
 
     private int displayedFrame = 0;
-    
+
     private JPanel topPanel;
-    
+
     private TagNameResolverInterface tagNameResolver = new DefaultTagNameResolver();
-    
+
     private boolean showAllDepthLevelsInfo = true;
-    
+
     private boolean selectionMode = false;
-    
+
     private boolean transformSelectionMode = false;
-    
+
     private boolean multiSelect = false;
-    
+
     private boolean inMoving = false;
-    
+
     private List<Integer> selectedDepths = new ArrayList<>();
-    
+
     private final List<Integer> parentFrames = new ArrayList<>();
-    
+
     private final List<Integer> parentDepths = new ArrayList<>();
 
     private final List<Timelined> parentTimelineds = new ArrayList<>();
 
     public void setFrozenButtons(boolean frozenButtons) {
         this.frozenButtons = frozenButtons;
-    }                
-    
+    }
+
     public boolean isMultiSelect() {
         return multiSelect;
-    }   
-    
+    }
+
     public void setMultiSelect(boolean multiSelect) {
         this.multiSelect = multiSelect;
-    }   
-    
+    }
+
     public void setSelectionMode(boolean selectionMode) {
         this.selectionMode = selectionMode;
-    } 
-    
+    }
+
     public void setTransformSelectionMode(boolean transformSelectionMode) {
         this.transformSelectionMode = transformSelectionMode;
-    }        
+    }
 
     public void setTagNameResolver(TagNameResolverInterface tagNameResolver) {
         this.tagNameResolver = tagNameResolver;
-    }        
+    }
 
     public void setShowAllDepthLevelsInfo(boolean showAllDepthLevelsInfo) {
         this.showAllDepthLevelsInfo = showAllDepthLevelsInfo;
-    }        
-    
+    }
+
     public void setTopPanelVisible(boolean visible) {
         topPanel.setVisible(visible);
     }
@@ -391,17 +389,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
 
     private List<PointUpdateListener> pointUpdateListeners = new ArrayList<>();
-    
+
     private List<Runnable> transformChangeListeners = new ArrayList<>();
 
     public void addTransformChangeListener(Runnable listener) {
         transformChangeListeners.add(listener);
     }
-    
+
     public void removeTransformChangeListener(Runnable listener) {
         transformChangeListeners.remove(listener);
     }
-    
+
     public void addPointUpdateListener(PointUpdateListener listener) {
         pointUpdateListeners.add(listener);
     }
@@ -415,7 +413,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             listener.pointsUpdated(points);
         }
     }
-    
+
     private void fireTransformChanged() {
         for (Runnable listener : transformChangeListeners) {
             listener.run();
@@ -639,8 +637,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         selectDepths(depths);
     }
+
     public synchronized void selectDepths(List<Integer> depths) {
-        
+
         depths = new ArrayList<>(depths);
         for (int i = 0; i < depths.size(); i++) {
             int depth = depths.get(i);
@@ -650,11 +649,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 i--;
             }
         }
-        
+
         transformUpdated = null;
         registrationPointUpdated = null;
         transform = null;
-            
+
         selectedDepths = new ArrayList<>(depths);
         doFreeTransform = false;
 
@@ -667,27 +666,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public List<Integer> getSelectedDepths() {
         return new ArrayList<>(selectedDepths);
-    }
-
-    public synchronized int getFrame() {
-        return frame;
-    }        
+    }   
 
     private void calculateFreeOrSelectionTransform() {
         if (!(doFreeTransform || selectionMode)) {
             return;
         }
         if (selectedDepths.isEmpty()) {
-            return;            
+            return;
         }
-        
+
         DepthState ds = null;
         Timeline timeline = timelined.getTimeline();
-        
+
         if (timeline.getFrameCount() <= frame) {
             return;
         }
-        
+
         if (selectedDepths.size() == 1) {
             ds = timeline.getFrame(frame).layers.get(selectedDepths.get(0));
         }
@@ -712,10 +707,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         } else {*/
-            transform = new Matrix();
-            Rectangle2D transformBounds = getTransformBounds();
-            registrationPointPosition = RegistrationPointPosition.CENTER;
-            fireBoundsChange(transformBounds, new Point2D.Double(transformBounds.getCenterX(), transformBounds.getCenterY()), registrationPointPosition);
+        transform = new Matrix();
+        Rectangle2D transformBounds = getTransformBounds();
+        registrationPointPosition = RegistrationPointPosition.CENTER;
+        fireBoundsChange(transformBounds, new Point2D.Double(transformBounds.getCenterX(), transformBounds.getCenterY()), registrationPointPosition);
         //}
     }
 
@@ -726,7 +721,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         freeTransformDepths(depths);
     }
-    
+
     public synchronized void freeTransformDepths(List<Integer> depths) {
         selectedDepths = new ArrayList<>(depths);
         doFreeTransform = !depths.isEmpty();
@@ -739,7 +734,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         redraw();
         iconPanel.requestFocusInWindow();
     }
-    
+
     private void centerImage() {
         Timelined tim = timelined;
         if (tim == null) {
@@ -1184,14 +1179,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
-                    if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {                                               
-                        
+
+                    if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
+
                         DepthState ds = depthStateUnderCursor;
                         if (ds != null) {
                             CharacterTag cht = ds.getCharacter();
                             if (cht instanceof Timelined) {
-                                synchronized(lock) {
+                                synchronized (lock) {
                                     parentTimelineds.add(timelined);
                                     parentDepths.add(ds.depth);
                                     parentFrames.add(ds.frame.frame);
@@ -1202,10 +1197,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 fireMediaDisplayStateChanged();
                             }
                         }
-                        
+
                         return;
                     }
-                    
+
                     if (shiftDown) {
                         List<Integer> newSelectedPoints = new ArrayList<>(pointsUnderCursor);
                         for (int i : selectedPoints) {
@@ -1220,10 +1215,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         selectedPoints = new ArrayList<>(pointsUnderCursor);
                     }
                     calculatePointsXY();
-                    
+
                     if (altDown || selectionMode) {
                         if (depthStateUnderCursor != null) {
-                            
+
                             List<Integer> newSelectedDepths = new ArrayList<>();
                             if (ctrlDown) {
                                 newSelectedDepths.addAll(selectedDepths);
@@ -1241,7 +1236,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     freeTransformDepths(newSelectedDepths);
                                     firePlaceObjectSelected();
                                 }
-                            } else if ((altDown && !selectionMode) || selectionMode){                                
+                            } else if ((altDown && !selectionMode) || selectionMode) {
                                 selectDepths(newSelectedDepths);
                                 firePlaceObjectSelected();
                             }
@@ -1256,27 +1251,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 selectDepths(new ArrayList<>());
                                 firePlaceObjectSelected();
                             }
-                        }                       
+                        }
                     }
-                }              
-                
+                }
+
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e)) {                        
-                        
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+
                         if (altDown || selectionMode) {
                             if (depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth)) {
                                 inMoving = selectionMode;
-                                calculateFreeOrSelectionTransform();                            
+                                calculateFreeOrSelectionTransform();
                             }
                             if (!selectionMode) {
                                 return;
-                            }                            
+                            }
                         }
-                        
+
                         mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging
-                        setDragStart(e.getPoint());                                                
-                      
+                        setDragStart(e.getPoint());
+
                         if (!shiftDown) {
                             boolean selectedUnderCursor = false;
                             for (int p : pointsUnderCursor) {
@@ -1351,7 +1346,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             updateScrollBarMinMax();
                         }
-                        
+
                         if (dragStart != null && !inMoving && multiSelect) {
                             Rectangle2D selectionRect = getSelectionRect();
                             if (selectionRect != null) {
@@ -1431,7 +1426,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     registrationPointPosition = null;
                                 }
                             }
-                            
+
                             calcRect(); //do not put this inside synchronized block, it cause deadlock
                             fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
                             fireTransformChanged();
@@ -1451,7 +1446,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseDragged(MouseEvent e) {
                     List<DisplayPoint> points = hilightedPoints;
-                    
+
                     if (dragStart != null && multiSelect && !inMoving && mode == Cursor.DEFAULT_CURSOR) {
                         selectionEnd = e.getPoint();
                         repaint();
@@ -1533,21 +1528,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         repaint();
                         return;
                     }
-                    
+
                     //move in selection mode
                     if (dragStart != null && selectionMode && !doFreeTransform) {
                         if (transform == null) {
                             return;
-                        }                        
+                        }
                         Matrix parentMatrix = getParentMatrix();
-                        
+
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
                         double dsx = dragStartTransPoint.getX();
                         double dsy = dragStartTransPoint.getY();
-                        
+
                         double deltaX = ex - dsx;
                         double deltaY = ey - dsy;
 
@@ -1556,7 +1551,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         t.translate(deltaX, deltaY);
                         t.concatenate(parentMatrix.inverse().toTransform());
                         newTransform.preConcatenate(t);
-                        
+
                         Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                         transformUpdated = newTransform;
@@ -1570,10 +1565,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
 
-                        Matrix parentMatrix = getParentMatrix();                        
+                        Matrix parentMatrix = getParentMatrix();
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                         //mouseTransPoint = parentMatrix.inverse().transform(mouseTransPoint);
-                        
+
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
@@ -1608,7 +1603,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
                             Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));
-                            
+
                             t.translate(bStart.getX(), bStart.getY());
                             t.shear(shearX, 0);
                             t.translate(-bStart.getX(), -bStart.getY());
@@ -1627,7 +1622,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));                            
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));
                             t.translate(bStart.getX(), bStart.getY());
                             t.shear(0, shearY);
                             t.translate(-bStart.getX(), -bStart.getY());
@@ -1646,7 +1641,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));                                                        
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));
                             t.translate(bStart.getX(), bStart.getY());
                             t.shear(0, shearY);
                             t.translate(-bStart.getX(), -bStart.getY());
@@ -1838,7 +1833,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             t.translate(deltaX, deltaY);
                             t.concatenate(parentMatrix.inverse().toTransform());
                             newTransform.preConcatenate(t);
-                            
+
                             Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
@@ -1858,7 +1853,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             newTransform.preConcatenate(t);
 
                             Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
-                            
+
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
                             repaint();
@@ -2274,8 +2269,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private void calcRect(Zoom z) {
             synchronized (ImagePanel.this) {
-                
-                
+
                 Timelined topTimelined = getTopTimelined();
                 if (_img != null || topTimelined != null) {
                     //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
@@ -2337,7 +2331,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (h < h2 && w < w2) {
                             offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2 - dx, iconPanel.getHeight() / 2 - h / 2 - dy);
                             updateScrollBars();
-                        }                        
+                        }
                     } else {
                         boolean doMove = h > h2 || w > w2;
                         if (zoom.fit) {
@@ -2670,8 +2664,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     @Override
                     public void run() {
                         drawFrame(thisTimer, true);
-                    }                    
-                }, 0);                
+                    }
+                }, 0);
             }
         }
     }
@@ -2804,14 +2798,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized void zoom(Zoom zoom) {
         zoom(zoom, false, false);
-    }
-    
-    public void zoomFit() {
-        Zoom z = new Zoom();
-        z.value = 1.0;
-        z.fit = true;
-        zoom(z, false, true);
-    }
+    }   
 
     private synchronized void zoom(Zoom zoom, boolean useCursor, boolean forced) {
         if (!zoomAvailable) {
@@ -2839,8 +2826,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             int dx = (int) (((cursorTransAfter.getX() - cursorTransBefore.getX()) * zoomDouble) / SWF.unitDivisor);
             int dy = (int) (((cursorTransAfter.getY() - cursorTransBefore.getY()) * zoomDouble) / SWF.unitDivisor);
-            
-            offsetPoint.setLocation(offsetPoint.getX() + dx, offsetPoint.getY() + dy);            
+
+            offsetPoint.setLocation(offsetPoint.getX() + dx, offsetPoint.getY() + dy);
 
             updateScrollBars();
 
@@ -2861,6 +2848,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
+    public void zoomFit() {
+        Zoom z = new Zoom();
+        z.value = 1.0;
+        z.fit = true;
+        zoom(z, false, true);
+    }
+    
     @Override
     public synchronized BufferedImage printScreen() {
         return iconPanel.getLastImage();
@@ -2874,7 +2868,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 
             double w2 = iconPanel.getWidth();
-            double h2 = iconPanel.getHeight();            
+            double h2 = iconPanel.getHeight();
 
             double w;
             double h;
@@ -2971,7 +2965,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
-            this.parentDepths.clear();            
+            this.parentDepths.clear();
             centerImage();
             this.swf = swf;
             zoomAvailable = allowZoom;
@@ -3195,7 +3189,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         fireMediaDisplayStateChanged();
     }
-    
+
     public Matrix getParentMatrix() {
         synchronized (lock) {
             Matrix parentMatrix = new Matrix();
@@ -3205,13 +3199,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             }
             return parentMatrix;
-        }        
+        }
     }
 
+    public synchronized int getFrame() {
+        return frame;
+    }
+    
     private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
             List<Timelined> parentTimelineds, List<Integer> parentDepths, List<Integer> parentFrames,
             Matrix parentMatrix
-            ) {
+    ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
 
@@ -3232,24 +3230,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         m.scale(zoom);
 
         Matrix fullM = m.clone();
-                
+
         for (int i = 0; i < selectedDepths.size(); i++) {
             if (newMatrix != null) {
                 DepthState ds = timeline.getFrame(frame).layers.get(selectedDepths.get(i));
                 if (ds != null) {
                     ds.temporaryMatrix = newMatrix.concatenate(new Matrix(ds.matrix)).toMATRIX();
-                } 
+                }
             }
-        }        
+        }
 
         Frame fr = timeline.getFrame(frame);
-        
+
         Frame bgFr = timeline.getFrame(frame);
-        
+
         if (!parentTimelineds.isEmpty()) {
             bgFr = parentTimelineds.get(0).getTimeline().getFrame(parentFrames.get(0));
         }
-        
+
         if (bgFr == null || fr == null) {
             return image;
         }
@@ -3258,36 +3256,35 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(backgroundColor.toColor());
             g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
-        }       
-                
-        
+        }
+
         parentMatrix = new Matrix();
         List<Integer> ignoreDepths = new ArrayList<>();
         for (int i = 0; i < parentTimelineds.size(); i++) {
-            Timelined parentTimelined = parentTimelineds.get(i);            
+            Timelined parentTimelined = parentTimelineds.get(i);
             DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
-            
+
             ignoreDepths.add(parentDepthState.depth);
             parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
                     parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
                     ignoreDepths);
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
-            ignoreDepths.clear();            
+            ignoreDepths.clear();
         }
-        
+
         if (!parentTimelineds.isEmpty()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(new Color(255, 255, 255, 128));
             g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
         }
-        
+
         timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
-        gg.setTransform(AffineTransform.getTranslateInstance(0, 0));                      
-        
+        gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+
         if (!doFreeTransform) {
             for (int selectedDepth : selectedDepths) {
                 DepthState ds = null;
@@ -3343,11 +3340,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         int dframe = time % drawableFrameCount;
                         //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
-                        
+
                         Matrix transform2 = transform;
-                        
+
                         transform2 = transform.concatenate(new Matrix(ds.matrix));
-                        
+
                         Shape outline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, transform2, true, viewRect, zoom);
 
                         if (temporaryMatrix != null) {
@@ -3371,29 +3368,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         if (totalBounds == null) {
-            totalBounds = new Rectangle(0,0,1,1);
+            totalBounds = new Rectangle(0, 0, 1, 1);
         }
-        
+
         boundsRef.setVal(totalBounds);
         gg.setStroke(new BasicStroke(1));
         gg.setPaint(Color.black);
         if (doFreeTransform) {
             gg.draw(totalBounds);
-            drawHandles(gg, totalBounds);                    
+            drawHandles(gg, totalBounds);
             Point2D regPoint = registrationPointRef.getVal();
             if (regPoint == null) {
                 regPoint = new Point2D.Double(totalBounds.getCenterX(), totalBounds.getCenterY());
             }
             drawRegistrationPoint(gg, regPoint);
         }
-        
+
         if (timeline != null && timeline.getFrameCount() > frame) {
             for (int i = 0; i < selectedDepths.size(); i++) {
                 int selectedDepth = selectedDepths.get(i);
                 DepthState ds = timeline.getDepthState(frame, selectedDepth);
                 if (ds != null) {
                     ds.temporaryMatrix = null;
-                }         
+                }
             }
         }
         img = image;
@@ -3628,7 +3625,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 RECT rect = getTopTimelined().getRect();
 
                 synchronized (ImagePanel.this) {
-                    synchronized (lock) {                        
+                    synchronized (lock) {
                         _viewRect = getViewRect();
                     }
                 }
@@ -3656,18 +3653,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 realRect.x += offsetPoint.getX();
                 realRect.y += offsetPoint.getY();
 
-                Point2D rawRegistrationPoint = registrationPoint == null ? null : toImagePoint(registrationPoint);                        
+                Point2D rawRegistrationPoint = registrationPoint == null ? null : toImagePoint(registrationPoint);
                 Reference<Point2D> registrationPointRef = new Reference<>(rawRegistrationPoint);
                 if (!autoPlayed) {
                     img = getImagePlay();
                 } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                     img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                 } else {
-                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());                    
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
                 }
 
                 synchronized (ImagePanel.this) {
-                    synchronized (lock) {                                               
+                    synchronized (lock) {
 
                         Rectangle2D newBounds = getTransformBounds();
                         if (newBounds != null) {
@@ -3678,9 +3675,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         newBounds.getCenterY());
                             }
                         }
-                    }                    
+                    }
                 }
-                    
+
                 sw.stop();
                 if (sw.getElapsedMilliseconds() > 100) {
                     if (Configuration.showSlowRenderingWarning.get()) {
@@ -3764,7 +3761,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     first = false;
                     CharacterTag c = ds.getCharacter();
-                    
+
                     ret.append(tagNameResolver.getTagName(c));
                     if (ds.depth > -1) {
                         ret.append(" ");
@@ -3864,7 +3861,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
 
-                    drawReady = true;                    
+                    drawReady = true;
                 }
             }
             synchronized (delayObject) {
@@ -3888,15 +3885,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
                 }
-                
+
                 if (soundInfo.syncStop) {
                     return;
-                }                
+                }
             }
-            
+
             if (soundPlayers.size() > MAX_SOUND_CHANNELS) {
                 return;
-            }            
+            }
         }
         final SoundTagPlayer sp;
         try {
@@ -3904,7 +3901,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (soundInfo != null && soundInfo.hasLoops) {
                 loopCount = Math.max(1, soundInfo.loopCount);
             }
-            
+
             sp = new SoundTagPlayer(soundInfo, st, loopCount, false, resample);
             sp.addEventListener(new MediaDisplayListener() {
                 @Override
@@ -4037,7 +4034,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
                         drawFrame(thisTimer, true);
-                        
+
                         fireMediaDisplayStateChanged();
                     } else {
                         //Time before drawing current frame
@@ -4165,6 +4162,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     /**
      * Goto frame
+     *
      * @param frame 1-based frame
      */
     @Override
@@ -4174,15 +4172,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         Timeline timeline = timelined.getTimeline();
         if (frame > timeline.getFrameCount()) {
-            frame = timeline.getFrameCount();           
+            frame = timeline.getFrameCount();
         }
         if (frame < 1) {
-            frame = 1;           
+            frame = 1;
         }
 
         this.autoPlayed = true;
         this.frame = frame - 1;
-        this.prevFrame = -1;                
+        this.prevFrame = -1;
         stopInternal();
         redraw();
         fireMediaDisplayStateChanged();
@@ -4265,8 +4263,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public RegistrationPointPosition getRegistrationPointPosition() {
         return registrationPointPosition;
-    }   
-    
+    }
+
     public void setRegistrationPoint(Point2D registrationPoint) {
         this.registrationPoint = registrationPoint;
         this.registrationPointPosition = null;
@@ -4300,7 +4298,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireTransformChanged();
     }
 
-    private Point2D toTransformPoint(Point2D point) {       
+    private Point2D toTransformPoint(Point2D point) {
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         if (lowQuality) {
             zoomDouble /= LQ_FACTOR;
@@ -4345,12 +4343,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Point2D bottomRight = toImagePoint(new Point2D.Double(rect.getMaxX(), rect.getMaxY()));
         return new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), bottomRight.getX() - topLeft.getX(), bottomRight.getY() - topLeft.getY());
     }
-    
+
     private Point2D toParentPoint(Point2D point) {
         point = getParentMatrix().transform(point);
         return point;
     }
-    
+
     private Rectangle2D toParentRect(Rectangle2D rect) {
         Point2D topLeft = toParentPoint(new Point2D.Double(rect.getMinX(), rect.getMinY()));
         Point2D bottomRight = toParentPoint(new Point2D.Double(rect.getMaxX(), rect.getMaxY()));
@@ -4370,16 +4368,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (freeTransformDepth == -1 && selectionMode && transform != null && selectedDepth != -1 && timeline.getFrameCount() > frame) {
             ds = timeline.getFrame(frame).layers.get(selectedDepth);
         }*/
-        
+
         if (timeline.getFrameCount() <= frame) {
-            return new Rectangle2D.Double(0,0,1,1);
+            return new Rectangle2D.Double(0, 0, 1, 1);
         }
-        
+
         Matrix newMatrix = getNewMatrix();
-        
+
         if (newMatrix == null) {
-            return new Rectangle2D.Double(0,0,1,1);
-        } 
+            return new Rectangle2D.Double(0, 0, 1, 1);
+        }
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null && !doFreeTransform) {
@@ -4438,8 +4436,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.pathPosition = pathPosition;
             this.closestPoint = closestPoint;
         }
-    }        
-    
+    }
+
     public Timelined getTopTimelined() {
         synchronized (lock) {
             if (!parentTimelineds.isEmpty()) {

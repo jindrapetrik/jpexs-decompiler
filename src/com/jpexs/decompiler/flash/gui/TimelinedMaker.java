@@ -63,7 +63,7 @@ import java.util.Set;
  * @author JPEXS
  */
 public class TimelinedMaker {
-    
+
     public static SWF makeTimelinedImage(ImageTag imageTag) {
         SWF swf = new SWF();
         swf.gfx = imageTag.getSwf().gfx;
@@ -191,7 +191,7 @@ public class TimelinedMaker {
         }
         return swf;
     }
-    
+
     public static Timelined makeTimelined(final Tag tag) {
         if (tag instanceof ImageTag) {
             return makeTimelinedImage((ImageTag) tag);
@@ -267,7 +267,7 @@ public class TimelinedMaker {
                     timeline.addFrame(f);
                     timeline.fontFrameNum = frame;
                 } else if (tag instanceof SoundTag) {
-                    
+                    //empty
                 } else {
                     Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f, f);
@@ -287,7 +287,7 @@ public class TimelinedMaker {
             @Override
             public RECT getRect(Set<BoundedTag> added) {
                 if (!(tag instanceof BoundedTag)) {
-                    return new RECT(0,1,0,1);
+                    return new RECT(0, 1, 0, 1);
                 }
                 BoundedTag bt = (BoundedTag) tag;
                 if (!added.contains(bt)) {
@@ -308,7 +308,7 @@ public class TimelinedMaker {
             @Override
             public boolean isModified() {
                 return false;
-            }                        
+            }
 
             @Override
             public ReadOnlyTagList getTags() {

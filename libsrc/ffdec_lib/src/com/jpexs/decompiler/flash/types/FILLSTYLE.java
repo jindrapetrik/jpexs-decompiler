@@ -203,6 +203,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
     /**
      * Checks if fill style has bitmap
+     *
      * @return True if fill style has bitmap
      */
     public boolean hasBitmap() {
@@ -218,6 +219,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
     /**
      * Checks if fill style has gradient
+     *
      * @return True if fill style has gradient
      */
     public boolean hasGradient() {
@@ -232,6 +234,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
     /**
      * Checks whether fill style is compatible with other fill style
+     *
      * @param otherFillStyle Other fill style
      * @param swf SWF
      * @return True if fill styles are compatible
@@ -264,6 +267,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
     /**
      * Converts fill style to morph fill style
+     *
      * @return Morph fill style
      */
     public MORPHFILLSTYLE toMorphStyle() {
@@ -289,6 +293,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
     /**
      * Converts fill style to morph fill style
+     *
      * @param endFillStyle End fill style
      * @param swf SWF
      * @return Morph fill style
@@ -376,10 +381,9 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
                 result.color = new RGBA(color);
             }
         }
-        if (fillStyleType == LINEAR_GRADIENT 
+        if (fillStyleType == LINEAR_GRADIENT
                 || fillStyleType == RADIAL_GRADIENT
-                || fillStyleType == FOCAL_RADIAL_GRADIENT
-                ) {
+                || fillStyleType == FOCAL_RADIAL_GRADIENT) {
             result.gradient = result.gradient.toShapeNum(targetShapeNum);
         }
         if (fillStyleType == FOCAL_RADIAL_GRADIENT && targetShapeNum < 4) {
@@ -387,7 +391,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
         return result;
     }
-    
+
     public int getMinShapeNum() {
         int shapeNum = 1;
         if (fillStyleType == SOLID) {

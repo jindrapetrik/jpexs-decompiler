@@ -31,12 +31,14 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 class MySwatchPanel extends JPanel {
+
     protected Color[] colors;
     protected Dimension swatchSize;
     protected Dimension numSwatches;
     protected Dimension gap;
     private int selRow;
     private int selCol;
+
     public MySwatchPanel() {
         initValues();
         initColors();
@@ -49,6 +51,7 @@ class MySwatchPanel extends JPanel {
             public void focusGained(FocusEvent e) {
                 repaint();
             }
+
             public void focusLost(FocusEvent e) {
                 repaint();
             }
@@ -103,15 +106,18 @@ class MySwatchPanel extends JPanel {
             }
         });
     }
+
     public Color getSelectedColor() {
         return getColorForCell(selCol, selRow);
     }
+
     protected void initValues() {
     }
+
     public void paintComponent(Graphics g) {
-         g.setColor(getBackground());
-         g.fillRect(0,0,getWidth(), getHeight());
-         for (int row = 0; row < numSwatches.height; row++) {
+        g.setColor(getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
+        for (int row = 0; row < numSwatches.height; row++) {
             int y = row * (swatchSize.height + gap.height);
             for (int column = 0; column < numSwatches.width; column++) {
                 Color c = getColorForCell(column, row);
@@ -122,10 +128,10 @@ class MySwatchPanel extends JPanel {
                 } else {
                     x = column * (swatchSize.width + gap.width);
                 }
-                g.fillRect( x, y, swatchSize.width, swatchSize.height);
+                g.fillRect(x, y, swatchSize.width, swatchSize.height);
                 g.setColor(Color.black);
-                g.drawLine( x+swatchSize.width-1, y, x+swatchSize.width-1, y+swatchSize.height-1);
-                g.drawLine( x, y+swatchSize.height-1, x+swatchSize.width-1, y+swatchSize.height-1);
+                g.drawLine(x + swatchSize.width - 1, y, x + swatchSize.width - 1, y + swatchSize.height - 1);
+                g.drawLine(x, y + swatchSize.height - 1, x + swatchSize.width - 1, y + swatchSize.height - 1);
                 if (selRow == row && selCol == column && this.isFocusOwner()) {
                     Color c2 = new Color(c.getRed() < 125 ? 255 : 0,
                             c.getGreen() < 125 ? 255 : 0,
@@ -139,19 +145,23 @@ class MySwatchPanel extends JPanel {
                     g.drawLine(x, y + swatchSize.height - 1, x + swatchSize.width - 1, y);
                 }
             }
-         }
+        }
     }
+
     public Dimension getPreferredSize() {
         int x = numSwatches.width * (swatchSize.width + gap.width) - 1;
         int y = numSwatches.height * (swatchSize.height + gap.height) - 1;
-        return new Dimension( x, y );
+        return new Dimension(x, y);
     }
+
     protected void initColors() {
     }
+
     public String getToolTipText(MouseEvent e) {
         Color color = getColorForLocation(e.getX(), e.getY());
-        return color.getRed()+", "+ color.getGreen() + ", " + color.getBlue();
+        return color.getRed() + ", " + color.getGreen() + ", " + color.getBlue();
     }
+
     public void setSelectedColorFromLocation(int x, int y) {
         if (!this.getComponentOrientation().isLeftToRight()) {
             selCol = numSwatches.width - x / (swatchSize.width + gap.width) - 1;
@@ -161,7 +171,8 @@ class MySwatchPanel extends JPanel {
         selRow = y / (swatchSize.height + gap.height);
         repaint();
     }
-    public Color getColorForLocation( int x, int y ) {
+
+    public Color getColorForLocation(int x, int y) {
         int column;
         if (!this.getComponentOrientation().isLeftToRight()) {
             column = numSwatches.width - x / (swatchSize.width + gap.width) - 1;
@@ -171,7 +182,8 @@ class MySwatchPanel extends JPanel {
         int row = y / (swatchSize.height + gap.height);
         return getColorForCell(column, row);
     }
-    private Color getColorForCell( int column, int row) {
-        return colors[ (row * numSwatches.width) + column ]; // (STEVE) - change data orientation here
+
+    private Color getColorForCell(int column, int row) {
+        return colors[(row * numSwatches.width) + column]; // (STEVE) - change data orientation here
     }
 }

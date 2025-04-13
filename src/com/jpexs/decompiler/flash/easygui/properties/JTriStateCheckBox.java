@@ -16,18 +16,19 @@
  */
 package com.jpexs.decompiler.flash.easygui.properties;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
+
 /**
  *
  * @author JPEXS
  */
-import com.jpexs.decompiler.flash.configuration.Configuration;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 
 public class JTriStateCheckBox extends JCheckBox {
 
-    final static boolean MID_AS_SELECTED = true;  //consider mid-state as selected ?
+    private static final boolean MID_AS_SELECTED = true;  //consider mid-state as selected ?
 
     public JTriStateCheckBox() {
         this("");
@@ -44,8 +45,6 @@ public class JTriStateCheckBox extends JCheckBox {
         super.fireActionPerformed(event);
     }
 
-    
-    
     public JTriStateCheckBox(String text, int sel) {
         /* tri-state checkbox has 3 selection states:
          * 0 unselected
@@ -57,6 +56,7 @@ public class JTriStateCheckBox extends JCheckBox {
         switch (sel) {
             case 2:
                 setSelected(true);
+                //fallthrough
             case 1:
             case 0:
                 putClientProperty("SelectionState", sel);
@@ -100,8 +100,6 @@ public class JTriStateCheckBox extends JCheckBox {
         super.setSelected(b);
         putClientProperty("SelectionState", b ? 2 : 0);
     }
-    
-    
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -109,10 +107,11 @@ public class JTriStateCheckBox extends JCheckBox {
         if (getSelectionState() == 1) {
             int w = 12;
             if (Configuration.useRibbonInterface.get()) {
-                /*SubstanceColorScheme baseMarkColorScheme = SubstanceColorSchemeUtilities
-				.getColorScheme(this, ColorSchemeAssociationKind.MARK,
-						                      ComponentState.getState(this));
-            
+                /*
+                SubstanceColorScheme baseMarkColorScheme = SubstanceColorSchemeUtilities
+                .getColorScheme(this, ColorSchemeAssociationKind.MARK,
+                ComponentState.getState(this));
+           
                 g.setColor(baseMarkColorScheme.getSelectionForegroundColor());*/
                 w = 14;
             } else {

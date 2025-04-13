@@ -41,12 +41,7 @@ public class BinDataOutputStream extends OutputStream {
             os.write(i);
         }
     }
-
-    public void writeUI16(int value) throws IOException {
-        write(value & 0xFF);
-        write((value >> 8) & 0xFF);
-    }
-
+    
     @Override
     public void write(byte[] b) throws IOException {
         os.write(b);
@@ -56,6 +51,11 @@ public class BinDataOutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         os.write(b, off, len);
     }
+
+    public void writeUI16(int value) throws IOException {
+        write(value & 0xFF);
+        write((value >> 8) & 0xFF);
+    }  
 
     public void writeUI32(long value) throws IOException {
         write((int) (value & 0xFF));

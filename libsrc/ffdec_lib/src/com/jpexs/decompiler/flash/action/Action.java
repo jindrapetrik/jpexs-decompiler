@@ -728,50 +728,49 @@ public abstract class Action implements GraphSourceItem {
                 }
             } else {
                 //if (!(a instanceof ActionNop)) {
-                String add = "";                
+                String add = "";
                 //Flash player 4 does not allow more than 1 item in ActionPush, so I commented this out
                 /*if ((a instanceof ActionPush) && lastPush) {
                     writer.appendNoHilight(", ");
                     ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, exportMode, writer);
                 } else 
-                */
-                {
-                    if (lastPush) {
-                        writer.newLine();
-                        //lastPush = false;
-                    }
+                { */                
+                if (lastPush) {
+                    writer.newLine();
+                    //lastPush = false;
+                }
 
-                    writer.append("", offset, a.getFileOffset());
+                writer.append("", offset, a.getFileOffset());
 
-                    int fixBranch = -1;
-                    if (a instanceof ActionIf) {
-                        ActionIf aif = (ActionIf) a;
-                        if (aif.jumpUsed && !aif.ignoreUsed) {
-                            fixBranch = 0;
-                        }
-                        if (!aif.jumpUsed && aif.ignoreUsed) {
-                            fixBranch = 1;
-                        }
+                int fixBranch = -1;
+                if (a instanceof ActionIf) {
+                    ActionIf aif = (ActionIf) a;
+                    if (aif.jumpUsed && !aif.ignoreUsed) {
+                        fixBranch = 0;
                     }
-
-                    if (fixBranch > -1) {
-                        writer.appendNoHilight("FFDec_DeobfuscatePop");
-                        if (fixBranch == 0) { //jump
-                            writer.newLine();
-                            writer.appendNoHilight("Jump loc");
-                            writer.appendNoHilight(Helper.formatAddress(((ActionIf) a).getTargetAddress()));
-                        } else {
-                            //nojump, ignore
-                        }
-                    } else {
-                        a.getASMSourceReplaced(list, importantOffsets, exportMode, writer);
-                    }
-                    writer.appendNoHilight(a.isIgnored() ? "; ignored" : "");
-                    writer.appendNoHilight(add);
-                    if (!(a instanceof ActionPush)) {
-                        writer.newLine();
+                    if (!aif.jumpUsed && aif.ignoreUsed) {
+                        fixBranch = 1;
                     }
                 }
+
+                if (fixBranch > -1) {
+                    writer.appendNoHilight("FFDec_DeobfuscatePop");
+                    if (fixBranch == 0) { //jump
+                        writer.newLine();
+                        writer.appendNoHilight("Jump loc");
+                        writer.appendNoHilight(Helper.formatAddress(((ActionIf) a).getTargetAddress()));
+                    } else {
+                        //nojump, ignore
+                    }
+                } else {
+                    a.getASMSourceReplaced(list, importantOffsets, exportMode, writer);
+                }
+                writer.appendNoHilight(a.isIgnored() ? "; ignored" : "");
+                writer.appendNoHilight(add);
+                if (!(a instanceof ActionPush)) {
+                    writer.newLine();
+                }
+                //}
                 lastPush = a instanceof ActionPush;
                 //}
             }
@@ -985,8 +984,7 @@ public abstract class Action implements GraphSourceItem {
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = 0;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem>
-                            tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+                    List<GraphTargetItem> tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     for (ActionTreeOperation treeOperation : treeOperations) {
                         treeOperation.run(tree);
@@ -1055,6 +1053,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts list of actions to List of treeItems.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
      * @param insideFunction Inside function?
@@ -1237,7 +1236,7 @@ public abstract class Action implements GraphSourceItem {
         loopip:
         while (ip <= end) {
 
-            long addr = ip2adr(actions, ip);           
+            long addr = ip2adr(actions, ip);
             if (ip > end) {
                 break;
             }
@@ -1248,7 +1247,7 @@ public abstract class Action implements GraphSourceItem {
             if (Configuration.simplifyExpressions.get()) {
                 stack.simplify();
             }
-            Action action = actions.get(ip);            
+            Action action = actions.get(ip);
             if (action.isIgnored()) {
                 ip++;
                 continue;

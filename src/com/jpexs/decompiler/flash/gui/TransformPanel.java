@@ -124,7 +124,7 @@ public class TransformPanel extends JPanel {
 
     private Map<String, JPanel> cardContents = new LinkedHashMap<>();
     private Map<String, JLabel> cardPlusMinusLabels = new LinkedHashMap<>();
-    
+
     private static final char PLUS_CHAR = '\u2BC8';
     private static final char MINUS_CHAR = '\u2BC6';
 
@@ -175,6 +175,7 @@ public class TransformPanel extends JPanel {
     public TransformPanel(ImagePanel imagePanel) {
         this(imagePanel, true);
     }
+
     public TransformPanel(ImagePanel imagePanel, boolean headerLabel) {
 
         imagePanel.addBoundsChangeListener(new BoundsChangeListener() {

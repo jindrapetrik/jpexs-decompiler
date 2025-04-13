@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.amf.amf0.Amf0OutputStream;
 import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.importers.amf.amf0.Amf0Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -46,24 +46,24 @@ public class SolFile {
     private DataInputStream is;
 
     private long pos = 0;
-    
+
     private List<Tag> tags = new ArrayList<>();
-    
+
     public SolFile(InputStream is) throws IOException {
         this.is = new DataInputStream(is);
         readTags();
     }
-    
+
     public SolFile(String fileName, int amfVersion, Map<String, Object> amfValues) {
         tags.add(new LsoTag(fileName, amfVersion, amfValues));
     }
-    
+
     public void writeTo(OutputStream os) throws IOException {
-        for (Tag t: tags) {
+        for (Tag t : tags) {
             writeTag(os, t);
         }
     }
-        
+
     private void readTags() throws IOException {
         while (is.available() > 0) {
             Tag t = readTag();
@@ -112,10 +112,10 @@ public class SolFile {
         is.skip(count);
         pos += count;
     }
-    
-    private void writeTag(OutputStream os, Tag t) throws IOException{
+
+    private void writeTag(OutputStream os, Tag t) throws IOException {
         Amf0OutputStream aos = new Amf0OutputStream(os);
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         t.writeData(baos);
         int contentLength = baos.size();
@@ -137,7 +137,7 @@ public class SolFile {
             contentLength = (int) readUI32();
             writeAsLong = true;
         }
-        int tagType = tagTypeAndLength >> 6;        
+        int tagType = tagTypeAndLength >> 6;
         byte[] data = readBytes(contentLength);
 
         switch (tagType) {
@@ -153,8 +153,8 @@ public class SolFile {
     public List<Tag> getTags() {
         return tags;
     }
-    
-    private LsoTag getLsoTag() throws IOException {        
+
+    private LsoTag getLsoTag() throws IOException {
         for (Tag t : getTags()) {
             if (t instanceof LsoTag) {
                 return (LsoTag) t;
@@ -162,7 +162,7 @@ public class SolFile {
         }
         return null;
     }
-    
+
     public int getAmfVersion() throws IOException {
         LsoTag lsoTag = getLsoTag();
         if (lsoTag == null) {
@@ -170,7 +170,7 @@ public class SolFile {
         }
         return lsoTag.amfVersion;
     }
-    
+
     public String getFileName() throws IOException {
         LsoTag lsoTag = getLsoTag();
         if (lsoTag == null) {
@@ -178,14 +178,14 @@ public class SolFile {
         }
         return lsoTag.fileName;
     }
-    
+
     public Map<String, Object> getAmfValues() throws IOException {
         LsoTag lsoTag = getLsoTag();
         if (lsoTag == null) {
             return new HashMap<>();
         }
         return lsoTag.amfValues;
-    }        
+    }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
         SolFile sol0 = new SolFile(new FileInputStream("testdata/sharedobjects/data/amf0test.sol"));

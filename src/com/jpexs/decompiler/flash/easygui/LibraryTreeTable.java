@@ -56,15 +56,15 @@ public class LibraryTreeTable extends JTreeTable {
 
     private final EasySwfPanel easySwfPanel;
     private SWF swf;
-       
+
     public LibraryTreeTable(EasySwfPanel easySwfPanel) {
-        super(new LibraryTreeTableModel(null));        
+        super(new LibraryTreeTableModel(null));
         getTree().setCellRenderer(new LibraryTreeCellRenderer());
         getTree().setRootVisible(false);
         getTree().setShowsRootHandles(true);
         addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {                
+            public void keyPressed(KeyEvent e) {
                 int selectedRow = getSelectedRow();
                 JTree tree = getTree();
 
@@ -72,7 +72,7 @@ public class LibraryTreeTable extends JTreeTable {
                     TreePath path = tree.getPathForRow(selectedRow);
                     if (path != null && tree.isExpanded(path)) {
                         tree.collapsePath(path);
-                        
+
                         int parentRow = tree.getRowForPath(path);
                         changeSelection(parentRow, 0, false, false);
                     } else if (path != null) {
@@ -106,16 +106,16 @@ public class LibraryTreeTable extends JTreeTable {
         setDragEnabled(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setUI(new BasicTableUI());
-        
+
         setRowHeight(18);
         getTree().setRowHeight(18);
-        
+
         if (View.isOceanic()) {
             setBackground(Color.WHITE);
             getTree().setBackground(Color.WHITE);
         }
         this.easySwfPanel = easySwfPanel;
-        
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -130,11 +130,11 @@ public class LibraryTreeTable extends JTreeTable {
                         easySwfPanel.setTimelined((Timelined) obj);
                     }
                 }
-            }            
+            }
         });
-        
+
     }
-    
+
     public void setSwf(SWF swf) {
         if (swf == this.swf) {
             return;
@@ -142,13 +142,12 @@ public class LibraryTreeTable extends JTreeTable {
         this.swf = swf;
         setTreeTableModel(new LibraryTreeTableModel(swf));
     }
-        
-    
+
     private static class LibraryTreeCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            JLabel label =  (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (!leaf) {
                 if (expanded) {
                     label.setIcon(View.getIcon("folderopen16"));
@@ -161,7 +160,7 @@ public class LibraryTreeTable extends JTreeTable {
                 Object object = node.getUserObject();
                 if (object instanceof ImageTag) {
                     ImageTag it = (ImageTag) object;
-                    label.setIcon(View.getIcon("image16"));                    
+                    label.setIcon(View.getIcon("image16"));
                 }
                 if (object instanceof ShapeTag) {
                     ShapeTag st = (ShapeTag) object;
@@ -209,16 +208,16 @@ public class LibraryTreeTable extends JTreeTable {
                 label.setOpaque(true);
             }
             return label;
-        }                
+        }
     }
-    
+
     private static class LibraryTreeTableModel implements TreeTableModel {
 
         private DefaultMutableTreeNode root;
 
         public LibraryTreeTableModel(SWF swf) {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode("SWF");
-        
+
             DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.images"));
             DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.graphics"));
             DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.shapeTweens"));
@@ -229,10 +228,9 @@ public class LibraryTreeTable extends JTreeTable {
             DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.sounds"));
             DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.videos"));
 
-
             this.root = root;
-            
-            if (swf == null) {                 
+
+            if (swf == null) {
                 return;
             }
             for (Tag t : swf.getTags()) {
@@ -257,13 +255,13 @@ public class LibraryTreeTable extends JTreeTable {
                 }
                 if (t instanceof ButtonTag) {
                     buttonsNode.add(node);
-                }                
+                }
                 if (t instanceof SoundTag) {
                     soundsNode.add(node);
                 }
                 if (t instanceof DefineVideoStreamTag) {
                     videosNode.add(node);
-                }            
+                }
             }
 
             if (!imagesNode.isLeaf()) {
@@ -292,11 +290,9 @@ public class LibraryTreeTable extends JTreeTable {
             }
             if (!videosNode.isLeaf()) {
                 root.add(videosNode);
-            }    
+            }
         }
-        
-        
-        
+
         @Override
         public int getColumnCount() {
             return 2;
@@ -318,11 +314,11 @@ public class LibraryTreeTable extends JTreeTable {
         public Class<?> getColumnClass(int column) {
             switch (column) {
                 case 0:
-                    return TreeTableModel.class;                    
+                    return TreeTableModel.class;
                 default:
                     return String.class;
             }
-            
+
         }
 
         @Override
@@ -332,7 +328,7 @@ public class LibraryTreeTable extends JTreeTable {
             switch (column) {
                 case 0:
                     return node;
-                case 1:    
+                case 1:
                     if (o instanceof CharacterTag) {
                         CharacterTag ct = (CharacterTag) o;
                         if (!ct.getClassNames().isEmpty()) {
@@ -359,7 +355,7 @@ public class LibraryTreeTable extends JTreeTable {
 
         @Override
         public void setValueAt(Object value, Object node, int column) {
-            
+
         }
 
         @Override
@@ -389,7 +385,7 @@ public class LibraryTreeTable extends JTreeTable {
 
         @Override
         public int getIndexOfChild(Object parent, Object child) {
-            return ((DefaultMutableTreeNode) parent).getIndex((DefaultMutableTreeNode)child);
+            return ((DefaultMutableTreeNode) parent).getIndex((DefaultMutableTreeNode) child);
         }
 
         @Override
@@ -399,6 +395,6 @@ public class LibraryTreeTable extends JTreeTable {
         @Override
         public void removeTreeModelListener(TreeModelListener l) {
         }
-    
+
     }
 }

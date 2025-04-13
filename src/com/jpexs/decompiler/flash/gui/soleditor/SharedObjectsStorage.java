@@ -43,18 +43,17 @@ import java.util.regex.Pattern;
 public class SharedObjectsStorage {
 
     public static boolean watchingPaused = false;
-    
+
     public static Map<WatchKey, File> watchedCookieDirectories = new HashMap<>();
-    
-    
+
     private static Map<File, List<CookiesChangedListener>> swfFileToListeners = new LinkedHashMap<>();
-    
+
     public static void addChangedListener(File file, CookiesChangedListener listener) {
         if (!swfFileToListeners.containsKey(file)) {
             swfFileToListeners.put(file, new ArrayList<>());
         }
         swfFileToListeners.get(file).add(listener);
-        
+
         File solDir = getSolDirectoryForLocalFile(file);
         if (solDir == null) {
             return;
@@ -74,7 +73,6 @@ public class SharedObjectsStorage {
         swfFileToListeners.get(file).remove(listener);
     }
 
-    
     private static void watchDir(File dir) {
         try {
             WatchKey key = dir.toPath().register(Main.getWatcher(), StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
@@ -82,9 +80,9 @@ public class SharedObjectsStorage {
         } catch (IOException ex) {
             //ignored
             //ex.printStackTrace();
-        }        
+        }
     }
-    
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
@@ -347,18 +345,18 @@ public class SharedObjectsStorage {
 
         return subDirs[0];
     }
-    
-    public static void watchedDirectoryChanged(File file) {        
+
+    public static void watchedDirectoryChanged(File file) {
         if (watchingPaused) {
             return;
         }
-        
+
         List<File> swfFiles = new ArrayList<>(swfFileToListeners.keySet());
         for (File swfFile : swfFiles) {
             File solDir = getSolDirectoryForLocalFile(swfFile);
             if (file.equals(solDir) || file.getParentFile().equals(solDir)) {
                 fireChanged(swfFile, getSolFilesForLocalFile(swfFile));
-            } else {                
+            } else {
                 if (solDir.exists()) {
                     continue;
                 }
@@ -373,13 +371,13 @@ public class SharedObjectsStorage {
             }
         }
     }
-    
+
     private static void fireChanged(File swfFile, List<File> files) {
         //System.err.println("- firing changed " + swfFile.getAbsolutePath());
         List<CookiesChangedListener> listeners = swfFileToListeners.get(swfFile);
         if (listeners != null) {
             listeners = new ArrayList<>(listeners);
-            for (CookiesChangedListener l:listeners) {
+            for (CookiesChangedListener l : listeners) {
                 l.cookiesChanged(swfFile, files);
             }
         }

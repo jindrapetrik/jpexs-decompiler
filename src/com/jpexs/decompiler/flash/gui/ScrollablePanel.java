@@ -33,8 +33,8 @@ import javax.swing.SwingConstants;
  * customize the scrollable features by using newly provided setter methods so
  * you don't have to extend this class every time.
  * <p>
- * Scrollable amounts can be specified as a percentage of the viewport size or as
- * an actual pixel value. The amount can be changed for both unit and block
+ * Scrollable amounts can be specified as a percentage of the viewport size or
+ * as an actual pixel value. The amount can be changed for both unit and block
  * scrolling for both horizontal and vertical scrollbars.
  * <p>
  * The Scrollable interface only provides a boolean value for determining
@@ -175,13 +175,13 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      *
      * @param orientation specify the scrolling orientation. Must be either:
      * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
-     * @param type
-     * @param amount a value used with the IncrementType to determine the
-     * scrollable amount
      * @param type specify how the amount parameter in the calculation of the
      * scrollable amount. Valid values are: IncrementType.PERCENT - treat the
      * amount as a % of the viewport size IncrementType.PIXEL - treat the amount
      * as the scrollable amount
+     * @param amount a value used with the IncrementType to determine the
+     * scrollable amount
+     
      */
     public void setScrollableBlockIncrement(int orientation, IncrementType type, int amount) {
         IncrementInfo info = new IncrementInfo(type, amount);

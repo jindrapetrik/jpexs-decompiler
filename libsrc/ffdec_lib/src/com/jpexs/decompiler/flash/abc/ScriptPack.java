@@ -463,7 +463,6 @@ public class ScriptPack extends AS3ClassTreeItem {
     /**
      * Converts the script pack to source.
      *
-     * @param swfVersion SWF version
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits

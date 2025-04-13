@@ -356,7 +356,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Writes imports.
      *
-     * @param trait Trait
+     * @param traits Traits
      * @param methodIndex Method index
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index

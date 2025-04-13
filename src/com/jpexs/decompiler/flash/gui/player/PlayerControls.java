@@ -97,7 +97,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private static final Icon resampleIcon = View.getIcon("resample16");
 
     //private final JLabel percentLabel = new JLabel("100%");
-
     private final ZoomPanel zoomPanel;
 
     private final JPanel graphicControls;
@@ -106,12 +105,9 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final JPanel frameControls;
 
-//    private boolean zoomToFit = false;
-
-//    private double realZoom = 1.0;
-
+    //private boolean zoomToFit = false;
+    //private double realZoom = 1.0;
     //private final JButton zoomFitButton;
-
     private final JButton snapshotButton;
 
     private final JToggleButton showButton;
@@ -134,10 +130,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private static Font notUnderlinedFont = null;
 
-    private final int zeroCharacterWidth;         
-    
+    private final int zeroCharacterWidth;
+
     private JButton selectColorButton;
-    
+
     static {
         Font font = new JLabel().getFont();
         notUnderlinedFont = font;
@@ -166,13 +162,11 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
         zoomPanel = new ZoomPanel(display);
         zoomPanel.setVisible(false);
-        
+
         snapshotButton = new JButton(View.getIcon("snapshot16"));
         snapshotButton.addActionListener(this::snapShotButtonActionPerformed);
         snapshotButton.setToolTipText(AppStrings.translate("button.snapshot.hint"));
         snapshotButton.setVisible(false);
-
-        
 
         graphicButtonsPanel.add(zoomPanel);
         graphicButtonsPanel.add(selectColorButton);
@@ -436,7 +430,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             }
         });
 
-    }      
+    }
 
     private void pauseButtonActionPerformed(ActionEvent evt) {
         if (display.isPlaying()) {
@@ -521,8 +515,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         }
     }
 
-    
-
     private void snapShotButtonActionPerformed(ActionEvent evt) {
         putImageToClipBoard(display.printScreen());
     }
@@ -548,8 +540,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         display.setMuted(muteButton.isSelected());
         Configuration.playFrameSounds.set(!muteButton.isSelected());
     }
-
-    
 
     @Override
     public void mediaDisplayStateChanged(MediaDisplay source) {

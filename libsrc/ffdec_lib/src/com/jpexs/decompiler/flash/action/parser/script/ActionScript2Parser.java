@@ -126,7 +126,6 @@ import com.jpexs.decompiler.flash.action.model.operations.StringNeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.FSCOMMAND;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
@@ -253,6 +252,7 @@ public class ActionScript2Parser {
 
     /**
      * Constructor
+     *
      * @param swf Swf
      * @param targetSource Target source
      */
@@ -269,6 +269,7 @@ public class ActionScript2Parser {
 
     /**
      * Parse SWF classes
+     *
      * @param swf SWF
      */
     private void parseSwfClasses(SWF swf) {
@@ -598,7 +599,7 @@ public class ActionScript2Parser {
                 s = lex();
                 GraphTargetItem parameter = null;
                 if (s.isType(SymbolType.COMMA)) {
-                    parameter = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);                
+                    parameter = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -1408,7 +1409,7 @@ public class ActionScript2Parser {
                 }
                 return new EmptyCommand();
             case DIRECTIVE:
-                switch((String)s.value) {
+                switch ((String) s.value) {
                     case "strict":
                         ret = new StrictModeActionItem(null, null, 1);
                         break;
@@ -2147,12 +2148,12 @@ public class ActionScript2Parser {
     }
 
     private DirectValueActionItem pushConst(String s) throws IOException, ActionParseException {
-        
+
         //ActionConstantPool was introduced in SWF 5
         if (swfVersion < 5) {
             return new DirectValueActionItem(null, null, 0, s, constantPool);
         }
-        
+
         int index = constantPool.indexOf(s);
         if (index == -1) {
             if (ActionConstantPool.calculateSize(constantPool) + ActionConstantPool.calculateSize(s) <= 0xffff) {
@@ -2175,6 +2176,7 @@ public class ActionScript2Parser {
 
     /**
      * Convert a string to a high-level model.
+     *
      * @param str The string to convert
      * @param constantPool The constant pool to use
      * @return The high-level model
@@ -2481,6 +2483,7 @@ public class ActionScript2Parser {
 
     /**
      * Converts a string to a list of actions.
+     *
      * @param s The string to convert
      * @param charset Charset
      * @return List of actions
