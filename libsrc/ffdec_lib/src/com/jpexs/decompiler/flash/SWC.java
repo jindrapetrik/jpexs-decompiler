@@ -18,9 +18,9 @@ package com.jpexs.decompiler.flash;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
@@ -32,17 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author JPEXS
  */
-public class SWC extends ZippedBundle {
-
-    /**
-     * Constructs SWC from input stream.
-     *
-     * @param is Input stream
-     * @throws IOException On I/O error
-     */
-    public SWC(InputStream is) throws IOException {
-        super(is);
-    }
+public class SWC extends ZippedBundle {   
 
     /**
      * Constructs SWC from file.
@@ -57,19 +47,18 @@ public class SWC extends ZippedBundle {
     /**
      * Initializes SWC bundle.
      *
-     * @param is Input stream
      * @param filename File
      * @throws IOException On I/O error
      */
     @Override
-    protected void initBundle(InputStream is, File filename) throws IOException {
-        super.initBundle(is, filename);
+    protected void initBundle(File filename) throws IOException {
+        super.initBundle(filename);
         keySet.clear();
-        this.is.reset();
-        ZipInputStream zip = new ZipInputStream(this.is);
-        ZipEntry entry;
+        ZipFile zipFile = new ZipFile(filename);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-        while ((entry = zip.getNextEntry()) != null) {
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
             if (entry.getName().equals("catalog.xml")) {
                 try {
                     SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -87,13 +76,14 @@ public class SWC extends ZippedBundle {
                         }
 
                     };
-                    saxParser.parse(zip, handler);
+                    saxParser.parse(zipFile.getInputStream(entry), handler);
                 } catch (Exception ex) {
                     //ignored
                 }
                 return;
             }
         }
+        zipFile.close();
     }
 
     /**

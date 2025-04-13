@@ -795,7 +795,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }*/
 
             if (Configuration.getPlayerSWC() != null) {
-                SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
+                SWC swc = new SWC(Configuration.getPlayerSWC());
                 //set allowRenameIdentifiers parameter to FALSE otherwise there will be an infinite loop
                 SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
                 playerGlobalAbcIndex = new AbcIndexing(swf);
@@ -803,7 +803,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         if (airGlobalAbcIndex == null) {
             if (Configuration.getAirSWC() != null) {
-                SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
+                SWC swc = new SWC(Configuration.getAirSWC());
                 //set allowRenameIdentifiers to FALSE
                 SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
                 airGlobalAbcIndex = new AbcIndexing(swf);
