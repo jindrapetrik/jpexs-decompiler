@@ -76,7 +76,7 @@
     </target>
     
     <target name="checkstyle">
-        <checkstyle config="${checkstyle_config.path}" failonviolation="true">
+        <checkstyle config="${checkstyle_config.path}" failonviolation="true" maxWarnings="0">
             <fileset dir="src/com/jpexs" includes="**/*.java">
                 <exclude name="**/FontPreviewDialog.java" />
                 <exclude name="**/*Lexer.java" />
