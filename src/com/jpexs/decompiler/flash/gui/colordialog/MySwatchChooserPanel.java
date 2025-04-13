@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.colordialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -98,8 +97,8 @@ public class MySwatchChooserPanel extends AbstractColorChooserPanel {
      * <code>UIManager.get("ColorChooser.swatchesMnemonic");</code>.
      *
      * @return KeyEvent.VK constant identifying the mnemonic; <= 0 for no
-     * mnemonic @see #getDisplayedMnemonicI
-     * ndex
+     * mnemonic @see #getDisplayedMnemonicIndex
+     *
      * @since 1.4
      */
     public int getMnemonic() {

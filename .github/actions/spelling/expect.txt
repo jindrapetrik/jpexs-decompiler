@@ -1927,6 +1927,7 @@ linkreport
 linmax
 listconfigs
 Listswf
+livedocs
 lix
 ljcb
 ljrb
