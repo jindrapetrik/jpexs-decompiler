@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2418] AS3 - initialization of class static vars in script initializer (Haxe)
 - [#2397] DefineScalingGrid - improper scaling on negative Xmin, Ymin
 - [#2425] ZIP/SWC reading - "Only DEFLATED entries can have EXT descriptor" message
+- Drawing points and shape paths highlighting did not respect UI scale factor
 
 ## [22.0.2] - 2025-01-17
 ### Added

@@ -928,7 +928,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             trans.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
                             trans.scale(zoomDouble, zoomDouble);
                             AffineTransform oldTransform = g2.getTransform();
-                            g2.setTransform(trans);
+                            g2.transform(trans);
 
                             if (hilightedEdge != null) {
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
