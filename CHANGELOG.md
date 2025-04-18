@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2425] ZIP/SWC reading - "Only DEFLATED entries can have EXT descriptor" message
 - Drawing points and shape paths highlighting did not respect UI scale factor
 - [#2416] FLA export - shape fixing in some cases
+- [#2394] FLA export - shape tweens in some cases
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3716,12 +3717,12 @@ Major version of SWF to XML export changed to 2.
 [#2397]: https://www.free-decompiler.com/flash/issues/2397
 [#2425]: https://www.free-decompiler.com/flash/issues/2425
 [#2416]: https://www.free-decompiler.com/flash/issues/2416
+[#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
 [#2381]: https://www.free-decompiler.com/flash/issues/2381
 [#2384]: https://www.free-decompiler.com/flash/issues/2384
-[#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2393]: https://www.free-decompiler.com/flash/issues/2393
 [#2407]: https://www.free-decompiler.com/flash/issues/2407
 [#2366]: https://www.free-decompiler.com/flash/issues/2366

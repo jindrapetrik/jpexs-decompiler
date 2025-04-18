@@ -2480,7 +2480,7 @@ public class XFLConverter {
                             shapeTweener = m;
                             shapeTween = false;
                         }
-                    }
+                    }                    
                     if (newCharId == -1 && newCharCls == null) {
                         newCharacter = character;
                     }
@@ -3936,6 +3936,9 @@ public class XFLConverter {
             if (t instanceof RemoveTag) {
                 RemoveTag rem = (RemoveTag) t;
                 if (rem.getDepth() == morphDepth) {
+                    if (onTrack) {
+                        outTimelineTags.add(t);
+                    }
                     onTrack = false;
                 }
             }
