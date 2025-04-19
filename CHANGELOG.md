@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#2394] FLA export - shape tweens in some cases
 - Not resetting timeline after shape tag type conversion
 - [#2400] Transforming - buttons must use hit test frame outline
+- [#2413] AS3 direct editation - try/catch clause in instance initializer
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3721,6 +3722,7 @@ Major version of SWF to XML export changed to 2.
 [#2416]: https://www.free-decompiler.com/flash/issues/2416
 [#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2400]: https://www.free-decompiler.com/flash/issues/2400
+[#2413]: https://www.free-decompiler.com/flash/issues/2413
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389

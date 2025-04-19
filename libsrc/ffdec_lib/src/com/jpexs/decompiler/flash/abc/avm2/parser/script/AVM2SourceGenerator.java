@@ -826,7 +826,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        //List<AVM2Instruction> cinitcode = new ArrayList<>();
         List<AVM2Instruction> initcode = new ArrayList<>();
         for (GraphTargetItem ti : commands) {
             if ((ti instanceof SlotAVM2Item) || (ti instanceof ConstAVM2Item)) {
@@ -854,13 +853,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         continue;
                     }
                 }
-                /*if (isStatic && val != null) {
-                    cinitcode.add(ins(AVM2Instructions.FindProperty, traitName(ns, tname)));
-                    localData.isStatic = true;
-                    cinitcode.addAll(toInsList(val.toSource(localData, this)));
-                    cinitcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
-                }
-                 */
                 if (!isStatic && val != null) {
                     //do not init basic values, that can be stored in trait
                     if (!(val instanceof IntegerValueAVM2Item)
@@ -881,11 +873,18 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abcIndex.getSelectedAbc().findBody(init);
+            
+            int len = 0;
+            for (AVM2Instruction ins : initcode) {
+                len += ins.getBytesLength();
+            }
+            
             initBody.getCode().code.addAll(iinit == null ? 0 : 2, initcode); //after getlocal0,pushscope
-
-            /*if (cinitBody.getCode().code.get(cinitBody.getCode().code.size() - 1).definition instanceof ReturnVoidIns) {
-                cinitBody.getCode().code.addAll(2, cinitcode); //after getlocal0,pushscope
-            }*/
+            for (ABCException ex:initBody.exceptions) {
+                ex.start += len;
+                ex.end += len;
+                ex.target += len;                
+            }           
         }
         cinitBody.markOffsets();
         cinitBody.autoFillStats(abcIndex.getSelectedAbc(), initScope + (implementsStr.isEmpty() ? 0 : 1), true);
