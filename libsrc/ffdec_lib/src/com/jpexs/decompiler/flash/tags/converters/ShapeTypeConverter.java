@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
@@ -92,14 +93,16 @@ public class ShapeTypeConverter {
         if (targetShapeNum == sh.getShapeNum()) {
             return;
         }
+        Timelined tim = sh.getTimelined();
         ShapeTag converted = convertTagType(sh, swf, targetShapeNum);
         converted.setCharacterId(characterId);
         swf.replaceTag(ct, converted);
-        converted.setTimelined(swf);
+        converted.setTimelined(tim);
         swf.updateCharacters();
         swf.clearShapeCache();
         swf.assignClassesToSymbols();
         swf.assignExportNamesToSymbols();
+        tim.resetTimeline();
     }
     
     /**
