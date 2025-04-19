@@ -20,8 +20,8 @@ All notable changes to this project will be documented in this file.
 - Drawing points and shape paths highlighting did not respect UI scale factor
 - [#2416] FLA export - shape fixing in some cases
 - [#2394] FLA export - shape tweens in some cases
-- Not reseting timeline after shape tag type conversion
-- [#2400] Transforming - buttons must use hittest frame outline
+- Not resetting timeline after shape tag type conversion
+- [#2400] Transforming - buttons must use hit test frame outline
 
 ## [22.0.2] - 2025-01-17
 ### Added
