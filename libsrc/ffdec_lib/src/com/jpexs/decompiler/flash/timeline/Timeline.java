@@ -1296,6 +1296,9 @@ public class Timeline {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
+                    if ((drawable instanceof ButtonTag) && !renderContext.enableButtons) {
+                        dframe = ButtonTag.FRAME_HITTEST;
+                    }
                     Shape shape = drawable.getOutline(true, dframe, dtime, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);

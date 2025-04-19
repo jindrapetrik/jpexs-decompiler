@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#2416] FLA export - shape fixing in some cases
 - [#2394] FLA export - shape tweens in some cases
 - Not reseting timeline after shape tag type conversion
+- [#2400] Transforming - buttons must use hittest frame outline
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3719,6 +3720,7 @@ Major version of SWF to XML export changed to 2.
 [#2425]: https://www.free-decompiler.com/flash/issues/2425
 [#2416]: https://www.free-decompiler.com/flash/issues/2416
 [#2394]: https://www.free-decompiler.com/flash/issues/2394
+[#2400]: https://www.free-decompiler.com/flash/issues/2400
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389

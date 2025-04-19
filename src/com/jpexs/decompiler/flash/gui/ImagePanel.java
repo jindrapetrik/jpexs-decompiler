@@ -698,6 +698,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (drawableFrameCount == 0) {
                         drawableFrameCount = 1;
                     }
+        
+                    if (dt instanceof ButtonTag) {
+                        dframe = ButtonTag.FRAME_HITTEST;
+                    }
 
                     transform = new Matrix(ds.matrix);
 
@@ -1363,7 +1367,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         int drawableFrameCount = dt.getNumFrames();
                                         if (drawableFrameCount == 0) {
                                             drawableFrameCount = 1;
-                                        }
+                                        }                                        
 
                                         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                                         if (lowQuality) {
@@ -1372,7 +1376,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         Matrix m = new Matrix();
                                         m.translate(-_viewRect.xMin * zoomDouble, -_viewRect.yMin * zoomDouble);
                                         m.scale(zoomDouble);
-                                        int dframe = 0;
                                         Matrix transformation = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix)));
                                         RECT dtRect = dt.getRect();
                                         Rectangle2D dtRect2D = new Rectangle2D.Double(dtRect.Xmin, dtRect.Ymin, dtRect.getWidth(), dtRect.getHeight());
@@ -3339,6 +3342,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         int dframe = time % drawableFrameCount;
+                        
+                        if (cht instanceof ButtonTag) {
+                            dframe = ButtonTag.FRAME_HITTEST;
+                        }
+                        
                         //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
 
                         Matrix transform2 = transform;
@@ -4402,6 +4410,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         Matrix b = newMatrix; //getParentMatrix().concatenate(newMatrix); //.concatenate(new Matrix(ds.matrix).inverse());
                         int dframe = time % drawableFrameCount;
+                        
+                        if (cht instanceof ButtonTag) {
+                            dframe = ButtonTag.FRAME_HITTEST;
+                        }
+                        
                         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                         if (lowQuality) {
                             zoomDouble /= LQ_FACTOR;
