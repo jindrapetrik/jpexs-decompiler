@@ -873,18 +873,18 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abcIndex.getSelectedAbc().findBody(init);
-            
+
             int len = 0;
             for (AVM2Instruction ins : initcode) {
                 len += ins.getBytesLength();
             }
-            
+
             initBody.getCode().code.addAll(iinit == null ? 0 : 2, initcode); //after getlocal0,pushscope
-            for (ABCException ex:initBody.exceptions) {
+            for (ABCException ex : initBody.exceptions) {
                 ex.start += len;
                 ex.end += len;
-                ex.target += len;                
-            }           
+                ex.target += len;
+            }
         }
         cinitBody.markOffsets();
         cinitBody.autoFillStats(abcIndex.getSelectedAbc(), initScope + (implementsStr.isEmpty() ? 0 : 1), true);
