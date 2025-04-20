@@ -111,3 +111,6 @@ exported1.all.bin
 /libsrc/decimal/build/
 /libsrc/gnujpdf/nbproject/private/
 /libsrc/gnujpdf/build/
+/libsrc/substance-fix/nbproject/private/
+/libsrc/substance-fix/build/
+/libsrc/substance-fix/dist/

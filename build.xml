@@ -94,7 +94,8 @@
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
             <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
             </classpath>
         </javac>
         <copy todir="${compile.dir}">
@@ -115,7 +116,8 @@
         <javac srcdir="${test.dir}" destdir="${compile.test.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true" includeantruntime="false" encoding="utf-8">                        
             <classpath>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javac>
@@ -151,7 +153,8 @@
                 <classpath>
                     <pathelement path="${compile.test.dir}"/>
                     <pathelement path="${compile.dir}"/>
-                    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                    <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                    <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                     <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
                 </classpath>
                 <jvmarg value="-noverify" />
@@ -695,7 +698,8 @@
         </propertyfile>
         
         <pathconvert pathsep=" " property="manifestClassPath">
-            <fileset dir="${dist.dir}" includes="${dist.lib.dirname}/**/*.*"/>
+            <fileset dir="${dist.dir}" includes="${dist.lib.dirname}/**/*-fix.jar"/>
+            <fileset dir="${dist.dir}" includes="${dist.lib.dirname}/**/*.jar" excludes="${dist.lib.dirname}/**/*-fix.jar"/>
             <chainedmapper>
                 <flattenmapper/>
                 <globmapper from="*" to="${dist.lib.dirname}/*"/>
@@ -733,7 +737,8 @@
                  useexternalfile="yes">
             <fileset dir="${src.dir}" includes="**/*.java"/>
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
             </classpath>
         </javadoc>
         <ant antfile="${core.lib.script}" target="javadoc" inheritAll="false" usenativebasedir="true"/>
@@ -762,7 +767,8 @@
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </nbjpdastart>
@@ -774,7 +780,8 @@
             <classpath>
                 <pathelement path="${compile.test.dir}"/>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify" />
@@ -933,7 +940,8 @@
     <target name="update-changelog-md" depends="compile">
         <java classname="com.jpexs.build.ChangelogUpdater" failonerror="true" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
         </java>
@@ -942,7 +950,8 @@
     <target name="update-metainfo" depends="compile" >
         <java classname="com.jpexs.build.MetainfoUpdater" failonerror="true" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
         </java>
