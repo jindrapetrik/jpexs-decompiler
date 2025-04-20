@@ -836,7 +836,7 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> playFrameSounds = null;
 
-    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> fixAntialiasConflation = null;
 
