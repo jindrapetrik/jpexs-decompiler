@@ -20,11 +20,15 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
@@ -74,7 +78,6 @@ public class LineNumbersRuler extends JPanel
     public static final int DEFAULT_R_MARGIN = 5;
     public static final int DEFAULT_L_MARGIN = 5;
     private Status status;
-    private final static int HEIGHT = Integer.MAX_VALUE - 1000000;
     //  Text component this TextTextLineNumber component is in sync with
     protected JEditorPane editor; //JPEXS: changed to protected
     private int minimumDisplayDigits = 2;
@@ -195,13 +198,37 @@ public class LineNumbersRuler extends JPanel
             int width = fontMetrics.charWidth('0') * digits;
             Insets insets = getInsets();
             int preferredWidth = insets.left + insets.right + width;
-
+                        
             Dimension d = getPreferredSize();
-            d.setSize(preferredWidth, HEIGHT);
+            d.setSize(preferredWidth, getMaxHeight(editor));
             setPreferredSize(d);
             setSize(d);
 
         }
+    }
+    
+    //JPEXS
+    private static int getMaxHeight(JEditorPane editor) {    
+        //Original was Integer.MAX_VALUE - 1000000,
+        //but it seems that on hi-dpi displays this value (height) is multiplied by UI scale
+        //and can overflow Integer.MAX_VALUE and causes glitches.
+        //In this method, we divide the height by Y scale value
+        
+        
+        Window window = SwingUtilities.getWindowAncestor(editor);
+        AffineTransform transform = null;
+        GraphicsConfiguration configuration;
+        if (window == null) {
+            configuration = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        } else {
+            configuration = window.getGraphicsConfiguration();
+        }
+        transform = configuration.getDefaultTransform();
+        double scaleY = 1.0;
+        if (transform != null) {
+            scaleY = transform.getScaleY();
+        }
+        return (int)Math.floor((Integer.MAX_VALUE - 1000000) / scaleY);
     }
 
     /**
@@ -210,7 +237,7 @@ public class LineNumbersRuler extends JPanel
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
+        
         FontMetrics fontMetrics = editor.getFontMetrics(editor.getFont());
         Insets insets = getInsets();
         int currentLine = -1;
