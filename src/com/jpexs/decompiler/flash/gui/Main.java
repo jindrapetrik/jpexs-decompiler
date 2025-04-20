@@ -83,11 +83,13 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.Component;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -2530,6 +2532,14 @@ public class Main {
         System.setProperty("sun.java2d.noddraw", "true");
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.       
+            if (!Configuration.uiScale.hasValue()) {
+                GraphicsConfiguration configuration = View.getMainDefaultScreenDevice().getDefaultConfiguration();
+
+                AffineTransform transform = configuration.getDefaultTransform();
+                if (transform != null) {
+                    Configuration.uiScale.set(transform.getScaleX());
+                }
+            }
             System.setProperty("sun.java2d.uiScale", "" + Configuration.uiScale.get());
         }
 

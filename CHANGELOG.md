@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#2427] Commandline export with use of imported SWFs (importAssets tag)
+- Auto detect scale factor on Hi-dpi displays
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
