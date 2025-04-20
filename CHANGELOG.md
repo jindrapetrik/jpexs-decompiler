@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Loading icon did not respect UI scale factor
 - Editor (JSyntaxPane) incorrectly draws line numbers panel on Hi-dpi displays
 - Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly
+- Incorrect icons for `New empty` action - with dashed borders
 
 ## [22.0.2] - 2025-01-17
 ### Added
