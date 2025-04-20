@@ -1924,6 +1924,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 displayEditCancelButton.setEnabled(true);
                 displayEditTransformButton.setVisible(false);
                 mainPanel.setEditingStatus();
+                if (Configuration.editorMode.get()) {
+                    displayEditEditPointsButton.setVisible(false);
+                    displayEditTransformButton.setVisible(false);
+                    replaceShapeButton.setVisible(false);
+                    replaceShapeUpdateBoundsButton.setVisible(false);
+                    replaceMorphShapeButton.setVisible(false);
+                    replaceMorphShapeUpdateBoundsButton.setVisible(false);
+                }
             }
 
             @Override
@@ -2737,6 +2745,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeUpdateBoundsButton.setVisible(false);
         replaceMorphShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
+        
+        displayEditSaveButton.setEnabled(true);
+        displayEditCancelButton.setEnabled(true);
 
         if ((displayEditTag instanceof MorphShapeTag) && (morphDisplayMode == MORPH_ANIMATE)) {
             displayEditShowStartButton.setSelected(true);
