@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - [#2400] Transforming - buttons must use hit test frame outline
 - [#2413] AS3 direct editation - try/catch clause in instance initializer
 - [#2386] Editor mode - not able to save shape/morphshape points
+- Loading icon did not respect UI scale factor
 
 ## [22.0.2] - 2025-01-17
 ### Added
