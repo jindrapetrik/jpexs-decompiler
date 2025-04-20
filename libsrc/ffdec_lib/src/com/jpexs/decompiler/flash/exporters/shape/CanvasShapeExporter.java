@@ -650,9 +650,4 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         fillWidth = 0;
         fillHeight = 0;
     }
-
-    @Override
-    public void beginAliasedFills() {
-        aliasedFill = true;
-    }
 }

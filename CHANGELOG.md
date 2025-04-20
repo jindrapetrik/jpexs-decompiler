@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2427] Commandline export with use of imported SWFs (importAssets tag)
 - Auto detect scale factor on Hi-dpi displays
+- [#1826] Extending fill area by half pixel to fix antialias conflation artifacts
+  (Can be turned off in advanced settings)
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -3717,6 +3719,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
+[#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2436]: https://www.free-decompiler.com/flash/issues/2436

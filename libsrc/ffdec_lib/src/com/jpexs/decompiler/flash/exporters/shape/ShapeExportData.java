@@ -43,11 +43,6 @@ public class ShapeExportData {
     public List<List<IEdge>> fillPaths;
 
     /**
-     * Aliased fill paths
-     */
-    public List<List<IEdge>> aliasedFillPaths;
-
-    /**
      * Line paths
      */
     public List<List<IEdge>> linePaths;

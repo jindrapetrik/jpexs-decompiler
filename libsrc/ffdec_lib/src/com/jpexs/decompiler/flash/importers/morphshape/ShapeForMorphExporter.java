@@ -226,11 +226,6 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void beginAliasedFills() {
-
-    }
-
-    @Override
     public void beginFills() {
 
     }

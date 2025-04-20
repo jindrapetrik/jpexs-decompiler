@@ -193,10 +193,4 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     protected double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }
-
-    @Override
-    public void beginAliasedFills() {
-        aliasedFill = true;
-    }
-
 }
