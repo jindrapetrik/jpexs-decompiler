@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - Editor (JSyntaxPane) incorrectly draws line numbers panel on Hi-dpi displays
 - Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly
 - Incorrect icons for `New empty` action - with dashed borders
+- [#2443] SVG importer - converting cubic bezier curves to quadratic
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3730,6 +3731,7 @@ Major version of SWF to XML export changed to 2.
 [#2400]: https://www.free-decompiler.com/flash/issues/2400
 [#2413]: https://www.free-decompiler.com/flash/issues/2413
 [#2386]: https://www.free-decompiler.com/flash/issues/2386
+[#2443]: https://www.free-decompiler.com/flash/issues/2443
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
