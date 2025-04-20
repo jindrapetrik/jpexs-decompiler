@@ -31,6 +31,7 @@ package org.pushingpixels.substance.internal.utils;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.*;
 
 import javax.swing.*;
@@ -54,6 +55,10 @@ import org.pushingpixels.substance.internal.utils.border.SubstanceTextComponentB
  * Text-related utilities. This class if for internal use only.
  * 
  * @author Kirill Grouchnikov
+ * 
+ * 
+ * JPEXS updates: Fixed paintTextWithDropShadow to work correctly on Hi-DPI monitors
+ *  
  */
 public class SubstanceTextUtilities {
 	public static final String ENFORCE_FG_COLOR = "substancelaf.internal.textUtilities.enforceFgColor";
@@ -83,11 +88,28 @@ public class SubstanceTextUtilities {
 			int xOffset, int yOffset) {
 		Graphics2D graphics = (Graphics2D) g.create();
 		RenderingUtils.installDesktopHints(graphics, c);
-
+                
+                
+                //JPEXS begin
+                AffineTransform t = graphics.getTransform();
+                if (t == null) {
+                    t = new AffineTransform();
+                }
+                Point2D p = new Point2D.Double(width, height);
+                Point2D p2 = new Point2D.Double();
+                t.transform(p, p2);
+                if (p2.getX() <= 0 || p2.getY() <= 0) {
+                    return;
+                }
+                //JPEXS end
+                
 		// blur the text shadow
-		BufferedImage blurred = SubstanceCoreUtilities.getBlankImage(width,
-				height);
+		BufferedImage blurred = SubstanceCoreUtilities.getBlankImage(
+                                (int)Math.round(p2.getX()), //JPEXS
+				(int)Math.round(p2.getY()) //JPEXS
+                );
 		Graphics2D gBlurred = (Graphics2D) blurred.getGraphics();
+                gBlurred.setTransform(graphics.getTransform()); // JPEXS
 		gBlurred.setFont(graphics.getFont());
 		gBlurred.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
@@ -95,17 +117,20 @@ public class SubstanceTextUtilities {
 		// SubstanceColorUtilities.getNegativeColor(foregroundColor);
 		float luminFactor = SubstanceColorUtilities
 				.getColorStrength(foregroundColor);
-		gBlurred.setColor(SubstanceColorUtilities
+                gBlurred.setColor(SubstanceColorUtilities
 				.getNegativeColor(foregroundColor));
 		ConvolveOp convolve = new ConvolveOp(new Kernel(3, 3, new float[] {
 				.02f, .05f, .02f, .05f, .02f, .05f, .02f, .05f, .02f }),
 				ConvolveOp.EDGE_NO_OP, null);
 		gBlurred.drawString(text, xOffset, yOffset - 1);
-		blurred = convolve.filter(blurred, null);
+                blurred = convolve.filter(blurred, null);
 
 		graphics.setComposite(LafWidgetUtilities.getAlphaComposite(c,
 				luminFactor, g));
+                AffineTransform ot = graphics.getTransform(); //JPEXS
+                graphics.setTransform(new AffineTransform()); //JPEXS
 		graphics.drawImage(blurred, 0, 0, null);
+                graphics.setTransform(ot); //JPEXS
 		graphics.setComposite(LafWidgetUtilities.getAlphaComposite(c, g));
 
 		FontMetrics fm = graphics.getFontMetrics();
