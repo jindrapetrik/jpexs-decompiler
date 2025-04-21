@@ -4,7 +4,8 @@
     <target depends="compile" name="debug-nb">
         <path id="cp">
             <pathelement path="${basedir}/build/classes"/>
-            <fileset dir="${basedir}/lib" includes="**/*.jar"/>
+            <fileset dir="${basedir}/lib" includes="**/*-fix.jar"/>
+            <fileset dir="${basedir}/lib" includes="**/*.jar" excludes="**/*-fix.jar"/>
         </path>
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath refid="cp"/>

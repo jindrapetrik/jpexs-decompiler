@@ -5,7 +5,8 @@
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
         </java>
@@ -14,7 +15,8 @@
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
                 <pathelement location="build/test"/>
             </classpath>
@@ -34,7 +36,8 @@
                 <pathelement path="${compile.test.dir}"/>
                 <pathelement path="${instr.dir}"/>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify"/>
@@ -56,7 +59,8 @@
                 <pathelement path="${compile.test.dir}"/>
                 <pathelement path="${instr.dir}"/>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify"/>
@@ -72,7 +76,8 @@
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath id="cp">
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </nbjpdastart>
@@ -87,7 +92,8 @@
             <classpath>
                 <pathelement path="${compile.test.dir}"/>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify"/>
@@ -105,7 +111,8 @@
         <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
             <classpath id="cp">
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </nbjpdastart>
@@ -120,7 +127,8 @@
             <classpath>
                 <pathelement path="${compile.test.dir}"/>
                 <pathelement path="${compile.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-noverify"/>
@@ -139,7 +147,8 @@
             <classpath>
                 <pathelement path="${compile.dir}"/>
                 <pathelement path="${compile.test.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
         </nbjpdastart>
@@ -147,7 +156,8 @@
             <classpath>
                 <pathelement path="${compile.dir}"/>
                 <pathelement path="${compile.test.dir}"/>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*-fix.jar"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-Xdebug"/>
@@ -159,13 +169,15 @@
         <ant antfile="build.xml" inheritall="false" target="build"/>
         <nbjpdastart addressproperty="jpda.address" name="jxar" transport="dt_socket">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
         </nbjpdastart>
         <java classname="${debug.class}" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
             <jvmarg value="-Xdebug"/>
@@ -179,7 +191,8 @@
         <fail unless="profile.class">Must set property 'profile.class'</fail>
         <java classname="${profile.class}" fork="true">
             <classpath>
-                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*-fix.jar"/>
+                <fileset dir="${basedir}" includes="lib/**/*.jar" excludes="lib/**/*-fix.jar"/>
                 <pathelement location="build/classes"/>
             </classpath>
             <jvmarg line="${agent.jvmargs}"/>
