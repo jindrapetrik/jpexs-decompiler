@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2427] Commandline export with use of imported SWFs (importAssets tag)
 - Auto detect scale factor on Hi-dpi displays
-- [#1826] (Optional) Extending fill area by half pixel to fix antialias conflation artifacts
+- [#1826] (Optional) Extending shape area by half pixel to fix antialias conflation artifacts
   (Can be turned on in advanced settings)
 
 ### Fixed

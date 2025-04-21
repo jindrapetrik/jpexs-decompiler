@@ -421,6 +421,10 @@ public class BitmapExporter extends ShapeExporterBase {
         if (thickness * unzoom < 1 * SWF.unitDivisor) {
             thickness = 1 * SWF.unitDivisor / unzoom;
         }
+        
+        if (Configuration.fixAntialiasConflation.get()) {
+            thickness += 1 * SWF.unitDivisor / unzoom;
+        }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
             //lineStroke =  new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
