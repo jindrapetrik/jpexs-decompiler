@@ -60,6 +60,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,8 +107,6 @@ public class SvgImporter {
     private double width;
     
     private double height;
-    
-    private double unitRatio;        
     
     /**
      * Constructor.
@@ -286,27 +285,20 @@ public class SvgImporter {
             SvgStyle style = new SvgStyle(this, idMap, rootElement, cachedBitmaps);
             Matrix transform = new Matrix();
 
-            double ratioX = 1;
-            double ratioY = 1;
-
             if (fill) {
-                ratioX = rect.getWidth() / width;
-                ratioY = rect.getHeight() / height;
+                double ratioX = rect.getWidth() / width;
+                double ratioY = rect.getHeight() / height;
                 transform = Matrix.getScaleInstance(ratioX / SWF.unitDivisor, ratioY / SWF.unitDivisor);
                 transform.translate(origXmin / ratioX, origYmin / ratioY);
             }
 
             transform = transform.preConcatenate(Matrix.getTranslateInstance(-viewBox.x, -viewBox.y));
             if (viewBox.height != 0 && viewBox.width != 0) {
-                double ratio2x = width / viewBox.width;
-                double ratio2y = height / viewBox.height;
-                ratioX *= ratio2x;
-                ratioY *= ratio2y;
-                transform = transform.preConcatenate(Matrix.getScaleInstance(ratio2x, ratio2y));
+                double ratioX = width / viewBox.width;
+                double ratioY = height / viewBox.height;
+                transform = transform.preConcatenate(Matrix.getScaleInstance(ratioX, ratioY));
             }
-            
-            this.unitRatio = (ratioX + ratioY) / 2;
-
+                        
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape, cachedBitmaps, false);
             if (rootElement.hasAttribute("ffdec:objectType")
                     && "morphshape".equals(rootElement.getAttribute("ffdec:objectType"))
@@ -343,14 +335,6 @@ public class SvgImporter {
 
         return (Tag) st;
     }
-
-    /**
-     * Gets unit ratio.
-     * @return Ratio value
-     */
-    public double getUnitRatio() {
-        return unitRatio;
-    }   
     
     /**
      * Applies animation to the element.
@@ -650,7 +634,7 @@ public class SvgImporter {
         double x0 = 0;
         double y0 = 0;
 
-        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style, morphShape);
+        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style, morphShape, transform);
         int fillStyle = morphShape ? scrStyle.fillStyle0 : scrStyle.fillStyle1;
         int lineStyle = scrStyle.lineStyle;
         scrStyle.stateFillStyle0 = true;
@@ -1481,11 +1465,11 @@ public class SvgImporter {
     private static void svgTest(String name) throws IOException, InterruptedException {
         System.err.println("running test " + name);
         if (!new File(name + ".original.svg").exists()) {
-            URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
+            URL svgUrl = URI.create("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg").toURL();
             byte[] svgData = Helper.readStream(svgUrl.openStream());
             Helper.writeFile(name + ".orig.svg", svgData);
 
-            URL pngUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png");
+            URL pngUrl = URI.create("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png").toURL();
             byte[] pngData = Helper.readStream(pngUrl.openStream());
             Helper.writeFile(name + ".orig.png", pngData);
         }
@@ -2001,7 +1985,7 @@ public class SvgImporter {
         }
     }
 
-    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style, boolean morphShape) {
+    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style, boolean morphShape, Matrix transform) {
         StyleChangeRecord scr = new StyleChangeRecord();
 
         scr.stateNewStyles = true;
@@ -2044,8 +2028,9 @@ public class SvgImporter {
             Color lineColor = strokeFill.toColor();
 
             ILINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
-            lineStyle.setColor(getRGB(shapeNum, lineColor));            
-            lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * this.unitRatio * SWF.unitDivisor));
+            lineStyle.setColor(getRGB(shapeNum, lineColor));
+            double scale = Math.max(transform.scaleX, transform.scaleY);
+            lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * scale * SWF.unitDivisor));
             SvgLineCap lineCap = style.getStrokeLineCap();
             SvgLineJoin lineJoin = style.getStrokeLineJoin();
             if (lineStyle instanceof LINESTYLE2) {
