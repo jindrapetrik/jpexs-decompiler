@@ -455,7 +455,7 @@ public class CubicToQuad {
 
     /**
      * Approximate cubic Bezier curve defined with base points p1, p2 and
-     * control points c1, c2 with with a few quadratic Bezier curves. The
+     * control points c1, c2 with a few quadratic Bezier curves. The
      * function uses tangent method to find quadratic approximation of cubic
      * curve segment and simplified Hausdorff distance to determine number of
      * segments that is enough to make error small. In general the method is the
@@ -515,7 +515,7 @@ public class CubicToQuad {
 
     /**
      * Approximate cubic Bezier curve defined with base points p1, p2 and
-     * control points c1, c2 with with a few quadratic Bezier curves. The
+     * control points c1, c2 with a few quadratic Bezier curves. The
      * function uses tangent method to find quadratic approximation of cubic
      * curve segment and simplified Hausdorff distance to determine number of
      * segments that is enough to make error small. In general the method is the
