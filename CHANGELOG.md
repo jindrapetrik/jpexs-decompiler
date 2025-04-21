@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - [#2443] SVG importer - converting cubic bezier curves to quadratic
 - [#2444] SVG importer - improper stroke width when using width/height with viewBox
 - [#2444] SVG importer - stroke width not respecting transforms
+- [#2415] AS3 direct editation - nested functions - prefer callstack variables over prototype chain
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3738,6 +3739,7 @@ Major version of SWF to XML export changed to 2.
 [#2386]: https://www.free-decompiler.com/flash/issues/2386
 [#2443]: https://www.free-decompiler.com/flash/issues/2443
 [#2444]: https://www.free-decompiler.com/flash/issues/2444
+[#2415]: https://www.free-decompiler.com/flash/issues/2415
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
