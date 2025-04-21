@@ -103,6 +103,12 @@ public class SvgImporter {
 
     private Rectangle2D.Double viewBox;
 
+    private double width;
+    
+    private double height;
+    
+    private double unitRatio;        
+    
     /**
      * Constructor.
      * @param st Shape tag
@@ -273,22 +279,33 @@ public class SvgImporter {
             }
 
             this.viewBox = viewBox;
+            this.width = width;
+            this.height = height;
 
             Map<String, Integer> cachedBitmaps = new HashMap<>();
             SvgStyle style = new SvgStyle(this, idMap, rootElement, cachedBitmaps);
             Matrix transform = new Matrix();
 
+            double ratioX = 1;
+            double ratioY = 1;
+
             if (fill) {
-                double ratioX = rect.getWidth() / width / SWF.unitDivisor;
-                double ratioY = rect.getHeight() / height / SWF.unitDivisor;
-                transform = Matrix.getScaleInstance(ratioX, ratioY);
-                transform.translate(origXmin / SWF.unitDivisor / ratioX, origYmin / SWF.unitDivisor / ratioY);
+                ratioX = rect.getWidth() / width;
+                ratioY = rect.getHeight() / height;
+                transform = Matrix.getScaleInstance(ratioX / SWF.unitDivisor, ratioY / SWF.unitDivisor);
+                transform.translate(origXmin / ratioX, origYmin / ratioY);
             }
 
             transform = transform.preConcatenate(Matrix.getTranslateInstance(-viewBox.x, -viewBox.y));
             if (viewBox.height != 0 && viewBox.width != 0) {
-                transform = transform.preConcatenate(Matrix.getScaleInstance(width / viewBox.width, height / viewBox.height));
+                double ratio2x = width / viewBox.width;
+                double ratio2y = height / viewBox.height;
+                ratioX *= ratio2x;
+                ratioY *= ratio2y;
+                transform = transform.preConcatenate(Matrix.getScaleInstance(ratio2x, ratio2y));
             }
+            
+            this.unitRatio = (ratioX + ratioY) / 2;
 
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape, cachedBitmaps, false);
             if (rootElement.hasAttribute("ffdec:objectType")
@@ -327,6 +344,14 @@ public class SvgImporter {
         return (Tag) st;
     }
 
+    /**
+     * Gets unit ratio.
+     * @return Ratio value
+     */
+    public double getUnitRatio() {
+        return unitRatio;
+    }   
+    
     /**
      * Applies animation to the element.
      * @param element Element
@@ -1440,6 +1465,18 @@ public class SvgImporter {
         processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape, false);
     }
 
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public Rectangle2D.Double getViewBox() {
+        return viewBox;
+    }        
+
     //Stub for w3 test. TODO: refactor and move to test directory. It's here because of easy access - compiling single file
     private static void svgTest(String name) throws IOException, InterruptedException {
         System.err.println("running test " + name);
@@ -2007,8 +2044,8 @@ public class SvgImporter {
             Color lineColor = strokeFill.toColor();
 
             ILINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
-            lineStyle.setColor(getRGB(shapeNum, lineColor));
-            lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * SWF.unitDivisor));
+            lineStyle.setColor(getRGB(shapeNum, lineColor));            
+            lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * this.unitRatio * SWF.unitDivisor));
             SvgLineCap lineCap = style.getStrokeLineCap();
             SvgLineJoin lineJoin = style.getStrokeLineJoin();
             if (lineStyle instanceof LINESTYLE2) {
@@ -2088,7 +2125,7 @@ public class SvgImporter {
         return parseLength(value, relativeTo);
     }
 
-    private double parseLength(String value, double relativeTo) {
+    public double parseLength(String value, double relativeTo) {
         if (value == null) {
             throw new NumberFormatException();
         }

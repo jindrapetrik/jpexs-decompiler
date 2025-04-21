@@ -791,8 +791,12 @@ class SvgStyle {
                 }
                 break;
                 case "stroke-width": {
-                    double strokeWidth = Double.parseDouble(value);
-                    return strokeWidth;
+                    return importer.parseLength(value, 
+                            Math.sqrt(
+                                    importer.getViewBox().width * importer.getViewBox().width
+                                    + importer.getViewBox().height * importer.getViewBox().height
+                            ) / Math.sqrt(2)
+                    );
                 }
                 case "stroke-opacity": {
                     double opacity = Double.parseDouble(value);

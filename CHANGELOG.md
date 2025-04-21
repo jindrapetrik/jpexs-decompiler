@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly
 - Incorrect icons for `New empty` action - with dashed borders
 - [#2443] SVG importer - converting cubic bezier curves to quadratic
+- SVG importer - improper stroke width when using width/height with viewBox
 
 ## [22.0.2] - 2025-01-17
 ### Added
