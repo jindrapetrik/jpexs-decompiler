@@ -214,7 +214,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 boolean foundInCallStack = false;
                 
                 if (objType == null) {
-                    loopcallstack: for (MethodBody b : callStack) {
+                    for (MethodBody b : callStack) {
                         for (int i = 0; i < b.traits.traits.size(); i++) {
                             Trait t = b.traits.traits.get(i);
                             if (t.getName(abc).getName(constants, null, true, true).equals(propertyName)) {
