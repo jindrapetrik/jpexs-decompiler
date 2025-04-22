@@ -169,6 +169,13 @@ public class ABCSimpleUsageDetector {
         initUsages(ItemKind.INT, abc.constants.getIntCount());
         initUsages(ItemKind.UINT, abc.constants.getUIntCount());
         initUsages(ItemKind.DOUBLE, abc.constants.getDoubleCount());
+        if (abc.hasFloatSupport()) {
+            initUsages(ItemKind.FLOAT, abc.constants.getFloatCount());
+        }
+        if (abc.hasDecimalSupport()) {
+            initUsages(ItemKind.DECIMAL, abc.constants.getDecimalCount());
+        }
+        
         initUsages(ItemKind.STRING, abc.constants.getStringCount());
         initUsages(ItemKind.NAMESPACE, abc.constants.getNamespaceCount());
         initUsages(ItemKind.NAMESPACESET, abc.constants.getNamespaceSetCount());
@@ -243,7 +250,7 @@ public class ABCSimpleUsageDetector {
                 }
                 if (m.flagHas_optional()) {
                     for (int i = 0; i < m.optional.length; i++) {
-                        handleUsageValueKind(m.optional[i].value_kind, m.optional[i].value_index, usageDescription + "/optional/op" + i);
+                        handleUsageValueKind(abc, m.optional[i].value_kind, m.optional[i].value_index, usageDescription + "/optional/op" + i);
                     }
                 }
 
@@ -297,6 +304,12 @@ public class ABCSimpleUsageDetector {
                                 break;
                             case AVM2Code.DAT_UINT_INDEX:
                                 handleUsage(ItemKind.UINT, operand, operandDescription);
+                                break;
+                            case AVM2Code.DAT_FLOAT_INDEX:
+                                handleUsage(ItemKind.FLOAT, operand, operandDescription);
+                                break;
+                            case AVM2Code.DAT_DECIMAL_INDEX:
+                                handleUsage(ItemKind.DECIMAL, operand, operandDescription);
                                 break;
                         }
                     }
@@ -386,7 +399,7 @@ public class ABCSimpleUsageDetector {
                 handleTraitMethodBase(abc, trait, scriptIndex, scriptTraitIndex, classIndex, traitIndex, walkType);
             }
 
-            protected void handleUsageValueKind(int value_kind, int value_index, String description) {
+            protected void handleUsageValueKind(ABC abc, int value_kind, int value_index, String description) {
                 switch (value_kind) {
                     case ValueKind.CONSTANT_Int:
                         handleUsage(ItemKind.INT, value_index, description);
@@ -399,6 +412,13 @@ public class ABCSimpleUsageDetector {
                         break;
                     case ValueKind.CONSTANT_Utf8:
                         handleUsage(ItemKind.STRING, value_index, description);
+                        break;
+                    case ValueKind.CONSTANT_DecimalOrFloat:
+                        if (abc.hasFloatSupport()) {
+                            handleUsage(ItemKind.FLOAT, value_index, description);
+                        } else {
+                            handleUsage(ItemKind.DECIMAL, value_index, description);
+                        }
                         break;
                     case ValueKind.CONSTANT_Namespace:
                     case ValueKind.CONSTANT_PackageNamespace:
@@ -446,7 +466,7 @@ public class ABCSimpleUsageDetector {
                 //description += " " + trait.getKindToStr();
                 handleUsageMultiname(trait.name_index, description + "/name");
                 handleUsageMultiname(trait.type_index, description + "/type");
-                handleUsageValueKind(trait.value_kind, trait.value_index, description + "/value_index");
+                handleUsageValueKind(abc, trait.value_kind, trait.value_index, description + "/value_index");
             }
 
             @Override
