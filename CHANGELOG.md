@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - [#2444] SVG importer - improper stroke width when using width/height with viewBox
 - [#2444] SVG importer - stroke width not respecting transforms
 - [#2415] AS3 direct editation - nested functions - prefer callstack variables over prototype chain
+- AS3 - AIR float support incorrectly writes float values to output stream
 
 ## [22.0.2] - 2025-01-17
 ### Added
