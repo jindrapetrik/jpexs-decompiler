@@ -3353,8 +3353,8 @@ public class Main {
 
     public static boolean checkForUpdates() {
         String currentVersion = ApplicationInfo.version;
-        if (currentVersion.equals("unknown")) {
-            // sometimes during development the version information is not available
+        if (currentVersion.equals("unknown") || currentVersion.equals("0.0.0")) {
+            // during development the version information is not available
             return false;
         }
 
@@ -3364,14 +3364,17 @@ public class Main {
         if (!showStable && !showNightly) {
             return false;
         }
-
+                
+        String stableTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+        String ignoreVersion = "-";
+        
         String currentTagName;
         if (ApplicationInfo.nightly) {
             currentTagName = "nightly" + ApplicationInfo.version_build;
         } else {
-            currentTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+            currentTagName = stableTagName;
         }
-
+        
         if (!showNightly) {
             //prereleases are not shown as latest, when checking latest nightly, this is useless
             JsonValue latestVersionInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_LATEST_URL);
@@ -3379,7 +3382,7 @@ public class Main {
                 return false;
             }
             String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
-            if (currentTagName.equals(latestTagName)) {
+            if (currentTagName.equals(latestTagName) || stableTagName.equals(latestTagName)) {
                 //no new version
                 return false;
             }
@@ -3394,7 +3397,7 @@ public class Main {
         for (int i = 0; i < arr.size(); i++) {
             JsonObject versionObj = arr.get(i).asObject();
             String tagName = versionObj.get("tag_name").asString();
-            if (currentVersion.equals(tagName)) {
+            if (currentVersion.equals(tagName) || stableTagName.equals(tagName)) {
                 //Stop at current version, do not display more
                 break;
             }
