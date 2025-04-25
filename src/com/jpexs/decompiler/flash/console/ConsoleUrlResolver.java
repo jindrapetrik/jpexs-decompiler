@@ -24,6 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
@@ -105,7 +106,7 @@ public class ConsoleUrlResolver implements UrlResolver {
                     return null;
                 }
                 try {
-                    URL u = new URL(currentUrl);
+                    URL u = URI.create(currentUrl).toURL();
                     SWF ret = open(u.openStream(), null, currentUrl); //?
                     return ret;
                 } catch (Exception ex) {

@@ -104,6 +104,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -1276,7 +1277,7 @@ public class Main {
 
                                 if (selFile == null && (url.startsWith("http://") || url.startsWith("https://"))) {
                                     try {
-                                        URL u = new URL(url);
+                                        URL u = URI.create(url).toURL();
                                         SWF ret = open(u.openStream(), null, url); //?
                                         loadedStatus.add("YES");
                                         return ret;
@@ -3327,7 +3328,7 @@ public class Main {
     private static JsonValue urlGetJson(String getUrl) {
         try {
             String proxyAddress = Configuration.updateProxyAddress.get();
-            URL url = new URL(getUrl);
+            URL url = URI.create(getUrl).toURL();
 
             URLConnection uc;
             if (proxyAddress != null && !proxyAddress.isEmpty()) {
