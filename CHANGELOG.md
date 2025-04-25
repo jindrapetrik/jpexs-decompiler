@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file.
 - [#2415] AS3 direct editation - nested functions - prefer callstack variables over prototype chain
 - AS3 - AIR float support - incorrect writing float values to output stream
 - AS3 - AIR float support - ABC Explorer incorrectly calculating float usages (For clean action, etc.)
-- nightly version asked for update to stable
+- Nightly version asked for update to previous stable
 
 ## [22.0.2] - 2025-01-17
 ### Added
