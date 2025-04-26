@@ -397,35 +397,39 @@ class SvgStyle {
                     importer.showWarning("fillNotSupported", "Parent gradient not found.");
                     return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
                 }
-
-                if ("linearGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
-                    SvgLinearGradient parentFill = (SvgLinearGradient) parseGradient(idMap, parent_el);
+                SvgGradient parentFill = null;
+                if (parent_el.getTagName().equals("linearGradient")) {
+                    parentFill = (SvgLinearGradient) parseGradient(idMap, parent_el);                    
+                }
+                if (parent_el.getTagName().equals("radialGradient")) {
+                    parentFill = (SvgRadialGradient) parseGradient(idMap, parent_el);                    
+                }
+                
+                if (parentFill != null) {
                     gradientUnits = parentFill.gradientUnits;
                     gradientTransform = parentFill.gradientTransform;
                     spreadMethod = parentFill.spreadMethod;
-
-                    x1 = parentFill.x1;
-                    y1 = parentFill.y1;
-                    x2 = parentFill.x2;
-                    y2 = parentFill.y2;
                     interpolation = parentFill.interpolation;
                     stops = parentFill.stops;
-                }
-                if ("radialGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
-                    SvgRadialGradient parentFill = (SvgRadialGradient) parseGradient(idMap, parent_el);
-                    gradientUnits = parentFill.gradientUnits;
-                    gradientTransform = parentFill.gradientTransform;
-                    spreadMethod = parentFill.spreadMethod;
-
-                    cx = parentFill.cx;
-                    cy = parentFill.cy;
-                    fx = parentFill.fx;
-                    fy = parentFill.fy;
-                    r = parentFill.r;
-                    interpolation = parentFill.interpolation;
-                    stops = parentFill.stops;
-                }
-
+                    
+                    if (el.getTagName().equals(parent_el.getTagName())) {
+                        if ("linearGradient".equals(el.getTagName())) {
+                            SvgLinearGradient linearParentFill = (SvgLinearGradient) parentFill;
+                            x1 = linearParentFill.x1;
+                            y1 = linearParentFill.y1;
+                            x2 = linearParentFill.x2;
+                            y2 = linearParentFill.y2;
+                        }
+                        if ("radialGradient".equals(el.getTagName())) {
+                            SvgRadialGradient radialParentFill = (SvgRadialGradient) parentFill;
+                            cx = radialParentFill.cx;
+                            cy = radialParentFill.cy;
+                            fx = radialParentFill.fx;
+                            fy = radialParentFill.fy;
+                            r = radialParentFill.r;
+                        }
+                    }
+                }                                                                
             } else {
                 importer.showWarning("fillNotSupported", "Parent gradient invalid.");
                 return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));

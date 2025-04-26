@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - AIR float support - incorrect writing float values to output stream
 - AS3 - AIR float support - ABC Explorer incorrectly calculating float usages (For clean action, etc.)
 - [#2446] Nightly version asked for update to previous stable
+- [#2447] SVG import - gradients can inherit (href) from other gradient types (radial vs linear)
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3744,6 +3745,7 @@ Major version of SWF to XML export changed to 2.
 [#2444]: https://www.free-decompiler.com/flash/issues/2444
 [#2415]: https://www.free-decompiler.com/flash/issues/2415
 [#2446]: https://www.free-decompiler.com/flash/issues/2446
+[#2447]: https://www.free-decompiler.com/flash/issues/2447
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
