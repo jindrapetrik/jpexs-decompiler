@@ -4936,7 +4936,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean replaceMorphShape(MorphShapeTag morphShape, boolean create, boolean fill) {
-        File fileStart = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.startShape"));
+        File fileStart = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.startShape"), "importmorphshape");
         if (fileStart == null) {
             return false;
         }
