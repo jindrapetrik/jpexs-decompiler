@@ -108,7 +108,7 @@ public class TypeItem extends GraphTargetItem {
      * @param ns Namespace
      */
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes, String ns) {
-        super(null, null, NOPRECEDENCE);
+        super(null, null, null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
         this.ns = ns;
     }

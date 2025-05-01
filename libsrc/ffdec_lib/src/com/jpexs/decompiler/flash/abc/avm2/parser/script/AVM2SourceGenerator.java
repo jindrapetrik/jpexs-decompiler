@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -450,7 +451,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 AssignableAVM2Item.setTemp(localData, this, collectionReg)
         ));
 
-        GraphTargetItem assigned = new GraphTargetItem() {
+        GraphTargetItem assigned = new GraphTargetItem(AVM2GraphTargetDialect.INSTANCE) {
             @Override
             public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
                 return null;
@@ -770,7 +771,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                  */
                 List<NameValuePair> pairs = new ArrayList<>();
                 for (String tname : skinParts.keySet()) {
-                    pairs.add(new NameValuePair(new StringAVM2Item(null, null, tname), skinParts.get(tname) ? new TrueItem(null, null) : new FalseItem(null, null)));
+                    pairs.add(new NameValuePair(new StringAVM2Item(null, null, tname), skinParts.get(tname) ? new TrueItem(AVM2GraphTargetDialect.INSTANCE, null, null) : new FalseItem(AVM2GraphTargetDialect.INSTANCE, null, null)));
                 }
 
                 NewObjectAVM2Item sltVal = new NewObjectAVM2Item(null, null, pairs);

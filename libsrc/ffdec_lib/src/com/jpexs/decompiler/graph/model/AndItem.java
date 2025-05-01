@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -43,13 +44,14 @@ public class AndItem extends BinaryOpItem implements CompoundableBinaryOp {
 
     /**
      * Constructor.
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param leftSide Left side
      * @param rightSide Right side
      */
-    public AndItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(src, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&", "Boolean", "Boolean");
+    public AndItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(dialect, src, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&", "Boolean", "Boolean");
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

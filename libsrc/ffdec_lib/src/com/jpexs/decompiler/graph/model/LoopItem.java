@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import java.util.List;
@@ -36,12 +37,13 @@ public abstract class LoopItem extends GraphTargetItem {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source item
      * @param lineStartItem Line start item
      * @param loop Loop
      */
-    public LoopItem(GraphSourceItem src, GraphSourceItem lineStartItem, Loop loop) {
-        super(src, lineStartItem, NOPRECEDENCE);
+    public LoopItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, Loop loop) {
+        super(dialect, src, lineStartItem, NOPRECEDENCE);
         this.loop = loop;
     }
 

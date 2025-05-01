@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -42,7 +43,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
      * Constructor.
      */
     public ActionItem() {
-        super(null, null, NOPRECEDENCE);
+        super(ActionGraphTargetDialect.INSTANCE, null, null, NOPRECEDENCE);
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
      * @param value Value
      */
     public ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
-        super(instruction, lineStartIns, precedence, value);
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, precedence, value);
     }
 
     /**

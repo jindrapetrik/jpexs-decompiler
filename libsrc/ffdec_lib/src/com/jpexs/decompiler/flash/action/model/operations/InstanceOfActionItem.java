@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.swf6.ActionInstanceOf;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -43,7 +44,7 @@ public class InstanceOfActionItem extends BinaryOpItem {
      * @param type Type
      */
     public InstanceOfActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof", "", "");
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof", "", "");
     }
 
     @Override

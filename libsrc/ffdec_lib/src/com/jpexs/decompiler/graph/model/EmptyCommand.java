@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
@@ -27,6 +28,13 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class EmptyCommand extends GraphTargetItem {
 
+    /**
+     * @param dialect Dialect
+     */
+    public EmptyCommand(GraphTargetDialect dialect) {
+        super(dialect);
+    }
+       
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer;

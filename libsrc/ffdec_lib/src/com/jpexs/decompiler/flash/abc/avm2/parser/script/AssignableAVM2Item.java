@@ -51,7 +51,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
     protected GraphTargetItem makeCoerced(GraphTargetItem assignedValue, GraphTargetItem targetType) {
         if (assignedValue instanceof OrItem) {
             OrItem oi = (OrItem) assignedValue;
-            return new OrItem(assignedValue.getSrc(), assignedValue.getLineStartItem(), makeCoerced(oi.leftSide, targetType), makeCoerced(oi.rightSide, targetType));
+            return new OrItem(dialect, assignedValue.getSrc(), assignedValue.getLineStartItem(), makeCoerced(oi.leftSide, targetType), makeCoerced(oi.rightSide, targetType));
         }
         //TODO: Is it needed for AndItem too?
         return new CoerceAVM2Item(null, null, assignedValue, targetType);

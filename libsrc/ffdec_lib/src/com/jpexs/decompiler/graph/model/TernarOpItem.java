@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -52,14 +53,15 @@ public class TernarOpItem extends GraphTargetItem {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param expression Expression
      * @param onTrue On true
      * @param onFalse On false
      */
-    public TernarOpItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
-        super(src, lineStartIns, PRECEDENCE_CONDITIONAL);
+    public TernarOpItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
+        super(dialect, src, lineStartIns, PRECEDENCE_CONDITIONAL);
         this.expression = expression;
         this.onTrue = onTrue;
         this.onFalse = onFalse;

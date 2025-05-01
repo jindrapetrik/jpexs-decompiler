@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -33,7 +34,7 @@ import java.util.List;
 public class NullCoalesceAVM2Item extends BinaryOpItem {
 
     public NullCoalesceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartItem, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartItem, PRECEDENCE_NULLCOALESCE, leftSide, rightSide, "??", null, null);
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartItem, PRECEDENCE_NULLCOALESCE, leftSide, rightSide, "??", null, null);
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -68,7 +69,7 @@ public abstract class AVM2Item extends GraphTargetItem {
      * @param value Value
      */
     public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
-        super(instruction, lineStartIns, precedence, value);
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, precedence, value);
         if (instruction instanceof AVM2Instruction) {
             this.instruction = (AVM2Instruction) instruction;
         }

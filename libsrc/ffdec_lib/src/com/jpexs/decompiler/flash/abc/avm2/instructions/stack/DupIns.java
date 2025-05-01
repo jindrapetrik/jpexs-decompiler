@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -53,7 +54,7 @@ public class DupIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
         stack.push(v);
-        stack.push(new DuplicateItem(ins, localData.lineStartInstruction, v));
+        stack.push(new DuplicateItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v));
         //v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 
     }

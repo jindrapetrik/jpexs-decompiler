@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -87,6 +88,7 @@ public class SwitchItem extends LoopItem implements Block {
 
     /**
      * Constructor.
+     * @param dialect Dialect
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param loop Loop
@@ -95,8 +97,8 @@ public class SwitchItem extends LoopItem implements Block {
      * @param caseCommands Case commands
      * @param valuesMapping Values mapping
      */
-    public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
-        super(instruction, lineStartIns, loop);
+    public SwitchItem(GraphTargetDialect dialect, GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
+        super(dialect, instruction, lineStartIns, loop);
         this.switchedObject = switchedObject;
         this.caseValues = caseValues;
         this.caseCommands = caseCommands;

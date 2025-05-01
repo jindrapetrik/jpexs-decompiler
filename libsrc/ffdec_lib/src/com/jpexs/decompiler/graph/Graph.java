@@ -86,6 +86,11 @@ public class Graph {
      * Graph entry points
      */
     public List<GraphPart> heads;
+    
+    /**
+     * Graph target dialect
+     */
+    protected GraphTargetDialect dialect;
 
     /**
      * Graph source code
@@ -144,10 +149,12 @@ public class Graph {
     /**
      * Constructs a new Graph.
      *
+     * @param dialect Dialect
      * @param code Graph source
      * @param exceptions Exceptions in the graph
      */
-    public Graph(GraphSource code, List<GraphException> exceptions) {
+    public Graph(GraphTargetDialect dialect, GraphSource code, List<GraphException> exceptions) {
+        this.dialect = dialect;
         this.code = code;
         this.exceptions = exceptions;
     }
@@ -1165,7 +1172,7 @@ public class Graph {
                             ContinueItem cnt = (ContinueItem) commands.get(commands.size() - 1);
                             if (cnt.loopId == lastLoopId) {
                                 hasContinues = true;
-                                commands.set(commands.size() - 1, new BreakItem(null, null, swi.loop.id));
+                                commands.set(commands.size() - 1, new BreakItem(dialect, null, null, swi.loop.id));
                                 if (c == swi.caseCommands.size() - 1) {
                                     if (commands.size() == 1) {
                                         commands.remove(0);
@@ -1187,7 +1194,7 @@ public class Graph {
                     }
                     targetCommands.addAll(toAdd);
                     if (toAdd.isEmpty() || (!((toAdd.get(toAdd.size() - 1) instanceof ExitItem) || (toAdd.get(toAdd.size() - 1) instanceof BreakItem)))) {
-                        targetCommands.add(new BreakItem(null, null, swi.loop.id));
+                        targetCommands.add(new BreakItem(dialect, null, null, swi.loop.id));
                     }
                 }
             } else if (item instanceof IfItem) {
@@ -1501,7 +1508,7 @@ public class Graph {
                         } else {
                             GraphTargetItem lastExpr = whi.expression.remove(whi.expression.size() - 1);
                             forFirstCommands.addAll(whi.expression);
-                            list.set(i, new ForItem(whi.getSrc(), whi.getLineStartItem(), whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
+                            list.set(i, new ForItem(dialect, whi.getSrc(), whi.getLineStartItem(), whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
                         }
                     }
                 }
@@ -1526,7 +1533,7 @@ public class Graph {
             if (gi.targetCommands != null) {
                 list.remove(gi);
                 if (gi.labelName != null) {
-                    list.add(new LabelItem(null, gi.lineStartItem, gi.labelName));
+                    list.add(new LabelItem(dialect, null, gi.lineStartItem, gi.labelName));
                 }
                 list.addAll(gi.targetCommands);
             }
@@ -2043,10 +2050,10 @@ public class Graph {
                 continue;
             }
             if (l.loopContinue == part) {
-                return (new ContinueItem(null, firstIns, l.id));
+                return (new ContinueItem(dialect, null, firstIns, l.id));
             }
             if (l.loopBreak == part) {
-                return (new BreakItem(null, firstIns, l.id));
+                return (new BreakItem(dialect, null, firstIns, l.id));
             }
         }
         return null;
@@ -2840,7 +2847,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding break");
                     }
-                    ret.add(new BreakItem(null, localData.lineStartInstruction, el.id));
+                    ret.add(new BreakItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
                 if (el.loopPreContinue == part) {
@@ -2850,7 +2857,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding precontinue");
                     }
-                    ret.add(new ContinueItem(null, localData.lineStartInstruction, el.id));
+                    ret.add(new ContinueItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
                 if (el.loopContinue == part) {
@@ -2860,7 +2867,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding continue");
                     }
-                    ret.add(new ContinueItem(null, localData.lineStartInstruction, el.id));
+                    ret.add(new ContinueItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
             }
@@ -2899,7 +2906,7 @@ public class Graph {
             }
 
             if (code.size() <= part.start) {
-                ret.add(new ScriptEndItem());
+                ret.add(new ScriptEndItem(dialect));
                 return ret;
             }
 
@@ -2925,9 +2932,9 @@ public class Graph {
                     if (firstCode.size() > firstCodePos && (firstCode.get(firstCodePos) instanceof LabelItem)) {
                         labelName = ((LabelItem) firstCode.get(firstCodePos)).labelName;
                     } else {
-                        firstCode.add(firstCodePos, new LabelItem(null, localData.lineStartInstruction, labelName));
+                        firstCode.add(firstCodePos, new LabelItem(dialect, null, localData.lineStartInstruction, labelName));
                     }
-                    ret.add(new GotoItem(null, localData.lineStartInstruction, labelName));
+                    ret.add(new GotoItem(dialect, null, localData.lineStartInstruction, labelName));
                     return ret;
                 } else {
                     visited.add(part);
@@ -2951,7 +2958,7 @@ public class Graph {
                 if (topBsr != null) {
                     stack.push(topBsr);
                 }
-                loopItem = new UniversalLoopItem(null, localData.lineStartInstruction, currentLoop, new ArrayList<>());
+                loopItem = new UniversalLoopItem(dialect, null, localData.lineStartInstruction, currentLoop, new ArrayList<>());
                 //loopItem.commands=printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops);
                 currentRet.add(loopItem);
                 currentRet = loopItem.commands;
@@ -3058,7 +3065,7 @@ public class Graph {
                     }
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
-                    output.add(new ScriptEndItem());
+                    output.add(new ScriptEndItem(dialect));
                 }
             }
 
@@ -3236,13 +3243,13 @@ public class Graph {
                                 pos++;
                                 continue;
                             }
-                            caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
+                            caseValues.add(new IntegerValueItem(dialect, null, localData.lineStartInstruction, pos));
                         } else if (caseExpressions.containsKey(pos)) {
                             GraphTargetItem expr = caseExpressions.get(pos);
                             if (caseCommaCommands.get(pos).size() > 0) {
                                 List<GraphTargetItem> exprCommaCommands = new ArrayList<>(caseCommaCommands.get(pos));
                                 exprCommaCommands.add(expr);
-                                expr = new CommaExpressionItem(null, expr.lineStartItem, exprCommaCommands);
+                                expr = new CommaExpressionItem(dialect, null, expr.lineStartItem, exprCommaCommands);
                             }
                             caseValues.add(expr);
                         } else {
@@ -3342,18 +3349,18 @@ public class Graph {
                             GraphTargetItem ternarOnTrue;
                             if (filteredOnTrue.size() > 1) {
                                 filteredOnTrue.set(filteredOnTrue.size() - 1, filteredOnTrue.get(filteredOnTrue.size() - 1).value); // replace Pushitem with its value
-                                ternarOnTrue = new CommaExpressionItem(null, null, filteredOnTrue);
+                                ternarOnTrue = new CommaExpressionItem(dialect, null, null, filteredOnTrue);
                             } else {
                                 ternarOnTrue = filteredOnTrue.get(0).value;
                             }
                             GraphTargetItem ternarOnFalse;
                             if (filteredOnFalse.size() > 1) {
                                 filteredOnFalse.set(filteredOnFalse.size() - 1, filteredOnFalse.get(filteredOnFalse.size() - 1).value); // replace Pushitem with its value                            
-                                ternarOnFalse = new CommaExpressionItem(null, null, filteredOnFalse);
+                                ternarOnFalse = new CommaExpressionItem(dialect, null, null, filteredOnFalse);
                             } else {
                                 ternarOnFalse = filteredOnFalse.get(0).value;
                             }
-                            TernarOpItem top = new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);
+                            TernarOpItem top = new TernarOpItem(dialect, null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);
                             stack.push(handleTernar(top, localData));
                         } else {
                             boolean isIf = true;
@@ -3382,7 +3389,7 @@ public class Graph {
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(prevExpr);
                                         } else {
-                                            stack.push(new OrItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                            stack.push(new OrItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
                                         isIf = false;
@@ -3391,7 +3398,7 @@ public class Graph {
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(prevExpr);
                                         } else {
-                                            stack.push(new AndItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                            stack.push(new AndItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (prevExpr instanceof FalseItem) {
                                         isIf = false;
@@ -3402,7 +3409,7 @@ public class Graph {
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(leftSide);
                                         } else {
-                                            stack.push(new AndItem(null, localData.lineStartInstruction, leftSide, rightSide));
+                                            stack.push(new AndItem(dialect, null, localData.lineStartInstruction, leftSide, rightSide));
                                         }
                                     } else if (prevExpr instanceof TrueItem) {
                                         isIf = false;
@@ -3411,7 +3418,7 @@ public class Graph {
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(leftSide);
                                         } else {
-                                            stack.push(new OrItem(null, localData.lineStartInstruction, leftSide, rightSide));
+                                            stack.push(new OrItem(dialect, null, localData.lineStartInstruction, leftSide, rightSide));
                                         }
                                     } else {
                                         stack.push(prevExpr); //push it back
@@ -3424,13 +3431,13 @@ public class Graph {
 
                             if (isIf) {
                                 makeAllCommands(currentRet, stack);
-                                IfItem b = new IfItem(null, localData.lineStartInstruction, expr.invert(null), onTrue, onFalse);
+                                IfItem b = new IfItem(dialect, null, localData.lineStartInstruction, expr.invert(null), onTrue, onFalse);
                                 b.decisionPart = part;
                                 b.onTruePart = nps.get(0);
                                 b.onFalsePart = nps.get(1);
                                 currentRet.add(b);
                                 if (processSubBlk(b, null)) {
-                                    stack.push(new PopItem(null, localData.lineStartInstruction));
+                                    stack.push(new PopItem(dialect, null, localData.lineStartInstruction));
                                 }
                             }
                         }
@@ -3485,7 +3492,7 @@ public class Graph {
                             expr = expr.invert(null);
                         }
                         exprList.add(expr);
-                        ret.add(index, li = new DoWhileItem(null, expr.getLineStartItem(), currentLoop, loopItem.commands, exprList));
+                        ret.add(index, li = new DoWhileItem(dialect, null, expr.getLineStartItem(), currentLoop, loopItem.commands, exprList));
                         loopTypeFound = true;
                     }
                 }
@@ -3530,7 +3537,7 @@ public class Graph {
                                 if (expr instanceof LogicalOpItem) {
                                     expr = ((LogicalOpItem) expr).invert(null);
                                 } else {
-                                    expr = new NotItem(null, expr.getLineStartItem(), expr);
+                                    expr = new NotItem(dialect, null, expr.getLineStartItem(), expr);
                                 }
                             }
                             exprList.add(expr);
@@ -3566,9 +3573,9 @@ public class Graph {
                                 finalComm.addAll(precontinueCommands);
                             }
                             if (!finalComm.isEmpty()) {
-                                ret.add(index, li = new ForItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                                ret.add(index, li = new ForItem(dialect, expr.getSrc(), expr.getLineStartItem(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                             } else {
-                                ret.add(index, li = new WhileItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, exprList, commands));
+                                ret.add(index, li = new WhileItem(dialect, expr.getSrc(), expr.getLineStartItem(), currentLoop, exprList, commands));
                             }
                             if (addBreakItem != null) {
                                 ret.add(index + 1, addBreakItem);
@@ -3623,7 +3630,7 @@ public class Graph {
                                 commands.addAll(bodyBranch);
                                 exprList.add(expr);
                                 checkContinueAtTheEnd(commands, currentLoop);
-                                ret.add(index, li = new DoWhileItem(null, exprList.get(0).getLineStartItem(), currentLoop, commands, exprList));
+                                ret.add(index, li = new DoWhileItem(dialect, null, exprList.get(0).getLineStartItem(), currentLoop, commands, exprList));
                             }
 
                             loopTypeFound = true;
@@ -4054,7 +4061,7 @@ public class Graph {
         //must go backwards to hit case 5, not case 4
         for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
             if (caseBodyParts.get(i) == defaultPart) {
-                DefaultItem di = new DefaultItem();
+                DefaultItem di = new DefaultItem(dialect);
                 caseValuesMap.add(i + 1, di);
                 caseBodyParts.add(i + 1, defaultPart);
                 hasDefault = true;
@@ -4076,7 +4083,7 @@ public class Graph {
             //must go backwards to hit case 2, not case 1
             for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
                 if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, throwStates, false)) {
-                    DefaultItem di = new DefaultItem();
+                    DefaultItem di = new DefaultItem(dialect);
                     caseValuesMap.add(i + 1, di);
                     caseBodyParts.add(i + 1, defaultPart);
                     hasDefault = true;
@@ -4097,7 +4104,7 @@ public class Graph {
              */
             for (int i = 0; i < caseBodyParts.size(); i++) {
                 if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, throwStates, false)) {
-                    DefaultItem di = new DefaultItem();
+                    DefaultItem di = new DefaultItem(dialect);
                     caseValuesMap.add(i, di);
                     caseBodyParts.add(i, defaultPart);
                     hasDefault = true;
@@ -4115,7 +4122,7 @@ public class Graph {
                         default:
                             trace("def");                        
              */
-            caseValuesMap.add(new DefaultItem());
+            caseValuesMap.add(new DefaultItem(dialect));
             caseBodyParts.add(defaultPart);
         }
 
@@ -4197,7 +4204,7 @@ public class Graph {
                 if (!currentCaseCommands.isEmpty()) {
                     GraphTargetItem last = currentCaseCommands.get(currentCaseCommands.size() - 1);
                     if (!(last instanceof ContinueItem) && !(last instanceof BreakItem) && !(last instanceof GotoItem) && !(last instanceof ExitItem) && !(last instanceof ScriptEndItem)) {
-                        currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
+                        currentCaseCommands.add(new BreakItem(dialect, null, localData.lineStartInstruction, currentLoop.id));
                     }
                 }
             }
@@ -4280,7 +4287,7 @@ public class Graph {
         GraphTargetItem ti = checkLoop(new ArrayList<>() /*??*/, next, stopPart, loops, throwStates);
         tiRef.setVal(ti);
 
-        return new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
+        return new SwitchItem(dialect, null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
 
     }
 

@@ -37,7 +37,7 @@ public class CommentItem extends GraphTargetItem {
      * @param comment Comment
      */
     public CommentItem(String comment) {
-        super(null, null, NOPRECEDENCE);
+        super(null, null, null, NOPRECEDENCE);
         this.commentLines = new String[]{comment};
     }
 
@@ -46,7 +46,7 @@ public class CommentItem extends GraphTargetItem {
      * @param commentLines Comment lines
      */
     public CommentItem(String[] commentLines) {
-        super(null, null, NOPRECEDENCE);
+        super(null, null, null, NOPRECEDENCE);
         this.commentLines = commentLines;
     }
 

@@ -14,39 +14,25 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.graph.model;
-
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TypeItem;
+package com.jpexs.decompiler.graph;
 
 /**
- * Any item.
  *
  * @author JPEXS
  */
-public class AnyItem extends GraphTargetItem {
+public abstract class GraphTargetDialect {
 
     /**
-     * Constructor.
+     * Identifier of the dialect.
+     * @return Name
      */
-    public AnyItem() {
-        super(null);
-    }
+    public abstract String getName();
     
-    @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return writer.append("§§any()");
-    }
-
-    @Override
-    public boolean hasReturnValue() {
-        return true;
-    }
-
-    @Override
-    public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
-    }
-
+    /**
+     * Conversion of ECMA value (that's used in simplifications)
+     * back to GraphTarget item.
+     * @param value
+     * @return 
+     */
+    public abstract GraphTargetItem valToItem(Object value);
 }

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.NumberContext;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -97,6 +98,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -147,6 +149,8 @@ import macromedia.asc.util.Decimal128;
  * @author JPEXS
  */
 public class ActionScript3Parser {
+    
+    private static final GraphTargetDialect DIALECT = AVM2GraphTargetDialect.INSTANCE;
 
     private long uniqLast = 0;
 
@@ -1661,7 +1665,7 @@ public class ActionScript3Parser {
                     }
                     break;
                 case CURLY_OPEN:
-                    ret = new BlockItem(null, null, commands(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables, abc));
+                    ret = new BlockItem(DIALECT, null, null, commands(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables, abc));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
                 /*case INCREMENT: //preincrement
@@ -1701,7 +1705,7 @@ public class ActionScript3Parser {
                     } else {
                         lexer.pushback(s);
                     }
-                    ret = new IfItem(null, null, ifExpr, onTrueList, onFalseList);
+                    ret = new IfItem(DIALECT, null, null, ifExpr, onTrueList, onFalseList);
                     break;
                 case WHILE:
                     expectedType(SymbolType.PARENT_OPEN);
@@ -1715,7 +1719,7 @@ public class ActionScript3Parser {
                     }
                     loops.push(wloop);
                     whileBody.add(command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables, abc));
-                    ret = new WhileItem(null, null, wloop, whileExpr, whileBody);
+                    ret = new WhileItem(DIALECT, null, null, wloop, whileExpr, whileBody);
                     loops.pop();
                     break;
                 case DO:
@@ -1731,7 +1735,7 @@ public class ActionScript3Parser {
                     List<GraphTargetItem> doExpr = new ArrayList<>();
                     doExpr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc));
                     expectedType(SymbolType.PARENT_CLOSE);
-                    ret = new DoWhileItem(null, null, dloop, doBody, doExpr);
+                    ret = new DoWhileItem(DIALECT, null, null, dloop, doBody, doExpr);
                     loops.pop();
                     break;
                 case FOR:
@@ -1777,7 +1781,7 @@ public class ActionScript3Parser {
                         //GraphTargetItem firstCommand = command(thisType,pkg,needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
                         forExpr = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc);
                         if (forExpr == null) {
-                            forExpr = new TrueItem(null, null);
+                            forExpr = new TrueItem(DIALECT, null, null);
                         }
                         expectedType(SymbolType.SEMICOLON);
                         GraphTargetItem fcom = command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables, abc);
@@ -1796,7 +1800,7 @@ public class ActionScript3Parser {
                             ret = new ForInAVM2Item(null, null, floop, inexpr, forBody);
                         }
                     } else {
-                        ret = new ForItem(null, null, floop, forFirstCommands, forExpr, forFinalCommands, forBody);
+                        ret = new ForItem(DIALECT, null, null, floop, forFirstCommands, forExpr, forFinalCommands, forBody);
                     }
                     loops.pop();
                     break;
@@ -1827,7 +1831,7 @@ public class ActionScript3Parser {
                     int pos = 0;
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                         while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
-                            GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc);
+                            GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem(DIALECT) : expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc);
                             expectedType(SymbolType.COLON);
                             s = lex();
                             caseExprsAll.add(curCaseExpr);
@@ -1840,7 +1844,7 @@ public class ActionScript3Parser {
                         s = lex();
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
-                    ret = new SwitchItem(null, null, sloop, switchExpr, caseExprsAll, caseCmds, valueMapping);
+                    ret = new SwitchItem(DIALECT, null, null, sloop, switchExpr, caseExprsAll, caseCmds, valueMapping);
                     loops.pop();
                     break;
                 case BREAK:
@@ -1864,7 +1868,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                         bloopId = loops.peek().id;
                     }
-                    ret = new BreakItem(null, null, bloopId);
+                    ret = new BreakItem(DIALECT, null, null, bloopId);
                     break;
                 case CONTINUE:
                     s = lex();
@@ -1899,7 +1903,7 @@ public class ActionScript3Parser {
                         }
                     }
                     //TODO: handle switch
-                    ret = new ContinueItem(null, null, cloopId);
+                    ret = new ContinueItem(DIALECT, null, null, cloopId);
                     break;
                 case RETURN:
                     GraphTargetItem retexpr = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables, false, abc);
@@ -2011,7 +2015,7 @@ public class ActionScript3Parser {
                         break;
                     }
                     if (s.type == SymbolType.SEMICOLON) {
-                        return new EmptyCommand();
+                        return new EmptyCommand(DIALECT);
                     }
                     lexer.pushback(s);
                     ret = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc);
@@ -2114,7 +2118,7 @@ public class ActionScript3Parser {
         if (commaItems.size() == 1) {
             return commaItems.get(0);
         }
-        return new CommaExpressionItem(null, null, commaItems);
+        return new CommaExpressionItem(DIALECT, null, null, commaItems);
     }
 
     /**
@@ -2219,7 +2223,7 @@ public class ActionScript3Parser {
                     break;
 
                 case TERNAR: //???
-                    lhs = new TernarOpItem(null, null, lhs, mhs, rhs);
+                    lhs = new TernarOpItem(DIALECT, null, null, lhs, mhs, rhs);
                     break;
                 case SHIFT_LEFT:
                     lhs = new LShiftAVM2Item(null, null, lhs, rhs);
@@ -2267,10 +2271,10 @@ public class ActionScript3Parser {
                     lhs = new GeAVM2Item(null, null, lhs, rhs);
                     break;
                 case AND:
-                    lhs = new AndItem(null, null, lhs, rhs);
+                    lhs = new AndItem(DIALECT, null, null, lhs, rhs);
                     break;
                 case OR:
-                    lhs = new OrItem(null, null, lhs, rhs);
+                    lhs = new OrItem(DIALECT, null, null, lhs, rhs);
                     break;
                 case MINUS:
                     lhs = new SubtractAVM2Item(null, null, lhs, rhs);
@@ -2344,10 +2348,10 @@ public class ActionScript3Parser {
                             assigned = new BitXorAVM2Item(null, null, lhs, assigned);
                             break;
                         case ASSIGN_AND:
-                            assigned = new AndItem(null, null, lhs, assigned);
+                            assigned = new AndItem(DIALECT, null, null, lhs, assigned);
                             break;
                         case ASSIGN_OR:
-                            assigned = new OrItem(null, null, lhs, assigned);
+                            assigned = new OrItem(DIALECT, null, null, lhs, assigned);
                             break;
                         case ASSIGN:
                         default:
@@ -2422,13 +2426,13 @@ public class ActionScript3Parser {
                         break;
                     //Both ASs
                     case "dup":
-                        ret = new DuplicateItem(null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc));
+                        ret = new DuplicateItem(DIALECT, null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc));
                         break;
                     case "push":
                         ret = new PushItem(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc));
                         break;
                     case "pop":
-                        ret = new PopItem(null, null);
+                        ret = new PopItem(DIALECT, null, null);
                         break;
                     case "goto": //TODO
                     case "multiname":
@@ -2634,11 +2638,11 @@ public class ActionScript3Parser {
 
                 break;
             case NOT:
-                ret = new NotItem(null, null, expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables, abc));
+                ret = new NotItem(DIALECT, null, null, expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables, abc));
 
                 break;
             case PARENT_OPEN:
-                ret = new ParenthesisItem(null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc));
+                ret = new ParenthesisItem(DIALECT, null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc));
                 expectedType(SymbolType.PARENT_CLOSE);
                 if (ret.value == null) {
                     throw new AVM2ParseException("Expression in parenthesis expected", lexer.yyline());

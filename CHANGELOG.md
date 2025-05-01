@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - [#2446] Nightly version asked for update to previous stable
 - [#2447] SVG import - gradients can inherit (href) from other gradient types (radial vs linear)
 - [#2450] Morphshape replace button/menu is not working (throws exception due to missing icon)
+- [#2355] AS1/2 Simplify expressions feature colliding with some other features like hex values
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3748,6 +3749,7 @@ Major version of SWF to XML export changed to 2.
 [#2446]: https://www.free-decompiler.com/flash/issues/2446
 [#2447]: https://www.free-decompiler.com/flash/issues/2447
 [#2450]: https://www.free-decompiler.com/flash/issues/2450
+[#2355]: https://www.free-decompiler.com/flash/issues/2355
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389

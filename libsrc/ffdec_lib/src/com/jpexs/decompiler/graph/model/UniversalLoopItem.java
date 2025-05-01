@@ -18,9 +18,10 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,23 +32,15 @@ import java.util.List;
 public class UniversalLoopItem extends WhileItem implements Block {
 
     /**
-     * True expression.
-     */
-    static final List<GraphTargetItem> TRUE_EXPRESSION = new ArrayList<>();
-
-    static {
-        TRUE_EXPRESSION.add(new TrueItem(null, null));
-    }
-
-    /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param loop Loop
      * @param commands Commands
      */
-    public UniversalLoopItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands) {
-        super(src, lineStartIns, loop, TRUE_EXPRESSION, commands);
+    public UniversalLoopItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands) {
+        super(dialect, src, lineStartIns, loop, Arrays.asList(new TrueItem(dialect, src, lineStartIns)), commands);
     }
 }

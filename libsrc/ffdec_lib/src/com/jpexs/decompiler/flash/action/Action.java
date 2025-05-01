@@ -1241,7 +1241,7 @@ public abstract class Action implements GraphSourceItem {
                 break;
             }
             if (ip >= actions.size()) {
-                output.add(new ScriptEndItem());
+                output.add(new ScriptEndItem(ActionGraphTargetDialect.INSTANCE));
                 break;
             }
             if (Configuration.simplifyExpressions.get()) {

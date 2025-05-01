@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
@@ -35,12 +36,14 @@ public class LabelItem extends GraphTargetItem {
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param labelName Label name
      */
-    public LabelItem(GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+    public LabelItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY);
         this.labelName = labelName;
     }
 

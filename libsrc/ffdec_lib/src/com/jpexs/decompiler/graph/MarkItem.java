@@ -38,7 +38,7 @@ public class MarkItem extends GraphTargetItem {
      * @param mark Mark string
      */
     public MarkItem(String mark) {
-        super(null, null, NOPRECEDENCE);
+        super(null, null, null, NOPRECEDENCE);
         this.mark = mark;
     }
 

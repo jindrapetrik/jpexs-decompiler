@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.parser.script;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
@@ -141,6 +142,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPEVENTFLAGS;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.AndItem;
@@ -181,6 +183,8 @@ import java.util.Map;
  */
 public class ActionScript2Parser {
 
+    private static final GraphTargetDialect DIALECT = ActionGraphTargetDialect.INSTANCE;
+    
     /**
      * Builtin classes that can be casted to
      */
@@ -1145,7 +1149,7 @@ public class ActionScript2Parser {
                 }
                 break;
             case CURLY_OPEN:
-                ret = new BlockItem(null, null, commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval));
+                ret = new BlockItem(DIALECT, null, null, commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval));
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
             case INCREMENT: //preincrement
@@ -1184,7 +1188,7 @@ public class ActionScript2Parser {
                 } else {
                     lexer.pushback(s);
                 }
-                ret = new IfItem(null, null, ifExpr, onTrueList, onFalseList);
+                ret = new IfItem(DIALECT, null, null, ifExpr, onTrueList, onFalseList);
                 break;
             case WHILE:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1193,7 +1197,7 @@ public class ActionScript2Parser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> whileBody = new ArrayList<>();
                 whileBody.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
-                ret = new WhileItem(null, null, null, whileExpr, whileBody);
+                ret = new WhileItem(DIALECT, null, null, null, whileExpr, whileBody);
                 break;
             case DO:
                 List<GraphTargetItem> doBody = new ArrayList<>();
@@ -1203,7 +1207,7 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> doExpr = new ArrayList<>();
                 doExpr.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new DoWhileItem(null, null, null, doBody, doExpr);
+                ret = new DoWhileItem(DIALECT, null, null, null, doBody, doExpr);
                 break;
             case FOR:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1240,7 +1244,7 @@ public class ActionScript2Parser {
 
                             item = new VariableActionItem(objIdent, null, define);
 
-                            item.setStoreValue(new GraphTargetItem() {
+                            item.setStoreValue(new GraphTargetItem(DIALECT) {
 
                                 @Override
                                 public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -1290,7 +1294,7 @@ public class ActionScript2Parser {
                     }
                     forExpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                     if (forExpr == null) {
-                        forExpr = new TrueItem(null, null);
+                        forExpr = new TrueItem(DIALECT, null, null);
                     }
                     expectedType(SymbolType.SEMICOLON);
                     GraphTargetItem fcom = command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
@@ -1304,7 +1308,7 @@ public class ActionScript2Parser {
                 if (forin) {
                     ret = new ForInActionItem(null, null, null, item, collection, forBody);
                 } else {
-                    ret = new ForItem(null, null, null, forFirstCommands, forExpr, forFinalCommands, forBody);
+                    ret = new ForItem(DIALECT, null, null, null, forFirstCommands, forExpr, forFinalCommands, forBody);
                 }
                 break;
             case SWITCH:
@@ -1330,7 +1334,7 @@ public class ActionScript2Parser {
                 while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                     //List<GraphTargetItem> caseExprs; = new ArrayList<>();
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
-                        GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                        GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem(DIALECT) : expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                         //caseExprs.add(curCaseExpr);
                         expectedType(SymbolType.COLON);
                         s = lex();
@@ -1344,13 +1348,13 @@ public class ActionScript2Parser {
                     s = lex();
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
-                ret = new SwitchItem(null, null, null, switchExpr, caseExprsAll, caseCmds, valueMapping);
+                ret = new SwitchItem(DIALECT, null, null, null, switchExpr, caseExprsAll, caseCmds, valueMapping);
                 break;
             case BREAK:
-                ret = new BreakItem(null, null, 0); //? There is no more than 1 level continue/break in AS1/2
+                ret = new BreakItem(DIALECT, null, null, 0); //? There is no more than 1 level continue/break in AS1/2
                 break;
             case CONTINUE:
-                ret = new ContinueItem(null, null, 0); //? There is no more than 1 level continue/break in AS1/2
+                ret = new ContinueItem(DIALECT, null, null, 0); //? There is no more than 1 level continue/break in AS1/2
                 break;
             case RETURN:
                 GraphTargetItem retexpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
@@ -1407,7 +1411,7 @@ public class ActionScript2Parser {
                 if (debugMode) {
                     System.out.println("/command");
                 }
-                return new EmptyCommand();
+                return new EmptyCommand(DIALECT);
             case DIRECTIVE:
                 switch ((String) s.value) {
                     case "strict":
@@ -1462,7 +1466,7 @@ public class ActionScript2Parser {
         if (commaItems.size() == 1) {
             return commaItems.get(0);
         }
-        return new CommaExpressionItem(null, null, commaItems);
+        return new CommaExpressionItem(DIALECT, null, null, commaItems);
     }
 
     private ParsedSymbol peekLex() throws IOException, ActionParseException, InterruptedException {
@@ -1541,7 +1545,7 @@ public class ActionScript2Parser {
             switch (op.type) {
 
                 case TERNAR:
-                    lhs = new TernarOpItem(null, null, lhs, mhs, rhs);
+                    lhs = new TernarOpItem(DIALECT, null, null, lhs, mhs, rhs);
                     break;
                 case SHIFT_LEFT:
                     lhs = new LShiftActionItem(null, null, lhs, rhs);
@@ -1589,10 +1593,10 @@ public class ActionScript2Parser {
                     lhs = new GeActionItem(null, null, lhs, rhs, true/*FIXME SWF version?*/);
                     break;
                 case AND:
-                    lhs = new AndItem(null, null, lhs, rhs);
+                    lhs = new AndItem(DIALECT, null, null, lhs, rhs);
                     break;
                 case OR:
-                    lhs = new OrItem(null, null, lhs, rhs);
+                    lhs = new OrItem(DIALECT, null, null, lhs, rhs);
                     break;
                 case FULLAND:
                     lhs = new AndActionItem(null, null, lhs, rhs);
@@ -1752,7 +1756,7 @@ public class ActionScript2Parser {
 
     private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (s.value.equals("not")) {
-            ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+            ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
         } else {
             String varName = s.value.toString();
             /*if (s.type == SymbolType.PATH) { //only with slash syntax
@@ -1797,13 +1801,13 @@ public class ActionScript2Parser {
                         break;
                     //Both ASs
                     case "dup":
-                        ret = new DuplicateItem(null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
+                        ret = new DuplicateItem(DIALECT, null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
                         break;
                     case "push":
                         ret = new PushItem(expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
                         break;
                     case "pop":
-                        ret = new PopItem(null, null);
+                        ret = new PopItem(DIALECT, null, null);
                         break;
                     case "strict":
                         s = lexer.lex();
@@ -1953,7 +1957,7 @@ public class ActionScript2Parser {
 
                 break;
             case NOT:
-                ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+                ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
 
                 break;
             case PARENT_OPEN:
@@ -1961,7 +1965,7 @@ public class ActionScript2Parser {
                 if (pexpr == null) {
                     throw new ActionParseException("Expression expected", lexer.yyline());
                 }
-                ret = new ParenthesisItem(null, null, pexpr);
+                ret = new ParenthesisItem(DIALECT, null, null, pexpr);
                 expectedType(SymbolType.PARENT_CLOSE);
                 allowMemberOrCall = true;
                 break;

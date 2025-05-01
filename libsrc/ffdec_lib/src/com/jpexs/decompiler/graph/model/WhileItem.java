@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -85,14 +86,15 @@ public class WhileItem extends LoopItem implements Block {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param loop Loop
      * @param expression Expression
      * @param commands Commands
      */
-    public WhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
-        super(src, lineStartIns, loop);
+    public WhileItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
+        super(dialect, src, lineStartIns, loop);
         this.expression = expression;
         this.commands = commands;
     }

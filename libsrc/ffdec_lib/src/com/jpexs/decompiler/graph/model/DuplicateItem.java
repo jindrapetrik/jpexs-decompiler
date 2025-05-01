@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -36,12 +37,14 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start item
      * @param value Value
      */
-    public DuplicateItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(src, lineStartIns, value.getPrecedence(), value);
+    public DuplicateItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(dialect, src, lineStartIns, value.getPrecedence(), value);
     }
 
     @Override

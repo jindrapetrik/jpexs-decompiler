@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -43,7 +44,7 @@ public abstract class BitwiseBinaryOpAVM2Item extends BinaryOpItem implements Co
      * @param coerceRight Coerce right
      */
     public BitwiseBinaryOpAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
-        super(instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
     }
 
     @Override

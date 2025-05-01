@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.as2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -873,7 +874,7 @@ public class ActionScript2ClassDetector {
                 } else {
                     onFalse.add(ter.onFalse);
                 }
-                commands.set(i, new IfItem(null, null, ter.expression, onTrue, onFalse));
+                commands.set(i, new IfItem(ActionGraphTargetDialect.INSTANCE, null, null, ter.expression, onTrue, onFalse));
             }
         }
     }

@@ -40,7 +40,7 @@ public class NotCompileTimeItem extends GraphTargetItem {
      * @param object Object that cannot be statically computed
      */
     public NotCompileTimeItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, NOPRECEDENCE);
+        super(null, instruction, lineStartIns, NOPRECEDENCE);
         this.object = object;
     }
 
