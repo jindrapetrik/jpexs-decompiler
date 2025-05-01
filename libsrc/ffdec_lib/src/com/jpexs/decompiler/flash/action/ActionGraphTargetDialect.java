@@ -21,16 +21,16 @@ import java.util.List;
 public class ActionGraphTargetDialect extends GraphTargetDialect {
 
     public static final GraphTargetDialect INSTANCE = new ActionGraphTargetDialect();
-    
+
     private ActionGraphTargetDialect() {
-        
+
     }
-    
+
     @Override
     public String getName() {
         return "Action";
-    }        
-    
+    }
+
     @Override
     public GraphTargetItem valToItem(Object r) {
         if (r == null) {
@@ -50,13 +50,13 @@ public class ActionGraphTargetDialect extends GraphTargetDialect {
             return new DirectValueActionItem((Long) r);
         }
         if (r instanceof Integer) {
-            return new DirectValueActionItem((Long)(long)(Integer) r);
+            return new DirectValueActionItem((Long) (long) (Integer) r);
         }
         if (r instanceof Short) {
-            return new DirectValueActionItem((Long)(long)(Short) r);
+            return new DirectValueActionItem((Long) (long) (Short) r);
         }
         if (r instanceof Byte) {
-            return new DirectValueActionItem((Long)(long)(Byte) r);
+            return new DirectValueActionItem((Long) (long) (Byte) r);
         }
         if (r instanceof Double) {
             return new DirectValueActionItem((Double) r);
@@ -81,7 +81,7 @@ public class ActionGraphTargetDialect extends GraphTargetDialect {
             ObjectType ot = (ObjectType) r;
             for (String k : ot.getAttributeNames()) {
                 names.add(valToItem(k));
-                vals.add(valToItem(ot.getAttribute(k)));                
+                vals.add(valToItem(ot.getAttribute(k)));
             }
             return new InitObjectActionItem(null, null, names, vals);
         }
