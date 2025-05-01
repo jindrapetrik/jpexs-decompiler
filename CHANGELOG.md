@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Auto detect scale factor on Hi-dpi displays
 - [#1826] (Optional) Extending shape area by half pixel to fix antialias conflation artifacts
   (Can be turned on in advanced settings)
+- Icons for Simple editor library folders
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
