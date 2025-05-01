@@ -113,7 +113,11 @@ public class QuickTreeFilterPanel extends JPanel implements QuickTreeFilterInter
         foldersPanel.setSize(new Dimension(getParent().getWidth(), 47));
         
         labelToFolder.clear();
-        foldersList = ((TagTreeModel) tagTree.getFullModel()).getAvailableFolders();
+        TagTreeModel model = (TagTreeModel) tagTree.getFullModel();
+        if (model == null) { // When switched to Simple editor for example
+            return;
+        }
+        foldersList = model.getAvailableFolders();
         for (String f : foldersList) {
             String icon = "folder" + f.toLowerCase(Locale.ENGLISH) + "16";
             if (f.equals("header")) {
