@@ -1049,6 +1049,10 @@ public final class Configuration {
     @ConfigurationDirectory
     public static ConfigurationItem<String> lastSolEditorDirectory = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> halfTransparentParentLayersEasy = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

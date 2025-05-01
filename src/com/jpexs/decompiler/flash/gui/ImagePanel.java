@@ -3268,9 +3268,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
 
             ignoreDepths.add(parentDepthState.depth);
-            parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
+            if (Configuration.halfTransparentParentLayersEasy.get()) {
+                parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
                     parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
                     ignoreDepths);
+            }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             ignoreDepths.clear();
         }

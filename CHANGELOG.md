@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1826] (Optional) Extending shape area by half pixel to fix antialias conflation artifacts
   (Can be turned on in advanced settings)
 - Icons for Simple editor library folders
+- [#2448] Simple editor - Option to turn off half transparent parent layers
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -3731,6 +3732,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
+[#2448]: https://www.free-decompiler.com/flash/issues/2448
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2436]: https://www.free-decompiler.com/flash/issues/2436
