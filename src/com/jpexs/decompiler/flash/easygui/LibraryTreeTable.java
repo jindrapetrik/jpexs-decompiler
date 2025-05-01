@@ -160,33 +160,34 @@ public class LibraryTreeTable extends JTreeTable {
                 Object object = node.getUserObject();
                 if (object instanceof LibraryFolder) {
                     String folderName = ((LibraryFolder) object).getName();
+                    String prefix = "folder";
                     switch (folderName) {
                         case "images":
-                            label.setIcon(View.getIcon("folderimages16"));
+                            label.setIcon(View.getIcon(prefix + "images16"));
                             break;
                         case "graphics":
-                            label.setIcon(View.getIcon("foldershapes16"));
+                            label.setIcon(View.getIcon(prefix + "shapes16"));
                             break;
                         case "shapeTweens":
-                            label.setIcon(View.getIcon("foldermorphshapes16"));
+                            label.setIcon(View.getIcon(prefix + "morphshapes16"));
                             break;
                         case "texts":
-                            label.setIcon(View.getIcon("foldertexts16"));
+                            label.setIcon(View.getIcon(prefix + "texts16"));
                             break;
                         case "fonts":
-                            label.setIcon(View.getIcon("folderfonts16"));
+                            label.setIcon(View.getIcon(prefix + "fonts16"));
                             break;
                         case "movieClips":
-                            label.setIcon(View.getIcon("foldersprites16"));
+                            label.setIcon(View.getIcon(prefix + "sprites16"));
                             break;
                         case "buttons":
-                            label.setIcon(View.getIcon("folderbuttons16"));
+                            label.setIcon(View.getIcon(prefix + "buttons16"));
                             break;
                         case "sounds":
-                            label.setIcon(View.getIcon("foldersounds16"));
+                            label.setIcon(View.getIcon(prefix + "sounds16"));
                             break;
                         case "videos":
-                            label.setIcon(View.getIcon("foldermovies16"));
+                            label.setIcon(View.getIcon(prefix + "movies16"));
                             break;
                         default:
                             label.setIcon(View.getIcon("folder16"));
