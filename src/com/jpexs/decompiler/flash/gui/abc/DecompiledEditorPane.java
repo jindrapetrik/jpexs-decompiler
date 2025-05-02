@@ -60,6 +60,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -97,6 +99,10 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     private boolean scriptLoaded = true;
 
+    public synchronized boolean isScriptLoaded() {
+        return scriptLoaded;
+    }   
+    
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
     }
@@ -140,7 +146,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return script.abc.findTraitByTraitId(classIndex, lastTraitIndex);
     }
 
-    public ScriptPack getScriptLeaf() {
+    public synchronized ScriptPack getScriptLeaf() {
         return script;
     }
 
@@ -870,21 +876,27 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         this.abcPanel = abcPanel;
     }
 
-    public void clearScript() {
+    public synchronized void clearScript() {
         script = null;
     }
 
     public void setScript(ScriptPack scriptLeaf, boolean force) {
         View.checkAccess();
-
+        
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
             setSourceWorker = null;
         }
-        scriptLoaded = false;
+        
+        synchronized (this) {
+            scriptLoaded = false;
+        }
+        
 
-        if (!force && this.script == scriptLeaf) {
-            scriptLoaded = true;
+        if (!force && this.script == scriptLeaf) {                            
+            synchronized (this) {
+                scriptLoaded = true;
+            }
             fireScript();
             return;
         }
@@ -974,7 +986,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
     }
 
-    private void setSourceCompleted(ScriptPack scriptLeaf, HighlightedText decompiledText) {
+    private synchronized void setSourceCompleted(ScriptPack scriptLeaf, HighlightedText decompiledText) {
         View.checkAccess();
 
         if (decompiledText == null) {
@@ -991,19 +1003,22 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             } else {
                 abcPanel.brokenHintPanel.setVisible(false);
             }
-
             setText(hilightedCode);
+            
+            
 
             if (highlightedText.getClassHighlights().size() > 0) {
                 try {
-                    setCaretPosition(highlightedText.getClassHighlights().get(0).startPos);
+                    int pos = highlightedText.getClassHighlights().get(0).startPos + 1;
+                    setCaretPosition(pos); //+1 for position just after class name
+                    caretUpdate(null);
                 } catch (Exception ex) { //sometimes happens
                     //ignore
                 }
             }
         }
 
-        scriptLoaded = true;
+        scriptLoaded = true;                
 
         fireScript();
     }
@@ -1030,7 +1045,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     @Override
-    public void setText(String t) {
+    public synchronized void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
     }
@@ -1054,4 +1069,19 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         // not found: so return existing text
         return super.getToolTipText();
     }
+
+    public synchronized void setCaretPositionForCurrentScript(int position, ScriptPack expectedScript) {
+        if (expectedScript != this.script) {
+            return;
+        }
+        if (!scriptLoaded) {
+            return;
+        }
+        setCaretPosition(position);
+    }
+    
+    @Override
+    public synchronized void setCaretPosition(int position) {
+        super.setCaretPosition(position);
+    }        
 }

@@ -45,6 +45,8 @@ All notable changes to this project will be documented in this file.
 - [#2355] AS1/2 Simplify expressions feature colliding with some other features like hex values
 - Exception on FFDec start when simple editor is on
 - [#2419] AS3 - There should be empty line after class header
+- AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered
+- AS 1/2 - Remembering caret position for frames
 
 ## [22.0.2] - 2025-01-17
 ### Added

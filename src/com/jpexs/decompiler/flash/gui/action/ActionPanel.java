@@ -194,6 +194,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     private boolean scriptLoaded = true;
 
+    public synchronized boolean isScriptLoaded() {
+        return scriptLoaded;
+    }   
+    
     public void addScriptListener(Runnable listener) {
         scriptListeners.add(listener);
     }
@@ -202,7 +206,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         scriptListeners.remove(listener);
     }
 
-    public void runWhenLoaded(Runnable l) {
+    public synchronized void runWhenLoaded(Runnable l) {
         if (scriptLoaded) {
             l.run();
         } else {
@@ -223,7 +227,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
     }
 
-    public void clearSource() {
+    public synchronized void clearSource() {
         View.checkAccess();
 
         lastCode = null;
@@ -492,9 +496,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         return listener;
     }
 
-    public void setSource(final ASMSource src, final boolean useCache) {
+    public synchronized void setSource(final ASMSource src, final boolean useCache) {
         View.checkAccess();
-
+      
         scriptLoaded = false;
 
         if (setSourceWorker != null) {
@@ -610,7 +614,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
     }
 
-    private void setSourceCompleted(ASMSource asm, HighlightedText decompiledText, ActionList actions) {
+    private synchronized void setSourceCompleted(ASMSource asm, HighlightedText decompiledText, ActionList actions) {
         View.checkAccess();
 
         if (decompiledText == null) {
@@ -1430,4 +1434,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         return (saveButton.isVisible() && saveButton.isEnabled())
                 || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }
+
+    public synchronized ASMSource getSrc() {
+        return src;
+    }        
 }

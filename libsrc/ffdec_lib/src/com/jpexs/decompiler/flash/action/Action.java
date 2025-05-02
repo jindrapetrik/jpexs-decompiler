@@ -1001,11 +1001,13 @@ public abstract class Action implements GraphSourceItem {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
 
-            ex.printStackTrace();
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
                 convertException = cause;
+            }
+            if (ex instanceof ExecutionException && cause instanceof InterruptedException) {
+                throw (InterruptedException) cause;
             }
             if (convertException instanceof TimeoutException) {
                 logger.log(Level.SEVERE, "Decompilation timeout in: " + path, convertException);

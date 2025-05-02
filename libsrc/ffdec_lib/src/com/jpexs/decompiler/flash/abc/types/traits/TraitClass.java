@@ -235,12 +235,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 }
             }
         }
-
+                
         //class header
         instanceInfo.getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, allowEmbed);
         writer.endTrait();
-        writer.startBlock();
         writer.startClass(class_info);
+        writer.startBlock();
         
         first.setVal(true);
                        

@@ -2111,9 +2111,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         setDecompiledEditMode(false);
         detailPanel.setEditMode(false);        
         detailPanel.methodTraitPanel.methodCodePanel.clear();
+        decompiledTextArea.setNoTrait();        
         setAbc(scriptPack.abc);
-        decompiledTextArea.setScript(scriptPack, true);
-        decompiledTextArea.setNoTrait();
-        
+        decompiledTextArea.setScript(scriptPack, true);                
     }
 }
