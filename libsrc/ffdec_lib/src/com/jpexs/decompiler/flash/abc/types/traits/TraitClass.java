@@ -241,15 +241,29 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.endTrait();
         writer.startBlock();
         writer.startClass(class_info);
-
+        
         first.setVal(true);
-
-        //static variables & constants
+                       
         ClassInfo classInfo = abc.class_info.get(class_info);
+        
+        //static initializer        
+        int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
+                
+        if (bodyIndex != -1) {
+            writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
+            writer.startMethod(classInfo.cinit_index, "cinit");
+            writer.append(""); 
+            writer.newLine();
+            writer.endMethod();
+            writer.endTrait();
+        } else {
+            writer.newLine();
+        }
+        
+        //static variables & constants
         classInfo.static_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
-        //static initializer
-        int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
+        //static initializer continue        
         if (bodyIndex != -1) {
             writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
             writer.startMethod(classInfo.cinit_index, "cinit");
@@ -268,7 +282,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
                     //TODO: handle this better in GUI(?)
-                    writer.append("");
+                    writer.append("");                    
                 }
             }
             writer.endMethod();

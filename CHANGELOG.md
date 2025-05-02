@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - [#2450] Morphshape replace button/menu is not working (throws exception due to missing icon)
 - [#2355] AS1/2 Simplify expressions feature colliding with some other features like hex values
 - Exception on FFDec start when simple editor is on
+- [#2419] AS3 - There should be empty line after class header
 
 ## [22.0.2] - 2025-01-17
 ### Added
@@ -3754,6 +3755,7 @@ Major version of SWF to XML export changed to 2.
 [#2447]: https://www.free-decompiler.com/flash/issues/2447
 [#2450]: https://www.free-decompiler.com/flash/issues/2450
 [#2355]: https://www.free-decompiler.com/flash/issues/2355
+[#2419]: https://www.free-decompiler.com/flash/issues/2419
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
