@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
+import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -49,10 +51,10 @@ public abstract class BitwiseBinaryOpAVM2Item extends BinaryOpItem implements Co
 
     @Override
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (operand instanceof IntegerValueAVM2Item) {
-            Integer val = ((IntegerValueAVM2Item) operand).value;
+        if ((operand instanceof IntegerValueAVM2Item) || (operand instanceof DoubleValueAVM2Item)) {
+            long val = operand.getAsLong();
             if (val > 9) {
-                String valHex = Integer.toHexString(val).toUpperCase();
+                String valHex = Long.toHexString(val).toUpperCase();
                 if (valHex.length() % 2 == 1) {
                     valHex = "0" + valHex;
                 }

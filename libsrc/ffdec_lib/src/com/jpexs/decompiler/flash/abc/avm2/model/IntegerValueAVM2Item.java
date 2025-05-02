@@ -213,5 +213,9 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
         }
         return true;
     }
-
+    
+    @Override
+    public long getAsLong() {
+        return (long) value;
+    }
 }

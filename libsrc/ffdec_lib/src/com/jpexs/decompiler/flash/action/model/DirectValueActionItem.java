@@ -317,4 +317,9 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     public String toString() {
         return "" + getResult();
     }
+
+    @Override
+    public long getAsLong() {
+        return (long) (double) EcmaScript.toNumberAs2(value);
+    }        
 }

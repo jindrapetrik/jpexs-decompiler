@@ -42,7 +42,7 @@ All notable changes to this project will be documented in this file.
 - [#2446] Nightly version asked for update to previous stable
 - [#2447] SVG import - gradients can inherit (href) from other gradient types (radial vs linear)
 - [#2450] Morphshape replace button/menu is not working (throws exception due to missing icon)
-- [#2355] AS1/2 Simplify expressions feature colliding with some other features like hex values
+- [#2355] AS1/2/3 Simplify expressions feature colliding with some other features like hex values
 - Exception on FFDec start when simple editor is on
 - [#2419] AS3 - There should be empty line after class header
 - AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered

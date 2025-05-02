@@ -49,8 +49,9 @@ public abstract class BitwiseBinaryOpActionItem extends BinaryOpItem implements 
 
     @Override
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if ((operand instanceof DirectValueActionItem) && (((DirectValueActionItem) operand).value instanceof Long)) {
-            long val = (long) (Long) ((DirectValueActionItem) operand).value;
+        if ((operand instanceof DirectValueActionItem)
+                && ((((DirectValueActionItem) operand).value instanceof Long) || (((DirectValueActionItem) operand).value instanceof Double))) {
+            long val = operand.getAsLong();
             if (val > 9) {
                 String valHex = Long.toHexString(val).toUpperCase();
                 if (valHex.length() % 2 == 1) {
