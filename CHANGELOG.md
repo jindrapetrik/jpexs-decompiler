@@ -50,6 +50,10 @@ All notable changes to this project will be documented in this file.
 - AS 1/2 - Remembering caret position for frames
 - Cleaner file association
 
+### Removed
+- Windows installer does not associate SWF files anymore as it caused false positives on some AVs.
+  You can associate them later in FFDec settings.
+
 ## [22.0.2] - 2025-01-17
 ### Added
 - FLA export - accessibility for AS3 files
