@@ -115,6 +115,6 @@ public class DoubleValueAVM2Item extends NumberValueAVM2Item {
 
     @Override
     public long getAsLong() {
-        return (long)(double) value;
+        return (long) (double) value;
     }
 }
