@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
   (Can be turned on in advanced settings)
 - Icons for Simple editor library folders
 - [#2448] Simple editor - Option to turn off half transparent parent layers
+- Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -47,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - [#2419] AS3 - There should be empty line after class header
 - AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered
 - AS 1/2 - Remembering caret position for frames
+- Cleaner file association
 
 ## [22.0.2] - 2025-01-17
 ### Added

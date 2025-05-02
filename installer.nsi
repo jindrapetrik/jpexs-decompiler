@@ -25,7 +25,7 @@ Unicode true
 SetCompressor /SOLID lzma
 !include "StrFunc.nsh"
 !include x64.nsh
-
+!include Integration.nsh
 
 !define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
 
@@ -362,9 +362,62 @@ var SMDir
   Exch $R2
 !macroend
 
+var clsname
+!define VERB "ffdec"
+!define VERBNAME "Open with FFDec"
+!define MUIVERB_ID "1001"
+var ext
 
 !define REG_CLASSES_HKEY HKLM
 
+
+Function un.RemoveExtContextMenu
+  pop $ext
+  ; ----------- Remove "Open With"
+  DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}"
+  ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+  IfErrors step2
+    DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}"
+  step2:  
+  DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}"
+FunctionEnd
+
+Function AddToExtContextMenu
+    pop $ext
+    
+    ; ------------ Register "Open With"
+    WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}\shell\open" "" ${VERB}
+    WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}\shell\open\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+    WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\.$ext\OpenWithList\${APP_EXENAME}" "" ""  
+
+    ; ------------ Associate file extension
+    !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" ".$ext"
+     Pop $R0
+     ${If} $R0 == 0
+           WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\.$ext" "" "ShockwaveFlash.ShockwaveFlash"
+     ${EndIf}
+
+     ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" $clsname
+     Pop $R0
+     ${If} $R0 == 0
+          WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname" "" "Flash Movie"
+     ${EndIf}
+
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}" "" "${VERBNAME}"
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${MUIVERB_ID}'
+    
+          
+     ; ----------- Associate global verb - if anybody changes default app, it won't remove the verbs
+     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" "SystemFileAssociations"
+     Pop $R0
+     ${If} $R0 == 1
+        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "" "${VERBNAME}"
+        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}\Command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${MUIVERB_ID}'           
+     ${EndIf}
+FunctionEnd
 
 Section "FFDec" SecDummy
                                       
@@ -443,13 +496,33 @@ Function .onInit
   SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
+Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
+    SetRegView 64
+    Push "swf"
+    Call AddToExtContextMenu
+    Push "spl"
+    Call AddToExtContextMenu
+    Push "gfx"
+    Call AddToExtContextMenu
+    
+    SetRegView 32
+    Push "swf"
+    Call AddToExtContextMenu
+    Push "spl"
+    Call AddToExtContextMenu    
+    Push "gfx"
+    Call AddToExtContextMenu
+    
+    ${NotifyShell_AssocChanged}
+SectionEnd
+
 ;--------------------------------
 ;Descriptions
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "$(STRING_SECTION_APP)"
- ;   !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
     !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut} "$(STRING_SECTION_SHORTCUT)"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -498,6 +571,23 @@ Section "Uninstall"
   RmDir /r "$SMPROGRAMS\$SMDir\*.*"
   RmDir "$SMPROGRAMS\$SMDir"   
   
+  SetRegView 64
+  Push "swf"
+  Call un.RemoveExtContextMenu
+  Push "spl"
+  Call un.RemoveExtContextMenu
+  Push "gfx"
+  Call un.RemoveExtContextMenu
+  
+  SetRegView 32
+  Push "swf"
+  Call un.RemoveExtContextMenu
+  Push "spl"
+  Call un.RemoveExtContextMenu
+  Push "gfx"
+  Call un.RemoveExtContextMenu
+
+  ${NotifyShell_AssocChanged}
 
   StrCmp $uninstlocal 1 0 +5
     SetShellVarContext current      
