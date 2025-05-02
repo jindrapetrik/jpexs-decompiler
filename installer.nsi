@@ -367,23 +367,19 @@ var SMDir
 
 /* ; Asociation - triggers Nemesis detection in VirusTotal :-(
 
-var clsname
+var className
 !define VERB "ffdec"
-!define VERBNAME "Open with FFDec"
-!define MUIVERB_ID "1001"
+!define VERB_NAME "Open with FFDec"
+!define VERB_RESOURCE_ID "1001"
 var ext
-
-
-
-
 
 Function un.RemoveExtContextMenu
   pop $ext
   ; ----------- Remove "Open With"
   DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\Applications\${APP_EXENAME}"
-  ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+  ReadRegStr $className ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
   IfErrors step2
-    DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}"
+    DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\$className\shell\${VERB}"
   step2:  
   DeleteRegKey ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}"
 FunctionEnd
@@ -403,25 +399,25 @@ Function AddToExtContextMenu
            WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\.$ext" "" "ShockwaveFlash.ShockwaveFlash"
      ${EndIf}
 
-     ReadRegStr $clsname ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
-     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" $clsname
+     ReadRegStr $className ${REG_CLASSES_HKEY} "Software\Classes\.$ext" ""
+     !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" $className
      Pop $R0
      ${If} $R0 == 0
-          WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname" "" "Flash Movie"
+          WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$className" "" "Flash Movie"
      ${EndIf}
 
-     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}" "" "${VERBNAME}"
-     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
-     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$clsname\shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${MUIVERB_ID}'
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$className\shell\${VERB}" "" "${VERB_NAME}"
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$className\shell\${VERB}\command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
+     WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\$className\shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${VERB_RESOURCE_ID}'
     
           
      ; ----------- Associate global verb - if anybody changes default app, it won't remove the verbs
      !insertmacro IfKeyExists ${REG_CLASSES_HKEY} "Software\Classes" "SystemFileAssociations"
      Pop $R0
      ${If} $R0 == 1
-        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "" "${VERBNAME}"
+        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "" "${VERB_NAME}"
         WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}\Command" "" '"$INSTDIR\${APP_EXENAME}" "%1"'
-        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${MUIVERB_ID}'           
+        WriteRegStr ${REG_CLASSES_HKEY} "Software\Classes\SystemFileAssociations\.$ext\Shell\${VERB}" "MUIVerb" '@$INSTDIR\${APP_EXENAME},-${VERB_RESOURCE_ID}'           
      ${EndIf}
 FunctionEnd
 
