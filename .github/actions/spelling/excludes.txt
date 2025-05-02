@@ -119,6 +119,7 @@
 ^nsis_locales/(?!English)
 ^resources/flashlib/
 _[a-z]+(?:_[A-Z]+|)\.properties$
+^open_with\.rc$
 ignore$
 Lexer\.java$
 \.sol$
