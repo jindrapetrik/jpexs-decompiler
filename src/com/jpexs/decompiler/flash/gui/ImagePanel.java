@@ -121,7 +121,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -1564,7 +1563,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    mouseMoved(e);
                     List<DisplayPoint> points = hilightedPoints;
 
                     if (dragStart != null && multiSelect && !inMoving && mode == Cursor.DEFAULT_CURSOR) {
@@ -2799,10 +2797,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     draggingGuideY = true;
                     guideDragY = -1;
                     topRuler.setCursor(guideYCursor);
+                    mode = MODE_GUIDE_Y;
+                    iconPanel.setCursor(guideYCursor);
                 } else if (c == leftRuler) {
                     draggingGuideX = true;
                     guideDragX = -1;
                     leftRuler.setCursor(guideXCursor);
+                    mode = MODE_GUIDE_X;
+                    iconPanel.setCursor(guideXCursor);
                 } else if (c == iconPanel) {
                     for (MouseListener l : iconPanel.mouseListeners) {
                         l.mousePressed(convertMouseEvent(e, iconPanel));
