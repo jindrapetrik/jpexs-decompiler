@@ -247,6 +247,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final int MODE_SHEAR_N = -7;
     private static final int MODE_SHEAR_W = -8;
 
+    private static final int MODE_GUIDE_X = -9;
+    private static final int MODE_GUIDE_Y = -10;
+
     private static Cursor moveCursor;
     private static Cursor moveRegPointCursor;
     private static Cursor resizeNWSECursor;
@@ -260,6 +263,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor movePointCursor;
     private static Cursor defaultCursor;
     private static Cursor addPointCursor;
+    private static Cursor guideXCursor;
+    private static Cursor guideYCursor;
 
     private Point2D offsetPoint = new Point2D.Double(0, 0);
 
@@ -364,6 +369,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final int GUIDE_FONT_HEIGHT = 11;
 
     private static final int GUIDE_TEXT_OFFSET = 10;
+
+    private static final int GUIDE_MOVE_TOLERANCE = 2;
 
     private SWF guidesSwf = null;
 
@@ -650,6 +657,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             movePointCursor = loadCursor("move_point", 0, 0);
             defaultCursor = loadCursor("default", 0, 0);
             addPointCursor = loadCursor("add_point", 0, 0);
+            guideXCursor = loadCursor("guide_x", 0, 0);
+            guideYCursor = loadCursor("guide_y", 0, 0);
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1349,13 +1358,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
 
-                        int guideTolerance = 2;
+                        mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging                                                                                               
 
                         Point mousePoint = e.getPoint();
                         for (int d = 0; d < guidesX.size(); d++) {
                             Double guide = guidesX.get(d);
                             int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
-                            if (mousePoint.x >= guideInPanel - guideTolerance && mousePoint.x <= guideInPanel + guideTolerance) {
+                            if (mousePoint.x >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.x <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
                                 guidesX.remove(d);
                                 guideDragX = guideInPanel;
                                 draggingGuideX = true;
@@ -1367,7 +1376,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         for (int d = 0; d < guidesY.size(); d++) {
                             Double guide = guidesY.get(d);
                             int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
-                            if (mousePoint.y >= guideInPanel - guideTolerance && mousePoint.y <= guideInPanel + guideTolerance) {
+                            if (mousePoint.y >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.y <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
                                 guidesY.remove(d);
                                 guideDragY = guideInPanel;
                                 draggingGuideY = true;
@@ -1376,7 +1385,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
 
-                        mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging                                                                                               
                         setDragStart(e.getPoint());
 
                         if (!shiftDown) {
@@ -1556,6 +1564,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    mouseMoved(e);
                     List<DisplayPoint> points = hilightedPoints;
 
                     if (dragStart != null && multiSelect && !inMoving && mode == Cursor.DEFAULT_CURSOR) {
@@ -2209,6 +2218,31 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         return;
                     }
+
+                    boolean nearGuideX = draggingGuideX;
+                    boolean nearGuideY = draggingGuideY;
+
+                    if (!draggingGuideX && !draggingGuideY) {
+                        Point mousePoint = e.getPoint();
+                        for (int d = 0; d < guidesX.size(); d++) {
+                            Double guide = guidesX.get(d);
+                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
+                            if (mousePoint.x >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.x <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
+                                nearGuideX = true;
+                                break;
+                            }
+                        }
+
+                        for (int d = 0; d < guidesY.size(); d++) {
+                            Double guide = guidesY.get(d);
+                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
+                            if (mousePoint.y >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.y <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
+                                nearGuideY = true;
+                                break;
+                            }
+                        }
+                    }
+
                     if (doFreeTransform) {
                         if (bounds == null) {
                             return;
@@ -2306,6 +2340,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 newMode = MODE_SHEAR_S;
                             }
                             cursor = shearXCursor;
+                        } else if (nearGuideX) {
+                            newMode = MODE_GUIDE_X;
+                            cursor = guideXCursor;
+                        } else if (nearGuideY) {
+                            newMode = MODE_GUIDE_Y;
+                            cursor = guideYCursor;
                         } else if (inBounds) {
                             newMode = Cursor.MOVE_CURSOR;
                             cursor = moveCursor;
@@ -2314,6 +2354,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             cursor = defaultCursor;
                         }
 
+                        if (getCursor() != cursor) {
+                            setCursor(cursor);
+                        }
+                        mode = newMode;
+                    } else {
+                        Cursor cursor = null;
+                        Integer newMode = null;
+                        if (nearGuideX) {
+                            newMode = MODE_GUIDE_X;
+                            cursor = guideXCursor;
+                        } else if (nearGuideY) {
+                            newMode = MODE_GUIDE_Y;
+                            cursor = guideYCursor;
+                        } else {
+                            newMode = Cursor.DEFAULT_CURSOR;
+                            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                        }
                         if (getCursor() != cursor) {
                             setCursor(cursor);
                         }
@@ -2683,6 +2740,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void mouseDragged(MouseEvent e) {
                 Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+
+                if (c == topRuler) {
+                    if (topRuler.getCursor() != guideYCursor) {
+                        topRuler.setCursor(guideYCursor);
+                    }
+                } else if (c == leftRuler) {
+                    if (leftRuler.getCursor() != guideXCursor) {
+                        leftRuler.setCursor(guideXCursor);
+                    }
+                }
+
                 if (c != iconPanel) {
                     return;
                 }
@@ -2730,9 +2798,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (c == topRuler) {
                     draggingGuideY = true;
                     guideDragY = -1;
+                    topRuler.setCursor(guideYCursor);
                 } else if (c == leftRuler) {
                     draggingGuideX = true;
                     guideDragX = -1;
+                    leftRuler.setCursor(guideXCursor);
                 } else if (c == iconPanel) {
                     for (MouseListener l : iconPanel.mouseListeners) {
                         l.mousePressed(convertMouseEvent(e, iconPanel));
@@ -2762,6 +2832,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 draggingGuideY = false;
                 guideDragX = -1;
                 guideDragY = -1;
+
+                topRuler.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                leftRuler.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
                 if (c != iconPanel) {
                     return;
@@ -4475,7 +4548,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             if (!doFreeTransform && hilightedPoints == null) {
                                 Cursor newCursor;
-                                if (iconPanel.isAltDown() && !selectionMode) {
+                                if (mode == MODE_GUIDE_X) {
+                                    newCursor = guideXCursor;
+                                } else if (mode == MODE_GUIDE_Y) {
+                                    newCursor = guideYCursor;
+                                } else if (iconPanel.isAltDown() && !selectionMode) {
                                     if (depthStateUnderCursor == null) {
                                         newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {
