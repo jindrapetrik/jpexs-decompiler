@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -62,13 +63,16 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -112,6 +116,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -329,6 +334,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<Timelined> parentTimelineds = new ArrayList<>();
 
+    private JPanel topRuler;
+
+    private JPanel leftRuler;
+
+    private boolean contentCanHaveRuler = false;
+
     public void setFrozenButtons(boolean frozenButtons) {
         this.frozenButtons = frozenButtons;
     }
@@ -359,6 +370,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setTopPanelVisible(boolean visible) {
         topPanel.setVisible(visible);
+
+        updateRulerVisibility();
     }
 
     public void setShowPoints(List<java.awt.Point> showPoints1, List<java.awt.Point> showPoints2) {
@@ -666,7 +679,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public List<Integer> getSelectedDepths() {
         return new ArrayList<>(selectedDepths);
-    }   
+    }
 
     private void calculateFreeOrSelectionTransform() {
         if (!(doFreeTransform || selectionMode)) {
@@ -1367,7 +1380,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         int drawableFrameCount = dt.getNumFrames();
                                         if (drawableFrameCount == 0) {
                                             drawableFrameCount = 1;
-                                        }                                        
+                                        }
 
                                         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                                         if (lowQuality) {
@@ -2456,6 +2469,42 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
+    private Integer getRulerFullLinePixels(double z) {
+        if (z < 0.0375) {
+            return null;
+        }
+
+        int fullLinePixels = 2000;
+
+        if (z >= 0.075) {
+            fullLinePixels = 1000;
+        }
+
+        if (z >= 0.15) {
+            fullLinePixels = 500;
+        }
+
+        if (z >= 0.31) {
+            fullLinePixels = 100;
+        }
+        if (z >= 0.6) {
+            fullLinePixels = 50;
+        }
+        if (z >= 1.5) {
+            fullLinePixels = 20;
+        }
+        if (z >= 2.99) {
+            fullLinePixels = 10;
+        }
+        if (z >= 5.95) {
+            fullLinePixels = 5;
+        }
+        if (z >= 14.64) {
+            fullLinePixels = 2;
+        }
+        return fullLinePixels;
+    }
+
     public ImagePanel() {
         super(new BorderLayout());
         //iconPanel.setHorizontalAlignment(JLabel.CENTER);
@@ -2502,8 +2551,148 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         pointEditPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
         topPanel.add(pointEditPanel);
+
+        topRuler = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                double z = getRealZoom();
+
+                Integer fullLinePixels = getRulerFullLinePixels(z);
+                if (fullLinePixels == null) {
+                    return;
+                }
+
+                double fullLineDistance = fullLinePixels * z;
+                double leftOffset = 25;
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                GeneralPath gp = new GeneralPath();
+
+                double minX = leftOffset + offsetPoint.getX();
+                for (; minX >= 0; minX -= fullLineDistance) {
+                    //empty
+                }
+
+                for (double x = minX; x < getWidth(); x += fullLineDistance) {
+                    gp.moveTo(x, 0);
+                    gp.lineTo(x, getHeight());
+                    int px = (int) Math.round((x - leftOffset - offsetPoint.getX()) / z);
+
+                    int smallLineLength = 4;
+                    int smallerLineLength = 2;
+                    int k = 0;
+                    for (double i = 0; i < fullLineDistance; i += fullLineDistance / 10.0, k++) {
+                        gp.moveTo(x + i, 25);
+                        gp.lineTo(x + i, 25 - (k % 2 == 0 ? smallLineLength : smallerLineLength));
+                    }
+
+                    g2.drawString("" + px, (int) x + 5, 15);
+                }
+                g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+                g2.draw(gp);
+
+                if (lastMouseEvent != null) {
+                    int triangleX = lastMouseEvent.getX() + 25;
+                    int triangleHalfWidth = 3;
+                    int triangleHeight = 3;
+                    int triangleYOffset = 3;
+
+                    Polygon triangle = new Polygon(
+                            new int[]{triangleX - triangleHalfWidth, triangleX + triangleHalfWidth, triangleX},
+                            new int[]{25 - triangleHeight - triangleYOffset, 25 - triangleHeight - triangleYOffset, 25 - triangleYOffset},
+                            3);
+                    g2.setPaint(getForeground());
+                    g2.fill(triangle);
+                }
+
+                g2.setPaint(getBackground());
+                g2.fillRect(0, 0, 25, 25);
+            }
+        };
+        topRuler.setPreferredSize(new Dimension(1, 25));
+        topPanel.add(topRuler);
+
+        leftRuler = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                double z = getRealZoom();
+
+                Integer fullLinePixels = getRulerFullLinePixels(z);
+                if (fullLinePixels == null) {
+                    return;
+                }
+
+                double fullLineDistance = fullLinePixels * z;
+                double topOffset = 0;
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                GeneralPath gp = new GeneralPath();
+
+                double minY = topOffset + offsetPoint.getY();
+                for (; minY >= 0; minY -= fullLineDistance) {
+                    //empty
+                }
+
+                AffineTransform origTransform = g2.getTransform();
+
+                for (double y = minY; y < getHeight(); y += fullLineDistance) {
+                    gp.moveTo(0, y);
+                    gp.lineTo(getWidth(), y);
+                    int py = (int) Math.round((y - topOffset - offsetPoint.getY()) / z);
+
+                    int smallLineLength = 4;
+                    int smallerLineLength = 2;
+                    int k = 0;
+                    for (double i = 0; i < fullLineDistance; i += fullLineDistance / 10.0, k++) {
+                        gp.moveTo(25, y + i);
+                        gp.lineTo(25 - (k % 2 == 0 ? smallLineLength : smallerLineLength), y + i);
+                    }
+
+                    g2.setTransform(origTransform);
+                    String drawnString = "" + py;
+                    int stringWidth = g2.getFontMetrics().stringWidth(drawnString);
+                    AffineTransform fontTrans = new AffineTransform();
+                    fontTrans.rotate(-Math.PI / 2, 15, 15);
+                    g2.transform(fontTrans);
+                    g2.drawString(drawnString, 15 - stringWidth + 15 - 5 - Math.round(y), 15);
+                }
+                g2.setTransform(origTransform);
+
+                if (lastMouseEvent != null) {
+                    int triangleY = lastMouseEvent.getY();
+                    int triangleHalfHeight = 3;
+                    int triangleWidth = 3;
+                    int triangleXOffset = 3;
+
+                    Polygon triangle = new Polygon(
+                            new int[]{25 - triangleWidth - triangleXOffset, 25 - triangleWidth - triangleXOffset, 25 - triangleXOffset},
+                            new int[]{triangleY - triangleHalfHeight, triangleY + triangleHalfHeight, triangleY},
+                            3);
+                    g2.setPaint(getForeground());
+                    g2.fill(triangle);
+                }
+
+                g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+                g2.draw(gp);
+            }
+        };
+        leftRuler.setPreferredSize(new Dimension(25, 1));
+        add(leftRuler, BorderLayout.WEST);
+
         pointEditPanel.setVisible(false);
         add(topPanel, BorderLayout.NORTH);
+
+        leftRuler.setVisible(false);
+        topRuler.setVisible(false);
+
+        Configuration.showRuler.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                updateRulerVisibility();
+            }
+        });
 
         horizontalScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
         verticalScrollBar = new JScrollBar(JScrollBar.VERTICAL);
@@ -2656,6 +2845,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (timelined == null) {
             return;
         }
+        leftRuler.repaint();
+        topRuler.repaint();
         if (thisTimer == null) {
             startTimer(timelined.getTimeline(), false);
         } else {
@@ -2801,7 +2992,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized void zoom(Zoom zoom) {
         zoom(zoom, false, false);
-    }   
+    }
 
     private synchronized void zoom(Zoom zoom, boolean useCursor, boolean forced) {
         if (!zoomAvailable) {
@@ -2847,6 +3038,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (textTag != null) {
                 setText(textTag, newTextTag);
             }
+            topRuler.repaint();
+            leftRuler.repaint();
+
             fireMediaDisplayStateChanged();
         }
     }
@@ -2857,7 +3051,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         z.fit = true;
         zoom(z, false, true);
     }
-    
+
     @Override
     public synchronized BufferedImage printScreen() {
         return iconPanel.getLastImage();
@@ -2899,7 +3093,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Timer setTimelinedTimer = null;
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -3018,6 +3212,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             iconPanel.calcRect();
+
+            contentCanHaveRuler = canHaveRuler;
+            updateRulerVisibility();
             redraw();
             if (autoPlay) {
                 play();
@@ -3058,7 +3255,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         horizontalScrollBar.setVisible(false);
         verticalScrollBar.setVisible(false);
+
+        contentCanHaveRuler = false;
+        updateRulerVisibility();
         fireMediaDisplayStateChanged();
+    }
+
+    private void updateRulerVisibility() {
+        topRuler.setVisible(contentCanHaveRuler && topPanel.isVisible() && Configuration.showRuler.get());
+        leftRuler.setVisible(contentCanHaveRuler && topPanel.isVisible() && Configuration.showRuler.get());
     }
 
     public synchronized void setText(TextTag textTag, TextTag newTextTag) {
@@ -3070,6 +3275,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         loaded = true;
         stillFrame = true;
         zoomAvailable = true;
+
+        contentCanHaveRuler = true;
+        updateRulerVisibility();
 
         this.textTag = textTag;
         this.newTextTag = newTextTag;
@@ -3208,7 +3416,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized int getFrame() {
         return frame;
     }
-    
+
     private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
             List<Timelined> parentTimelineds, List<Integer> parentDepths, List<Integer> parentFrames,
             Matrix parentMatrix
@@ -3270,8 +3478,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             ignoreDepths.add(parentDepthState.depth);
             if (Configuration.halfTransparentParentLayersEasy.get()) {
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
-                    parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
-                    ignoreDepths);
+                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
+                        ignoreDepths);
             }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             ignoreDepths.clear();
@@ -3344,13 +3552,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         int dframe = time % drawableFrameCount;
-                        
+
                         if (cht instanceof ButtonTag) {
                             dframe = ButtonTag.FRAME_HITTEST;
                         }
-                        
-                        //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
 
+                        //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
                         Matrix transform2 = transform;
 
                         transform2 = transform.concatenate(new Matrix(ds.matrix));
@@ -4412,11 +4619,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         Matrix b = newMatrix; //getParentMatrix().concatenate(newMatrix); //.concatenate(new Matrix(ds.matrix).inverse());
                         int dframe = time % drawableFrameCount;
-                        
+
                         if (cht instanceof ButtonTag) {
                             dframe = ButtonTag.FRAME_HITTEST;
                         }
-                        
+
                         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                         if (lowQuality) {
                             zoomDouble /= LQ_FACTOR;

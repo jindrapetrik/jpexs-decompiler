@@ -1053,6 +1053,11 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> halfTransparentParentLayersEasy = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> showRuler = null;
+    
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2427] Commandline export with use of imported SWFs (importAssets tag)
 - Auto detect scale factor on Hi-dpi displays
-- [#1826] (Optional) Extending shape area by half pixel to fix antialias conflation artifacts
-  (Can be turned on in advanced settings)
+- [#1826] Option to extend shape area by half pixel to fix antialias conflation artifacts
 - Icons for Simple editor library folders
 - [#2448] Simple editor - Option to turn off half transparent parent layers
 - Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)
+- [#2370] Objects display - Option to show horizontal and vertical rulers
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -3742,6 +3742,7 @@ Major version of SWF to XML export changed to 2.
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448
+[#2370]: https://www.free-decompiler.com/flash/issues/2370
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2436]: https://www.free-decompiler.com/flash/issues/2436

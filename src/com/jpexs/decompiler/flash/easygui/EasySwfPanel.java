@@ -527,7 +527,7 @@ public class EasySwfPanel extends JPanel {
                 if (obj instanceof Tag) {
                     Tag t = (Tag) obj;
                     libraryPreviewPanel.setTimelined(TimelinedMaker.makeTimelined(t), t.getSwf(),
-                            -1, false, true, true, true, true, false, true, true);
+                            -1, false, true, true, true, true, false, true, true, true);
                     libraryPreviewPanel.zoomFit();
                 } else {
                     libraryPreviewPanel.clearAll();
@@ -579,7 +579,7 @@ public class EasySwfPanel extends JPanel {
             libraryTreeTable.setSwf(swf);
             libraryPreviewPanel.clearAll();
             if (updateStage) {
-                stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true);
+                stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);
                 stagePanel.pause();
                 stagePanel.gotoFrame(0);
             }
