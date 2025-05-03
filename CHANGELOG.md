@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#2448] Simple editor - Option to turn off half transparent parent layers
 - Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)
 - [#2370] Objects display - Option to show horizontal and vertical rulers
+- [#2370] Objects display - Create guides by dragging from a ruler
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

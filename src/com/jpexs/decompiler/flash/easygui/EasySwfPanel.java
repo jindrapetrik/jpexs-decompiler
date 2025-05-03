@@ -580,6 +580,11 @@ public class EasySwfPanel extends JPanel {
             libraryPreviewPanel.clearAll();
             if (updateStage) {
                 stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);
+                if (timelined instanceof CharacterTag) {
+                    stagePanel.setGuidesCharacter(swf, ((CharacterTag) timelined).getCharacterId());
+                } else {
+                    stagePanel.setGuidesCharacter(swf, -1);
+                }
                 stagePanel.pause();
                 stagePanel.gotoFrame(0);
             }

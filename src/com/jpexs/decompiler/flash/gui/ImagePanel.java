@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -62,6 +64,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -95,6 +98,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -106,6 +110,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -338,7 +343,31 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private JPanel leftRuler;
 
+    private boolean draggingYGuide = false;
+
+    private boolean draggingXGuide = false;
+
+    private int guideDragX = -1;
+
+    private int guideDragY = -1;
+
     private boolean contentCanHaveRuler = false;
+
+    private List<Double> guidesX = new ArrayList<>();
+
+    private List<Double> guidesY = new ArrayList<>();
+
+    private static final Color GUIDES_COLOR = Color.green;
+
+    private static final int GUIDE_THICKNESS = 20;
+
+    private static final int GUIDE_FONT_HEIGHT = 11;
+
+    private static final int GUIDE_TEXT_OFFSET = 10;
+
+    private SWF guidesSwf = null;
+
+    private int guidesCharacterId = -1;
 
     public void setFrozenButtons(boolean frozenButtons) {
         this.frozenButtons = frozenButtons;
@@ -1100,6 +1129,40 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private boolean shiftDown = false;
 
+        private List<MouseMotionListener> mouseMotionListeners = new ArrayList<>();
+        private List<MouseListener> mouseListeners = new ArrayList<>();
+        private List<MouseWheelListener> mouseWheelListeners = new ArrayList<>();
+
+        @Override
+        public synchronized void addMouseMotionListener(MouseMotionListener l) {
+            mouseMotionListeners.add(l);
+        }
+
+        @Override
+        public synchronized void removeMouseMotionListener(MouseMotionListener l) {
+            mouseMotionListeners.remove(l);
+        }
+
+        @Override
+        public synchronized void addMouseListener(MouseListener l) {
+            mouseListeners.add(l);
+        }
+
+        @Override
+        public synchronized void removeMouseListener(MouseListener l) {
+            mouseListeners.remove(l);
+        }
+
+        @Override
+        public synchronized void addMouseWheelListener(MouseWheelListener l) {
+            mouseWheelListeners.add(l);
+        }
+
+        @Override
+        public synchronized void removeMouseWheelListener(MouseWheelListener l) {
+            mouseWheelListeners.remove(l);
+        }
+
         public boolean isAltDown() {
             return altDown;
         }
@@ -1286,7 +1349,34 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
 
-                        mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging
+                        int guideTolerance = 2;
+
+                        Point mousePoint = e.getPoint();
+                        for (int d = 0; d < guidesX.size(); d++) {
+                            Double guide = guidesX.get(d);
+                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
+                            if (mousePoint.x >= guideInPanel - guideTolerance && mousePoint.x <= guideInPanel + guideTolerance) {
+                                guidesX.remove(d);
+                                guideDragX = guideInPanel;
+                                draggingXGuide = true;
+                                saveGuides();
+                                return;
+                            }
+                        }
+
+                        for (int d = 0; d < guidesY.size(); d++) {
+                            Double guide = guidesY.get(d);
+                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
+                            if (mousePoint.y >= guideInPanel - guideTolerance && mousePoint.y <= guideInPanel + guideTolerance) {
+                                guidesY.remove(d);
+                                guideDragY = guideInPanel;
+                                draggingYGuide = true;
+                                saveGuides();
+                                return;
+                            }
+                        }
+
+                        mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging                                                                                               
                         setDragStart(e.getPoint());
 
                         if (!shiftDown) {
@@ -1322,6 +1412,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
+
+                        if (draggingXGuide || draggingYGuide) {
+                            draggingXGuide = false;
+                            draggingYGuide = false;
+                        }
 
                         if (hilightedPoints != null) {
                             Rectangle2D selectionRect = getSelectionRect();
@@ -2379,6 +2474,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
+            g2d.setColor(GUIDES_COLOR);
+            if (draggingXGuide && lastMouseEvent != null) {
+                g2d.drawLine(guideDragX, 0, guideDragX, getHeight());
+            }
+
+            if (draggingYGuide && lastMouseEvent != null) {
+                g2d.drawLine(0, guideDragY, getWidth(), guideDragY);
+            }
+
+            for (Double guide : guidesX) {
+                int guideRealPx = (int) Math.round(offsetPoint.getX() + guide * getRealZoom());
+                g2d.drawLine(guideRealPx, 0, guideRealPx, getHeight());
+            }
+
+            for (Double guide : guidesY) {
+                int guideRealPx = (int) Math.round(offsetPoint.getY() + guide * getRealZoom());
+                g2d.drawLine(0, guideRealPx, getWidth(), guideRealPx);
+            }
+
             if (Configuration._debugMode.get()) {
                 g2d.setColor(Color.red);
                 DecimalFormat df = new DecimalFormat();
@@ -2507,13 +2621,176 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public ImagePanel() {
         super(new BorderLayout());
-        //iconPanel.setHorizontalAlignment(JLabel.CENTER);
+        JPanel p = new JPanel();
+        add(p, BorderLayout.CENTER);
+
+        //This is a bit hack so we can drag guides from rulers to iconPanel
+        MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
+
+            private MouseEvent convertMouseEvent(MouseEvent originalEvent, Component newSourceComponent) {
+                Point newPoint = SwingUtilities.convertPoint(
+                        originalEvent.getComponent(),
+                        originalEvent.getPoint(),
+                        newSourceComponent
+                );
+
+                return new MouseEvent(
+                        newSourceComponent,
+                        originalEvent.getID(),
+                        originalEvent.getWhen(),
+                        originalEvent.getModifiersEx(),
+                        newPoint.x,
+                        newPoint.y,
+                        originalEvent.getClickCount(),
+                        originalEvent.isPopupTrigger(),
+                        originalEvent.getButton()
+                );
+            }
+
+            private MouseWheelEvent convertMouseWheelEvent(MouseWheelEvent originalEvent, Component newSourceComponent) {
+                Point newPoint = SwingUtilities.convertPoint(
+                        originalEvent.getComponent(),
+                        originalEvent.getPoint(),
+                        newSourceComponent
+                );
+
+                return new MouseWheelEvent(
+                        newSourceComponent,
+                        originalEvent.getID(),
+                        originalEvent.getWhen(),
+                        originalEvent.getModifiersEx(),
+                        newPoint.x,
+                        newPoint.y,
+                        originalEvent.getClickCount(),
+                        originalEvent.isPopupTrigger(),
+                        originalEvent.getScrollType(),
+                        originalEvent.getScrollAmount(),
+                        originalEvent.getWheelRotation()
+                );
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseListener l : iconPanel.mouseListeners) {
+                    l.mouseClicked(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
+                    l.mouseDragged(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseListener l : iconPanel.mouseListeners) {
+                    l.mouseEntered(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseListener l : iconPanel.mouseListeners) {
+                    l.mouseExited(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
+                    l.mouseMoved(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c == topRuler) {
+                    draggingYGuide = true;
+                    guideDragY = -1;
+                } else if (c == leftRuler) {
+                    draggingXGuide = true;
+                    guideDragX = -1;
+                } else if (c == iconPanel) {
+                    for (MouseListener l : iconPanel.mouseListeners) {
+                        l.mousePressed(convertMouseEvent(e, iconPanel));
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+
+                if (c == iconPanel) {
+                    if (draggingXGuide && guideDragX > 0) {
+                        double guide = (guideDragX - offsetPoint.getX()) / getRealZoom();
+                        guidesX.add(guide);
+                        saveGuides();
+                    }
+                    if (draggingYGuide && guideDragY > 0) {
+                        double guide = (guideDragY - offsetPoint.getY()) / getRealZoom();
+                        guidesY.add(guide);
+                        saveGuides();
+                    }
+                }
+
+                draggingXGuide = false;
+                draggingYGuide = false;
+                guideDragX = -1;
+                guideDragY = -1;
+
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseListener l : iconPanel.mouseListeners) {
+                    l.mouseReleased(convertMouseEvent(e, iconPanel));
+                }
+            }
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
+                if (c != iconPanel) {
+                    return;
+                }
+                for (MouseWheelListener l : iconPanel.mouseWheelListeners) {
+                    l.mouseWheelMoved(convertMouseWheelEvent(e, iconPanel));
+                }
+            }
+        };
+        super.addMouseListener(mouseInputAdapter);
+        super.addMouseMotionListener(mouseInputAdapter);
+        super.addMouseWheelListener(mouseInputAdapter);
+
         setOpaque(true);
         setBackground(View.getDefaultBackgroundColor());
 
         loop = true;
         iconPanel = new IconPanel();
-        //labelPan.add(label, new GridBagConstraints());
         add(iconPanel, BorderLayout.CENTER);
 
         topPanel = new JPanel();
@@ -2564,9 +2841,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 double fullLineDistance = fullLinePixels * z;
-                double leftOffset = 25;
+                double leftOffset = GUIDE_THICKNESS;
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                g2.setFont(new Font("Monospaced", Font.PLAIN, GUIDE_FONT_HEIGHT));
                 GeneralPath gp = new GeneralPath();
 
                 double minX = leftOffset + offsetPoint.getX();
@@ -2583,34 +2860,40 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     int smallerLineLength = 2;
                     int k = 0;
                     for (double i = 0; i < fullLineDistance; i += fullLineDistance / 10.0, k++) {
-                        gp.moveTo(x + i, 25);
-                        gp.lineTo(x + i, 25 - (k % 2 == 0 ? smallLineLength : smallerLineLength));
+                        gp.moveTo(x + i, GUIDE_THICKNESS);
+                        gp.lineTo(x + i, GUIDE_THICKNESS - (k % 2 == 0 ? smallLineLength : smallerLineLength));
                     }
 
-                    g2.drawString("" + px, (int) x + 5, 15);
+                    g2.drawString("" + px, (int) x + 5, GUIDE_THICKNESS - GUIDE_TEXT_OFFSET);
                 }
                 g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                 g2.draw(gp);
 
-                if (lastMouseEvent != null) {
-                    int triangleX = lastMouseEvent.getX() + 25;
+                if (guideDragX == -1 && lastMouseEvent != null) {
+                    int triangleX = lastMouseEvent.getX() + GUIDE_THICKNESS;
                     int triangleHalfWidth = 3;
                     int triangleHeight = 3;
                     int triangleYOffset = 3;
 
                     Polygon triangle = new Polygon(
                             new int[]{triangleX - triangleHalfWidth, triangleX + triangleHalfWidth, triangleX},
-                            new int[]{25 - triangleHeight - triangleYOffset, 25 - triangleHeight - triangleYOffset, 25 - triangleYOffset},
+                            new int[]{GUIDE_THICKNESS - triangleHeight - triangleYOffset, GUIDE_THICKNESS - triangleHeight - triangleYOffset, GUIDE_THICKNESS - triangleYOffset},
                             3);
                     g2.setPaint(getForeground());
                     g2.fill(triangle);
                 }
 
                 g2.setPaint(getBackground());
-                g2.fillRect(0, 0, 25, 25);
+                g2.fillRect(0, 0, GUIDE_THICKNESS, GUIDE_THICKNESS);
+
+                if (guideDragX > -1) {
+                    g2.setColor(GUIDES_COLOR);
+                    g2.drawLine(GUIDE_THICKNESS + guideDragX, 0, GUIDE_THICKNESS + guideDragX, GUIDE_THICKNESS);
+                }
+
             }
         };
-        topRuler.setPreferredSize(new Dimension(1, 25));
+        topRuler.setPreferredSize(new Dimension(1, GUIDE_THICKNESS));
         topPanel.add(topRuler);
 
         leftRuler = new JPanel() {
@@ -2627,7 +2910,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 double fullLineDistance = fullLinePixels * z;
                 double topOffset = 0;
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                g2.setFont(new Font("Monospaced", Font.PLAIN, GUIDE_FONT_HEIGHT));
                 GeneralPath gp = new GeneralPath();
 
                 double minY = topOffset + offsetPoint.getY();
@@ -2646,28 +2929,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     int smallerLineLength = 2;
                     int k = 0;
                     for (double i = 0; i < fullLineDistance; i += fullLineDistance / 10.0, k++) {
-                        gp.moveTo(25, y + i);
-                        gp.lineTo(25 - (k % 2 == 0 ? smallLineLength : smallerLineLength), y + i);
+                        gp.moveTo(GUIDE_THICKNESS, y + i);
+                        gp.lineTo(GUIDE_THICKNESS - (k % 2 == 0 ? smallLineLength : smallerLineLength), y + i);
                     }
 
                     g2.setTransform(origTransform);
                     String drawnString = "" + py;
                     int stringWidth = g2.getFontMetrics().stringWidth(drawnString);
                     AffineTransform fontTrans = new AffineTransform();
-                    fontTrans.rotate(-Math.PI / 2, 15, 15);
+                    fontTrans.rotate(-Math.PI / 2, GUIDE_THICKNESS - GUIDE_TEXT_OFFSET, GUIDE_THICKNESS - GUIDE_TEXT_OFFSET);
                     g2.transform(fontTrans);
-                    g2.drawString(drawnString, 15 - stringWidth + 15 - 5 - Math.round(y), 15);
+                    g2.drawString(drawnString, GUIDE_THICKNESS - stringWidth - Math.round(y) - 5, GUIDE_THICKNESS - GUIDE_TEXT_OFFSET);
                 }
                 g2.setTransform(origTransform);
 
-                if (lastMouseEvent != null) {
+                if (guideDragY == -1 && lastMouseEvent != null) {
                     int triangleY = lastMouseEvent.getY();
                     int triangleHalfHeight = 3;
                     int triangleWidth = 3;
                     int triangleXOffset = 3;
 
                     Polygon triangle = new Polygon(
-                            new int[]{25 - triangleWidth - triangleXOffset, 25 - triangleWidth - triangleXOffset, 25 - triangleXOffset},
+                            new int[]{GUIDE_THICKNESS - triangleWidth - triangleXOffset, GUIDE_THICKNESS - triangleWidth - triangleXOffset, GUIDE_THICKNESS - triangleXOffset},
                             new int[]{triangleY - triangleHalfHeight, triangleY + triangleHalfHeight, triangleY},
                             3);
                     g2.setPaint(getForeground());
@@ -2676,10 +2959,36 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                 g2.draw(gp);
+
+                if (guideDragY > -1) {
+                    g2.setColor(GUIDES_COLOR);
+                    g2.drawLine(0, guideDragY, GUIDE_THICKNESS, guideDragY);
+                }
             }
         };
-        leftRuler.setPreferredSize(new Dimension(25, 1));
+        leftRuler.setPreferredSize(new Dimension(GUIDE_THICKNESS, 1));
         add(leftRuler, BorderLayout.WEST);
+
+        super.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    if (!draggingXGuide && !draggingYGuide) {
+                        return;
+                    }
+                    if (iconPanel == SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY())) {
+                        Point p = SwingUtilities.convertPoint(ImagePanel.this, e.getX(), e.getY(), iconPanel);
+                        if (draggingXGuide) {
+                            guideDragX = p.x;
+                        }
+                        if (draggingYGuide) {
+                            guideDragY = p.y;
+                        }
+                        iconPanel.repaint();
+                    }
+                }
+            }
+        });
 
         pointEditPanel.setVisible(false);
         add(topPanel, BorderLayout.NORTH);
@@ -2838,6 +3147,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         });
+        //*/
     }
 
     private synchronized void redraw() {
@@ -3213,6 +3523,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             iconPanel.calcRect();
 
+            clearGuides();
+            setNoGuidesCharacter();
+
             contentCanHaveRuler = canHaveRuler;
             updateRulerVisibility();
             redraw();
@@ -3238,6 +3551,136 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
+    public synchronized void clearGuides() {
+        draggingXGuide = false;
+        draggingYGuide = false;
+        guideDragX = -1;
+        guideDragY = -1;
+        guidesX.clear();
+        guidesY.clear();
+    }
+
+    public synchronized void addGuideX(double guidePixels) {
+        guidesX.add(guidePixels);
+        repaint();
+    }
+
+    public synchronized void addGuideY(double guidePixels) {
+        guidesY.add(guidePixels);
+        repaint();
+    }
+
+    public synchronized void setNoGuidesCharacter() {
+        guidesSwf = null;
+        guidesCharacterId = -1;
+    }
+
+    public synchronized void setGuidesCharacter(SWF swf, int characterId) {
+        guidesSwf = swf;
+        guidesCharacterId = characterId;
+        loadGuidesCharacter();
+    }
+
+    private synchronized void loadGuidesCharacter() {
+        clearGuides();
+        if (guidesSwf == null) {
+            return;
+        }
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(guidesSwf.getShortPathTitle());
+        if (conf == null) {
+            return;
+        }
+        String guides = conf.getCustomData(CustomConfigurationKeys.KEY_GUIDES, "");
+        if (guides.isEmpty()) {
+            return;
+        }
+        List<String> parts = new ArrayList<>();
+        if (!guides.isEmpty()) {
+            String[] partsArr = guides.split("\\|", -1);
+            parts = new ArrayList<>(Arrays.asList(partsArr));
+        }
+        for (String part : parts) {
+            if (part.startsWith("" + guidesCharacterId + ":")) {
+                part = part.substring(part.indexOf(":") + 1);
+                String[] xy = part.split(";", -1);
+                String[] xArr = xy[0].split(",", -1);
+                String[] yArr = xy[1].split(",", -1);
+
+                try {
+                    if (!xy[0].isEmpty()) {
+                        for (String x : xArr) {
+                            guidesX.add(Double.parseDouble(x));
+                        }
+                    }
+                    if (!xy[1].isEmpty()) {
+                        for (String y : yArr) {
+                            guidesY.add(Double.parseDouble(y));
+                        }
+                    }
+                } catch (NumberFormatException nfe) {
+                    Logger.getLogger(ImagePanel.class.getName()).warning("Invalid configuration of guides. Cannot load.");
+                }
+                return;
+            }
+        }
+    }
+
+    private synchronized void saveGuides() {
+        if (guidesSwf == null) {
+            return;
+        }
+        SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(guidesSwf.getShortPathTitle());
+        String previous = conf.getCustomData(CustomConfigurationKeys.KEY_GUIDES, "");
+
+        //Format: character1:x1,x2,x3,x4;y1,y2|character2:...
+        List<String> parts = new ArrayList<>();
+        if (!previous.isEmpty()) {
+            String[] partsArr = previous.split("\\|", -1);
+            parts = new ArrayList<>(Arrays.asList(partsArr));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(guidesCharacterId);
+        sb.append(":");
+        boolean first = true;
+        for (Double guide : guidesX) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(guide);
+            first = false;
+        }
+        sb.append(";");
+        first = true;
+        for (Double guide : guidesY) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(guide);
+            first = false;
+        }
+        String guidesStr = sb.toString();
+
+        for (int i = 0; i < parts.size(); i++) {
+            if (parts.get(i).startsWith("" + guidesCharacterId + ":")) {
+                parts.remove(i);
+                i--;
+                continue;
+            }
+            String part = parts.get(0);
+            String noChar = part.substring(part.indexOf(":") + 1);
+            if (";".equals(noChar)) {
+                parts.remove(i);
+                i--;
+            }
+        }
+        if (!("" + guidesCharacterId + ":;").equals(guidesStr)) {
+            parts.add(guidesStr);
+        }
+
+        conf.setCustomData(CustomConfigurationKeys.KEY_GUIDES, String.join("|", parts));
+    }
+
     public synchronized void setImage(SerializableImage image) {
         lda = null;
         setBackground(View.getSwfBackgroundColor());
@@ -3255,6 +3698,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         horizontalScrollBar.setVisible(false);
         verticalScrollBar.setVisible(false);
+
+        clearGuides();
+        setNoGuidesCharacter();
 
         contentCanHaveRuler = false;
         updateRulerVisibility();
@@ -4156,6 +4602,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         clearImagePanel();
         timelined = null;
         swf = null;
+        guidesSwf = null;
         lda = null;
         showObjectsUnderCursor = false;
         fireMediaDisplayStateChanged();
