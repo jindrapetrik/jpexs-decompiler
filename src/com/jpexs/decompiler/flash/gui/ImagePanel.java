@@ -1420,11 +1420,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
 
-                        if (draggingGuideX || draggingGuideY) {
-                            draggingGuideX = false;
-                            draggingGuideY = false;
-                        }
-
                         if (hilightedPoints != null) {
                             Rectangle2D selectionRect = getSelectionRect();
                             if (selectionRect != null) {
@@ -1553,7 +1548,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (selectionMode && !doFreeTransform) {
                             //transform = null;
                         }
-                        mode = Cursor.DEFAULT_CURSOR;
+                        if (mode != MODE_GUIDE_X && mode != MODE_GUIDE_Y) {
+                            mode = Cursor.DEFAULT_CURSOR;
+                        }
                     }
                 }
 
