@@ -306,7 +306,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final int TOUCH_POINT_DISTANCE = 15;
 
     private DisplayPoint snapOffset = new DisplayPoint(0, 0);
-        
+
     private static final int SNAP_DISTANCE = 10;
 
     //private DisplayPoint closestPoint = null;
@@ -1430,12 +1430,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         selectedPointsOriginalValues = newPointsUnderCursorValues;
-                        
-                        if (
-                                (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth))
-                                ||
-                                (!selectionMode && doFreeTransform && depthStateUnderCursor != null)
-                            ) {
+
+                        if ((selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth))
+                                || (!selectionMode && doFreeTransform && depthStateUnderCursor != null)) {
                             Matrix matrix = new Matrix();
                             if (depthStateUnderCursor.matrix != null) {
                                 matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
@@ -1462,7 +1459,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         new Point2D.Double(rect.Xmax, (rect.Ymin + rect.Ymax) / 2.0),
                                         new Point2D.Double(rect.Xmin, rect.Ymax),
                                         new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymax),
-                                        new Point2D.Double(rect.Xmax, rect.Ymax),};
+                                        new Point2D.Double(rect.Xmax, rect.Ymax)
+                                    };
 
                                     Point2D nearestPoint = null;
                                     double distance = Double.MAX_VALUE;
@@ -1720,15 +1718,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         repaint();
                         return;
                     }
-                    
+
                     //Snapping
-                    if (dragStart != null 
-                            && (
-                            selectionMode 
+                    if (dragStart != null
+                            && (selectionMode
                             || (doFreeTransform && mode == Cursor.MOVE_CURSOR)
-                            || (points != null && !selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty())
-                            )
-                        ) {
+                            || (points != null && !selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty()))) {
                         Point2D touchPointPos = new Point2D.Double(e.getX(), e.getY());
                         if (touchPointOffset != null) {
                             touchPointPos = new Point2D.Double(e.getX() + touchPointOffset.x, e.getY() + touchPointOffset.y);
@@ -1736,17 +1731,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         Integer snapOffsetX = null;
                         Integer snapOffsetY = null;
-                        
-                        double zoomDouble = getRealZoom();
-                            
 
-                        if (Configuration.snapToObjects.get() 
-                                && depthStateUnderCursor != null && 
-                                !selectedDepths.contains(depthStateUnderCursor.depth)                               
-                                ) {
-                            System.err.println("depthStateUnderCursor.depth = " + depthStateUnderCursor.depth);
-                            if (!selectedDepths.isEmpty())
-                            System.err.println("selectedDepths = " + selectedDepths.get(0));
+                        double zoomDouble = getRealZoom();
+
+                        if (Configuration.snapToObjects.get()
+                                && depthStateUnderCursor != null
+                                && !selectedDepths.contains(depthStateUnderCursor.depth)) {
                             CharacterTag ch = depthStateUnderCursor.getCharacter();
                             if (ch != null) {
                                 if (ch instanceof BoundedTag) {
@@ -1772,7 +1762,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         new Point2D.Double(rect.Xmax, (rect.Ymin + rect.Ymax) / 2.0),
                                         new Point2D.Double(rect.Xmin, rect.Ymax),
                                         new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymax),
-                                        new Point2D.Double(rect.Xmax, rect.Ymax),};
+                                        new Point2D.Double(rect.Xmax, rect.Ymax)
+                                    };
 
                                     Point2D nearestPoint = null;
                                     double distance = Double.MAX_VALUE;
@@ -1841,17 +1832,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 snapOffsetY = (int) Math.round(positionPxY * zoomDouble - touchPointPos.getY() + offsetPoint.getY());
                             }
                         }
-                        
+
                         if (snapOffsetX == null) {
                             snapOffsetX = 0;
                         }
                         if (snapOffsetY == null) {
                             snapOffsetY = 0;
                         }
-                        
+
                         snapOffset = new DisplayPoint(snapOffsetX, snapOffsetY);
                     }
-                    
+
                     if (dragStart != null && points != null) {
                         if (pointsUnderCursor.isEmpty()) {
                             selectionEnd = e.getPoint();
@@ -1927,7 +1918,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         repaint();
                         return;
-                    }                   
+                    }
 
                     //move in selection mode
                     if (dragStart != null && selectionMode && !doFreeTransform) {
@@ -4775,8 +4766,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             } else {
                 depthStateUnderCursor = null;
             }
-            
-            if (showObjectsUnderCursor && autoPlayed) {               
+
+            if (showObjectsUnderCursor && autoPlayed) {
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
                     DepthState ds = renderContext.stateUnderCursor.get(i);
