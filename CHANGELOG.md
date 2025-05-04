@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2370] Objects display - Option to show horizontal and vertical rulers
 - [#2370] Objects display - Create guides by dragging from a ruler
 - Objects dragging - show touch point and snap it to 9 important points around object rectangle
-- [#2370] Snap to guides
+- [#2370] Snap to guides, objects and pixels
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

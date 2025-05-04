@@ -295,8 +295,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private DepthState depthStateUnderCursor = null;
 
-    private List<DepthState> allDepthStatesUnderCursor = null;
-
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
 
     private Point[] hilightedEdge = null;
@@ -308,11 +306,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final int TOUCH_POINT_DISTANCE = 15;
 
     private DisplayPoint snapOffset = new DisplayPoint(0, 0);
-
+        
     private static final int SNAP_DISTANCE = 10;
-
-    //TODO: Move this to config
-    private static final boolean SNAP_TO_GUIDES = true;
 
     //private DisplayPoint closestPoint = null;
     private List<Integer> pointsUnderCursor = new ArrayList<>();
@@ -1134,11 +1129,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         if (touchPointOffset != null) {
-                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             boolean snapped = snapOffset.x != 0 || snapOffset.y != 0;
-                            g2.setStroke(new BasicStroke((float) ((snapped ? 2 : 1) / zoomDouble)));
+                            g2.setStroke(new BasicStroke((float) ((snapped ? 2 : 1))));
                             DisplayPoint p = new DisplayPoint(lastMouseEvent.getX() + touchPointOffset.x + snapOffset.x, lastMouseEvent.getY() + touchPointOffset.y + snapOffset.y);
-                            double pointSize = (snapped ? 4 : 3) / zoomDouble;
+                            double pointSize = (snapped ? 4 : 3);
                             Shape pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
                             g2.setPaint(Color.black);
                             g2.draw(pointShape);
@@ -1437,14 +1431,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         selectedPointsOriginalValues = newPointsUnderCursorValues;
 
-                        if (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth) && !allDepthStatesUnderCursor.isEmpty()) {
+                        if (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth)) {
                             Matrix matrix = new Matrix();
-                            for (DepthState ds : allDepthStatesUnderCursor) {
-                                if (ds.matrix != null) {
-                                    matrix = matrix.preConcatenate(new Matrix(ds.matrix));
-                                }
+                            if (depthStateUnderCursor.matrix != null) {
+                                matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
                             }
-
                             Matrix scaleMatrix = Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor);
 
                             matrix = matrix.preConcatenate(scaleMatrix);
@@ -1452,8 +1443,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             Point2D cursorPos = new Point2D.Double(e.getX(), e.getY());
 
-                            DepthState lastDs = allDepthStatesUnderCursor.get(0);
-                            CharacterTag ch = lastDs.getCharacter();
+                            CharacterTag ch = depthStateUnderCursor.getCharacter();
                             if (ch != null) {
                                 if (ch instanceof BoundedTag) {
                                     BoundedTag bt = (BoundedTag) ch;
@@ -1804,50 +1794,121 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
 
                     //snapping
-                    if (dragStart != null && selectionMode && !doFreeTransform) {
+                    if (dragStart != null && (selectionMode || (doFreeTransform && mode == Cursor.MOVE_CURSOR))) {
                         Point2D touchPointPos = new Point2D.Double(e.getX(), e.getY());
                         if (touchPointOffset != null) {
                             touchPointPos = new Point2D.Double(e.getX() + touchPointOffset.x, e.getY() + touchPointOffset.y);
                         }
 
-                        int snapOffsetX = 0;
-                        int snapOffsetY = 0;
+                        Integer snapOffsetX = null;
+                        Integer snapOffsetY = null;
+                        
+                        double zoomDouble = getRealZoom();
+                            
 
-                        if (SNAP_TO_GUIDES) {
-                            Double nearestGuideX = null;
-                            double distance = Double.MAX_VALUE;
-                            double zoomDouble = getRealZoom();
+                        if (Configuration.snapToObjects.get() && depthStateUnderCursor != null && !selectedDepths.contains(depthStateUnderCursor.depth)) {
+                            CharacterTag ch = depthStateUnderCursor.getCharacter();
+                            if (ch != null) {
+                                if (ch instanceof BoundedTag) {
+                                    BoundedTag bt = (BoundedTag) ch;
+                                    RECT rect = bt.getRect();
 
-                            for (Double gx : guidesX) {
-                                gx = gx * zoomDouble + offsetPoint.getX();
-                                double d = Math.abs(gx - touchPointPos.getX());
-                                if (d < distance) {
-                                    distance = d;
-                                    nearestGuideX = gx;
+                                    Matrix matrix = new Matrix();
+                                    if (depthStateUnderCursor.matrix != null) {
+                                        matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
+                                    }
+
+                                    Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
+
+                                    matrix = matrix.preConcatenate(scaleMatrix);
+                                    matrix = matrix.preConcatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
+
+                                    Point2D[] importantPoints = new Point2D[]{
+                                        new Point2D.Double(rect.Xmin, rect.Ymin),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymin),
+                                        new Point2D.Double(rect.Xmax, rect.Ymin),
+                                        new Point2D.Double(rect.Xmin, (rect.Ymin + rect.Ymax) / 2.0),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, (rect.Ymin + rect.Ymax) / 2.0),
+                                        new Point2D.Double(rect.Xmax, (rect.Ymin + rect.Ymax) / 2.0),
+                                        new Point2D.Double(rect.Xmin, rect.Ymax),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymax),
+                                        new Point2D.Double(rect.Xmax, rect.Ymax),};
+
+                                    Point2D nearestPoint = null;
+                                    double distance = Double.MAX_VALUE;
+                                    for (Point2D p : importantPoints) {
+                                        Point2D windowPoint = matrix.transform(p);
+                                        double d = windowPoint.distance(touchPointPos);
+                                        if (d < distance) {
+                                            distance = d;
+                                            nearestPoint = windowPoint;
+                                        }
+                                    }
+                                    if (distance < SNAP_DISTANCE) {
+                                        snapOffsetX = (int) Math.round(nearestPoint.getX() - touchPointPos.getX());
+                                        snapOffsetY = (int) Math.round(nearestPoint.getY() - touchPointPos.getY());
+                                    }
                                 }
-                            }
-
-                            if (distance < SNAP_DISTANCE) {
-                                snapOffsetX = (int) Math.round(nearestGuideX - touchPointPos.getX());
-                            }
-                            Double nearestGuideY = null;
-                            distance = Double.MAX_VALUE;
-
-                            for (Double gy : guidesY) {
-                                gy = gy * zoomDouble + offsetPoint.getY();
-
-                                double d = Math.abs(gy - touchPointPos.getY());
-                                if (d < distance) {
-                                    distance = d;
-                                    nearestGuideY = gy;
-                                }
-                            }
-
-                            if (distance < SNAP_DISTANCE) {
-                                snapOffsetY = (int) Math.round(nearestGuideY - touchPointPos.getY());
                             }
                         }
 
+                        if (Configuration.snapToGuides.get()) {
+                            if (snapOffsetX == null) {
+                                Double nearestGuideX = null;
+                                double distance = Double.MAX_VALUE;
+
+                                for (Double gx : guidesX) {
+                                    gx = gx * zoomDouble + offsetPoint.getX();
+                                    double d = Math.abs(gx - touchPointPos.getX());
+                                    if (d < distance) {
+                                        distance = d;
+                                        nearestGuideX = gx;
+                                    }
+                                }
+
+                                if (distance < SNAP_DISTANCE) {
+                                    snapOffsetX = (int) Math.round(nearestGuideX - touchPointPos.getX());
+                                }
+                            }
+
+                            if (snapOffsetY == null) {
+                                Double nearestGuideY = null;
+                                double distance = Double.MAX_VALUE;
+
+                                for (Double gy : guidesY) {
+                                    gy = gy * zoomDouble + offsetPoint.getY();
+
+                                    double d = Math.abs(gy - touchPointPos.getY());
+                                    if (d < distance) {
+                                        distance = d;
+                                        nearestGuideY = gy;
+                                    }
+                                }
+
+                                if (distance < SNAP_DISTANCE) {
+                                    snapOffsetY = (int) Math.round(nearestGuideY - touchPointPos.getY());
+                                }
+                            }
+                        }
+
+                        if (Configuration.snapToPixels.get()) {
+                            if (snapOffsetX == null) {
+                                int positionPxX = (int) Math.round((touchPointPos.getX() - offsetPoint.getX()) / zoomDouble);
+                                snapOffsetX = (int) Math.round(positionPxX * zoomDouble - touchPointPos.getX() + offsetPoint.getX());
+                            }
+                            if (snapOffsetY == null) {
+                                int positionPxY = (int) Math.round((touchPointPos.getY() - offsetPoint.getY()) / zoomDouble);
+                                snapOffsetY = (int) Math.round(positionPxY * zoomDouble - touchPointPos.getY() + offsetPoint.getY());
+                            }
+                        }
+                        
+                        if (snapOffsetX == null) {
+                            snapOffsetX = 0;
+                        }
+                        if (snapOffsetY == null) {
+                            snapOffsetY = 0;
+                        }                                                
+                        
                         snapOffset = new DisplayPoint(snapOffsetX, snapOffsetY);
                     }
 
@@ -2147,8 +2208,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                         }
                         if (mode == Cursor.MOVE_CURSOR) {
-                            double deltaX = ex - dsx;
-                            double deltaY = ey - dsy;
+                            double deltaX = ex + snapOffset.x - dsx;
+                            double deltaY = ey + snapOffset.y - dsy;
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = parentMatrix.toTransform();
@@ -3795,7 +3856,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.resample = Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
-            allDepthStatesUnderCursor = new ArrayList<>();
             hilightedEdge = null;
             hilightedPoints = null;
             pointEditPanel.setVisible(false);
@@ -4534,7 +4594,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null && (!doFreeTransform || transformSelectionMode)) {
-            renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
+            DisplayPoint touchPoint = new DisplayPoint(cursorPosition);
+            if (touchPointOffset != null) {
+                touchPoint = new DisplayPoint(cursorPosition.x + touchPointOffset.x, cursorPosition.y + touchPointOffset.y);
+            }
+
+            renderContext.cursorPosition = new Point((int) (touchPoint.x * SWF.unitDivisor), (int) (touchPoint.y * SWF.unitDivisor));
             renderContext.cursorPosition = getParentMatrix().transform(renderContext.cursorPosition);
         }
 
@@ -4688,10 +4753,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 if (!renderContext.stateUnderCursor.isEmpty()) {
                     depthStateUnderCursor = renderContext.stateUnderCursor.get(renderContext.stateUnderCursor.size() - 1);
-                    allDepthStatesUnderCursor = new ArrayList<>(renderContext.stateUnderCursor);
                 } else {
                     depthStateUnderCursor = null;
-                    allDepthStatesUnderCursor = new ArrayList<>();
                 }
 
                 boolean first = true;
@@ -4721,7 +4784,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             } else {
                 depthStateUnderCursor = null;
-                allDepthStatesUnderCursor = new ArrayList<>();
             }
 
             ButtonTag lastMouseOverButton;
