@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)
 - [#2370] Objects display - Option to show horizontal and vertical rulers
 - [#2370] Objects display - Create guides by dragging from a ruler
+- Objects dragging - show touch point and snap it to 9 important points around object rectangle
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

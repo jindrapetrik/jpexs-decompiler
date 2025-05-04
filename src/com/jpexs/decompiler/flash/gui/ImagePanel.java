@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
+import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -55,6 +57,10 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -288,12 +294,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
     private DepthState depthStateUnderCursor = null;
+    
+    private List<DepthState> allDepthStatesUnderCursor = null;
 
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
 
     private Point[] hilightedEdge = null;
 
     private List<DisplayPoint> hilightedPoints = null;
+    
+    private DisplayPoint touchPointOffset = null;
+    
+    private static final int TOUCH_POINT_DISTANCE = 15;
 
     //private DisplayPoint closestPoint = null;
     private List<Integer> pointsUnderCursor = new ArrayList<>();
@@ -1113,6 +1125,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g2.draw(new Rectangle2D.Double(selectionRect.getX(), selectionRect.getY(), selectionRect.getWidth(), selectionRect.getHeight()));
                             g2.setComposite(AlphaComposite.SrcOver);
                         }
+                        
+                        if (touchPointOffset != null) {
+                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                            g2.setStroke(new BasicStroke((float) (1 / zoomDouble)));
+                            DisplayPoint p = new DisplayPoint(lastMouseEvent.getX() + touchPointOffset.x, lastMouseEvent.getY() + touchPointOffset.y);
+                            double pointSize = 3 / zoomDouble;                            
+                            Shape pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                            g2.setPaint(Color.black);
+                            g2.draw(pointShape);                                    
+                        }
                     }
                 } catch (InternalError ie) {
                     //On some devices like Linux X11 - BlendComposite.Invert is not available
@@ -1407,6 +1429,137 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         selectedPointsOriginalValues = newPointsUnderCursorValues;
 
+                        if (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth) && !allDepthStatesUnderCursor.isEmpty()) {
+                            Matrix matrix = new Matrix();
+                            for (DepthState ds : allDepthStatesUnderCursor) {
+                                if (ds.matrix != null) {
+                                    matrix = matrix.preConcatenate(new Matrix(ds.matrix));
+                                }
+                            }
+                            
+                            Matrix scaleMatrix = Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor);
+                            
+                            matrix = matrix.preConcatenate(scaleMatrix);                            
+                            matrix = matrix.preConcatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
+                            
+                            Point2D cursorPos = new Point2D.Double(e.getX(), e.getY());
+                            
+                            DepthState lastDs = allDepthStatesUnderCursor.get(0);
+                            CharacterTag ch = lastDs.getCharacter();                            
+                            if (ch != null) {
+                                if (ch instanceof BoundedTag) {
+                                    BoundedTag bt = (BoundedTag) ch;
+                                    RECT rect = bt.getRect();
+                                    
+                                    Point2D[] importantPoints = new Point2D[] {                                        
+                                        new Point2D.Double(rect.Xmin, rect.Ymin),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymin),
+                                        new Point2D.Double(rect.Xmax, rect.Ymin),
+                                        
+                                        new Point2D.Double(rect.Xmin, (rect.Ymin + rect.Ymax) / 2.0),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, (rect.Ymin + rect.Ymax) / 2.0),
+                                        new Point2D.Double(rect.Xmax, (rect.Ymin + rect.Ymax) / 2.0),
+                                        
+                                        new Point2D.Double(rect.Xmin, rect.Ymax),
+                                        new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymax),
+                                        new Point2D.Double(rect.Xmax, rect.Ymax),                                        
+                                    };
+                                    
+                                    Point2D nearestPoint = null;
+                                    double distance = Double.MAX_VALUE;
+                                    for (Point2D p : importantPoints) {
+                                        Point2D windowPoint = matrix.transform(p);
+                                        double d = windowPoint.distance(cursorPos);
+                                        if (d < distance) {
+                                            distance = d;
+                                            nearestPoint = windowPoint;
+                                        }
+                                    }
+                                    
+                                    if (distance < TOUCH_POINT_DISTANCE) {
+                                        touchPointOffset = new DisplayPoint((int) Math.round(nearestPoint.getX() - cursorPos.getX()), (int) Math.round(nearestPoint.getY() - cursorPos.getY()));  
+                                    } else {
+                                        touchPointOffset = new DisplayPoint(0, 0);
+                                    }
+                                }
+                                //If we wanted touch point on center of edge, then something like this:
+                                /*else if (ch instanceof ShapeTag) {
+                                    ShapeTag st = (ShapeTag) ch;
+                                    List<SHAPERECORD> records = st.getShapes().shapeRecords;
+                                    
+                                    List<Point2D> points = new ArrayList<>();
+                                    int x = 0;
+                                    int y = 0;
+                                    DisplayPoint prevPoint = new DisplayPoint(x, y);
+                                    Point2D prevPoint2d = matrix.transform(new Point2D.Double(0, 0));
+                                    for (SHAPERECORD rec : records) {
+                                        if (rec instanceof StraightEdgeRecord) {
+                                            StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                                            DisplayPoint point = new DisplayPoint(x + ser.deltaX, y + ser.deltaY);
+                                            
+                                            Point2D point2d = matrix.transform(new Point2D.Double(point.x, point.y));
+                                            
+                                            BezierEdge be = new BezierEdge(Arrays.asList(prevPoint2d, point2d));
+                                            
+                                            if (!be.isEmpty()) {
+                                                points.add(be.pointAt(0.5));
+                                            }
+                                            
+                                            points.add(point2d);                                            
+                                                                                        
+                                            prevPoint2d = point2d;
+                                            prevPoint = point;
+                                        }
+                                        if (rec instanceof CurvedEdgeRecord) {
+                                            CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                                            DisplayPoint controlPoint = new DisplayPoint(x + cer.controlDeltaX, y + cer.controlDeltaY, false);
+                                            DisplayPoint anchorPoint = new DisplayPoint(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);                                            
+                                            
+                                            Point2D controlPoint2d = matrix.transform(new Point2D.Double(controlPoint.x, controlPoint.y));
+                                            Point2D anchorPoint2d = matrix.transform(new Point2D.Double(anchorPoint.x, anchorPoint.y));
+                                            BezierEdge be = new BezierEdge(Arrays.asList(prevPoint2d, controlPoint2d, anchorPoint2d));
+                                            if (!be.isEmpty()) {
+                                                points.add(be.pointAt(0.5));
+                                            }
+                                            points.add(anchorPoint2d);
+                                            prevPoint2d = anchorPoint2d;
+                                            prevPoint = anchorPoint;
+                                        }
+                                        if (rec instanceof StyleChangeRecord) {
+                                            StyleChangeRecord scr = (StyleChangeRecord) rec;
+                                            if (scr.stateMoveTo) {
+                                                DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);                                                                                                                                                
+                                                Point2D point2d = matrix.transform(new Point2D.Double(point.x, point.y));                                            
+                                                
+                                                points.add(point2d);                                                
+                                                prevPoint2d = point2d;
+                                                prevPoint = point;                                                
+                                            }
+                                        }
+
+                                        x = rec.changeX(x);
+                                        y = rec.changeY(y);
+                                    }
+                                    
+                                    Point2D nearestPoint = null;
+                                    double distance = Double.MAX_VALUE;
+                                    for (Point2D p : points) {
+                                        double d = p.distance(cursorPos);
+                                        if (d < distance) {
+                                            nearestPoint = p;
+                                            distance = d;
+                                        }
+                                    }
+                                    if (nearestPoint != null && distance <= TOUCH_POINT_DISTANCE) {
+                                        touchPointOffset = new DisplayPoint((int) Math.round(nearestPoint.getX() - cursorPos.getX()), (int) Math.round(nearestPoint.getY() - cursorPos.getY()));                                        
+                                    } else {
+                                        touchPointOffset = new DisplayPoint(0, 0);
+                                    }
+                                }*/
+                            }
+                        }
+                        
+                        
                         if (!autoPlayed) {
                             Configuration.autoPlayPreviews.set(true);
                             autoPlayed = true;
@@ -1510,6 +1663,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         dragStart = null;
                         selectionEnd = null;
                         inMoving = false;
+                        touchPointOffset = null;
 
                         if (((doFreeTransform && mode != Cursor.DEFAULT_CURSOR) || (selectionMode && transform != null)) && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
@@ -1598,7 +1752,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                             return;
                         }
-                    }
+                    }                    
                     if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
                         Point2D dragEnd = e.getPoint();
                         Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
@@ -1611,7 +1765,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         iconPanel.calcRect();
                         _viewRect = getViewRect();
 
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;                                                
 
                         synchronized (lock) {
 
@@ -3588,6 +3742,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.resample = Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
+            allDepthStatesUnderCursor = new ArrayList<>();
             hilightedEdge = null;
             hilightedPoints = null;
             pointEditPanel.setVisible(false);
@@ -4480,8 +4635,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 if (!renderContext.stateUnderCursor.isEmpty()) {
                     depthStateUnderCursor = renderContext.stateUnderCursor.get(renderContext.stateUnderCursor.size() - 1);
+                    allDepthStatesUnderCursor = new ArrayList<>(renderContext.stateUnderCursor);
                 } else {
                     depthStateUnderCursor = null;
+                    allDepthStatesUnderCursor = new ArrayList<>();
                 }
 
                 boolean first = true;
@@ -4511,6 +4668,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             } else {
                 depthStateUnderCursor = null;
+                allDepthStatesUnderCursor = new ArrayList<>();
             }
 
             ButtonTag lastMouseOverButton;
