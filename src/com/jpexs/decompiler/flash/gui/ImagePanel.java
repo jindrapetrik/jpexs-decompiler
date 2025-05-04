@@ -294,7 +294,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
     private DepthState depthStateUnderCursor = null;
-    
+
     private List<DepthState> allDepthStatesUnderCursor = null;
 
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
@@ -302,10 +302,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Point[] hilightedEdge = null;
 
     private List<DisplayPoint> hilightedPoints = null;
-    
+
     private DisplayPoint touchPointOffset = null;
-    
+
     private static final int TOUCH_POINT_DISTANCE = 15;
+
+    private DisplayPoint snapOffset = new DisplayPoint(0, 0);
+
+    private static final int SNAP_DISTANCE = 10;
+
+    //TODO: Move this to config
+    private static final boolean SNAP_TO_GUIDES = true;
 
     //private DisplayPoint closestPoint = null;
     private List<Integer> pointsUnderCursor = new ArrayList<>();
@@ -1125,15 +1132,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g2.draw(new Rectangle2D.Double(selectionRect.getX(), selectionRect.getY(), selectionRect.getWidth(), selectionRect.getHeight()));
                             g2.setComposite(AlphaComposite.SrcOver);
                         }
-                        
+
                         if (touchPointOffset != null) {
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                            g2.setStroke(new BasicStroke((float) (1 / zoomDouble)));
-                            DisplayPoint p = new DisplayPoint(lastMouseEvent.getX() + touchPointOffset.x, lastMouseEvent.getY() + touchPointOffset.y);
-                            double pointSize = 3 / zoomDouble;                            
+                            boolean snapped = snapOffset.x != 0 || snapOffset.y != 0;
+                            g2.setStroke(new BasicStroke((float) ((snapped ? 2 : 1) / zoomDouble)));
+                            DisplayPoint p = new DisplayPoint(lastMouseEvent.getX() + touchPointOffset.x + snapOffset.x, lastMouseEvent.getY() + touchPointOffset.y + snapOffset.y);
+                            double pointSize = (snapped ? 4 : 3) / zoomDouble;
                             Shape pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
                             g2.setPaint(Color.black);
-                            g2.draw(pointShape);                                    
+                            g2.draw(pointShape);
                         }
                     }
                 } catch (InternalError ie) {
@@ -1436,35 +1444,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     matrix = matrix.preConcatenate(new Matrix(ds.matrix));
                                 }
                             }
-                            
+
                             Matrix scaleMatrix = Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor);
-                            
-                            matrix = matrix.preConcatenate(scaleMatrix);                            
+
+                            matrix = matrix.preConcatenate(scaleMatrix);
                             matrix = matrix.preConcatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
-                            
+
                             Point2D cursorPos = new Point2D.Double(e.getX(), e.getY());
-                            
+
                             DepthState lastDs = allDepthStatesUnderCursor.get(0);
-                            CharacterTag ch = lastDs.getCharacter();                            
+                            CharacterTag ch = lastDs.getCharacter();
                             if (ch != null) {
                                 if (ch instanceof BoundedTag) {
                                     BoundedTag bt = (BoundedTag) ch;
                                     RECT rect = bt.getRect();
-                                    
-                                    Point2D[] importantPoints = new Point2D[] {                                        
+
+                                    Point2D[] importantPoints = new Point2D[]{
                                         new Point2D.Double(rect.Xmin, rect.Ymin),
                                         new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymin),
                                         new Point2D.Double(rect.Xmax, rect.Ymin),
-                                        
                                         new Point2D.Double(rect.Xmin, (rect.Ymin + rect.Ymax) / 2.0),
                                         new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, (rect.Ymin + rect.Ymax) / 2.0),
                                         new Point2D.Double(rect.Xmax, (rect.Ymin + rect.Ymax) / 2.0),
-                                        
                                         new Point2D.Double(rect.Xmin, rect.Ymax),
                                         new Point2D.Double((rect.Xmin + rect.Xmax) / 2.0, rect.Ymax),
-                                        new Point2D.Double(rect.Xmax, rect.Ymax),                                        
-                                    };
-                                    
+                                        new Point2D.Double(rect.Xmax, rect.Ymax),};
+
                                     Point2D nearestPoint = null;
                                     double distance = Double.MAX_VALUE;
                                     for (Point2D p : importantPoints) {
@@ -1475,9 +1480,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                             nearestPoint = windowPoint;
                                         }
                                     }
-                                    
+
                                     if (distance < TOUCH_POINT_DISTANCE) {
-                                        touchPointOffset = new DisplayPoint((int) Math.round(nearestPoint.getX() - cursorPos.getX()), (int) Math.round(nearestPoint.getY() - cursorPos.getY()));  
+                                        touchPointOffset = new DisplayPoint((int) Math.round(nearestPoint.getX() - cursorPos.getX()), (int) Math.round(nearestPoint.getY() - cursorPos.getY()));
                                     } else {
                                         touchPointOffset = new DisplayPoint(0, 0);
                                     }
@@ -1558,8 +1563,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }*/
                             }
                         }
-                        
-                        
+
                         if (!autoPlayed) {
                             Configuration.autoPlayPreviews.set(true);
                             autoPlayed = true;
@@ -1705,6 +1709,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (mode != MODE_GUIDE_X && mode != MODE_GUIDE_Y) {
                             mode = Cursor.DEFAULT_CURSOR;
                         }
+                        snapOffset = new DisplayPoint(0, 0);
                     }
                 }
 
@@ -1752,7 +1757,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                             return;
                         }
-                    }                    
+                    }
                     if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
                         Point2D dragEnd = e.getPoint();
                         Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
@@ -1765,7 +1770,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         iconPanel.calcRect();
                         _viewRect = getViewRect();
 
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;                                                
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
 
                         synchronized (lock) {
 
@@ -1798,6 +1803,54 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         return;
                     }
 
+                    //snapping
+                    if (dragStart != null && selectionMode && !doFreeTransform) {
+                        Point2D touchPointPos = new Point2D.Double(e.getX(), e.getY());
+                        if (touchPointOffset != null) {
+                            touchPointPos = new Point2D.Double(e.getX() + touchPointOffset.x, e.getY() + touchPointOffset.y);
+                        }
+
+                        int snapOffsetX = 0;
+                        int snapOffsetY = 0;
+
+                        if (SNAP_TO_GUIDES) {
+                            Double nearestGuideX = null;
+                            double distance = Double.MAX_VALUE;
+                            double zoomDouble = getRealZoom();
+
+                            for (Double gx : guidesX) {
+                                gx = gx * zoomDouble + offsetPoint.getX();
+                                double d = Math.abs(gx - touchPointPos.getX());
+                                if (d < distance) {
+                                    distance = d;
+                                    nearestGuideX = gx;
+                                }
+                            }
+
+                            if (distance < SNAP_DISTANCE) {
+                                snapOffsetX = (int) Math.round(nearestGuideX - touchPointPos.getX());
+                            }
+                            Double nearestGuideY = null;
+                            distance = Double.MAX_VALUE;
+
+                            for (Double gy : guidesY) {
+                                gy = gy * zoomDouble + offsetPoint.getY();
+
+                                double d = Math.abs(gy - touchPointPos.getY());
+                                if (d < distance) {
+                                    distance = d;
+                                    nearestGuideY = gy;
+                                }
+                            }
+
+                            if (distance < SNAP_DISTANCE) {
+                                snapOffsetY = (int) Math.round(nearestGuideY - touchPointPos.getY());
+                            }
+                        }
+
+                        snapOffset = new DisplayPoint(snapOffsetX, snapOffsetY);
+                    }
+
                     //move in selection mode
                     if (dragStart != null && selectionMode && !doFreeTransform) {
                         if (transform == null) {
@@ -1805,7 +1858,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         Matrix parentMatrix = getParentMatrix();
 
-                        Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
+                        Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX() + snapOffset.x, e.getY() + snapOffset.y));
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
