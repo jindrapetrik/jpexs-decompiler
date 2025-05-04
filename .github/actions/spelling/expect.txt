@@ -4011,6 +4011,7 @@ xorval
 xpacket
 xpathsyntaxkit
 XPels
+XPoint
 xpos
 xrefs
 xscale
@@ -4057,6 +4058,7 @@ yorig
 yourfile
 Yoyodyne
 YPels
+YPoint
 ypos
 YRef
 yscale
