@@ -1716,85 +1716,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         repaint();
                         return;
                     }
-                    if (dragStart != null && points != null) {
-                        if (pointsUnderCursor.isEmpty()) {
-                            selectionEnd = e.getPoint();
-                            redraw();
-                        }
-                        if (!selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty()) {
-                            boolean selectedUnderCursor = false;
-                            for (int p : pointsUnderCursor) {
-                                if (selectedPoints.contains(p)) {
-                                    selectedUnderCursor = true;
-                                    break;
-                                }
-                            }
-                            if (!selectedUnderCursor) {
-                                return;
-                            }
-                            for (int i = 0; i < selectedPoints.size(); i++) {
-                                int pointIndex = selectedPoints.get(i);
-                                DisplayPoint pointStart = selectedPointsOriginalValues.get(i);
-                                Point2D dragEnd = e.getPoint();
-                                Point2D startTransformPoint = toTransformPoint(dragStart);
-                                Point2D endTransformPoint = toTransformPoint(dragEnd);
-                                Point2D delta = new Point2D.Double(endTransformPoint.getX() - startTransformPoint.getX(), endTransformPoint.getY() - startTransformPoint.getY());
-                                DisplayPoint newPoint = new DisplayPoint((int) Math.round(pointStart.x + delta.getX()), (int) Math.round(pointStart.y + delta.getY()), pointStart.onPath);
-                                points.set(pointIndex, newPoint);
-                            }
-                            firePointsUpdated(points);
-                            calculatePointsXY();
-                            repaint();
-                            return;
-                        }
-                    }
-                    if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
-                        Point2D dragEnd = e.getPoint();
-                        Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
-                        Point2D regPointImage = registrationPoint == null ? null : toImagePoint(registrationPoint);
-                        offsetPoint.setLocation(offsetPoint.getX() + delta.getX(), offsetPoint.getY() + delta.getY());
-                        updateScrollBars();
-
-                        ExportRectangle oldViewRect = new ExportRectangle(_viewRect);
-                        dragStart = dragEnd;
-                        iconPanel.calcRect();
-                        _viewRect = getViewRect();
-
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-
-                        synchronized (lock) {
-
-                            if (transform != null) {
-                                /*Matrix prevTransform = transform.clone();
-
-                                Matrix m = new Matrix();
-                                m.scale(1 / SWF.unitDivisor);
-                                m.translate(-oldViewRect.xMin * zoomDouble, -oldViewRect.yMin * zoomDouble);
-                                //m.scale(zoomDouble);
-                                Matrix mi = m.inverse();
-
-                                transform = transform.preConcatenate(mi);
-
-                                Matrix m2 = new Matrix();
-                                m2.scale(1 / SWF.unitDivisor);
-                                m2.translate(-_viewRect.xMin * zoomDouble, -_viewRect.yMin * zoomDouble);
-                                //m2.scale(zoomDouble);
-
-                                transform = transform.preConcatenate(m2);
-                                 */
-                                if (registrationPoint != null) {
-                                    Point2D regPointImageUpdated = new Point2D.Double(regPointImage.getX() + delta.getX(), regPointImage.getY() + delta.getY());
-                                    registrationPoint = toTransformPoint(regPointImageUpdated);
-                                }
-                            }
-
-                        }
-                        repaint();
-                        return;
-                    }
-
-                    //snapping
-                    if (dragStart != null && (selectionMode || (doFreeTransform && mode == Cursor.MOVE_CURSOR))) {
+                    
+                    //Snapping
+                    if (dragStart != null 
+                            && (
+                            selectionMode 
+                            || (doFreeTransform && mode == Cursor.MOVE_CURSOR)
+                            || (points != null && !selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty())
+                            )
+                        ) {
                         Point2D touchPointPos = new Point2D.Double(e.getX(), e.getY());
                         if (touchPointOffset != null) {
                             touchPointPos = new Point2D.Double(e.getX() + touchPointOffset.x, e.getY() + touchPointOffset.y);
@@ -1907,10 +1837,87 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         if (snapOffsetY == null) {
                             snapOffsetY = 0;
-                        }                                                
+                        }
                         
                         snapOffset = new DisplayPoint(snapOffsetX, snapOffsetY);
                     }
+                    
+                    if (dragStart != null && points != null) {
+                        if (pointsUnderCursor.isEmpty()) {
+                            selectionEnd = e.getPoint();
+                            redraw();
+                        }
+                        if (!selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty()) {
+                            boolean selectedUnderCursor = false;
+                            for (int p : pointsUnderCursor) {
+                                if (selectedPoints.contains(p)) {
+                                    selectedUnderCursor = true;
+                                    break;
+                                }
+                            }
+                            if (!selectedUnderCursor) {
+                                return;
+                            }
+                            for (int i = 0; i < selectedPoints.size(); i++) {
+                                int pointIndex = selectedPoints.get(i);
+                                DisplayPoint pointStart = selectedPointsOriginalValues.get(i);
+                                Point2D dragEnd = new Point2D.Double(e.getX() + snapOffset.x, e.getY() + snapOffset.y);
+                                Point2D startTransformPoint = toTransformPoint(dragStart);
+                                Point2D endTransformPoint = toTransformPoint(dragEnd);
+                                Point2D delta = new Point2D.Double(endTransformPoint.getX() - startTransformPoint.getX(), endTransformPoint.getY() - startTransformPoint.getY());
+                                DisplayPoint newPoint = new DisplayPoint((int) Math.round(pointStart.x + delta.getX()), (int) Math.round(pointStart.y + delta.getY()), pointStart.onPath);
+                                points.set(pointIndex, newPoint);
+                            }
+                            firePointsUpdated(points);
+                            calculatePointsXY();
+                            repaint();
+                            return;
+                        }
+                    }
+                    if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
+                        Point2D dragEnd = e.getPoint();
+                        Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
+                        Point2D regPointImage = registrationPoint == null ? null : toImagePoint(registrationPoint);
+                        offsetPoint.setLocation(offsetPoint.getX() + delta.getX(), offsetPoint.getY() + delta.getY());
+                        updateScrollBars();
+
+                        ExportRectangle oldViewRect = new ExportRectangle(_viewRect);
+                        dragStart = dragEnd;
+                        iconPanel.calcRect();
+                        _viewRect = getViewRect();
+
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+
+                        synchronized (lock) {
+
+                            if (transform != null) {
+                                /*Matrix prevTransform = transform.clone();
+
+                                Matrix m = new Matrix();
+                                m.scale(1 / SWF.unitDivisor);
+                                m.translate(-oldViewRect.xMin * zoomDouble, -oldViewRect.yMin * zoomDouble);
+                                //m.scale(zoomDouble);
+                                Matrix mi = m.inverse();
+
+                                transform = transform.preConcatenate(mi);
+
+                                Matrix m2 = new Matrix();
+                                m2.scale(1 / SWF.unitDivisor);
+                                m2.translate(-_viewRect.xMin * zoomDouble, -_viewRect.yMin * zoomDouble);
+                                //m2.scale(zoomDouble);
+
+                                transform = transform.preConcatenate(m2);
+                                 */
+                                if (registrationPoint != null) {
+                                    Point2D regPointImageUpdated = new Point2D.Double(regPointImage.getX() + delta.getX(), regPointImage.getY() + delta.getY());
+                                    registrationPoint = toTransformPoint(regPointImageUpdated);
+                                }
+                            }
+
+                        }
+                        repaint();
+                        return;
+                    }                   
 
                     //move in selection mode
                     if (dragStart != null && selectionMode && !doFreeTransform) {
