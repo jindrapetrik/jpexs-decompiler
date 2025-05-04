@@ -996,15 +996,31 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 int pointsPos = 0;
                 int x = 0;
                 int y = 0;
+                StyleChangeRecord lastStyleChangeRecord = null;
+                boolean wasMoveTo = false;
                 for (int i = 0; i < selectedRecords.size(); i++) {
                     SHAPERECORD rec = selectedRecords.get(i);
                     if (rec instanceof StyleChangeRecord) {
                         StyleChangeRecord scr = (StyleChangeRecord) rec;
+                        lastStyleChangeRecord = scr;
                         if (scr.stateMoveTo) {
                             scr.moveDeltaX = points.get(pointsPos).x;
                             scr.moveDeltaY = points.get(pointsPos).y;
                             scr.calculateBits();
                             pointsPos++;
+                            wasMoveTo = true;
+                        }
+                    }
+                    if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                        if (lastStyleChangeRecord != null) {
+                            lastStyleChangeRecord.moveDeltaX = points.get(pointsPos).x;
+                            lastStyleChangeRecord.moveDeltaY = points.get(pointsPos).y;
+                            if (lastStyleChangeRecord.moveDeltaX != 0 || lastStyleChangeRecord.moveDeltaY != 0) {
+                                lastStyleChangeRecord.stateMoveTo = true;
+                                lastStyleChangeRecord.calculateBits();
+                            }
+                            pointsPos++;
+                            wasMoveTo = true;
                         }
                     }
                     if (rec instanceof StraightEdgeRecord) {
@@ -1073,13 +1089,25 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     int importantRecordPos = importantRecordPosRef.getVal();
                     int otherPosition = 0;
                     int otherImportantRecordPos = 0;
+                    boolean wasMoveTo = false;
+                    StyleChangeRecord lastStyleChangeRecord = null;
                     for (int i = 0; i < otherRecords.size(); i++) {
                         SHAPERECORD rec = otherRecords.get(i);
                         if (rec instanceof StyleChangeRecord) {
                             StyleChangeRecord scr = (StyleChangeRecord) rec;
+                            lastStyleChangeRecord = scr;
                             if (scr.stateMoveTo) {
                                 otherPosition++;
                                 otherImportantRecordPos++;
+                                wasMoveTo = true;
+                            }
+                        }
+                        
+                        if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                            if (lastStyleChangeRecord != null) {
+                                otherPosition++;
+                                otherImportantRecordPos++;
+                                wasMoveTo = true;
                             }
                         }
                         if (rec instanceof StraightEdgeRecord) {
@@ -1108,13 +1136,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 int x = 0;
                 int y = 0;
                 int importantRecordPos = 0;
+                boolean wasMoveTo = false;
+                StyleChangeRecord lastStyleChangeRecord = null;
                 for (int i = 0; i < selectedRecords.size(); i++) {
                     SHAPERECORD rec = selectedRecords.get(i);
                     if (rec instanceof StyleChangeRecord) {
                         StyleChangeRecord scr = (StyleChangeRecord) rec;
+                        lastStyleChangeRecord = scr;
                         if (scr.stateMoveTo) {
                             pointsPos++;
                             importantRecordPos++;
+                            wasMoveTo = true;
+                        }
+                    }
+                    if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                        if (lastStyleChangeRecord != null) {
+                            pointsPos++;
+                            importantRecordPos++;
+                            wasMoveTo = true;
                         }
                     }
                     if (rec instanceof StraightEdgeRecord) {
@@ -1212,13 +1251,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     int importantRecordPos = importantRecordPosRef.getVal();
                     int otherPosition = 0;
                     int otherImportantRecordPos = 0;
+                    StyleChangeRecord lastStyleChangeRecord = null;
+                    boolean wasMoveTo = false;
                     for (int i = 0; i < otherRecords.size(); i++) {
                         SHAPERECORD rec = otherRecords.get(i);
                         if (rec instanceof StyleChangeRecord) {
                             StyleChangeRecord scr = (StyleChangeRecord) rec;
+                            lastStyleChangeRecord = scr;
                             if (scr.stateMoveTo) {
                                 otherPosition++;
                                 otherImportantRecordPos++;
+                                wasMoveTo = true;
+                            }
+                        }
+                        if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                            if (lastStyleChangeRecord != null) {
+                                otherPosition++;
+                                otherImportantRecordPos++;
+                                wasMoveTo = true;
                             }
                         }
                         if (rec instanceof StraightEdgeRecord) {
@@ -1247,7 +1297,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 int importantRecordPos = 0;
                 int x = 0;
                 int y = 0;
-
+                
+                
+                StyleChangeRecord lastStyleChangeRecord = null;
+                boolean wasMoveTo = false;
                 for (int i = 0; i < selectedRecords.size(); i++) {
                     SHAPERECORD rec = selectedRecords.get(i);
                     SHAPERECORD prevRec = i == 0 ? null : selectedRecords.get(i - 1);
@@ -1255,9 +1308,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
                     if (rec instanceof StyleChangeRecord) {
                         StyleChangeRecord scr = (StyleChangeRecord) rec;
+                        lastStyleChangeRecord = scr;
                         if (scr.stateMoveTo) {
                             pointsPos++;
                             importantRecordPos++;
+                            wasMoveTo = true;
+                        }
+                    }
+                    if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                        if (lastStyleChangeRecord != null) {
+                            pointsPos++;
+                            importantRecordPos++;
+                            wasMoveTo = true;
                         }
                     }
                     if (rec instanceof StraightEdgeRecord) {
@@ -2820,7 +2882,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int y = 0;
 
         List<DisplayPoint> points = new ArrayList<>();
+        boolean wasMoveTo = false;
+        StyleChangeRecord lastStyleChangeRecord = null;
         for (SHAPERECORD rec : selectedRecords) {
+            if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
+                if (lastStyleChangeRecord != null) {
+                    DisplayPoint point = new DisplayPoint(0, 0);
+                    points.add(point);
+                    wasMoveTo = true;
+                }
+            }
+            
             if (rec instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) rec;
                 DisplayPoint point = new DisplayPoint(x + ser.deltaX, y + ser.deltaY);
@@ -2833,11 +2905,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 points.add(controlPoint);
                 points.add(anchorPoint);
             }
+            
             if (rec instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) rec;
+                lastStyleChangeRecord = scr;
                 if (scr.stateMoveTo) {
                     DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);
                     points.add(point);
+                    wasMoveTo = true;
                 }
             }
 
