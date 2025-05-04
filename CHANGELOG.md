@@ -52,7 +52,7 @@ All notable changes to this project will be documented in this file.
 - AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered
 - AS 1/2 - Remembering caret position for frames
 - Cleaner file association
-- Editing shape points when first edge has no moveTo flag (coordinates 0, 0)
+- Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)
 
 ### Removed
 - Windows installer does not associate SWF files anymore as it caused false positives on some AVs.

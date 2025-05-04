@@ -2456,12 +2456,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void transformSHAPE(Matrix matrix, SHAPE shape, int shapeNum) {
         int x = 0;
         int y = 0;
+        StyleChangeRecord lastStyleChangeRecord = null;
+        boolean wasMoveTo = false;
         for (SHAPERECORD rec : shape.shapeRecords) {
             if (rec instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) rec;
+                lastStyleChangeRecord = scr;
                 if (scr.stateNewStyles) {
                     transformStyles(matrix, scr.fillStyles, scr.lineStyles, shapeNum);
-                }
+                }                
                 if (scr.stateMoveTo) {
                     Point nextPoint = new Point(scr.moveDeltaX, scr.moveDeltaY);
                     x = scr.changeX(x);
@@ -2469,6 +2472,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     Point nextPoint2 = matrix.transform(nextPoint);
                     scr.moveDeltaX = nextPoint2.x;
                     scr.moveDeltaY = nextPoint2.y;
+                    scr.calculateBits();
+                    wasMoveTo = true;
+                }
+            }
+            
+            if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {                
+                if (lastStyleChangeRecord != null) {
+                    Point nextPoint2 = matrix.transform(new Point(x, y));
+                    if (nextPoint2.x != 0 || nextPoint2.y != 0) {
+                        lastStyleChangeRecord.stateMoveTo = true;
+                        lastStyleChangeRecord.moveDeltaX = nextPoint2.x;
+                        lastStyleChangeRecord.moveDeltaY = nextPoint2.y;
+                        lastStyleChangeRecord.calculateBits();
+                        wasMoveTo = true;
+                    }
                 }
             }
             if (rec instanceof StraightEdgeRecord) {
