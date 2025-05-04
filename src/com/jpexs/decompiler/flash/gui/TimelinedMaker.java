@@ -243,6 +243,7 @@ public class TimelinedMaker {
                     }
                     Frame f = new Frame(timeline, framesCnt);
                     DepthState ds = new DepthState(tag.getSwf(), f, f);
+                    ds.depth = 1;
                     ds.characterId = fChId;
                     ds.matrix = new MATRIX();
                     ds.ratio = 65535;
@@ -260,6 +261,7 @@ public class TimelinedMaker {
                     //Fonts are really added to stage in some corner cases like for vertical text.
                     Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f, f);
+                    ds.depth = 1;
                     ds.characterId = fChId;
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
@@ -271,6 +273,7 @@ public class TimelinedMaker {
                 } else {
                     Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f, f);
+                    ds.depth = 1;
                     ds.characterId = fChId;
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);

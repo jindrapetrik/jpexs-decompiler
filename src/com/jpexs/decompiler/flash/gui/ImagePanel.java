@@ -1430,8 +1430,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         selectedPointsOriginalValues = newPointsUnderCursorValues;
-
-                        if (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth)) {
+                        
+                        if (
+                                (selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth))
+                                ||
+                                (!selectionMode && doFreeTransform && depthStateUnderCursor != null)
+                            ) {
                             Matrix matrix = new Matrix();
                             if (depthStateUnderCursor.matrix != null) {
                                 matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
@@ -1736,7 +1740,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         double zoomDouble = getRealZoom();
                             
 
-                        if (Configuration.snapToObjects.get() && depthStateUnderCursor != null && !selectedDepths.contains(depthStateUnderCursor.depth)) {
+                        if (Configuration.snapToObjects.get() 
+                                && depthStateUnderCursor != null && 
+                                !selectedDepths.contains(depthStateUnderCursor.depth)                               
+                                ) {
+                            System.err.println("depthStateUnderCursor.depth = " + depthStateUnderCursor.depth);
+                            if (!selectedDepths.isEmpty())
+                            System.err.println("selectedDepths = " + selectedDepths.get(0));
                             CharacterTag ch = depthStateUnderCursor.getCharacter();
                             if (ch != null) {
                                 if (ch instanceof BoundedTag) {
@@ -4600,7 +4610,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }*/
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
-        if (cursorPosition != null && (!doFreeTransform || transformSelectionMode)) {
+        if (cursorPosition != null) { // && (!doFreeTransform || transformSelectionMode)) {
             DisplayPoint touchPoint = new DisplayPoint(cursorPosition);
             if (touchPointOffset != null) {
                 touchPoint = new DisplayPoint(cursorPosition.x + touchPointOffset.x, cursorPosition.y + touchPointOffset.y);
@@ -4756,14 +4766,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozenButtons;
 
-            if (showObjectsUnderCursor && autoPlayed) {
-
+            if (autoPlayed) {
                 if (!renderContext.stateUnderCursor.isEmpty()) {
                     depthStateUnderCursor = renderContext.stateUnderCursor.get(renderContext.stateUnderCursor.size() - 1);
                 } else {
                     depthStateUnderCursor = null;
                 }
-
+            } else {
+                depthStateUnderCursor = null;
+            }
+            
+            if (showObjectsUnderCursor && autoPlayed) {               
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
                     DepthState ds = renderContext.stateUnderCursor.get(i);
@@ -4789,8 +4802,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (first) {
                     ret.append(DEFAULT_DEBUG_LABEL_TEXT);
                 }
-            } else {
-                depthStateUnderCursor = null;
             }
 
             ButtonTag lastMouseOverButton;
