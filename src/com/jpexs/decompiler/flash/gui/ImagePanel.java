@@ -305,9 +305,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private static final int TOUCH_POINT_DISTANCE = 15;
 
-    private DisplayPoint snapOffset = new DisplayPoint(0, 0);
+    private Point2D snapOffset = new Point2D.Double(0, 0);
+
+    private DisplayPoint snapAlignXPoint1 = null;
+    private DisplayPoint snapAlignXPoint2 = null;
+
+    private DisplayPoint snapAlignYPoint1 = null;
+    private DisplayPoint snapAlignYPoint2 = null;
 
     private static final int SNAP_DISTANCE = 10;
+
+    private static final int SNAP_ALIGN_DISTANCE = 5;
+
+    private static final int SNAP_ALIGN_AFTER_LINE = 50;
 
     //private DisplayPoint closestPoint = null;
     private List<Integer> pointsUnderCursor = new ArrayList<>();
@@ -1129,14 +1139,43 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         if (touchPointOffset != null) {
-                            boolean snapped = snapOffset.x != 0 || snapOffset.y != 0;
+                            boolean snapped = snapOffset.getX() != 0 || snapOffset.getY() != 0;
                             g2.setStroke(new BasicStroke((float) ((snapped ? 2 : 1))));
-                            DisplayPoint p = new DisplayPoint(lastMouseEvent.getX() + touchPointOffset.x + snapOffset.x, lastMouseEvent.getY() + touchPointOffset.y + snapOffset.y);
+                            Point2D p = new Point2D.Double(lastMouseEvent.getX() + touchPointOffset.x + snapOffset.getX(), lastMouseEvent.getY() + touchPointOffset.y + snapOffset.getY());
                             double pointSize = (snapped ? 4 : 3);
-                            Shape pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                            Shape pointShape = new Ellipse2D.Double(p.getX() - pointSize, p.getY() - pointSize, pointSize * 2, pointSize * 2);
                             g2.setPaint(Color.black);
                             g2.draw(pointShape);
                         }
+
+                        DisplayPoint snapAlignStart;
+                        DisplayPoint snapAlignEnd;
+
+                        g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1, new float[]{2}, 0));
+                        GeneralPath gp = new GeneralPath();
+
+                        snapAlignStart = snapAlignXPoint1;
+                        snapAlignEnd = snapAlignXPoint2;
+
+                        if (snapAlignStart != null && snapAlignEnd != null) {
+                            gp.moveTo(snapAlignStart.x, snapAlignStart.y);
+                            gp.lineTo(snapAlignEnd.x, snapAlignEnd.y);
+                        }
+                        snapAlignStart = snapAlignYPoint1;
+                        snapAlignEnd = snapAlignYPoint2;
+                        if (snapAlignStart != null && snapAlignEnd != null) {
+                            gp.moveTo(snapAlignStart.x, snapAlignStart.y);
+                            gp.lineTo(snapAlignEnd.x, snapAlignEnd.y);
+                        }
+                        if (canInvert) {
+                            g2.setComposite(BlendComposite.Invert);
+                            g2.setPaint(Color.black);
+                        } else {
+                            g2.setComposite(AlphaComposite.SrcOver);
+                            g2.setPaint(Color.cyan);
+                        }
+                        g2.draw(gp);
+                        g2.setComposite(AlphaComposite.SrcOver);
                     }
                 } catch (InternalError ie) {
                     //On some devices like Linux X11 - BlendComposite.Invert is not available
@@ -1479,6 +1518,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         touchPointOffset = new DisplayPoint(0, 0);
                                     }
                                 }
+
                                 //If we wanted touch point on center of edge, then something like this:
                                 /*else if (ch instanceof ShapeTag) {
                                     ShapeTag st = (ShapeTag) ch;
@@ -1660,6 +1700,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         selectionEnd = null;
                         inMoving = false;
                         touchPointOffset = null;
+                        snapAlignXPoint1 = null;
+                        snapAlignXPoint2 = null;
+                        snapAlignYPoint1 = null;
+                        snapAlignYPoint2 = null;
 
                         if (((doFreeTransform && mode != Cursor.DEFAULT_CURSOR) || (selectionMode && transform != null)) && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
@@ -1701,7 +1745,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (mode != MODE_GUIDE_X && mode != MODE_GUIDE_Y) {
                             mode = Cursor.DEFAULT_CURSOR;
                         }
-                        snapOffset = new DisplayPoint(0, 0);
+                        snapOffset = new Point2D.Double(0, 0);
                     }
                 }
 
@@ -1729,10 +1773,201 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             touchPointPos = new Point2D.Double(e.getX() + touchPointOffset.x, e.getY() + touchPointOffset.y);
                         }
 
-                        Integer snapOffsetX = null;
-                        Integer snapOffsetY = null;
+                        Double snapOffsetX = null;
+                        Double snapOffsetY = null;
 
                         double zoomDouble = getRealZoom();
+
+                        if (Configuration.snapAlign.get() && timelined != null && points == null) {
+                            Frame fr = timelined.getTimeline().getFrame(frame);
+                            if (fr != null) {
+                                Timeline timeline = timelined.getTimeline();
+
+                                Matrix parentMatrix = getParentMatrix();
+
+                                Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
+                                double ex = mouseTransPoint.getX();
+                                double ey = mouseTransPoint.getY();
+                                Point2D dragStartTransPoint = toTransformPoint(dragStart);
+                                double dsx = dragStartTransPoint.getX();
+                                double dsy = dragStartTransPoint.getY();
+
+                                double deltaX = ex - dsx;
+                                double deltaY = ey - dsy;
+
+                                AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                                AffineTransform t = parentMatrix.toTransform();
+                                t.translate(deltaX, deltaY);
+                                AffineTransform tx = parentMatrix.inverse().toTransform();
+                                t.concatenate(tx);
+                                newTransform.preConcatenate(t);
+
+                                Rectangle2D selectedBounds = null; //toImageRect(getTransformBounds(new Matrix(newTransform))); //null;
+                                for (int i = 0; i < selectedDepths.size(); i++) {
+                                    int selectedDepth = selectedDepths.get(i);
+                                    DepthState ds = null;
+                                    if (selectedDepth > -1 && timeline.getFrameCount() > frame && fr != null) {
+                                        ds = fr.layers.get(selectedDepth);
+                                    }
+                                    if (ds != null) {
+                                        CharacterTag cht = ds.getCharacter();
+                                        if (cht != null) {
+                                            if (cht instanceof BoundedTag) {
+                                                BoundedTag bt = (BoundedTag) cht;
+                                                RECT rect = bt.getRect();
+
+                                                Matrix matrix = new Matrix();
+                                                matrix = matrix.concatenate(toImageMatrix(new Matrix(newTransform)));
+                                                if (ds.matrix != null) {
+                                                    matrix = matrix.concatenate(new Matrix(ds.matrix));
+                                                }
+                                                Rectangle2D bounds = matrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
+                                                if (selectedBounds == null) {
+                                                    selectedBounds = bounds;
+                                                } else {
+                                                    selectedBounds.add(bounds);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (selectedBounds != null) {
+                                    boolean snapAlignedX = false;
+                                    boolean snapAlignedY = false;
+
+                                    for (DepthState ds : fr.layers.values()) {
+                                        if (selectedDepths.contains(ds.depth)) {
+                                            continue;
+                                        }
+                                        CharacterTag ct = ds.getCharacter();
+                                        if (ct != null) {
+                                            if (ct instanceof BoundedTag) {
+                                                BoundedTag bt = (BoundedTag) ct;
+                                                RECT rect = bt.getRect();
+
+                                                Matrix matrix = new Matrix();
+                                                if (ds.matrix != null) {
+                                                    matrix = matrix.preConcatenate(new Matrix(ds.matrix));
+                                                }
+
+                                                Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
+
+                                                matrix = matrix.preConcatenate(scaleMatrix);
+                                                matrix = matrix.preConcatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
+
+                                                Rectangle2D bounds = matrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
+
+                                                if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetX = bounds.getMinX() - selectedBounds.getMinX();
+                                                    snapAlignXPoint1 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMinX()),
+                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignXPoint2 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMinX()),
+                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignedX = true;
+                                                } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetX = bounds.getMaxX() - selectedBounds.getMinX();
+                                                    snapAlignXPoint1 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMaxX()),
+                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignXPoint2 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMaxX()),
+                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignedX = true;
+                                                } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetX = bounds.getMaxX() - selectedBounds.getMaxX();
+                                                    snapAlignXPoint1 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMaxX()),
+                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignXPoint2 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMaxX()),
+                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignedX = true;
+                                                } else if (Math.abs(bounds.getMinX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetX = bounds.getMinX() - selectedBounds.getMaxX();
+                                                    snapAlignXPoint1 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMinX()),
+                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignXPoint2 = new DisplayPoint(
+                                                            (int) Math.round(bounds.getMinX()),
+                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                    );
+                                                    snapAlignedX = true;
+                                                }
+
+                                                if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetY = bounds.getMinY() - selectedBounds.getMinY();
+                                                    snapAlignYPoint1 = new DisplayPoint(
+                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMinY())
+                                                    );
+                                                    snapAlignYPoint2 = new DisplayPoint(
+                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMinY())
+                                                    );
+                                                    snapAlignedY = true;
+                                                } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetY = bounds.getMaxY() - selectedBounds.getMinY();
+                                                    snapAlignYPoint1 = new DisplayPoint(
+                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMaxY())
+                                                    );
+                                                    snapAlignYPoint2 = new DisplayPoint(
+                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMaxY())
+                                                    );
+                                                    snapAlignedY = true;
+                                                } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetY = bounds.getMaxY() - selectedBounds.getMaxY();
+                                                    snapAlignYPoint1 = new DisplayPoint(
+                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMaxY())
+                                                    );
+                                                    snapAlignYPoint2 = new DisplayPoint(
+                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMaxY())
+                                                    );
+                                                    snapAlignedY = true;
+                                                } else if (Math.abs(bounds.getMinY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                                    snapOffsetY = bounds.getMinY() - selectedBounds.getMaxY();
+                                                    snapAlignYPoint1 = new DisplayPoint(
+                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMinY())
+                                                    );
+                                                    snapAlignYPoint2 = new DisplayPoint(
+                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                            (int) Math.round(bounds.getMinY())
+                                                    );
+                                                    snapAlignedY = true;
+                                                }
+
+                                                if (snapAlignedX && snapAlignedY) {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!snapAlignedX) {
+                                        snapAlignXPoint1 = null;
+                                        snapAlignXPoint2 = null;
+                                    }
+                                    if (!snapAlignedY) {
+                                        snapAlignYPoint1 = null;
+                                        snapAlignYPoint2 = null;
+                                    }
+                                }
+                            }
+                        }
 
                         if (Configuration.snapToObjects.get()
                                 && depthStateUnderCursor != null
@@ -1776,8 +2011,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         }
                                     }
                                     if (distance < SNAP_DISTANCE) {
-                                        snapOffsetX = (int) Math.round(nearestPoint.getX() - touchPointPos.getX());
-                                        snapOffsetY = (int) Math.round(nearestPoint.getY() - touchPointPos.getY());
+                                        snapOffsetX = nearestPoint.getX() - touchPointPos.getX();
+                                        snapOffsetY = nearestPoint.getY() - touchPointPos.getY();
                                     }
                                 }
                             }
@@ -1798,7 +2033,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
 
                                 if (distance < SNAP_DISTANCE) {
-                                    snapOffsetX = (int) Math.round(nearestGuideX - touchPointPos.getX());
+                                    snapOffsetX = nearestGuideX - touchPointPos.getX();
                                 }
                             }
 
@@ -1817,7 +2052,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
 
                                 if (distance < SNAP_DISTANCE) {
-                                    snapOffsetY = (int) Math.round(nearestGuideY - touchPointPos.getY());
+                                    snapOffsetY = nearestGuideY - touchPointPos.getY();
                                 }
                             }
                         }
@@ -1825,22 +2060,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (Configuration.snapToPixels.get()) {
                             if (snapOffsetX == null) {
                                 int positionPxX = (int) Math.round((touchPointPos.getX() - offsetPoint.getX()) / zoomDouble);
-                                snapOffsetX = (int) Math.round(positionPxX * zoomDouble - touchPointPos.getX() + offsetPoint.getX());
+                                snapOffsetX = positionPxX * zoomDouble - touchPointPos.getX() + offsetPoint.getX();
                             }
                             if (snapOffsetY == null) {
                                 int positionPxY = (int) Math.round((touchPointPos.getY() - offsetPoint.getY()) / zoomDouble);
-                                snapOffsetY = (int) Math.round(positionPxY * zoomDouble - touchPointPos.getY() + offsetPoint.getY());
+                                snapOffsetY = positionPxY * zoomDouble - touchPointPos.getY() + offsetPoint.getY();
                             }
                         }
 
                         if (snapOffsetX == null) {
-                            snapOffsetX = 0;
+                            snapOffsetX = 0.0;
                         }
                         if (snapOffsetY == null) {
-                            snapOffsetY = 0;
+                            snapOffsetY = 0.0;
                         }
 
-                        snapOffset = new DisplayPoint(snapOffsetX, snapOffsetY);
+                        snapOffset = new Point2D.Double(snapOffsetX, snapOffsetY);
                     }
 
                     if (dragStart != null && points != null) {
@@ -1862,7 +2097,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             for (int i = 0; i < selectedPoints.size(); i++) {
                                 int pointIndex = selectedPoints.get(i);
                                 DisplayPoint pointStart = selectedPointsOriginalValues.get(i);
-                                Point2D dragEnd = new Point2D.Double(e.getX() + snapOffset.x, e.getY() + snapOffset.y);
+                                Point2D dragEnd = new Point2D.Double(e.getX() + snapOffset.getX(), e.getY() + snapOffset.getY());
                                 Point2D startTransformPoint = toTransformPoint(dragStart);
                                 Point2D endTransformPoint = toTransformPoint(dragEnd);
                                 Point2D delta = new Point2D.Double(endTransformPoint.getX() - startTransformPoint.getX(), endTransformPoint.getY() - startTransformPoint.getY());
@@ -1927,7 +2162,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         Matrix parentMatrix = getParentMatrix();
 
-                        Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX() + snapOffset.x, e.getY() + snapOffset.y));
+                        Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX() + snapOffset.getX(), e.getY() + snapOffset.getY()));
+                        Point2D mouseTransPointNoSnapOffset = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
@@ -1940,7 +2176,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         AffineTransform newTransform = new AffineTransform(transform.toTransform());
                         AffineTransform t = parentMatrix.toTransform();
                         t.translate(deltaX, deltaY);
-                        t.concatenate(parentMatrix.inverse().toTransform());
+                        AffineTransform tx = parentMatrix.inverse().toTransform();
+                        t.concatenate(tx);
                         newTransform.preConcatenate(t);
 
                         Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
@@ -1958,10 +2195,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         Matrix parentMatrix = getParentMatrix();
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
-                        //mouseTransPoint = parentMatrix.inverse().transform(mouseTransPoint);
+                        Point2D mouseTransPointSnapped = toTransformPoint(new Point2D.Double(e.getX() + snapOffset.getX(), e.getY() + snapOffset.getY()));
 
+                        //mouseTransPoint = parentMatrix.inverse().transform(mouseTransPoint);
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
+                        double exSnapped = mouseTransPointSnapped.getX();
+                        double eySnapped = mouseTransPointSnapped.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
                         Point2D parentRegistrationPoint = parentMatrix.transform(registrationPoint);
                         double dsx = dragStartTransPoint.getX();
@@ -2216,8 +2456,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                         }
                         if (mode == Cursor.MOVE_CURSOR) {
-                            double deltaX = ex + snapOffset.x - dsx;
-                            double deltaY = ey + snapOffset.y - dsy;
+                            double deltaX = exSnapped - dsx;
+                            double deltaY = eySnapped - dsy;
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = parentMatrix.toTransform();
@@ -5378,24 +5618,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private Rectangle2D getTransformBounds() {
+        return getTransformBounds(getNewMatrix());
+    }
+
+    private Rectangle2D getTransformBounds(Matrix newMatrix) {
         if (timelined == null) {
             return null;
         }
         int time = frozen ? 0 : this.time;
         DepthState ds = null;
         Timeline timeline = timelined.getTimeline();
-        /*if (freeTransformDepth > -1 && timeline.getFrameCount() > frame && transform != null) {
-            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
-        }
-        if (freeTransformDepth == -1 && selectionMode && transform != null && selectedDepth != -1 && timeline.getFrameCount() > frame) {
-            ds = timeline.getFrame(frame).layers.get(selectedDepth);
-        }*/
 
         if (timeline.getFrameCount() <= frame) {
             return new Rectangle2D.Double(0, 0, 1, 1);
         }
-
-        Matrix newMatrix = getNewMatrix();
 
         if (newMatrix == null) {
             return new Rectangle2D.Double(0, 0, 1, 1);

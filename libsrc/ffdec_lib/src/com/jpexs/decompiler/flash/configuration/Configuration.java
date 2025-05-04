@@ -1069,6 +1069,9 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapToPixels = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlign = null;
     
     private enum OSId {
         WINDOWS, OSX, UNIX
