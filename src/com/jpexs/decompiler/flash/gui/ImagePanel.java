@@ -400,6 +400,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int guidesCharacterId = -1;
 
     @Override
+    public boolean canHaveRuler() {
+        return this.contentCanHaveRuler;
+    }   
+    
+    @Override
     public boolean canUseSnapping() {
         return selectionMode || doFreeTransform || hilightedPoints != null;
     }

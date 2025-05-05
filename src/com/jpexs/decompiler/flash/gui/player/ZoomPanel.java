@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.SnapOptionsButton;
@@ -27,6 +29,7 @@ import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 /**
  *
@@ -37,6 +40,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
     private MediaDisplay display;
     private JButton zoomFitButton;
     private SnapOptionsButton snapOptionsButton;
+    private JToggleButton rulerButton;
     private final JLabel percentLabel = new JLabel("100%");
     private boolean zoomToFit = false;
     private double realZoom = 1.0;
@@ -59,7 +63,19 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
         zoomNoneButton.addActionListener(this::zoomNoneButtonActionPerformed);
         zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
-                
+        
+        rulerButton = new JToggleButton(View.getIcon("ruler16"));
+        rulerButton.addActionListener(this::rulerActionPerformed);
+        rulerButton.setToolTipText(AppStrings.translate("button.ruler.hint"));
+        rulerButton.setSelected(Configuration.showRuler.get());
+        
+        Configuration.showRuler.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                rulerButton.setSelected(newValue);
+            }            
+        });
+                        
         snapOptionsButton = new SnapOptionsButton();
 
         setLayout(new FlowLayout());
@@ -68,11 +84,17 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         add(zoomOutButton);
         add(zoomNoneButton);
         add(zoomFitButton);
+        add(rulerButton);
         add(snapOptionsButton);
 
         display.addEventListener(this);
     }
 
+    private void rulerActionPerformed(ActionEvent evt) {
+        JToggleButton toggleButton = (JToggleButton) evt.getSource();
+        Configuration.showRuler.set(toggleButton.isSelected());
+    }
+    
     private void zoomInButtonActionPerformed(ActionEvent evt) {
         double currentRealZoom = getRealZoom();
         if (currentRealZoom >= MAX_ZOOM) {
@@ -155,6 +177,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
             zoomFitButton.setVisible(zoom != null);
             percentLabel.setVisible(zoom != null);
             snapOptionsButton.setVisible(display.canUseSnapping());
+            rulerButton.setVisible(display.canHaveRuler());
             Zoom currentZoom = new Zoom();
             currentZoom.fit = zoomToFit;
             currentZoom.value = realZoom;

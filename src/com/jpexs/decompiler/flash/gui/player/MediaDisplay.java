@@ -84,4 +84,6 @@ public interface MediaDisplay extends Closeable {
     public boolean isMutable();
     
     public boolean canUseSnapping();
+    
+    public boolean canHaveRuler();
 }
