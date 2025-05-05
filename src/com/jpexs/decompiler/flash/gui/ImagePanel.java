@@ -402,8 +402,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public boolean canHaveRuler() {
         return this.contentCanHaveRuler;
-    }   
-    
+    }
+
     @Override
     public boolean canUseSnapping() {
         return selectionMode || doFreeTransform || hilightedPoints != null;
@@ -1432,28 +1432,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging                                                                                               
 
-                        Point mousePoint = e.getPoint();
-                        for (int d = 0; d < guidesX.size(); d++) {
-                            Double guide = guidesX.get(d);
-                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
-                            if (mousePoint.x >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.x <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
-                                guidesX.remove(d);
-                                guideDragX = guideInPanel;
-                                draggingGuideX = true;
-                                saveGuides();
-                                return;
+                        if (Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
+                            Point mousePoint = e.getPoint();
+                            for (int d = 0; d < guidesX.size(); d++) {
+                                Double guide = guidesX.get(d);
+                                int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
+                                if (mousePoint.x >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.x <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
+                                    guidesX.remove(d);
+                                    guideDragX = guideInPanel;
+                                    draggingGuideX = true;
+                                    saveGuides();
+                                    return;
+                                }
                             }
-                        }
 
-                        for (int d = 0; d < guidesY.size(); d++) {
-                            Double guide = guidesY.get(d);
-                            int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
-                            if (mousePoint.y >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.y <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
-                                guidesY.remove(d);
-                                guideDragY = guideInPanel;
-                                draggingGuideY = true;
-                                saveGuides();
-                                return;
+                            for (int d = 0; d < guidesY.size(); d++) {
+                                Double guide = guidesY.get(d);
+                                int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
+                                if (mousePoint.y >= guideInPanel - GUIDE_MOVE_TOLERANCE && mousePoint.y <= guideInPanel + GUIDE_MOVE_TOLERANCE) {
+                                    guidesY.remove(d);
+                                    guideDragY = guideInPanel;
+                                    draggingGuideY = true;
+                                    saveGuides();
+                                    return;
+                                }
                             }
                         }
 
@@ -1788,7 +1790,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         double zoomDouble = getRealZoom();
 
-                        if (Configuration.snapAlign.get() && timelined != null && points == null) {
+                        if (Configuration.snapAlign.get() && timelined != null && points == null && transform != null) {
                             Frame fr = timelined.getTimeline().getFrame(frame);
                             if (fr != null) {
                                 Timeline timeline = timelined.getTimeline();
@@ -2848,7 +2850,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     boolean nearGuideX = draggingGuideX;
                     boolean nearGuideY = draggingGuideY;
 
-                    if (!draggingGuideX && !draggingGuideY) {
+                    if (!draggingGuideX && !draggingGuideY && Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
                         Point mousePoint = e.getPoint();
                         for (int d = 0; d < guidesX.size(); d++) {
                             Double guide = guidesX.get(d);
@@ -3166,14 +3168,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 g2d.drawLine(0, guideDragY, getWidth(), guideDragY);
             }
 
-            for (Double guide : guidesX) {
-                int guideRealPx = (int) Math.round(offsetPoint.getX() + guide * getRealZoom());
-                g2d.drawLine(guideRealPx, 0, guideRealPx, getHeight());
+            if (!Configuration.showGuides.get() && (draggingGuideX || draggingGuideY) && (guideDragX > 0 || guideDragY > 0)) {
+                Configuration.showGuides.set(true);
             }
 
-            for (Double guide : guidesY) {
-                int guideRealPx = (int) Math.round(offsetPoint.getY() + guide * getRealZoom());
-                g2d.drawLine(0, guideRealPx, getWidth(), guideRealPx);
+            if (Configuration.showGuides.get()) {
+                for (Double guide : guidesX) {
+                    int guideRealPx = (int) Math.round(offsetPoint.getX() + guide * getRealZoom());
+                    g2d.drawLine(guideRealPx, 0, guideRealPx, getHeight());
+                }
+
+                for (Double guide : guidesY) {
+                    int guideRealPx = (int) Math.round(offsetPoint.getY() + guide * getRealZoom());
+                    g2d.drawLine(0, guideRealPx, getWidth(), guideRealPx);
+                }
             }
 
             if (Configuration._debugMode.get()) {
@@ -4226,7 +4234,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             iconPanel.calcRect();
 
-            clearGuides();
+            clearGuidesInternal();
             setNoGuidesCharacter();
 
             contentCanHaveRuler = canHaveRuler;
@@ -4254,7 +4262,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
+    @Override
     public synchronized void clearGuides() {
+        clearGuidesInternal();
+        saveGuides();
+        repaint();
+    }
+
+    private synchronized void clearGuidesInternal() {
         draggingGuideX = false;
         draggingGuideY = false;
         guideDragX = -1;
@@ -4285,7 +4300,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void loadGuidesCharacter() {
-        clearGuides();
+        clearGuidesInternal();
         if (guidesSwf == null) {
             return;
         }
@@ -4402,7 +4417,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         horizontalScrollBar.setVisible(false);
         verticalScrollBar.setVisible(false);
 
-        clearGuides();
+        clearGuidesInternal();
         setNoGuidesCharacter();
 
         contentCanHaveRuler = false;

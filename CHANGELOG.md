@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2370] Objects display - Create guides by dragging from a ruler
 - Objects dragging - show touch point and snap it to 9 important points around object rectangle
 - [#2370] Snap to guides, objects and pixels, Snap align, toggle with magnet icon
+- [#2370] Show/Hide guides, lock guides, clear guides actions from icon menu
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
