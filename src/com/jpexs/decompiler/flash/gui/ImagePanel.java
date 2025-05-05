@@ -1821,8 +1821,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                                 BoundedTag bt = (BoundedTag) cht;
                                                 RECT rect = bt.getRect();
 
-                                                Matrix matrix = new Matrix();
-                                                matrix = matrix.concatenate(toImageMatrix(new Matrix(newTransform)));
+                                                Matrix matrix = toImageMatrix(new Matrix(newTransform));
                                                 if (ds.matrix != null) {
                                                     matrix = matrix.concatenate(new Matrix(ds.matrix));
                                                 }
@@ -1840,6 +1839,108 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 if (selectedBounds != null) {
                                     boolean snapAlignedX = false;
                                     boolean snapAlignedY = false;
+
+                                    if (timelined instanceof SWF) {
+                                        RECT stageRect = timelined.getRect();
+                                        Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
+                                        Matrix matrix = new Matrix();
+                                        matrix = matrix.concatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
+                                        matrix = matrix.concatenate(scaleMatrix);
+
+                                        Rectangle2D bounds = matrix.transform(new Rectangle2D.Double(stageRect.Xmin, stageRect.Ymin, stageRect.getWidth(), stageRect.getHeight()));
+
+                                        if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetX = bounds.getMinX() - selectedBounds.getMinX();
+                                            snapAlignXPoint1 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMinX()),
+                                                    (int) Math.round(selectedBounds.getMinY() - SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignXPoint2 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMinX()),
+                                                    (int) Math.round(selectedBounds.getMaxY() + SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignedX = true;
+                                        } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetX = bounds.getMaxX() - selectedBounds.getMinX();
+                                            snapAlignXPoint1 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMaxX()),
+                                                    (int) Math.round(selectedBounds.getMinY() - SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignXPoint2 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMaxX()),
+                                                    (int) Math.round(selectedBounds.getMaxY() + SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignedX = true;
+                                        } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetX = bounds.getMaxX() - selectedBounds.getMaxX();
+                                            snapAlignXPoint1 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMaxX()),
+                                                    (int) Math.round(selectedBounds.getMinY() - SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignXPoint2 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMaxX()),
+                                                    (int) Math.round(selectedBounds.getMaxY() + SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignedX = true;
+                                        } else if (Math.abs(bounds.getMinX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetX = bounds.getMinX() - selectedBounds.getMaxX();
+                                            snapAlignXPoint1 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMinX()),
+                                                    (int) Math.round(selectedBounds.getMinY() - SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignXPoint2 = new DisplayPoint(
+                                                    (int) Math.round(bounds.getMinX()),
+                                                    (int) Math.round(selectedBounds.getMaxY() + SNAP_ALIGN_AFTER_LINE)
+                                            );
+                                            snapAlignedX = true;
+                                        }
+
+                                        if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetY = bounds.getMinY() - selectedBounds.getMinY();
+                                            snapAlignYPoint1 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMinX() - SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMinY())
+                                            );
+                                            snapAlignYPoint2 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMaxX() + SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMinY())
+                                            );
+                                            snapAlignedY = true;
+                                        } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetY = bounds.getMaxY() - selectedBounds.getMinY();
+                                            snapAlignYPoint1 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMinX() - SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMaxY())
+                                            );
+                                            snapAlignYPoint2 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMaxX() + SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMaxY())
+                                            );
+                                            snapAlignedY = true;
+                                        } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetY = bounds.getMaxY() - selectedBounds.getMaxY();
+                                            snapAlignYPoint1 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMinX() - SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMaxY())
+                                            );
+                                            snapAlignYPoint2 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMaxX() + SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMaxY())
+                                            );
+                                            snapAlignedY = true;
+                                        } else if (Math.abs(bounds.getMinY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                            snapOffsetY = bounds.getMinY() - selectedBounds.getMaxY();
+                                            snapAlignYPoint1 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMinX() - SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMinY())
+                                            );
+                                            snapAlignYPoint2 = new DisplayPoint(
+                                                    (int) Math.round(selectedBounds.getMaxX() + SNAP_ALIGN_AFTER_LINE),
+                                                    (int) Math.round(bounds.getMinY())
+                                            );
+                                            snapAlignedY = true;
+                                        }
+                                    }
 
                                     for (DepthState ds : fr.layers.values()) {
                                         if (selectedDepths.contains(ds.depth)) {
@@ -1863,96 +1964,100 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                                 Rectangle2D bounds = matrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
 
-                                                if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetX = bounds.getMinX() - selectedBounds.getMinX();
-                                                    snapAlignXPoint1 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMinX()),
-                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignXPoint2 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMinX()),
-                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignedX = true;
-                                                } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetX = bounds.getMaxX() - selectedBounds.getMinX();
-                                                    snapAlignXPoint1 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMaxX()),
-                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignXPoint2 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMaxX()),
-                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignedX = true;
-                                                } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetX = bounds.getMaxX() - selectedBounds.getMaxX();
-                                                    snapAlignXPoint1 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMaxX()),
-                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignXPoint2 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMaxX()),
-                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignedX = true;
-                                                } else if (Math.abs(bounds.getMinX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetX = bounds.getMinX() - selectedBounds.getMaxX();
-                                                    snapAlignXPoint1 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMinX()),
-                                                            (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignXPoint2 = new DisplayPoint(
-                                                            (int) Math.round(bounds.getMinX()),
-                                                            (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
-                                                    );
-                                                    snapAlignedX = true;
+                                                if (!snapAlignedX) {
+                                                    if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetX = bounds.getMinX() - selectedBounds.getMinX();
+                                                        snapAlignXPoint1 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMinX()),
+                                                                (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignXPoint2 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMinX()),
+                                                                (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignedX = true;
+                                                    } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetX = bounds.getMaxX() - selectedBounds.getMinX();
+                                                        snapAlignXPoint1 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMaxX()),
+                                                                (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignXPoint2 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMaxX()),
+                                                                (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignedX = true;
+                                                    } else if (Math.abs(bounds.getMaxX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetX = bounds.getMaxX() - selectedBounds.getMaxX();
+                                                        snapAlignXPoint1 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMaxX()),
+                                                                (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignXPoint2 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMaxX()),
+                                                                (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignedX = true;
+                                                    } else if (Math.abs(bounds.getMinX() - selectedBounds.getMaxX()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetX = bounds.getMinX() - selectedBounds.getMaxX();
+                                                        snapAlignXPoint1 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMinX()),
+                                                                (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignXPoint2 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getMinX()),
+                                                                (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignedX = true;
+                                                    }
                                                 }
 
-                                                if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetY = bounds.getMinY() - selectedBounds.getMinY();
-                                                    snapAlignYPoint1 = new DisplayPoint(
-                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMinY())
-                                                    );
-                                                    snapAlignYPoint2 = new DisplayPoint(
-                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMinY())
-                                                    );
-                                                    snapAlignedY = true;
-                                                } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetY = bounds.getMaxY() - selectedBounds.getMinY();
-                                                    snapAlignYPoint1 = new DisplayPoint(
-                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMaxY())
-                                                    );
-                                                    snapAlignYPoint2 = new DisplayPoint(
-                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMaxY())
-                                                    );
-                                                    snapAlignedY = true;
-                                                } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetY = bounds.getMaxY() - selectedBounds.getMaxY();
-                                                    snapAlignYPoint1 = new DisplayPoint(
-                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMaxY())
-                                                    );
-                                                    snapAlignYPoint2 = new DisplayPoint(
-                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMaxY())
-                                                    );
-                                                    snapAlignedY = true;
-                                                } else if (Math.abs(bounds.getMinY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
-                                                    snapOffsetY = bounds.getMinY() - selectedBounds.getMaxY();
-                                                    snapAlignYPoint1 = new DisplayPoint(
-                                                            (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMinY())
-                                                    );
-                                                    snapAlignYPoint2 = new DisplayPoint(
-                                                            (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
-                                                            (int) Math.round(bounds.getMinY())
-                                                    );
-                                                    snapAlignedY = true;
+                                                if (!snapAlignedY) {
+                                                    if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetY = bounds.getMinY() - selectedBounds.getMinY();
+                                                        snapAlignYPoint1 = new DisplayPoint(
+                                                                (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMinY())
+                                                        );
+                                                        snapAlignYPoint2 = new DisplayPoint(
+                                                                (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMinY())
+                                                        );
+                                                        snapAlignedY = true;
+                                                    } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetY = bounds.getMaxY() - selectedBounds.getMinY();
+                                                        snapAlignYPoint1 = new DisplayPoint(
+                                                                (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMaxY())
+                                                        );
+                                                        snapAlignYPoint2 = new DisplayPoint(
+                                                                (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMaxY())
+                                                        );
+                                                        snapAlignedY = true;
+                                                    } else if (Math.abs(bounds.getMaxY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetY = bounds.getMaxY() - selectedBounds.getMaxY();
+                                                        snapAlignYPoint1 = new DisplayPoint(
+                                                                (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMaxY())
+                                                        );
+                                                        snapAlignYPoint2 = new DisplayPoint(
+                                                                (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMaxY())
+                                                        );
+                                                        snapAlignedY = true;
+                                                    } else if (Math.abs(bounds.getMinY() - selectedBounds.getMaxY()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetY = bounds.getMinY() - selectedBounds.getMaxY();
+                                                        snapAlignYPoint1 = new DisplayPoint(
+                                                                (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMinY())
+                                                        );
+                                                        snapAlignYPoint2 = new DisplayPoint(
+                                                                (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getMinY())
+                                                        );
+                                                        snapAlignedY = true;
+                                                    }
                                                 }
 
                                                 if (snapAlignedX && snapAlignedY) {
