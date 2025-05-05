@@ -399,6 +399,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int guidesCharacterId = -1;
 
+    @Override
+    public boolean canUseSnapping() {
+        return selectionMode || doFreeTransform || hilightedPoints != null;
+    }
+
     public void setFrozenButtons(boolean frozenButtons) {
         this.frozenButtons = frozenButtons;
     }

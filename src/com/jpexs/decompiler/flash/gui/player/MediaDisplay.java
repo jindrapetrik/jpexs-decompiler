@@ -82,4 +82,6 @@ public interface MediaDisplay extends Closeable {
     public void setMuted(boolean value);
 
     public boolean isMutable();
+    
+    public boolean canUseSnapping();
 }

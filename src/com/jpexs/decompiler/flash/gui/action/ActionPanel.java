@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.ScrollablePanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
@@ -92,6 +93,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -196,8 +198,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
-    }   
-    
+    }
+
     public void addScriptListener(Runnable listener) {
         scriptListeners.add(listener);
     }
@@ -498,7 +500,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public synchronized void setSource(final ASMSource src, final boolean useCache) {
         View.checkAccess();
-      
+
         scriptLoaded = false;
 
         if (setSourceWorker != null) {
@@ -554,7 +556,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         asm.removeDisassemblyListener(listener);
                     }
 
-                    if (decompileNeeded) {                        
+                    if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);
                             if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
@@ -946,8 +948,23 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         });
 
-        JButton deobfuscateOptionsButton = new JButton(View.getIcon("deobfuscateoptions16"));
-        deobfuscateOptionsButton.addActionListener(this::deobfuscateOptionsButtonActionPerformed);
+        PopupButton deobfuscateOptionsButton = new PopupButton(View.getIcon("deobfuscateoptions16")) {
+            @Override
+            protected JPopupMenu getPopupMenu() {
+                JPopupMenu popupMenu = new JPopupMenu();
+                JCheckBox simplifyExpressionsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.simplify_expressions"));
+                simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
+                simplifyExpressionsMenuItem.addActionListener(ActionPanel.this::simplifyExpressionsMenuItemActionPerformed);
+                JCheckBox removeObfuscatedDeclarationsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
+                removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
+                removeObfuscatedDeclarationsMenuItem.addActionListener(ActionPanel.this::removeObfuscatedDeclarationsMenuItemActionPerformed);
+
+                popupMenu.add(simplifyExpressionsMenuItem);
+                popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+
+                return popupMenu;
+            }
+        };
         deobfuscateOptionsButton.setToolTipText(AppStrings.translate("button.deobfuscate_options"));
         deobfuscateOptionsButton.setMargin(new Insets(0, 0, 0, 0));
         deobfuscateOptionsButton.setPreferredSize(new Dimension(30, deobfuscateButton.getPreferredSize().height));
@@ -1074,31 +1091,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
     }
 
-    private void deobfuscateOptionsButtonActionPerformed(ActionEvent evt) {
-        JPopupMenu popupMenu = new JPopupMenu();
-        JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
-        simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
-        simplifyExpressionsMenuItem.addActionListener(this::simplifyExpressionsMenuItemActionPerformed);
-        JCheckBoxMenuItem removeObfuscatedDeclarationsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
-        removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
-        removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
-
-        popupMenu.add(simplifyExpressionsMenuItem);
-        popupMenu.add(removeObfuscatedDeclarationsMenuItem);
-
-        JButton sourceButton = (JButton) evt.getSource();
-        popupMenu.show(sourceButton, 0, sourceButton.getHeight());
-    }
-
     private void simplifyExpressionsMenuItemActionPerformed(ActionEvent evt) {
-        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
-        Configuration.simplifyExpressions.set(menuItem.isSelected());
+        JCheckBox checkBox = (JCheckBox) evt.getSource();
+        Configuration.simplifyExpressions.set(checkBox.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
 
     private void removeObfuscatedDeclarationsMenuItemActionPerformed(ActionEvent evt) {
-        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
-        Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(menuItem.isSelected());
+        JCheckBox checkBox = (JCheckBox) evt.getSource();
+        Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(checkBox.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
 
@@ -1437,5 +1438,5 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public synchronized ASMSource getSrc() {
         return src;
-    }        
+    }
 }

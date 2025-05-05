@@ -72,6 +72,11 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     private Color bgColor;
 
     @Override
+    public boolean canUseSnapping() {
+        return false;
+    }        
+
+    @Override
     public boolean loopAvailable() {
         return false;
     }

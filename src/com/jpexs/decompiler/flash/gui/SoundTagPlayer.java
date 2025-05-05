@@ -92,6 +92,11 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private int instanceId = totalInstances++;
 
+    @Override
+    public boolean canUseSnapping() {
+        return false;
+    }
+        
     public int getInstanceId() {
         return instanceId;
     }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.abc.SnapOptionsButton;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.math.BigDecimal;
@@ -35,6 +36,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
 
     private MediaDisplay display;
     private JButton zoomFitButton;
+    private SnapOptionsButton snapOptionsButton;
     private final JLabel percentLabel = new JLabel("100%");
     private boolean zoomToFit = false;
     private double realZoom = 1.0;
@@ -57,6 +59,8 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         JButton zoomNoneButton = new JButton(View.getIcon("zoomnone16"));
         zoomNoneButton.addActionListener(this::zoomNoneButtonActionPerformed);
         zoomNoneButton.setToolTipText(AppStrings.translate("button.zoomnone.hint"));
+                
+        snapOptionsButton = new SnapOptionsButton();
 
         setLayout(new FlowLayout());
         add(percentLabel);
@@ -64,6 +68,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         add(zoomOutButton);
         add(zoomNoneButton);
         add(zoomFitButton);
+        add(snapOptionsButton);
 
         display.addEventListener(this);
     }
@@ -149,6 +154,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
             Zoom zoom = display.getZoom();
             zoomFitButton.setVisible(zoom != null);
             percentLabel.setVisible(zoom != null);
+            snapOptionsButton.setVisible(display.canUseSnapping());
             Zoom currentZoom = new Zoom();
             currentZoom.fit = zoomToFit;
             currentZoom.value = realZoom;
