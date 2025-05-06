@@ -105,6 +105,18 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         guidesOptionsButton.setToolTipText(AppStrings.translate("button.guides_options.hint"));
 
         snapOptionsButton = new SnapOptionsButton();
+        
+        JToggleButton gridButton = new JToggleButton(View.getIcon("grid16"));
+        gridButton.addActionListener(this::gridButtonActionPerformed);
+        gridButton.setToolTipText(AppStrings.translate("button.grid.hint"));
+        gridButton.setSelected(Configuration.showGrid.get());
+        Configuration.showGrid.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                gridButton.setSelected(newValue);
+            }
+        });
+
 
         setLayout(new FlowLayout());
         add(percentLabel);
@@ -113,10 +125,16 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         add(zoomNoneButton);
         add(zoomFitButton);
         add(rulerButton);
+        add(gridButton);
         add(guidesOptionsButton);
         add(snapOptionsButton);
 
         display.addEventListener(this);
+    }
+    
+    private void gridButtonActionPerformed(ActionEvent evt) {
+        JToggleButton source = (JToggleButton) evt.getSource();
+        Configuration.showGrid.set(source.isSelected());
     }
 
     private void guidesShowActionPerformed(ActionEvent evt) {

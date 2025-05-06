@@ -910,6 +910,54 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void setResample(boolean resample) {
         this.resample = resample;
     }
+    
+    private static void drawGridSwf(Graphics2D g, Rectangle realRect, double zoom) {
+        g.setColor(new Color(0x94, 0x94, 0x94));
+        double x;
+        double y;
+        int ix;
+        int iy;
+        int minIx = 0;
+        int minIy = 0;
+        int maxIx;
+        int maxIy;
+
+        ix = 0;
+        while ((double) realRect.x + ix * Configuration.gridHorizontalSpace.get() * zoom < realRect.getMaxX()) {
+            ix++;
+        }
+        maxIx = ix;
+
+        iy = 0;
+        while ((double) realRect.y + iy * Configuration.gridVerticalSpace.get() * zoom < realRect.getMaxY()) {
+            iy++;
+        }
+        maxIy = iy;
+
+        for (ix = minIx; ix <= maxIx; ix++) {
+            x = realRect.x + ix * Configuration.gridHorizontalSpace.get() * zoom;
+            Point2D p1 = new Point2D.Double(x, realRect.y + minIy * Configuration.gridVerticalSpace.get() * zoom);
+            Point2D p2 = new Point2D.Double(x, realRect.y + maxIy * Configuration.gridVerticalSpace.get() * zoom);
+            g.drawLine(
+                    (int) Math.round(p1.getX()),
+                    (int) Math.round(p1.getY()),
+                    (int) Math.round(p2.getX()),
+                    (int) Math.round(p2.getY())
+            );
+        }
+
+        for (iy = minIy; iy <= maxIy; iy++) {
+            y = realRect.y + iy * Configuration.gridVerticalSpace.get() * zoom;
+            Point2D p1 = new Point2D.Double(realRect.x + minIx * Configuration.gridHorizontalSpace.get() * zoom, y);
+            Point2D p2 = new Point2D.Double(realRect.x + maxIx * Configuration.gridHorizontalSpace.get() * zoom, y);
+            g.drawLine(
+                    (int) Math.round(p1.getX()),
+                    (int) Math.round(p1.getY()),
+                    (int) Math.round(p2.getX()),
+                    (int) Math.round(p2.getY())
+            );
+        }
+    }
 
     private class IconPanel extends JPanel {
 
@@ -959,7 +1007,69 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return allowMove;
         }
 
-        VolatileImage renderImage;
+        VolatileImage renderImage;       
+        
+        private void drawGridNoSwf(Graphics2D g2, int x, int y) {
+            double zoomDouble = getRealZoom();
+            g2.setColor(new Color(0x94, 0x94, 0x94));
+            double gx;
+            double gy;
+            int ix = 0;
+            int iy = 0;
+            int minIx;
+            int minIy;
+            int maxIx;
+            int maxIy;
+            double sx = x + offsetPoint.getX();
+            double sy = y + offsetPoint.getY();
+
+            while (sx + ix * Configuration.gridHorizontalSpace.get() * zoomDouble > 0) {
+                ix--;
+            }
+            minIx = ix;
+            ix = 0;
+            while (sx + ix * Configuration.gridHorizontalSpace.get() * zoomDouble < getWidth()) {
+                ix++;
+            }
+            maxIx = ix;
+
+            while (sy + iy * Configuration.gridVerticalSpace.get() * zoomDouble > 0) {
+                iy--;
+            }
+            minIy = iy;
+
+            iy = 0;
+            while (sy + iy * Configuration.gridVerticalSpace.get() * zoomDouble < getHeight()) {
+                iy++;
+            }
+            maxIy = iy;
+
+            for (ix = minIx; ix <= maxIx; ix++) {
+                gx = sx + ix * Configuration.gridHorizontalSpace.get() * zoomDouble;
+
+                Point2D p1 = new Point2D.Double(gx, sy + minIy * Configuration.gridVerticalSpace.get() * zoomDouble);
+                Point2D p2 = new Point2D.Double(gx, sy + maxIy * Configuration.gridVerticalSpace.get() * zoomDouble);
+                g2.drawLine(
+                        (int) Math.round(p1.getX()),
+                        (int) Math.round(p1.getY()),
+                        (int) Math.round(p2.getX()),
+                        (int) Math.round(p2.getY())
+                );
+            }
+
+            for (iy = minIy; iy <= maxIy; iy++) {
+                gy = sy + iy * Configuration.gridVerticalSpace.get() * zoomDouble;
+
+                Point2D p1 = new Point2D.Double(sx + minIx * Configuration.gridHorizontalSpace.get() * zoomDouble, gy);
+                Point2D p2 = new Point2D.Double(sx + maxIx * Configuration.gridHorizontalSpace.get() * zoomDouble, gy);
+                g2.drawLine(
+                        (int) Math.round(p1.getX()),
+                        (int) Math.round(p1.getY()),
+                        (int) Math.round(p2.getX()),
+                        (int) Math.round(p2.getY())
+                );
+            }
+        }
 
         public void render() {
             SerializableImage img = getImg();
@@ -1001,7 +1111,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             y = (int) offsetPoint.getY();
                         }
 
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+
+                        if (Configuration.showGrid.get() && !(timelined instanceof SWF) && !Configuration.gridOverObjects.get()) {
+                            drawGridNoSwf(g2, x, y);
+                        }
+
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
+
+                        if (Configuration.showGrid.get() && !(timelined instanceof SWF) && Configuration.gridOverObjects.get()) {
+                            drawGridNoSwf(g2, x, y);
+                        }
 
                         if (hilightedEdge != null || hilightedPoints != null) {
                             hilightEdgeColor += hilightEdgeColorStep;
@@ -1010,7 +1130,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 hilightEdgeColor += hilightEdgeColorStep * 2;
                             }
                             RECT timRect = timelined.getRect();
-                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             AffineTransform trans = new AffineTransform();
                             trans.translate(offsetPoint.getX(), offsetPoint.getY());
                             trans.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
@@ -1104,7 +1223,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (!(timelined instanceof SWF) && (doFreeTransform || hilightedPoints != null)) {
                             int axisX = 0;
                             int axisY = 0;
-                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             RECT timRect = timelined.getRect();
                             axisX = (int) Math.round(offsetPoint.getX());
                             axisY = (int) Math.round(offsetPoint.getY());
@@ -2170,6 +2288,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                 if (distance < SNAP_DISTANCE) {
                                     snapOffsetY = nearestGuideY - touchPointPos.getY();
+                                }
+                            }
+                        }
+
+                        if (Configuration.showGrid.get() && Configuration.snapToGrid.get()) {
+                            if (snapOffsetX == null) {
+                                int positionPxX = (int) Math.round((touchPointPos.getX() - offsetPoint.getX()) / zoomDouble);
+                                int d = (positionPxX / Configuration.gridHorizontalSpace.get()) * Configuration.gridHorizontalSpace.get();
+                                if ((positionPxX - d) * zoomDouble < SNAP_DISTANCE) {
+                                    snapOffsetX = d * zoomDouble - touchPointPos.getX() + offsetPoint.getX();
+                                } else if ((d + Configuration.gridHorizontalSpace.get() - positionPxX) * zoomDouble < SNAP_DISTANCE) {
+                                    snapOffsetX = (d + Configuration.gridHorizontalSpace.get()) * zoomDouble - touchPointPos.getX() + offsetPoint.getX();
+                                }
+                            }
+                            if (snapOffsetY == null) {
+                                int positionPxY = (int) Math.round((touchPointPos.getY() - offsetPoint.getY()) / zoomDouble);
+                                int d = (positionPxY / Configuration.gridVerticalSpace.get()) * Configuration.gridVerticalSpace.get();
+                                if ((positionPxY - d) * zoomDouble < SNAP_DISTANCE) {
+                                    snapOffsetY = d * zoomDouble - touchPointPos.getY() + offsetPoint.getY();
+                                } else if ((d + Configuration.gridVerticalSpace.get() - positionPxY) * zoomDouble < SNAP_DISTANCE) {
+                                    snapOffsetY = (d + Configuration.gridVerticalSpace.get()) * zoomDouble - touchPointPos.getY() + offsetPoint.getY();
                                 }
                             }
                         }
@@ -4633,6 +4772,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
         }
 
+        if (Configuration.showGrid.get() && (drawable instanceof SWF) && !Configuration.gridOverObjects.get()) {
+            Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
+            drawGridSwf(g, realRect, zoom);
+        }
+
         parentMatrix = new Matrix();
         List<Integer> ignoreDepths = new ArrayList<>();
         for (int i = 0; i < parentTimelineds.size(); i++) {
@@ -4774,6 +4918,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         }
+        
+        
+        if (Configuration.showGrid.get() && (drawable instanceof SWF) && Configuration.gridOverObjects.get()) {
+            Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
+            drawGridSwf(g, realRect, zoom);
+        }
+        
         img = image;
 
         /*if (shouldCache) {

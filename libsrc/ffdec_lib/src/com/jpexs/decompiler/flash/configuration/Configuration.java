@@ -1081,6 +1081,26 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> lockGuides = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> showGrid = null;        
+    
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> gridVerticalSpace = null;
+    
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> gridHorizontalSpace = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapToGrid = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> gridOverObjects = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

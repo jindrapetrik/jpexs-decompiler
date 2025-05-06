@@ -50,6 +50,11 @@ public class SnapOptionsButton extends PopupButton {
         snapAlignMenuItem.addActionListener(this::snapAlignMenuItemActionPerformed);
         popupMenu.add(snapAlignMenuItem);
         
+        JCheckBox snapToGridMenuItem = new JCheckBox(AppStrings.translate("snap_options.snap_to_grid"));
+        snapToGridMenuItem.setSelected(Configuration.snapToGrid.get());
+        snapToGridMenuItem.addActionListener(this::snapToGridMenuItemActionPerformed);
+        popupMenu.add(snapToGridMenuItem);
+        
         JCheckBox snapToGuidesMenuItem = new JCheckBox(AppStrings.translate("snap_options.snap_to_guides"));
         snapToGuidesMenuItem.setSelected(Configuration.snapToGuides.get());
         snapToGuidesMenuItem.addActionListener(this::snapToGuidesMenuItemActionPerformed);
@@ -71,6 +76,11 @@ public class SnapOptionsButton extends PopupButton {
     private void snapAlignMenuItemActionPerformed(ActionEvent evt) {
         JCheckBox menuItem = (JCheckBox) evt.getSource();
         Configuration.snapAlign.set(menuItem.isSelected());        
+    }
+    
+    private void snapToGridMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBox menuItem = (JCheckBox) evt.getSource();
+        Configuration.snapToGrid.set(menuItem.isSelected());        
     }
     
     private void snapToGuidesMenuItemActionPerformed(ActionEvent evt) {
