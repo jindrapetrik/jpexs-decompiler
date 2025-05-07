@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.configuration.enums.GridSnapAccuracy;
+import com.jpexs.decompiler.flash.configuration.enums.GuidesSnapAccuracy;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
@@ -1110,6 +1112,34 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Color> guidesColor = null;
     
+    @ConfigurationCategory("display")
+    @ConfigurationDefaultString("NORMAL")
+    public static ConfigurationItem<GridSnapAccuracy> gridSnapAccuracy = null;
+    
+    @ConfigurationCategory("display")
+    @ConfigurationDefaultString("NORMAL")
+    public static ConfigurationItem<GuidesSnapAccuracy> guidesSnapAccuracy = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignObjectHorizontalSpace = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignObjectVerticalSpace = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignStageBorder = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlignCenterAlignmentHorizontal = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
+        
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

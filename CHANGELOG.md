@@ -15,6 +15,9 @@ All notable changes to this project will be documented in this file.
 - [#2370] Snap to guides, objects and pixels, Snap align, toggle with magnet icon
 - [#2370] Show/Hide guides, lock guides, clear guides actions from icon menu
 - Display grid, snap to grid
+- [#2370] Snap align border space, object spacing, center alignment
+- [#2370] Setting for color and snap accuracy for guides, grid
+- [#2370] Dialogs for editing grid, guides and snapping
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

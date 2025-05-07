@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.gui.player;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.GridDialog;
+import com.jpexs.decompiler.flash.gui.GuidesDialog;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.SnapOptionsButton;
@@ -30,6 +33,7 @@ import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -93,30 +97,39 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
                 lockGuidesMenuItem.addActionListener(ZoomPanel.this::guidesLockActionPerformed);
                 JMenuItem clearGuidesMenuItem = new JMenuItem(AppStrings.translate("guides_options.clear"));
                 clearGuidesMenuItem.addActionListener(ZoomPanel.this::guidesClearActionPerformed);
+                JMenuItem editGuidesMenuItem = new JMenuItem(AppStrings.translate("guides_options.edit"));
+                editGuidesMenuItem.addActionListener(ZoomPanel.this::guidesEditActionPerformed);
 
                 menu.add(showGuidesMenuItem);
                 menu.add(lockGuidesMenuItem);
                 menu.add(clearGuidesMenuItem);
+                menu.add(editGuidesMenuItem);
 
                 return menu;
             }
         };
 
-        guidesOptionsButton.setToolTipText(AppStrings.translate("button.guides_options.hint"));
+        guidesOptionsButton.setToolTipText(AppStrings.translate("button.guides_options"));
 
         snapOptionsButton = new SnapOptionsButton();
         
-        JToggleButton gridButton = new JToggleButton(View.getIcon("grid16"));
-        gridButton.addActionListener(this::gridButtonActionPerformed);
-        gridButton.setToolTipText(AppStrings.translate("button.grid.hint"));
-        gridButton.setSelected(Configuration.showGrid.get());
-        Configuration.showGrid.addListener(new ConfigurationItemChangeListener<Boolean>() {
+        PopupButton gridButton = new PopupButton(View.getIcon("grid16")) {
             @Override
-            public void configurationItemChanged(Boolean newValue) {
-                gridButton.setSelected(newValue);
-            }
-        });
-
+            protected JPopupMenu getPopupMenu() {
+                JPopupMenu menu = new JPopupMenu();
+                JCheckBoxMenuItem showGridCheckBoxMenuItem = new JCheckBoxMenuItem(AppStrings.translate("grid_options.show_grid"));
+                showGridCheckBoxMenuItem.addActionListener(ZoomPanel.this::showGridCheckBoxMenuItemActionPerformed);
+                showGridCheckBoxMenuItem.setSelected(Configuration.showGrid.get());
+                menu.add(showGridCheckBoxMenuItem);
+                
+                JMenuItem editGridMenuItem = new JMenuItem(AppStrings.translate("grid_options.edit"));
+                editGridMenuItem.addActionListener(ZoomPanel.this::editGridMenuItemActionPerformed);
+                menu.add(editGridMenuItem);
+                
+                return menu;
+            }            
+        };
+        gridButton.setToolTipText(AppStrings.translate("button.grid_options"));       
 
         setLayout(new FlowLayout());
         add(percentLabel);
@@ -132,8 +145,13 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         display.addEventListener(this);
     }
     
-    private void gridButtonActionPerformed(ActionEvent evt) {
-        JToggleButton source = (JToggleButton) evt.getSource();
+    
+    private void editGridMenuItemActionPerformed(ActionEvent evt) {
+        new GridDialog(Main.getDefaultDialogsOwner()).setVisible(true);
+    }
+    
+    private void showGridCheckBoxMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
         Configuration.showGrid.set(source.isSelected());
     }
 
@@ -147,6 +165,10 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         Configuration.lockGuides.set(source.isSelected());
     }
 
+    private void guidesEditActionPerformed(ActionEvent evt) {
+        new GuidesDialog(Main.getDefaultDialogsOwner(), display).setVisible(true);
+    }
+    
     private void guidesClearActionPerformed(ActionEvent evt) {
         display.clearGuides();
     }

@@ -18,14 +18,14 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.PopupButton;
+import com.jpexs.decompiler.flash.gui.SnappingDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 /**
@@ -69,8 +69,16 @@ public class SnapOptionsButton extends PopupButton {
         snapToObjectsMenuItem.setSelected(Configuration.snapToObjects.get());
         snapToObjectsMenuItem.addActionListener(this::snapToObjectsMenuItemActionPerformed);
         popupMenu.add(snapToObjectsMenuItem);
+        
+        JMenuItem editSnappingMenuItem = new JMenuItem(AppStrings.translate("snap_options.edit"));
+        editSnappingMenuItem.addActionListener(this::editSnappingMenuItemActionPerformed);        
+        popupMenu.add(editSnappingMenuItem);
                         
         return popupMenu;
+    }
+    
+    private void editSnappingMenuItemActionPerformed(ActionEvent evt) {
+        new SnappingDialog(Main.getDefaultDialogsOwner()).setVisible(true);
     }
     
     private void snapAlignMenuItemActionPerformed(ActionEvent evt) {

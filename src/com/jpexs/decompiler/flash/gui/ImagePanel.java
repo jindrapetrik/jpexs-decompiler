@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
-import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
@@ -44,7 +43,6 @@ import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -57,10 +55,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
-import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -195,8 +189,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int time = 0;
 
-    //private int selectedDepth = -1;
-    //private int freeTransformDepth = -1;
     private boolean doFreeTransform = false;
 
     private Zoom zoom = new Zoom();
@@ -313,9 +305,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private DisplayPoint snapAlignYPoint1 = null;
     private DisplayPoint snapAlignYPoint2 = null;
 
-    private static final int SNAP_DISTANCE = 10;
-
     private static final int SNAP_ALIGN_DISTANCE = 5;
+
+    private static final int SNAP_TO_OBJECTS_DISTANCE = 10;
 
     private static final int SNAP_ALIGN_AFTER_LINE = 50;
 
@@ -396,6 +388,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
+
+    private static int getSnapGuidesDistance() {
+        return Configuration.guidesSnapAccuracy.get().getDistance();
+    }
+
+    private static int getSnapGridDistance() {
+        return Configuration.gridSnapAccuracy.get().getDistance();
+    }
 
     @Override
     public boolean canHaveRuler() {
@@ -908,7 +908,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void setResample(boolean resample) {
         this.resample = resample;
     }
-    
+
     private static void drawGridSwf(Graphics2D g, Rectangle realRect, double zoom) {
         g.setColor(Configuration.gridColor.get());
         double x;
@@ -1005,8 +1005,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return allowMove;
         }
 
-        VolatileImage renderImage;       
-        
+        VolatileImage renderImage;
+
         private void drawGridNoSwf(Graphics2D g2, int x, int y) {
             double zoomDouble = getRealZoom();
             g2.setColor(Configuration.gridColor.get());
@@ -1965,6 +1965,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                     if (timelined instanceof SWF) {
                                         RECT stageRect = timelined.getRect();
+
+                                        stageRect = new RECT(
+                                                (int) Math.round(stageRect.Xmin + Configuration.snapAlignStageBorder.get() * SWF.unitDivisor),
+                                                (int) Math.round(stageRect.Xmax - Configuration.snapAlignStageBorder.get() * SWF.unitDivisor),
+                                                (int) Math.round(stageRect.Ymin + Configuration.snapAlignStageBorder.get() * SWF.unitDivisor),
+                                                (int) Math.round(stageRect.Ymax - Configuration.snapAlignStageBorder.get() * SWF.unitDivisor)
+                                        );
+
                                         Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
                                         Matrix matrix = new Matrix();
                                         matrix = matrix.concatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
@@ -2075,20 +2083,39 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                                 BoundedTag bt = (BoundedTag) ct;
                                                 RECT rect = bt.getRect();
 
-                                                Matrix matrix = new Matrix();
+                                                Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
+                                                Matrix translateMatrix = Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY());
+
+                                                Matrix matrix = translateMatrix.concatenate(scaleMatrix);
+
+                                                Matrix dsMatrix = new Matrix();
                                                 if (ds.matrix != null) {
-                                                    matrix = matrix.preConcatenate(new Matrix(ds.matrix));
+                                                    dsMatrix = new Matrix(ds.matrix);
                                                 }
 
-                                                Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
+                                                Rectangle2D bounds = dsMatrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
+                                                bounds = new Rectangle2D.Double(
+                                                        bounds.getX() - Configuration.snapAlignObjectHorizontalSpace.get() * SWF.unitDivisor,
+                                                        bounds.getY() - Configuration.snapAlignObjectVerticalSpace.get() * SWF.unitDivisor,
+                                                        bounds.getWidth() + 2 * Configuration.snapAlignObjectHorizontalSpace.get() * SWF.unitDivisor,
+                                                        bounds.getHeight() + 2 * Configuration.snapAlignObjectVerticalSpace.get() * SWF.unitDivisor
+                                                );
 
-                                                matrix = matrix.preConcatenate(scaleMatrix);
-                                                matrix = matrix.preConcatenate(Matrix.getTranslateInstance(offsetPoint.getX(), offsetPoint.getY()));
-
-                                                Rectangle2D bounds = matrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
+                                                bounds = matrix.transform(bounds);
 
                                                 if (!snapAlignedX) {
-                                                    if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
+                                                    if (Configuration.snapAlignCenterAlignmentVertical.get() && Math.abs(bounds.getCenterX() - selectedBounds.getCenterX()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetX = bounds.getCenterX() - selectedBounds.getCenterX();
+                                                        snapAlignXPoint1 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getCenterX()),
+                                                                (int) Math.round(Math.min(bounds.getMinY(), selectedBounds.getMinY()) - SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignXPoint2 = new DisplayPoint(
+                                                                (int) Math.round(bounds.getCenterX()),
+                                                                (int) Math.round(Math.max(bounds.getMaxY(), selectedBounds.getMaxY()) + SNAP_ALIGN_AFTER_LINE)
+                                                        );
+                                                        snapAlignedX = true;
+                                                    } else if (Math.abs(bounds.getMinX() - selectedBounds.getMinX()) < SNAP_ALIGN_DISTANCE) {
                                                         snapOffsetX = bounds.getMinX() - selectedBounds.getMinX();
                                                         snapAlignXPoint1 = new DisplayPoint(
                                                                 (int) Math.round(bounds.getMinX()),
@@ -2136,7 +2163,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                                 }
 
                                                 if (!snapAlignedY) {
-                                                    if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
+                                                    if (Configuration.snapAlignCenterAlignmentHorizontal.get() && Math.abs(bounds.getCenterY() - selectedBounds.getCenterY()) < SNAP_ALIGN_DISTANCE) {
+                                                        snapOffsetY = bounds.getCenterY() - selectedBounds.getCenterY();
+                                                        snapAlignYPoint1 = new DisplayPoint(
+                                                                (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getCenterY())
+                                                        );
+                                                        snapAlignYPoint2 = new DisplayPoint(
+                                                                (int) Math.round(Math.max(bounds.getMaxX(), selectedBounds.getMaxX()) + SNAP_ALIGN_AFTER_LINE),
+                                                                (int) Math.round(bounds.getCenterY())
+                                                        );
+                                                        snapAlignedY = true;
+                                                    } else if (Math.abs(bounds.getMinY() - selectedBounds.getMinY()) < SNAP_ALIGN_DISTANCE) {
                                                         snapOffsetY = bounds.getMinY() - selectedBounds.getMinY();
                                                         snapAlignYPoint1 = new DisplayPoint(
                                                                 (int) Math.round(Math.min(bounds.getMinX(), selectedBounds.getMinX()) - SNAP_ALIGN_AFTER_LINE),
@@ -2243,7 +2281,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                             nearestPoint = windowPoint;
                                         }
                                     }
-                                    if (distance < SNAP_DISTANCE) {
+                                    if (distance < SNAP_TO_OBJECTS_DISTANCE) {
                                         snapOffsetX = nearestPoint.getX() - touchPointPos.getX();
                                         snapOffsetY = nearestPoint.getY() - touchPointPos.getY();
                                     }
@@ -2265,7 +2303,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 }
 
-                                if (distance < SNAP_DISTANCE) {
+                                if (distance < getSnapGuidesDistance()) {
                                     snapOffsetX = nearestGuideX - touchPointPos.getX();
                                 }
                             }
@@ -2284,7 +2322,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 }
 
-                                if (distance < SNAP_DISTANCE) {
+                                if (distance < getSnapGuidesDistance()) {
                                     snapOffsetY = nearestGuideY - touchPointPos.getY();
                                 }
                             }
@@ -2294,18 +2332,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (snapOffsetX == null) {
                                 int positionPxX = (int) Math.round((touchPointPos.getX() - offsetPoint.getX()) / zoomDouble);
                                 int d = (positionPxX / Configuration.gridHorizontalSpace.get()) * Configuration.gridHorizontalSpace.get();
-                                if ((positionPxX - d) * zoomDouble < SNAP_DISTANCE) {
+                                if ((positionPxX - d) * zoomDouble < getSnapGridDistance()) {
                                     snapOffsetX = d * zoomDouble - touchPointPos.getX() + offsetPoint.getX();
-                                } else if ((d + Configuration.gridHorizontalSpace.get() - positionPxX) * zoomDouble < SNAP_DISTANCE) {
+                                } else if ((d + Configuration.gridHorizontalSpace.get() - positionPxX) * zoomDouble < getSnapGridDistance()) {
                                     snapOffsetX = (d + Configuration.gridHorizontalSpace.get()) * zoomDouble - touchPointPos.getX() + offsetPoint.getX();
                                 }
                             }
                             if (snapOffsetY == null) {
                                 int positionPxY = (int) Math.round((touchPointPos.getY() - offsetPoint.getY()) / zoomDouble);
                                 int d = (positionPxY / Configuration.gridVerticalSpace.get()) * Configuration.gridVerticalSpace.get();
-                                if ((positionPxY - d) * zoomDouble < SNAP_DISTANCE) {
+                                if ((positionPxY - d) * zoomDouble < getSnapGridDistance()) {
                                     snapOffsetY = d * zoomDouble - touchPointPos.getY() + offsetPoint.getY();
-                                } else if ((d + Configuration.gridVerticalSpace.get() - positionPxY) * zoomDouble < SNAP_DISTANCE) {
+                                } else if ((d + Configuration.gridVerticalSpace.get() - positionPxY) * zoomDouble < getSnapGridDistance()) {
                                     snapOffsetY = (d + Configuration.gridVerticalSpace.get()) * zoomDouble - touchPointPos.getY() + offsetPoint.getY();
                                 }
                             }
@@ -4916,13 +4954,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         }
-        
-        
+
         if (Configuration.showGrid.get() && (drawable instanceof SWF) && Configuration.gridOverObjects.get()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             drawGridSwf(g, realRect, zoom);
         }
-        
+
         img = image;
 
         /*if (shouldCache) {
