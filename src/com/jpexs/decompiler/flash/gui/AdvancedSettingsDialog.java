@@ -35,6 +35,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -55,6 +57,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -68,6 +71,8 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -409,6 +414,9 @@ public class AdvancedSettingsDialog extends AppDialog {
                             Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+                    if (itemType == Color.class) {
+                        defaultValue = ConfigurationColorSelection.colorToHex((Color) defaultValue);
+                    }
                     String locNameHtml = locName;
                     if (!filter.trim().equals("")) {
                         locNameHtml = Pattern.compile(Pattern.quote(filter), Pattern.UNICODE_CASE + Pattern.CASE_INSENSITIVE).matcher(locNameHtml).replaceAll("{bold}$0{/bold}");
@@ -464,6 +472,11 @@ public class AdvancedSettingsDialog extends AppDialog {
                             cb.setSelected((Boolean) item.get());
                             cb.setToolTipText(description);
                             c = cb;
+                        } else if (itemType == Color.class) {
+                            ConfigurationColorSelection cb = new ConfigurationColorSelection(item, (Color) item.get(), description);
+                            
+                            cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));                            
+                            c = cb;                                 
                         } else if (itemType.isEnum()) {
                             JComboBox<String> cb = new JComboBox<>();
                             @SuppressWarnings("unchecked")
@@ -574,6 +587,9 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
             if (itemType == Boolean.class) {
                 value = ((JCheckBox) c).isSelected();
+            }
+            if (itemType == Color.class) {
+                value = ((ConfigurationColorSelection) c).getValue();
             }
 
             if (itemType == Calendar.class) {

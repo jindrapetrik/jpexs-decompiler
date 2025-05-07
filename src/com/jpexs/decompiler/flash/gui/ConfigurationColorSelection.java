@@ -1,0 +1,94 @@
+/*
+ * Copyright (C) 2025 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jpexs.decompiler.flash.gui;
+
+import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class ConfigurationColorSelection extends JPanel {
+    private JPanel colorPanel;
+
+    public ConfigurationColorSelection(ConfigurationItem item, Color value, String description) {
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        colorPanel = new JPanel();
+        colorPanel.setToolTipText(description);
+        colorPanel.setSize(16, 16);
+        colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        JLabel colorLabel = new JLabel();
+        colorPanel.setBackground(value);
+
+        colorPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            }   
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            }                                
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Color newColor = ViewMessages.showColorDialog(colorPanel, colorPanel.getBackground(), false);
+                if (newColor != null) {
+                    colorPanel.setBackground(newColor);
+
+                }
+            }                                                                
+
+        });       
+        colorLabel.setText(colorToHex(value));
+        colorLabel.setToolTipText(description);
+        
+
+        add(colorPanel);
+        add(colorLabel);
+    }
+    
+    public static String colorToHex(Color value) {
+        String rh = Integer.toHexString(value.getRed());
+        if (rh.length() < 2) {
+            rh = "0" + rh;
+        }
+        String gh = Integer.toHexString(value.getGreen());
+        if (gh.length() < 2) {
+            gh = "0" + gh;
+        }
+        String bh = Integer.toHexString(value.getBlue());
+        if (bh.length() < 2) {
+            bh = "0" + bh;
+        }
+        return "#" + rh + gh + bh;
+    }
+    
+    public Color getValue() {
+        return colorPanel.getBackground();
+    }
+    
+}

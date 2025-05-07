@@ -385,8 +385,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private List<Double> guidesY = new ArrayList<>();
 
-    private static final Color GUIDES_COLOR = Color.green;
-
     private static final int GUIDE_THICKNESS = 20;
 
     private static final int GUIDE_FONT_HEIGHT = 11;
@@ -912,7 +910,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
     
     private static void drawGridSwf(Graphics2D g, Rectangle realRect, double zoom) {
-        g.setColor(new Color(0x94, 0x94, 0x94));
+        g.setColor(Configuration.gridColor.get());
         double x;
         double y;
         int ix;
@@ -1011,7 +1009,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         
         private void drawGridNoSwf(Graphics2D g2, int x, int y) {
             double zoomDouble = getRealZoom();
-            g2.setColor(new Color(0x94, 0x94, 0x94));
+            g2.setColor(Configuration.gridColor.get());
             double gx;
             double gy;
             int ix = 0;
@@ -3298,7 +3296,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            g2d.setColor(GUIDES_COLOR);
+            g2d.setColor(Configuration.guidesColor.get());
             if (draggingGuideX && lastMouseEvent != null) {
                 g2d.drawLine(guideDragX, 0, guideDragX, getHeight());
             }
@@ -3737,7 +3735,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 g2.fillRect(0, 0, GUIDE_THICKNESS, GUIDE_THICKNESS);
 
                 if (guideDragX > -1) {
-                    g2.setColor(GUIDES_COLOR);
+                    g2.setColor(Configuration.guidesColor.get());
                     g2.drawLine(GUIDE_THICKNESS + guideDragX, 0, GUIDE_THICKNESS + guideDragX, GUIDE_THICKNESS);
                 }
 
@@ -3811,7 +3809,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 g2.draw(gp);
 
                 if (guideDragY > -1) {
-                    g2.setColor(GUIDES_COLOR);
+                    g2.setColor(Configuration.guidesColor.get());
                     g2.drawLine(0, guideDragY, GUIDE_THICKNESS, guideDragY);
                 }
             }

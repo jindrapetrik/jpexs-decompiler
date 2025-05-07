@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -1101,6 +1102,14 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> gridOverObjects = null;
     
+    @ConfigurationDefaultColor("#949494")
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Color> gridColor = null;    
+    
+    @ConfigurationDefaultColor("#00FF00")
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Color> guidesColor = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
@@ -1483,6 +1492,17 @@ public final class Configuration {
             GregorianCalendar mingc = new GregorianCalendar();
             mingc.setTime(new Date(aCalendar.value()));
             defaultValue = mingc;
+        }
+        
+        ConfigurationDefaultColor aColor = field.getAnnotation(ConfigurationDefaultColor.class);
+        if (aColor != null) {
+            Pattern p = Pattern.compile("#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$");
+            Matcher m = p.matcher(aColor.value());
+            if (m.matches()) {
+                defaultValue = new Color(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16));
+            } else {
+                defaultValue = Color.black;
+            }
         }
         return defaultValue;
     }
