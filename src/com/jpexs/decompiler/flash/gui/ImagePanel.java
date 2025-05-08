@@ -1467,7 +1467,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Double guide = guidesX.get(d);
                                 int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
                                 if (mousePoint.x == guideInPanel) {
-                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), EcmaNumberToString.stringFor(guide));
+                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), View.getIcon("guidemovex32"), EcmaNumberToString.stringFor(guide));
                                     if (newPositionStr != null) {
                                         try {
                                             double newPosition = Double.parseDouble(newPositionStr);
@@ -1486,7 +1486,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Double guide = guidesY.get(d);
                                 int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
                                 if (mousePoint.y == guideInPanel) {
-                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), EcmaNumberToString.stringFor(guide));
+                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), View.getIcon("guidemovey32"), EcmaNumberToString.stringFor(guide));
                                     if (newPositionStr != null) {
                                         try {
                                             double newPosition = Double.parseDouble(newPositionStr);
