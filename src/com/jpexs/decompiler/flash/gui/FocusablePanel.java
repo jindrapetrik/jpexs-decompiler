@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -45,10 +44,10 @@ import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
  *
  * @author JPEXS
  */
-public class FocusableJPanel extends JPanel {    
+public class FocusablePanel extends JPanel {
+
     private List<ActionListener> listeners = new ArrayList<>();
-    
-    
+
     private static final Set<Integer> pressedModifiers = new HashSet<>();
 
     private static void setupGlobalKeyListener() {
@@ -61,28 +60,33 @@ public class FocusableJPanel extends JPanel {
             return false;
         });
     }
-    
+
     private static int getCurrentModifiers() {
         int mods = 0;
-        if (pressedModifiers.contains(KeyEvent.VK_CONTROL)) mods |= InputEvent.CTRL_DOWN_MASK;
-        if (pressedModifiers.contains(KeyEvent.VK_SHIFT)) mods |= InputEvent.SHIFT_DOWN_MASK;
-        if (pressedModifiers.contains(KeyEvent.VK_ALT)) mods |= InputEvent.ALT_DOWN_MASK;
+        if (pressedModifiers.contains(KeyEvent.VK_CONTROL)) {
+            mods |= InputEvent.CTRL_DOWN_MASK;
+        }
+        if (pressedModifiers.contains(KeyEvent.VK_SHIFT)) {
+            mods |= InputEvent.SHIFT_DOWN_MASK;
+        }
+        if (pressedModifiers.contains(KeyEvent.VK_ALT)) {
+            mods |= InputEvent.ALT_DOWN_MASK;
+        }
         return mods;
     }
-    
+
     public void addActionListener(ActionListener l) {
         listeners.add(l);
     }
-    
+
     public void removeActionListener(ActionListener l) {
         listeners.remove(l);
     }
-    
-   
-    public FocusableJPanel() {
+
+    public FocusablePanel() {
         setupGlobalKeyListener();
         setFocusable(true);
-                
+
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -109,14 +113,14 @@ public class FocusableJPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 requestFocusInWindow();
-                fireAction(null);                
+                fireAction(null);
             }
         });
     }
-    
+
     private void fireAction(ActionEvent e) {
         if (e == null) {
-            e = new ActionEvent(FocusableJPanel.this, ActionEvent.ACTION_PERFORMED, "CLICK", getCurrentModifiers());
+            e = new ActionEvent(FocusablePanel.this, ActionEvent.ACTION_PERFORMED, "CLICK", getCurrentModifiers());
         }
         for (ActionListener l : listeners) {
             l.actionPerformed(e);
@@ -126,14 +130,19 @@ public class FocusableJPanel extends JPanel {
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
-        
+
         if (Configuration.useRibbonInterface.get() && isFocusOwner()) {
-            SubstanceCoreUtilities.paintFocus(g, this, this, (new SubstanceCheckBoxUI(new JCheckBox())), null, new Rectangle(),
-                                  1.0f, SubstanceSizeUtils
-                                                           .getFocusRingPadding(SubstanceSizeUtils
-                                                   .getComponentFontSize(this)));
-       }
+            SubstanceCoreUtilities.paintFocus(
+                    g,
+                    this,
+                    this,
+                    (new SubstanceCheckBoxUI(new JCheckBox())),
+                    null,
+                    new Rectangle(),
+                    1.0f,
+                    SubstanceSizeUtils.getFocusRingPadding(SubstanceSizeUtils.getComponentFontSize(this))
+            );
+        }
     }
-    
-    
+
 }

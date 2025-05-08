@@ -32,7 +32,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class ConfigurationColorSelection extends FocusableJPanel {
+public class ConfigurationColorSelection extends FocusablePanel {
     private JPanel colorPanel;
 
     public ConfigurationColorSelection(ConfigurationItem item, Color value, String description) {
