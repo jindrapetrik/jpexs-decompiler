@@ -924,18 +924,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         while ((double) realRect.x + ix * Configuration.gridHorizontalSpace.get() * zoom < realRect.getMaxX()) {
             ix++;
         }
-        maxIx = ix;
+        maxIx = ix - 1;
 
         iy = 0;
         while ((double) realRect.y + iy * Configuration.gridVerticalSpace.get() * zoom < realRect.getMaxY()) {
             iy++;
         }
-        maxIy = iy;
+        maxIy = iy - 1;
 
         for (ix = minIx; ix <= maxIx; ix++) {
             x = realRect.x + ix * Configuration.gridHorizontalSpace.get() * zoom;
-            Point2D p1 = new Point2D.Double(x, realRect.y + minIy * Configuration.gridVerticalSpace.get() * zoom);
-            Point2D p2 = new Point2D.Double(x, realRect.y + maxIy * Configuration.gridVerticalSpace.get() * zoom);
+            Point2D p1 = new Point2D.Double(x, realRect.getMinY());
+            Point2D p2 = new Point2D.Double(x, realRect.getMaxY());
             g.drawLine(
                     (int) Math.round(p1.getX()),
                     (int) Math.round(p1.getY()),
@@ -946,8 +946,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         for (iy = minIy; iy <= maxIy; iy++) {
             y = realRect.y + iy * Configuration.gridVerticalSpace.get() * zoom;
-            Point2D p1 = new Point2D.Double(realRect.x + minIx * Configuration.gridHorizontalSpace.get() * zoom, y);
-            Point2D p2 = new Point2D.Double(realRect.x + maxIx * Configuration.gridHorizontalSpace.get() * zoom, y);
+            Point2D p1 = new Point2D.Double(realRect.getMinX(), y);
+            Point2D p2 = new Point2D.Double(realRect.getMaxX(), y);
             g.drawLine(
                     (int) Math.round(p1.getX()),
                     (int) Math.round(p1.getY()),
