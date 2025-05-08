@@ -64,6 +64,8 @@ All notable changes to this project will be documented in this file.
 - [PR215] ffdec.sh - Ignore all java options when checking version
 
 ### Removed
+- Option to preview flash items via ActiveX component is no longer available.
+  FFDec now supports its internal flash viewer only.
 - Windows installer does not associate SWF files anymore as it caused false positives on some AVs.
   You can associate them later in FFDec settings.
 

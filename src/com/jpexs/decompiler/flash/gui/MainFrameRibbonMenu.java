@@ -102,8 +102,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     private final Map<String, RibbonContextualTaskGroup> optionalGroups = new HashMap<>();
 
-    public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
-        super(mainFrame, externalFlashPlayerUnavailable);
+    public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon) {
+        super(mainFrame);
         this.ribbon = ribbon;
     }
 

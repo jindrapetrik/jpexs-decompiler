@@ -262,7 +262,7 @@ public class AddScriptDialog extends AppDialog {
         frameList.addListSelectionListener(this::frameValueChanged);
         frameList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        framePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        framePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         framePreviewPanel.setReadOnly(true);
         framePreviewPanel.setPreferredSize(new Dimension(300, 1));
         framePreviewPanel.showEmpty();
@@ -312,7 +312,7 @@ public class AddScriptDialog extends AppDialog {
 
     private JPanel createSpriteInitPanel() {
 
-        spriteInitPreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        spriteInitPreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         spriteInitPreviewPanel.setReadOnly(true);
         spriteInitPreviewPanel.setPreferredSize(new Dimension(300, 1));
         spriteInitPreviewPanel.showEmpty();
@@ -436,7 +436,7 @@ public class AddScriptDialog extends AppDialog {
 
         spriteFramePanel.add(spriteFrameTopPanel, BorderLayout.NORTH);
 
-        spriteFramePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        spriteFramePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         spriteFramePreviewPanel.setReadOnly(true);
         spriteFramePreviewPanel.setPreferredSize(new Dimension(300, 1));
         spriteFramePreviewPanel.showEmpty();
@@ -475,7 +475,7 @@ public class AddScriptDialog extends AppDialog {
         buttonList.addListSelectionListener(this::buttonValueChanged);
         buttonList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        buttonPreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        buttonPreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         buttonPreviewPanel.setReadOnly(true);
         buttonPreviewPanel.setPreferredSize(new Dimension(300, 1));
         buttonPreviewPanel.showEmpty();
@@ -664,7 +664,7 @@ public class AddScriptDialog extends AppDialog {
             instanceTree.setBackground(Color.white);
         }
 
-        instancePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        instancePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         instancePreviewPanel.setReadOnly(true);
         instancePreviewPanel.setPreferredSize(new Dimension(300, 1));
         instancePreviewPanel.showEmpty();

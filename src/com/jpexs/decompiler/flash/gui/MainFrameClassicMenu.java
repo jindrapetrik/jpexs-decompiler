@@ -47,8 +47,8 @@ public class MainFrameClassicMenu extends MainFrameMenu {
 
     private final Map<String, ButtonGroup> menuButtonGroups = new HashMap<>();
 
-    public MainFrameClassicMenu(MainFrameClassic mainFrame, boolean externalFlashPlayerUnavailable) {
-        super(mainFrame, externalFlashPlayerUnavailable);
+    public MainFrameClassicMenu(MainFrameClassic mainFrame) {
+        super(mainFrame);
         this.mainFrame = mainFrame;
 
     }

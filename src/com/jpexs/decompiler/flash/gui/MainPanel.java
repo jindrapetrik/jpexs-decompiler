@@ -342,11 +342,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private ClipboardPanel resourcesClipboardPanel;
     private ClipboardPanel tagListClipboardPanel;
-
-    private final FlashPlayerPanel flashPanel;
-
-    private final FlashPlayerPanel flashPanel2;
-
+    
     private final JPanel contentPanel;
 
     private final JPanel displayPanel;
@@ -1091,13 +1087,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return mainFrame.translate(key);
     }
 
-    public MainPanel(MainFrame mainFrame, MainFrameMenu mainMenu, FlashPlayerPanel flashPanel, FlashPlayerPanel previewFlashPanel) {
+    public MainPanel(MainFrame mainFrame, MainFrameMenu mainMenu) {
         super();
 
         this.mainFrame = mainFrame;
         this.mainMenu = mainMenu;
-        this.flashPanel = flashPanel;
-        this.flashPanel2 = previewFlashPanel;
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
 
@@ -1260,9 +1254,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         displayPanel = new JPanel(new CardLayout());
 
         DefaultSyntaxKit.initKit();
-        previewPanel = new PreviewPanel(this, flashPanel);
+        previewPanel = new PreviewPanel(this);
 
-        dumpPreviewPanel = new PreviewPanel(this, previewFlashPanel);
+        dumpPreviewPanel = new PreviewPanel(this);
         dumpPreviewPanel.setReadOnly(true);
 
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
@@ -5547,24 +5541,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
         return null;
-    }
-
-    public void unloadFlashPlayer() {
-        if (flashPanel != null) {
-            try {
-                flashPanel.close();
-            } catch (IOException ex) {
-                // ignore
-            }
-        }
-        if (flashPanel2 != null) {
-            try {
-                flashPanel2.close();
-            } catch (IOException ex) {
-                // ignore
-            }
-        }
-    }
+    }   
 
     public void clearDebuggerColors() {
         if (abcPanel != null) {
@@ -5575,24 +5552,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             actionPanel.decompiledEditor.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
             actionPanel.editor.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
         }
-    }
-
-    private void stopFlashPlayer() {
-        if (flashPanel != null) {
-            if (!flashPanel.isStopped()) {
-                flashPanel.stopSWF();
-            }
-        }
-        if (flashPanel2 != null) {
-            if (!flashPanel2.isStopped()) {
-                flashPanel2.stopSWF();
-            }
-        }
-    }
-
-    public static boolean isAdobeFlashPlayerEnabled() {
-        return Configuration.useAdobeFlashPlayerForPreviews.get();
-    }
+    }  
 
     public static final int VIEW_RESOURCES = 0;
 
@@ -5845,19 +5805,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showEmpty();
             return;
         }
-        boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!DefineVideoStreamTag.displayAvailable());
 
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
-            if (internalViewer) {
-                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false, true);
-            } else {
-                previewPanel.setParametersPanelVisible(false);
-                previewPanel.showFlashViewerPanel();
-                previewPanel.showSwf(swf);
-            }
+            previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false, true);            
         } else if ((treeItem instanceof PlaceObjectTypeTag)) {
             previewPanel.showDisplayEditTagPanel((PlaceObjectTypeTag) treeItem, frame);
         } else if (treeItem instanceof ShapeTag) {
@@ -5885,7 +5838,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false, false, false, false);
             SWF imageSWF = TimelinedMaker.makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true, true, false, false, true, true, true);
-        } else if (!isVideoButNotDrawable && (treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
+        } else if (!isVideoButNotDrawable && (treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag))) {
             final Tag tag = (Tag) treeItem;
             DrawableTag d = (DrawableTag) tag;
             Timelined timelined;
@@ -5906,7 +5859,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, !((Tag) treeItem).isReadOnly());
             }
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get() && !(treeItem instanceof ButtonTag), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag) || (treeItem instanceof ShapeTag), true, false, true);
-        } else if (treeItem instanceof Frame && internalViewer) {
+        } else if (treeItem instanceof Frame) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
             previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false, true);
@@ -5932,9 +5885,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-        } else if ((treeItem instanceof FontTag) && internalViewer) {
+        } else if ((treeItem instanceof FontTag)) {
             previewPanel.showFontPanel((FontTag) treeItem);
-        } else if ((treeItem instanceof TextTag) && internalViewer) {
+        } else if ((treeItem instanceof TextTag)) {
             previewPanel.showTextPanel((TextTag) treeItem);
         } else if ((!(treeItem instanceof DefineFont4Tag)) && ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag))) {
             previewPanel.createAndShowTempSwf(treeItem);
@@ -6156,11 +6109,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         folderPreviewPanel.clear();
         folderListPanel.clear();
         previewPanel.clear();
-        stopFlashPlayer();
 
         previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, false);
-
-        boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         Frame frameTreeItem = null;
         if (treeItem instanceof Frame) {
@@ -6297,22 +6247,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof ImageTag) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
+        } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag))) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof FontTag) && internalViewer) {
+        } else if (treeItem instanceof FontTag) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof TextTag) && internalViewer) {
+        } else if (treeItem instanceof TextTag) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if (frameTreeItem != null && internalViewer) {
+        } else if (frameTreeItem != null) {
             showPreview(frameTreeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if (treeItem instanceof ShowFrameTag && internalViewer) {
+        } else if (treeItem instanceof ShowFrameTag) {
             showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem));
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
+        } else if ((treeItem instanceof SoundTag)) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (frameTreeItem != null) {

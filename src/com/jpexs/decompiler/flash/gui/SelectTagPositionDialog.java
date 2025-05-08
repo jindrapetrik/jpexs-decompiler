@@ -416,7 +416,7 @@ public class SelectTagPositionDialog extends AppDialog {
         positionTree.addTreeSelectionListener(this::positionTreeValueChanged);
         positionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        previewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
+        previewPanel = new PreviewPanel(Main.getMainFrame().getPanel());
         previewPanel.setReadOnly(true);
         previewPanel.setPreferredSize(new Dimension(300, 1));
         previewPanel.showEmpty();

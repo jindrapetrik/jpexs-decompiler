@@ -112,6 +112,7 @@ public final class Configuration {
      */
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> useAdobeFlashPlayerForPreviews = null;
 
     @ConfigurationDefaultInt(1000)
@@ -565,6 +566,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")    
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
 
     @ConfigurationDefaultBoolean(false)
@@ -788,6 +790,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> allowMiterClipLinestyle = null;
 
     @ConfigurationDefaultBoolean(true)
@@ -1554,6 +1557,10 @@ public final class Configuration {
         Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
+            ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);
+            if (removedAnnotation != null) {
+                continue;
+            }
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
                 String name = ConfigurationItem.getName(field);
                 if (lowerCaseNames) {

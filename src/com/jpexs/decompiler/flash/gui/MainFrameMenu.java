@@ -112,16 +112,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected final Map<String, ActionListener> menuActions = new HashMap<>();
-
-    /*public boolean isInternalFlashViewerSelected() {
-        return isMenuChecked("/settings/internalViewer"); //miInternalViewer.isSelected();
-    }*/
-    private final boolean externalFlashPlayerUnavailable;
-
-    public MainFrameMenu(MainFrame mainFrame, boolean externalFlashPlayerUnavailable) {
+    
+    public MainFrameMenu(MainFrame mainFrame) {
         registerHotKeys();
         this.mainFrame = mainFrame;
-        this.externalFlashPlayerUnavailable = externalFlashPlayerUnavailable;
     }
 
     protected String translate(String key) {

@@ -43,25 +43,12 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
     private final MainFrameMenu mainMenu;
 
     public MainFrameClassic() {
-        super();
+        super();      
 
-        FlashPlayerPanel flashPanel = null;
-        FlashPlayerPanel flashPanel2 = null;
-
-        if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
-            try {
-                flashPanel = new FlashPlayerPanel(this);
-                flashPanel2 = new FlashPlayerPanel(this);
-            } catch (FlashUnsupportedException fue) {
-                //ignored
-            }
-        }
-
-        boolean externalFlashPlayerUnavailable = flashPanel == null;
-        mainMenu = new MainFrameClassicMenu(this, externalFlashPlayerUnavailable);
+        mainMenu = new MainFrameClassicMenu(this);
         mainMenu.createMenuBar();
 
-        panel = new MainPanel(this, mainMenu, flashPanel, flashPanel2);
+        panel = new MainPanel(this, mainMenu);
 
         int w = Configuration.guiWindowWidth.get();
         int h = Configuration.guiWindowHeight.get();

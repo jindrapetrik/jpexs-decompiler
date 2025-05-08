@@ -182,8 +182,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private final JPanel viewerCards;
 
-    private final FlashPlayerPanel flashPanel;
-
     private File tempFile;
 
     private ImagePanel imagePanel;
@@ -355,15 +353,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
     }
 
-    public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
+    public PreviewPanel(MainPanel mainPanel) {
         super(JSplitPane.HORIZONTAL_SPLIT, Configuration.guiPreviewSplitPaneDividerLocationPercent);
         this.mainPanel = mainPanel;
-        this.flashPanel = flashPanel;
 
         viewerCards = new JPanel();
         viewerCards.setLayout(new CardLayout());
 
-        viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
+        viewerCards.add(createFlashPlayerPanel(), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
         viewerCards.add(createProductInfoCard(), PRODUCTINFO_TAG_CARD);
@@ -560,52 +557,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return metadataTagButtonsPanel;
     }
 
-    private JPanel createFlashPlayerPanel(FlashPlayerPanel flashPanel) {
+    private JPanel createFlashPlayerPanel() {
         JPanel pan = new JPanel(new BorderLayout());
         JLabel prevLabel = new HeaderLabel(mainPanel.translate("swfpreview"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
+        
         pan.add(prevLabel, BorderLayout.NORTH);
+        JPanel swtPanel = new JPanel(new GridBagLayout());        
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        JButton flashProjectorButton = new JButton(mainPanel.translate("button.showin.flashprojector"));
+        flashProjectorButton.addActionListener(this::flashProjectorActionPerformed);
+        buttonsPanel.add(flashProjectorButton);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        swtPanel.add(buttonsPanel, gbc);
 
-        Component leftComponent;
-        if (flashPanel != null) {
-            JPanel flashPlayPanel = new JPanel(new BorderLayout());
-            flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
-
-            JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
-            flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel, null), BorderLayout.SOUTH);
-            leftComponent = flashPlayPanel2;
-        } else {
-            JPanel swtPanel = new JPanel(new GridBagLayout());
-            /*String labelStr = "";
-            if (!Platform.isWindows()) {
-                labelStr = mainPanel.translate("notavailonthisplatform");
-            } else {
-                if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
-                    labelStr = mainPanel.translate("notavailable.activex") + "\n" + mainPanel.translate("notavailable.activex.disable");
-                } else {
-                    labelStr = mainPanel.translate("notavailable.internalviewer");
-                }
-            }
-            String htmlLabelStr = "<html><center>" + labelStr.replace("\n", "<br>") + "</center></html>";
-            swtPanel.add(new JLabel(htmlLabelStr, JLabel.CENTER), BorderLayout.CENTER);
-            swtPanel.setBackground(View.getDefaultBackgroundColor());*/
-
-            JPanel buttonsPanel = new JPanel(new FlowLayout());
-            JButton flashProjectorButton = new JButton(mainPanel.translate("button.showin.flashprojector"));
-            flashProjectorButton.addActionListener(this::flashProjectorActionPerformed);
-            buttonsPanel.add(flashProjectorButton);
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.anchor = GridBagConstraints.CENTER;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            swtPanel.add(buttonsPanel, gbc);
-
-            leftComponent = swtPanel;
-        }
-
-        pan.add(leftComponent, BorderLayout.CENTER);
+        pan.add(swtPanel, BorderLayout.CENTER);
         return pan;
     }
 
@@ -1805,9 +1773,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void showFontPage(FontTag fontTag) {
-        if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false, true, false);
-        }
+        showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false, true, false);
     }
 
     public static int getFontPageCount(FontTag fontTag) {
@@ -1824,9 +1790,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void showTextPanel(TextTag textTag) {
-        if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true, true, true);
-        }
+        showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true, true, true);        
 
         showCardRight(CARDTEXTPANEL);
         if (!readOnly) {
@@ -2219,61 +2183,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, false);
             }
 
-            if (flashPanel != null) {
-                flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, header.frameRate);
-            }
-
             this.currentItem = treeItem;
 
             showFlashViewerPanel();
         } catch (IOException | ActionParseException ex) {
             Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public void showSwf(SWF swf) {
-        currentItem = swf;
-        if (flashPanel == null) {
-            return;
-        }
-        Color backgroundColor = View.getDefaultBackgroundColor();
-        SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
-        if (setBgColorTag != null) {
-            backgroundColor = setBgColorTag.backgroundColor.toColor();
-        }
-
-        if (tempFile != null) {
-            tempFile.delete();
-        }
-        try {
-            tempFile = File.createTempFile("ffdec_view_", ".swf");
-            SWF savedSWF = swf;
-            if (swf.gfx) {
-                savedSWF = new GfxConvertor().convertSwf(swf);
-            }
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                swf.saveTo(fos, false, swf.gfx);
-            }
-            //Inject Loader
-            if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && Configuration.useAdobeFlashPlayerForPreviews.get() && !DebuggerTools.hasDebugger(swf)) {
-                SWF instrSWF;
-                try (InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
-                    instrSWF = new SWF(fis, false, false);
-                }
-
-                DebuggerTools.switchDebugger(instrSWF);
-                DebuggerTools.injectDebugLoader(instrSWF);
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                    instrSWF.saveTo(fos);
-                }
-            }
-            flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
-        } catch (IOException iex) {
-            Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
-        } catch (InterruptedException ex) {
-            //ignored
-        }
-    }
+    }   
 
     private void editMetadataButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
@@ -3298,18 +3214,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         FontTag fontTag = fontPanel.getFontTag();
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
-        if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true, false);
-        }
+        imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true, false);        
     }
 
     private void nextFontsButtonActionPerformed(ActionEvent evt) {
         FontTag fontTag = fontPanel.getFontTag();
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + 1) % pageCount;
-        if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true, false);
-        }
+        imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true, false);        
     }
 
     @Override

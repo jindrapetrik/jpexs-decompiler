@@ -3284,7 +3284,6 @@ public class Main {
         }
         Configuration.saveConfig();
         if (mainFrame != null && mainFrame.getPanel() != null) {
-            mainFrame.getPanel().unloadFlashPlayer();
             mainFrame.dispose();
         }
         if (fileTxt != null) {
