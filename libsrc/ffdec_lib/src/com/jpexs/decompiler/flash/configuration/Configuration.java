@@ -1397,7 +1397,7 @@ public final class Configuration {
 
     private static void saveToFile(String file) {
         HashMap<String, Object> config = new HashMap<>();
-        for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+        for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
             try {
                 String name = entry.getKey();
                 Field field = entry.getValue();
@@ -1450,7 +1450,7 @@ public final class Configuration {
     public static void setConfigurationFields() {
         try {
             HashMap<String, Object> config = loadFromFile(getConfigFile());
-            for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+            for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();
                 /* Unsupported in java 9+
@@ -1541,26 +1541,28 @@ public final class Configuration {
         return defaultValue;
     }
 
-    /**
+    /*
      * Get configuration fields
      * @return Configuration fields
      */
-    public static Map<String, Field> getConfigurationFields() {
-        return getConfigurationFields(false);
-    }
+    /*public static Map<String, Field> getConfigurationFields(boolean alsoRemoved) {
+        return getConfigurationFields(false, alsoRemoved);
+    }*/
 
     /**
      * Get configuration fields
      * @param lowerCaseNames Lower case names
      * @return Configuration fields
      */
-    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames) {
+    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames, boolean alsoRemoved) {
         Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
-            ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);
-            if (removedAnnotation != null) {
-                continue;
+            if (!alsoRemoved) {
+                ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);
+                if (removedAnnotation != null) {
+                    continue;
+                }
             }
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
                 String name = ConfigurationItem.getName(field);

@@ -327,7 +327,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     public static void getCategories(String hilightBackgroundColorHex, String hilightForegroundColorHex, Map<String, Component> allComponentsMap, Map<String, Integer> categoryCounts, String filter, Map<String, String> titleToNameMap, Map<String, JLabel> labelsMap, Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
         Map<String, Map<String, Field>> categorized = new HashMap<>();
 
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
@@ -592,7 +592,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     @SuppressWarnings("unchecked")
     private void okButtonActionPerformed(ActionEvent evt) {
         boolean modified = false;
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         Map<String, Object> values = new HashMap<>();
         for (String name : fields.keySet()) {
             Component c = allComponentsMap.get(name);
@@ -691,7 +691,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     }
 
     private void resetButtonActionPerformed(ActionEvent evt) {
-        Map<String, Field> rfields = Configuration.getConfigurationFields();
+        Map<String, Field> rfields = Configuration.getConfigurationFields(false, false);
         for (Entry<String, Field> entry : rfields.entrySet()) {
             String name = entry.getKey();
             Field field = entry.getValue();

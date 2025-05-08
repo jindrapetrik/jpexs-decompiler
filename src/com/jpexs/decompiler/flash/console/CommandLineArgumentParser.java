@@ -271,7 +271,7 @@ public class CommandLineArgumentParser {
     }
 
     public static void printConfigurationSettings() {
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
@@ -282,7 +282,7 @@ public class CommandLineArgumentParser {
             if (ConfigurationItem.isInternal(field)) {
                 continue;
             }
-
+            
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             Object value = item.get();
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -852,7 +852,7 @@ public class CommandLineArgumentParser {
             cfgs = new String[]{cfgStr};
         }
 
-        Map<String, Field> fields = Configuration.getConfigurationFields(true);
+        Map<String, Field> fields = Configuration.getConfigurationFields(true, false);
         for (String c : cfgs) {
             String[] cp = c.split("=");
             if (cp.length == 1) {

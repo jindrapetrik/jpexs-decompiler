@@ -130,6 +130,11 @@ public class ConfigurationItem<T> {
         ConfigurationInternal cint = field.getAnnotation(ConfigurationInternal.class);
         return cint != null;
     }
+    
+    public static boolean isRemoved(Field field) {
+        ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);
+        return removedAnnotation != null;
+    }    
 
     @Override
     public String toString() {
