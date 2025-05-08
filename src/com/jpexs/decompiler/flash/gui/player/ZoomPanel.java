@@ -18,14 +18,18 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
+import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.GridDialog;
 import com.jpexs.decompiler.flash.gui.GuidesDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -129,6 +133,30 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         };
         gridButton.setToolTipText(AppStrings.translate("button.grid_options"));       
 
+        
+        percentLabel.setToolTipText(AppStrings.translate("zoom.hint"));
+        percentLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                double currentZoom = roundZoom(getRealZoom() * 100, 3);
+                String newZoomStr = ViewMessages.showInputDialog(ZoomPanel.this, AppStrings.translate("zoom.enter"), AppStrings.translate("zoom"), View.getIcon("zoom32"), EcmaNumberToString.stringFor(currentZoom));
+                if (newZoomStr != null) {
+                    try {
+                        double newZoom = Double.parseDouble(newZoomStr) / 100;
+                        if (newZoom <= 0) {
+                            return;
+                        }
+                        realZoom = newZoom;
+                        zoomToFit = false;
+                        updateZoom();
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
+                    
+                }
+            }            
+        });
+        
         setLayout(new FlowLayout());
         add(percentLabel);
         add(zoomInButton);

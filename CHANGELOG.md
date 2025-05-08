@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2370] Setting for color and snap accuracy for guides, grid
 - [#2370] Dialogs for editing grid, guides and snapping
 - [#2453] SVG export/import - use image-rendering attribute for image smoothing
+- Option to enter custom zoom level by clicking on zoom percentage label
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
