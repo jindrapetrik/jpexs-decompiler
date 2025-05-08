@@ -105,16 +105,16 @@ fi
 
 # Check default java
 if [ -x "$(which java)" ]; then
-    JAVA_VERSION_OUTPUT=$(java -version 2>&1 | grep -v "Picked up _JAVA_OPTIONS")
-    JAVA_VERSION_OUTPUT=$(echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/')
+    JAVA_VERSION_OUTPUT=$(java -version 2>&1)
+    JAVA_VERSION_OUTPUT=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/.*(openjdk|java) version/java version/')
     check_java_version && exec java "${args[@]}"
 fi
 
 # Test other possible Java locations
 for JRE_PATH in $LOOKUP_JRE_DIRS; do
     if [ -x "$JRE_PATH/bin/java" ]; then
-        JAVA_VERSION_OUTPUT=$("$JRE_PATH/bin/java" -version 2>&1 | grep -v "Picked up _JAVA_OPTIONS")
-        JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
+        JAVA_VERSION_OUTPUT=$("$JRE_PATH/bin/java" -version 2>&1)
+        JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed -E 's/.*(openjdk|java) version/java version/'`
         check_java_version && {
             export JRE_PATH
             exec "$JRE_PATH/bin/java" "${args[@]}"
