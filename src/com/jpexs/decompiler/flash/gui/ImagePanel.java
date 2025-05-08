@@ -725,13 +725,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         depths = new ArrayList<>(depths);
         
-        Frame fr = timelined.getTimeline().getFrame(frame);            
         
-        for (int i = 0; i < depths.size(); i++) {
-            int depth = depths.get(i);
-            if (fr == null || !fr.layers.containsKey(depth)) {
-                depths.remove(i);
-                i--;
+        if (timelined == null) {
+            depths = new ArrayList<>();
+        } else {
+            Frame fr = timelined.getTimeline().getFrame(frame);            
+
+            for (int i = 0; i < depths.size(); i++) {
+                int depth = depths.get(i);
+                if (fr == null || !fr.layers.containsKey(depth)) {
+                    depths.remove(i);
+                    i--;
+                }
             }
         }
 
