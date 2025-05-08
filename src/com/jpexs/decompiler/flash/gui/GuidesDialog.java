@@ -46,7 +46,7 @@ public class GuidesDialog extends AppDialog {
     private final JCheckBox showGuidesCheckBox;
     private final JCheckBox snapToGuidesCheckBox;
     private final JCheckBox lockGuidesCheckBox;
-    private final JComboBox<AcurracyItem> snapAccuracyComboBox;
+    private final JComboBox<AccuracyItem> snapAccuracyComboBox;
     private final MediaDisplay mediaDisplay;
     
     public GuidesDialog(Window owner, MediaDisplay mediaDisplay) {
@@ -96,15 +96,15 @@ public class GuidesDialog extends AppDialog {
         centralPanel.add(snapAccuracyLabel, c);
         
         snapAccuracyComboBox = new JComboBox<>(
-                new AcurracyItem[] {
-                    new AcurracyItem(GuidesSnapAccuracy.MUST_BE_CLOSE),
-                    new AcurracyItem(GuidesSnapAccuracy.NORMAL),
-                    new AcurracyItem(GuidesSnapAccuracy.CAN_BE_DISTANT)
+                new AccuracyItem[] {
+                    new AccuracyItem(GuidesSnapAccuracy.MUST_BE_CLOSE),
+                    new AccuracyItem(GuidesSnapAccuracy.NORMAL),
+                    new AccuracyItem(GuidesSnapAccuracy.CAN_BE_DISTANT)
                 }
         );
         snapAccuracyLabel.setLabelFor(snapAccuracyComboBox);
         
-        snapAccuracyComboBox.setSelectedItem(new AcurracyItem(Configuration.guidesSnapAccuracy.get()));
+        snapAccuracyComboBox.setSelectedItem(new AccuracyItem(Configuration.guidesSnapAccuracy.get()));
         
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;                
@@ -152,7 +152,7 @@ public class GuidesDialog extends AppDialog {
         Configuration.showGuides.set(showGuidesCheckBox.isSelected());
         Configuration.snapToGuides.set(snapToGuidesCheckBox.isSelected());
         Configuration.lockGuides.set(lockGuidesCheckBox.isSelected());
-        Configuration.guidesSnapAccuracy.set(((AcurracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
+        Configuration.guidesSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
         setVisible(false);
     }
     
@@ -160,10 +160,10 @@ public class GuidesDialog extends AppDialog {
         setVisible(false);
     }
     
-    private class AcurracyItem {
+    private class AccuracyItem {
         private GuidesSnapAccuracy acurracy;
 
-        public AcurracyItem(GuidesSnapAccuracy acurracy) {
+        public AccuracyItem(GuidesSnapAccuracy acurracy) {
             this.acurracy = acurracy;
         }
 
@@ -189,7 +189,7 @@ public class GuidesDialog extends AppDialog {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final AcurracyItem other = (AcurracyItem) obj;
+            final AccuracyItem other = (AccuracyItem) obj;
             return this.acurracy == other.acurracy;
         }
 

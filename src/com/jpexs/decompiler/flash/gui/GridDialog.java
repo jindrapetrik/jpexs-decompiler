@@ -46,9 +46,9 @@ public class GridDialog extends AppDialog {
     private final JCheckBox showGridCheckBox;
     private final JCheckBox snapToGridCheckBox;
     private final JCheckBox showOverObjectsCheckBox;
-    private final JComboBox<AcurracyItem> snapAccuracyComboBox;
-    private final JTextField spacingXTextField;
-    private final JTextField spacingYTextField;
+    private final JComboBox<AccuracyItem> snapAccuracyComboBox;
+    private final JTextField spacingHorizontalTextField;
+    private final JTextField spacingVerticalTextField;
     
     public GridDialog(Window owner) {
         super(owner);
@@ -89,31 +89,31 @@ public class GridDialog extends AppDialog {
         c.gridy++;
         centralPanel.add(showOverObjectsCheckBox, c);
                 
-        JLabel spacingXLabel = new JLabel(translate("spacing.x"));
+        JLabel spacingHorizontalLabel = new JLabel(translate("spacing.x"));
         c.gridx = 0;
         c.gridy++;
         c.anchor = GridBagConstraints.LINE_END;    
-        centralPanel.add(spacingXLabel, c);
+        centralPanel.add(spacingHorizontalLabel, c);
         
-        spacingXTextField = new JTextField(10);
-        spacingXLabel.setLabelFor(spacingXTextField);
-        spacingXTextField.setText("" + Configuration.gridHorizontalSpace.get());        
+        spacingHorizontalTextField = new JTextField(10);
+        spacingHorizontalLabel.setLabelFor(spacingHorizontalTextField);
+        spacingHorizontalTextField.setText("" + Configuration.gridHorizontalSpace.get());        
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
-        centralPanel.add(spacingXTextField, c);
+        centralPanel.add(spacingHorizontalTextField, c);
                         
-        JLabel spacingYLabel = new JLabel(translate("spacing.y"));
+        JLabel spacingVerticalLabel = new JLabel(translate("spacing.y"));
         c.gridx = 0;
         c.gridy++;
         c.anchor = GridBagConstraints.LINE_END;    
-        centralPanel.add(spacingYLabel, c);
+        centralPanel.add(spacingVerticalLabel, c);
         
-        spacingYTextField = new JTextField(10);
-        spacingYLabel.setLabelFor(spacingYTextField);
-        spacingYTextField.setText("" + Configuration.gridVerticalSpace.get());
+        spacingVerticalTextField = new JTextField(10);
+        spacingVerticalLabel.setLabelFor(spacingVerticalTextField);
+        spacingVerticalTextField.setText("" + Configuration.gridVerticalSpace.get());
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
-        centralPanel.add(spacingYTextField, c);        
+        centralPanel.add(spacingVerticalTextField, c);        
         
         JLabel snapAccuracyLabel = new JLabel(translate("snapAccuracy"));
         c.gridx = 0;
@@ -122,16 +122,16 @@ public class GridDialog extends AppDialog {
         centralPanel.add(snapAccuracyLabel, c);
         
         snapAccuracyComboBox = new JComboBox<>(
-                new AcurracyItem[] {
-                    new AcurracyItem(GridSnapAccuracy.MUST_BE_CLOSE),
-                    new AcurracyItem(GridSnapAccuracy.NORMAL),
-                    new AcurracyItem(GridSnapAccuracy.CAN_BE_DISTANT),
-                    new AcurracyItem(GridSnapAccuracy.ALWAYS_SNAP)
+                new AccuracyItem[] {
+                    new AccuracyItem(GridSnapAccuracy.MUST_BE_CLOSE),
+                    new AccuracyItem(GridSnapAccuracy.NORMAL),
+                    new AccuracyItem(GridSnapAccuracy.CAN_BE_DISTANT),
+                    new AccuracyItem(GridSnapAccuracy.ALWAYS_SNAP)
                 }
         );
         snapAccuracyLabel.setLabelFor(snapAccuracyComboBox);
         
-        snapAccuracyComboBox.setSelectedItem(new AcurracyItem(Configuration.gridSnapAccuracy.get()));
+        snapAccuracyComboBox.setSelectedItem(new AccuracyItem(Configuration.gridSnapAccuracy.get()));
         
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;                
@@ -165,30 +165,30 @@ public class GridDialog extends AppDialog {
     }
     
     private void okButtonActionPerformed(ActionEvent evt) {
-        int spacingX;
+        int horizontalSpacing;
         try {
-            spacingX = Integer.parseInt(spacingXTextField.getText());
+            horizontalSpacing = Integer.parseInt(spacingHorizontalTextField.getText());
         } catch (NumberFormatException nfe) {
             ViewMessages.showMessageDialog(this, translate("error.invalidSpacing"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            spacingXTextField.requestFocus();
+            spacingHorizontalTextField.requestFocus();
             return;
         }
-        int spacingY;
+        int verticalSpacing;
         try {
-            spacingY = Integer.parseInt(spacingYTextField.getText());
+            verticalSpacing = Integer.parseInt(spacingVerticalTextField.getText());
         } catch (NumberFormatException nfe) {
             ViewMessages.showMessageDialog(this, translate("error.invalidSpacing"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            spacingYTextField.requestFocus();
+            spacingVerticalTextField.requestFocus();
             return;
         }
         
-        Configuration.gridHorizontalSpace.set(spacingX);
-        Configuration.gridVerticalSpace.set(spacingY);
+        Configuration.gridHorizontalSpace.set(horizontalSpacing);
+        Configuration.gridVerticalSpace.set(verticalSpacing);
         Configuration.gridColor.set(colorSelection.getValue());
         Configuration.showGrid.set(showGridCheckBox.isSelected());
         Configuration.snapToGrid.set(snapToGridCheckBox.isSelected());
         Configuration.gridOverObjects.set(showOverObjectsCheckBox.isSelected());
-        Configuration.gridSnapAccuracy.set(((AcurracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
+        Configuration.gridSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
         setVisible(false);
     }
     
@@ -196,10 +196,10 @@ public class GridDialog extends AppDialog {
         setVisible(false);
     }
     
-    private class AcurracyItem {
+    private class AccuracyItem {
         private GridSnapAccuracy acurracy;
 
-        public AcurracyItem(GridSnapAccuracy acurracy) {
+        public AccuracyItem(GridSnapAccuracy acurracy) {
             this.acurracy = acurracy;
         }
 
@@ -225,7 +225,7 @@ public class GridDialog extends AppDialog {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final AcurracyItem other = (AcurracyItem) obj;
+            final AccuracyItem other = (AccuracyItem) obj;
             return this.acurracy == other.acurracy;
         }
 
