@@ -389,7 +389,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
-
+    
     private static int getSnapGuidesDistance() {
         return Configuration.guidesSnapAccuracy.get().getDistance();
     }
@@ -724,9 +724,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized void selectDepths(List<Integer> depths) {
 
         depths = new ArrayList<>(depths);
+        
+        Frame fr = timelined.getTimeline().getFrame(frame);            
+        
         for (int i = 0; i < depths.size(); i++) {
             int depth = depths.get(i);
-            Frame fr = timelined.getTimeline().getFrame(frame);
             if (fr == null || !fr.layers.containsKey(depth)) {
                 depths.remove(i);
                 i--;
@@ -3821,6 +3823,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     g2.drawLine(GUIDE_THICKNESS + guideDragX, 0, GUIDE_THICKNESS + guideDragX, GUIDE_THICKNESS);
                 }
 
+                if (!selectedDepths.isEmpty() && transform != null) {
+                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    g2.setColor(getForeground());
+
+                    Rectangle2D imgBounds = toImageRect(transformBounds);
+                    g2.drawLine((int) Math.round(leftOffset + imgBounds.getMinX()), 0, (int) Math.round(leftOffset + imgBounds.getMinX()), getHeight());
+                    g2.drawLine((int) Math.round(leftOffset + imgBounds.getMaxX()), 0, (int) Math.round(leftOffset + imgBounds.getMaxX()), getHeight());
+                }
             }
         };
         topRuler.setPreferredSize(new Dimension(1, GUIDE_THICKNESS));
@@ -3893,6 +3903,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (guideDragY > -1) {
                     g2.setColor(Configuration.guidesColor.get());
                     g2.drawLine(0, guideDragY, GUIDE_THICKNESS, guideDragY);
+                }
+                
+                if (!selectedDepths.isEmpty() && transform != null) {
+                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    g2.setColor(getForeground());
+
+                    Rectangle2D imgBounds = toImageRect(transformBounds);
+                    g2.drawLine(0, (int) Math.round(imgBounds.getMinY()), getWidth(), (int) Math.round(imgBounds.getMinY()));
+                    g2.drawLine(0, (int) Math.round(imgBounds.getMaxY()), getWidth(), (int) Math.round(imgBounds.getMaxY()));
                 }
             }
         };
@@ -6042,7 +6061,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         if (totalBounds == null) {
             return new Rectangle2D.Double(0, 0, 1, 1);
-        }
+        }        
         return totalBounds;
     }
 
