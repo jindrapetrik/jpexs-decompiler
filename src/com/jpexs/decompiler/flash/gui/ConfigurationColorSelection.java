@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
@@ -30,7 +32,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class ConfigurationColorSelection extends JPanel {
+public class ConfigurationColorSelection extends FocusableJPanel {
     private JPanel colorPanel;
 
     public ConfigurationColorSelection(ConfigurationItem item, Color value, String description) {
@@ -42,7 +44,7 @@ public class ConfigurationColorSelection extends JPanel {
         JLabel colorLabel = new JLabel();
         colorPanel.setBackground(value);
 
-        colorPanel.addMouseListener(new MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -55,14 +57,18 @@ public class ConfigurationColorSelection extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                
+            }                                                                
+        });       
+        addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 Color newColor = ViewMessages.showColorDialog(colorPanel, colorPanel.getBackground(), false);
                 if (newColor != null) {
                     colorPanel.setBackground(newColor);
-
                 }
-            }                                                                
-
-        });       
+            }            
+        });
         colorLabel.setText(colorToHex(value));
         colorLabel.setToolTipText(description);
         
