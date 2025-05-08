@@ -319,7 +319,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         cnt.add(bottomPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "searchresults");
         this.ignoreCase = ignoreCase;
     }
 
