@@ -62,6 +62,7 @@ All notable changes to this project will be documented in this file.
 - Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)
 - Exceptions when closing non-ribbon window
 - [PR215] ffdec.sh - Ignore all java options when checking version
+- Text search was not available as context menu option for AS3 scripts folder
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.

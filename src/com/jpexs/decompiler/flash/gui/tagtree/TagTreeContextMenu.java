@@ -1068,6 +1068,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     hasTexts = true;
                 }
             }
+            if (item instanceof ClassesListTreeModel) {
+                hasScripts = true;
+            }
         }
 
         boolean allSelectedIsTag = true;
