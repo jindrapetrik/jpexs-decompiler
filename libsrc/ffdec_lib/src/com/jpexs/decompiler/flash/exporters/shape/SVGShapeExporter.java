@@ -162,7 +162,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
-                pattern.setAttribute("ffdec:smoothed", smoothed ? "true" : "false");
+                //Smoothed attribute was used in older FFDec versions - it is now only used for reading, for backwards compatibility
+                //pattern.setAttribute("ffdec:smoothed", smoothed ? "true" : "false");
                 if (matrix != null) {
                     pattern.setAttribute("patternTransform", matrix.getSvgTransformationString(SWF.unitDivisor / zoom, SWF.unitDivisor / zoom));
                 }
@@ -170,6 +171,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 imageElement.setAttribute("width", "" + width);
                 imageElement.setAttribute("height", "" + height);
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
+                if (smoothed) {
+                    imageElement.setAttribute("style", "image-rendering:optimizeQuality");                    
+                } else {
+                    //https://stackoverflow.com/questions/50184674/stop-auto-image-smoothing-inside-an-svgz                
+                    imageElement.setAttribute("style", "image-rendering:optimizeSpeed; image-rendering:pixelated");
+                }
                 pattern.appendChild(imageElement);
                 exporter.addToGroup(pattern);
                 return patternId;

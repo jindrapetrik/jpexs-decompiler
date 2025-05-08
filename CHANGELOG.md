@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2370] Snap align border space, object spacing, center alignment
 - [#2370] Setting for color and snap accuracy for guides, grid
 - [#2370] Dialogs for editing grid, guides and snapping
+- [#2453] SVG export/import - use image-rendering attribute for image smoothing
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -3753,6 +3754,7 @@ Major version of SWF to XML export changed to 2.
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448
 [#2370]: https://www.free-decompiler.com/flash/issues/2370
+[#2453]: https://www.free-decompiler.com/flash/issues/2453
 [#2424]: https://www.free-decompiler.com/flash/issues/2424
 [#2391]: https://www.free-decompiler.com/flash/issues/2391
 [#2436]: https://www.free-decompiler.com/flash/issues/2436

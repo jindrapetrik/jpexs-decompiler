@@ -657,7 +657,31 @@ class SvgStyle {
                     if (e.hasAttribute("patternTransform")) {
                         bitmapFill.patternTransform = e.getAttribute("patternTransform");
                     }
-                    if (e.hasAttribute("ffdec:smoothed")) {
+                    
+                    NodeList childNodes = e.getChildNodes();
+                    Element element = null;
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        if (childNodes.item(i) instanceof Element) {
+
+                            if ("animateTransform".equals(((Element) childNodes.item(i)).getTagName())) {
+                                continue;
+                            }
+
+                            if (element != null) {
+                                element = null;
+                                break;
+                            }
+
+                            element = (Element) childNodes.item(i);
+                        }
+                    }
+                    
+                    SvgImageRendering imageRendering = null;
+                    if (element != null) {
+                        imageRendering = getValue(element, "image-rendering", true);
+                    }
+                                        
+                    if (e.hasAttribute("ffdec:smoothed")) { //backwards compatibility
                         String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
                         if ("true".equals(smoothedValue)) {
                             bitmapFill.smoothed = true;
@@ -665,8 +689,12 @@ class SvgStyle {
                         if ("false".equals(smoothedValue)) {
                             bitmapFill.smoothed = false;
                         }
-                    } else {
-                        bitmapFill.smoothed = true;
+                    } else {     
+                        if (imageRendering == SvgImageRendering.OPTIMIZE_SPEED) {
+                            bitmapFill.smoothed = false;
+                        } else {
+                            bitmapFill.smoothed = true;
+                        }
                     }
                     return bitmapFill;
                 }
@@ -714,7 +742,8 @@ class SvgStyle {
                                 if (e.hasAttribute("patternTransform")) {
                                     bitmapFill.patternTransform = e.getAttribute("patternTransform");
                                 }
-                                if (e.hasAttribute("ffdec:smoothed")) {
+                                SvgImageRendering imageRendering = getValue(element, "image-rendering", true);
+                                if (e.hasAttribute("ffdec:smoothed")) { //backwards compatibility
                                     String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
                                     if ("true".equals(smoothedValue)) {
                                         bitmapFill.smoothed = true;
@@ -723,7 +752,11 @@ class SvgStyle {
                                         bitmapFill.smoothed = false;
                                     }
                                 } else {
-                                    bitmapFill.smoothed = true;
+                                    if (imageRendering == SvgImageRendering.OPTIMIZE_SPEED) {
+                                        bitmapFill.smoothed = false;
+                                    } else {
+                                        bitmapFill.smoothed = true;
+                                    }
                                 }
 
                                 cachedBitmaps.put(elementId, imageTag.characterID);
@@ -825,6 +858,18 @@ class SvgStyle {
                             return SvgLineJoin.ROUND;
                         case "bevel":
                             return SvgLineJoin.BEVEL;
+                    }
+                }
+                break;
+                case "image-rendering": {
+                    switch (value) {
+                        case "optimizeSpeed":
+                        case "pixelated": //a weird value used by the Chrome browser
+                            return SvgImageRendering.OPTIMIZE_SPEED;
+                        case "optimizeQuality":
+                            return SvgImageRendering.OPTIMIZE_QUALITY;
+                        case "auto":
+                            return SvgImageRendering.AUTO;
                     }
                 }
                 break;
