@@ -60,6 +60,7 @@ All notable changes to this project will be documented in this file.
 - Cleaner file association
 - Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)
 - Exceptions when closing non-ribbon window
+- [PR215] ffdec.sh - Ignore all java options when checking version
 
 ### Removed
 - Windows installer does not associate SWF files anymore as it caused false positives on some AVs.
@@ -4918,6 +4919,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
 [PR203]: https://github.com/jindrapetrik/jpexs-decompiler/pull/203
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
 [PR194]: https://github.com/jindrapetrik/jpexs-decompiler/pull/194
