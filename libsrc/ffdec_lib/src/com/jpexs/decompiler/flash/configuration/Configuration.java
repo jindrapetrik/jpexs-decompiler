@@ -117,6 +117,7 @@ public final class Configuration {
 
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("display")
+    @ConfigurationRemoved
     public static ConfigurationItem<Integer> setMovieDelay = null;
 
     @ConfigurationDefaultBoolean(false)
