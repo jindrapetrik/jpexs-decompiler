@@ -125,6 +125,8 @@ public class SnappingDialog extends AppDialog {
         snapAlignPanel.add(stageBorderLabel, c);
 
         stageBorderTextField = new JTextField(10);
+        stageBorderLabel.setLabelFor(stageBorderTextField);
+        
         stageBorderTextField.setText("" + Configuration.snapAlignStageBorder.get());
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
@@ -140,7 +142,8 @@ public class SnappingDialog extends AppDialog {
         snapAlignPanel.add(objectHorizontalSpacingLabel, c);
 
         objectHorizontalSpacingTextField = new JTextField(10);
-        objectHorizontalSpacingTextField.setText("" + Configuration.snapAlignObjectHorizontalSpace.get());
+        objectHorizontalSpacingLabel.setLabelFor(objectHorizontalSpacingTextField);
+        objectHorizontalSpacingTextField.setText("" + Configuration.snapAlignObjectHorizontalSpace.get());        
         
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
@@ -152,7 +155,9 @@ public class SnappingDialog extends AppDialog {
         snapAlignPanel.add(objectVerticalSpacingLabel, c);
 
         objectVerticalSpacingTextField = new JTextField(10);
+        objectVerticalSpacingLabel.setLabelFor(objectVerticalSpacingTextField);
         objectVerticalSpacingTextField.setText("" + Configuration.snapAlignObjectVerticalSpace.get());
+        
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
         snapAlignPanel.add(objectVerticalSpacingTextField, c);

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.enums.GridSnapAccuracy;
-import com.jpexs.decompiler.flash.configuration.enums.GuidesSnapAccuracy;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -43,13 +42,13 @@ import javax.swing.JTextField;
  * @author JPEXS
  */
 public class GridDialog extends AppDialog {
-    private ConfigurationColorSelection colorSelection;
-    private JCheckBox showGridCheckBox;
-    private JCheckBox snapToGridCheckBox;
-    private JCheckBox showOverObjectsCheckBox;
-    private JComboBox<AcurracyItem> snapAccuracyComboBox;
-    private JTextField spacingXTextField;
-    private JTextField spacingYTextField;
+    private final ConfigurationColorSelection colorSelection;
+    private final JCheckBox showGridCheckBox;
+    private final JCheckBox snapToGridCheckBox;
+    private final JCheckBox showOverObjectsCheckBox;
+    private final JComboBox<AcurracyItem> snapAccuracyComboBox;
+    private final JTextField spacingXTextField;
+    private final JTextField spacingYTextField;
     
     public GridDialog(Window owner) {
         super(owner);
@@ -70,6 +69,7 @@ public class GridDialog extends AppDialog {
         centralPanel.add(colorLabel, c);
         
         colorSelection = new ConfigurationColorSelection(Configuration.gridColor, Configuration.gridColor.get(), null);
+        colorLabel.setLabelFor(colorSelection);
         c.gridx = 1;
         c.anchor = GridBagConstraints.LINE_START;        
         centralPanel.add(colorSelection, c);
@@ -96,7 +96,8 @@ public class GridDialog extends AppDialog {
         centralPanel.add(spacingXLabel, c);
         
         spacingXTextField = new JTextField(10);
-        spacingXTextField.setText("" + Configuration.gridHorizontalSpace.get());
+        spacingXLabel.setLabelFor(spacingXTextField);
+        spacingXTextField.setText("" + Configuration.gridHorizontalSpace.get());        
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
         centralPanel.add(spacingXTextField, c);
@@ -108,6 +109,7 @@ public class GridDialog extends AppDialog {
         centralPanel.add(spacingYLabel, c);
         
         spacingYTextField = new JTextField(10);
+        spacingYLabel.setLabelFor(spacingYTextField);
         spacingYTextField.setText("" + Configuration.gridVerticalSpace.get());
         c.gridx++;
         c.anchor = GridBagConstraints.LINE_START;
@@ -127,6 +129,7 @@ public class GridDialog extends AppDialog {
                     new AcurracyItem(GridSnapAccuracy.ALWAYS_SNAP)
                 }
         );
+        snapAccuracyLabel.setLabelFor(snapAccuracyComboBox);
         
         snapAccuracyComboBox.setSelectedItem(new AcurracyItem(Configuration.gridSnapAccuracy.get()));
         

@@ -69,6 +69,7 @@ public class GuidesDialog extends AppDialog {
         centralPanel.add(colorLabel, c);
         
         colorSelection = new ConfigurationColorSelection(Configuration.guidesColor, Configuration.guidesColor.get(), null);
+        colorLabel.setLabelFor(colorSelection);
         c.gridx = 1;
         c.anchor = GridBagConstraints.LINE_START;        
         centralPanel.add(colorSelection, c);
@@ -101,6 +102,7 @@ public class GuidesDialog extends AppDialog {
                     new AcurracyItem(GuidesSnapAccuracy.CAN_BE_DISTANT)
                 }
         );
+        snapAccuracyLabel.setLabelFor(snapAccuracyComboBox);
         
         snapAccuracyComboBox.setSelectedItem(new AcurracyItem(Configuration.guidesSnapAccuracy.get()));
         
