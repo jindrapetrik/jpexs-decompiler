@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Configuration removed annotation.
+ * Configuration directory annotation.
  *
  * @author JPEXS
  */

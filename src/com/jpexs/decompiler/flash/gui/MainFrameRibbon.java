@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;

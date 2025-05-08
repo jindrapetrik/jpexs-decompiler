@@ -346,7 +346,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar;lib/ffdec_lib.jar;lib/JavactiveX.jar</classpath>
+                <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar;lib/ffdec_lib.jar;testlib/JavactiveX.jar</classpath>
                 <built-to>build/test</built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>
