@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -1456,6 +1457,49 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+
+                    if (e.getClickCount() == 2) {
+                        if (Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
+                            Point mousePoint = e.getPoint();
+                            for (int d = 0; d < guidesX.size(); d++) {
+                                Double guide = guidesX.get(d);
+                                int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
+                                if (mousePoint.x == guideInPanel) {
+                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), EcmaNumberToString.stringFor(guide));
+                                    if (newPositionStr != null) {
+                                        try {
+                                            double newPosition = Double.parseDouble(newPositionStr);
+                                            guidesX.set(d, newPosition);
+                                            saveGuides();
+                                            repaint();
+                                        } catch (NumberFormatException nfe) {
+                                            //ignore
+                                        }
+                                    }
+                                    return;
+                                }
+                            }
+
+                            for (int d = 0; d < guidesY.size(); d++) {
+                                Double guide = guidesY.get(d);
+                                int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
+                                if (mousePoint.y == guideInPanel) {
+                                    String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), EcmaNumberToString.stringFor(guide));
+                                    if (newPositionStr != null) {
+                                        try {
+                                            double newPosition = Double.parseDouble(newPositionStr);
+                                            guidesY.set(d, newPosition);
+                                            saveGuides();
+                                            repaint();
+                                        } catch (NumberFormatException nfe) {
+                                            //ignore
+                                        }
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
 
                     if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
 
