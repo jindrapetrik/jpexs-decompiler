@@ -38,7 +38,7 @@ public class ConfigurationColorSelection extends FocusablePanel {
     public ConfigurationColorSelection(ConfigurationItem item, Color value, String description) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         colorPanel = new JPanel();
-        colorPanel.setToolTipText(description);
+        setToolTipText(description);
         colorPanel.setSize(16, 16);
         colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         JLabel colorLabel = new JLabel();
@@ -59,7 +59,7 @@ public class ConfigurationColorSelection extends FocusablePanel {
             public void mouseClicked(MouseEvent e) {
                 
             }                                                                
-        });       
+        });
         addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,9 +70,7 @@ public class ConfigurationColorSelection extends FocusablePanel {
             }            
         });
         colorLabel.setText(colorToHex(value));
-        colorLabel.setToolTipText(description);
         
-
         add(colorPanel);
         add(colorLabel);
     }

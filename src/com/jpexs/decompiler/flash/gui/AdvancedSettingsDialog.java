@@ -30,13 +30,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -57,7 +58,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -71,8 +71,6 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -348,7 +346,11 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
 
         for (String cat : categorized.keySet()) {
-            JPanel configPanel = new JPanel(new SpringLayout());
+            JPanel configPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = -1;
+            gbc.insets = new Insets(2, 2, 2, 2);
             int itemCount = 0;
             List<String> names = new ArrayList<>(categorized.get(cat).keySet());
 
@@ -431,7 +433,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                     JLabel l = new JLabel(locNameHtml, JLabel.TRAILING);
                     titleToNameMap.put(locName, name);
                     l.setToolTipText(description);
-                    configPanel.add(l);
+                    gbc.gridx = 0;
+                    gbc.gridy++;
+                    gbc.anchor = GridBagConstraints.LINE_END;
+                    configPanel.add(l, gbc);
 
                     Component c = null;
 
@@ -447,25 +452,41 @@ public class AdvancedSettingsDialog extends AppDialog {
                             ConfigurationFile confFile = field.getAnnotation(ConfigurationFile.class);
                             ConfigurationDirectory confDirectory = field.getAnnotation(ConfigurationDirectory.class);
 
-                            JTextField tf = new JTextField();
                             Object val = item.get();
                             if (val == null) {
                                 val = "";
                             }
-                            if (itemType == Calendar.class) {
-                                tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
-                            } else {
-                                tf.setText(val.toString());
-                            }
-                            tf.setToolTipText(description);
-                            tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
-
-                            c = tf;
+                            int minW;
+                            int maxW;
+                                
                             if (confFile != null) {
                                 c = new ConfigurationFileSelection(item, confFile, val.toString(), description);
-                            }
-                            if (confDirectory != null) {
+                                minW = 300;
+                                maxW = 300;
+                            } else if (confDirectory != null) {
                                 c = new ConfigurationDirectorySelection(item, val.toString(), description);
+                                minW = 300;
+                                maxW = 300;
+                            } else {
+                                JTextField tf = new JTextField();
+                                if (itemType == Calendar.class) {
+                                    tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
+                                } else {
+                                    tf.setText(val.toString());
+                                }
+                                tf.setToolTipText(description);                                
+                                
+                                c = tf;
+                                minW = 100;
+                                maxW = 400;
+                            }   
+                            
+                            if (c.getPreferredSize().width > maxW) {
+                                Dimension dim = new Dimension(maxW, c.getPreferredSize().height);
+                                c.setPreferredSize(dim);                            
+                            } else {
+                                Dimension dim = new Dimension(minW, c.getPreferredSize().height);
+                                c.setPreferredSize(dim);  
                             }
                         } else if (itemType == Boolean.class) {
                             JCheckBox cb = new JCheckBox();
@@ -512,7 +533,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                         toLabelComponent = ((ConfigurationDirectorySelection) toLabelComponent).getTextField();
                     }
                     l.setLabelFor(toLabelComponent);
-                    configPanel.add(c);
+                    gbc.gridx++;
+                    gbc.anchor = GridBagConstraints.LINE_START;
+                    //gbc.fill = GridBagConstraints.HORIZONTAL;
+                    configPanel.add(c, gbc);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());
@@ -520,13 +544,20 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                 itemCount++;
             }
+            
+            gbc.gridy++;
+            gbc.gridx = 0;
+            gbc.gridwidth = 2;
+            gbc.weighty = 1;
+            configPanel.add(new JPanel(), gbc);
 
             categoryCounts.put(cat, itemCount);
 
-            SpringUtilities.makeCompactGrid(configPanel,
+            /*SpringUtilities.makeCompactGrid(configPanel,
                     itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
+            */
             if (resourceBundle.containsKey("config.group.tip." + cat)) {
                 String tip = resourceBundle.getString("config.group.tip." + cat);
                 String[] urls = new String[0];

@@ -46,7 +46,7 @@ import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
  */
 public class FocusablePanel extends JPanel {
 
-    private List<ActionListener> listeners = new ArrayList<>();
+    private final List<ActionListener> listeners = new ArrayList<>();
 
     private static final Set<Integer> pressedModifiers = new HashSet<>();
 
