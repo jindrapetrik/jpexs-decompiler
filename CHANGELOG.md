@@ -67,6 +67,7 @@ All notable changes to this project will be documented in this file.
 - Text search was not available as context menu option for AS3 scripts folder
 - [#2454] SVG export - color matrix not applied to images
 - [PR216] ffdec.sh - Support BSD version of sed in java version checks
+- Simple editor - adding a library item to the last frame adds a frame
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.

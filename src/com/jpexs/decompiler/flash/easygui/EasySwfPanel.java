@@ -290,9 +290,11 @@ public class EasySwfPanel extends JPanel {
                                 } else {
                                     timelined.addTag(timelined.indexOfTag(showFrameTag), place);
 
-                                    RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
-                                    remove.depth = newDepth;
-                                    timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
+                                    if (fframe < timelined.getFrameCount() - 1) {
+                                        RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
+                                        remove.depth = newDepth;
+                                        timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
+                                    }
                                 }
 
                                 DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
