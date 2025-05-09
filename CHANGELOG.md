@@ -65,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - [PR215] ffdec.sh - Ignore all java options when checking version
 - Text search was not available as context menu option for AS3 scripts folder
 - [#2454] SVG export - color matrix not applied to images
+- [PR216] ffdec.sh - Support BSD version of sed in java version checks
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.
@@ -4927,6 +4928,7 @@ Major version of SWF to XML export changed to 2.
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
+[PR216]: https://github.com/jindrapetrik/jpexs-decompiler/pull/216
 [PR203]: https://github.com/jindrapetrik/jpexs-decompiler/pull/203
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
 [PR194]: https://github.com/jindrapetrik/jpexs-decompiler/pull/194
