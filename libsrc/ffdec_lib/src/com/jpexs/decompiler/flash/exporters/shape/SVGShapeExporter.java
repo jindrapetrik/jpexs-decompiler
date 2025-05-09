@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.w3c.dom.Element;
 
 /**
@@ -143,16 +146,31 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (image != null) {
             SerializableImage img = image.getImageCached();
             if (img != null) {
-                if (colorTransform != null) {
-                    img = colorTransform.apply(img);
-                }
-
                 int width = img.getWidth();
                 int height = img.getHeight();
                 lastPatternId++;
                 String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getConvertedImageData());
+                
+                if (colorTransform != null) {
+                    //Apply transform and convert it to PNG.
+                    //If we use the same format as input, then we would lose quality for JPEGs.
+                    //This will also make significantly larger files for JPEGs.
+                    //It would be better if we use a SVG filter for colormatrix transform,
+                    //but that will be problematic during importing it back (we cannot properly parse filters)
+                    
+                    img = colorTransform.apply(img);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        ImageIO.write(img.getBufferedImage(), "PNG", baos);
+                    } catch (IOException iex) {
+                        //ignore
+                    }
+                    imageData = baos.toByteArray();
+                    format = ImageFormat.PNG;
+                }
+                
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
 
                 Element pattern = exporter.createElement("pattern");
