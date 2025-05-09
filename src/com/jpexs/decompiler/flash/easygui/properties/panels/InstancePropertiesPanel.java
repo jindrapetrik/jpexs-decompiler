@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui.properties.panels;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.EasySwfPanel;
 import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
+import com.jpexs.decompiler.flash.easygui.FiltersTreeTable;
 import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
@@ -36,9 +37,11 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -55,9 +58,11 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -96,6 +101,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private final JComboBox<String> backgroundComboBox = new JComboBox<>();
     private final JPanel backgroundColorPanel = new JPanel();
     private final JLabel backgroundColorLabel = new JLabel();
+
+    private final FiltersTreeTable filtersTable;
 
     private boolean updating = false;
 
@@ -325,16 +332,43 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         displayPanel.add(new JPanel(), gbc);
 
-        propertiesPanel = new JPanel();
-        propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
+        JPanel filtersPanel = new JPanel(new BorderLayout());
+        filtersTable = new FiltersTreeTable();
+        JScrollPane sp = new JScrollPane(filtersTable);
+        filtersPanel.add(sp, BorderLayout.CENTER);
+        sp.getViewport().setBackground(filtersTable.getBackground());
+        //filtersPanel.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+        //sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        propertiesPanel.add(makeCard("positionSize", null, positionSizePanel));
+        propertiesPanel = new JPanel();
+        //propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
+        //propertiesPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 5));
+        propertiesPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        propertiesPanel.setLayout(new GridBagLayout());
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = -1;
+        /*gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbcc.weightx = 1;*/
+
+        addCard(propertiesPanel, "positionSize", null, positionSizePanel, gbc, false);
+
+        //gbc.gridy++;
+        addCard(propertiesPanel, "colorEffect", null, colorEffectPanel, gbc, false);
+
+        //gbc.gridy++;
+        addCard(propertiesPanel, "display", null, displayPanel, gbc, false);
+
+        //gbc.gridy++;      
+        //gbc.fill = GridBagConstraints.BOTH; //GridBagConstraints.BOTH;
+        //gbc.weighty = 1;
+        addCard(propertiesPanel, "filters", null, filtersPanel, gbc, true);
 
         setCardOpened("positionSize", true);
-
-        propertiesPanel.add(makeCard("colorEffect", null, colorEffectPanel));
-
-        propertiesPanel.add(makeCard("display", null, displayPanel));
 
         this.swfPanel = swfPanel;
 
@@ -675,6 +709,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         Set<Integer> blendMode = new HashSet<>();
         Set<Boolean> cacheAsBitmap = new HashSet<>();
         Set<RGBA> backgroundColor = new HashSet<>();
+        Set<List<FILTER>> filters = new HashSet<>();
 
         for (DepthState ds : dss) {
             if (ds == null) {
@@ -708,6 +743,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             blendMode.add(bm);
             cacheAsBitmap.add(ds.cacheAsBitmap);
             backgroundColor.add(ds.backGroundColor);
+            filters.add(ds.filters);
         }
 
         if (visible.size() == 0) {
@@ -788,6 +824,18 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 backgroundColorPanel.setOpaque(true);
             }
 
+        }
+        if (filters.size() == 1) {
+            List<FILTER> oneFilters = filters.iterator().next();
+            if (oneFilters == null) {
+                filtersTable.setFilters(new ArrayList<>());
+            } else {
+                filtersTable.setFilters(oneFilters);
+            }
+        } else if (filters.isEmpty()) {
+            filtersTable.setFilters(new ArrayList<>());
+        } else {
+            filtersTable.setFilters(null);
         }
         updating = false;
         revalidate();

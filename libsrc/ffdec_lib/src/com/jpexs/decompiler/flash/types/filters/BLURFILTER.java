@@ -82,4 +82,40 @@ public class BLURFILTER extends FILTER {
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
         return blurSvg(blurX, blurY, passes, document, filtersElement, exporter, in);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.blurX) ^ (Double.doubleToLongBits(this.blurX) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.blurY) ^ (Double.doubleToLongBits(this.blurY) >>> 32));
+        hash = 37 * hash + this.passes;
+        hash = 37 * hash + this.reserved;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BLURFILTER other = (BLURFILTER) obj;
+        if (Double.doubleToLongBits(this.blurX) != Double.doubleToLongBits(other.blurX)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.blurY) != Double.doubleToLongBits(other.blurY)) {
+            return false;
+        }
+        if (this.passes != other.passes) {
+            return false;
+        }
+        return this.reserved == other.reserved;
+    }
+    
+    
 }

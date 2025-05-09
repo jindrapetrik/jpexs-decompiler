@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui.properties.panels;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -30,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -49,6 +49,8 @@ public abstract class AbstractPropertiesPanel extends JPanel {
 
     private static final char PLUS_CHAR = '\u2BC8';
     private static final char MINUS_CHAR = '\u2BC6';
+    
+    private JPanel verticalFiller = new JPanel();
 
     public AbstractPropertiesPanel(String titleIdentifier) {
         this.titleIdentifier = titleIdentifier;
@@ -59,8 +61,8 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         return EasyStrings.translate("property.label").replace("%item%", item);
     }
 
-    protected JPanel makeCard(String id, String icon, JPanel contents) {
-        JPanel cardPanel = new JPanel();
+    protected void addCard(JPanel cardPanel, String id, String icon, JPanel contents, GridBagConstraints gbc, boolean last) {
+        //JPanel cardPanel = new JPanel();
 
         JPanel headerPanel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(EasyStrings.translate("properties." + titleIdentifier + ".header." + id));
@@ -76,31 +78,54 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         headerPanel.add(plusMinusLabel, BorderLayout.WEST);
         headerPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        headerPanel.setMinimumSize(new Dimension(0, 30));
+        headerPanel.setMinimumSize(new Dimension(0, 30));        
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        //cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         headerPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    setCardOpened(id, !isCardOpened(id));
+                    boolean newOpened = !isCardOpened(id);
+                    if (last) {
+                        verticalFiller.setVisible(!newOpened);
+                    }
+                    setCardOpened(id, newOpened);
                     cardPanel.revalidate();
                     cardPanel.repaint();
                 }
             }
         });
-        contents.setAlignmentX(Component.LEFT_ALIGNMENT);
-        contents.setVisible(false);
-        cardPanel.add(headerPanel);
-        cardPanel.add(contents);
+        //contents.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contents.setVisible(false);        
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        cardPanel.add(headerPanel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = last ? 1 : 0;
+        cardPanel.add(contents, gbc);
         contents.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        //contents.setBorder(BorderFactory.createLineBorder(Color.green, 5));
         //contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
-        cardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cardPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        //cardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //cardPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         cardContents.put(id, contents);
         cardPlusMinusLabels.put(id, plusMinusLabel);
-        return cardPanel;
+        
+        if (last) {
+            gbc.gridy++;
+            gbc.weighty = 1;
+            gbc.fill = GridBagConstraints.BOTH;
+            cardPanel.add(verticalFiller, gbc);
+        }
+        
+        //cardPanel.setBorder(BorderFactory.createLineBorder(Color.red, 2));
+        //return cardPanel;
     }
 
     private boolean isCardOpened(String id) {

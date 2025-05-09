@@ -23,7 +23,9 @@ import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -138,4 +140,60 @@ public class CONVOLUTIONFILTER extends FILTER {
 
         return result;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.matrixX;
+        hash = 53 * hash + this.matrixY;
+        hash = 53 * hash + Float.floatToIntBits(this.divisor);
+        hash = 53 * hash + Float.floatToIntBits(this.bias);
+        hash = 53 * hash + Arrays.hashCode(this.matrix);
+        hash = 53 * hash + Objects.hashCode(this.defaultColor);
+        hash = 53 * hash + this.reserved;
+        hash = 53 * hash + (this.clamp ? 1 : 0);
+        hash = 53 * hash + (this.preserveAlpha ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CONVOLUTIONFILTER other = (CONVOLUTIONFILTER) obj;
+        if (this.matrixX != other.matrixX) {
+            return false;
+        }
+        if (this.matrixY != other.matrixY) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.divisor) != Float.floatToIntBits(other.divisor)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.bias) != Float.floatToIntBits(other.bias)) {
+            return false;
+        }
+        if (this.reserved != other.reserved) {
+            return false;
+        }
+        if (this.clamp != other.clamp) {
+            return false;
+        }
+        if (this.preserveAlpha != other.preserveAlpha) {
+            return false;
+        }
+        if (!Arrays.equals(this.matrix, other.matrix)) {
+            return false;
+        }
+        return Objects.equals(this.defaultColor, other.defaultColor);
+    }
+    
+    
 }
