@@ -316,6 +316,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInTagListViewTagMenuItem;
 
     private JMenuItem showInHexDumpViewTagMenuItem;
+    
+    private JMenuItem showInEasyViewTagMenuItem;
 
     private JMenuItem showInFramesFolderMenuItem;
 
@@ -430,6 +432,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInHexDumpViewTagMenuItem.addActionListener(this::showInHexDumpViewActionPerformed);
         showInHexDumpViewTagMenuItem.setIcon(View.getIcon("viewhex16"));
         add(showInHexDumpViewTagMenuItem);
+        
+        showInEasyViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInEasy"));
+        showInEasyViewTagMenuItem.addActionListener(this::showInEasyViewActionPerformed);
+        showInEasyViewTagMenuItem.setIcon(View.getIcon("easy16"));
+        add(showInEasyViewTagMenuItem);
 
         textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
         textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
@@ -1317,6 +1324,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInResourcesViewTagMenuItem.setVisible(false);
         showInTagListViewTagMenuItem.setVisible(false);
         showInHexDumpViewTagMenuItem.setVisible(false);
+        showInEasyViewTagMenuItem.setVisible(false);
         showInFramesFolderMenuItem.setVisible(false);
         addFramesMenuItem.setVisible(false);
         addFramesBeforeMenuItem.setVisible(false);
@@ -1610,6 +1618,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
+            if (firstItem instanceof Timelined) {
+                showInEasyViewTagMenuItem.setVisible(true);
+            }
+            
             if ((firstItem instanceof Tag)
                     || (firstItem instanceof CLIPACTIONRECORD)
                     || (firstItem instanceof BUTTONRECORD)
@@ -4401,7 +4413,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
         mainPanel.updateMenu();
-    }
+    }    
 
     private void showInHexDumpViewActionPerformed(ActionEvent evt) {
         if (mainPanel.isModified()) {
@@ -4413,6 +4425,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         mainPanel.showView(MainPanel.VIEW_DUMP);
         mainPanel.dumpTree.setSelectedItem(item);
+        mainPanel.updateMenu();
+    }
+    
+    private void showInEasyViewActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+        if (!(item instanceof Timelined)) {
+            return;
+        }
+        mainPanel.showView(MainPanel.VIEW_EASY);
+        mainPanel.easyPanel.setTimelined((Timelined) item);
         mainPanel.updateMenu();
     }
 

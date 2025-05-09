@@ -301,7 +301,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final JPanel welcomePanel;
 
-    private final EasyPanel easyPanel;
+    public final EasyPanel easyPanel;
 
     private final MainFrameStatusPanel statusPanel;
 
@@ -5622,10 +5622,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean showView(int view) {
         View.checkAccess();
-
-        if (view == VIEW_EASY && !EasyPanel.EASY_AVAILABLE) {
-            view = VIEW_RESOURCES;
-        }
 
         setTreeModel(view);
         switch (view) {

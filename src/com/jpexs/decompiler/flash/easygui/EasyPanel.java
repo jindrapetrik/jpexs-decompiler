@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,7 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class EasyPanel extends JPanel {
-
-    /**
-     * TODO: switch to true when Easy mode is released. I think it's not
-     * production ready yet.
-     */
-    public static final boolean EASY_AVAILABLE = true;
-
+    
     private TabSwitcher<SWF> tabSwitcher;
     private EasySwfPanel easySwfPanel;
 
@@ -70,6 +65,11 @@ public class EasyPanel extends JPanel {
 
     public SWF getSwf() {
         return tabSwitcher.getSelectedValue();
+    }
+    
+    public void setTimelined(Timelined tim) {
+        setSwf(tim.getSwf());
+        easySwfPanel.setTimelined(tim);
     }
 
     public void dispose() {
