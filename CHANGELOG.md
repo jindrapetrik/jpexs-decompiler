@@ -68,6 +68,7 @@ All notable changes to this project will be documented in this file.
 - [#2454] SVG export - color matrix not applied to images
 - [PR216] ffdec.sh - Support BSD version of sed in java version checks
 - Simple editor - adding a library item to the last frame adds a frame
+- Simple editor - white square on top left corner of the timeline
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.
