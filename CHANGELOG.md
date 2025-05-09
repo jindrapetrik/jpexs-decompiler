@@ -63,6 +63,7 @@ All notable changes to this project will be documented in this file.
 - Exceptions when closing non-ribbon window
 - [PR215] ffdec.sh - Ignore all java options when checking version
 - Text search was not available as context menu option for AS3 scripts folder
+- [#2454] SVG export - color matrix not applied to images
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.
@@ -3782,6 +3783,7 @@ Major version of SWF to XML export changed to 2.
 [#2450]: https://www.free-decompiler.com/flash/issues/2450
 [#2355]: https://www.free-decompiler.com/flash/issues/2355
 [#2419]: https://www.free-decompiler.com/flash/issues/2419
+[#2454]: https://www.free-decompiler.com/flash/issues/2454
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389

@@ -144,7 +144,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             SerializableImage img = image.getImageCached();
             if (img != null) {
                 if (colorTransform != null) {
-                    colorTransform.apply(img);
+                    img = colorTransform.apply(img);
                 }
 
                 int width = img.getWidth();
