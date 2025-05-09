@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#2453] SVG export/import - use image-rendering attribute for image smoothing
 - Option to enter custom zoom level by clicking on zoom percentage label
 - Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)
+- Simple editor - change background color
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

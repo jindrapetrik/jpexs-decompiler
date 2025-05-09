@@ -23,9 +23,13 @@ import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
+import com.jpexs.decompiler.flash.easygui.properties.PropertyChangeDoableOperation;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.ColorSelectionButton;
 import com.jpexs.decompiler.flash.gui.ComboBoxItem;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.types.RGB;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,8 +53,6 @@ import javax.swing.event.ChangeEvent;
  * @author JPEXS
  */
 public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
-
-    private final JLabel displayRectPixelsLabel = new JLabel();
 
     private final JPanel compressionEditorPanel = new JPanel();
 
@@ -76,6 +78,8 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
 
     private final IntegerPropertyField heightEditor = new IntegerPropertyField(400, 1, 8192);
 
+    private final ColorSelectionButton colorSelectionButton;
+    
     private final JPanel warningPanel = new JPanel();
 
     private final JLabel warningLabel = new JLabel();
@@ -132,6 +136,8 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
         displayRectEditorPanel.add(new JLabel("\u00D7    "));
         displayRectEditorPanel.add(heightEditor);
         displayRectEditorPanel.add(new JLabel(" px"));
+        
+        colorSelectionButton = new ColorSelectionButton(Color.white, null);        
 
         warningLabel.setIcon(View.getIcon("warning16"));
         warningPanel.setLayout(layout);
@@ -141,25 +147,35 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
         GridBagLayout gridBag = new GridBagLayout();
         propertiesPanel.setLayout(gridBag);
 
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.compression")), 0, 1);
-        addToGrid(gridBag, propertiesPanel, compressionEditorPanel, 1, 1);
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.version")), 0, 2);
-        addToGrid(gridBag, propertiesPanel, versionEditorPanel, 1, 2);
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.encrypted")), 0, 3);
-        addToGrid(gridBag, propertiesPanel, encryptedCheckBox, 1, 3);
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.gfx")), 0, 4);
-        addToGrid(gridBag, propertiesPanel, gfxCheckBox, 1, 4);
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.framerate")), 0, 6);
-        addToGrid(gridBag, propertiesPanel, frameRateEditorPanel, 1, 6);
-        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.displayrect")), 0, 7);
-        addToGrid(gridBag, propertiesPanel, displayRectEditorPanel, 1, 7);
-        addToGrid(gridBag, propertiesPanel, new JLabel(""), 0, 8);
-        addToGrid(gridBag, propertiesPanel, displayRectPixelsLabel, 1, 8);
-        addToGrid(gridBag, propertiesPanel, warningPanel, 0, 9, 2, 1);
+        int y = 0;
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.compression")), 0, y);
+        addToGrid(gridBag, propertiesPanel, compressionEditorPanel, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.version")), 0, y);
+        addToGrid(gridBag, propertiesPanel, versionEditorPanel, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.encrypted")), 0, y);
+        addToGrid(gridBag, propertiesPanel, encryptedCheckBox, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.gfx")), 0, y);
+        addToGrid(gridBag, propertiesPanel, gfxCheckBox, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.framerate")), 0, y);
+        addToGrid(gridBag, propertiesPanel, frameRateEditorPanel, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(AppStrings.translate("header.displayrect")), 0, y);
+        addToGrid(gridBag, propertiesPanel, displayRectEditorPanel, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, new JLabel(EasyStrings.translate("property.label").replace("%item%", EasyStrings.translate("property.document.backgroundColor"))), 0, y);
+        addToGrid(gridBag, propertiesPanel, colorSelectionButton, 1, y);
+        y++;
+        addToGrid(gridBag, propertiesPanel, warningPanel, 0, y, 2, 1);
 
+        y++;
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = y;
         gbc.gridwidth = 3;
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
@@ -168,7 +184,7 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.gridheight = 10;
+        gbc.gridheight = y;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         propertiesPanel.add(new JPanel(), gbc);
@@ -327,6 +343,48 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 }
             }, swf);
         });
+        
+        colorSelectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
+                if (backgroundColorTag == null) {
+                    return; //???
+                }
+                
+                undoManager.doOperation(new PropertyChangeDoableOperation("document.backgroundColor") {
+                    final RGB prevColor = backgroundColorTag.backgroundColor;
+                    final RGB newColor = new RGB(colorSelectionButton.getValue());
+                    final boolean prevModified = backgroundColorTag.isModified();
+                    
+                    @Override
+                    public void doOperation() {
+                        modifying = true;
+                        SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
+                        if (backgroundColorTag == null) {
+                            return;
+                        }
+                        backgroundColorTag.backgroundColor = newColor;
+                        backgroundColorTag.setModified(true);
+                        swf.resetTimeline();
+                        refresh();
+                        modifying = false;
+                    }
+
+                    @Override
+                    public void undoOperation() {
+                        SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
+                        if (backgroundColorTag == null) {
+                            return;
+                        }
+                        backgroundColorTag.backgroundColor = prevColor;
+                        backgroundColorTag.setModified(prevModified);
+                        swf.resetTimeline();
+                        refresh();
+                    }                    
+                }, swf);
+            }
+        });
     }
 
     
@@ -400,6 +458,12 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
 
         widthEditor.setValue(swf.displayRect.getWidth() / 20);
         heightEditor.setValue(swf.displayRect.getHeight() / 20);
+        
+        SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
+        
+        if (backgroundColorTag != null) {
+            colorSelectionButton.setValue(backgroundColorTag.backgroundColor.toColor());
+        }
         
         modifying = false;
     }

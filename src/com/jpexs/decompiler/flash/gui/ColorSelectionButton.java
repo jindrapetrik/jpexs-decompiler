@@ -32,16 +32,17 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class ConfigurationColorSelection extends FocusablePanel {
+public class ColorSelectionButton extends FocusablePanel {
     private JPanel colorPanel;
+    private JLabel colorLabel;
 
-    public ConfigurationColorSelection(ConfigurationItem item, Color value, String description) {
+    public ColorSelectionButton(Color value, String description) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         colorPanel = new JPanel();
         setToolTipText(description);
         colorPanel.setSize(16, 16);
         colorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        JLabel colorLabel = new JLabel();
+        colorLabel = new JLabel();
         colorPanel.setBackground(value);
 
         addMouseListener(new MouseAdapter() {
@@ -75,24 +76,17 @@ public class ConfigurationColorSelection extends FocusablePanel {
         add(colorLabel);
     }
     
-    public static String colorToHex(Color value) {
-        String rh = Integer.toHexString(value.getRed());
-        if (rh.length() < 2) {
-            rh = "0" + rh;
-        }
-        String gh = Integer.toHexString(value.getGreen());
-        if (gh.length() < 2) {
-            gh = "0" + gh;
-        }
-        String bh = Integer.toHexString(value.getBlue());
-        if (bh.length() < 2) {
-            bh = "0" + bh;
-        }
-        return "#" + rh + gh + bh;
+    public static String colorToHex(Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
     
     public Color getValue() {
         return colorPanel.getBackground();
+    }
+    
+    public void setValue(Color color) {
+        colorLabel.setText(colorToHex(color));
+        colorPanel.setBackground(color);
     }
     
 }

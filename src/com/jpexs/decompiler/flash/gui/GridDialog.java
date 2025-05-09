@@ -42,7 +42,7 @@ import javax.swing.JTextField;
  * @author JPEXS
  */
 public class GridDialog extends AppDialog {
-    private final ConfigurationColorSelection colorSelection;
+    private final ColorSelectionButton colorSelection;
     private final JCheckBox showGridCheckBox;
     private final JCheckBox snapToGridCheckBox;
     private final JCheckBox showOverObjectsCheckBox;
@@ -68,7 +68,7 @@ public class GridDialog extends AppDialog {
         
         centralPanel.add(colorLabel, c);
         
-        colorSelection = new ConfigurationColorSelection(Configuration.gridColor, Configuration.gridColor.get(), null);
+        colorSelection = new ColorSelectionButton(Configuration.gridColor.get(), null);
         colorLabel.setLabelFor(colorSelection);
         c.gridx = 1;
         c.anchor = GridBagConstraints.LINE_START;        

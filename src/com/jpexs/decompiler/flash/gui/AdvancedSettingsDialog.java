@@ -415,7 +415,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                         }
                     }
                     if (itemType == Color.class) {
-                        defaultValue = ConfigurationColorSelection.colorToHex((Color) defaultValue);
+                        defaultValue = ColorSelectionButton.colorToHex((Color) defaultValue);
                     }
                     String locNameHtml = locName;
                     if (!filter.trim().equals("")) {
@@ -492,7 +492,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                             cb.setToolTipText(description);
                             c = cb;
                         } else if (itemType == Color.class) {
-                            ConfigurationColorSelection cb = new ConfigurationColorSelection(item, (Color) item.get(), description);
+                            ColorSelectionButton cb = new ColorSelectionButton((Color) item.get(), description);
                             
                             cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));                            
                             c = cb;                                 
@@ -618,7 +618,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 value = ((JCheckBox) c).isSelected();
             }
             if (itemType == Color.class) {
-                value = ((ConfigurationColorSelection) c).getValue();
+                value = ((ColorSelectionButton) c).getValue();
             }
 
             if (itemType == Calendar.class) {

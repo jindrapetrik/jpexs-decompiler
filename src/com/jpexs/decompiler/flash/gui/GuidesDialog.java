@@ -42,7 +42,7 @@ import javax.swing.JPanel;
  */
 public class GuidesDialog extends AppDialog {
     
-    private final ConfigurationColorSelection colorSelection;
+    private final ColorSelectionButton colorSelection;
     private final JCheckBox showGuidesCheckBox;
     private final JCheckBox snapToGuidesCheckBox;
     private final JCheckBox lockGuidesCheckBox;
@@ -68,7 +68,7 @@ public class GuidesDialog extends AppDialog {
         
         centralPanel.add(colorLabel, c);
         
-        colorSelection = new ConfigurationColorSelection(Configuration.guidesColor, Configuration.guidesColor.get(), null);
+        colorSelection = new ColorSelectionButton(Configuration.guidesColor.get(), null);
         colorLabel.setLabelFor(colorSelection);
         c.gridx = 1;
         c.anchor = GridBagConstraints.LINE_START;        
