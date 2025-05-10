@@ -380,7 +380,12 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 };
                 
                 for (Class filterClass : possilbleFilters) {
-                    JMenuItem filterMenuItem = new JMenuItem(filterClass.getSimpleName());
+                    
+                    String filterName = filterClass.getSimpleName();
+                    filterName = filterName.substring(0, filterName.length() - "FILTER".length());
+                    filterName = EasyStrings.translate("filter." + filterName.toLowerCase());
+                    
+                    JMenuItem filterMenuItem = new JMenuItem(filterName);
                     filterMenuItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {

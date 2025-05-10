@@ -594,7 +594,9 @@ public class FiltersTreeTable extends JTreeTable {
 
         @Override
         public String toString() {
-            return filter.getClass().getSimpleName();
+            String filterName = filter.getClass().getSimpleName();
+            filterName = filterName.substring(0, filterName.length() - "FILTER".length());
+            return EasyStrings.translate("filter." + filterName.toLowerCase());
         }
     }
 
