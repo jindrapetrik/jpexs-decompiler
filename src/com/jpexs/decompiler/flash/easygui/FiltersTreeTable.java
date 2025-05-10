@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,7 +59,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
@@ -226,7 +227,26 @@ public class FiltersTreeTable extends JTreeTable {
             int filterIndex = root.getIndex(node);
             FiltersTreeTableModel model = (FiltersTreeTableModel) getTree().getModel();
             model.removeFilter(filterIndex);
+            
+            //Select previous filter
+            filterIndex--;
+            if (filterIndex < 0) {
+                filterIndex = 0;
+            }            
             fireFilterChanged();
+            if (filterIndex < root.getChildCount()) {
+                Timer timer = new Timer();
+                final int fFilterIndex = filterIndex;
+                //Add some delay, otherwise it won't work. WTF?
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (root.getChildCount() > fFilterIndex) {
+                            getTree().setSelectionPath(new TreePath(new Object[] {root, root.getChildAt(fFilterIndex)}));    
+                        }                        
+                    }                    
+                }, 50);                            
+            }
         }
     }
 
