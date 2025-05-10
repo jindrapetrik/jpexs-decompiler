@@ -17,12 +17,14 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FocusablePanel;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -36,6 +38,8 @@ import java.awt.event.FocusEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -50,7 +54,7 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 /**
  * @author JPEXS
  */
-public class ColorEditor extends JPanel implements GenericTagEditor, ActionListener {
+public class ColorEditor extends FocusablePanel implements GenericTagEditor, ActionListener {
 
     private final Object obj;
 
@@ -74,6 +78,8 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
 
     private final JButton buttonChange;
 
+    private final List<ChangeListener> changeListeners = new ArrayList<>();
+
     public int getColorType() {
         return colorType;
     }
@@ -90,7 +96,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         this.type = type;
         this.fieldName = fieldName;
 
-        setLayout(new FlowLayout());
+        setLayout(new BorderLayout());
 
         buttonChange = new JButton("") {
 
@@ -111,7 +117,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         Dimension colorDim = new Dimension(16, 16);
         buttonChange.setSize(colorDim);
         buttonChange.setPreferredSize(colorDim);
-        add(buttonChange);
+        add(buttonChange, BorderLayout.WEST);
         reset();
     }
 
@@ -163,15 +169,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
 
     @Override
     public void addChangeListener(final ChangeListener l) {
-        final GenericTagEditor t = this;
-        addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                l.change(t);
-            }
-
-        });
+        changeListeners.add(l);
     }
 
     @Override
@@ -256,15 +254,15 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
     }
 
     JDialog chooserDialog = null;
-    
+
     private void colorCancelPerformed(ActionEvent e) {
         chooserDialog.setVisible(false);
     }
-    
+
     private void colorOkPerformed(ActionEvent e) {
         chooserDialog.setVisible(false);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -283,6 +281,10 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
             color = newColor;
             buttonChange.setBackground(color);
             repaint();
+            List<ChangeListener> listeners2 = new ArrayList<>(changeListeners);
+            for (ChangeListener l : listeners2) {
+                l.change(this);
+            }
         }
     }
 
@@ -295,5 +297,10 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
     @Override
     public Object getObject() {
         return obj;
+    }
+
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+
     }
 }

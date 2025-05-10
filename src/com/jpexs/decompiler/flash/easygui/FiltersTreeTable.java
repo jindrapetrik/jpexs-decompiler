@@ -17,31 +17,58 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
+import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ValueNormalizer;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
+import java.util.Objects;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTableUI;
-import javax.swing.table.TableColumn;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -49,6 +76,8 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public class FiltersTreeTable extends JTreeTable {
+
+    private List<ActionListener> filterChangedListeners = new ArrayList<>();
 
     public FiltersTreeTable() {
         super(new FiltersTreeTableModel(null));
@@ -106,7 +135,7 @@ public class FiltersTreeTable extends JTreeTable {
             getTree().setBackground(Color.WHITE);
         }
 
-        addMouseListener(new MouseAdapter() {
+        /*addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
@@ -119,18 +148,278 @@ public class FiltersTreeTable extends JTreeTable {
 
                 }
             }
-        });
-
+        });*/
         getTableHeader().setReorderingAllowed(false);
+        /*getTree().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (isEditing()) {
+                    getCellEditor().stopCellEditing();
+                }
+            }            
+        });*/
+    }
+
+    public void addFilterChangedListener(ActionListener l) {
+        filterChangedListeners.add(l);
+    }
+
+    public void removeFilterChangedListener(ActionListener l) {
+        filterChangedListeners.remove(l);
+    }
+
+    private void fireFilterChanged() {
+        List<ActionListener> listeners2 = new ArrayList<>(filterChangedListeners);
+        for (ActionListener l : listeners2) {
+            l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "filterChanged"));
+        }
+    }
+
+    public List<FILTER> getFilters() {
+        TreeModel model = getTree().getModel();
+        if (model instanceof FiltersTreeTableModel) {
+            FiltersTreeTableModel treeTableModel = (FiltersTreeTableModel) model;
+            return treeTableModel.filters;
+        }
+        return new ArrayList<>();
     }
 
     public void setFilters(List<FILTER> filters) {
+        if (Objects.equals(getFilters(), filters)) {
+            return;
+        }
         setTreeTableModel(new FiltersTreeTableModel(filters));
 
         getColumnModel().getColumn(0).setMinWidth(200);
         getColumnModel().getColumn(0).setWidth(200);
         getColumnModel().getColumn(0).setPreferredWidth(200);
         getColumnModel().getColumn(1).setPreferredWidth(Integer.MAX_VALUE);
+
+        getColumnModel().getColumn(1).setCellEditor(new FiltersValueCellEditor(this));
+        getColumnModel().getColumn(1).setCellRenderer(new FiltersTableCellRenderer());
+
+        TreeModel ttm = getTree().getModel();
+        Object root = ttm.getRoot();
+        int childCount = ttm.getChildCount(root);
+        for (int i = 0; i < childCount; i++) {
+            getTree().expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
+        }
+    }
+
+    private static class FiltersValueCellEditor implements TableCellEditor {
+
+        private Object value;
+        private GenericTagEditor editor;
+        private List<CellEditorListener> listeners = new ArrayList<>();
+        private final FiltersTreeTable filtersTable;
+
+        public FiltersValueCellEditor(FiltersTreeTable filtersTable) {
+            this.filtersTable = filtersTable;
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            if (value == null) {
+                return null;
+            }
+
+            if (!(value instanceof FilterValue)) {
+                return null;
+            }
+
+            FilterValue filterValue = (FilterValue) value;
+            Object realValue = filterValue.getValue();
+            this.value = value;
+
+            FilterField filterField = filterValue.filterField;
+
+            if (editor != null) {
+                //((Component) editor).setVisible(false);
+            }
+            editor = null;
+            if (realValue.getClass() == Boolean.class) {
+                editor = new BooleanEditor(filterField.toString(), filterField.filter, filterField.field, -1, Boolean.class);
+                /*editor.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void change(GenericTagEditor editor) {
+                            editor.save();
+                    }                    
+                });*/
+                //((BooleanEditor) editor).setRequestFocusEnabled(false);
+            } else if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
+                editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
+                //editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
+                if ("angle".equals(filterField.field.getName())) {
+                    editor.setValueNormalizer(new ValueNormalizer() {
+                        @Override
+                        public Object toFieldValue(Object viewValue) {
+                            return Math.toRadians((double) viewValue);
+                        }
+
+                        @Override
+                        public Object toViewValue(Object fieldValue) {
+                            return Math.round(Math.toDegrees((double) fieldValue) * 100) / 100.0;
+                        }
+                    });
+                }
+            } else if (realValue.getClass() == int.class || realValue.getClass() == Integer.class) {
+                editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
+            } else if (realValue.getClass() == RGBA.class) {
+                editor = new ColorEditor(filterField.toString(), filterField.filter, filterField.field, -1, RGBA.class);
+            }
+
+            if (editor != null) {
+
+                editor.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void change(GenericTagEditor editor) {
+                        editor.save();
+                        filtersTable.fireFilterChanged();
+                    }
+                });
+
+                if (table instanceof JTreeTable) {
+                    JTreeTable treeTable = (JTreeTable) table;
+                    if (treeTable.isRowSelected(row)) {
+                        ((JComponent) editor).setForeground(new Color(UIManager.getColor("Table.selectionForeground").getRGB(), true));
+                        ((JComponent) editor).setBackground(new Color(UIManager.getColor("Table.selectionBackground").getRGB(), true));
+                        ((JComponent) editor).setOpaque(true);
+                    } else {
+                        ((JComponent) editor).setOpaque(false);
+                    }
+                }
+            }
+
+            return (Component) editor;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return value;
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject anEvent) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            if (value == null) {
+                return true;
+            }
+
+            if (!(value instanceof FilterValue)) {
+                return false;
+            }
+
+            FilterValue filterValue = (FilterValue) value;
+
+            Object realValue = filterValue.getValue();
+
+            if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
+                return true;
+            }
+            if (realValue.getClass() == Boolean.class) {
+                return false;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            editor.save();
+            List<CellEditorListener> listeners2 = new ArrayList<>(listeners);
+            for (CellEditorListener l : listeners2) {
+                l.editingStopped(new ChangeEvent(editor));
+            }
+            return true;
+        }
+
+        @Override
+        public void cancelCellEditing() {
+            List<CellEditorListener> listeners2 = new ArrayList<>(listeners);
+            for (CellEditorListener l : listeners2) {
+                l.editingCanceled(new ChangeEvent(editor));
+            }
+            editor.reset();
+        }
+
+        @Override
+        public void addCellEditorListener(CellEditorListener l) {
+            listeners.add(l);
+        }
+
+        @Override
+        public void removeCellEditorListener(CellEditorListener l) {
+            listeners.remove(l);
+        }
+
+    }
+
+    private static class FiltersTableCellRenderer extends DefaultTableCellRenderer {
+
+        JLabel label = new JLabel();
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            label.setText(value.toString());
+
+            if (table instanceof JTreeTable) {
+                JTreeTable treeTable = (JTreeTable) table;
+                isSelected = treeTable.isRowSelected(row);
+            }
+
+            JComponent component = label;
+            if (value instanceof FilterValue) {
+                FilterValue filterValue = (FilterValue) value;
+                Object fieldValue = filterValue.getValue();
+                if (fieldValue != null) {
+                    if (fieldValue.getClass() == Boolean.class) {
+                        JPanel panel = new JPanel(new BorderLayout());
+                        JCheckBox checkBox = new JCheckBox();
+                        //checkBox.setHorizontalAlignment(CENTER);
+                        checkBox.setSelected((Boolean) fieldValue);
+                        checkBox.setOpaque(false);
+                        panel.add(checkBox, BorderLayout.CENTER);
+                        panel.setOpaque(false);
+                        component = panel;
+                    }
+                    if (fieldValue.getClass() == RGBA.class) {
+                        JPanel panel = new JPanel(new BorderLayout());
+                        JButton buttonChange = new JButton("") {
+
+                            @Override
+                            protected void paintComponent(Graphics g) {
+                                g.setColor(getBackground());
+                                g.fillRect(0, 0, getWidth(), getHeight());
+                                super.paintBorder(g);
+                            }
+
+                        };
+                        buttonChange.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+                        buttonChange.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        buttonChange.setBorderPainted(true);
+                        buttonChange.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        Dimension colorDim = new Dimension(16, 16);
+                        buttonChange.setSize(colorDim);
+                        buttonChange.setPreferredSize(colorDim);
+                        buttonChange.setBackground(((RGBA) fieldValue).toColor());
+                        panel.add(buttonChange, BorderLayout.WEST);
+                        component = panel;
+                    }
+                }
+            }
+
+            if (isSelected) {
+                component.setForeground(new Color(UIManager.getColor("Table.selectionForeground").getRGB(), true));
+                component.setBackground(new Color(UIManager.getColor("Table.selectionBackground").getRGB(), true));
+                component.setOpaque(true);
+            } else {
+                component.setOpaque(false);
+            }
+            return component;
+        }
     }
 
     private static class FiltersTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -152,24 +441,6 @@ public class FiltersTreeTable extends JTreeTable {
                 label.setOpaque(true);
             }
             return label;
-        }
-    }
-
-    private static class LibraryFolder {
-
-        private String name;
-
-        public LibraryFolder(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return EasyStrings.translate("library.folder." + name);
-        }
-
-        public String getName() {
-            return name;
         }
     }
 
@@ -206,15 +477,76 @@ public class FiltersTreeTable extends JTreeTable {
 
     }
 
+    private static class FilterValue {
+
+        private final FilterField filterField;
+
+        public FilterValue(FilterField filterField) {
+            this.filterField = filterField;
+        }
+
+        public Object getValue() {
+            return filterField.getValue();
+        }
+
+        @Override
+        public String toString() {
+            return valueToString(filterField.getField().getName(), filterField.getValue());
+        }
+    }
+
+    private static String valueToString(String fieldName, Object value) {
+        if (value == null) {
+            return "null";
+        }
+
+        if (value.getClass().isArray()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            int length = Array.getLength(value);
+            for (int i = 0; i < length; i++) {
+                Object element = Array.get(value, i);
+                sb.append(valueToString(fieldName, element));
+                if (i < length - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+        if (value.getClass() == RGBA.class) {
+            RGBA rgb = (RGBA) value;
+            return rgb.toHexARGB();
+        }
+        if (value.getClass() == RGB.class) {
+            RGB rgb = (RGB) value;
+            return rgb.toHexRGB();
+        }
+
+        if (fieldName.equals("angle")) {
+            return "" + EcmaNumberToString.stringFor(Math.round(Math.toDegrees((double) value) * 100) / 100.0);
+        }
+        if (value.getClass() == Double.class) {
+            return EcmaNumberToString.stringFor((Double) value);
+        }
+        if (value.getClass() == Float.class) {
+            return EcmaNumberToString.stringFor((Float) value);
+        }
+        return "" + value;
+    }
+
     private static class FiltersTreeTableModel implements TreeTableModel {
 
         private final DefaultMutableTreeNode root;
 
+        private List<FILTER> filters;
+
         public FiltersTreeTableModel(List<FILTER> filters) {
             root = new DefaultMutableTreeNode("root");
+            this.filters = filters;
 
             if (filters == null) {
-                DefaultMutableTreeNode indeterminate = new DefaultMutableTreeNode(EasyStrings.translate("properties.instance.filters.indeterminate"));
+                DefaultMutableTreeNode indeterminate = new DefaultMutableTreeNode(EasyStrings.translate("property.instance.filters.indeterminate"));
                 root.add(indeterminate);
                 return;
             }
@@ -243,9 +575,9 @@ public class FiltersTreeTable extends JTreeTable {
         public String getColumnName(int column) {
             switch (column) {
                 case 0:
-                    return EasyStrings.translate("properties.instance.filters.header.property");
+                    return EasyStrings.translate("property.instance.filters.header.property");
                 case 1:
-                    return EasyStrings.translate("properties.instance.filters.header.value");
+                    return EasyStrings.translate("property.instance.filters.header.value");
                 default:
                     return null;
             }
@@ -262,46 +594,6 @@ public class FiltersTreeTable extends JTreeTable {
 
         }
 
-        private String valueToString(String fieldName, Object value) {
-            if (value == null) {
-                return "null";
-            }
-
-            if (value.getClass().isArray()) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("[");
-                int length = Array.getLength(value);
-                for (int i = 0; i < length; i++) {
-                    Object element = Array.get(value, i);
-                    sb.append(valueToString(fieldName, element));
-                    if (i < length - 1) {
-                        sb.append(", ");
-                    }
-                }
-                sb.append("]");
-                return sb.toString();
-            }
-            if (value.getClass() == RGBA.class) {
-                RGBA rgb = (RGBA) value;
-                return rgb.toHexARGB();
-            }
-            if (value.getClass() == RGB.class) {
-                RGB rgb = (RGB) value;
-                return rgb.toHexRGB();
-            }
-
-            if (fieldName.equals("angle")) {
-                return "" + EcmaNumberToString.stringFor(Math.round(Math.toDegrees((double) value) * 100) / 100.0);
-            }
-            if (value.getClass() == Double.class) {
-                return EcmaNumberToString.stringFor((Double) value);
-            }
-            if (value.getClass() == Float.class) {
-                return EcmaNumberToString.stringFor((Float) value);
-            }
-            return "" + value;
-        }
-
         @Override
         public Object getValueAt(Object node, int column) {
             DefaultMutableTreeNode n = (DefaultMutableTreeNode) node;
@@ -312,7 +604,7 @@ public class FiltersTreeTable extends JTreeTable {
                 case 1:
                     if (o instanceof FilterField) {
                         FilterField filterField = (FilterField) o;
-                        return valueToString(filterField.field.getName(), filterField.getValue());
+                        return new FilterValue(filterField);
                     } else {
                         return "";
                     }
@@ -324,6 +616,10 @@ public class FiltersTreeTable extends JTreeTable {
         @Override
         public boolean isCellEditable(Object node, int column) {
             if (column == 0) {
+                return true;
+            }
+            DefaultMutableTreeNode n = (DefaultMutableTreeNode) node;
+            if (column == 1 && n.getUserObject() instanceof FilterField) {
                 return true;
             }
             return false;

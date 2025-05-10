@@ -5262,7 +5262,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 Reference<Rectangle2D> boundsRef = new Reference<>(null);
 
-                RECT rect = getTopTimelined().getRect();
+                Timelined t = getTopTimelined();
+                if (t == null) {
+                    return;
+                }
+                RECT rect = t.getRect();
 
                 synchronized (ImagePanel.this) {
                     synchronized (lock) {

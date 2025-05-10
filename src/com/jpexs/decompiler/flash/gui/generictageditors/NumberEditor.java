@@ -19,12 +19,14 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ReflectionTools;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import javax.swing.JFormattedTextField;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -33,7 +35,7 @@ import javax.swing.text.DefaultFormatter;
 /**
  * @author JPEXS
  */
-public class NumberEditor extends JSpinner implements GenericTagEditor {
+public class NumberEditor extends JPanel implements GenericTagEditor {
 
     private final Object obj;
 
@@ -46,6 +48,10 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     private final SWFType swfType;
 
     private String fieldName;
+    
+    private ValueNormalizer normalizer;
+    
+    private JSpinner spinner;
 
     @Override
     public BaselineResizeBehavior getBaselineResizeBehavior() {
@@ -71,20 +77,28 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         this.type = type;
         this.swfType = swfType;
         this.fieldName = fieldName;
+        spinner = new JSpinner();
+        
+        setLayout(new BorderLayout());
+        add(spinner, BorderLayout.WEST);
+        setOpaque(false);
 
-        reset();
-        ((JSpinner.NumberEditor) getEditor()).getFormat().setGroupingUsed(false);
-        JFormattedTextField jtf = ((JSpinner.NumberEditor) getEditor()).getTextField();
+        reset();        
+        ((JSpinner.NumberEditor) spinner.getEditor()).getFormat().setGroupingUsed(false);
+        JFormattedTextField jtf = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
         DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
         formatter.setCommitsOnValidEdit(true);
-
+        
     }
 
     @Override
     public void reset() {
         try {
             Object value = ReflectionTools.getValue(obj, field, index);
-            setModel(getModel(swfType, value));
+            if (normalizer != null) {
+                value = normalizer.toViewValue(value);
+            }
+            spinner.setModel(getModel(swfType, value));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -93,13 +107,21 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     @Override
     public boolean save() {
         try {
-            Object oldValue = ReflectionTools.getValue(obj, field, index);
-            Object newValue = getChangedValue();
-            if (newValue == null) {
+            Object oldValue = ReflectionTools.getValue(obj, field, index);            
+            Object oldViewValue = oldValue;
+            if (normalizer != null) {
+                oldViewValue = normalizer.toViewValue(oldValue);
+            }
+            Object newViewValue = getChangedValue();
+            if (newViewValue == null) {
                 return false;
             }
-            if (Objects.equals(oldValue, newValue)) {
+            if (Objects.equals(oldViewValue, newViewValue)) {
                 return false;
+            }
+            Object newValue = newViewValue;
+            if (normalizer != null) {
+                newValue = normalizer.toFieldValue(newViewValue);
             }
             ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -210,15 +232,15 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     public Object getChangedValue() {
         Object value = null;
         if (type.equals(int.class) || type.equals(Integer.class)) {
-            value = Integer.parseInt(getValue().toString());
+            value = Integer.parseInt(spinner.getValue().toString());
         } else if (type.equals(short.class) || type.equals(Short.class)) {
-            value = Short.parseShort(getValue().toString());
+            value = Short.parseShort(spinner.getValue().toString());
         } else if (type.equals(long.class) || type.equals(Long.class)) {
-            value = Long.parseLong(getValue().toString());
+            value = Long.parseLong(spinner.getValue().toString());
         } else if (type.equals(double.class) || type.equals(Double.class)) {
-            value = Double.parseDouble(getValue().toString());
+            value = Double.parseDouble(spinner.getValue().toString());
         } else if (type.equals(float.class) || type.equals(Float.class)) {
-            value = Float.parseFloat(getValue().toString());
+            value = Float.parseFloat(spinner.getValue().toString());
         }
         return value;
     }
@@ -242,4 +264,9 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+        this.normalizer = normalizer;
+    }  
 }

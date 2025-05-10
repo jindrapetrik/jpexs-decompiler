@@ -42,4 +42,6 @@ public interface GenericTagEditor {
     public void validateValue();
 
     public Object getObject();
+    
+    public void setValueNormalizer(ValueNormalizer normalizer);
 }

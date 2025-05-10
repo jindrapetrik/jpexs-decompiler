@@ -247,6 +247,14 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
         throw new UnsupportedOperationException();
     }
     
+    public void setPlaceFlagHasFilterList(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setFilters(List<FILTER> filters) {
+        throw new UnsupportedOperationException();
+    }
+    
     /**
      * Checks if place equals.
      * @param other Other place object type tag
@@ -290,6 +298,9 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
             return false;
         }
         if (!Objects.equals(getAmfData(), other.getAmfData())) { //?
+            return false;
+        }
+        if (!Objects.equals(getFilters(), other.getFilters())) {
             return false;
         }
         return true;

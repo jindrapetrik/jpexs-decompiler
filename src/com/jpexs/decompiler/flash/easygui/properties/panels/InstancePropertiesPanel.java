@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -337,35 +338,35 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         JScrollPane sp = new JScrollPane(filtersTable);
         filtersPanel.add(sp, BorderLayout.CENTER);
         sp.getViewport().setBackground(filtersTable.getBackground());
-        //filtersPanel.setBorder(BorderFactory.createLineBorder(Color.red, 5));
-        //sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
+        filtersTable.addFilterChangedListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<FILTER> newFilters = filtersTable.getFilters();
+                if (newFilters != null) {
+                    undoManager.doOperation(new PlaceChangeDoableOperation("instance.filters", 3) {
+                        List<FILTER> applyFilters = Helper.deepCopy(newFilters);
+
+                        @Override
+                        public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
+                            placeObject.setFilters(applyFilters);
+                        }
+                    }, swfPanel.getSwf());
+                }
+            }
+        });
 
         propertiesPanel = new JPanel();
-        //propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
-        //propertiesPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 5));
         propertiesPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         propertiesPanel.setLayout(new GridBagLayout());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = -1;
-        /*gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbcc.weightx = 1;*/
 
         addCard(propertiesPanel, "positionSize", null, positionSizePanel, gbc, false);
-
-        //gbc.gridy++;
         addCard(propertiesPanel, "colorEffect", null, colorEffectPanel, gbc, false);
-
-        //gbc.gridy++;
         addCard(propertiesPanel, "display", null, displayPanel, gbc, false);
-
-        //gbc.gridy++;      
-        //gbc.fill = GridBagConstraints.BOTH; //GridBagConstraints.BOTH;
-        //gbc.weighty = 1;
         addCard(propertiesPanel, "filters", null, filtersPanel, gbc, true);
 
         setCardOpened("positionSize", true);
@@ -825,12 +826,13 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
 
         }
+
         if (filters.size() == 1) {
             List<FILTER> oneFilters = filters.iterator().next();
             if (oneFilters == null) {
                 filtersTable.setFilters(new ArrayList<>());
             } else {
-                filtersTable.setFilters(oneFilters);
+                filtersTable.setFilters(Helper.deepCopy(oneFilters));
             }
         } else if (filters.isEmpty()) {
             filtersTable.setFilters(new ArrayList<>());

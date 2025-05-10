@@ -276,6 +276,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (selected != null) {
             selected = mapping(selected);
         }
+        if (menuGroups == null) {
+            return;
+        }
         for (String path : menuGroups.get(group)) {
             setMenuChecked(path, selected == null ? false : path.equals(selected));
         }

@@ -748,21 +748,36 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.placeFlagHasBlendMode = value;
     }
     
+    @Override
     public void setBitmapCache(int value) {
         this.bitmapCache = value;
         this.placeFlagHasCacheAsBitmap = true;
     }
 
+    @Override
     public void setPlaceFlagHasCacheAsBitmap(boolean value) {
         this.placeFlagHasCacheAsBitmap = value;
     }
     
+    @Override
     public void setBackgroundColor(RGBA value) {
         this.backgroundColor = value;
         this.placeFlagOpaqueBackground = true;
     }
 
+    @Override
     public void setPlaceFlagOpaqueBackground(boolean value) {
         this.placeFlagOpaqueBackground = value;
+    }
+    
+    @Override
+    public void setPlaceFlagHasFilterList(boolean placeFlagHasFilterList) {
+        this.placeFlagHasFilterList = placeFlagHasFilterList;
+    }
+
+    @Override
+    public void setFilters(List<FILTER> filters) {
+        this.surfaceFilterList = new ArrayList<>(filters);
+        this.placeFlagHasFilterList = true;
     }
 }

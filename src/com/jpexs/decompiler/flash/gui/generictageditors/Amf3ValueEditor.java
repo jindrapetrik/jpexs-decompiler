@@ -264,4 +264,9 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
     public Object getObject() {
         return obj;
     }
+
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }        
 }

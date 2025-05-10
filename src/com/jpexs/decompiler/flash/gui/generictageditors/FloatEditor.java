@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.JTextField;
 
@@ -41,7 +43,9 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     private final Class<?> type;
 
     private String fieldName;
-
+    
+    private ValueNormalizer normalizer;
+    
     @Override
     public boolean getScrollableTracksViewportWidth() {
         return true;
@@ -77,7 +81,10 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     public void reset() {
         try {
             Object val = ReflectionTools.getValue(obj, field, index);
-            setText(val == null ? "" : val.toString());
+            if (normalizer != null) {
+                val = normalizer.toViewValue(val);
+            }
+            setText(val == null ? "" : EcmaScript.toString(val));            
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -86,7 +93,11 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     @Override
     public boolean save() {
         try {
-            String oldValue = (String) EcmaScript.toString(ReflectionTools.getValue(obj, field, index));
+            Object oldFieldValue = ReflectionTools.getValue(obj, field, index);
+            if (normalizer != null) {
+                oldFieldValue = normalizer.toViewValue(oldFieldValue);
+            }
+            String oldValue = (String) EcmaScript.toString(oldFieldValue);
             String newValue = getText();
             if (Objects.equals(oldValue, newValue)) {
                 return false;
@@ -96,6 +107,9 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
                 val = Double.valueOf(getText());
             } else {
                 val = Float.valueOf(getText());
+            }
+            if (normalizer != null) {
+                val = normalizer.toFieldValue(val);
             }
             ReflectionTools.setValue(obj, field, index, val);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -150,4 +164,10 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+        this.normalizer = normalizer;
+        reset();
+    }  
 }

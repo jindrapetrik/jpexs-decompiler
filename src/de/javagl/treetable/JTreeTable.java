@@ -99,7 +99,7 @@ public class JTreeTable extends JTable
         // Install the tree editor renderer and editor.
         setDefaultRenderer(TreeTableModel.class, tree);
         setDefaultEditor(TreeTableModel.class, new TreeTableCellEditor());
-
+        
         // No grid.
         setShowGrid(false);
 
