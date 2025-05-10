@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ValueNormalizer;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import de.javagl.treetable.JTreeTable;
@@ -62,6 +64,7 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -168,7 +171,7 @@ public class FiltersTreeTable extends JTreeTable {
         filterChangedListeners.remove(l);
     }
 
-    private void fireFilterChanged() {
+    public void fireFilterChanged() {
         List<ActionListener> listeners2 = new ArrayList<>(filterChangedListeners);
         for (ActionListener l : listeners2) {
             l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "filterChanged"));
@@ -184,12 +187,50 @@ public class FiltersTreeTable extends JTreeTable {
         return new ArrayList<>();
     }
 
-    public void setFilters(List<FILTER> filters) {
-        if (Objects.equals(getFilters(), filters)) {
+    public void addFilter(FILTER filter) {
+        TreeModel model = getTree().getModel();
+        if (model instanceof FiltersTreeTableModel) {
+            FiltersTreeTableModel treeTableModel = (FiltersTreeTableModel) model;
+            treeTableModel.addFilter(filter);
+            DefaultMutableTreeNode root = ((DefaultMutableTreeNode) treeTableModel.getRoot());
+            getTree().expandPath(new TreePath(new Object[]{root, root.getChildAt(root.getChildCount() - 1)}));
+            updateColumns();
+            fireFilterChanged();
+        }
+    }
+
+    public void clearFilters() {
+        TreeModel model = getTree().getModel();
+        if (model instanceof FiltersTreeTableModel) {
+            setTreeTableModel(new FiltersTreeTableModel(new ArrayList<>()));
+            fireFilterChanged();
+        }
+    }
+
+    public boolean isFilterSelected() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getTree().getLastSelectedPathComponent();
+        if (node == null) {
+            return false;
+        }
+        return node.getUserObject() instanceof FilterName;
+    }
+
+    public void removeSelectedFilter() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getTree().getLastSelectedPathComponent();
+        if (node == null) {
             return;
         }
-        setTreeTableModel(new FiltersTreeTableModel(filters));
+        Object object = node.getUserObject();
+        if (object instanceof FilterName) {
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
+            int filterIndex = root.getIndex(node);
+            FiltersTreeTableModel model = (FiltersTreeTableModel) getTree().getModel();
+            model.removeFilter(filterIndex);
+            fireFilterChanged();
+        }
+    }
 
+    private void updateColumns() {
         getColumnModel().getColumn(0).setMinWidth(200);
         getColumnModel().getColumn(0).setWidth(200);
         getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -197,7 +238,14 @@ public class FiltersTreeTable extends JTreeTable {
 
         getColumnModel().getColumn(1).setCellEditor(new FiltersValueCellEditor(this));
         getColumnModel().getColumn(1).setCellRenderer(new FiltersTableCellRenderer());
-
+    }
+    
+    public void setFilters(List<FILTER> filters) {
+        if (Objects.equals(getFilters(), filters)) {
+            return;
+        }
+        setTreeTableModel(new FiltersTreeTableModel(filters));
+       
         TreeModel ttm = getTree().getModel();
         Object root = ttm.getRoot();
         int childCount = ttm.getChildCount(root);
@@ -374,7 +422,7 @@ public class FiltersTreeTable extends JTreeTable {
             if (value instanceof FilterValue) {
                 FilterValue filterValue = (FilterValue) value;
                 Object fieldValue = filterValue.getValue();
-                if (fieldValue != null) {
+                if (fieldValue != null) {                    
                     if (fieldValue.getClass() == Boolean.class) {
                         JPanel panel = new JPanel(new BorderLayout());
                         JCheckBox checkBox = new JCheckBox();
@@ -526,13 +574,28 @@ public class FiltersTreeTable extends JTreeTable {
         if (fieldName.equals("angle")) {
             return "" + EcmaNumberToString.stringFor(Math.round(Math.toDegrees((double) value) * 100) / 100.0);
         }
-        if (value.getClass() == Double.class) {
-            return EcmaNumberToString.stringFor((Double) value);
-        }
-        if (value.getClass() == Float.class) {
-            return EcmaNumberToString.stringFor((Float) value);
+        if (value.getClass() == Double.class
+                || value.getClass() == Float.class
+                || value.getClass() == float.class
+                || value.getClass() == double.class
+                ) {
+            return EcmaScript.toString(value);
         }
         return "" + value;
+    }
+
+    private static class FilterName {
+
+        private final FILTER filter;
+
+        public FilterName(FILTER filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public String toString() {
+            return filter.getClass().getSimpleName();
+        }
     }
 
     private static class FiltersTreeTableModel implements TreeTableModel {
@@ -541,28 +604,63 @@ public class FiltersTreeTable extends JTreeTable {
 
         private List<FILTER> filters;
 
+        private List<TreeModelListener> listeners = new ArrayList<>();
+
         public FiltersTreeTableModel(List<FILTER> filters) {
             root = new DefaultMutableTreeNode("root");
-            this.filters = filters;
 
             if (filters == null) {
                 DefaultMutableTreeNode indeterminate = new DefaultMutableTreeNode(EasyStrings.translate("property.instance.filters.indeterminate"));
                 root.add(indeterminate);
+                this.filters = null;
                 return;
             }
 
+            this.filters = new ArrayList<>();
+            
             for (FILTER filter : filters) {
-                DefaultMutableTreeNode filterNode = new DefaultMutableTreeNode(filter.getClass().getSimpleName());
-                root.add(filterNode);
-                Field[] fields = filter.getClass().getFields();
-                for (Field field : fields) {
-                    if ("id".equals(field.getName())) {
-                        continue;
-                    }
-                    FilterField filterField = new FilterField(filter, field);
-                    DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(filterField);
-                    filterNode.add(fieldNode);
+                addFilter(filter);
+            }
+        }
+
+        public void addFilter(FILTER filter) {
+            if (this.filters == null) { //indeterminate
+                DefaultMutableTreeNode indeterminate = (DefaultMutableTreeNode) root.getChildAt(0);
+                root.remove(0);
+                this.filters = new ArrayList<>();
+                for (TreeModelListener l : listeners) {
+                    l.treeNodesRemoved(new TreeModelEvent(this, new Object[]{root}, new int[]{0}, new Object[]{indeterminate}));
                 }
+            }
+
+            DefaultMutableTreeNode filterNode = new DefaultMutableTreeNode(new FilterName(filter));
+            root.add(filterNode);
+            Field[] fields = filter.getClass().getFields();
+            for (Field field : fields) {
+                if ("id".equals(field.getName())) {
+                    continue;
+                }
+                Reserved reserved = field.getAnnotation(Reserved.class);
+                if (reserved != null) {
+                    continue;
+                }
+                FilterField filterField = new FilterField(filter, field);
+                DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(filterField);
+                filterNode.add(fieldNode);
+            }
+            this.filters.add(filter);
+
+            for (TreeModelListener l : listeners) {
+                l.treeNodesInserted(new TreeModelEvent(this, new Object[]{root}, new int[]{this.filters.size() - 1}, new Object[]{filterNode}));
+            }
+        }
+
+        public void removeFilter(int index) {
+            filters.remove(index);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getChildAt(index);
+            root.remove(node);
+            for (TreeModelListener l : listeners) {
+                l.treeNodesRemoved(new TreeModelEvent(this, new Object[]{root}, new int[]{this.filters.size()}, new Object[]{node}));
             }
         }
 
@@ -662,10 +760,12 @@ public class FiltersTreeTable extends JTreeTable {
 
         @Override
         public void addTreeModelListener(TreeModelListener l) {
+            listeners.add(l);
         }
 
         @Override
         public void removeTreeModelListener(TreeModelListener l) {
+            listeners.remove(l);
         }
 
     }
