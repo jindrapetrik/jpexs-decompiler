@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
@@ -24,8 +25,6 @@ import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.swing.JTextField;
 
@@ -120,7 +119,7 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
 
     @Override
     public void addChangeListener(final ChangeListener l) {
-        final GenericTagEditor t = this;
+        final PropertyEditor t = this;
         addFocusListener(new FocusAdapter() {
 
             @Override

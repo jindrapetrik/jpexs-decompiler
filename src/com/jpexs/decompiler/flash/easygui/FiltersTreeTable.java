@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
+import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -278,7 +280,7 @@ public class FiltersTreeTable extends JTreeTable {
     private static class FiltersValueCellEditor implements TableCellEditor {
 
         private Object value;
-        private GenericTagEditor editor;
+        private PropertyEditor editor;
         private List<CellEditorListener> listeners = new ArrayList<>();
         private final FiltersTreeTable filtersTable;
 
@@ -302,11 +304,10 @@ public class FiltersTreeTable extends JTreeTable {
 
             FilterField filterField = filterValue.filterField;
 
-            if (editor != null) {
-                //((Component) editor).setVisible(false);
-            }
             editor = null;
-            if (realValue.getClass() == Boolean.class) {
+            if ("gradientColors".equals(filterField.field.getName())) {
+                editor = new GradientEditor(filterField.filter);
+            } else if (realValue.getClass() == Boolean.class) {
                 editor = new BooleanEditor(filterField.toString(), filterField.filter, filterField.field, -1, Boolean.class);
                 /*editor.addChangeListener(new ChangeListener() {
                     @Override
@@ -319,7 +320,7 @@ public class FiltersTreeTable extends JTreeTable {
                 editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
                 //editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
                 if ("angle".equals(filterField.field.getName())) {
-                    editor.setValueNormalizer(new ValueNormalizer() {
+                    ((FloatEditor) editor).setValueNormalizer(new ValueNormalizer() {
                         @Override
                         public Object toFieldValue(Object viewValue) {
                             return Math.toRadians((double) viewValue);
@@ -341,7 +342,7 @@ public class FiltersTreeTable extends JTreeTable {
 
                 editor.addChangeListener(new ChangeListener() {
                     @Override
-                    public void change(GenericTagEditor editor) {
+                    public void change(PropertyEditor editor) {
                         editor.save();
                         filtersTable.fireFilterChanged();
                     }
@@ -452,9 +453,12 @@ public class FiltersTreeTable extends JTreeTable {
                     case "distance":
                         units = " px";
                 }
-                label.setText(value.toString() + units);
+                label.setText(value.toString() + units);                
                 Object fieldValue = filterValue.getValue();
-                if (fieldValue != null) {                    
+                if (fieldValue != null) {          
+                    if ("gradientColors".equals(filterValue.filterField.field.getName())) {
+                        component = new GradientEditor(filterValue.filterField.filter);
+                    }
                     if (fieldValue.getClass() == Boolean.class) {
                         JPanel panel = new JPanel(new BorderLayout());
                         JCheckBox checkBox = new JCheckBox();
@@ -552,6 +556,9 @@ public class FiltersTreeTable extends JTreeTable {
 
         @Override
         public String toString() {
+            if ("gradientColors".equals(field.getName())) {
+                return "gradient";
+            }
             return field.getName();
         }
 
@@ -672,6 +679,9 @@ public class FiltersTreeTable extends JTreeTable {
             Field[] fields = filter.getClass().getFields();
             for (Field field : fields) {
                 if ("id".equals(field.getName())) {
+                    continue;
+                }
+                if ("gradientRatio".equals(field.getName())) {
                     continue;
                 }
                 Reserved reserved = field.getAnnotation(Reserved.class);
