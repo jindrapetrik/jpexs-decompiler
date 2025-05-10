@@ -252,6 +252,7 @@ public class FiltersTreeTable extends JTreeTable {
         for (int i = 0; i < childCount; i++) {
             getTree().expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
         }
+        updateColumns();
     }
 
     private static class FiltersValueCellEditor implements TableCellEditor {
@@ -421,6 +422,17 @@ public class FiltersTreeTable extends JTreeTable {
             JComponent component = label;
             if (value instanceof FilterValue) {
                 FilterValue filterValue = (FilterValue) value;
+                String units = "";
+                switch(filterValue.filterField.field.getName()) {
+                    case "angle":
+                        units = " \u00B0"; //degrees
+                        break;
+                    case "blurX":
+                    case "blurY":
+                    case "distance":
+                        units = " px";
+                }
+                label.setText(value.toString() + units);
                 Object fieldValue = filterValue.getValue();
                 if (fieldValue != null) {                    
                     if (fieldValue.getClass() == Boolean.class) {
