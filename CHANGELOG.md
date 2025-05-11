@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Option to enter custom zoom level by clicking on zoom percentage label
 - Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)
 - Simple editor - change background color
-- Simple editor - filters (without editing convolution, colormatrix)
+- Simple editor - filters (without editing convolution)
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
@@ -72,6 +72,7 @@ All notable changes to this project will be documented in this file.
 - Simple editor - white square on top left corner of the timeline
 - Bevel and Glow filters incorrect rendering
 - Incorrect cursor handling when placed object has filters
+- FLA export - Rounding errors on COLORMATRIXFILTER contrast
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.

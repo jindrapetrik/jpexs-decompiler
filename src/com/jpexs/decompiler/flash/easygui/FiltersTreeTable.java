@@ -29,10 +29,13 @@ import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ValueNormalizer;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
+import com.jpexs.decompiler.flash.types.filters.ColorMatrixConvertor;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
@@ -46,6 +49,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -305,7 +309,89 @@ public class FiltersTreeTable extends JTreeTable {
             FilterField filterField = filterValue.filterField;
 
             editor = null;
-            if ("gradientColors".equals(filterField.field.getName())) {
+            if (filterField.special > 0) {
+                editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, int.class, new SWFType() {
+                    @Override
+                    public BasicType value() {
+                        return BasicType.SI16;
+                    }
+
+                    @Override
+                    public BasicType alternateValue() {
+                        return null;
+                    }
+
+                    @Override
+                    public String alternateCondition() {
+                        return "";
+                    }
+
+                    @Override
+                    public int count() {
+                        return 0;
+                    }
+
+                    @Override
+                    public String countField() {
+                        return "";
+                    }
+
+                    @Override
+                    public int countAdd() {
+                        return 0;
+                    }
+
+                    @Override
+                    public boolean canAdd() {
+                        return false;
+                    }
+
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return SWFType.class;
+                    }
+                    
+                }) {
+                    @Override
+                    protected void saveValue(Object newValue) {
+                        float[] matrix = (float[]) super.loadValue();
+                        ColorMatrixConvertor convertor = new ColorMatrixConvertor(matrix);
+                        switch (filterField.special) {
+                            case FilterField.SPECIAL_BRIGHTNESS:
+                                convertor.setBrightness((int) newValue);
+                                break;
+                            case FilterField.SPECIAL_CONTRAST:
+                                convertor.setContrast((int) newValue);
+                                break;
+                            case FilterField.SPECIAL_SATURATION:
+                                convertor.setSaturation((int) newValue);
+                                break;
+                            case FilterField.SPECIAL_HUE:
+                                convertor.setHue((int) newValue);
+                                break;
+                        }               
+                        matrix = convertor.getMatrix();
+                        super.saveValue(matrix);
+                    }
+
+                    @Override
+                    protected Object loadValue() {
+                        float[] matrix = (float[]) super.loadValue();
+                        ColorMatrixConvertor convertor = new ColorMatrixConvertor(matrix);
+                        switch (filterField.special) {
+                            case FilterField.SPECIAL_BRIGHTNESS:
+                                return convertor.getBrightness();
+                            case FilterField.SPECIAL_CONTRAST:
+                                return convertor.getContrast();
+                            case FilterField.SPECIAL_SATURATION:
+                                return convertor.getSaturation();
+                            case FilterField.SPECIAL_HUE:
+                                return convertor.getHue();
+                        }
+                        return 0;
+                    }                                                            
+                };
+            } else if ("gradientColors".equals(filterField.field.getName())) {
                 editor = new GradientEditor(filterField.filter);
             } else if (realValue.getClass() == Boolean.class) {
                 editor = new BooleanEditor(filterField.toString(), filterField.filter, filterField.field, -1, Boolean.class);
@@ -340,13 +426,12 @@ public class FiltersTreeTable extends JTreeTable {
 
             if (editor != null) {
 
-                editor.addChangeListener(new ChangeListener() {
+                /*editor.addChangeListener(new ChangeListener() {
                     @Override
                     public void change(PropertyEditor editor) {
-                        editor.save();
-                        filtersTable.fireFilterChanged();
+                        editor.save();                        
                     }
-                });
+                });*/
 
                 if (table instanceof JTreeTable) {
                     JTreeTable treeTable = (JTreeTable) table;
@@ -390,6 +475,10 @@ public class FiltersTreeTable extends JTreeTable {
             if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
                 return true;
             }
+            
+            if (filterValue.filterField.special > 0) {
+                return true;
+            }
             if (realValue.getClass() == Boolean.class) {
                 return false;
             }
@@ -399,10 +488,12 @@ public class FiltersTreeTable extends JTreeTable {
         @Override
         public boolean stopCellEditing() {
             editor.save();
+            filtersTable.fireFilterChanged();
             List<CellEditorListener> listeners2 = new ArrayList<>(listeners);
-            for (CellEditorListener l : listeners2) {
+            for (CellEditorListener l : listeners2) {                
                 l.editingStopped(new ChangeEvent(editor));
             }
+            filtersTable.repaint();
             return true;
         }
 
@@ -422,7 +513,7 @@ public class FiltersTreeTable extends JTreeTable {
 
         @Override
         public void removeCellEditorListener(CellEditorListener l) {
-            listeners.remove(l);
+            listeners.remove(l);            
         }
 
     }
@@ -452,9 +543,30 @@ public class FiltersTreeTable extends JTreeTable {
                     case "blurY":
                     case "distance":
                         units = " px";
-                }
-                label.setText(value.toString() + units);
+                }                                
+
                 Object fieldValue = filterValue.getValue();
+                
+                if (filterValue.filterField.special > 0) {
+                    float[] matrix = (float[]) fieldValue;
+                    ColorMatrixConvertor convertor = new ColorMatrixConvertor(matrix);
+                    switch (filterValue.filterField.special) {
+                        case FilterField.SPECIAL_BRIGHTNESS:
+                            label.setText("" + convertor.getBrightness());
+                            break;
+                        case FilterField.SPECIAL_CONTRAST:
+                            label.setText("" + convertor.getContrast());
+                            break;
+                        case FilterField.SPECIAL_SATURATION:
+                            label.setText("" + convertor.getSaturation());
+                            break;
+                        case FilterField.SPECIAL_HUE:                            
+                            label.setText("" + convertor.getHue());
+                            break;
+                    }
+                } else {
+                    label.setText(value.toString() + units);
+                }
                 if (fieldValue != null) {
                     if ("gradientColors".equals(filterValue.filterField.field.getName())) {
                         component = new GradientEditor(filterValue.filterField.filter);
@@ -532,12 +644,28 @@ public class FiltersTreeTable extends JTreeTable {
 
         private final FILTER filter;
         private final Field field;
+        private final int special;
 
+        public static final int SPECIAL_BRIGHTNESS = 1;
+        public static final int SPECIAL_CONTRAST = 2;
+        public static final int SPECIAL_SATURATION = 3;
+        public static final int SPECIAL_HUE = 4;
+        
+        
         public FilterField(FILTER filter, Field property) {
-            this.filter = filter;
-            this.field = property;
+            this(filter, property, 0);
         }
 
+        public FilterField(FILTER filter, Field property, int special) {
+            this.filter = filter;
+            this.field = property;
+            this.special = special;
+        }
+
+        public int getSpecial() {
+            return special;
+        }              
+        
         public FILTER getFilter() {
             return filter;
         }
@@ -556,6 +684,16 @@ public class FiltersTreeTable extends JTreeTable {
 
         @Override
         public String toString() {
+            switch (special) {
+                case SPECIAL_BRIGHTNESS:
+                    return "brightness";
+                case SPECIAL_CONTRAST:
+                    return "contrast";
+                case SPECIAL_SATURATION:
+                    return "saturation";
+                case SPECIAL_HUE:
+                    return "hue";
+            }
             if ("gradientColors".equals(field.getName())) {
                 return "gradient";
             }
@@ -682,6 +820,32 @@ public class FiltersTreeTable extends JTreeTable {
                 }
                 if ("gradientRatio".equals(field.getName())) {
                     continue;
+                }
+                if (filter instanceof COLORMATRIXFILTER) {
+                    if ("matrix".equals(field.getName())) {
+                        
+                        DefaultMutableTreeNode fieldNode;
+                        FilterField filterField;
+                        
+                        
+                        filterField = new FilterField(filter, field, FilterField.SPECIAL_BRIGHTNESS);
+                        fieldNode = new DefaultMutableTreeNode(filterField);
+                        filterNode.add(fieldNode);
+                        
+                        filterField = new FilterField(filter, field, FilterField.SPECIAL_CONTRAST);
+                        fieldNode = new DefaultMutableTreeNode(filterField);
+                        filterNode.add(fieldNode);
+                        
+                        filterField = new FilterField(filter, field, FilterField.SPECIAL_SATURATION);
+                        fieldNode = new DefaultMutableTreeNode(filterField);
+                        filterNode.add(fieldNode);
+                        
+                        filterField = new FilterField(filter, field, FilterField.SPECIAL_HUE);
+                        fieldNode = new DefaultMutableTreeNode(filterField);
+                        filterNode.add(fieldNode);
+                        
+                        continue;
+                    }
                 }
                 Reserved reserved = field.getAnnotation(Reserved.class);
                 if (reserved != null) {

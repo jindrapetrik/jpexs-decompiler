@@ -440,6 +440,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                         @Override
                         public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
                             placeObject.setFilters(applyFilters);
+                            depthState.filters = applyFilters;
                         }
                     }, swfPanel.getSwf());
                 }

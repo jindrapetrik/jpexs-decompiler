@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
 import javax.swing.text.DefaultFormatter;
 
 /**
@@ -48,9 +49,9 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
     private final SWFType swfType;
 
     private String fieldName;
-    
+
     private ValueNormalizer normalizer;
-    
+
     private JSpinner spinner;
 
     @Override
@@ -78,56 +79,66 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
         this.swfType = swfType;
         this.fieldName = fieldName;
         spinner = new JSpinner();
-        
+
         setLayout(new BorderLayout());
         add(spinner, BorderLayout.WEST);
         setOpaque(false);
 
-        reset();        
+        reset();
         ((JSpinner.NumberEditor) spinner.getEditor()).getFormat().setGroupingUsed(false);
         JFormattedTextField jtf = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
         DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
         formatter.setCommitsOnValidEdit(true);
-        
+
     }
 
     @Override
-    public void reset() {
-        try {
-            Object value = ReflectionTools.getValue(obj, field, index);
-            if (normalizer != null) {
-                value = normalizer.toViewValue(value);
-            }
-            spinner.setModel(getModel(swfType, value));
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            // ignore
+    public void reset() {        
+        Object value = loadValue();
+        if (normalizer != null) {
+            value = normalizer.toViewValue(value);
         }
+        spinner.setModel(getModel(swfType, value));        
     }
 
     @Override
     public boolean save() {
+        Object oldValue = loadValue();
+        Object oldViewValue = oldValue;
+        if (normalizer != null) {
+            oldViewValue = normalizer.toViewValue(oldValue);
+        }
+        Object newViewValue = getChangedValue();
+        if (newViewValue == null) {
+            return false;
+        }
+        if (Objects.equals(oldViewValue, newViewValue)) {
+            return false;
+        }
+        Object newValue = newViewValue;
+        if (normalizer != null) {
+            newValue = normalizer.toFieldValue(newViewValue);
+        }
+        saveValue(newValue);
+
+        return true;
+    }
+
+    protected Object loadValue() {
         try {
-            Object oldValue = ReflectionTools.getValue(obj, field, index);            
-            Object oldViewValue = oldValue;
-            if (normalizer != null) {
-                oldViewValue = normalizer.toViewValue(oldValue);
-            }
-            Object newViewValue = getChangedValue();
-            if (newViewValue == null) {
-                return false;
-            }
-            if (Objects.equals(oldViewValue, newViewValue)) {
-                return false;
-            }
-            Object newValue = newViewValue;
-            if (normalizer != null) {
-                newValue = normalizer.toFieldValue(newViewValue);
-            }
+            return ReflectionTools.getValue(obj, field, index);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            // ignore
+        }
+        return null;
+    }
+
+    protected void saveValue(Object newValue) {
+        try {
             ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
-        return true;
     }
 
     private SpinnerModel getModel(SWFType swfType, Object value) {
@@ -264,9 +275,9 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
-    
+
     @Override
     public void setValueNormalizer(ValueNormalizer normalizer) {
         this.normalizer = normalizer;
-    }  
+    }
 }
