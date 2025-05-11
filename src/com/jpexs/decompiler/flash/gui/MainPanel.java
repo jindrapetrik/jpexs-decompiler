@@ -1818,7 +1818,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
                         @SuppressWarnings("unchecked")
                         List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                        if (!droppedFiles.isEmpty()) {
+                        if (droppedFiles != null && !droppedFiles.isEmpty()) {
                             OpenableSourceInfo[] sourceInfos = new OpenableSourceInfo[droppedFiles.size()];
                             for (int i = 0; i < droppedFiles.size(); i++) {
                                 sourceInfos[i] = new OpenableSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
