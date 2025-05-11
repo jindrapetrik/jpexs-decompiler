@@ -114,7 +114,7 @@ public class BEVELFILTER extends FILTER {
         } else if (!innerShadow) {
             type = Filtering.OUTER;
         }
-        return Filtering.bevel(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, highlightColor.toInt(), shadowColor.toInt(), (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, passes);
+        return Filtering.bevel(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, highlightColor.toInt(), shadowColor.toInt(), (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, compositeSource, passes);
     }
 
     @Override
@@ -320,6 +320,5 @@ public class BEVELFILTER extends FILTER {
         }
         return Objects.equals(this.highlightColor, other.highlightColor);
     }
-    
-    
+
 }

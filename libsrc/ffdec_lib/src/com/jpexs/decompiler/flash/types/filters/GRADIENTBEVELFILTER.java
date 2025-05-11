@@ -139,7 +139,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
             type = Filtering.OUTER;
         }
 
-        return Filtering.gradientBevel(src, colorsArr, ratiosArr, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, passes);
+        return Filtering.gradientBevel(src, colorsArr, ratiosArr, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, compositeSource, passes);
     }
 
     @Override
