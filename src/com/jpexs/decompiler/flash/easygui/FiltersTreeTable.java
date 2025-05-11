@@ -229,12 +229,12 @@ public class FiltersTreeTable extends JTreeTable {
             int filterIndex = root.getIndex(node);
             FiltersTreeTableModel model = (FiltersTreeTableModel) getTree().getModel();
             model.removeFilter(filterIndex);
-            
+
             //Select previous filter
             filterIndex--;
             if (filterIndex < 0) {
                 filterIndex = 0;
-            }            
+            }
             fireFilterChanged();
             if (filterIndex < root.getChildCount()) {
                 Timer timer = new Timer();
@@ -244,10 +244,10 @@ public class FiltersTreeTable extends JTreeTable {
                     @Override
                     public void run() {
                         if (root.getChildCount() > fFilterIndex) {
-                            getTree().setSelectionPath(new TreePath(new Object[] {root, root.getChildAt(fFilterIndex)}));    
-                        }                        
-                    }                    
-                }, 50);                            
+                            getTree().setSelectionPath(new TreePath(new Object[]{root, root.getChildAt(fFilterIndex)}));
+                        }
+                    }
+                }, 50);
             }
         }
     }
@@ -261,13 +261,13 @@ public class FiltersTreeTable extends JTreeTable {
         getColumnModel().getColumn(1).setCellEditor(new FiltersValueCellEditor(this));
         getColumnModel().getColumn(1).setCellRenderer(new FiltersTableCellRenderer());
     }
-    
+
     public void setFilters(List<FILTER> filters) {
         if (Objects.equals(getFilters(), filters)) {
             return;
         }
         setTreeTableModel(new FiltersTreeTableModel(filters));
-       
+
         TreeModel ttm = getTree().getModel();
         Object root = ttm.getRoot();
         int childCount = ttm.getChildCount(root);
@@ -444,7 +444,7 @@ public class FiltersTreeTable extends JTreeTable {
             if (value instanceof FilterValue) {
                 FilterValue filterValue = (FilterValue) value;
                 String units = "";
-                switch(filterValue.filterField.field.getName()) {
+                switch (filterValue.filterField.field.getName()) {
                     case "angle":
                         units = " \u00B0"; //degrees
                         break;
@@ -453,9 +453,9 @@ public class FiltersTreeTable extends JTreeTable {
                     case "distance":
                         units = " px";
                 }
-                label.setText(value.toString() + units);                
+                label.setText(value.toString() + units);
                 Object fieldValue = filterValue.getValue();
-                if (fieldValue != null) {          
+                if (fieldValue != null) {
                     if ("gradientColors".equals(filterValue.filterField.field.getName())) {
                         component = new GradientEditor(filterValue.filterField.filter);
                     }
@@ -616,8 +616,7 @@ public class FiltersTreeTable extends JTreeTable {
         if (value.getClass() == Double.class
                 || value.getClass() == Float.class
                 || value.getClass() == float.class
-                || value.getClass() == double.class
-                ) {
+                || value.getClass() == double.class) {
             return EcmaScript.toString(value);
         }
         return "" + value;
@@ -658,7 +657,7 @@ public class FiltersTreeTable extends JTreeTable {
             }
 
             this.filters = new ArrayList<>();
-            
+
             for (FILTER filter : filters) {
                 addFilter(filter);
             }

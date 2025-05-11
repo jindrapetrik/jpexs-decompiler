@@ -419,49 +419,46 @@ public class Filtering {
         gg.fill(RECTANGLE_512_1);
         int[] gradientPixels = getRGB(gradient);
 
-        BufferedImage shadowInner = null;
-        BufferedImage hilightInner = null;
-        {
-            BufferedImage hilightIm = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true, true);
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true, true);
-            BufferedImage h2 = new BufferedImage(width, height, src.getType());
-            BufferedImage s2 = new BufferedImage(width, height, src.getType());
-            Graphics2D hc = h2.createGraphics();
-            Graphics2D sc = s2.createGraphics();
-            hc.drawImage(hilightIm, 0, 0, null);
-            hc.setComposite(AlphaComposite.DstOut);
-            hc.drawImage(shadowIm, 0, 0, null);
+        BufferedImage shadowInner;
+        BufferedImage hilightInner;
+        
+        BufferedImage hilightImInner = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true, true);
+        BufferedImage shadowImInner = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true, true);
+        BufferedImage h2Inner = new BufferedImage(width, height, src.getType());
+        BufferedImage s2Inner = new BufferedImage(width, height, src.getType());
+        Graphics2D hcInner = h2Inner.createGraphics();
+        Graphics2D scInner = s2Inner.createGraphics();
+        hcInner.drawImage(hilightImInner, 0, 0, null);
+        hcInner.setComposite(AlphaComposite.DstOut);
+        hcInner.drawImage(shadowImInner, 0, 0, null);
 
-            sc.drawImage(shadowIm, 0, 0, null);
-            sc.setComposite(AlphaComposite.DstOut);
-            sc.drawImage(hilightIm, 0, 0, null);
-            shadowInner = s2;
-            hilightInner = h2;
-        }
+        scInner.drawImage(shadowImInner, 0, 0, null);
+        scInner.setComposite(AlphaComposite.DstOut);
+        scInner.drawImage(hilightImInner, 0, 0, null);
+        shadowInner = s2Inner;
+        hilightInner = h2Inner;
 
-        BufferedImage shadowOuter = null;
-        BufferedImage hilightOuter = null;
+        BufferedImage shadowOuter;
+        BufferedImage hilightOuter;
 
-        {
-            BufferedImage hilightIm = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true, true);
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true, true);
-            BufferedImage h2 = new BufferedImage(width, height, src.getType());
-            BufferedImage s2 = new BufferedImage(width, height, src.getType());
-            Graphics2D hc = h2.createGraphics();
-            Graphics2D sc = s2.createGraphics();
-            hc.drawImage(hilightIm, 0, 0, null);
-            hc.setComposite(AlphaComposite.DstOut);
-            hc.drawImage(shadowIm, 0, 0, null);
+        BufferedImage hilightImOuter = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true, true);
+        BufferedImage shadowImOuter = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true, true);
+        BufferedImage h2Outer = new BufferedImage(width, height, src.getType());
+        BufferedImage s2Outer = new BufferedImage(width, height, src.getType());
+        Graphics2D hcOuter = h2Outer.createGraphics();
+        Graphics2D scOuter = s2Outer.createGraphics();
+        hcOuter.drawImage(hilightImOuter, 0, 0, null);
+        hcOuter.setComposite(AlphaComposite.DstOut);
+        hcOuter.drawImage(shadowImOuter, 0, 0, null);
 
-            sc.drawImage(shadowIm, 0, 0, null);
-            sc.setComposite(AlphaComposite.DstOut);
-            sc.drawImage(hilightIm, 0, 0, null);
-            shadowOuter = s2;
-            hilightOuter = h2;
-        }
+        scOuter.drawImage(shadowImOuter, 0, 0, null);
+        scOuter.setComposite(AlphaComposite.DstOut);
+        scOuter.drawImage(hilightImOuter, 0, 0, null);
+        shadowOuter = s2Outer;
+        hilightOuter = h2Outer;
 
-        BufferedImage hilightIm = null;
-        BufferedImage shadowIm = null;
+        BufferedImage hilightIm;
+        BufferedImage shadowIm;
         hilightIm = hilightInner;
         shadowIm = shadowInner;
         Graphics2D hc = hilightIm.createGraphics();

@@ -81,7 +81,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         }
     }
 
-    public GradientEditor(FILTER filter) {        
+    public GradientEditor(FILTER filter) {
         this.filter = filter;
         setLayout(new BorderLayout());
         JPanel miniGradientPanel = new JPanel() {
@@ -116,7 +116,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                     dialog.pack();
 
                     Window window = SwingUtilities.getWindowAncestor(GradientEditor.this);
-                    
+
                     dialog.setLocationRelativeTo(window);
                     Point loc = SwingUtilities.convertPoint(miniGradientPanel, 0, 0, window);
                     if (loc.x + dialog.getWidth() > window.getWidth()) {
@@ -126,7 +126,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         loc.y -= loc.y + dialog.getHeight() - window.getHeight();
                     }
                     SwingUtilities.convertPointToScreen(loc, window);
-                    
+
                     dialog.setLocation(loc);
                     dialog.addWindowListener(new WindowAdapter() {
                         @Override
@@ -356,12 +356,11 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         return;
                     }
                     if (dragIndex > -1) {
-                        
+
                         if (isFixedZeroAlphaIndex(dragIndex)) {
                             return;
                         }
-                        
-                        
+
                         draggedOut = colors.size() > 2 && e.getY() > getHeight();
 
                         synchronized (GradientEditorPanel.this) {
@@ -418,13 +417,12 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             if (filter instanceof GRADIENTGLOWFILTER && index == 0 && colors.get(0).getAlpha() == 0) {
                 return true;
             }
-            if (filter instanceof GRADIENTBEVELFILTER && ratios.get(index) == 128f/255f && colors.get(index).getAlpha() == 0) {
+            if (filter instanceof GRADIENTBEVELFILTER && ratios.get(index) == 128f / 255f && colors.get(index).getAlpha() == 0) {
                 return true;
             }
             return false;
         }
-        
-        
+
         private List<Rectangle> getColorRects() {
             List<Rectangle> rects = new ArrayList<>();
 
