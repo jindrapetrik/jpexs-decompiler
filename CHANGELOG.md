@@ -71,6 +71,7 @@ All notable changes to this project will be documented in this file.
 - Simple editor - adding a library item to the last frame adds a frame
 - Simple editor - white square on top left corner of the timeline
 - Bevel and Glow filters incorrect rendering
+- Incorrect cursor handling when placed object has filters
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.

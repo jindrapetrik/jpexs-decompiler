@@ -4891,7 +4891,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
         ExportRectangle viewRect = new ExportRectangle(rect);
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, true, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>());
+        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>());
 
         return image;
     }
