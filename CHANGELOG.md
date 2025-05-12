@@ -73,6 +73,7 @@ All notable changes to this project will be documented in this file.
 - Bevel and Glow filters incorrect rendering
 - Incorrect cursor handling when placed object has filters
 - FLA export - Rounding errors on COLORMATRIXFILTER contrast
+- Filters - image bounds
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.

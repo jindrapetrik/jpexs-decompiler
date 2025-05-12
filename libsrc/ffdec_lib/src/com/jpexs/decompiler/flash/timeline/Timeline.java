@@ -1086,8 +1086,8 @@ public class Timeline {
             for (FILTER filter : filters) {
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
-                deltaXMax = Math.max(x, deltaXMax);
-                deltaYMax = Math.max(y, deltaYMax);
+                deltaXMax += x;
+                deltaYMax += y;
             }
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
