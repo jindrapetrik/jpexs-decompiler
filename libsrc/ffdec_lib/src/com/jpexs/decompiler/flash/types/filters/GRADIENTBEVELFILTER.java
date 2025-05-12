@@ -119,13 +119,17 @@ public class GRADIENTBEVELFILTER extends FILTER {
     public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
+        float lastRatioF = 0f;
         for (int i = 0; i < gradientColors.length; i++) {
+            float ratioF = gradientRatio[i] / 255f;            
             if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
-                continue;
+                ratioF = lastRatioF + 0.000001f;
             }
             colors.add(gradientColors[i].toColor());
-            ratios.add(gradientRatio[i] / 255f);
+            ratios.add(ratioF);
+            lastRatioF = ratioF;
         }
+        
         float[] ratiosArr = new float[ratios.size()];
         for (int i = 0; i < ratios.size(); i++) {
             ratiosArr[i] = ratios.get(i);
