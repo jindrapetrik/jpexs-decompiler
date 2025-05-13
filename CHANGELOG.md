@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Option to enter custom zoom level by clicking on zoom percentage label
 - Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)
 - Simple editor - change background color
-- Simple editor - filters (without editing convolution)
+- Simple editor - filters
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

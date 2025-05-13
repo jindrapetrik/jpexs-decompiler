@@ -669,7 +669,7 @@ public class Filtering {
             int srcHeight
     ) {
         Kernel kernel = new Kernel(w, h, matrix);
-        BufferedImage dst = new BufferedImage(src.getWidth() + 1, src.getHeight() + 1, src.getType());
+        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
         BufferedImageOp op = new ConvolveOp(
                 kernel,
                 new RenderingHints(null),

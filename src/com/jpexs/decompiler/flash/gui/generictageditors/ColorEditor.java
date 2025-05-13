@@ -29,12 +29,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -45,7 +42,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.border.BevelBorder;
@@ -118,6 +114,7 @@ public class ColorEditor extends FocusablePanel implements GenericTagEditor, Act
         buttonChange.setSize(colorDim);
         buttonChange.setPreferredSize(colorDim);
         add(buttonChange, BorderLayout.WEST);
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         reset();
     }
 

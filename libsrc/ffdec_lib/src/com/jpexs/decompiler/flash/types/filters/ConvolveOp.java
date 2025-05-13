@@ -142,8 +142,8 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
 
         float[] kvals = kernel.getKernelData(null);
 
-        for (int x = srcX - left; x < srcX + srcWidth + left + 1; x++) {
-            for (int y = srcY - top; y < srcY + srcHeight + top + 1; y++) {
+        for (int x = srcX - left; x < srcX + srcWidth + left; x++) {
+            for (int y = srcY - top; y < srcY + srcHeight + top; y++) {
                 float a;
                 if (preserveAlpha) {
                     boolean outSide = false;

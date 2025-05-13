@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.easygui.properties.ConvolutionMatrixEditor;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
 import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import com.jpexs.decompiler.flash.ecma.EcmaNumberToString;
@@ -23,10 +24,8 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ValueNormalizer;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -35,6 +34,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
+import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
 import com.jpexs.decompiler.flash.types.filters.ColorMatrixConvertor;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import de.javagl.treetable.JTreeTable;
@@ -84,9 +84,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 /**
@@ -535,6 +533,8 @@ public class FiltersTreeTable extends JTreeTable {
                         return 0;
                     }
                 };
+            } else if ("matrix".equals(filterField.field.getName()) && filterField.filter instanceof CONVOLUTIONFILTER) {
+                editor = new ConvolutionMatrixEditor((CONVOLUTIONFILTER) filterField.filter);
             } else if ("gradientColors".equals(filterField.field.getName())) {
                 editor = new GradientEditor(filterField.filter);
             } else if (realValue.getClass() == Boolean.class) {
@@ -710,7 +710,11 @@ public class FiltersTreeTable extends JTreeTable {
                 } else {
                     label.setText(value.toString() + units);
                 }
-                if (fieldValue != null) {
+                if (fieldValue != null) {                    
+                    if ("matrix".equals(filterValue.filterField.field.getName()) && filterValue.filterField.filter instanceof CONVOLUTIONFILTER) {
+                        component = new ConvolutionMatrixEditor((CONVOLUTIONFILTER) filterValue.filterField.filter);
+                    }
+                    
                     if ("gradientColors".equals(filterValue.filterField.field.getName())) {
                         component = new GradientEditor(filterValue.filterField.filter);
                     }
@@ -724,28 +728,9 @@ public class FiltersTreeTable extends JTreeTable {
                         panel.setOpaque(false);
                         component = panel;
                     }
-                    if (fieldValue.getClass() == RGBA.class) {
-                        JPanel panel = new JPanel(new BorderLayout());
-                        JButton buttonChange = new JButton("") {
-
-                            @Override
-                            protected void paintComponent(Graphics g) {
-                                g.setColor(getBackground());
-                                g.fillRect(0, 0, getWidth(), getHeight());
-                                super.paintBorder(g);
-                            }
-
-                        };
-                        buttonChange.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
-                        buttonChange.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        buttonChange.setBorderPainted(true);
-                        buttonChange.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                        Dimension colorDim = new Dimension(16, 16);
-                        buttonChange.setSize(colorDim);
-                        buttonChange.setPreferredSize(colorDim);
-                        buttonChange.setBackground(((RGBA) fieldValue).toColor());
-                        panel.add(buttonChange, BorderLayout.WEST);
-                        component = panel;
+                    if (fieldValue.getClass() == RGBA.class) {                       
+                        component = new ColorEditor(filterValue.filterField.toString(), filterValue.filterField.filter, filterValue.filterField.field, -1, RGBA.class);
+                        component.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
                     }
                 }
             }
@@ -966,6 +951,12 @@ public class FiltersTreeTable extends JTreeTable {
                 }
                 if ("gradientRatio".equals(field.getName())) {
                     continue;
+                }
+                if (filter instanceof CONVOLUTIONFILTER) {
+                    if ("matrixX".equals(field.getName())
+                            || "matrixY".equals(field.getName())) {
+                        continue;
+                    }
                 }
                 if (filter instanceof COLORMATRIXFILTER) {
                     if ("matrix".equals(field.getName())) {
