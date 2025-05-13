@@ -75,6 +75,7 @@ All notable changes to this project will be documented in this file.
 - FLA export - Rounding errors on COLORMATRIXFILTER contrast
 - Filters - image bounds
 - Simple editor - Exceptions caused by not setting timelined when modifying PlaceObject
+- [#2455] Commandline export ConcurrentModificationException
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.
@@ -3795,6 +3796,7 @@ Major version of SWF to XML export changed to 2.
 [#2355]: https://www.free-decompiler.com/flash/issues/2355
 [#2419]: https://www.free-decompiler.com/flash/issues/2419
 [#2454]: https://www.free-decompiler.com/flash/issues/2454
+[#2455]: https://www.free-decompiler.com/flash/issues/2455
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389

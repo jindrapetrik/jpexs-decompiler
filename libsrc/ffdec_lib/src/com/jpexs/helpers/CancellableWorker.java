@@ -155,7 +155,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     @Override
     public final void run() {
-        workers.add(this);
+        synchronized (CancellableWorker.class) {
+            workers.add(this);
+        }        
         future.run();
     }
 
@@ -245,7 +247,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         if (thread != null && thread2Worker.get(thread) == this) {
             //thread2Worker.remove(thread);
         }
-        workers.remove(this);
+        synchronized (CancellableWorker.class) {
+            workers.remove(this);
+        }
         done();
     }
 
@@ -282,15 +286,17 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
      * Cancels all background threads.
      */
     public static void cancelBackgroundThreads() {
-        List<CancellableWorker> oldWorkers = workers;
-        workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
-        for (CancellableWorker worker : oldWorkers) {
-            if (worker != null) {
-                worker.cancel(true);
-            } else {
-                Logger.getLogger(CancellableWorker.class.getName()).log(Level.SEVERE, "worker is null");
+        synchronized (CancellableWorker.class) {
+            List<CancellableWorker> oldWorkers = workers;
+            workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
+            for (CancellableWorker worker : oldWorkers) {
+                if (worker != null) {
+                    worker.cancel(true);
+                } else {
+                    Logger.getLogger(CancellableWorker.class.getName()).log(Level.SEVERE, "worker is null");
+                }
             }
-        }
+        }        
     }
 
     public static void cancelThread(Thread t) {
