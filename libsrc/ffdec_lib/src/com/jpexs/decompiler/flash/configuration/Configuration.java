@@ -1503,7 +1503,8 @@ public final class Configuration {
      * @param field Field
      * @return Default value
      */
-    public static Object getDefaultValue(Field field) {
+    @SuppressWarnings("unchecked")
+    public static Object getDefaultValue(Field field) {        
         Object defaultValue = null;
         ConfigurationDefaultBoolean aBool = field.getAnnotation(ConfigurationDefaultBoolean.class);
         if (aBool != null) {
@@ -1516,6 +1517,11 @@ public final class Configuration {
         ConfigurationDefaultString aString = field.getAnnotation(ConfigurationDefaultString.class);
         if (aString != null) {
             defaultValue = aString.value();
+            
+            Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
+            if (type.isEnum()) {
+                return Enum.valueOf(type.asSubclass(Enum.class), (String) defaultValue);
+            }                            
         }
         ConfigurationDefaultDouble aDouble = field.getAnnotation(ConfigurationDefaultDouble.class);
         if (aDouble != null) {
