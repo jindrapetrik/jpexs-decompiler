@@ -74,6 +74,7 @@ All notable changes to this project will be documented in this file.
 - Incorrect cursor handling when placed object has filters
 - FLA export - Rounding errors on COLORMATRIXFILTER contrast
 - Filters - image bounds
+- Simple editor - Exceptions caused by not setting timelined when modifying PlaceObject
 
 ### Removed
 - Option to preview flash items via ActiveX component is no longer available.
