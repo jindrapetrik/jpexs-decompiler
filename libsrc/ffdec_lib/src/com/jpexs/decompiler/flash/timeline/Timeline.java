@@ -1084,6 +1084,9 @@ public class Timeline {
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
             for (FILTER filter : filters) {
+                if (!filter.enabled) {
+                    continue;
+                }
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
                 deltaXMax += x;
@@ -1204,6 +1207,9 @@ public class Timeline {
 
             if (filters != null) {
                 for (FILTER filter : filters) {
+                    if (!filter.enabled) {
+                        continue;
+                    }
                     img = filter.apply(img, unzoom, 0, 0, newWidth, newHeight);
                 }
             }
@@ -1703,6 +1709,9 @@ public class Timeline {
      */
     public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
         Frame fr = getFrame(frame);
+        if (fr == null) {
+            return;
+        }
         if (time == 0) {
             sounds.addAll(fr.sounds);
             soundClasses.addAll(fr.soundClasses);

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types.filters;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.SerializableImage;
@@ -42,6 +43,12 @@ public abstract class FILTER implements Serializable {
     @SWFType(BasicType.UI8)
     public int id;
 
+    /**
+     * FILTER is enabled. Used internally by Simple editor GUI. Not a real SWF field.
+     */
+    @Internal
+    public boolean enabled = true;
+    
     /**
      * Constructor
      *

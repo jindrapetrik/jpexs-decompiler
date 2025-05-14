@@ -433,16 +433,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 filtersTable.removeSelectedFilter();
             }
         });
-        removeFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.remove"));        
-        
-        
-        filtersTable.getTree().addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                removeFilterButton.setEnabled(filtersTable.isFilterSelected());
-            }           
-        });
-        
+        removeFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.remove"));                                
         PopupButton clipboardFilterButton = new PopupButton(View.getIcon("clipboard16")) {
             @Override
             protected JPopupMenu getPopupMenu() {
@@ -491,10 +482,32 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         };
         
+        JButton enableFilterButton = new JButton(View.getIcon("show16"));
+        enableFilterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FILTER filter = filtersTable.getSelectedFilter();
+                filter.enabled = !filter.enabled;
+                filtersTable.fireFilterChanged();
+                filtersTable.repaint();
+            }
+        });
+        enableFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.enable"));
+        
+        filtersTable.getTree().addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                boolean filterSelected = filtersTable.isFilterSelected();
+                removeFilterButton.setEnabled(filterSelected);
+                enableFilterButton.setEnabled(filterSelected);
+            }           
+        });
+        
         
         filtersToolbar.add(addFilterButton);
         filtersToolbar.add(removeFilterButton);
         filtersToolbar.add(clipboardFilterButton);
+        filtersToolbar.add(enableFilterButton);
         
         JScrollPane sp = new JScrollPane(filtersTable);
         filtersPanel.add(sp, BorderLayout.CENTER);

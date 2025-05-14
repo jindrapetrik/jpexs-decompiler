@@ -804,6 +804,12 @@ public class FiltersTreeTable extends JTreeTable {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
                 Object object = node.getUserObject();
                 label.setText(object.toString());
+                if (object instanceof FilterName) {
+                    FilterName filterName = (FilterName) object;
+                    if (!filterName.filter.enabled) {
+                        label.setIcon(View.getIcon("cross16"));                        
+                    }
+                }
             }
             if (View.isOceanic()) {
                 if (selected) {
@@ -1001,6 +1007,9 @@ public class FiltersTreeTable extends JTreeTable {
             LinkedDefaultMutableTreeNode lastLinkedNode = null;
             for (Field field : fields) {
                 if ("id".equals(field.getName())) {
+                    continue;
+                }
+                if ("enabled".equals(field.getName())) {
                     continue;
                 }
                 if ("gradientRatio".equals(field.getName())) {
