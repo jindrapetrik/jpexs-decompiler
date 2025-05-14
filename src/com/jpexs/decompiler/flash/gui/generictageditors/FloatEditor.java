@@ -18,20 +18,30 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
  * @author JPEXS
  */
-public class FloatEditor extends JTextField implements GenericTagEditor {
+public class FloatEditor extends JPanel implements GenericTagEditor {
 
     private final Object obj;
 
@@ -42,13 +52,17 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     private final Class<?> type;
 
     private String fieldName;
-    
+
     private ValueNormalizer normalizer;
-    
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
+
+    private Field linkedField;
+
+    private boolean linkEnabled;
+
+    private List<ChangeListener> listeners = new ArrayList<>();
+
+    private JTextField textField;
+    private JLabel linkLabel;
 
     @Override
     public Dimension getPreferredSize() {
@@ -73,7 +87,48 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
         this.index = index;
         this.type = type;
         this.fieldName = fieldName;
-        reset();
+
+        addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                for (ChangeListener l : listeners) {
+                    l.change(FloatEditor.this);
+                }
+            }
+        });
+
+        textField = new JTextField() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+        };
+
+        textField.setBorder(BorderFactory.createEmptyBorder());
+        
+        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        textField.setPreferredSize(new Dimension(50, textField.getPreferredSize().height));
+        textField.setMaximumSize(textField.getPreferredSize());
+                        
+        add(textField);
+        linkLabel = new JLabel(View.getIcon("link16"));
+        add(linkLabel);
+        
+        linkLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boolean newValue = !linkEnabled;
+                setLinkEnabled(newValue);
+                for (ChangeListener l : listeners) {
+                    l.linkChanged(newValue);
+                }           
+                repaint();
+            }            
+        });
+        
+        linkLabel.setVisible(false);
+
+        reset();        
     }
 
     @Override
@@ -83,7 +138,7 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
             if (normalizer != null) {
                 val = normalizer.toViewValue(val);
             }
-            setText(val == null ? "" : EcmaScript.toString(val));            
+            textField.setText(val == null ? "" : EcmaScript.toString(val));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -97,20 +152,38 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
                 oldFieldValue = normalizer.toViewValue(oldFieldValue);
             }
             String oldValue = (String) EcmaScript.toString(oldFieldValue);
-            String newValue = getText();
+            String newValue = textField.getText();
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
             Object val;
             if (type.equals(double.class) || type.equals(Double.class)) {
-                val = Double.valueOf(getText());
+                val = Double.valueOf(textField.getText());
             } else {
-                val = Float.valueOf(getText());
+                val = Float.valueOf(textField.getText());
             }
             if (normalizer != null) {
                 val = normalizer.toFieldValue(val);
             }
+
             ReflectionTools.setValue(obj, field, index, val);
+
+            if (linkedField != null && linkEnabled) {
+                Object linkedFieldValue = ReflectionTools.getValue(obj, linkedField);
+                Object newLinkefFieldValue = null;
+                if (oldFieldValue instanceof Double) {
+                    Double v = (Double) oldFieldValue;
+                    Double v2 = (Double) val;
+                    Double vL = (Double) linkedFieldValue;
+                    newLinkefFieldValue = v == 0.0 ? v2 : v2 * vL / v;
+                } else if (oldFieldValue instanceof Float) {
+                    Float v = (Float) oldFieldValue;
+                    Float v2 = (Float) val;
+                    Float vL = (Float) linkedFieldValue;
+                    newLinkefFieldValue = v == 0f ? v2 : v2 * vL / v;
+                }
+                ReflectionTools.setValue(obj, linkedField, -1, newLinkefFieldValue);
+            }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -119,20 +192,12 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
 
     @Override
     public void addChangeListener(final ChangeListener l) {
-        final PropertyEditor t = this;
-        addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                l.change(t);
-            }
-
-        });
+        listeners.add(l);
     }
 
     @Override
     public Object getChangedValue() {
-        return getText();
+        return textField.getText();
     }
 
     @Override
@@ -163,10 +228,24 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
-    
+
     @Override
     public void setValueNormalizer(ValueNormalizer normalizer) {
         this.normalizer = normalizer;
         reset();
-    }  
+    }
+
+    public void setLinkedField(Field linkedField) {
+        this.linkedField = linkedField;
+        linkLabel.setVisible(true);
+    }
+
+    public void setLinkEnabled(boolean enabled) {
+        this.linkEnabled = enabled;
+        linkLabel.setIcon(View.getIcon(enabled ? "link16" : "linkbreak16"));
+    }
+
+    public boolean isLinkEnabled() {
+        return linkEnabled;
+    }
 }

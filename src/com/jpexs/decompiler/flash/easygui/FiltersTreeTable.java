@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
@@ -42,6 +43,8 @@ import de.javagl.treetable.TreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -60,6 +63,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DropMode;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -89,6 +94,7 @@ import javax.swing.tree.TreePath;
 public class FiltersTreeTable extends JTreeTable {
 
     private List<ActionListener> filterChangedListeners = new ArrayList<>();
+    private boolean linkEnabled = true;
         
     public FiltersTreeTable() {
         super(new FiltersTreeTableModel(null));
@@ -556,7 +562,6 @@ public class FiltersTreeTable extends JTreeTable {
                 //((BooleanEditor) editor).setRequestFocusEnabled(false);
             } else if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
                 editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
-                //editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
                 if ("angle".equals(filterField.field.getName())) {
                     ((FloatEditor) editor).setValueNormalizer(new ValueNormalizer() {
                         @Override
@@ -570,6 +575,22 @@ public class FiltersTreeTable extends JTreeTable {
                         }
                     });
                 }
+                if ("blurX".equals(filterField.field.getName())) {
+                    try {
+                        ((FloatEditor) editor).setLinkedField(filterField.filter.getClass().getField("blurY"));
+                        ((FloatEditor) editor).setLinkEnabled(filtersTable.linkEnabled);
+                    } catch (NoSuchFieldException | SecurityException ex) {
+                        //ignore
+                    }
+                }
+                if ("blurY".equals(filterField.field.getName())) {
+                    try {
+                        ((FloatEditor) editor).setLinkedField(filterField.filter.getClass().getField("blurX"));
+                        ((FloatEditor) editor).setLinkEnabled(filtersTable.linkEnabled);
+                    } catch (NoSuchFieldException | SecurityException ex) {
+                        //ignore
+                    }
+                }
             } else if (realValue.getClass() == int.class || realValue.getClass() == Integer.class) {
                 editor = new NumberEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
             } else if (realValue.getClass() == RGBA.class) {
@@ -578,12 +599,18 @@ public class FiltersTreeTable extends JTreeTable {
 
             if (editor != null) {
 
-                /*editor.addChangeListener(new ChangeListener() {
+                editor.addChangeListener(new ChangeListener() {
                     @Override
                     public void change(PropertyEditor editor) {
-                        editor.save();                        
                     }
-                });*/
+
+                    @Override
+                    public void linkChanged(boolean newValue) {
+                        filtersTable.linkEnabled = newValue;
+                        stopCellEditing();
+                        filtersTable.repaint();
+                    }                    
+                });
                 if (table instanceof JTreeTable) {
                     JTreeTable treeTable = (JTreeTable) table;
                     if (treeTable.isRowSelected(row)) {
@@ -672,7 +699,7 @@ public class FiltersTreeTable extends JTreeTable {
     private static class FiltersTableCellRenderer extends DefaultTableCellRenderer {
 
         JLabel label = new JLabel();
-
+        
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             label.setText(value.toString());
@@ -739,6 +766,17 @@ public class FiltersTreeTable extends JTreeTable {
                     if (fieldValue.getClass() == RGBA.class) {                       
                         component = new ColorEditor(filterValue.filterField.toString(), filterValue.filterField.filter, filterValue.filterField.field, -1, RGBA.class);
                         component.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+                    }
+                    if ("blurX".equals(filterValue.filterField.field.getName())
+                            || "blurY".equals(filterValue.filterField.field.getName())) {
+                        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                        JLabel blurLabel = new JLabel(label.getText());
+                        panel.add(blurLabel);
+                        blurLabel.setPreferredSize(new Dimension(50, blurLabel.getPreferredSize().height));
+                        blurLabel.setMaximumSize(blurLabel.getPreferredSize());
+                        JLabel linkLabel = new JLabel(View.getIcon(((FiltersTreeTable) table).linkEnabled ? "link16" : "linkbreak16"));
+                        panel.add(linkLabel);
+                        component = panel;
                     }
                 }
             }
@@ -953,6 +991,7 @@ public class FiltersTreeTable extends JTreeTable {
             DefaultMutableTreeNode filterNode = new DefaultMutableTreeNode(new FilterName(filter));
             root.insert(filterNode, index);
             Field[] fields = filter.getClass().getFields();
+            LinkedDefaultMutableTreeNode lastLinkedNode = null;
             for (Field field : fields) {
                 if ("id".equals(field.getName())) {
                     continue;
@@ -996,7 +1035,19 @@ public class FiltersTreeTable extends JTreeTable {
                     continue;
                 }
                 FilterField filterField = new FilterField(filter, field);
-                DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(filterField);
+                DefaultMutableTreeNode fieldNode;
+                if ("blurX".equals(field.getName())) {
+                    LinkedDefaultMutableTreeNode linkedNode = new LinkedDefaultMutableTreeNode(filterField);
+                    fieldNode = linkedNode;
+                    lastLinkedNode = linkedNode;                    
+                } else if ("blurY".equals(field.getName())) {
+                    LinkedDefaultMutableTreeNode linkedNode = new LinkedDefaultMutableTreeNode(filterField);                    
+                    fieldNode = linkedNode;
+                    linkedNode.setLinkedNode(lastLinkedNode);
+                    lastLinkedNode.setLinkedNode(linkedNode);
+                } else {
+                    fieldNode = new DefaultMutableTreeNode(filterField);
+                }
                 filterNode.add(fieldNode);
             }
             this.filters.add(index, filter);
@@ -1130,5 +1181,23 @@ public class FiltersTreeTable extends JTreeTable {
         public void removeTreeModelListener(TreeModelListener l) {
             listeners.remove(l);
         }
-    }    
+    }
+    
+    private static class LinkedDefaultMutableTreeNode extends DefaultMutableTreeNode {
+        private LinkedDefaultMutableTreeNode linkedNode;
+
+        public LinkedDefaultMutableTreeNode(Object userObject) {
+            super(userObject);
+        }
+
+        
+        
+        public void setLinkedNode(LinkedDefaultMutableTreeNode linkedNode) {
+            this.linkedNode = linkedNode;
+        }
+
+        public LinkedDefaultMutableTreeNode getLinkedNode() {
+            return linkedNode;
+        }                
+    }
 }

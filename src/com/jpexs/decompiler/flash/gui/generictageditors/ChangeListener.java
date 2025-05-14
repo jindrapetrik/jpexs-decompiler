@@ -21,8 +21,9 @@ import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 /**
  * @author JPEXS
  */
-@FunctionalInterface
 public interface ChangeListener {
 
     public void change(PropertyEditor editor);
+    
+    public void linkChanged(boolean newValue);
 }
