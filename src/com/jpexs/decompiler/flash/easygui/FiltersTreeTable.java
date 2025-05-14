@@ -42,9 +42,6 @@ import de.javagl.treetable.TreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -57,14 +54,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.BorderFactory;
 import javax.swing.DropMode;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -74,7 +70,6 @@ import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TreeModelEvent;
@@ -94,7 +89,7 @@ import javax.swing.tree.TreePath;
 public class FiltersTreeTable extends JTreeTable {
 
     private List<ActionListener> filterChangedListeners = new ArrayList<>();
-
+        
     public FiltersTreeTable() {
         super(new FiltersTreeTableModel(null));
         getTree().setCellRenderer(new FiltersTreeCellRenderer());
@@ -1046,6 +1041,18 @@ public class FiltersTreeTable extends JTreeTable {
                     if (o instanceof FilterField) {
                         FilterField filterField = (FilterField) o;
                         return new FilterValue(filterField);
+                    } else if (o instanceof FilterName) {
+                        FilterName filterName = (FilterName) o;
+                        if (filterName.filter instanceof CONVOLUTIONFILTER) {
+                            ConvolutionPreset preset = ConvolutionPreset.getPresetOfFilter((CONVOLUTIONFILTER) filterName.filter);
+                            if (preset == null) {
+                                return "";
+                            } else {
+                                return preset;
+                            }
+                        } else {
+                            return "";
+                        }
                     } else {
                         return "";
                     }
@@ -1110,6 +1117,5 @@ public class FiltersTreeTable extends JTreeTable {
         public void removeTreeModelListener(TreeModelListener l) {
             listeners.remove(l);
         }
-
-    }
+    }    
 }

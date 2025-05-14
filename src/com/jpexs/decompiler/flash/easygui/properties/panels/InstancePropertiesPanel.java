@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.easygui.properties.panels;
 
+import com.jpexs.decompiler.flash.easygui.ConvolutionPreset;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.EasySwfPanel;
 import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
@@ -64,6 +65,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +74,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -121,6 +124,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
 
     private boolean updating = false;
 
+    
+    
     public InstancePropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         super("instance");
         setLayout(new BorderLayout());
@@ -382,20 +387,36 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                     filterName = filterName.substring(0, filterName.length() - "FILTER".length());
                     filterName = EasyStrings.translate("filter." + filterName.toLowerCase());
                     
-                    JMenuItem filterMenuItem = new JMenuItem(filterName);
-                    filterMenuItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            FILTER filter;
-                            try {                                
-                                filter = (FILTER) filterClass.getConstructor().newInstance();
-                            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-                                return;
-                            }
-                            filtersTable.addFilter(filter);
-                        }                        
-                    });
-                    menu.add(filterMenuItem);
+                    if (filterClass == CONVOLUTIONFILTER.class) {
+                        JMenu convolutionMenu = new JMenu(filterName);
+                        for (ConvolutionPreset preset : ConvolutionPreset.getAllPresets()) {
+                            JMenuItem filterMenuItem = new JMenuItem(preset.toString());
+                            filterMenuItem.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    FILTER filter = preset.createFilter();
+                                    filtersTable.addFilter(filter);
+                                }                        
+                            });
+                            convolutionMenu.add(filterMenuItem);
+                        }
+                        menu.add(convolutionMenu);
+                    } else {
+                        JMenuItem filterMenuItem = new JMenuItem(filterName);
+                        filterMenuItem.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                FILTER filter;
+                                try {                                
+                                    filter = (FILTER) filterClass.getConstructor().newInstance();
+                                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+                                    return;
+                                }
+                                filtersTable.addFilter(filter);
+                            }                        
+                        });
+                        menu.add(filterMenuItem);
+                    }
                 }
                 return menu;
             }            
@@ -1020,5 +1041,5 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
 
         public abstract void doColorEffectOperation(CXFORMWITHALPHA colorTransform);
     }
-
+       
 }

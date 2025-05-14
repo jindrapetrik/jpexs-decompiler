@@ -103,12 +103,12 @@ public class CONVOLUTIONFILTER extends FILTER {
 
     @Override
     public double getDeltaX() {
-        return ((matrixX - 1) >> 1) + 1;
+        return 0;
     }
 
     @Override
     public double getDeltaY() {
-        return ((matrixY - 1) >> 1) + 1;
+        return 0;
     }
 
     @Override

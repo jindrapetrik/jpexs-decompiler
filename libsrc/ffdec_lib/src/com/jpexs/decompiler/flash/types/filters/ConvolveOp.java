@@ -142,8 +142,8 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
 
         float[] kvals = kernel.getKernelData(null);
 
-        for (int x = srcX - left; x < srcX + srcWidth + left; x++) {
-            for (int y = srcY - top; y < srcY + srcHeight + top; y++) {
+        for (int x = srcX; x < srcX + srcWidth; x++) {
+            for (int y = srcY; y < srcY + srcHeight; y++) {
                 float a;
                 if (preserveAlpha) {
                     boolean outSide = false;
@@ -157,12 +157,12 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                         fsrcY = srcY;
                         outSide = true;
                     }
-                    if (fsrcX >= srcX + srcWidth + 1) {
-                        fsrcX = srcX + srcWidth;
+                    if (fsrcX >= srcX + srcWidth) {
+                        fsrcX = srcX + srcWidth - 1;
                         outSide = true;
                     }
-                    if (fsrcY >= srcY + srcHeight + 1) {
-                        fsrcY = srcY + srcHeight;
+                    if (fsrcY >= srcY + srcHeight) {
+                        fsrcY = srcY + srcHeight - 1;
                         outSide = true;
                     }
                     if (outSide) {
@@ -212,16 +212,16 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                     nSrcX = srcX;
                     outSide = true;
                 }
-                if (nSrcX >= srcX + srcWidth + 1) {
-                    nSrcX = srcX + srcWidth;
+                if (nSrcX >= srcX + srcWidth) {
+                    nSrcX = srcX + srcWidth - 1;
                     outSide = true;
                 }
                 if (nSrcY < srcY) {
                     nSrcY = srcY;
                     outSide = true;
                 }
-                if (nSrcY >= srcY + srcHeight + 1) {
-                    nSrcY = srcY + srcHeight;
+                if (nSrcY >= srcY + srcHeight) {
+                    nSrcY = srcY + srcHeight - 1;
                     outSide = true;
                 }
 

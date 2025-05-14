@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)
 - Simple editor - change background color
 - Simple editor - filters
+- Simple editor - convolution filter presets
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
