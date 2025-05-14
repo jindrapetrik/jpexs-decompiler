@@ -553,13 +553,16 @@ public class FiltersTreeTable extends JTreeTable {
                 editor = new GradientEditor(filterField.filter);
             } else if (realValue.getClass() == Boolean.class) {
                 editor = new BooleanEditor(filterField.toString(), filterField.filter, filterField.field, -1, Boolean.class);
-                /*editor.addChangeListener(new ChangeListener() {
+                editor.addChangeListener(new ChangeListener() {
                     @Override
-                    public void change(GenericTagEditor editor) {
-                            editor.save();
-                    }                    
-                });*/
-                //((BooleanEditor) editor).setRequestFocusEnabled(false);
+                    public void change(PropertyEditor editor) {
+                        stopCellEditing();
+                    }
+                    
+                    @Override
+                    public void linkChanged(boolean newValue) {
+                    }                                        
+                });
             } else if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
                 editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
                 if ("angle".equals(filterField.field.getName())) {
@@ -855,8 +858,7 @@ public class FiltersTreeTable extends JTreeTable {
             }
         }
 
-        @Override
-        public String toString() {
+        public String getIdentifier() {            
             switch (special) {
                 case SPECIAL_BRIGHTNESS:
                     return "brightness";
@@ -871,6 +873,11 @@ public class FiltersTreeTable extends JTreeTable {
                 return "gradient";
             }
             return field.getName();
+        }
+        
+        @Override
+        public String toString() {
+            return EasyStrings.translate("property.instance.filters." + getIdentifier());
         }
 
     }
