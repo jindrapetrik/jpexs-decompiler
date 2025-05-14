@@ -106,6 +106,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private final IntegerPropertyField greenAddPropertyField = new IntegerPropertyField(0, -255, 255);
     private final IntegerPropertyField blueAddPropertyField = new IntegerPropertyField(0, -255, 255);
     private final EasySwfPanel swfPanel;
+    
+    private final IntegerPropertyField ratioPropertyField = new IntegerPropertyField(-1, -1, 65535);
+    
 
     private final JPanel propertiesPanel;
 
@@ -250,8 +253,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
 
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 0;                        
         gbc.gridwidth = 1;
+                
         gbc.anchor = GridBagConstraints.EAST;
         displayPanel.add(new JLabel(formatPropertyName("display.visible")), gbc);
 
@@ -260,6 +264,18 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.anchor = GridBagConstraints.WEST;
 
         displayPanel.add(visibleCheckBox, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;        
+        gbc.anchor = GridBagConstraints.EAST;
+        displayPanel.add(new JLabel(formatPropertyName("display.ratio")), gbc);
+
+        gbc.gridx++;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        displayPanel.add(ratioPropertyField, gbc);
 
         gbc.gridy++;
         gbc.gridx = 0;
@@ -727,6 +743,23 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         });
         hPropertyField.addValidation(nonZeroFloatValidation);
+        
+        ratioPropertyField.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.ratio", 2) {
+                    Integer ratio = ratioPropertyField.getValue();
+                    @Override
+                    public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
+                        if (ratio == null) {
+                            placeObject.setPlaceFlagHasRatio(false);
+                        } else {
+                            placeObject.setRatio(ratio);
+                        }
+                    }                    
+                }, swfPanel.getSwf());
+            }
+        });
 
         visibleCheckBox.addActionListener(new ActionListener() {
             @Override
@@ -887,6 +920,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         Set<Boolean> cacheAsBitmap = new HashSet<>();
         Set<RGBA> backgroundColor = new HashSet<>();
         Set<List<FILTER>> filters = new HashSet<>();
+        Set<Integer> ratio = new HashSet<>();
+        
 
         for (DepthState ds : dss) {
             if (ds == null) {
@@ -921,6 +956,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             cacheAsBitmap.add(ds.cacheAsBitmap);
             backgroundColor.add(ds.backGroundColor);
             filters.add(ds.filters);
+            ratio.add(ds.ratio == -1 ? 0 : ds.ratio);
         }
 
         if (visible.size() == 0) {
@@ -936,6 +972,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         bluePercentPropertyField.setValue(bluePercent, true);
         blueAddPropertyField.setValue(blueAdd, true);
 
+        ratioPropertyField.setValue(ratio, true);
+        
         if (visible.size() > 1) {
             visibleCheckBox.setSelectionState(1);
         } else {

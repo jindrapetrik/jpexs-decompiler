@@ -495,4 +495,15 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.colorTransform = new CXFORMWITHALPHA(colorTransform);
         placeFlagHasColorTransform = true;
     }
+
+    @Override
+    public void setPlaceFlagHasRatio(boolean placeFlagHasRatio) {
+        this.placeFlagHasRatio = placeFlagHasRatio;
+    }
+
+    @Override
+    public void setRatio(int ratio) {
+        this.ratio = ratio;
+        placeFlagHasRatio = true;
+    }
 }

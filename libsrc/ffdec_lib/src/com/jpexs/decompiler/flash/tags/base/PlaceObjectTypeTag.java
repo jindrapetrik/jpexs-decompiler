@@ -255,6 +255,14 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
         throw new UnsupportedOperationException();
     }
     
+    public void setPlaceFlagHasRatio(boolean placeFlagHasRatio) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setRatio(int ratio) {
+        throw new UnsupportedOperationException();
+    }
+    
     /**
      * Checks if place equals.
      * @param other Other place object type tag

@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Simple editor - change background color
 - Simple editor - filters
 - Simple editor - convolution filter presets
+- Simple editor - ratio (shapetweens, video)
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

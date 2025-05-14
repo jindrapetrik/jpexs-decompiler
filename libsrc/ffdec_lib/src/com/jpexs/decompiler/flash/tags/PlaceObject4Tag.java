@@ -780,4 +780,15 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.surfaceFilterList = new ArrayList<>(filters);
         this.placeFlagHasFilterList = true;
     }
+    
+    @Override
+    public void setPlaceFlagHasRatio(boolean placeFlagHasRatio) {
+        this.placeFlagHasRatio = placeFlagHasRatio;
+    }
+
+    @Override
+    public void setRatio(int ratio) {
+        this.ratio = ratio;
+        placeFlagHasRatio = true;
+    }
 }
