@@ -358,7 +358,20 @@ public class FiltersTreeTable extends JTreeTable {
         }
         return node.getUserObject() instanceof FilterName;
     }
-
+    
+    public FILTER getSelectedFilter() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getTree().getLastSelectedPathComponent();
+        if (node == null) {
+            return null;
+        }
+        if (!(node.getUserObject() instanceof FilterName)) {
+            return null;
+        }
+        
+        FilterName filterName = (FilterName) node.getUserObject();
+        return filterName.filter;                
+    }
+    
     public void removeSelectedFilter() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getTree().getLastSelectedPathComponent();
         if (node == null) {

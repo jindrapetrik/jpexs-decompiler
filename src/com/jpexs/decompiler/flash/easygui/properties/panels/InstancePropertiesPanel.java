@@ -65,7 +65,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,6 +84,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -123,6 +123,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private final FiltersTreeTable filtersTable;
 
     private boolean updating = false;
+    
+    private List<FILTER> filterClipboard = new ArrayList<>();
 
     
     
@@ -431,7 +433,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 filtersTable.removeSelectedFilter();
             }
         });
-        removeFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.remove"));
+        removeFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.remove"));        
         
         
         filtersTable.getTree().addTreeSelectionListener(new TreeSelectionListener() {
@@ -441,9 +443,58 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }           
         });
         
+        PopupButton clipboardFilterButton = new PopupButton(View.getIcon("clipboard16")) {
+            @Override
+            protected JPopupMenu getPopupMenu() {
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem copySelectedMenuItem = new JMenuItem(EasyStrings.translate("property.instance.filters.menu.clipboard.copySelected"));
+                copySelectedMenuItem.addActionListener(this::copySelectedActionPerformed);
+                
+                JMenuItem copyAllMenuItem = new JMenuItem(EasyStrings.translate("property.instance.filters.menu.clipboard.copyAll"));
+                copyAllMenuItem.addActionListener(this::copyAllActionPerformed);
+                
+                JMenuItem pasteMenuItem = new JMenuItem(EasyStrings.translate("property.instance.filters.menu.clipboard.paste"));
+                pasteMenuItem.addActionListener(this::pasteActionPerformed);
+                
+                if (!filtersTable.isFilterSelected()) {
+                    copySelectedMenuItem.setEnabled(false);
+                }
+                
+                menu.add(copySelectedMenuItem);
+                menu.add(copyAllMenuItem);
+                menu.add(pasteMenuItem);
+                
+                return menu;
+            }            
+            
+            private void copySelectedActionPerformed(ActionEvent evt) {
+                FILTER filter = filtersTable.getSelectedFilter();
+                if (filter == null) {
+                    return;
+                }
+                
+                filterClipboard.clear();
+                filterClipboard.add(Helper.deepCopy(filter));
+            }
+            
+            private void copyAllActionPerformed(ActionEvent evt) {
+                filterClipboard.clear();
+                for (FILTER filter : filtersTable.getFilters()) {
+                    filterClipboard.add(Helper.deepCopy(filter));
+                }                
+            }
+            
+            private void pasteActionPerformed(ActionEvent evt) {
+                for (FILTER filter : filterClipboard) {
+                    filtersTable.addFilter(Helper.deepCopy(filter));
+                }
+            }
+        };
+        
         
         filtersToolbar.add(addFilterButton);
         filtersToolbar.add(removeFilterButton);
+        filtersToolbar.add(clipboardFilterButton);
         
         JScrollPane sp = new JScrollPane(filtersTable);
         filtersPanel.add(sp, BorderLayout.CENTER);
