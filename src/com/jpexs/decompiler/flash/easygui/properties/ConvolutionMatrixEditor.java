@@ -28,6 +28,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.TextField;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -126,6 +127,7 @@ public class ConvolutionMatrixEditor extends JPanel implements PropertyEditor {
                     dialog.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowDeactivated(WindowEvent e) {
+                            matrixEditorPanel.stopEditing();
                             filter.matrixX = matrixEditorPanel.getMatrixX();
                             filter.matrixY = matrixEditorPanel.getMatrixY();
                             filter.matrix = matrixEditorPanel.getMatrix();
@@ -174,6 +176,13 @@ public class ConvolutionMatrixEditor extends JPanel implements PropertyEditor {
             }
             return matrix;
         }
+        
+        public void stopEditing() {
+            TableCellEditor editor = matrixTable.getCellEditor();
+            if (editor != null) {
+                editor.stopCellEditing();
+            }
+        }
 
         public MatrixEditorPanel(JDialog dialog) {
             setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -200,14 +209,17 @@ public class ConvolutionMatrixEditor extends JPanel implements PropertyEditor {
                 }
             });
 
+            JTextField textField = new JTextField();
+            textField.setBorder(BorderFactory.createEmptyBorder());
+            
             matrixTable.setDefaultEditor(float.class, new TableCellEditor() {
 
                 private List<CellEditorListener> listeners = new ArrayList<>();
-                private JTextField textField = new JTextField();
 
                 @Override
                 public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                     textField.setText(EcmaScript.toString(value));
+                    SwingUtilities.invokeLater(() -> textField.selectAll());
                     return textField;
                 }
 
@@ -268,6 +280,10 @@ public class ConvolutionMatrixEditor extends JPanel implements PropertyEditor {
                 matrixTable.setBackground(Color.WHITE);
             }
 
+            matrixTable.setRowSelectionAllowed(false);
+            matrixTable.setColumnSelectionAllowed(false);
+            matrixTable.setCellSelectionEnabled(true);
+            
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
 
