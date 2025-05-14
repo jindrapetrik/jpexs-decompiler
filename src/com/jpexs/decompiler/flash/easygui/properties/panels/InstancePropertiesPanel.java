@@ -497,6 +497,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 }
             }
         };
+        clipboardFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.clipboard"));
         
         JButton enableFilterButton = new JButton(View.getIcon("show16"));
         enableFilterButton.addActionListener(new ActionListener() {
@@ -509,6 +510,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         });
         enableFilterButton.setToolTipText(EasyStrings.translate("property.instance.filters.menu.enable"));
+        enableFilterButton.setEnabled(false);
         
         filtersTable.getTree().addTreeSelectionListener(new TreeSelectionListener() {
             @Override
