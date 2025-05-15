@@ -1824,6 +1824,9 @@ public class Main {
                         mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
+                    if (fswf != null) {
+                        mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                    }
                 }
 
                 if (executeAfterOpen != null && fopenable != null) {
