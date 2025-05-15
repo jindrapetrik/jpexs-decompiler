@@ -199,4 +199,9 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }  
 }

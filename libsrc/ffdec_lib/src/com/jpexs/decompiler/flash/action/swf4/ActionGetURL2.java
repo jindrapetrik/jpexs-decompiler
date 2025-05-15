@@ -93,6 +93,7 @@ public class ActionGetURL2 extends Action {
 
     /**
      * Constructor
+     *
      * @param sendVarsMethod Send variables method
      * @param loadVariablesFlag Load variables flag
      * @param loadTargetFlag Load target flag
@@ -107,6 +108,7 @@ public class ActionGetURL2 extends Action {
 
     /**
      * Constructor
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @param charset Charset
@@ -145,6 +147,7 @@ public class ActionGetURL2 extends Action {
 
     /**
      * Constructor
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -219,10 +222,7 @@ public class ActionGetURL2 extends Action {
                 }
             }
         }
-        
-        
-        
-        
+
         if (loadVariablesFlag) {
             if (num != null) {
                 output.add(new LoadVariablesNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
@@ -244,7 +244,7 @@ public class ActionGetURL2 extends Action {
             boolean doPrintAsBitmap = false;
             boolean doFSCommand = false;
             boolean doUnload = false;
-                                    
+
             if (urlString.isCompileTime() && (urlString.getResult() instanceof String)) {
                 String urlStr = (String) urlString.getResult();
                 if ("".equals(urlStr)) {
@@ -260,30 +260,30 @@ public class ActionGetURL2 extends Action {
                     doFSCommand = true;
                 }
             } else if (urlString instanceof StringAddActionItem) {
-                    StringAddActionItem sa = (StringAddActionItem) urlString;
-                    if (sa.leftSide.isCompileTime()) {
-                        Object res = sa.leftSide.getResult();
-                        if (res instanceof String) {
-                            String urlStr = (String) res;
-                            switch (urlStr) {
-                                case printPrefix:
-                                    printType = sa.rightSide;
-                                    doPrint = true;
-                                    urlString = null;
-                                    break;
-                                case printAsBitmapPrefix:
-                                    printType = sa.rightSide;
-                                    doPrintAsBitmap = true;
-                                    urlString = null;
-                                    break;
-                                case fscommandPrefix:
-                                    urlString = sa.rightSide;
-                                    doFSCommand = true;
-                                    break;                                
-                            }
+                StringAddActionItem sa = (StringAddActionItem) urlString;
+                if (sa.leftSide.isCompileTime()) {
+                    Object res = sa.leftSide.getResult();
+                    if (res instanceof String) {
+                        String urlStr = (String) res;
+                        switch (urlStr) {
+                            case printPrefix:
+                                printType = sa.rightSide;
+                                doPrint = true;
+                                urlString = null;
+                                break;
+                            case printAsBitmapPrefix:
+                                printType = sa.rightSide;
+                                doPrintAsBitmap = true;
+                                urlString = null;
+                                break;
+                            case fscommandPrefix:
+                                urlString = sa.rightSide;
+                                doFSCommand = true;
+                                break;
                         }
                     }
                 }
+            }
 
             if (num != null) {
                 if (doUnload) {

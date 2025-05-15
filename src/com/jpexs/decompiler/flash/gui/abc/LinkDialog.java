@@ -42,6 +42,7 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -57,6 +58,8 @@ public class LinkDialog extends JDialog {
     private JList<LinkItem> linkList;
 
     private SWF swf;
+
+    private boolean overLinkButton = false;
 
     private List<ActionListener> saveListeners = new ArrayList<>();
 
@@ -74,8 +77,19 @@ public class LinkDialog extends JDialog {
         }
     }
 
-    public LinkDialog(MainPanel mainPanel) {
+    public LinkDialog(MainPanel mainPanel, JToggleButton linkButton) {
         this.mainPanel = mainPanel;
+        linkButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                overLinkButton = true;
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                overLinkButton = false;
+            }
+        });
         setUndecorated(true);
         setResizable(false);
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
@@ -86,6 +100,9 @@ public class LinkDialog extends JDialog {
             public void windowDeactivated(WindowEvent e) {
                 save(swf, false);
                 swf = null;
+                if (!overLinkButton) {
+                    linkButton.setSelected(false);
+                }
                 dispose();
             }
         });

@@ -19,28 +19,15 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.ecma.ObjectType;
-import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
-import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
-import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
@@ -136,6 +123,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * ASM Position
      */
     protected int pos = 0;
+    
+    /**
+     * Dialect
+     */
+    public GraphTargetDialect dialect;
 
     /**
      * Gets the line start item
@@ -145,64 +137,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphSourceItem getLineStartItem() {
         return lineStartItem;
     }
-
-    /**
-     * Converts a value to an item
-     *
-     * FIXME!!! This should only convert to values relatable to current Graph type, 
-     * e.g. ActionItems for AS1/2, AVM2Items for AS3
-     * 
-     * @param r Value
-     * @return Graph target item
-     */
-    protected static GraphTargetItem valToItem(Object r) {
-        if (r == null) {
-            return null;
-        }
-        if (r instanceof Boolean) {
-            if ((Boolean) r) {
-                return new TrueItem(null, null);
-            } else {
-                return new FalseItem(null, null);
-            }
-        }
-        if (r instanceof String) {
-            return new StringAVM2Item(null, null, (String) r);
-        }
-        if (r instanceof Long) {
-            return new DoubleValueAVM2Item(null, null, (double) (Long) r);
-        }
-        if (r instanceof Integer) {
-            return new IntegerValueAVM2Item(null, null, (Integer) r);
-        }
-
-        if (r instanceof Double) {
-            return new DoubleValueAVM2Item(null, null, (Double) r);
-        }
-        if (r instanceof Null) {
-            return new NullAVM2Item(null, null);
-        }
-        if (r instanceof Undefined) {
-            return new UndefinedAVM2Item(null, null);
-        }
-        if (r instanceof ArrayType) {
-            List<GraphTargetItem> vals = new ArrayList<>();
-            ArrayType at = (ArrayType) r;
-            for (Object v : at.values) {
-                vals.add(valToItem(v));
-            }
-            return new NewArrayAVM2Item(null, null, vals);
-        }
-        if (r instanceof ObjectType) {
-            List<NameValuePair> props = new ArrayList<>();
-            ObjectType ot = (ObjectType) r;
-            for (String k : ot.getAttributeNames()) {
-                props.add(new NameValuePair(valToItem(k), valToItem(ot.getAttribute(k))));
-            }
-            return new NewObjectAVM2Item(null, null, props);
-        }
-        return null;
-    }
+   
 
     /**
      * Simplifies something
@@ -237,7 +172,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                 break;
         }
 
-        GraphTargetItem it2 = valToItem(r);
+        GraphTargetItem it2 = it.dialect == null ? null : it.dialect.valToItem(r);
         if (it2 == null) {
             return it;
         }
@@ -297,8 +232,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Constructs GraphTargetItem
      */
-    public GraphTargetItem() {
-        this(null, null, NOPRECEDENCE);
+    public GraphTargetItem(GraphTargetDialect dialect) {
+        this(dialect, null, null, NOPRECEDENCE);        
     }
 
     /**
@@ -308,8 +243,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param lineStartItem Line start item
      * @param precedence Precedence
      */
-    public GraphTargetItem(GraphSourceItem src, GraphSourceItem lineStartItem, int precedence) {
-        this(src, lineStartItem, precedence, null);
+    public GraphTargetItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, int precedence) {
+        this(dialect, src, lineStartItem, precedence, null);
     }
 
     /**
@@ -320,7 +255,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param precedence Precedence
      * @param value Value
      */
-    public GraphTargetItem(GraphSourceItem src, GraphSourceItem lineStartItem, int precedence, GraphTargetItem value) {
+    public GraphTargetItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, int precedence, GraphTargetItem value) {
+        this.dialect = dialect;
         this.src = src;
         this.lineStartItem = lineStartItem;
         this.precedence = precedence;
@@ -1064,7 +1000,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Inverted item
      */
     public GraphTargetItem invert(GraphSourceItem src) {
-        return new NotItem(src, getLineStartItem(), this);
+        return new NotItem(dialect, src, getLineStartItem(), this);
     }
 
     /**
@@ -1130,11 +1066,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return This as long
      */
     public long getAsLong() {
-        if (this instanceof DirectValueActionItem) {
-            DirectValueActionItem dvai = (DirectValueActionItem) this;
-            return (long) (double) EcmaScript.toNumberAs2(dvai.value);
-        }
-
+        //override as needed
         return 0;
     }
 

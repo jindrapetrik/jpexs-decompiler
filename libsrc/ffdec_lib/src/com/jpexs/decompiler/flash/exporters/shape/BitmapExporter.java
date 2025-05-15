@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -76,8 +77,6 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private final GeneralPath path;
 
-    private Shape aliasedShape;
-
     private Paint fillPaint;
 
     private boolean fillRepeat;
@@ -107,13 +106,6 @@ public class BitmapExporter extends ShapeExporterBase {
     private static boolean linearGradientColorWarningShown = false;
 
     private boolean scaleStrokes;
-
-    private boolean aliasedFill = false;
-
-    @Override
-    public void beginAliasedFills() {
-        aliasedFill = true;
-    }
 
     private class TransformedStroke implements Stroke {
 
@@ -241,8 +233,7 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void beginFills() {
-        aliasedFill = false;
+    public void beginFills() {        
     }
 
     @Override
@@ -430,6 +421,10 @@ public class BitmapExporter extends ShapeExporterBase {
         if (thickness * unzoom < 1 * SWF.unitDivisor) {
             thickness = 1 * SWF.unitDivisor / unzoom;
         }
+        
+        if (Configuration.fixAntialiasConflation.get()) {
+            thickness += 1 * SWF.unitDivisor / unzoom;
+        }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
             //lineStroke =  new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
@@ -553,21 +548,13 @@ public class BitmapExporter extends ShapeExporterBase {
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
         path.quadTo(controlX, controlY, anchorX, anchorY);
     }
-
+    
     /**
      * Finalizes the path.
      */
     protected void finalizePath() {
         if (fillPaint != null) {
             Shape shp = path;
-            if (aliasedFill) {
-                aliasedShape = new BasicStroke((float) (SWF.unitDivisor / unzoom / 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
-                return;
-            } else if (aliasedShape != null) {
-                Area a = new Area(shp);
-                a.add(new Area(aliasedShape));
-                shp = a;
-            }
             graphics.setComposite(AlphaComposite.SrcOver);
             if (fillPaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
@@ -704,7 +691,11 @@ public class BitmapExporter extends ShapeExporterBase {
             } else {
                 graphics.setPaint(fillPaint);
                 graphics.fill(shp);
-            }
+                if (Configuration.fixAntialiasConflation.get()) {
+                    Shape strokeShape = new BasicStroke((float) (1 * SWF.unitDivisor / unzoom), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
+                    graphics.fill(strokeShape);                    
+                }
+            }            
         }
         if (linePaint != null && lineStroke != null) {
             if (true) {

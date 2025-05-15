@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -43,7 +44,7 @@ public class URShiftActionItem extends BinaryOpItem implements CompoundableBinar
      * @param rightSide Right side
      */
     public URShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>", "Number", "Number");
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>", "Number", "Number");
     }
 
     @Override

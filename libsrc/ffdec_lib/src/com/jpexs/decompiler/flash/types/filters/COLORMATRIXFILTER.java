@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -96,4 +97,27 @@ public class COLORMATRIXFILTER extends FILTER {
         return result;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Arrays.hashCode(this.matrix);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final COLORMATRIXFILTER other = (COLORMATRIXFILTER) obj;
+        return Arrays.equals(this.matrix, other.matrix);
+    }
+
+    
 }

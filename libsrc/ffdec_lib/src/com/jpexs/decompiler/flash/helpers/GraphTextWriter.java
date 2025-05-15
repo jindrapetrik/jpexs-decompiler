@@ -420,6 +420,19 @@ public abstract class GraphTextWriter {
     public GraphTextWriter startBlock() {
         return startBlock("{");
     }
+    
+    /**
+     * Starts block, but do not continue to new line.
+     * @return GraphTextWriter
+     */
+    public GraphTextWriter startBlockNoNewLine() {
+        if (formatting.beginBlockOnNewLine) {
+            newLine();
+        } else {
+            append(" ");
+        }
+        return append("{");
+    }
 
     /**
      * Ends block.

@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.w3c.dom.Element;
 
 /**
@@ -143,16 +146,31 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (image != null) {
             SerializableImage img = image.getImageCached();
             if (img != null) {
-                if (colorTransform != null) {
-                    colorTransform.apply(img);
-                }
-
                 int width = img.getWidth();
                 int height = img.getHeight();
                 lastPatternId++;
                 String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getConvertedImageData());
+                
+                if (colorTransform != null) {
+                    //Apply transform and convert it to PNG.
+                    //If we use the same format as input, then we would lose quality for JPEGs.
+                    //This will also make significantly larger files for JPEGs.
+                    //It would be better if we use a SVG filter for colormatrix transform,
+                    //but that will be problematic during importing it back (we cannot properly parse filters)
+                    
+                    img = colorTransform.apply(img);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        ImageIO.write(img.getBufferedImage(), "PNG", baos);
+                    } catch (IOException iex) {
+                        //ignore
+                    }
+                    imageData = baos.toByteArray();
+                    format = ImageFormat.PNG;
+                }
+                
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
 
                 Element pattern = exporter.createElement("pattern");
@@ -162,7 +180,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
-                pattern.setAttribute("ffdec:smoothed", smoothed ? "true" : "false");
+                //Smoothed attribute was used in older FFDec versions - it is now only used for reading, for backwards compatibility
+                //pattern.setAttribute("ffdec:smoothed", smoothed ? "true" : "false");
                 if (matrix != null) {
                     pattern.setAttribute("patternTransform", matrix.getSvgTransformationString(SWF.unitDivisor / zoom, SWF.unitDivisor / zoom));
                 }
@@ -170,6 +189,12 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 imageElement.setAttribute("width", "" + width);
                 imageElement.setAttribute("height", "" + height);
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
+                if (smoothed) {
+                    imageElement.setAttribute("style", "image-rendering:optimizeQuality");                    
+                } else {
+                    //https://stackoverflow.com/questions/50184674/stop-auto-image-smoothing-inside-an-svgz                
+                    imageElement.setAttribute("style", "image-rendering:optimizeSpeed; image-rendering:pixelated");
+                }
                 pattern.appendChild(imageElement);
                 exporter.addToGroup(pattern);
                 return patternId;

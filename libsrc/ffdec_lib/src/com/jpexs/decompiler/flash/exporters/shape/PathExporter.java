@@ -182,9 +182,4 @@ public class PathExporter extends ShapeExporterBase {
         paths.add(path);
         path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
     }
-
-    @Override
-    public void beginAliasedFills() {
-        aliasedFill = true;
-    }
 }

@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
-import static com.jpexs.decompiler.flash.easygui.TimelineDepthPanel.FONT_SIZE;
-import static com.jpexs.decompiler.flash.easygui.TimelineDepthPanel.PADDING;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -61,9 +59,9 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     public void setTimeline(Timeline timeline) {
         int maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
         String maxDepthStr = Integer.toString(maxDepth);
-        setFont(getFont().deriveFont(FONT_SIZE));
+        setFont(getFont().deriveFont(TimelineDepthPanel.FONT_SIZE));
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
-        leftPos = maxDepthW + 2 * PADDING;
+        leftPos = maxDepthW + 2 * TimelineDepthPanel.PADDING;
     }
     
     

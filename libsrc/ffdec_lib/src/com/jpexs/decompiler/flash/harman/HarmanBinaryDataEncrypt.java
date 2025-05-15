@@ -46,23 +46,24 @@ public class HarmanBinaryDataEncrypt {
 
     /**
      * Encrypts data.
+     *
      * @param data Data to encrypt
      * @param key Key
      * @return Encrypted data
      */
     public static byte[] encrypt(byte[] data, String key) {
-        
+
         byte[] customKey = null;
-        
+
         if (key != null) {
             customKey = new byte[16];
             int keyLen = key.length();
 
-            for(int i = 0; i < 16; ++i) {
-               customKey[i] = (byte)key.charAt(i % keyLen);
+            for (int i = 0; i < 16; ++i) {
+                customKey[i] = (byte) key.charAt(i % keyLen);
             }
         }
-        
+
         byte[] result;
         try {
             SecureRandom random = new SecureRandom();
@@ -165,6 +166,7 @@ public class HarmanBinaryDataEncrypt {
 
     /**
      * Decrypts data.
+     *
      * @param data Encrypted data
      * @param key
      * @return Decrypted data
@@ -173,18 +175,18 @@ public class HarmanBinaryDataEncrypt {
         if (data.length < 32) {
             return null;
         }
-        
+
         byte[] customKey = null;
-        
+
         if (key != null) {
             customKey = new byte[16];
             int keyLen = key.length();
 
-            for(int i = 0; i < 16; ++i) {
-               customKey[i] = (byte)key.charAt(i % keyLen);
+            for (int i = 0; i < 16; ++i) {
+                customKey[i] = (byte) key.charAt(i % keyLen);
             }
         }
-        
+
         long encryptedLen = data.length;
         long encryptedLenXorHash = unpack(data, 0);
         long decryptedLenXorRandom1 = unpack(data, 4);
@@ -224,6 +226,7 @@ public class HarmanBinaryDataEncrypt {
 
     /**
      * Test encryption/decryption.
+     *
      * @param args Command line arguments
      * @throws IOException On I/O error
      */

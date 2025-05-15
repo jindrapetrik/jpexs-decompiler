@@ -334,7 +334,7 @@ public class View {
         images.add(loadImage(icon + "16"));
         images.add(loadImage(icon + "32"));
         f.setIconImages(images);
-    }
+    }        
 
     /**
      * Sets icon of specified frame to ASDec icon
@@ -362,6 +362,18 @@ public class View {
             images.add(loadImage("icon256"));
             f.setIconImages(images);
         }
+    }
+    
+    /**
+     * Sets icon of the window - only 16 px variant.
+     *
+     * @param f
+     * @param icon Icon identifier. Icon must exist in 16px variant.
+     */
+    public static void setWindowIcon16(Window f, String icon) {
+        List<Image> images = new ArrayList<>();
+        images.add(loadImage(icon + "16"));
+        f.setIconImages(images);
     }
 
     public static void centerScreenMain(Window f) {

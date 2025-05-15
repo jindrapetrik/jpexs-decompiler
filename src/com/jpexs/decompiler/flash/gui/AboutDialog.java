@@ -118,7 +118,7 @@ public class AboutDialog extends AppDialog {
         authorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(authorLabel);
 
-        JLabel dateLabel = new JLabel("2010-2024");
+        JLabel dateLabel = new JLabel("2010-2025");
         dateLabel.setAlignmentX(0.5f);
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);

@@ -188,7 +188,7 @@ public class RGBA extends RGB implements Serializable {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof RGB) {
+        if ((obj instanceof RGB) && (!(obj instanceof RGBA))) {
             final RGB other = (RGBA) obj;
             if (this.alpha != 255) {
                 return false;
@@ -218,5 +218,5 @@ public class RGBA extends RGB implements Serializable {
             return false;
         }
         return this.alpha == other.alpha;
-    }
+    }        
 }

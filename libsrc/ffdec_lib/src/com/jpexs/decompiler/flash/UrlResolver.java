@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash;
 
+import java.io.File;
+
 /**
  * URL resolver interface.
  *
@@ -26,8 +28,9 @@ public interface UrlResolver {
     /**
      * Resolves URL to SWF object.
      *
+     * @param basePath Base SWF path
      * @param url URL
      * @return SWF object or null if not valid
      */
-    public SWF resolveUrl(String url);
+    public SWF resolveUrl(String basePath, String url);
 }

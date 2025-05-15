@@ -20,18 +20,18 @@ package com.jpexs.decompiler.flash.easygui.properties;
  *
  * @author JPEXS
  */
-public class TextPropertyField extends AbstractPropertyField<String> {       
-    
+public class TextPropertyField extends AbstractPropertyField<String> {
+
     public TextPropertyField(String text, int maxLength) {
         super(text);
-        
+
         writeField.setColumns(maxLength);
-        
-        addValidation(new PropertyValidationInterface<String>(){
+
+        addValidation(new PropertyValidationInterface<String>() {
             @Override
             public boolean validate(String value) {
                 return value.length() <= maxLength;
-            }            
+            }
         });
     }
 
@@ -44,5 +44,5 @@ public class TextPropertyField extends AbstractPropertyField<String> {
     protected String valueToText(String value) {
         return value;
     }
-    
+
 }

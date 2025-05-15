@@ -122,6 +122,7 @@ package
         TestSwitchDefault;
         TestSwitchIf;
         TestTernarOperator;
+        TestTernarOperator2;
         TestTry;
         TestTryIf;
         TestTryReturn;

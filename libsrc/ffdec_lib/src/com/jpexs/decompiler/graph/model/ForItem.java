@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -100,6 +101,7 @@ public class ForItem extends LoopItem implements Block {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param loop Loop
@@ -108,8 +110,8 @@ public class ForItem extends LoopItem implements Block {
      * @param finalCommands Final commands
      * @param commands Commands
      */
-    public ForItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
-        super(src, lineStartIns, loop);
+    public ForItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
+        super(dialect, src, lineStartIns, loop);
         this.firstCommands = firstCommands;
         this.expression = expression;
         this.finalCommands = finalCommands;

@@ -54,7 +54,6 @@ public class FSCommand2ActionItem extends ActionItem {
      *
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
-     * @param command Command
      * @param arguments Arguments
      */
     public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> arguments) {

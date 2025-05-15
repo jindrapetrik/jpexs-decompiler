@@ -1007,7 +1007,7 @@ public class Timeline {
      * @param drawMode Draw mode
      * @param canUseSmoothing Can use smoothing
      */
-    private void drawDrawable(SWF swf, Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, int parentBlendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform mergedColorTransform, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, boolean canUseSmoothing) {
+    private void drawDrawable(SWF swf, Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, int parentBlendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform mergedColorTransform, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, Matrix fullTransformation, boolean scaleStrokes, int drawMode, boolean canUseSmoothing) {
         Matrix drawMatrix = new Matrix();
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
@@ -1084,11 +1084,14 @@ public class Timeline {
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
             for (FILTER filter : filters) {
+                if (!filter.enabled) {
+                    continue;
+                }
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
-                deltaXMax = Math.max(x, deltaXMax);
-                deltaYMax = Math.max(y, deltaYMax);
-            }            
+                deltaXMax += x;
+                deltaYMax += y;
+            }
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
             rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
@@ -1096,9 +1099,9 @@ public class Timeline {
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
             viewRect2.yMin -= deltaYMax * SWF.unitDivisor;
-            viewRect2.yMax += deltaYMax * SWF.unitDivisor;   
+            viewRect2.yMax += deltaYMax * SWF.unitDivisor;
         }
-                    
+
         drawMatrix.translate(rect.xMin, rect.yMin);
         drawMatrix.translateX /= SWF.unitDivisor;
         drawMatrix.translateY /= SWF.unitDivisor;
@@ -1111,7 +1114,6 @@ public class Timeline {
             int deltaY = (int) Math.ceil(rect.yMin / SWF.unitDivisor);
             newWidth = Math.min(image.getWidth() - deltaX, newWidth);
             newHeight = Math.min(image.getHeight() - deltaY, newHeight);
-            
 
             if (newWidth <= 0 || newHeight <= 0) {
                 return;
@@ -1186,26 +1188,29 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, mergedColorTransform2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
+                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, mergedColorTransform2, unzoom, sameImage, viewRect2, viewRectRaw, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
             } else {
                 // todo: show one time warning
             }
-            
+
             if (cacheAsBitmap && layer.backGroundColor != null && (blendMode <= 1 || (filters != null && !filters.isEmpty()))) {
                 Graphics2D g2 = (Graphics2D) img.getGraphics();
                 g2.setComposite(AlphaComposite.DstOver);
                 Color bgColor = layer.backGroundColor.toColor();
-                g2.setColor(bgColor);                
+                g2.setColor(bgColor);
                 g2.fillRect((int) Math.round(deltaXMax * unzoom),
-                        (int) Math.round(deltaYMax * unzoom),                        
-                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
-                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
-                );                        
+                        (int) Math.round(deltaYMax * unzoom),
+                        (int) Math.round(rect.getWidth() / SWF.unitDivisor - 2 * deltaXMax * unzoom),
+                        (int) Math.round(rect.getHeight() / SWF.unitDivisor - 2 * deltaYMax * unzoom)
+                );
             }
 
             if (filters != null) {
                 for (FILTER filter : filters) {
-                    img = filter.apply(img, unzoom, (int) deltaXMax, (int) deltaYMax, (int) Math.round(newWidth - 2 * deltaXMax), (int) Math.round(newHeight - 2 * deltaYMax));
+                    if (!filter.enabled) {
+                        continue;
+                    }
+                    img = filter.apply(img, unzoom, 0, 0, newWidth, newHeight);
                 }
             }
             if (blendMode > 1) {
@@ -1213,7 +1218,7 @@ public class Timeline {
                     img = colorTransForm.apply(img);
                 }
             }
-            
+
             if (!sameImage && cacheAsBitmap && renderContext.displayObjectCache != null) {
                 renderContext.clearPlaceObjectCache(layer.placeObjectTag);
                 renderContext.displayObjectCache.put(new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect), img);
@@ -1289,14 +1294,17 @@ public class Timeline {
             clips.add(clip);
         } else {
             if (renderContext.cursorPosition != null) {
-                int dx = (int) Math.round(viewRect.xMin * unzoom);
-                int dy = (int) Math.round(viewRect.yMin * unzoom);
+                int dx = (int) Math.round(viewRectRaw.xMin * unzoom);
+                int dy = (int) Math.round(viewRectRaw.yMin * unzoom);
                 Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
                 if (drawable instanceof DefineSpriteTag) {
                     if (renderContext.stateUnderCursor.size() > stateCount) {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
+                    if ((drawable instanceof ButtonTag) && !renderContext.enableButtons) {
+                        dframe = ButtonTag.FRAME_HITTEST;
+                    }
                     Shape shape = drawable.getOutline(true, dframe, dtime, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);
@@ -1315,20 +1323,20 @@ public class Timeline {
                 g.setTransform(drawMatrix.toTransform());
 
                 if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && mergedColorTransform != null) {
-                    img = mergedColorTransform.apply(img);                   
+                    img = mergedColorTransform.apply(img);
                 }
-                
+
                 if (blendMode > 1 && (filters == null || filters.isEmpty()) && cacheAsBitmap && layer.backGroundColor != null) {
                     Graphics2D g2 = (Graphics2D) img.getGraphics();
                     g2.setComposite(AlphaComposite.DstOver);
                     Color bgColor = layer.backGroundColor.toColor();
                     g2.setColor(bgColor);
                     g2.fillRect((int) Math.round(deltaXMax * unzoom),
-                        (int) Math.round(deltaYMax * unzoom),                        
-                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
-                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
+                            (int) Math.round(deltaYMax * unzoom),
+                            (int) Math.round(rect.getWidth() / SWF.unitDivisor - 2 * deltaXMax * unzoom),
+                            (int) Math.round(rect.getHeight() / SWF.unitDivisor - 2 * deltaYMax * unzoom)
                     );
-                }                
+                }
 
                 if (!((blendMode == 11 || blendMode == 12) && parentBlendMode <= 1)) { //alpha and erase modes require parent blendmode not normal
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
@@ -1365,7 +1373,7 @@ public class Timeline {
      * @param canUseSmoothing Can use smoothing
      * @param ignoreDepths Ignore these depths when drawing
      */
-    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, List<Integer> ignoreDepths) {
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, List<Integer> ignoreDepths) {
         if (getFrameCount() <= frame) {
             return;
         }
@@ -1386,7 +1394,7 @@ public class Timeline {
 
         int maxDepth = getMaxDepth();
         int clipCount = 0;
-        for (int i = 0; i <= maxDepth; i++) {                        
+        for (int i = 0; i <= maxDepth; i++) {
             boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
@@ -1449,11 +1457,11 @@ public class Timeline {
             if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SHAPES && (character instanceof ShapeTag)) {
                 continue;
             }
-            
+
             if (ignoreDepths.contains(i)) {
                 continue;
             }
-            
+
             if (character instanceof DrawableTag) {
 
                 RECT scalingRect = null;
@@ -1499,7 +1507,7 @@ public class Timeline {
                             Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
 
                             g.setClip(r);
-                            drawDrawable(swf, strokeTransformation, layer, transforms[s], g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, false, DRAW_MODE_SHAPES, canUseSmoothing);
+                            drawDrawable(swf, strokeTransformation, layer, transforms[s], g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, viewRectRaw, fullTransformation, false, DRAW_MODE_SHAPES, canUseSmoothing);
                             s++;
                         }
                     }
@@ -1508,13 +1516,13 @@ public class Timeline {
                     g.setTransform(origTransform);
 
                     //draw all nonshapes (normally scaled) next
-                    drawDrawable(swf, strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, scaleStrokes, DRAW_MODE_SPRITES, canUseSmoothing);
+                    drawDrawable(swf, strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, viewRectRaw, fullTransformation, scaleStrokes, DRAW_MODE_SPRITES, canUseSmoothing);
                 } else {
                     boolean subScaleStrokes = scaleStrokes;
                     if (character instanceof DefineSpriteTag) {
                         subScaleStrokes = true;
                     }
-                    drawDrawable(swf, strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, subScaleStrokes, DRAW_MODE_ALL, canUseSmoothing);
+                    drawDrawable(swf, strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, viewRectRaw, fullTransformation, subScaleStrokes, DRAW_MODE_ALL, canUseSmoothing);
                 }
             } else if (character instanceof BoundedTag) {
                 showPlaceholder = true;
@@ -1701,6 +1709,9 @@ public class Timeline {
      */
     public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
         Frame fr = getFrame(frame);
+        if (fr == null) {
+            return;
+        }
         if (time == 0) {
             sounds.addAll(fr.sounds);
             soundClasses.addAll(fr.soundClasses);

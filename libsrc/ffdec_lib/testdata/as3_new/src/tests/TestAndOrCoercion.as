@@ -24,7 +24,7 @@ package tests
             
             this.ti = ti && (ti = new TestClass());
             
-            var a = ti && (ti = new TestClass());
+            var a:* = ti && (ti = new TestClass());
             
             var b:int = 1 + (i || j); //no coercion
             
@@ -33,7 +33,7 @@ package tests
             return ti && (ti = new TestClass());
 		}
         
-        public function test(p:TestInterface)
+        public function test(p:TestInterface): void
         {
         
         }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.operations;
 
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,13 +44,14 @@ public abstract class BitwiseBinaryOpActionItem extends BinaryOpItem implements 
      * @param coerceRight Coerce right
      */
     public BitwiseBinaryOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
-        super(instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
     }
 
     @Override
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if ((operand instanceof DirectValueActionItem) && (((DirectValueActionItem) operand).value instanceof Long)) {
-            long val = (long) (Long) ((DirectValueActionItem) operand).value;
+        if ((operand instanceof DirectValueActionItem)
+                && ((((DirectValueActionItem) operand).value instanceof Long) || (((DirectValueActionItem) operand).value instanceof Double))) {
+            long val = operand.getAsLong();
             if (val > 9) {
                 String valHex = Long.toHexString(val).toUpperCase();
                 if (valHex.length() % 2 == 1) {

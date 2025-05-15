@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -35,11 +36,13 @@ public class PopItem extends GraphTargetItem {
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      */
-    public PopItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+    public PopItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns) {
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override

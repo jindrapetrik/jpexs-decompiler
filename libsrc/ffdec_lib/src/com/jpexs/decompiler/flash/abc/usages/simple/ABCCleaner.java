@@ -223,7 +223,7 @@ public class ABCCleaner {
                             break;
                         case AVM2Code.DAT_UINT_INDEX:
                             ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.UINT, ins.operands[operandIndex], replaceMap);
-                            break;
+                            break;                        
                     }
                     int newOperand = ins.operands[operandIndex];
                     if (oldOperand != newOperand) {

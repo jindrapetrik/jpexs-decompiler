@@ -31,17 +31,19 @@ import javax.swing.UIManager;
  * @author JPEXS
  */
 class MyRecentSwatchPanel extends MySwatchPanel {
+
     protected void initValues() {
         swatchSize = UIManager.getDimension("ColorChooser.swatchesRecentSwatchSize", getLocale());
-        numSwatches = new Dimension( 5, 7 );
+        numSwatches = new Dimension(5, 7);
         gap = new Dimension(1, 1);
     }
+
     protected void initColors() {
         Color defaultRecentColor = UIManager.getColor("ColorChooser.swatchesDefaultRecentColor", getLocale());
         int numColors = numSwatches.width * numSwatches.height;
         colors = new Color[numColors];
         String recentColorsStr = Configuration.recentColors.get();
-        for (int i = 0; i < numColors ; i++) {
+        for (int i = 0; i < numColors; i++) {
             colors[i] = defaultRecentColor;
         }
         Pattern hexColorPattern = Pattern.compile("^#(?<a>[a-fA-F0-9]{2})(?<r>[a-fA-F0-9]{2})(?<g>[a-fA-F0-9]{2})(?<b>[a-fA-F0-9]{2})$");
@@ -50,24 +52,25 @@ class MyRecentSwatchPanel extends MySwatchPanel {
             for (int i = 0; i < colorsHex.length; i++) {
                 Matcher m = hexColorPattern.matcher(colorsHex[i]);
                 if (m.matches()) {
-                    colors[i] = new Color(Integer.parseInt(m.group("r"), 16),Integer.parseInt(m.group("g"), 16),Integer.parseInt(m.group("b"), 16), Integer.parseInt(m.group("a"), 16));
+                    colors[i] = new Color(Integer.parseInt(m.group("r"), 16), Integer.parseInt(m.group("g"), 16), Integer.parseInt(m.group("b"), 16), Integer.parseInt(m.group("a"), 16));
                 }
             }
-        }        
+        }
     }
+
     public void setMostRecentColor(Color c) {
         if (colors[0].equals(c)) {
             return;
         }
-        System.arraycopy( colors, 0, colors, 1, colors.length-1);
+        System.arraycopy(colors, 0, colors, 1, colors.length - 1);
         colors[0] = c;
-        
+
         List<String> colorsAsStr = new ArrayList<>();
         for (int i = 0; i < colors.length; i++) {
             colorsAsStr.add(new RGBA(colors[i]).toHexARGB());
         }
         Configuration.recentColors.set(String.join(",", colorsAsStr));
-        
+
         repaint();
-    }   
+    }
 }

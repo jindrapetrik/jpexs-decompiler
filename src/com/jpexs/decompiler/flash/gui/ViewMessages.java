@@ -136,6 +136,14 @@ public class ViewMessages {
         });
         return ret[0];
     }
+
+    public static String showInputDialog(Component parentComponent, final Object message, final String title, final Icon icon, final Object initialSelection) {
+        final String[] ret = new String[1];
+        View.execInEventDispatch(() -> {
+            ret[0] = (String) JOptionPane.showInputDialog(parentComponent, message, title, JOptionPane.QUESTION_MESSAGE, icon, null, initialSelection);
+        });
+        return ret[0];
+    }
     
     public static Color showColorDialog(Component parentComponent, Color initialColor, boolean withTransparency) {
         MyColorChooserDialog colorDialog = new MyColorChooserDialog(parentComponent, initialColor, withTransparency);

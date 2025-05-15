@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -43,7 +44,7 @@ public class InAVM2Item extends BinaryOpItem {
      * @param object Object
      */
     public InAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
     }
 
     @Override

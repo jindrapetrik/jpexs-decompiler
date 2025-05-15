@@ -700,7 +700,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
     /**
      * Converts to array.
      *
-     * @param the array into which the elements of this collection are to be
+     * @param value the array into which the elements of this collection are to be
      * stored, if it is big enough; otherwise, a new array of the same runtime
      * type is allocated for this purpose.
      * @param <T> Type
@@ -708,19 +708,19 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] a) {
-        if (a.length != size) {
-            a = (T[]) new AVM2InstructionItem[size];
+    public <T> T[] toArray(T[] value) {
+        if (value.length != size) {
+            value = (T[]) new AVM2InstructionItem[size];
         }
 
         AVM2InstructionItem item = firstItem;
         if (item == null) {
-            return a;
+            return value;
         }
 
         int i = 0;
         do {
-            a[i] = (T) item;
+            value[i] = (T) item;
             item = item.next;
             i++;
         } while (item != firstItem);

@@ -182,7 +182,12 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "false"                        |
   "null"                         |
   "this"                         |
-  "true"                         { return token(TokenType.KEYWORD); }
+  "true"                         |
+  "delete"                       |
+  "instanceof"                   |
+  "new"                          |
+  "typeof"                       |
+  "void"                         { return token(TokenType.KEYWORD); }
 
 
   {RegExp}                       { 
@@ -244,12 +249,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "%="                           |
   "<<="                          |
   ">>="                          |
-  ">>>="                         |
-  "delete"                       |
-  "instanceof"                   |
-  "new"                          |
-  "typeof"                       |
-  "void"                         |
+  ">>>="                         |  
  {NewVector}                     |
   "@"                            { return token(TokenType.OPERATOR); }
 

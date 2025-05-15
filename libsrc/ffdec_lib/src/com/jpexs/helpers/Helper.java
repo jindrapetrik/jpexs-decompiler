@@ -46,6 +46,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
@@ -1739,7 +1740,7 @@ public class Helper {
 
     public static byte[] downloadUrl(String urlString) throws IOException {
         String proxyAddress = Configuration.updateProxyAddress.get();
-        URL url = new URL(urlString);
+        URL url = URI.create(urlString).toURL();
 
         URLConnection uc;
         if (proxyAddress != null && !proxyAddress.isEmpty()) {

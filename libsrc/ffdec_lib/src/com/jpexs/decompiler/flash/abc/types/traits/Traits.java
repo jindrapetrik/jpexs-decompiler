@@ -313,9 +313,9 @@ public class Traits implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(int swfVersion, DottedChain packageName, Reference<Boolean> first, AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {     
+    public GraphTextWriter toString(int swfVersion, DottedChain packageName, Reference<Boolean> first, AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
         List<Trait> ordered = traits;
-        
+
         for (Trait trait : ordered) {
             int t = traits.indexOf(trait);
             if (traitTypes != null) {
@@ -336,23 +336,23 @@ public class Traits implements Cloneable, Serializable {
             if (ignoredTraitNames.contains(trait.getName(abc).getName(abc.constants, new ArrayList<>(), false, false))) {
                 continue;
             }
-            
+
             if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait) && isStatic) {
                 continue;
             }
-            
+
             if (!first.getVal()) {
-                writer.newLine();     
+                writer.newLine();
             }
             first.setVal(false);
-            int h = abc.getGlobalTraitId(TraitType.METHOD , isStatic, classIndex, t);
+            int h = abc.getGlobalTraitId(TraitType.METHOD, isStatic, classIndex, t);
             writer.startTrait(h);
             if (makePackages) {
                 trait.toStringPackaged(swfVersion, abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             } else {
                 trait.toString(swfVersion, abcIndex, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
-            writer.endTrait();            
+            writer.endTrait();
         }
         return writer;
     }

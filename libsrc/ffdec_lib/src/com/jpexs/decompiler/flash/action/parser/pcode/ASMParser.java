@@ -422,10 +422,12 @@ public class ASMParser {
         ActionList list = new ActionList(charset);
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
-        ActionConstantPool cpool = new ActionConstantPool(constantPool, charset);
-        cpool.setAddress(address);
-        address += cpool.getTotalActionLength();
-        list.add(cpool);
+        if (!constantPool.isEmpty()) {
+            ActionConstantPool cpool = new ActionConstantPool(constantPool, charset);
+            cpool.setAddress(address);
+            address += cpool.getTotalActionLength();
+            list.add(cpool);
+        }
 
         while (true) {
             ASMParsedSymbol symb = lexer.lex();

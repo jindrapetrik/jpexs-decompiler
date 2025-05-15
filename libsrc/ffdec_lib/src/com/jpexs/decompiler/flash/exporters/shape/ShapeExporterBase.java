@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.FillStyle;
 import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -57,8 +56,6 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private final List<LineStyle> _lineStyles;
 
     private final List<List<IEdge>> _fillPaths;
-
-    private final List<List<IEdge>> _aliasedFillPaths;
 
     private final List<List<IEdge>> _linePaths;
 
@@ -109,26 +106,22 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
             // Create edge maps
             List<Map<Integer, List<IEdge>>> fillEdgeMaps = new ArrayList<>();
-            List<Map<Integer, List<IEdge>>> aliasedFillEdgeMaps = new ArrayList<>();
             List<Map<Integer, List<IEdge>>> lineEdgeMaps = new ArrayList<>();
             try {
-                createEdgeMaps(shapeNum, shape, fillStyles, lineStyles, fillEdgeMaps, aliasedFillEdgeMaps, lineEdgeMaps);
+                createEdgeMaps(shapeNum, shape, fillStyles, lineStyles, fillEdgeMaps, lineEdgeMaps);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
             int count = lineEdgeMaps.size();
             List<List<IEdge>> fillPaths = new ArrayList<>(count);
-            List<List<IEdge>> aliasedFillPaths = new ArrayList<>(count);
             List<List<IEdge>> linePaths = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 fillPaths.add(createPathFromEdgeMap(fillEdgeMaps.get(i)));
-                aliasedFillPaths.add(createPathFromEdgeMap(aliasedFillEdgeMaps.get(i)));
                 linePaths.add(createPathFromEdgeMap(lineEdgeMaps.get(i)));
             }
-
+            
             cachedData = new ShapeExportData();
             cachedData.fillPaths = fillPaths;
-            cachedData.aliasedFillPaths = aliasedFillPaths;
             cachedData.linePaths = linePaths;
             cachedData.fillStyles = fillStyles;
             cachedData.lineStyles = lineStyles;
@@ -138,7 +131,6 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         _fillStyles = cachedData.fillStyles;
         _lineStyles = cachedData.lineStyles;
         _fillPaths = cachedData.fillPaths;
-        _aliasedFillPaths = cachedData.aliasedFillPaths;
         _linePaths = cachedData.linePaths;
     }
 
@@ -158,12 +150,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         beginShape();
         // Export fills and strokes for each group separately
         for (int i = 0; i < _linePaths.size(); i++) {
-
-            if (Configuration.fixAntialiasConflation.get()) {
-                exportFillPath(_aliasedFillPaths.get(i), true);
-            }
             // Export fills first
-            exportFillPath(_fillPaths.get(i), false);
+            exportFillPath(_fillPaths.get(i));
             // Export strokes last
             exportLinePath(_linePaths.get(i));
         }
@@ -172,7 +160,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     }
 
     private void createEdgeMaps(int shapeNum, SHAPE shape, List<FillStyle> fillStyles, List<LineStyle> lineStyles,
-            List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> aliasedFillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
+            List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
         int xPos = 0;
         int yPos = 0;
         int fillStyleIdxOffset = 0;
@@ -183,14 +171,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         List<IEdge> subPath = new ArrayList<>();
         Map<Integer, List<IEdge>> currentFillEdgeMap = new HashMap<>();
         Map<Integer, List<IEdge>> currentLineEdgeMap = new HashMap<>();
-        Map<Integer, List<IEdge>> currentAliasedFillEdgeMap = new HashMap<>();
         List<SHAPERECORD> records = shape.shapeRecords;
         for (int i = 0; i < records.size(); i++) {
             SHAPERECORD shapeRecord = records.get(i);
             if (shapeRecord instanceof StyleChangeRecord) {
                 StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
                 if (styleChangeRecord.stateLineStyle || styleChangeRecord.stateFillStyle0 || styleChangeRecord.stateFillStyle1) {
-                    processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap, currentAliasedFillEdgeMap);
+                    processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
                     subPath = new ArrayList<>();
                 }
                 if (styleChangeRecord.stateNewStyles) {
@@ -209,13 +196,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         && styleChangeRecord.stateFillStyle0 && styleChangeRecord.fillStyle0 == 0
                         && styleChangeRecord.stateFillStyle1 && styleChangeRecord.fillStyle1 == 0) {
                     cleanEdgeMap(currentFillEdgeMap);
-                    cleanEdgeMap(currentAliasedFillEdgeMap);
                     cleanEdgeMap(currentLineEdgeMap);
                     fillEdgeMaps.add(currentFillEdgeMap);
-                    aliasedFillEdgeMaps.add(currentAliasedFillEdgeMap);
                     lineEdgeMaps.add(currentLineEdgeMap);
                     currentFillEdgeMap = new HashMap<>();
-                    currentAliasedFillEdgeMap = new HashMap<>();
                     currentLineEdgeMap = new HashMap<>();
                     currentLineStyleIdx = 0;
                     currentFillStyleIdx0 = 0;
@@ -268,62 +252,37 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 subPath.add(new CurvedEdge(xPosFrom, yPosFrom, xPosControl, yPosControl, xPos, yPos, currentLineStyleIdx, currentFillStyleIdx1));
             } else if (shapeRecord instanceof EndShapeRecord) {
                 // We're done. Process the last subpath, if any
-                processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap, currentAliasedFillEdgeMap);
+                processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap);
                 cleanEdgeMap(currentFillEdgeMap);
-                cleanEdgeMap(currentAliasedFillEdgeMap);
                 cleanEdgeMap(currentLineEdgeMap);
                 fillEdgeMaps.add(currentFillEdgeMap);
-                aliasedFillEdgeMaps.add(currentAliasedFillEdgeMap);
                 lineEdgeMaps.add(currentLineEdgeMap);
             }
         }
     }
 
     private void processSubPath(List<IEdge> subPath, int lineStyleIdx, int fillStyleIdx0, int fillStyleIdx1,
-            Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap, Map<Integer, List<IEdge>> currentAliasedFillEdgeMap) {
+            Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap) {
         List<IEdge> path;
-        List<IEdge> apath = null;
-        boolean bothFillStyles = fillStyleIdx0 != 0 && fillStyleIdx1 != 0;
         if (fillStyleIdx0 != 0) {
-            path = currentFillEdgeMap.get(fillStyleIdx0);
-            if (bothFillStyles) {
-                apath = currentAliasedFillEdgeMap.get(fillStyleIdx0);
-            }
+            path = currentFillEdgeMap.get(fillStyleIdx0);            
             if (path == null) {
                 path = new ArrayList<>();
                 currentFillEdgeMap.put(fillStyleIdx0, path);
             }
-            if (bothFillStyles && apath == null) {
-                apath = new ArrayList<>();
-                currentAliasedFillEdgeMap.put(fillStyleIdx0, apath);
-            }
             for (int j = subPath.size() - 1; j >= 0; j--) {
                 IEdge rev = subPath.get(j).reverseWithNewFillStyle(fillStyleIdx0);
-                //System.err.println("appending reversed " + rev);
                 path.add(rev);
-                if (bothFillStyles) {
-                    apath.add(rev);
-                }
             }
 
         }
         if (fillStyleIdx1 != 0) {
-            /*if (bothFillStyles) {
-                apath = currentAliasedFillEdgeMap.get(fillStyleIdx1);
-            }*/
             path = currentFillEdgeMap.get(fillStyleIdx1);
             if (path == null) {
                 path = new ArrayList<>();
                 currentFillEdgeMap.put(fillStyleIdx1, path);
             }
-            /*if (bothFillStyles && apath == null) {
-                apath = new ArrayList<>();
-                currentAliasedFillEdgeMap.put(fillStyleIdx1, apath);                        
-            }*/
-            appendEdges(path, subPath);
-            /*if (bothFillStyles) {
-                appendEdges(apath, subPath);
-            }*/
+            appendEdges(path, subPath);            
         }
         if (lineStyleIdx != 0) {
             path = currentLineEdgeMap.get(lineStyleIdx);
@@ -335,16 +294,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         }
     }
 
-    private void exportFillPath(List<IEdge> path, boolean aliased) {
+    private void exportFillPath(List<IEdge> path) {
         int posX = Integer.MAX_VALUE;
         int posY = Integer.MAX_VALUE;
         int fillStyleIdx = Integer.MAX_VALUE;
-        if (path.size() > 0) {
-            if (aliased) {
-                beginAliasedFills();
-            } else {
-                beginFills();
-            }
+        if (!path.isEmpty()) {
+            beginFills();
             for (int i = 0; i < path.size(); i++) {
                 IEdge e = path.get(i);
                 if (fillStyleIdx != e.getFillStyleIdx()) {
@@ -419,7 +374,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         int lastMoveToX = posX;
         int lastMoveToY = posY;
         int lineStyleIdx = Integer.MAX_VALUE;
-        if (path.size() > 0) {
+        if (!path.isEmpty()) {
             boolean autoClose = true;
             beginLines();
             for (int i = 0; i < path.size(); i++) {
@@ -544,13 +499,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private void cleanEdgeMap(Map<Integer, List<IEdge>> edgeMap) {
         for (Integer styleIdx : edgeMap.keySet()) {
             List<IEdge> subPath = edgeMap.get(styleIdx);
-            if (subPath != null && subPath.size() > 0) {
+            if (subPath != null && !subPath.isEmpty()) {
                 int idx;
                 IEdge prevEdge = null;
                 List<IEdge> tmpPath = new ArrayList<>();
                 Map<Long, List<IEdge>> coordMap = createCoordMap(subPath);
                 Map<Long, List<IEdge>> reverseCoordMap = createReverseCoordMap(subPath);
-                while (subPath.size() > 0) {
+                while (!subPath.isEmpty()) {
                     idx = 0;
                     while (idx < subPath.size()) {
                         if (prevEdge != null) {
@@ -661,7 +616,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private IEdge findNextEdgeInCoordMap(Map<Long, List<IEdge>> coordMap, IEdge edge) {
         long toLong = (((long) edge.getToX()) << 32) | (edge.getToY() & 0xffffffffL);
         List<IEdge> coordMapArray = coordMap.get(toLong);
-        if (coordMapArray != null && coordMapArray.size() > 0) {
+        if (coordMapArray != null && !coordMapArray.isEmpty()) {
             return coordMapArray.get(0);
         }
         return null;

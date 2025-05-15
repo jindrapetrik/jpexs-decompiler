@@ -129,7 +129,6 @@ anttask
 antversion
 anzeigen
 aos
-apath
 apgeneratedsrcdir
 APICOM
 apiprivate
@@ -165,6 +164,7 @@ asinterface
 Asize
 asms
 asoc
+Asociation
 ASQ
 asr
 asre
@@ -462,6 +462,7 @@ CGJ
 CGMS
 CGMSA
 chainedmapper
+changeimport
 changeinplace
 changeslog
 channelnumber
@@ -495,7 +496,6 @@ cindex
 cindices
 cinepak
 cinit
-cinitcode
 cint
 citem
 citt
@@ -539,7 +539,6 @@ clonesprite
 closeall
 clpbrd
 CLSIDs
-clsname
 clt
 cmap
 Cmb
@@ -910,7 +909,6 @@ dumpsplit
 dumpswf
 dumpview
 DUPLICATEMOVIECLIP
-dvai
 dval
 DVD
 dvf
@@ -1402,7 +1400,7 @@ hasnext
 HASPARENT
 Hausmatt
 Hauspie
-Haxe
+haxe
 hbitmap
 hbm
 hbmp
@@ -1443,7 +1441,6 @@ hiliter
 hinst
 HITTEST
 HIWORD
-HKCU
 HKEYBy
 HKLM
 HLayout
@@ -1492,6 +1489,7 @@ HWNDFIRST
 HWNDLAST
 HWNDNEXT
 HWNDPREV
+hxml
 Hzre
 iae
 iai
@@ -1927,6 +1925,7 @@ linkreport
 linmax
 listconfigs
 Listswf
+livedocs
 lix
 ljcb
 ljrb
@@ -2223,7 +2222,6 @@ movieclip
 moviesfolder
 MPEGLAYER
 mpis
-mru
 msb
 msc
 MSDTC
@@ -3806,6 +3804,7 @@ USETHUMBS
 USHIFT
 USHOR
 usre
+ustom
 UWORD
 uwyn
 vaact
@@ -3833,7 +3832,6 @@ VCP
 vdata
 vdir
 velikost
-VERBNAME
 VERDATE
 verifyop
 verifypass
@@ -4013,6 +4011,7 @@ xorval
 xpacket
 xpathsyntaxkit
 XPels
+XPoint
 xpos
 xrefs
 xscale
@@ -4059,6 +4058,7 @@ yorig
 yourfile
 Yoyodyne
 YPels
+YPoint
 ypos
 YRef
 yscale

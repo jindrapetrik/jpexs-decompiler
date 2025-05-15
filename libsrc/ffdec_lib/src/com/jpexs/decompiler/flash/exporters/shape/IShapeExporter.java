@@ -39,11 +39,6 @@ public interface IShapeExporter {
     public void endShape();
 
     /**
-     * Begins aliased fills.
-     */
-    public void beginAliasedFills();
-
-    /**
      * Begins fills.
      */
     public void beginFills();

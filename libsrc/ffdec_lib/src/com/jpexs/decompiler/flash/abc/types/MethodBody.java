@@ -447,9 +447,10 @@ public final class MethodBody implements Cloneable {
      * @param initTraits Initial traits
      * @param firstLevel First level
      * @param seenMethods Seen methods
+     * @param initTraitClasses Class ids which traits to init
      * @throws InterruptedException On interrupt
      */
-    public void convert(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, Traits initTraits, boolean firstLevel, Set<Integer> seenMethods) throws InterruptedException {
+    public void convert(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, Traits initTraits, boolean firstLevel, Set<Integer> seenMethods, List<Integer> initTraitClasses) throws InterruptedException {
         seenMethods.add(this.method_info);
         if (debugMode) {
             System.err.println("Decompiling " + path);
@@ -472,7 +473,7 @@ public final class MethodBody implements Cloneable {
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
-                                convertedItems1 = converted.getCode().toGraphTargetItems(swfVersion, callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>()); //converted.getCode().visitCode(converted)
+                                convertedItems1 = converted.getCode().toGraphTargetItems(swfVersion, callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>(), initTraitClasses); //converted.getCode().visitCode(converted)
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
                                 Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion));
@@ -660,7 +661,7 @@ public final class MethodBody implements Cloneable {
         ConvertData convertData = new ConvertData();
         convertData.deobfuscationMode = 0;
         try {
-            convert(swfVersion, callStack, abcIndex, convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, seenMethods);
+            convert(swfVersion, callStack, abcIndex, convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, seenMethods, new ArrayList<>());
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             writer.indent().indent().indent();
             toString(swfVersion, callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods);

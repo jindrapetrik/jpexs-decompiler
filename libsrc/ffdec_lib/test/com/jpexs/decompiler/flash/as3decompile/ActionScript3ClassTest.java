@@ -45,6 +45,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         addSwf("standard", "testdata/as3_new/bin/as3_new.flex.swf");
         addSwf("assembled", "testdata/as3_assembled/bin/as3_assembled.swf");
         addSwf("getouterscope", "testdata/getouterscope/getouterscope.swf");
+        addSwf("haxe", "testdata/haxe/output.swf");
     }
 
     private void decompileScriptPack(String swfId, String path, String expectedResult) {
@@ -718,6 +719,33 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   trace(v);\n"
                 + "}\n"
                 + "TestHello;\n"
+        );
+    }
+
+    @Test
+    public void testHaxeStaticVars() {
+        /*
+        Static vars in Haxe are initialized in script initializer (normal flash uses class initializer)
+        */
+        decompileScriptPack("haxe", "tests_classes.TestStaticVars", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestStaticVars\n"
+                + "   {\n"
+                + "      public static var sa:int = 1001;\n"
+                + "      \n"
+                + "      public static var sb:int = 1002;\n"
+                + "      \n"
+                + "      public var b:int;\n"
+                + "      \n"
+                + "      public var a:int;\n"
+                + "      \n"
+                + "      public function TestStaticVars(param1:int, param2:int)\n"
+                + "      {\n"
+                + "         a = param1;\n"
+                + "         b = param2;\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
         );
     }
 }

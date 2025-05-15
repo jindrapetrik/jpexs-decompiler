@@ -1998,6 +1998,15 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testTernarOperator2() {
+        decompileMethod("classic_air", "testTernarOperator2", "var b:Boolean = true;\r\n"
+                + "var i:int = 1;\r\n"
+                + "var j:int = int(b ? i : i + 1);\r\n"
+                + "var k:int = int(i ? j : j + 1);\r\n",
+                 false);
+    }
+
+    @Test
     public void testTry() {
         decompileMethod("classic_air", "testTry", "var i:int = 0;\r\n"
                 + "i = 7;\r\n"

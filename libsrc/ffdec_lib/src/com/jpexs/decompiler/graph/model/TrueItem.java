@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -36,11 +37,13 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      */
-    public TrueItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+    public TrueItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns) {
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override
@@ -65,7 +68,7 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new FalseItem(getSrc(), getLineStartItem());
+        return new FalseItem(dialect, getSrc(), getLineStartItem());
     }
 
     @Override

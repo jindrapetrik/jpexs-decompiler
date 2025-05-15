@@ -111,7 +111,7 @@ public class ShapeFixer {
         //int oldpct = 0;
         loopi1:
         for (int i1 = 0; i1 < shapes.size(); i1++) {
-            int layer = layers.get(i1);
+            int layer = layers.get(i1);                                
             /*if (i1 % 10 == 0) {
                 int pct = i1 * 100 / shapes.size();
                 if (oldpct != pct) {
@@ -132,6 +132,20 @@ public class ShapeFixer {
                     if (layers.get(i2) != layer) {
                         continue;
                     }
+                    
+                    
+                    //its with fills vs stroke only, we can ignore these, I hope
+                    if (fillStyles0.get(i1) == 0 
+                            && fillStyles1.get(i1) == 0
+                            && (fillStyles0.get(i2) != 0 || fillStyles1.get(i2) != 0)) {
+                        continue;
+                    }
+                    if (fillStyles0.get(i2) == 0 
+                            && fillStyles1.get(i2) == 0
+                            && (fillStyles0.get(i1) != 0 || fillStyles1.get(i1) != 0)) {
+                        continue;
+                    }
+                    
                     loopj2:
                     for (int j2 = 0; j2 < shapes.get(i2).size(); j2++) {
                         BezierEdge be2 = shapes.get(i2).get(j2);
@@ -158,7 +172,8 @@ public class ShapeFixer {
                         }
 
                         //duplicated edge
-                        if (be1.equals(be2) || be1.equalsReverse(be2)) {
+                        if ((be1.equals(be2) || be1.equalsReverse(be2))
+                                && (lineStyles.get(i1) == lineStyles.get(i2))) {
                             shapes.get(i2).remove(j2);
                             if (i1 == i2 && j1 > j2) {
                                 j1--;
@@ -204,8 +219,8 @@ public class ShapeFixer {
                                     && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
                                 continue;
                             }
-                        }
-
+                        }                       
+                        
                         if (DEBUG_PRINT) {
                             System.err.println("intersects " + be1.toSvg() + "   " + be2.toSvg());
                             System.err.println(" fillstyle0: " + fillStyles0.get(i1) + " , " + fillStyles0.get(i2));

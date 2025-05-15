@@ -1,6 +1,96 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- [#2427] Commandline export with use of imported SWFs (importAssets tag)
+- Auto detect scale factor on Hi-dpi displays
+- [#1826] Option to extend shape area by half pixel to fix antialias conflation artifacts
+- Icons for Simple editor library folders
+- [#2448] Simple editor - Option to turn off half transparent parent layers
+- Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)
+- [#2370] Objects display - Option to show horizontal and vertical rulers
+- [#2370] Objects display - Create guides by dragging from a ruler
+- Objects dragging - show touch point and snap it to 9 important points around object rectangle
+- [#2370] Snap to guides, objects and pixels, Snap align, toggle with magnet icon
+- [#2370] Show/Hide guides, lock guides, clear guides actions from icon menu
+- Display grid, snap to grid
+- [#2370] Snap align border space, object spacing, center alignment
+- [#2370] Setting for color and snap accuracy for guides, grid
+- [#2370] Dialogs for editing grid, guides and snapping
+- [#2453] SVG export/import - use image-rendering attribute for image smoothing
+- Option to enter custom zoom level by clicking on zoom percentage label
+- Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)
+- Simple editor - change background color
+- Simple editor - filters
+- Simple editor - convolution filter presets
+- Simple editor - ratio (shapetweens, video)
+
+### Fixed
+- [#2424] DefineEditText handling of letterSpacing, font size on incorrect values
+- [#2391] Double not operator in ternar operator expression
+- [#2436] PDF export clipping - missing colors / text
+- [#2437] AS1 P-code - do not group pushes automatically
+- [#2437] AS1 - use Constant pool only on FP5+
+- [#2430] AS1/2/3 - Missing syntax hilighting of "new" keyword and few others
+- [#2428] Charset setting on FLA export in format MX and below
+- [#2428] Default charset for SWFS v5 and lower is WINDOWS-1252
+- [#2418] AS3 - initialization of class static vars in script initializer (Haxe)
+- [#2397] DefineScalingGrid - improper scaling on negative Xmin, Ymin
+- [#2425] ZIP/SWC reading - "Only DEFLATED entries can have EXT descriptor" message
+- Drawing points and shape paths highlighting did not respect UI scale factor
+- [#2416] FLA export - shape fixing in some cases
+- [#2394] FLA export - shape tweens in some cases
+- Not resetting timeline after shape tag type conversion
+- [#2400] Transforming - buttons must use hit test frame outline
+- [#2413] AS3 direct editation - try/catch clause in instance initializer
+- [#2386] Editor mode - not able to save shape/morphshape points
+- Loading icon did not respect UI scale factor
+- Editor (JSyntaxPane) incorrectly draws line numbers panel on Hi-dpi displays
+- Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly
+- Incorrect icons for `New empty` action - with dashed borders
+- [#2443] SVG importer - converting cubic bezier curves to quadratic
+- [#2444] SVG importer - improper stroke width when using width/height with viewBox
+- [#2444] SVG importer - stroke width not respecting transforms
+- [#2415] AS3 direct editation - nested functions - prefer callstack variables over prototype chain
+- AS3 - AIR float support - incorrect writing float values to output stream
+- AS3 - AIR float support - ABC Explorer incorrectly calculating float usages (For clean action, etc.)
+- [#2446] Nightly version asked for update to previous stable
+- [#2447] SVG import - gradients can inherit (href) from other gradient types (radial vs linear)
+- [#2450] Morphshape replace button/menu is not working (throws exception due to missing icon)
+- [#2355] AS1/2/3 Simplify expressions feature colliding with some other features like hex values
+- Exception on FFDec start when simple editor is on
+- [#2419] AS3 - There should be empty line after class header
+- AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered
+- AS 1/2 - Remembering caret position for frames
+- Cleaner file association
+- Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)
+- Exceptions when closing non-ribbon window
+- [PR215] ffdec.sh - Ignore all java options when checking version
+- Text search was not available as context menu option for AS3 scripts folder
+- [#2454] SVG export - color matrix not applied to images
+- [PR216] ffdec.sh - Support BSD version of sed in java version checks
+- Simple editor - adding a library item to the last frame adds a frame
+- Simple editor - white square on top left corner of the timeline
+- Bevel and Glow filters incorrect rendering
+- Incorrect cursor handling when placed object has filters
+- FLA export - Rounding errors on COLORMATRIXFILTER contrast
+- Filters - image bounds
+- Simple editor - Exceptions caused by not setting timelined when modifying PlaceObject
+- [#2455] Commandline export ConcurrentModificationException
+- [#1962] Close button could close more than one file at once
+- Simple editor - Selecting previous SWF when swf close
+
+### Changed
+- An item selected in the tag tree is needed for actions to be available.
+  Also SWF node is selected by default on first SWF opening.
+
+### Removed
+- Option to preview flash items via ActiveX component is no longer available.
+  FFDec now supports its internal flash viewer only.
+- Windows installer does not associate SWF files anymore as it caused false positives on some AVs.
+  You can associate them later in FFDec settings.
+
 ## [22.0.2] - 2025-01-17
 ### Added
 - FLA export - accessibility for AS3 files
@@ -16,6 +106,7 @@ All notable changes to this project will be documented in this file.
 - [#2394] Broken AS1/2 deobfuscation on incorrect length of ActionStrictMode,
 - [#2394] AS1/2 ActionStrictMode with mode larger than 1 now ignored
 - [#2393] AS1/2 ActionGotoFrame2 P-code trailing comma
+- [#2407] Replace commandline command for AS1/2 scripts must use export names
 
 ## [22.0.1] - 2024-11-20
 ### Added
@@ -3517,6 +3608,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.2...dev
 [22.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.1...version22.0.2
 [22.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.0...version22.0.1
 [22.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...version22.0.0
@@ -3684,13 +3776,43 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2427]: https://www.free-decompiler.com/flash/issues/2427
+[#1826]: https://www.free-decompiler.com/flash/issues/1826
+[#2448]: https://www.free-decompiler.com/flash/issues/2448
+[#2370]: https://www.free-decompiler.com/flash/issues/2370
+[#2453]: https://www.free-decompiler.com/flash/issues/2453
+[#2424]: https://www.free-decompiler.com/flash/issues/2424
+[#2391]: https://www.free-decompiler.com/flash/issues/2391
+[#2436]: https://www.free-decompiler.com/flash/issues/2436
+[#2437]: https://www.free-decompiler.com/flash/issues/2437
+[#2430]: https://www.free-decompiler.com/flash/issues/2430
+[#2428]: https://www.free-decompiler.com/flash/issues/2428
+[#2418]: https://www.free-decompiler.com/flash/issues/2418
+[#2397]: https://www.free-decompiler.com/flash/issues/2397
+[#2425]: https://www.free-decompiler.com/flash/issues/2425
+[#2416]: https://www.free-decompiler.com/flash/issues/2416
+[#2394]: https://www.free-decompiler.com/flash/issues/2394
+[#2400]: https://www.free-decompiler.com/flash/issues/2400
+[#2413]: https://www.free-decompiler.com/flash/issues/2413
+[#2386]: https://www.free-decompiler.com/flash/issues/2386
+[#2443]: https://www.free-decompiler.com/flash/issues/2443
+[#2444]: https://www.free-decompiler.com/flash/issues/2444
+[#2415]: https://www.free-decompiler.com/flash/issues/2415
+[#2446]: https://www.free-decompiler.com/flash/issues/2446
+[#2447]: https://www.free-decompiler.com/flash/issues/2447
+[#2450]: https://www.free-decompiler.com/flash/issues/2450
+[#2355]: https://www.free-decompiler.com/flash/issues/2355
+[#2419]: https://www.free-decompiler.com/flash/issues/2419
+[#2454]: https://www.free-decompiler.com/flash/issues/2454
+[#2455]: https://www.free-decompiler.com/flash/issues/2455
+[#1962]: https://www.free-decompiler.com/flash/issues/1962
 [#2375]: https://www.free-decompiler.com/flash/issues/2375
 [#2374]: https://www.free-decompiler.com/flash/issues/2374
 [#2389]: https://www.free-decompiler.com/flash/issues/2389
 [#2381]: https://www.free-decompiler.com/flash/issues/2381
 [#2384]: https://www.free-decompiler.com/flash/issues/2384
-[#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2393]: https://www.free-decompiler.com/flash/issues/2393
+[#2407]: https://www.free-decompiler.com/flash/issues/2407
 [#2366]: https://www.free-decompiler.com/flash/issues/2366
 [#2367]: https://www.free-decompiler.com/flash/issues/2367
 [#2372]: https://www.free-decompiler.com/flash/issues/2372
@@ -4825,6 +4947,8 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
+[PR216]: https://github.com/jindrapetrik/jpexs-decompiler/pull/216
 [PR203]: https://github.com/jindrapetrik/jpexs-decompiler/pull/203
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
 [PR194]: https://github.com/jindrapetrik/jpexs-decompiler/pull/194

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -88,7 +89,7 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
      * @param commands Commands
      */
     public ForEachInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
-        super(instruction, lineStartIns, loop);
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, loop);
 
         /*
          Following was commented out:

@@ -35,17 +35,19 @@ import java.util.List;
 public class Amf0OutputStream extends OutputStream {
 
     private final OutputStream os;
+
     /**
      * Constructor.
      *
      * @param os Output stream
      */
     public Amf0OutputStream(OutputStream os) {
-        this.os = os;        
+        this.os = os;
     }
-    
+
     /**
      * Writes U8 (unsigned 8-bit integer).
+     *
      * @param v Value
      * @throws IOException On I/O error
      */
@@ -55,6 +57,7 @@ public class Amf0OutputStream extends OutputStream {
 
     /**
      * Writes U16 (unsigned 16-bit integer).
+     *
      * @param v Value
      * @throws IOException On I/O error
      */
@@ -64,9 +67,10 @@ public class Amf0OutputStream extends OutputStream {
         write(b1);
         write(b2);
     }
-    
+
     /**
      * Writes S16 (signed 16-bit integer).
+     *
      * @param v Value
      * @throws IOException On I/O error
      */
@@ -76,9 +80,10 @@ public class Amf0OutputStream extends OutputStream {
         write(b1);
         write(b2);
     }
-    
+
     /**
      * Writes U32 (unsigned 32-bit integer).
+     *
      * @param v Value
      * @throws IOException On I/O error
      */
@@ -96,15 +101,17 @@ public class Amf0OutputStream extends OutputStream {
 
     /**
      * Writes double.
+     *
      * @param v Value
      * @throws IOException On I/O error
      */
     public void writeDouble(double v) throws IOException {
         writeLong(Double.doubleToLongBits(v));
     }
-    
+
     /**
      * Writes long.
+     *
      * @param value Value
      * @throws IOException On I/O error
      */
@@ -123,13 +130,14 @@ public class Amf0OutputStream extends OutputStream {
 
     /**
      * Writes bytes.
+     *
      * @param data Data
      * @throws IOException On I/O error
      */
     public void writeBytes(byte[] data) throws IOException {
         os.write(data);
     }
-    
+
     @Override
     public void write(int v) throws IOException {
         os.write(v);
@@ -144,41 +152,41 @@ public class Amf0OutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         os.write(b, off, len);
     }
-    
+
     public void writeUtf8(String value) throws IOException {
         byte[] data = value.getBytes("UTF-8");
         writeU16(data.length);
-        writeBytes(data);  
+        writeBytes(data);
     }
-    
+
     public void writeUtf8Long(String value) throws IOException {
         byte[] data = value.getBytes("UTF-8");
         writeU32(data.length);
-        writeBytes(data);        
+        writeBytes(data);
     }
-    
+
     public void writeObjectProperty(String name, Object value, List<Object> complexObjectsList) throws IOException {
         writeUtf8(name);
         writeValue(value, complexObjectsList);
     }
-    
+
     public void writeUtf8Empty() throws IOException {
         writeU16(0);
     }
-    
+
     public void writeValue(Object value, List<Object> complexObjectsList) throws IOException {
-        
+
         if (value instanceof ComplexObject) {
             int index = complexObjectsList.indexOf(value);
             if (index != -1 && index <= 65535) {
                 write(Marker.REFERENCE);
-                writeU16(index);   
+                writeU16(index);
                 return;
             } else {
                 complexObjectsList.add(value);
             }
         }
-        
+
         if (value instanceof Double) {
             write(Marker.NUMBER);
             writeDouble((Double) value);
@@ -198,7 +206,7 @@ public class Amf0OutputStream extends OutputStream {
             write(Marker.OBJECT);
             ObjectType ot = (ObjectType) value;
             for (String key : ot.properties.keySet()) {
-                writeObjectProperty(key, ot.properties.get(key), complexObjectsList);                
+                writeObjectProperty(key, ot.properties.get(key), complexObjectsList);
             }
             writeUtf8Empty();
             write(Marker.OBJECT_END);
@@ -211,7 +219,7 @@ public class Amf0OutputStream extends OutputStream {
             EcmaArrayType ea = (EcmaArrayType) value;
             writeU32(ea.denseValues.size());
             for (String key : ea.denseValues.keySet()) {
-                writeObjectProperty(key, ea.denseValues.get(key), complexObjectsList);                
+                writeObjectProperty(key, ea.denseValues.get(key), complexObjectsList);
             }
             for (String key : ea.associativeValues.keySet()) {
                 writeObjectProperty(key, ea.associativeValues.get(key), complexObjectsList);
@@ -239,14 +247,14 @@ public class Amf0OutputStream extends OutputStream {
             TypedObjectType tot = (TypedObjectType) value;
             writeUtf8(tot.className);
             for (String key : tot.properties.keySet()) {
-                writeObjectProperty(key, tot.properties.get(key), complexObjectsList);                
+                writeObjectProperty(key, tot.properties.get(key), complexObjectsList);
             }
             writeUtf8Empty();
             write(Marker.OBJECT_END);
         } else {
             throw new IllegalArgumentException("Unsupported value type for serialization");
         }
-        
+
         //TODO: Switching to AMF3 when necessary
     }
 }

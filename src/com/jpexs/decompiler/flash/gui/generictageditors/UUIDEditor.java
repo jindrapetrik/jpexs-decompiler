@@ -165,4 +165,9 @@ public class UUIDEditor extends JTextField implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }  
 }

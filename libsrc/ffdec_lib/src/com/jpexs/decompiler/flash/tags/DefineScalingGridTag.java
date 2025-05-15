@@ -189,10 +189,20 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
     public static void getSlices(ExportRectangle targetBounds, ExportRectangle boundsRect, ExportRectangle scalingGrid, ExportRectangle[] sourceRect, ExportRectangle[] targetRect, Matrix[] transforms) {
 
         double[] src_x = new double[]{boundsRect.xMin, scalingGrid.xMin, scalingGrid.xMax, boundsRect.xMax};
-        double[] dst_x = new double[]{targetBounds.xMin, targetBounds.xMin + scalingGrid.xMin, targetBounds.xMax - (boundsRect.xMax - scalingGrid.xMax), targetBounds.xMax};
+        double[] dst_x = new double[]{
+            targetBounds.xMin, 
+            targetBounds.xMin + scalingGrid.xMin - boundsRect.xMin, 
+            targetBounds.xMax - (boundsRect.xMax - scalingGrid.xMax),
+            targetBounds.xMax
+        };
 
         double[] src_y = new double[]{boundsRect.yMin, scalingGrid.yMin, scalingGrid.yMax, boundsRect.yMax};
-        double[] dst_y = new double[]{targetBounds.yMin, targetBounds.yMin + scalingGrid.yMin, targetBounds.yMax - (boundsRect.yMax - scalingGrid.yMax), targetBounds.yMax};
+        double[] dst_y = new double[]{
+            targetBounds.yMin, 
+            targetBounds.yMin + scalingGrid.yMin - boundsRect.yMin,
+            targetBounds.yMax - (boundsRect.yMax - scalingGrid.yMax), 
+            targetBounds.yMax
+        };
 
         int pos = 0;
         for (int sy = 0; sy < 3; sy++) {

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -47,7 +48,7 @@ public class DivideAVM2Item extends BinaryOpItem implements CompoundableBinaryOp
      * @param rightSide Right side
      */
     public DivideAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/", "Number", "Number");
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/", "Number", "Number");
     }
 
     @Override

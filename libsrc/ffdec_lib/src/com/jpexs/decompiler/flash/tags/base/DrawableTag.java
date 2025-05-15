@@ -99,12 +99,13 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @param unzoom Unzoom
      * @param sameImage Same image
      * @param viewRect View rectangle
+     * @param viewRectRaw View rectangle raw
      * @param scaleStrokes Scale strokes
      * @param drawMode Draw mode
      * @param blendMode Blend mode
      * @param canUseSmoothing Can use smoothing
      */
-    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing);
+    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing);
 
     /**
      * Converts the drawable to SVG.

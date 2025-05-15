@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types.filters;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.SerializableImage;
@@ -43,6 +44,13 @@ public abstract class FILTER implements Serializable {
     public int id;
 
     /**
+     * FILTER is enabled. Used internally by Simple editor GUI. Not a real SWF
+     * field.
+     */
+    @Internal
+    public boolean enabled = true;
+
+    /**
      * Constructor
      *
      * @param id Type identifier
@@ -53,6 +61,7 @@ public abstract class FILTER implements Serializable {
 
     /**
      * Applies filter to image.
+     *
      * @param src Image to apply filter to
      * @param zoom Zoom level
      * @param srcX X coordinate of the source rectangle
@@ -65,18 +74,21 @@ public abstract class FILTER implements Serializable {
 
     /**
      * Gets delta X
+     *
      * @return Delta X
      */
     public abstract double getDeltaX();
 
     /**
      * Gets delta Y
+     *
      * @return Delta Y
      */
     public abstract double getDeltaY();
 
     /**
      * Converts filter to SVG.
+     *
      * @param document Document
      * @param filtersElement Filters element
      * @param exporter SVG exporter
@@ -87,6 +99,7 @@ public abstract class FILTER implements Serializable {
 
     /**
      * Converts drop shadow to SVG.
+     *
      * @param distance Distance
      * @param angle Angle
      * @param dropShadowColor Drop shadow color
@@ -247,6 +260,7 @@ public abstract class FILTER implements Serializable {
 
     /**
      * Converts blur to SVG.
+     *
      * @param blurX Blur X
      * @param blurY Blur Y
      * @param iterations Iterations
@@ -299,5 +313,48 @@ public abstract class FILTER implements Serializable {
         filtersElement.appendChild(element);
 
         return blurSvg(blurX, blurY, iterations - 1, document, filtersElement, exporter, result);
+    }
+
+    /**
+     * Converts gradient ratios to Java format float ratios.
+     * @param input 0-255 values
+     * @return 0f - 1f values, strictly increasing
+     */
+    public static float[] convertRatiosToJavaGradient(int[] input) {
+        int n = input.length;
+        float[] output = new float[n];
+        final float max = 1.0f;
+        final float epsilon = 0.000001f;
+
+        for (int i = 0; i < n; i++) {
+            output[i] = input[i] / 255f;
+        }
+
+        for (int i = 1; i < n; i++) {
+            if (output[i] <= output[i - 1]) {
+                float proposed = output[i - 1] + epsilon;
+
+                if (proposed > max) {
+                    int j = i - 1;
+                    while (j >= 0 && output[j] >= (max - (i - j) * epsilon)) {
+                        j--;
+                    }
+
+                    if (j < 0) {
+                        for (int k = i - (i); k <= i; k++) {
+                            output[k] = max - (i - k) * epsilon;
+                        }
+                    } else {
+                        for (int k = j + 1; k <= i; k++) {
+                            output[k] = output[k - 1] + epsilon;
+                        }
+                    }
+                } else {
+                    output[i] = proposed;
+                }
+            }
+        }
+
+        return output;
     }
 }

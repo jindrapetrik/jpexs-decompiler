@@ -41,7 +41,6 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
     private final int methodIndex;
     private final int traitIndex;
 
-            
     /**
      *
      * @param instruction
@@ -58,7 +57,7 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
     public TraitSlotConstAVM2Item(
             GraphSourceItem instruction,
             GraphSourceItem lineStartIns,
-            TraitSlotConst trait, 
+            TraitSlotConst trait,
             GraphTargetItem assignedValue,
             boolean isStatic,
             int scriptIndex,
@@ -66,7 +65,7 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
             int initializer,
             int methodIndex,
             int traitIndex
-            ) {
+    ) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.trait = trait;
         this.assignedValue = assignedValue;
@@ -80,28 +79,28 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        
+
         writer.endMethod();
         writer.endTrait();
-        
+
         int h = traitIndex;
         if (initializer != GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
-            h = localData.abc.getGlobalTraitId(TraitType.METHOD , isStatic, classIndex, traitIndex);
+            h = localData.abc.getGlobalTraitId(TraitType.METHOD, isStatic, classIndex, traitIndex);
         }
         writer.startTrait(h);
         ConvertData cd = new ConvertData();
         cd.assignedValues.put(trait, new AssignedValue(null, assignedValue, initializer, methodIndex));
-        boolean insideInterface = classIndex > -1 ? localData.abc.instance_info.get(classIndex).isInterface() : false;        
+        boolean insideInterface = classIndex > -1 ? localData.abc.instance_info.get(classIndex).isInterface() : false;
         trait.toString(
                 localData.swfVersion,
                 localData.abcIndex,
                 DottedChain.EMPTY /*??*/,
-                null, 
+                null,
                 cd,
-                "trait " + trait.getName(localData.abc), 
-                localData.abc, 
-                isStatic, 
-                localData.exportMode, 
+                "trait " + trait.getName(localData.abc),
+                localData.abc,
+                isStatic,
+                localData.exportMode,
                 scriptIndex,
                 classIndex,
                 writer,
@@ -110,9 +109,9 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
                 insideInterface
         );
         writer.endTrait();
-        
+
         writer.startTrait(initializer);
-        writer.startMethod(methodIndex, null);        
+        writer.startMethod(methodIndex, null);
         return writer;
     }
 
@@ -124,17 +123,17 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         return null;
-    }        
+    }
 
     @Override
     public boolean needsSemicolon() {
         return false;
-    }    
+    }
 
     @Override
     public boolean hasSingleNewLineAround() {
         return true;
-    }            
+    }
 
     @Override
     public boolean handlesNewLine() {
@@ -143,5 +142,5 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
 
     public TraitSlotConst getTrait() {
         return trait;
-    }            
+    }
 }

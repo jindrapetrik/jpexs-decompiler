@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -44,7 +45,7 @@ public class StringNeActionItem extends BinaryOpItem implements Inverted {
      * @param rightSide Right side
      */
     public StringNeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "ne", "String", "String");
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "ne", "String", "String");
     }
 
     @Override

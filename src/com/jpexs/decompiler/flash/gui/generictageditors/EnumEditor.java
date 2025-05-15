@@ -159,4 +159,9 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }  
 }

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -38,12 +39,14 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param value Value
      */
-    public NotItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "!", "Boolean");
+    public NotItem(GraphTargetDialect dialect, GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(dialect, instruction, lineStartIns, PRECEDENCE_UNARY, value, "!", "Boolean");
     }
 
     @Override
@@ -111,7 +114,7 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
         }
         //If it is not a boolean, put !! there for toBoolean conversion
         if (!TypeItem.BOOLEAN.equals(value.returnType()) && !(value instanceof DuplicateItem)) {
-            return new NotItem(null, null, this);
+            return new NotItem(dialect, null, null, this);
         }
 
         //can be inverted

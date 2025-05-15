@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -32,29 +31,30 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author JPEXS
  */
- class CharacterTagTransferHandler extends TransferHandler {
+class CharacterTagTransferHandler extends TransferHandler {
 
-        @Override
-        protected Transferable createTransferable(JComponent c) {
-            JTreeTable table = (JTreeTable) c;
-            int selectedRow = table.getSelectedRow();
+    @Override
+    protected Transferable createTransferable(JComponent c) {
+        JTreeTable table = (JTreeTable) c;
+        int selectedRow = table.getSelectedRow();
 
-            if (selectedRow >= 0) {
-                DefaultMutableTreeNode mn = (DefaultMutableTreeNode) table.getModel().getValueAt(selectedRow, 0);
-                Object o = mn.getUserObject();
-                if ((o instanceof DefineSpriteTag)
-                        || (o instanceof ShapeTag)
-                        || (o instanceof TextTag)
-                        || (o instanceof ButtonTag)
-                        ) {
-                    return new CharacterTagTransferable((CharacterTag) o);
-                }
+        if (selectedRow >= 0) {
+            DefaultMutableTreeNode mn = (DefaultMutableTreeNode) table.getModel().getValueAt(selectedRow, 0);
+            Object o = mn.getUserObject();
+            if (
+                    (o instanceof DefineSpriteTag)
+                    || (o instanceof ShapeTag)
+                    || (o instanceof TextTag)
+                    || (o instanceof ButtonTag)
+                ) {
+                return new CharacterTagTransferable((CharacterTag) o);
             }
-            return null;
         }
-
-        @Override
-        public int getSourceActions(JComponent c) {
-            return COPY;
-        }
+        return null;
     }
+
+    @Override
+    public int getSourceActions(JComponent c) {
+        return COPY;
+    }
+}

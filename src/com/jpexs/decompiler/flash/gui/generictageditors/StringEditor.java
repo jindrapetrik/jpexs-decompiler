@@ -151,4 +151,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }  
 }

@@ -135,7 +135,7 @@ public class LoadingPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         AffineTransform t = AffineTransform.getRotateInstance(getRotation(), size / 2.0, size / 2.0);
-        g2.setTransform(t);
+        g2.transform(t);
         g2.drawImage(lastImage, 0, 0, this);
     }
 

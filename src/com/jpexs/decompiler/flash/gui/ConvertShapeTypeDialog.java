@@ -36,20 +36,20 @@ import javax.swing.JRadioButton;
  * @author JPEXS
  */
 public class ConvertShapeTypeDialog extends AppDialog {
-    
+
     private List<JRadioButton> radios = new ArrayList<>();
-    
+
     private int result = 0;
-    
+
     public ConvertShapeTypeDialog(Window owner, int currentShapeNum, int minForced, int min) {
         super(owner);
         setTitle(translate("dialog.title"));
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
         ButtonGroup radioGroup = new ButtonGroup();
-        
+
         JButton okButton = new JButton(translate("button.ok"));
-        
+
         for (int i = 1; i <= 4; i++) {
             String text = "DefineShape" + (i > 1 ? "" + i : "");
             if (i < minForced) {
@@ -68,39 +68,38 @@ public class ConvertShapeTypeDialog extends AppDialog {
                 radio.setSelected(true);
             }
             final int fi = i;
-            radio.addActionListener(new ActionListener(){
+            radio.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     okButton.setEnabled(fi != currentShapeNum);
-                }                
+                }
             });
-            radioPanel.add(radio);            
+            radioPanel.add(radio);
             radioGroup.add(radio);
-            radios.add(radio);            
+            radios.add(radio);
         }
-        
-        Container cnt = getContentPane();        
+
+        Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        
+
         cnt.add(radioPanel, BorderLayout.CENTER);
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
-        
         okButton.setEnabled(false);
         okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
-        
+
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
         View.setWindowIcon(this, "shape");
         setModal(true);
     }
-    
+
     private void okButtonActionPerformed(ActionEvent evt) {
         result = 0;
         for (int i = 0; i < radios.size(); i++) {
@@ -111,16 +110,16 @@ public class ConvertShapeTypeDialog extends AppDialog {
         }
         setVisible(false);
     }
-    
+
     private void cancelButtonActionPerformed(ActionEvent evt) {
         setVisible(false);
     }
 
     public int getResult() {
         return result;
-    }       
-    
-    public int showDialog() {        
+    }
+
+    public int showDialog() {
         setVisible(true);
         return result;
     }

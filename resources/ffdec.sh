@@ -39,10 +39,10 @@ search_jar_file() {
 }
 
 check_java_version () {
-    JVER1=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "\([0-9]*\)\.[0-9]*\.[0-9]*\(_[0-9]*\)\?".*/\1/')
-    JVER2=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.\([0-9]*\)\.[0-9]*\(_[0-9]*\)\?".*/\1/')
-    JVER3=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.\([0-9]*\)\(_[0-9]*\)\?".*/\1/')
-    JVER4=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.[0-9]*\(_\([0-9]*\)\)\?".*/\2/' | sed 's/^$/0/')
+    JVER1=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/java version "([0-9]*)\.[0-9]*\.[0-9]*(_[0-9]*)?".*/\1/')
+    JVER2=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/java version "[0-9]*\.([0-9]*)\.[0-9]*(_[0-9]*)?".*/\1/')
+    JVER3=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/java version "[0-9]*\.[0-9]*\.([0-9]*)(_[0-9]*)?".*/\1/')
+    JVER4=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/java version "[0-9]*\.[0-9]*\.[0-9]*(_([0-9]*))?".*/\2/' | sed 's/^$/0/')
 
     if [ "$JVER1" -gt $REQ_JVER1 ]; then
         return 0
@@ -106,7 +106,7 @@ fi
 # Check default java
 if [ -x "$(which java)" ]; then
     JAVA_VERSION_OUTPUT=$(java -version 2>&1)
-    JAVA_VERSION_OUTPUT=$(echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/')
+    JAVA_VERSION_OUTPUT=$(echo $JAVA_VERSION_OUTPUT | sed -E 's/.*(openjdk|java) version/java version/')
     check_java_version && exec java "${args[@]}"
 fi
 
@@ -114,7 +114,7 @@ fi
 for JRE_PATH in $LOOKUP_JRE_DIRS; do
     if [ -x "$JRE_PATH/bin/java" ]; then
         JAVA_VERSION_OUTPUT=$("$JRE_PATH/bin/java" -version 2>&1)
-        JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
+        JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed -E 's/.*(openjdk|java) version/java version/'`
         check_java_version && {
             export JRE_PATH
             exec "$JRE_PATH/bin/java" "${args[@]}"

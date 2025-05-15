@@ -18,11 +18,14 @@ package com.jpexs.decompiler.flash.exporters.amf.amf0;
 
 import com.jpexs.decompiler.flash.amf.amf0.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf0.types.BasicType;
+import com.jpexs.decompiler.flash.amf.amf0.types.ComplexObject;
 import com.jpexs.decompiler.flash.amf.amf0.types.DateType;
 import com.jpexs.decompiler.flash.amf.amf0.types.EcmaArrayType;
 import com.jpexs.decompiler.flash.amf.amf0.types.ObjectType;
+import com.jpexs.decompiler.flash.amf.amf0.types.ReferenceType;
 import com.jpexs.decompiler.flash.amf.amf0.types.TypedObjectType;
 import com.jpexs.decompiler.flash.amf.amf0.types.XmlDocumentType;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,9 +33,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.jpexs.decompiler.flash.amf.amf0.types.ComplexObject;
-import com.jpexs.decompiler.flash.amf.amf0.types.ReferenceType;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 
 /**
  * AMF0 exporter.
@@ -43,23 +43,23 @@ public class Amf0Exporter {
 
     public static String amfMapToString(
             Map<String, Object> map,
-            int level, 
+            int level,
             String newLine
-            ) {
+    ) {
         List<Object> processedObjects = new ArrayList<>();
         Map<Object, Integer> referenceCount = new LinkedHashMap<>();
         Map<Object, String> objectAlias = new LinkedHashMap<>();
-        
+
         List<Object> objectList = new ArrayList<>();
-        for (String key: map.keySet()) {
+        for (String key : map.keySet()) {
             Object val = map.get(key);
             populateObjects(val, referenceCount, objectList, objectAlias);
         }
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("{").append(newLine);
         boolean first = true;
-        for (String key: map.keySet()) {
+        for (String key : map.keySet()) {
             if (!first) {
                 sb.append(",").append(newLine);
             }
@@ -71,7 +71,7 @@ public class Amf0Exporter {
         sb.append(indent(level)).append("}");
         return sb.toString();
     }
-        
+
     private static String referenceToString(String objectAlias, int level, String newLine) {
         StringBuilder sb = new StringBuilder();
         sb.append("{").append(newLine);
@@ -80,15 +80,15 @@ public class Amf0Exporter {
         sb.append(indent(level)).append("}");
         return sb.toString();
     }
-    
+
     public static String amfToString(
             Object value,
-            int level, 
+            int level,
             String newLine,
             List<Object> processedObjects,
             Map<Object, Integer> referenceCount,
             Map<Object, String> objectAlias
-    ) {                  
+    ) {
         String addId = "";
         if (referenceCount.containsKey(value)) {
             Integer refCount = referenceCount.get(value);
@@ -100,12 +100,12 @@ public class Amf0Exporter {
             }
             processedObjects.add(value);
         }
-        
+
         if (value instanceof ReferenceType) {
             ReferenceType rt = (ReferenceType) value;
             return referenceToString("obj" + rt.referenceIndex, level, newLine);
         }
-        
+
         if (value == BasicType.UNDEFINED) {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
@@ -113,7 +113,7 @@ public class Amf0Exporter {
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
-        
+
         if (value instanceof Double) {
             return EcmaScript.toString(value);
         }
@@ -153,7 +153,7 @@ public class Amf0Exporter {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"Array\",").append(newLine);
-            sb.append(addId);            
+            sb.append(addId);
             sb.append(indent(level + 1)).append("\"values\": [").append(newLine);
             boolean first = true;
             for (Object val : at.values) {
@@ -174,7 +174,7 @@ public class Amf0Exporter {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"TypedObject\",").append(newLine);
-            sb.append(addId);            
+            sb.append(addId);
             sb.append(indent(level + 1)).append("\"className\": \"").append(Helper.escapeActionScriptString(tot.className)).append("\",").append(newLine);
             membersToString("members", sb, tot.properties, level + 1, newLine, processedObjects, referenceCount, objectAlias);
             sb.append(newLine);
@@ -194,7 +194,7 @@ public class Amf0Exporter {
             sb.append(indent(level + 1)).append("\"type\": \"Date\",").append(newLine);
             sb.append(addId);
             sb.append(indent(level + 1)).append("\"value\": \"").append(sdf.format(dt.toDate())).append("\",").append(newLine);
-            sb.append(indent(level + 1)).append("\"timezone\": ").append(dt.getTimezone()).append(newLine);            
+            sb.append(indent(level + 1)).append("\"timezone\": ").append(dt.getTimezone()).append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
@@ -209,7 +209,7 @@ public class Amf0Exporter {
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
-        
+
         return "unknown";
     }
 
@@ -217,7 +217,7 @@ public class Amf0Exporter {
             String membersLabel,
             StringBuilder sb,
             Map<String, Object> members,
-            int level, 
+            int level,
             String newLine,
             List<Object> processedObjects,
             Map<Object, Integer> referenceCount,
@@ -244,7 +244,7 @@ public class Amf0Exporter {
         }
         return na;
     }
-    
+
     /**
      * Populates all object instances and their references and generates aliases
      *
@@ -268,12 +268,12 @@ public class Amf0Exporter {
         if (prevRef == 0) {
             if (object instanceof ComplexObject) {
                 objectAlias.put(object, "obj" + objectList.size());
-                objectList.add(object);            
+                objectList.add(object);
                 List<Object> subvalues = ((ComplexObject) object).getSubValues();
                 for (Object o : subvalues) {
                     populateObjects(o, referenceCount, objectList, objectAlias);
                 }
-            }            
+            }
         }
     }
 }

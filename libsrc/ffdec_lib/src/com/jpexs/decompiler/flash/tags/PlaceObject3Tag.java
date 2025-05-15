@@ -698,18 +698,18 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public boolean hasImage() {
         return placeFlagHasImage;
     }
-    
+
     @Override
     public void setColorTransform(ColorTransform colorTransform) {
         this.colorTransform = new CXFORMWITHALPHA(colorTransform);
         placeFlagHasColorTransform = true;
-    }    
+    }
 
     @Override
     public void setVisible(int value) {
         this.visible = value;
         placeFlagHasVisible = true;
-    }        
+    }
 
     @Override
     public void setPlaceFlagHasVisible(boolean value) {
@@ -725,24 +725,49 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @Override
     public void setPlaceFlagHasBlendMode(boolean value) {
         this.placeFlagHasBlendMode = value;
-    }       
+    }
 
+    @Override
     public void setBitmapCache(int value) {
         this.bitmapCache = value;
         this.placeFlagHasCacheAsBitmap = true;
     }
 
+    @Override
     public void setPlaceFlagHasCacheAsBitmap(boolean value) {
         this.placeFlagHasCacheAsBitmap = value;
-    }        
+    }
 
+    @Override
     public void setBackgroundColor(RGBA value) {
         this.backgroundColor = value;
         this.placeFlagOpaqueBackground = true;
     }
 
+    @Override
     public void setPlaceFlagOpaqueBackground(boolean value) {
         this.placeFlagOpaqueBackground = value;
-    }        
-    
+    }
+
+    @Override
+    public void setPlaceFlagHasFilterList(boolean placeFlagHasFilterList) {
+        this.placeFlagHasFilterList = placeFlagHasFilterList;
+    }
+
+    @Override
+    public void setFilters(List<FILTER> filters) {
+        this.surfaceFilterList = new ArrayList<>(filters);
+        this.placeFlagHasFilterList = true;
+    }
+
+    @Override
+    public void setPlaceFlagHasRatio(boolean placeFlagHasRatio) {
+        this.placeFlagHasRatio = placeFlagHasRatio;
+    }
+
+    @Override
+    public void setRatio(int ratio) {
+        this.ratio = ratio;
+        placeFlagHasRatio = true;
+    }
 }

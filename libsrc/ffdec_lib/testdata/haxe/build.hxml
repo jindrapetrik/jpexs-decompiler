@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-swf output.swf
+-swf-version 11

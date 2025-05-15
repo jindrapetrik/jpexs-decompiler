@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.soleditor.CookiesChangedListener;
 import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -83,11 +84,13 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.Component;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -102,6 +105,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -147,6 +151,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
@@ -665,7 +670,7 @@ public class Main {
 
     private static void deleteCookiesAfterRun(File tempFile) {
         SharedObjectsStorage.removeChangedListener(tempFile, runCookieListener);
-        File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);        
+        File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
         File origSolDir = runningSWF.getFile() == null ? null : SharedObjectsStorage.getSolDirectoryForLocalFile(new File(runningSWF.getFile()));
         if (solDir != null) {
             WatchKey foundKey = null;
@@ -674,20 +679,20 @@ public class Main {
                     foundKey = key;
                     break;
                 }
-            } 
+            }
             if (foundKey != null) {
                 SharedObjectsStorage.watchedCookieDirectories.remove(foundKey);
             }
-            
+
             View.execInEventDispatchLater(new Runnable() {
-                public void run() {                                    
+                public void run() {
                     if (solDir.exists()) {
-                        
-                        if (origSolDir != null && origSolDir.exists()) {                                                        
+
+                        if (origSolDir != null && origSolDir.exists()) {
                             for (File f : origSolDir.listFiles()) {
                                 f.delete();
                             }
-                            
+
                             for (File f : solDir.listFiles()) {
                                 try {
                                     Files.copy(f.toPath(), origSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
@@ -696,12 +701,12 @@ public class Main {
                                 }
                             }
                         }
-                        
+
                         for (File f : solDir.listFiles()) {
                             f.delete();
                         }
-                        solDir.delete();                                                
-                    }                
+                        solDir.delete();
+                    }
                 }
             });
         }
@@ -730,7 +735,7 @@ public class Main {
                 } catch (IOException ex) {
                     //ignored
                 }
-            }            
+            }
         }
 
         runCookieListener = new CookiesChangedListener() {
@@ -753,7 +758,7 @@ public class Main {
                     } catch (IOException ex) {
                         //ignored
                     }
-                }                
+                }
             }
         };
         SharedObjectsStorage.addChangedListener(tempFile, runCookieListener);
@@ -1201,7 +1206,7 @@ public class Main {
                         String shortName = fileTitle != null ? fileTitle : file;
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
-                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
                         List<String> loadedUrls = new ArrayList<>();
                         List<String> loadedStatus = new ArrayList<>();
 
@@ -1235,7 +1240,7 @@ public class Main {
                             }
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
                             @Override
-                            public SWF resolveUrl(final String url) {
+                            public SWF resolveUrl(String file, final String url) {
                                 loadedUrls.add(url);
                                 File selFile = null;
                                 int opt = -1;
@@ -1274,7 +1279,7 @@ public class Main {
 
                                 if (selFile == null && (url.startsWith("http://") || url.startsWith("https://"))) {
                                     try {
-                                        URL u = new URL(url);
+                                        URL u = URI.create(url).toURL();
                                         SWF ret = open(u.openStream(), null, url); //?
                                         loadedStatus.add("YES");
                                         return ret;
@@ -1344,7 +1349,7 @@ public class Main {
                                                 @Override
                                                 public boolean accept(File f) {
                                                     return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
-                                                            || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))                                                           
+                                                            || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))
                                                             || (f.isDirectory());
                                                 }
 
@@ -1814,13 +1819,30 @@ public class Main {
                     }
 
                     if (isInited()) {
-                        mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
-                        mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
+                        if (resourcesPathStr == null) {
+                            TreePath tp = mainFrame.getPanel().tagTree.getFullModel().getTreePath(fopenable);
+                            if (tp != null) {
+                                mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                            }
+                        } else {
+                            mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                        }
+                        if (tagListPathStr == null) {
+                            TreePath tp = mainFrame.getPanel().tagListTree.getFullModel().getTreePath(fopenable);
+                            if (tp != null) {
+                                mainFrame.getPanel().tagListTree.setSelectionPath(tp);
+                            }
+                        } else {
+                            mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
+                        }
                     } else {
                         mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
                         mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
+                    if (fswf != null) {
+                        mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                    }
                 }
 
                 if (executeAfterOpen != null && fopenable != null) {
@@ -2014,30 +2036,30 @@ public class Main {
             if (fileName != null) {
                 Configuration.addRecentFile(fileName);
                 SharedObjectsStorage.addChangedListener(new File(fileName), new CookiesChangedListener() {
-                    
+
                     Timer timer;
-                    
+
                     @Override
-                    public void cookiesChanged(File swfFile, List<File> cookies) {                        
+                    public void cookiesChanged(File swfFile, List<File> cookies) {
                         if (timer != null) {
                             return;
                         }
-                        
+
                         timer = new Timer();
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
-                                View.execInEventDispatchLater(new Runnable(){
+                                View.execInEventDispatchLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         getMainFrame().getPanel().refreshTree();
                                         timer = null;
-                                    }                                    
+                                    }
                                 });
-                                
-                            }                            
+
+                            }
                         }, 500);
-                        
+
                     }
                 });
                 if (watcher != null && Configuration.checkForModifications.get()) {
@@ -2151,8 +2173,8 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) 
-                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl")) 
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
+                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))
                         || (f.isDirectory());
             }
 
@@ -2396,8 +2418,8 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) 
-                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl")) 
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
+                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))
                         || (f.isDirectory());
             }
 
@@ -2530,6 +2552,14 @@ public class Main {
         System.setProperty("sun.java2d.noddraw", "true");
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.       
+            if (!Configuration.uiScale.hasValue()) {
+                GraphicsConfiguration configuration = View.getMainDefaultScreenDevice().getDefaultConfiguration();
+
+                AffineTransform transform = configuration.getDefaultTransform();
+                if (transform != null) {
+                    Configuration.uiScale.set(transform.getScaleX());
+                }
+            }
             System.setProperty("sun.java2d.uiScale", "" + Configuration.uiScale.get());
         }
 
@@ -2583,10 +2613,10 @@ public class Main {
                                     File dir = SharedObjectsStorage.watchedCookieDirectories.get(key);
                                     java.nio.file.Path child = dir.toPath().resolve(filename);
                                     File fullPath = child.toFile();
-                                    
+
                                     View.execInEventDispatchLater(new Runnable() {
                                         @Override
-                                        public void run() {                                            
+                                        public void run() {
                                             SharedObjectsStorage.watchedDirectoryChanged(fullPath);
                                         }
                                     });
@@ -3273,7 +3303,6 @@ public class Main {
         }
         Configuration.saveConfig();
         if (mainFrame != null && mainFrame.getPanel() != null) {
-            mainFrame.getPanel().unloadFlashPlayer();
             mainFrame.dispose();
         }
         if (fileTxt != null) {
@@ -3317,7 +3346,7 @@ public class Main {
     private static JsonValue urlGetJson(String getUrl) {
         try {
             String proxyAddress = Configuration.updateProxyAddress.get();
-            URL url = new URL(getUrl);
+            URL url = URI.create(getUrl).toURL();
 
             URLConnection uc;
             if (proxyAddress != null && !proxyAddress.isEmpty()) {
@@ -3343,8 +3372,8 @@ public class Main {
 
     public static boolean checkForUpdates() {
         String currentVersion = ApplicationInfo.version;
-        if (currentVersion.equals("unknown")) {
-            // sometimes during development the version information is not available
+        if (currentVersion.equals("unknown") || currentVersion.equals("0.0.0")) {
+            // during development the version information is not available
             return false;
         }
 
@@ -3354,14 +3383,17 @@ public class Main {
         if (!showStable && !showNightly) {
             return false;
         }
-
+                
+        String stableTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+        String ignoreVersion = "-";
+        
         String currentTagName;
         if (ApplicationInfo.nightly) {
             currentTagName = "nightly" + ApplicationInfo.version_build;
         } else {
-            currentTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+            currentTagName = stableTagName;
         }
-
+        
         if (!showNightly) {
             //prereleases are not shown as latest, when checking latest nightly, this is useless
             JsonValue latestVersionInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_LATEST_URL);
@@ -3369,7 +3401,7 @@ public class Main {
                 return false;
             }
             String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
-            if (currentTagName.equals(latestTagName)) {
+            if (currentTagName.equals(latestTagName) || stableTagName.equals(latestTagName)) {
                 //no new version
                 return false;
             }
@@ -3384,7 +3416,7 @@ public class Main {
         for (int i = 0; i < arr.size(); i++) {
             JsonObject versionObj = arr.get(i).asObject();
             String tagName = versionObj.get("tag_name").asString();
-            if (currentVersion.equals(tagName)) {
+            if (currentVersion.equals(tagName) || stableTagName.equals(tagName)) {
                 //Stop at current version, do not display more
                 break;
             }

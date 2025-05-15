@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
@@ -501,9 +502,9 @@ public class ActionPush extends Action {
                 if (o instanceof Boolean) {
                     Boolean b = (Boolean) o;
                     if (b) {
-                        toPush = new TrueItem(this, lineStartAction);
+                        toPush = new TrueItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction);
                     } else {
-                        toPush = new FalseItem(this, lineStartAction);
+                        toPush = new FalseItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction);
                     }
                 } else {
                     DirectValueActionItem dvt = new DirectValueActionItem(this, lineStartAction, pos, o, constantPool);

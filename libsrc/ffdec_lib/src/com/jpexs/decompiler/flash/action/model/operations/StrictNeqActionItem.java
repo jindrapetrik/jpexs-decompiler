@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -47,7 +48,7 @@ public class StrictNeqActionItem extends BinaryOpItem implements LogicalOpItem, 
      * @param rightSide Right side
      */
     public StrictNeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==", "", "");
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==", "", "");
     }
 
     @Override

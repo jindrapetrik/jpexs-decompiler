@@ -95,7 +95,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
      */
     private PopItem getPop() {
         if (pop == null) {
-            pop = new PopItem(null, null); //TODO: linestart?
+            pop = new PopItem(null, null, null); //TODO: linestart?
         }
 
         return pop;

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationDirectory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
-import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +29,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -65,7 +67,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
@@ -326,7 +327,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     public static void getCategories(String hilightBackgroundColorHex, String hilightForegroundColorHex, Map<String, Component> allComponentsMap, Map<String, Integer> categoryCounts, String filter, Map<String, String> titleToNameMap, Map<String, JLabel> labelsMap, Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
         Map<String, Map<String, Field>> categorized = new HashMap<>();
 
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
@@ -343,7 +344,11 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
 
         for (String cat : categorized.keySet()) {
-            JPanel configPanel = new JPanel(new SpringLayout());
+            JPanel configPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = -1;
+            gbc.insets = new Insets(2, 2, 2, 2);
             int itemCount = 0;
             List<String> names = new ArrayList<>(categorized.get(cat).keySet());
 
@@ -409,6 +414,9 @@ public class AdvancedSettingsDialog extends AppDialog {
                             Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+                    if (itemType == Color.class) {
+                        defaultValue = ColorSelectionButton.colorToHex((Color) defaultValue);
+                    }
                     String locNameHtml = locName;
                     if (!filter.trim().equals("")) {
                         locNameHtml = Pattern.compile(Pattern.quote(filter), Pattern.UNICODE_CASE + Pattern.CASE_INSENSITIVE).matcher(locNameHtml).replaceAll("{bold}$0{/bold}");
@@ -423,7 +431,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                     JLabel l = new JLabel(locNameHtml, JLabel.TRAILING);
                     titleToNameMap.put(locName, name);
                     l.setToolTipText(description);
-                    configPanel.add(l);
+                    gbc.gridx = 0;
+                    gbc.gridy++;
+                    gbc.anchor = GridBagConstraints.LINE_END;
+                    configPanel.add(l, gbc);
 
                     Component c = null;
 
@@ -439,31 +450,52 @@ public class AdvancedSettingsDialog extends AppDialog {
                             ConfigurationFile confFile = field.getAnnotation(ConfigurationFile.class);
                             ConfigurationDirectory confDirectory = field.getAnnotation(ConfigurationDirectory.class);
 
-                            JTextField tf = new JTextField();
                             Object val = item.get();
                             if (val == null) {
                                 val = "";
                             }
-                            if (itemType == Calendar.class) {
-                                tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
-                            } else {
-                                tf.setText(val.toString());
-                            }
-                            tf.setToolTipText(description);
-                            tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
-
-                            c = tf;
+                            int minW;
+                            int maxW;
+                                
                             if (confFile != null) {
                                 c = new ConfigurationFileSelection(item, confFile, val.toString(), description);
-                            }
-                            if (confDirectory != null) {
+                                minW = 300;
+                                maxW = 300;
+                            } else if (confDirectory != null) {
                                 c = new ConfigurationDirectorySelection(item, val.toString(), description);
+                                minW = 300;
+                                maxW = 300;
+                            } else {
+                                JTextField tf = new JTextField();
+                                if (itemType == Calendar.class) {
+                                    tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
+                                } else {
+                                    tf.setText(val.toString());
+                                }
+                                tf.setToolTipText(description);                                
+                                
+                                c = tf;
+                                minW = 100;
+                                maxW = 400;
+                            }   
+                            
+                            if (c.getPreferredSize().width > maxW) {
+                                Dimension dim = new Dimension(maxW, c.getPreferredSize().height);
+                                c.setPreferredSize(dim);                            
+                            } else {
+                                Dimension dim = new Dimension(minW, c.getPreferredSize().height);
+                                c.setPreferredSize(dim);  
                             }
                         } else if (itemType == Boolean.class) {
                             JCheckBox cb = new JCheckBox();
                             cb.setSelected((Boolean) item.get());
                             cb.setToolTipText(description);
                             c = cb;
+                        } else if (itemType == Color.class) {
+                            ColorSelectionButton cb = new ColorSelectionButton((Color) item.get(), description);
+                            
+                            cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));                            
+                            c = cb;                                 
                         } else if (itemType.isEnum()) {
                             JComboBox<String> cb = new JComboBox<>();
                             @SuppressWarnings("unchecked")
@@ -499,7 +531,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                         toLabelComponent = ((ConfigurationDirectorySelection) toLabelComponent).getTextField();
                     }
                     l.setLabelFor(toLabelComponent);
-                    configPanel.add(c);
+                    gbc.gridx++;
+                    gbc.anchor = GridBagConstraints.LINE_START;
+                    //gbc.fill = GridBagConstraints.HORIZONTAL;
+                    configPanel.add(c, gbc);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());
@@ -507,13 +542,20 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                 itemCount++;
             }
+            
+            gbc.gridy++;
+            gbc.gridx = 0;
+            gbc.gridwidth = 2;
+            gbc.weighty = 1;
+            configPanel.add(new JPanel(), gbc);
 
             categoryCounts.put(cat, itemCount);
 
-            SpringUtilities.makeCompactGrid(configPanel,
+            /*SpringUtilities.makeCompactGrid(configPanel,
                     itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
+            */
             if (resourceBundle.containsKey("config.group.tip." + cat)) {
                 String tip = resourceBundle.getString("config.group.tip." + cat);
                 String[] urls = new String[0];
@@ -550,7 +592,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     @SuppressWarnings("unchecked")
     private void okButtonActionPerformed(ActionEvent evt) {
         boolean modified = false;
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         Map<String, Object> values = new HashMap<>();
         for (String name : fields.keySet()) {
             Component c = allComponentsMap.get(name);
@@ -574,6 +616,9 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
             if (itemType == Boolean.class) {
                 value = ((JCheckBox) c).isSelected();
+            }
+            if (itemType == Color.class) {
+                value = ((ColorSelectionButton) c).getValue();
             }
 
             if (itemType == Calendar.class) {
@@ -646,7 +691,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     }
 
     private void resetButtonActionPerformed(ActionEvent evt) {
-        Map<String, Field> rfields = Configuration.getConfigurationFields();
+        Map<String, Field> rfields = Configuration.getConfigurationFields(false, false);
         for (Entry<String, Field> entry : rfields.entrySet()) {
             String name = entry.getKey();
             Field field = entry.getValue();

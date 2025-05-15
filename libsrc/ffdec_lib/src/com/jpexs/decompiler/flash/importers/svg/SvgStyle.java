@@ -397,35 +397,39 @@ class SvgStyle {
                     importer.showWarning("fillNotSupported", "Parent gradient not found.");
                     return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
                 }
-
-                if ("linearGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
-                    SvgLinearGradient parentFill = (SvgLinearGradient) parseGradient(idMap, parent_el);
+                SvgGradient parentFill = null;
+                if (parent_el.getTagName().equals("linearGradient")) {
+                    parentFill = (SvgLinearGradient) parseGradient(idMap, parent_el);                    
+                }
+                if (parent_el.getTagName().equals("radialGradient")) {
+                    parentFill = (SvgRadialGradient) parseGradient(idMap, parent_el);                    
+                }
+                
+                if (parentFill != null) {
                     gradientUnits = parentFill.gradientUnits;
                     gradientTransform = parentFill.gradientTransform;
                     spreadMethod = parentFill.spreadMethod;
-
-                    x1 = parentFill.x1;
-                    y1 = parentFill.y1;
-                    x2 = parentFill.x2;
-                    y2 = parentFill.y2;
                     interpolation = parentFill.interpolation;
                     stops = parentFill.stops;
-                }
-                if ("radialGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
-                    SvgRadialGradient parentFill = (SvgRadialGradient) parseGradient(idMap, parent_el);
-                    gradientUnits = parentFill.gradientUnits;
-                    gradientTransform = parentFill.gradientTransform;
-                    spreadMethod = parentFill.spreadMethod;
-
-                    cx = parentFill.cx;
-                    cy = parentFill.cy;
-                    fx = parentFill.fx;
-                    fy = parentFill.fy;
-                    r = parentFill.r;
-                    interpolation = parentFill.interpolation;
-                    stops = parentFill.stops;
-                }
-
+                    
+                    if (el.getTagName().equals(parent_el.getTagName())) {
+                        if ("linearGradient".equals(el.getTagName())) {
+                            SvgLinearGradient linearParentFill = (SvgLinearGradient) parentFill;
+                            x1 = linearParentFill.x1;
+                            y1 = linearParentFill.y1;
+                            x2 = linearParentFill.x2;
+                            y2 = linearParentFill.y2;
+                        }
+                        if ("radialGradient".equals(el.getTagName())) {
+                            SvgRadialGradient radialParentFill = (SvgRadialGradient) parentFill;
+                            cx = radialParentFill.cx;
+                            cy = radialParentFill.cy;
+                            fx = radialParentFill.fx;
+                            fy = radialParentFill.fy;
+                            r = radialParentFill.r;
+                        }
+                    }
+                }                                                                
             } else {
                 importer.showWarning("fillNotSupported", "Parent gradient invalid.");
                 return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
@@ -653,7 +657,31 @@ class SvgStyle {
                     if (e.hasAttribute("patternTransform")) {
                         bitmapFill.patternTransform = e.getAttribute("patternTransform");
                     }
-                    if (e.hasAttribute("ffdec:smoothed")) {
+                    
+                    NodeList childNodes = e.getChildNodes();
+                    Element element = null;
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        if (childNodes.item(i) instanceof Element) {
+
+                            if ("animateTransform".equals(((Element) childNodes.item(i)).getTagName())) {
+                                continue;
+                            }
+
+                            if (element != null) {
+                                element = null;
+                                break;
+                            }
+
+                            element = (Element) childNodes.item(i);
+                        }
+                    }
+                    
+                    SvgImageRendering imageRendering = null;
+                    if (element != null) {
+                        imageRendering = getValue(element, "image-rendering", true);
+                    }
+                                        
+                    if (e.hasAttribute("ffdec:smoothed")) { //backwards compatibility
                         String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
                         if ("true".equals(smoothedValue)) {
                             bitmapFill.smoothed = true;
@@ -661,8 +689,12 @@ class SvgStyle {
                         if ("false".equals(smoothedValue)) {
                             bitmapFill.smoothed = false;
                         }
-                    } else {
-                        bitmapFill.smoothed = true;
+                    } else {     
+                        if (imageRendering == SvgImageRendering.OPTIMIZE_SPEED) {
+                            bitmapFill.smoothed = false;
+                        } else {
+                            bitmapFill.smoothed = true;
+                        }
                     }
                     return bitmapFill;
                 }
@@ -710,7 +742,8 @@ class SvgStyle {
                                 if (e.hasAttribute("patternTransform")) {
                                     bitmapFill.patternTransform = e.getAttribute("patternTransform");
                                 }
-                                if (e.hasAttribute("ffdec:smoothed")) {
+                                SvgImageRendering imageRendering = getValue(element, "image-rendering", true);
+                                if (e.hasAttribute("ffdec:smoothed")) { //backwards compatibility
                                     String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
                                     if ("true".equals(smoothedValue)) {
                                         bitmapFill.smoothed = true;
@@ -719,7 +752,11 @@ class SvgStyle {
                                         bitmapFill.smoothed = false;
                                     }
                                 } else {
-                                    bitmapFill.smoothed = true;
+                                    if (imageRendering == SvgImageRendering.OPTIMIZE_SPEED) {
+                                        bitmapFill.smoothed = false;
+                                    } else {
+                                        bitmapFill.smoothed = true;
+                                    }
                                 }
 
                                 cachedBitmaps.put(elementId, imageTag.characterID);
@@ -791,8 +828,12 @@ class SvgStyle {
                 }
                 break;
                 case "stroke-width": {
-                    double strokeWidth = Double.parseDouble(value);
-                    return strokeWidth;
+                    return importer.parseLength(value, 
+                            Math.sqrt(
+                                    importer.getViewBox().width * importer.getViewBox().width
+                                    + importer.getViewBox().height * importer.getViewBox().height
+                            ) / Math.sqrt(2)
+                    );
                 }
                 case "stroke-opacity": {
                     double opacity = Double.parseDouble(value);
@@ -817,6 +858,18 @@ class SvgStyle {
                             return SvgLineJoin.ROUND;
                         case "bevel":
                             return SvgLineJoin.BEVEL;
+                    }
+                }
+                break;
+                case "image-rendering": {
+                    switch (value) {
+                        case "optimizeSpeed":
+                        case "pixelated": //a weird value used by the Chrome browser
+                            return SvgImageRendering.OPTIMIZE_SPEED;
+                        case "optimizeQuality":
+                            return SvgImageRendering.OPTIMIZE_QUALITY;
+                        case "auto":
+                            return SvgImageRendering.AUTO;
                     }
                 }
                 break;

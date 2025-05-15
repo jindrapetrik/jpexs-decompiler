@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -96,8 +97,8 @@ public class DoWhileItem extends LoopItem implements Block {
      * @param commands Commands
      * @param expression Expression
      */
-    public DoWhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
-        super(src, lineStartIns, loop);
+    public DoWhileItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
+        super(dialect, src, lineStartIns, loop);
         this.expression = expression;
         this.commands = commands;
     }

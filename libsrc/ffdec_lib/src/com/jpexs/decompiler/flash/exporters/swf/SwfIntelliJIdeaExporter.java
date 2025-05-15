@@ -62,24 +62,23 @@ public class SwfIntelliJIdeaExporter {
         if (!swf.isAS3()) {
             return false;
         }
-        
+
         //Cannot export if it has something on main timeline
         for (Tag t : swf.getTags()) {
-            if (
-                    (t instanceof PlaceObjectTypeTag)
+            if ((t instanceof PlaceObjectTypeTag)
                     || (t instanceof SoundStreamBlockTag)
                     || (t instanceof VideoFrameTag)
                     || (t instanceof StartSoundTag)
-                    || (t instanceof StartSound2Tag)
-                ) {
+                    || (t instanceof StartSound2Tag)) {
                 return false;
             }
         }
         return true;
     }
-    
+
     /**
      * Exports SWF to IntelliJ IDEA project.
+     *
      * @param swf SWF to export
      * @param outDir Output directory
      * @param handler Handler for abort, retry, ignore
@@ -91,6 +90,7 @@ public class SwfIntelliJIdeaExporter {
 
     /**
      * Exports SWF to IntelliJ IDEA project.
+     *
      * @param swf SWF to export
      * @param outDir Output directory
      * @param handler Handler for abort, retry, ignore
@@ -101,7 +101,7 @@ public class SwfIntelliJIdeaExporter {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");
         }
-        
+
         if (!canExportSwf(swf)) {
             throw new IllegalArgumentException("SWF must not contain main timeline");
         }
@@ -136,14 +136,13 @@ public class SwfIntelliJIdeaExporter {
         }
 
         String flashPlayerVersion = FlashPlayerVersion.getFlashPlayerBySwfVersion(swf.version);
-        
-        
+
         String imlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<module type=\"Flex\" version=\"4\">\n"
                 + "  <component name=\"FlexBuildConfigurationManager\" active=\"" + simpleName + "\">\n"
                 + "    <configurations>\n"
                 + "      <configuration name=\"" + simpleName + "\" pure-as=\"true\" main-class=\"" + documentClass + "\" output-file=\"" + simpleName + ".swf\" output-folder=\"$MODULE_DIR$/out/production/" + simpleName + "\">\n"
-                + "        <dependencies target-player=\"" + flashPlayerVersion +"\">\n"
+                + "        <dependencies target-player=\"" + flashPlayerVersion + "\">\n"
                 + "          <sdk name=\"flex\" />\n"
                 + "        </dependencies>\n"
                 + "        <compiler-options>\n"

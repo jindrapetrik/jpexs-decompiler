@@ -114,10 +114,12 @@
 ^libsrc/ffdec_lib/testdata/gfx/gfx_test_images_tga_pack/
 ^libsrc/ffdec_lib/testdata/gfx/gfx_test_sounds/
 ^libsrc/jlayer-1\.0\.2/src/main/resources/javazoom/
+^libsrc/substance-fix/
 ^libsrc/ttf/
 ^nsis_locales/(?!English)
 ^resources/flashlib/
 _[a-z]+(?:_[A-Z]+|)\.properties$
+^open_with\.rc$
 ignore$
 Lexer\.java$
 \.sol$

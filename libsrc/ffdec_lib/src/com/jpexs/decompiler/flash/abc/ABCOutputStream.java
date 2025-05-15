@@ -248,7 +248,11 @@ public class ABCOutputStream extends OutputStream {
      * @throws IOException On I/O error
      */
     public void writeFloat(float value) throws IOException {
-        writeU16(Float.floatToIntBits(value));
+        int val = Float.floatToIntBits(value);
+        write(val & 0xFF);
+        write((val >> 8) & 0xFF);
+        write((val >> 16) & 0xFF);
+        write((val >> 24) & 0xFF);
     }
 
     /**

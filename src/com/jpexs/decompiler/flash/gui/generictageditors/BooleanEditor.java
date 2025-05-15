@@ -17,15 +17,18 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.helpers.ReflectionTools;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 /**
  * @author JPEXS
  */
-public class BooleanEditor extends JCheckBox implements GenericTagEditor {
+public class BooleanEditor extends JPanel implements GenericTagEditor {
 
     private final Object obj;
 
@@ -36,6 +39,8 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     private final Class<?> type;
 
     private final String fieldName;
+    
+    private final JCheckBox checkBox;
 
     @Override
     public void added() {
@@ -49,7 +54,13 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
         this.index = index;
         this.type = type;
         this.fieldName = fieldName;
-        reset();
+        checkBox = new JCheckBox();
+        checkBox.setOpaque(false);
+        checkBox.setRequestFocusEnabled(false);
+        setLayout(new BorderLayout());        
+        add(checkBox, BorderLayout.CENTER);
+        setOpaque(false);
+        reset();        
     }
 
     @Override
@@ -59,7 +70,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     @Override
     public void reset() {
         try {
-            setSelected((boolean) ReflectionTools.getValue(obj, field, index));
+            checkBox.setSelected((boolean) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -69,13 +80,13 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     public boolean save() {
         try {
             boolean oldValue = (boolean) ReflectionTools.getValue(obj, field, index);
-            boolean newValue = isSelected();
+            boolean newValue = checkBox.isSelected();
 
             if (oldValue == newValue) {
                 return false;
             }
 
-            ReflectionTools.setValue(obj, field, index, isSelected());
+            ReflectionTools.setValue(obj, field, index, checkBox.isSelected());
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -85,7 +96,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     @Override
     public void addChangeListener(final ChangeListener l) {
         final GenericTagEditor t = this;
-        addActionListener(new ActionListener() {
+        checkBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,7 +107,7 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
 
     @Override
     public Object getChangedValue() {
-        return isSelected();
+        return checkBox.isSelected();
     }
 
     @Override
@@ -118,4 +129,9 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
+    
+    @Override
+    public void setValueNormalizer(ValueNormalizer normalizer) {
+    
+    }  
 }

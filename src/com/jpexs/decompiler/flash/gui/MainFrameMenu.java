@@ -112,16 +112,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected final Map<String, ActionListener> menuActions = new HashMap<>();
-
-    /*public boolean isInternalFlashViewerSelected() {
-        return isMenuChecked("/settings/internalViewer"); //miInternalViewer.isSelected();
-    }*/
-    private final boolean externalFlashPlayerUnavailable;
-
-    public MainFrameMenu(MainFrame mainFrame, boolean externalFlashPlayerUnavailable) {
+    
+    public MainFrameMenu(MainFrame mainFrame) {
         registerHotKeys();
         this.mainFrame = mainFrame;
-        this.externalFlashPlayerUnavailable = externalFlashPlayerUnavailable;
     }
 
     protected String translate(String key) {
@@ -313,23 +307,30 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         Set<OpenableList> listsToClose = new LinkedHashSet<>();
         List<SWF> binaryDataClosedSwfs = new ArrayList<>();
-
-        for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
-            if (item instanceof OpenableList) {
-                listsToClose.add((OpenableList) item);
-            } else {
-                Openable itemOpenable = item.getOpenable();
-                enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+        
+        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_EASY) {
+            Openable itemOpenable = mainFrame.getPanel().easyPanel.getSwf();
+            enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+        } else {
+            for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
+                if (item instanceof OpenableList) {
+                    listsToClose.add((OpenableList) item);
+                } else {
+                    Openable itemOpenable = item.getOpenable();
+                    enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+                }
             }
         }
         if (openable != null && !binaryDataClosedSwfs.contains(openable)) {
             enumerateListsToClose(listsToClose, openable, binaryDataClosedSwfs);
         }
+        openable = null;
+        
         for (OpenableList list : listsToClose) {
             Main.closeFile(list);
         }
         mainFrame.getPanel().refreshTree();
-        openable = null;
+        
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -1199,9 +1200,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     setGroupSelection("view", "/file/view/viewHex");
                     break;
                 case MainPanel.VIEW_EASY:
-                    if (EasyPanel.EASY_AVAILABLE) {
-                        setMenuChecked("/file/view/easy", true);
-                    }
+                    setGroupSelection("view", null);
+                    setMenuChecked("/file/view/easy", true);
                     break;
             }
         }
@@ -1295,9 +1295,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
-        if (EasyPanel.EASY_AVAILABLE) {
-            addToggleMenuItem("/file/view/easy", translate("menu.file.view.easy"), null, "easy32", this::easyActionPerformed, PRIORITY_TOP, null);
-        }
+        addToggleMenuItem("/file/view/easy", translate("menu.file.view.easy"), null, "easy32", this::easyActionPerformed, PRIORITY_TOP, null);
+        
         finishMenu("/file/view");
 
         addSeparator("/file");
@@ -1565,9 +1564,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
-        if (EasyPanel.EASY_AVAILABLE) {
-            setMenuChecked("/file/view/easy", false);
-        }
+        setMenuChecked("/file/view/easy", false);        
     }
 
     private void viewHexActionPerformed(ActionEvent evt) {
@@ -1583,9 +1580,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainPanel.showView(MainPanel.VIEW_DUMP);
         setGroupSelection("view", "/file/view/viewHex");
-        if (EasyPanel.EASY_AVAILABLE) {
-            setMenuChecked("/file/view/easy", false);
-        }
+        setMenuChecked("/file/view/easy", false);
     }
 
     private void viewTagListActionPerformed(ActionEvent evt) {
@@ -1597,9 +1592,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         setGroupSelection("view", "/file/view/viewTagList");
-        if (EasyPanel.EASY_AVAILABLE) {
-            setMenuChecked("/file/view/easy", false);
-        }
+        setMenuChecked("/file/view/easy", false);        
     }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {

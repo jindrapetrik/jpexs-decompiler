@@ -65,8 +65,10 @@ public abstract class ABCWalker {
      */
     public ABCWalker() {
     }
+
     /**
      * Walks ABC
+     *
      * @param abc ABC
      * @param walkOrphanItems Walk orphan items
      */
@@ -99,6 +101,7 @@ public abstract class ABCWalker {
 
     /**
      * Optional handle class
+     *
      * @param handledClasses Handled classes
      * @param handledMethodBodies Handled method bodies
      * @param handledMethodInfos Handled method infos
@@ -126,6 +129,7 @@ public abstract class ABCWalker {
 
     /**
      * Optional handle method info.
+     *
      * @param handledMethodBodies Handled method bodies
      * @param handledMethodInfos Handled method infos
      * @param abc ABC
@@ -161,6 +165,7 @@ public abstract class ABCWalker {
 
     /**
      * Optional handle method body.
+     *
      * @param handledMethodBodies Handled method bodies
      * @param handledMethodInfos Handled method infos
      * @param abc ABC
@@ -192,6 +197,7 @@ public abstract class ABCWalker {
 
     /**
      * Walk traits.
+     *
      * @param abc ABC
      * @param traits Traits
      * @param scriptIndex Script index
@@ -250,6 +256,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle method info.
+     *
      * @param abc ABC
      * @param index Index
      * @param scriptIndex Script index
@@ -266,6 +273,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle method body.
+     *
      * @param abc ABC
      * @param index Index
      * @param scriptIndex Script index
@@ -280,6 +288,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle class.
+     *
      * @param abc ABC
      * @param index Index
      * @param scriptIndex Script index
@@ -292,6 +301,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle script.
+     *
      * @param abc ABC
      * @param index Index
      */
@@ -301,6 +311,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle trait slot const.
+     *
      * @param abc ABC
      * @param trait Trait
      * @param scriptIndex Script index
@@ -318,6 +329,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle trait method getter setter.
+     *
      * @param abc ABC
      * @param trait Trait
      * @param scriptIndex Script index
@@ -332,6 +344,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle trait function.
+     *
      * @param abc ABC
      * @param trait Trait
      * @param scriptIndex Script index
@@ -346,6 +359,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle trait class.
+     *
      * @param abc ABC
      * @param trait Trait
      * @param scriptIndex Script index
@@ -357,6 +371,7 @@ public abstract class ABCWalker {
 
     /**
      * Handle metadata info.
+     *
      * @param abc ABC
      * @param index Index
      * @param trait Trait

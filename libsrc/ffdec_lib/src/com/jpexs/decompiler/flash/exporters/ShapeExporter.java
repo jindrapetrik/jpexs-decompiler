@@ -132,7 +132,7 @@ public class ShapeExporter {
                             }
                             Matrix m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else {

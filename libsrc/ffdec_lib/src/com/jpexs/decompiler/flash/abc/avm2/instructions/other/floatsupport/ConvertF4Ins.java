@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConvertTypeIns{
+public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     /**
      * Constructor
@@ -65,7 +65,7 @@ public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConve
         lda.operandStack.push(new Float4(f, f, f, f));
         return true;
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
@@ -75,12 +75,12 @@ public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConve
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
-    
+
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.getConstants(), ins)));
     }
-    
+
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
         return new TypeItem("float4");

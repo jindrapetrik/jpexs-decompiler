@@ -450,20 +450,24 @@ public class DefineEditTextTag extends TextTag {
                                     }
                                 }
                                 String size = unescape(attributes.getValue("size"));
-                                if (size != null && size.length() > 0) {
-                                    char firstChar = size.charAt(0);
-                                    if (firstChar != '+' && firstChar != '-') {
-                                        int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
-                                    } else {
-                                        int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
-                                        if (firstChar == '+') {
-                                            style.fontHeight = style.fontHeight + fontSizeDelta;
+                                if (size != null && size.length() > 0) {                                    
+                                    try {
+                                        char firstChar = size.charAt(0);
+                                        if (firstChar != '+' && firstChar != '-') {
+                                            int fontSize = Integer.parseInt(size);
+                                            style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
                                         } else {
-                                            style.fontHeight = style.fontHeight - fontSizeDelta;
+                                            int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
+                                            if (firstChar == '+') {
+                                                style.fontHeight = style.fontHeight + fontSizeDelta;
+                                            } else {
+                                                style.fontHeight = style.fontHeight - fontSizeDelta;
+                                            }
                                         }
+                                        style.fontLeading = leading;
+                                    } catch (NumberFormatException nfe) {
+                                        //do not change fontHeight or leading
                                     }
-                                    style.fontLeading = leading;
                                 }
                                 String face = unescape(attributes.getValue("face"));
 
@@ -473,7 +477,11 @@ public class DefineEditTextTag extends TextTag {
 
                                 String letterspacing = unescape(attributes.getValue("letterSpacing"));
                                 if (letterspacing != null && letterspacing.length() > 0) {
-                                    style.letterSpacing = Double.parseDouble(letterspacing);
+                                    try {
+                                        style.letterSpacing = Double.parseDouble(letterspacing);
+                                    } catch (NumberFormatException nfe) {
+                                        //do not change letterSpacing
+                                    }                                    
                                 }
 
                                 String kerning = unescape(attributes.getValue("kerning"));
@@ -1027,7 +1035,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
     }
 

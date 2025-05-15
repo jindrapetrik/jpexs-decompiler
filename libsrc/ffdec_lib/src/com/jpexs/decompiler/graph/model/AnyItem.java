@@ -31,7 +31,7 @@ public class AnyItem extends GraphTargetItem {
      * Constructor.
      */
     public AnyItem() {
-        
+        super(null);
     }
     
     @Override

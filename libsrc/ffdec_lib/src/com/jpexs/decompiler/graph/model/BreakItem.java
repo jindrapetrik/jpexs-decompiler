@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -46,12 +47,13 @@ public class BreakItem extends GraphTargetItem {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source item
      * @param lineStartIns Line start instruction
      * @param loopId Loop id
      */
-    public BreakItem(GraphSourceItem src, GraphSourceItem lineStartIns, long loopId) {
-        super(src, lineStartIns, NOPRECEDENCE);
+    public BreakItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, long loopId) {
+        super(dialect, src, lineStartIns, NOPRECEDENCE);
         this.loopId = loopId;
     }
 

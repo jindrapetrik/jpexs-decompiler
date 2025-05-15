@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -29,7 +30,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JScrollPane;
+import javax.swing.text.BadLocationException;
 
 /**
  * Storage for remembering scroll/caret positions of scripts / preview folder.
@@ -115,6 +119,11 @@ public class ScrollPosStorage {
         //move to bottom
         storage.remove(index);
         storage.add(sitem);
+        
+        TreeItem asmItem = item;
+        if (asmItem instanceof TagScript) {
+            asmItem = ((TagScript) item).getTag();
+        }
 
         if (Configuration.rememberScriptsScrollPos.get()) {
             if (item instanceof ScriptPack) {
@@ -122,7 +131,7 @@ public class ScrollPosStorage {
                     @Override
                     public void run() {
                         if (sitem.getActionScriptCaret() < mainPanel.getABCPanel().decompiledTextArea.getDocument().getLength()) {
-                            mainPanel.getABCPanel().decompiledTextArea.setCaretPosition(sitem.getActionScriptCaret());
+                            mainPanel.getABCPanel().decompiledTextArea.setCaretPositionForCurrentScript(sitem.getActionScriptCaret(), (ScriptPack) item);
                         }
 
                         try {
@@ -149,10 +158,10 @@ public class ScrollPosStorage {
 
                     }
                 });
-            } else if (item instanceof ASMSource) {
+            } else if (asmItem instanceof ASMSource) {
                 mainPanel.getActionPanel().runWhenLoaded(new Runnable() {
                     @Override
-                    public void run() {
+                    public void run() {                                                
                         if (sitem.getActionScriptCaret() < mainPanel.getActionPanel().decompiledEditor.getDocument().getLength()) {
                             mainPanel.getActionPanel().decompiledEditor.setCaretPosition(sitem.getActionScriptCaret());
                         }
@@ -203,10 +212,15 @@ public class ScrollPosStorage {
     public void saveScrollPos(TreeItem item) {
 
         boolean doSave = false;
+        
+        TreeItem asmItem = item;
+        if (item instanceof TagScript) {
+            asmItem = ((TagScript) item).getTag();
+        }
         if (item instanceof ScriptPack) {
             doSave = true;
         }
-        if (item instanceof ASMSource) {
+        if (asmItem instanceof ASMSource) {
             doSave = true;
         }
         if (item instanceof FolderItem) {
@@ -230,19 +244,38 @@ public class ScrollPosStorage {
         int pcodeScrollVertical = 0;
         int pcodeCaret = 0;
         if (item instanceof ScriptPack) {
-            actionScriptScrollHorizontal = mainPanel.getABCPanel().decompiledScrollPane.getHorizontalScrollBar().getValue();
-            actionScriptScrollVertical = mainPanel.getABCPanel().decompiledScrollPane.getVerticalScrollBar().getValue();
-            actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getCaretPosition();
-            pcodeScrollHorizontal = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getHorizontalScrollBar().getValue();
-            pcodeScrollVertical = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getVerticalScrollBar().getValue();
-            pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getCaretPosition();
-        } else if (item instanceof ASMSource) {
-            actionScriptScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getHorizontalScrollBar().getValue();
-            actionScriptScrollVertical = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getVerticalScrollBar().getValue();
-            actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getCaretPosition();
-            pcodeScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getHorizontalScrollBar().getValue();
-            pcodeScrollVertical = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getVerticalScrollBar().getValue();
-            pcodeCaret = mainPanel.getActionPanel().editor.getCaretPosition();
+            synchronized (mainPanel.getABCPanel().decompiledTextArea) {
+                if (!mainPanel.getABCPanel().decompiledTextArea.isScriptLoaded()) {
+                    return;
+                }
+                if (mainPanel.getABCPanel().decompiledTextArea.getScriptLeaf() != item) {
+                    return;
+                }
+                actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getCaretPosition();
+                
+                actionScriptScrollHorizontal = mainPanel.getABCPanel().decompiledScrollPane.getHorizontalScrollBar().getValue();
+                actionScriptScrollVertical = mainPanel.getABCPanel().decompiledScrollPane.getVerticalScrollBar().getValue();
+                pcodeScrollHorizontal = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getHorizontalScrollBar().getValue();
+                pcodeScrollVertical = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getVerticalScrollBar().getValue();
+                pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getCaretPosition();
+            }
+                                    
+        } else if (asmItem instanceof ASMSource) {       
+            
+            synchronized (mainPanel.getActionPanel()) {
+                if (!mainPanel.getActionPanel().isScriptLoaded()) {
+                    return;
+                }
+                if (mainPanel.getActionPanel().getSrc() != asmItem) {
+                    return;
+                }
+                actionScriptScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getHorizontalScrollBar().getValue();
+                actionScriptScrollVertical = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getVerticalScrollBar().getValue();
+                actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getCaretPosition();
+                pcodeScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getHorizontalScrollBar().getValue();
+                pcodeScrollVertical = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getVerticalScrollBar().getValue();
+                pcodeCaret = mainPanel.getActionPanel().editor.getCaretPosition();
+            }            
         }
         int folderPreviewScrollVertical = 0;
         int folderListScrollVertical = 0;

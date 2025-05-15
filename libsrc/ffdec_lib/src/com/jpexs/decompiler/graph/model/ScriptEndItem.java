@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
@@ -29,9 +30,11 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      */
-    public ScriptEndItem() {
-        super(null, null, NOPRECEDENCE);
+    public ScriptEndItem(GraphTargetDialect dialect) {
+        super(dialect, null, null, NOPRECEDENCE);
     }
 
     @Override

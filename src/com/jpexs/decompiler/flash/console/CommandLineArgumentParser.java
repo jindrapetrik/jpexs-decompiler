@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
+import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
@@ -131,8 +132,8 @@ import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -228,6 +229,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -269,7 +271,7 @@ public class CommandLineArgumentParser {
     }
 
     public static void printConfigurationSettings() {
-        Map<String, Field> fields = Configuration.getConfigurationFields();
+        Map<String, Field> fields = Configuration.getConfigurationFields(false, false);
         String[] keys = new String[fields.size()];
         keys = fields.keySet().toArray(keys);
         Arrays.sort(keys);
@@ -280,7 +282,7 @@ public class CommandLineArgumentParser {
             if (ConfigurationItem.isInternal(field)) {
                 continue;
             }
-
+            
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             Object value = item.get();
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -359,7 +361,7 @@ public class CommandLineArgumentParser {
         if (filter == null) {
             out.println(PREFIX + "myfile.swf");
             exampleFound = true;
-        }      
+        }
 
         if (filter == null || filter.equals("export") || filter.equals("format") || filter.equals("selectclass") || filter.equals("onerror")) {
             out.println(PREFIX + "-export script \"C:\\decompiled\" myfile.swf");
@@ -494,7 +496,9 @@ public class CommandLineArgumentParser {
         }
 
         AbortRetryIgnoreHandler handler = null;
+        UrlResolver urlResolver = new ConsoleUrlResolver(false, false, false, new HashMap<>());
         Map<String, String> format = new HashMap<>();
+        Map<String, String> changedImports = new LinkedHashMap<>();
         double zoom = 1;
         String charset = Charset.defaultCharset().name();
         boolean cliMode = false;
@@ -598,6 +602,12 @@ public class CommandLineArgumentParser {
                     }
                     Configuration._debugMode.set(true);
                     break;
+                case "-importassets":
+                    urlResolver = parseImportAssets(args, changedImports);
+                    break;
+                case "-changeimport":
+                    parseChangeImport(args, changedImports);
+                    break;
                 default:
                     break OUTER;
             }
@@ -658,7 +668,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav, transparentBackground);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav, transparentBackground, urlResolver);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -842,7 +852,7 @@ public class CommandLineArgumentParser {
             cfgs = new String[]{cfgStr};
         }
 
-        Map<String, Field> fields = Configuration.getConfigurationFields(true);
+        Map<String, Field> fields = Configuration.getConfigurationFields(true, false);
         for (String c : cfgs) {
             String[] cp = c.split("=");
             if (cp.length == 1) {
@@ -1732,6 +1742,43 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseChangeImport(Stack<String> args, Map<String, String> changedImports) {
+        if (args.size() < 2) {
+            System.err.println("source and target of import expected");
+            badArguments("changeimport");
+        }
+        changedImports.put(args.pop(), args.pop());
+    }
+
+    private static UrlResolver parseImportAssets(Stack<String> args, Map<String, String> changedImports) {
+        if (args.isEmpty()) {
+            System.err.println("importassets options expected");
+            badArguments("importassets");
+        }
+        String impOptionsStr = args.pop();
+        String[] impOptionsArr = impOptionsStr.split(",", -1);
+        boolean doResolve = false;
+        boolean doAsk = false;
+        boolean localOnly = false;
+        for (String impOption : impOptionsArr) {
+            switch (impOption) {
+                case "yes":
+                    doResolve = true;
+                    break;
+                case "ask":
+                    doAsk = true;
+                    break;
+                case "local":
+                    localOnly = true;
+                    break;
+                default:
+                    System.err.println("incorrect importassets option: " + impOption);
+                    badArguments("importassets");
+            }
+        }
+        return new ConsoleUrlResolver(doResolve, doAsk, localOnly, changedImports);
+    }
+
     private static void parsePriority(Stack<String> args) {
         if (Platform.isWindows()) {
             if (args.isEmpty()) {
@@ -1930,7 +1977,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav, boolean transparentBackground) {
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav, boolean transparentBackground, UrlResolver urlResolver) {
         if (args.size() < 3) {
             badArguments("export");
         }
@@ -2025,7 +2072,7 @@ public class CommandLineArgumentParser {
                 OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
-                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, charset);
+                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, urlResolver, charset);
                 } catch (FileNotFoundException | SwfOpenException ex) {
                     // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
@@ -2200,7 +2247,7 @@ public class CommandLineArgumentParser {
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
                 if (exportAs2Script || exportAs3Script) {
                     System.out.println("Exporting scripts...");
-                    
+
                     String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
                     Path.createDirectorySafe(new File(scriptsFolder));
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -2839,7 +2886,7 @@ public class CommandLineArgumentParser {
                         renderContext.stateUnderCursor = new ArrayList<>();
 
                         try {
-                            tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>());
+                            tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>());
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -3042,7 +3089,7 @@ public class CommandLineArgumentParser {
                             System.exit(1);
                         }
                     } else {
-                        Map<String, ASMSource> asms = swf.getASMs(false);
+                        Map<String, ASMSource> asms = swf.getASMs(true);
                         boolean found = false;
                         if (asms.containsKey(objectToReplace)) {
                             found = true;
@@ -3469,7 +3516,7 @@ public class CommandLineArgumentParser {
         if (format == null) {
             format = "html";
         }
-        
+
         if (!format.equals("html")) {
             badArguments("doc");
         }

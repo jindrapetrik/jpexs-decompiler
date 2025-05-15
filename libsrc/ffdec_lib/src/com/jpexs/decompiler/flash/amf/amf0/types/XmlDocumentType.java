@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.amf.amf0.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.types.*;
+import com.jpexs.decompiler.flash.amf.amf3.types.Amf3ValueType;
 import java.util.ArrayList;
 import java.util.List;
 

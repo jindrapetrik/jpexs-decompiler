@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 
 /**
  * Reads bin/*.dat file of lossless images and produces BufferedImage
+ *
  * @author JPEXS
  */
 public class LosslessImageBinDataReader {
@@ -87,14 +88,14 @@ public class LosslessImageBinDataReader {
                 int b = data[pos++] & 0xFF;
                 int g = data[pos++] & 0xFF;
                 int r = data[pos++] & 0xFF;
-                
+
                 if (a != 0 && a != 255) {
                     a = a - 1;
-                    
-                    r = (int)Math.floor(r * 256f / a);                    
-                    g = (int)Math.floor(g * 256f / a);
-                    b = (int)Math.floor(b * 256f / a);    
-                }                
+
+                    r = (int) Math.floor(r * 256f / a);
+                    g = (int) Math.floor(g * 256f / a);
+                    b = (int) Math.floor(b * 256f / a);
+                }
 
                 int rgba = r + (g << 8) + (b << 16) + (a << 24);
                 img.setRGB(x, y, rgba);

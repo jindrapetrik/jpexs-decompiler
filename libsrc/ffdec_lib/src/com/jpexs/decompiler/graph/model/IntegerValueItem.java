@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.Set;
@@ -36,12 +37,14 @@ public class IntegerValueItem extends GraphTargetItem implements IntegerValueTyp
 
     /**
      * Constructor.
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param value Value
      */
-    public IntegerValueItem(GraphSourceItem src, GraphSourceItem lineStartIns, int value) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+    public IntegerValueItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, int value) {
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY);
         this.intValue = value;
     }
 

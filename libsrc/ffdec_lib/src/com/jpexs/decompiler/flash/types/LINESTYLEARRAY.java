@@ -51,7 +51,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
     public int getMinShapeNum(int sourceShapeNum) {
         int result = 1;
-        if (sourceShapeNum >= 4) {            
+        if (sourceShapeNum >= 4) {
             for (LINESTYLE2 ls : lineStyles2) {
                 int sn = ls.getMinShapeNum();
                 if (sn > result) {
@@ -68,7 +68,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return result;
     }
-    
+
     public LINESTYLEARRAY toShapeNum(int sourceShapeNum, int targetShapeNum) {
         if (sourceShapeNum == targetShapeNum) {
             return Helper.deepCopy(this);
@@ -80,7 +80,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
                 result.lineStyles2[i] = lineStyles[i].toLineStyle2();
             }
         } else {
-            result.lineStyles = new LINESTYLE[sourceShapeNum >=4 ? lineStyles2.length : lineStyles.length];
+            result.lineStyles = new LINESTYLE[sourceShapeNum >= 4 ? lineStyles2.length : lineStyles.length];
             if (sourceShapeNum >= 4) {
                 for (int i = 0; i < lineStyles2.length; i++) {
                     result.lineStyles[i] = lineStyles2[i].toLineStyle1(targetShapeNum);
@@ -100,7 +100,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return result;
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (lineStyles != null) {
@@ -150,6 +150,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
     /**
      * Converts to MORPHLINESTYLEARRAY
+     *
      * @return MORPHLINESTYLEARRAY
      */
     public MORPHLINESTYLEARRAY toMorphLineStyleArray() {

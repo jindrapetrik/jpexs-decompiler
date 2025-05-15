@@ -47,9 +47,15 @@ jobs:
         apt install -y -qq php
     - name: Set up NSis
       run: |
+        #apt install -y -qq wget
+        #we need the specific version - 3.0.8 as this version seems to not be flagged by AVs
+        #wget http://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.08-2_all.deb
+        #wget http://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.08-2_amd64.deb
+        #dpkg -i nsis-common_3.08-2_all.deb
+        #dpkg -i nsis_3.08-2_amd64.deb        
         apt-get -y update
         apt-get -y install nsis
-        makensis -VERSION
+        makensis -VERSION       
     - name: Set up ant
       run: |
         apt install -y -qq ant 

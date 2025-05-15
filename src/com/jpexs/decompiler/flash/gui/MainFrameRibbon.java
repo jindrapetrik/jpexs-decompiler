@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -54,29 +53,17 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
     public MainFrameRibbon() {
         super();
-
-        FlashPlayerPanel flashPanel = null;
-        FlashPlayerPanel flashPanel2 = null;
-
-        if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
-            try {
-                flashPanel = new FlashPlayerPanel(this);
-                flashPanel2 = new FlashPlayerPanel(this);
-            } catch (FlashUnsupportedException fue) {
-                //ignored
-            }
-        }
+        
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         JRibbon ribbon = getRibbon();
         cnt.add(ribbon, BorderLayout.NORTH);
 
-        boolean externalFlashPlayerUnavailable = flashPanel == null;
-        mainMenu = new MainFrameRibbonMenu(this, ribbon, externalFlashPlayerUnavailable);
+        mainMenu = new MainFrameRibbonMenu(this, ribbon);
         mainMenu.createMenuBar();
 
-        panel = new MainPanel(this, mainMenu, flashPanel, flashPanel2);
+        panel = new MainPanel(this, mainMenu);
         panel.setBackground(Color.yellow);
         cnt.add(panel, BorderLayout.CENTER);
 
@@ -158,11 +145,11 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                     SWF easySwf = panel.getEasyPanel().getSwf();
                     if (easySwf != null) {
-                        Configuration.lastSessionEasySwf.set(easySwf.getFile()+ "|" + easySwf.getFileTitle());
+                        Configuration.lastSessionEasySwf.set(easySwf.getFile() + "|" + easySwf.getFileTitle());
                     } else {
                         Configuration.lastSessionEasySwf.set("");
                     }
-                    
+
                     String pathResources = panel.tagTree.getSelectionPathString();
                     if (pathResources != null) {
                         Configuration.lastSessionSelection.set(pathResources);

@@ -47,8 +47,8 @@ public class MainFrameClassicMenu extends MainFrameMenu {
 
     private final Map<String, ButtonGroup> menuButtonGroups = new HashMap<>();
 
-    public MainFrameClassicMenu(MainFrameClassic mainFrame, boolean externalFlashPlayerUnavailable) {
-        super(mainFrame, externalFlashPlayerUnavailable);
+    public MainFrameClassicMenu(MainFrameClassic mainFrame) {
+        super(mainFrame);
         this.mainFrame = mainFrame;
 
     }
@@ -218,6 +218,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (path.equals("_") || path.startsWith("_/")) {
             return;
         }
+        if (menuElements == null) {
+            return;
+        }
         MenuElement menu = menuElements.get(path);
         if (menu == null) {
             throw new IllegalArgumentException("Menu " + path + " does not exist");
@@ -252,6 +255,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     @Override
     public void setMenuChecked(String path, boolean checked) {
         path = mapping(path);
+        if (menuElements == null) {
+            return;
+        }
         MenuElement menu = menuElements.get(path);
         if (menu == null) {
             throw new IllegalArgumentException("Menu " + path + " does not exist");
@@ -269,6 +275,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     public void setGroupSelection(String group, String selected) {
         if (selected != null) {
             selected = mapping(selected);
+        }
+        if (menuGroups == null) {
+            return;
         }
         for (String path : menuGroups.get(group)) {
             setMenuChecked(path, selected == null ? false : path.equals(selected));
@@ -372,6 +381,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
 
     @Override
     public void setPathVisible(String path, boolean val) {
+        if (menuElements == null) {
+            return;
+        }
         MenuElement me = menuElements.get(path);
         if (me instanceof JComponent) {
             ((JComponent) me).setVisible(val);

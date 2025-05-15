@@ -16,20 +16,15 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import java.lang.reflect.Field;
 
 /**
  * @author JPEXS
  */
-public interface GenericTagEditor {
+public interface GenericTagEditor extends PropertyEditor {
 
-    public void added();
-
-    public void reset();
-
-    public boolean save();
-
-    public void addChangeListener(ChangeListener l);
+    public void added();      
 
     public Object getChangedValue();
 
@@ -42,4 +37,6 @@ public interface GenericTagEditor {
     public void validateValue();
 
     public Object getObject();
+    
+    public void setValueNormalizer(ValueNormalizer normalizer);
 }

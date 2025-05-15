@@ -17,12 +17,15 @@
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.configuration.enums.GridSnapAccuracy;
+import com.jpexs.decompiler.flash.configuration.enums.GuidesSnapAccuracy;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -109,10 +112,12 @@ public final class Configuration {
      */
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> useAdobeFlashPlayerForPreviews = null;
 
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("display")
+    @ConfigurationRemoved
     public static ConfigurationItem<Integer> setMovieDelay = null;
 
     @ConfigurationDefaultBoolean(false)
@@ -562,6 +567,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")    
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
 
     @ConfigurationDefaultBoolean(false)
@@ -785,6 +791,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> allowMiterClipLinestyle = null;
 
     @ConfigurationDefaultBoolean(true)
@@ -1049,6 +1056,94 @@ public final class Configuration {
     @ConfigurationDirectory
     public static ConfigurationItem<String> lastSolEditorDirectory = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> halfTransparentParentLayersEasy = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> showRuler = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapToGuides = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapToObjects = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapToPixels = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlign = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> showGuides = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> lockGuides = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> showGrid = null;        
+    
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> gridVerticalSpace = null;
+    
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> gridHorizontalSpace = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapToGrid = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> gridOverObjects = null;
+    
+    @ConfigurationDefaultColor("#949494")
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Color> gridColor = null;    
+    
+    @ConfigurationDefaultColor("#00FF00")
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Color> guidesColor = null;
+    
+    @ConfigurationCategory("display")
+    @ConfigurationDefaultString("NORMAL")
+    public static ConfigurationItem<GridSnapAccuracy> gridSnapAccuracy = null;
+    
+    @ConfigurationCategory("display")
+    @ConfigurationDefaultString("NORMAL")
+    public static ConfigurationItem<GuidesSnapAccuracy> guidesSnapAccuracy = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignObjectHorizontalSpace = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignObjectVerticalSpace = null;
+    
+    @ConfigurationDefaultInt(0)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> snapAlignStageBorder = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlignCenterAlignmentHorizontal = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
+        
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
@@ -1302,7 +1397,7 @@ public final class Configuration {
 
     private static void saveToFile(String file) {
         HashMap<String, Object> config = new HashMap<>();
-        for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+        for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
             try {
                 String name = entry.getKey();
                 Field field = entry.getValue();
@@ -1355,7 +1450,7 @@ public final class Configuration {
     public static void setConfigurationFields() {
         try {
             HashMap<String, Object> config = loadFromFile(getConfigFile());
-            for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
+            for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();
                 /* Unsupported in java 9+
@@ -1408,7 +1503,8 @@ public final class Configuration {
      * @param field Field
      * @return Default value
      */
-    public static Object getDefaultValue(Field field) {
+    @SuppressWarnings("unchecked")
+    public static Object getDefaultValue(Field field) {        
         Object defaultValue = null;
         ConfigurationDefaultBoolean aBool = field.getAnnotation(ConfigurationDefaultBoolean.class);
         if (aBool != null) {
@@ -1421,6 +1517,11 @@ public final class Configuration {
         ConfigurationDefaultString aString = field.getAnnotation(ConfigurationDefaultString.class);
         if (aString != null) {
             defaultValue = aString.value();
+            
+            Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
+            if (type.isEnum()) {
+                return Enum.valueOf(type.asSubclass(Enum.class), (String) defaultValue);
+            }                            
         }
         ConfigurationDefaultDouble aDouble = field.getAnnotation(ConfigurationDefaultDouble.class);
         if (aDouble != null) {
@@ -1432,26 +1533,43 @@ public final class Configuration {
             mingc.setTime(new Date(aCalendar.value()));
             defaultValue = mingc;
         }
+        
+        ConfigurationDefaultColor aColor = field.getAnnotation(ConfigurationDefaultColor.class);
+        if (aColor != null) {
+            Pattern p = Pattern.compile("#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$");
+            Matcher m = p.matcher(aColor.value());
+            if (m.matches()) {
+                defaultValue = new Color(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16));
+            } else {
+                defaultValue = Color.black;
+            }
+        }
         return defaultValue;
     }
 
-    /**
+    /*
      * Get configuration fields
      * @return Configuration fields
      */
-    public static Map<String, Field> getConfigurationFields() {
-        return getConfigurationFields(false);
-    }
+    /*public static Map<String, Field> getConfigurationFields(boolean alsoRemoved) {
+        return getConfigurationFields(false, alsoRemoved);
+    }*/
 
     /**
      * Get configuration fields
      * @param lowerCaseNames Lower case names
      * @return Configuration fields
      */
-    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames) {
+    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames, boolean alsoRemoved) {
         Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
+            if (!alsoRemoved) {
+                ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);
+                if (removedAnnotation != null) {
+                    continue;
+                }
+            }
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
                 String name = ConfigurationItem.getName(field);
                 if (lowerCaseNames) {

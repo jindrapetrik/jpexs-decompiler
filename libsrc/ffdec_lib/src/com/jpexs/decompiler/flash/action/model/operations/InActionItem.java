@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.operations;
 
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,7 +42,7 @@ public class InActionItem extends BinaryOpItem {
      * @param object Object
      */
     public InActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, ActionItem name, ActionItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
+        super(ActionGraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
     }
 
     @Override

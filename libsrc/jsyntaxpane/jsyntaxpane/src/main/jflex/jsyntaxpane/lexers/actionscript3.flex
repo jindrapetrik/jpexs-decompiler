@@ -205,7 +205,14 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   "false"                        |
   "null"                         |
   "this"                         |
-  "true"                         { return token(TokenType.KEYWORD); }
+  "true"                         |
+  "as"                           |
+  "delete"                       |
+  "instanceof"                   |
+  "is"                           |
+  "new"                          |
+  "typeof"                       |
+  "void"                         { return token(TokenType.KEYWORD); }
 
 
   {RegExp}                       { 
@@ -279,15 +286,8 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   "<<="                          |
   ">>="                          |
   ">>>="                         |
-  "as"                           |
-  "delete"                       |
-  "instanceof"                   |
-  "is"                           |
   "::"                           |
-  "new"                          |
-  "typeof"                       |
-  "void"                         |
- {NewVector}                     |
+  {NewVector}                     |
   "@"                            { return token(TokenType.OPERATOR); }
 
   /* string literal */

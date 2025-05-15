@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SimpleValue;
@@ -110,14 +111,15 @@ public class IfItem extends GraphTargetItem implements Block {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param expression Expression
      * @param onTrue On true
      * @param onFalse On false
      */
-    public IfItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
-        super(src, lineStartIns, NOPRECEDENCE);
+    public IfItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
+        super(dialect, src, lineStartIns, NOPRECEDENCE);
         this.expression = expression;
         this.onTrue = onTrue;
         this.onFalse = onFalse;

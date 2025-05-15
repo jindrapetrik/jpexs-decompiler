@@ -123,7 +123,7 @@ public class ActionGraph extends Graph {
      * @param charset Charset
      */
     public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
-        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
+        super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
@@ -506,7 +506,7 @@ public class ActionGraph extends Graph {
                                     checkedBody.remove(0);
                                     if (checkedLoop == null) {
                                         checkedLoop = new Loop(localData.loops.size(), null, null);
-                                        checkedBody.add(new BreakItem(null, null, checkedLoop.id));
+                                        checkedBody.add(new BreakItem(dialect, null, null, checkedLoop.id));
                                     }
                                     sti.setValue(new DirectValueActionItem(Null.INSTANCE));
                                     list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) sti, enumerateItem.object, checkedBody));
@@ -524,7 +524,7 @@ public class ActionGraph extends Graph {
                     list.remove(t);
                     if (checkedLoop == null) {
                         checkedLoop = new Loop(localData.loops.size(), null, null);
-                        checkedBody.add(new BreakItem(null, null, checkedLoop.id));
+                        checkedBody.add(new BreakItem(dialect, null, null, checkedLoop.id));
                     }
                     list.remove(t - 1);
                     t--;

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -41,7 +42,7 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
      * @param object Object
      */
     public PreDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unnecessary ++Number(xx) when xx not number*/);
+        super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unnecessary ++Number(xx) when xx not number*/);
     }
 
     @Override

@@ -46,7 +46,7 @@ public class TypeFunctionItem extends GraphTargetItem {
      * @param fullTypeName Full type name
      */
     public TypeFunctionItem(String fullTypeName) {
-        super(null, null, NOPRECEDENCE);
+        super(null, null, null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
 

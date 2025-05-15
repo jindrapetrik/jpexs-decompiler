@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -116,21 +117,12 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     @Override
     public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
-        List<Color> colors = new ArrayList<>();
-        List<Float> ratios = new ArrayList<>();
+        Color[] colorsArr = new Color[gradientColors.length];
         for (int i = 0; i < gradientColors.length; i++) {
-            if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
-                continue;
-            }
-            colors.add(gradientColors[i].toColor());
-            ratios.add(gradientRatio[i] / 255f);
+            colorsArr[i] = gradientColors[i].toColor();
         }
-        float[] ratiosArr = new float[ratios.size()];
-        for (int i = 0; i < ratios.size(); i++) {
-            ratiosArr[i] = ratios.get(i);
-        }
-
-        Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+        float[] ratiosArr = convertRatiosToJavaGradient(gradientRatio);
+        
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;
@@ -138,7 +130,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
             type = Filtering.OUTER;
         }
 
-        return Filtering.gradientBevel(src, colorsArr, ratiosArr, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, passes);
+        return Filtering.gradientBevel(src, colorsArr, ratiosArr, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, compositeSource, passes);
     }
 
     @Override
@@ -155,4 +147,72 @@ public class GRADIENTBEVELFILTER extends FILTER {
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
         return null; //NOT SUPPORTED
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + Arrays.deepHashCode(this.gradientColors);
+        hash = 37 * hash + Arrays.hashCode(this.gradientRatio);
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.blurX) ^ (Double.doubleToLongBits(this.blurX) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.blurY) ^ (Double.doubleToLongBits(this.blurY) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.angle) ^ (Double.doubleToLongBits(this.angle) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.distance) ^ (Double.doubleToLongBits(this.distance) >>> 32));
+        hash = 37 * hash + Float.floatToIntBits(this.strength);
+        hash = 37 * hash + (this.innerShadow ? 1 : 0);
+        hash = 37 * hash + (this.knockout ? 1 : 0);
+        hash = 37 * hash + (this.compositeSource ? 1 : 0);
+        hash = 37 * hash + (this.onTop ? 1 : 0);
+        hash = 37 * hash + this.passes;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GRADIENTBEVELFILTER other = (GRADIENTBEVELFILTER) obj;
+        if (Double.doubleToLongBits(this.blurX) != Double.doubleToLongBits(other.blurX)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.blurY) != Double.doubleToLongBits(other.blurY)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.angle) != Double.doubleToLongBits(other.angle)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.distance) != Double.doubleToLongBits(other.distance)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.strength) != Float.floatToIntBits(other.strength)) {
+            return false;
+        }
+        if (this.innerShadow != other.innerShadow) {
+            return false;
+        }
+        if (this.knockout != other.knockout) {
+            return false;
+        }
+        if (this.compositeSource != other.compositeSource) {
+            return false;
+        }
+        if (this.onTop != other.onTop) {
+            return false;
+        }
+        if (this.passes != other.passes) {
+            return false;
+        }
+        if (!Arrays.deepEquals(this.gradientColors, other.gradientColors)) {
+            return false;
+        }
+        return Arrays.equals(this.gradientRatio, other.gradientRatio);
+    }
+    
+    
 }

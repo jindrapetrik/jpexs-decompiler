@@ -1223,9 +1223,9 @@ public class ABCExplorerDialog extends AppDialog {
         CONSTANT_INT("Integers", "int", TreeIcon.CONSTANT_INT, ABCSimpleUsageDetector.ItemKind.INT),
         CONSTANT_UINT("UnsignedIntegers", "uint", TreeIcon.CONSTANT_UINT, ABCSimpleUsageDetector.ItemKind.UINT),
         CONSTANT_DOUBLE("Doubles", "dbl", TreeIcon.CONSTANT_DOUBLE, ABCSimpleUsageDetector.ItemKind.DOUBLE),
-        CONSTANT_DECIMAL("Decimals", "dc", TreeIcon.CONSTANT_DECIMAL, null), //needs ABC decimal support
-        CONSTANT_FLOAT("Floats", "fl", TreeIcon.CONSTANT_FLOAT, null), //needs ABC float support
-        CONSTANT_FLOAT_4("Floats4", "fl4", TreeIcon.CONSTANT_FLOAT_4, null), //needs ABC float support
+        CONSTANT_DECIMAL("Decimals", "dc", TreeIcon.CONSTANT_DECIMAL, ABCSimpleUsageDetector.ItemKind.DECIMAL), //needs ABC decimal support
+        CONSTANT_FLOAT("Floats", "fl", TreeIcon.CONSTANT_FLOAT, ABCSimpleUsageDetector.ItemKind.FLOAT), //needs ABC float support
+        CONSTANT_FLOAT_4("Floats4", "fl4", TreeIcon.CONSTANT_FLOAT_4, ABCSimpleUsageDetector.ItemKind.FLOAT4), //needs ABC float4 support
         CONSTANT_STRING("Strings", "str", TreeIcon.CONSTANT_STRING, ABCSimpleUsageDetector.ItemKind.STRING),
         CONSTANT_NAMESPACE("Namespaces", "ns", TreeIcon.CONSTANT_NAMESPACE, ABCSimpleUsageDetector.ItemKind.NAMESPACE),
         CONSTANT_NAMESPACE_SET("NamespaceSets", "nss", TreeIcon.CONSTANT_NAMESPACE_SET, ABCSimpleUsageDetector.ItemKind.NAMESPACESET),

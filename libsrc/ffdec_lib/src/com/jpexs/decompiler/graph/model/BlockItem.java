@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -41,13 +42,14 @@ public class BlockItem extends GraphTargetItem {
 
     /**
      * Constructor.
-     *
+     * 
+     * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start instruction
      * @param commands Commands
      */
-    public BlockItem(GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+    public BlockItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY);
         this.commands = commands;
     }
 

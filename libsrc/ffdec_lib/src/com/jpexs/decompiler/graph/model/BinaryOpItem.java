@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SimpleValue;
@@ -71,6 +72,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     /**
      * Constructor.
      *
+     * @param dialect Dialect
      * @param instruction Instruction
      * @param lineStartItem Line start item
      * @param precedence Precedence
@@ -80,8 +82,8 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
      * @param coerceLeft Coerce left
      * @param coerceRight Coerce right
      */
-    public BinaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
-        super(instruction, lineStartItem, precedence);
+    public BinaryOpItem(GraphTargetDialect dialect, GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
+        super(dialect, instruction, lineStartItem, precedence);
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;

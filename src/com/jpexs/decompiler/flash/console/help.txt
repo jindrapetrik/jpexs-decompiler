@@ -444,3 +444,17 @@ Pre-options:
     Ignores SWF background color when exporting frames
     and thus make background transparent.
 
+-importAssets <importOptions>
+    Applies to: -export
+    Specifies options for importAssets tag - using external SWFs.
+    <importOptions> format: (combination of yes,ask,local)
+            yes = use external SWFs when available
+            ask = ask whether to use external SWFs
+            yes,ask = use external SWFs, ask for alternatives when not available
+            yes,local = ignores URLs - SWFs starting with http/s:// prefix
+
+-changeImport <source> <target>
+    Applies to: -export
+    Replaces <source> URL in importAssets tag with <target>
+    for purposes of export. Can be used multiple times.
+

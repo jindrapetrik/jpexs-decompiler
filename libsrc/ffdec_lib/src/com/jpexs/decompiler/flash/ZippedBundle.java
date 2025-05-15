@@ -18,20 +18,19 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -44,33 +43,13 @@ public class ZippedBundle implements Bundle {
     /**
      * Key set
      */
-    protected Set<String> keySet = new HashSet<>();
-
-    /**
-     * File input stream for the ZIP file
-     */
-    protected FileInputStream fis;
-
-    /**
-     * Re-readable input stream for the ZIP file
-     */
-    protected ReReadableInputStream is;
+    protected Set<String> keySet = new HashSet<>();  
 
     /**
      * File name of the ZIP file
      */
-    protected File filename;
-
-    /**
-     * Constructs a new ZippedBundle from an input stream.
-     *
-     * @param is Input stream
-     * @throws IOException On I/O error
-     */
-    public ZippedBundle(InputStream is) throws IOException {
-        this(is, null);
-    }
-
+    protected File filename;        
+   
     /**
      * Constructs a new ZippedBundle from a file.
      *
@@ -78,18 +57,7 @@ public class ZippedBundle implements Bundle {
      * @throws IOException On I/O error
      */
     public ZippedBundle(File filename) throws IOException {
-        this(null, filename);
-    }
-
-    /**
-     * Constructs a new ZippedBundle from an input stream and a file.
-     *
-     * @param is Input stream
-     * @param filename File
-     * @throws IOException On I/O error
-     */
-    protected ZippedBundle(InputStream is, File filename) throws IOException {
-        initBundle(is, filename);
+        initBundle(filename);
     }
 
     /**
@@ -99,18 +67,15 @@ public class ZippedBundle implements Bundle {
      * @param filename File
      * @throws IOException On I/O error
      */
-    protected void initBundle(InputStream is, File filename) throws IOException {
-        if (filename != null) {
-            fis = new FileInputStream(filename);
-            is = fis;
-        }
+    protected void initBundle(File filename) throws IOException {
         this.filename = filename;
-        this.is = new ReReadableInputStream(is);
-        ZipInputStream zip = new ZipInputStream(this.is);
-        ZipEntry entry;
+        ZipFile zipFile = new ZipFile(filename);
         keySet.clear();
+                
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-        while ((entry = zip.getNextEntry()) != null) {
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
             if (entry.getName().toLowerCase().endsWith(".swf")
                     || entry.getName().toLowerCase().endsWith(".spl")
                     || entry.getName().toLowerCase().endsWith(".gfx")
@@ -118,6 +83,7 @@ public class ZippedBundle implements Bundle {
                 keySet.add(entry.getName());
             }
         }
+        zipFile.close();
     }
 
     @Override
@@ -136,24 +102,13 @@ public class ZippedBundle implements Bundle {
         if (!keySet.contains(key)) {
             return null;
         }
-        //if (!cachedSWFs.containsKey(key)) {
-        SeekableInputStream ret = null;
-        this.is.reset();
-        ZipInputStream zip = new ZipInputStream(this.is);
-        ZipEntry entry;
-
-        while ((entry = zip.getNextEntry()) != null) {
-            if (entry.getName().equals(key)) {
-                MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zip));
-                ret = mis;
-                //cachedSWFs.put(key, mis);
-                break;
-            }
-            zip.closeEntry();
-        }
+        ZipFile zipFile = new ZipFile(filename);
+        ZipEntry entry = zipFile.getEntry(key);        
+        MemoryInputStream mis = new MemoryInputStream(Helper.readStream(zipFile.getInputStream(entry)));
+        SeekableInputStream ret = mis;                
+        zipFile.close();
 
         return ret;
-        //return cachedSWFs.get(key);
     }
 
     @Override
@@ -186,46 +141,48 @@ public class ZippedBundle implements Bundle {
         if (!getKeys().contains(key)) { //replace only existing keys
             return false;
         }
+        
+        ZipFile zipFile = new ZipFile(filename);
+        
         //Write to temp file first
         File tempFile = new File((filename.getAbsolutePath()) + ".tmp");
 
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(tempFile));
-            this.is.reset();
-            ZipInputStream zis = new ZipInputStream(this.is);
             ZipEntry entryIn;
             ZipEntry entryOut;
 
             byte[] swfData = Helper.readStream(swfIs);
+            
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
             try {
-                while ((entryIn = zis.getNextEntry()) != null) {
+                while (entries.hasMoreElements()) {
                     InputStream src;
+                    entryIn = entries.nextElement();
                     if (entryIn.getName().equals(key)) {
                         entryOut = new ZipEntry(key);
                         src = new ByteArrayInputStream(swfData);
                     } else {
-                        src = zis;
+                        src = zipFile.getInputStream(entryIn);
                         entryOut = entryIn;
                     }
                     zos.putNextEntry(entryOut);
                     Helper.copyStream(src, zos, entryOut.getSize() == -1 ? Long.MAX_VALUE : entryOut.getSize());
                     zos.closeEntry();
-                    zis.closeEntry();
                 }
+            
             } finally {
-                zis.close();
                 zos.close();
-            }
-            this.is.close();
-            this.fis.close();
+                zipFile.close();
+            }            
         } catch (IOException ex) {
             tempFile.delete();
             throw ex;
         }
         filename.delete();
         tempFile.renameTo(filename);
-        initBundle(null, filename);
+        initBundle(filename);
 
         return true;
     }

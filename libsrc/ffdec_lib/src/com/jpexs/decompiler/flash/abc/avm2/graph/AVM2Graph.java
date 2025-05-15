@@ -222,7 +222,7 @@ public class AVM2Graph extends Graph {
      * @param localRegAssignmentIps Local register assignment IPs
      */
     public AVM2Graph(int swfVersion, AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ScopeStack localScopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssignmentIps) {
-        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssignmentIps), getExceptionEntries(body));
+        super(AVM2GraphTargetDialect.INSTANCE, new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssignmentIps), getExceptionEntries(body));
         this.avm2code = code;
         this.abc = abc;
         this.body = body;
@@ -2066,17 +2066,17 @@ public class AVM2Graph extends Graph {
                                         if (withCommands.size() > 1) {
                                             withCommands.remove(withCommands.size() - 1);
                                             withCommands.add(expr);
-                                            expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
+                                            expr = new CommaExpressionItem(dialect, null, localData.lineStartInstruction, withCommands);
                                         }
                                     } else {
                                         //There is no if - this means there was something that
                                         // can be evaluated on compiletime and compiler removed the whole if
                                         // ASC2 does this
-                                        withCommands.add(new FalseItem(null, localData.lineStartInstruction));
-                                        expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
+                                        withCommands.add(new FalseItem(dialect, null, localData.lineStartInstruction));
+                                        expr = new CommaExpressionItem(dialect, null, localData.lineStartInstruction, withCommands);
                                     }
                                 } else {
-                                    expr = new FalseItem(null, localData.lineStartInstruction);
+                                    expr = new FalseItem(dialect, null, localData.lineStartInstruction);
                                 }
                                 FilteredCheckAVM2Item filteredCheck = (FilteredCheckAVM2Item) hn.obj.getThroughRegister().getNotCoerced();
                                 FilterAVM2Item filter = new FilterAVM2Item(null, null, filteredCheck.object, expr);
@@ -2737,13 +2737,13 @@ public class AVM2Graph extends Graph {
                 if (wi.expression == list && !list.isEmpty()) {
                     GraphTargetItem lastExpr = list.remove(list.size() - 1);
                     List<GraphTargetItem> onTrue = new ArrayList<>();
-                    BreakItem bi = new BreakItem(null, null, wi.loop.id);
+                    BreakItem bi = new BreakItem(dialect, null, null, wi.loop.id);
                     onTrue.add(bi);                    
-                    IfItem ifi = new IfItem(null, null, lastExpr.invert(null), onTrue, new ArrayList<>());
+                    IfItem ifi = new IfItem(dialect, null, null, lastExpr.invert(null), onTrue, new ArrayList<>());
                     list.add(ifi);
                     wi.commands.addAll(0, list);
                     list.clear();
-                    list.add(new TrueItem(null, null));
+                    list.add(new TrueItem(dialect, null, null));
                 }
             }
             

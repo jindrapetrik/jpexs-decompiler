@@ -113,4 +113,8 @@ public class DoubleValueAVM2Item extends NumberValueAVM2Item {
         return true;
     }
 
+    @Override
+    public long getAsLong() {
+        return (long) (double) value;
+    }
 }

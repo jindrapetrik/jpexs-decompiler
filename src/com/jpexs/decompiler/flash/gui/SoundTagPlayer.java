@@ -92,6 +92,16 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private int instanceId = totalInstances++;
 
+    @Override
+    public boolean canHaveRuler() {
+        return false;
+    }   
+    
+    @Override
+    public boolean canUseSnapping() {
+        return false;
+    }
+        
     public int getInstanceId() {
         return instanceId;
     }
@@ -573,4 +583,9 @@ public class SoundTagPlayer implements MediaDisplay {
     public boolean isMutable() {
         return true;
     }
+
+    @Override
+    public void clearGuides() {
+        
+    }        
 }

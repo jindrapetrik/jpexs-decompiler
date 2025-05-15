@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.util.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -114,4 +115,64 @@ public class DROPSHADOWFILTER extends FILTER {
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
         return dropShadowSvg(distance, angle, dropShadowColor, innerShadow, knockout, compositeSource, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.dropShadowColor);
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.blurX) ^ (Double.doubleToLongBits(this.blurX) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.blurY) ^ (Double.doubleToLongBits(this.blurY) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.angle) ^ (Double.doubleToLongBits(this.angle) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.distance) ^ (Double.doubleToLongBits(this.distance) >>> 32));
+        hash = 97 * hash + Float.floatToIntBits(this.strength);
+        hash = 97 * hash + (this.innerShadow ? 1 : 0);
+        hash = 97 * hash + (this.knockout ? 1 : 0);
+        hash = 97 * hash + (this.compositeSource ? 1 : 0);
+        hash = 97 * hash + this.passes;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DROPSHADOWFILTER other = (DROPSHADOWFILTER) obj;
+        if (Double.doubleToLongBits(this.blurX) != Double.doubleToLongBits(other.blurX)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.blurY) != Double.doubleToLongBits(other.blurY)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.angle) != Double.doubleToLongBits(other.angle)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.distance) != Double.doubleToLongBits(other.distance)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.strength) != Float.floatToIntBits(other.strength)) {
+            return false;
+        }
+        if (this.innerShadow != other.innerShadow) {
+            return false;
+        }
+        if (this.knockout != other.knockout) {
+            return false;
+        }
+        if (this.compositeSource != other.compositeSource) {
+            return false;
+        }
+        if (this.passes != other.passes) {
+            return false;
+        }
+        return Objects.equals(this.dropShadowColor, other.dropShadowColor);
+    }
+    
+    
 }
