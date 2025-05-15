@@ -65,6 +65,100 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="23.0.0" date="2025-05-15">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2427 Commandline export with use of imported SWFs (importAssets tag)</li>
+					<li>Auto detect scale factor on Hi-dpi displays</li>
+					<li>#1826 Option to extend shape area by half pixel to fix antialias conflation artifacts</li>
+					<li>Icons for Simple editor library folders</li>
+					<li>#2448 Simple editor - Option to turn off half transparent parent layers</li>
+					<li>Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)</li>
+					<li>#2370 Objects display - Option to show horizontal and vertical rulers</li>
+					<li>#2370 Objects display - Create guides by dragging from a ruler</li>
+					<li>Objects dragging - show touch point and snap it to 9 important points around object rectangle</li>
+					<li>#2370 Snap to guides, objects and pixels, Snap align, toggle with magnet icon</li>
+					<li>#2370 Show/Hide guides, lock guides, clear guides actions from icon menu</li>
+					<li>Display grid, snap to grid</li>
+					<li>#2370 Snap align border space, object spacing, center alignment</li>
+					<li>#2370 Setting for color and snap accuracy for guides, grid</li>
+					<li>#2370 Dialogs for editing grid, guides and snapping</li>
+					<li>#2453 SVG export/import - use image-rendering attribute for image smoothing</li>
+					<li>Option to enter custom zoom level by clicking on zoom percentage label</li>
+					<li>Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)</li>
+					<li>Simple editor - change background color</li>
+					<li>Simple editor - filters</li>
+					<li>Simple editor - convolution filter presets</li>
+					<li>Simple editor - ratio (shapetweens, video)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2424 DefineEditText handling of letterSpacing, font size on incorrect values</li>
+					<li>#2391 Double not operator in ternar operator expression</li>
+					<li>#2436 PDF export clipping - missing colors / text</li>
+					<li>#2437 AS1 P-code - do not group pushes automatically</li>
+					<li>#2437 AS1 - use Constant pool only on FP5+</li>
+					<li>#2430 AS1/2/3 - Missing syntax hilighting of "new" keyword and few others</li>
+					<li>#2428 Charset setting on FLA export in format MX and below</li>
+					<li>#2428 Default charset for SWFS v5 and lower is WINDOWS-1252</li>
+					<li>#2418 AS3 - initialization of class static vars in script initializer (Haxe)</li>
+					<li>#2397 DefineScalingGrid - improper scaling on negative Xmin, Ymin</li>
+					<li>#2425 ZIP/SWC reading - "Only DEFLATED entries can have EXT descriptor" message</li>
+					<li>Drawing points and shape paths highlighting did not respect UI scale factor</li>
+					<li>#2416 FLA export - shape fixing in some cases</li>
+					<li>#2394 FLA export - shape tweens in some cases</li>
+					<li>Not resetting timeline after shape tag type conversion</li>
+					<li>#2400 Transforming - buttons must use hit test frame outline</li>
+					<li>#2413 AS3 direct editation - try/catch clause in instance initializer</li>
+					<li>#2386 Editor mode - not able to save shape/morphshape points</li>
+					<li>Loading icon did not respect UI scale factor</li>
+					<li>Editor (JSyntaxPane) incorrectly draws line numbers panel on Hi-dpi displays</li>
+					<li>Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly</li>
+					<li>Incorrect icons for `New empty` action - with dashed borders</li>
+					<li>#2443 SVG importer - converting cubic bezier curves to quadratic</li>
+					<li>#2444 SVG importer - improper stroke width when using width/height with viewBox</li>
+					<li>#2444 SVG importer - stroke width not respecting transforms</li>
+					<li>#2415 AS3 direct editation - nested functions - prefer callstack variables over prototype chain</li>
+					<li>AS3 - AIR float support - incorrect writing float values to output stream</li>
+					<li>AS3 - AIR float support - ABC Explorer incorrectly calculating float usages (For clean action, etc.)</li>
+					<li>#2446 Nightly version asked for update to previous stable</li>
+					<li>#2447 SVG import - gradients can inherit (href) from other gradient types (radial vs linear)</li>
+					<li>#2450 Morphshape replace button/menu is not working (throws exception due to missing icon)</li>
+					<li>#2355 AS1/2/3 Simplify expressions feature colliding with some other features like hex values</li>
+					<li>Exception on FFDec start when simple editor is on</li>
+					<li>#2419 AS3 - There should be empty line after class header</li>
+					<li>AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered</li>
+					<li>AS 1/2 - Remembering caret position for frames</li>
+					<li>Cleaner file association</li>
+					<li>Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)</li>
+					<li>Exceptions when closing non-ribbon window</li>
+					<li>PR215 ffdec.sh - Ignore all java options when checking version</li>
+					<li>Text search was not available as context menu option for AS3 scripts folder</li>
+					<li>#2454 SVG export - color matrix not applied to images</li>
+					<li>PR216 ffdec.sh - Support BSD version of sed in java version checks</li>
+					<li>Simple editor - adding a library item to the last frame adds a frame</li>
+					<li>Simple editor - white square on top left corner of the timeline</li>
+					<li>Bevel and Glow filters incorrect rendering</li>
+					<li>Incorrect cursor handling when placed object has filters</li>
+					<li>FLA export - Rounding errors on COLORMATRIXFILTER contrast</li>
+					<li>Filters - image bounds</li>
+					<li>Simple editor - Exceptions caused by not setting timelined when modifying PlaceObject</li>
+					<li>#2455 Commandline export ConcurrentModificationException</li>
+					<li>#1962 Close button could close more than one file at once</li>
+					<li>Simple editor - Selecting previous SWF when swf close</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>An item selected in the tag tree is needed for actions to be available. Also SWF node is selected by default on first SWF opening.</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Option to preview flash items via ActiveX component is no longer available. FFDec now supports its internal flash viewer only.</li>
+					<li>Windows installer does not associate SWF files anymore as it caused false positives on some AVs. You can associate them later in FFDec settings.</li>
+				</ul>
+			</description>
+		</release>
 		<release version="22.0.2" date="2025-01-17">
 			<description>
 				<p>Added</p>
