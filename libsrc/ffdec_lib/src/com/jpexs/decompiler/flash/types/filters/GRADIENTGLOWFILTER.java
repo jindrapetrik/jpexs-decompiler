@@ -119,18 +119,12 @@ public class GRADIENTGLOWFILTER extends FILTER {
 
     @Override
     public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
-        List<Color> colors = new ArrayList<>();
-        List<Float> ratios = new ArrayList<>();
-        float lastRatioF = 0f;
+        Color[] colorsArr = new Color[gradientColors.length];
         for (int i = 0; i < gradientColors.length; i++) {
-            float ratioF = gradientRatio[i] / 255f;            
-            if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
-                ratioF = lastRatioF + 0.000001f;
-            }
-            colors.add(gradientColors[i].toColor());
-            ratios.add(ratioF);
-            lastRatioF = ratioF;
+            colorsArr[i] = gradientColors[i].toColor();
         }
+        float[] ratiosArr = convertRatiosToJavaGradient(gradientRatio);
+        
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;
@@ -138,11 +132,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
             type = Filtering.OUTER;
         }
 
-        float[] ratiosAr = new float[ratios.size()];
-        for (int i = 0; i < ratios.size(); i++) {
-            ratiosAr[i] = ratios.get(i);
-        }
-        return Filtering.gradientGlow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), (int) (angle * 180 / Math.PI), distance * zoom, colors.toArray(new Color[colors.size()]), ratiosAr, type, passes, strength, knockout, compositeSource);
+        return Filtering.gradientGlow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), (int) (angle * 180 / Math.PI), distance * zoom, colorsArr, ratiosArr, type, passes, strength, knockout, compositeSource);
     }
 
     @Override

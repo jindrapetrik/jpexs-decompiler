@@ -117,25 +117,12 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     @Override
     public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
-        List<Color> colors = new ArrayList<>();
-        List<Float> ratios = new ArrayList<>();
-        float lastRatioF = 0f;
+        Color[] colorsArr = new Color[gradientColors.length];
         for (int i = 0; i < gradientColors.length; i++) {
-            float ratioF = gradientRatio[i] / 255f;            
-            if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
-                ratioF = lastRatioF + 0.000001f;
-            }
-            colors.add(gradientColors[i].toColor());
-            ratios.add(ratioF);
-            lastRatioF = ratioF;
+            colorsArr[i] = gradientColors[i].toColor();
         }
+        float[] ratiosArr = convertRatiosToJavaGradient(gradientRatio);
         
-        float[] ratiosArr = new float[ratios.size()];
-        for (int i = 0; i < ratios.size(); i++) {
-            ratiosArr[i] = ratios.get(i);
-        }
-
-        Color[] colorsArr = colors.toArray(new Color[colors.size()]);
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;
