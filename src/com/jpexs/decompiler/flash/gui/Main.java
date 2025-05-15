@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.soleditor.CookiesChangedListener;
 import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -150,6 +151,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
@@ -1817,8 +1819,22 @@ public class Main {
                     }
 
                     if (isInited()) {
-                        mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
-                        mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
+                        if (resourcesPathStr == null) {
+                            TreePath tp = mainFrame.getPanel().tagTree.getFullModel().getTreePath(fopenable);
+                            if (tp != null) {
+                                mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                            }
+                        } else {
+                            mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                        }
+                        if (tagListPathStr == null) {
+                            TreePath tp = mainFrame.getPanel().tagListTree.getFullModel().getTreePath(fopenable);
+                            if (tp != null) {
+                                mainFrame.getPanel().tagListTree.setSelectionPath(tp);
+                            }
+                        } else {
+                            mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
+                        }
                     } else {
                         mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
                         mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);

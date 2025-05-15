@@ -146,9 +146,22 @@ public class TabSwitcher<E> extends JPanel {
         tabbedPane.setSelectedIndex(index);
     }
     
+    public int getSelectedIndex() {
+        return tabbedPane.getSelectedIndex();
+    }
+    
     public void setValue(E value) {
+        if (value == null) {
+            setSelectedIndex(-1);
+            return;
+        }
         int index = values.indexOf(value);
         setSelectedIndex(index);
+    }
+    
+    
+    public int indexOf(E value) {
+        return values.indexOf(value);
     }
     
     public E getSelectedValue() {

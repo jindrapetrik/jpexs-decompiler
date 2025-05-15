@@ -307,23 +307,30 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         Set<OpenableList> listsToClose = new LinkedHashSet<>();
         List<SWF> binaryDataClosedSwfs = new ArrayList<>();
-
-        for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
-            if (item instanceof OpenableList) {
-                listsToClose.add((OpenableList) item);
-            } else {
-                Openable itemOpenable = item.getOpenable();
-                enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+        
+        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_EASY) {
+            Openable itemOpenable = mainFrame.getPanel().easyPanel.getSwf();
+            enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+        } else {
+            for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
+                if (item instanceof OpenableList) {
+                    listsToClose.add((OpenableList) item);
+                } else {
+                    Openable itemOpenable = item.getOpenable();
+                    enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
+                }
             }
         }
         if (openable != null && !binaryDataClosedSwfs.contains(openable)) {
             enumerateListsToClose(listsToClose, openable, binaryDataClosedSwfs);
         }
+        openable = null;
+        
         for (OpenableList list : listsToClose) {
             Main.closeFile(list);
         }
         mainFrame.getPanel().refreshTree();
-        openable = null;
+        
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

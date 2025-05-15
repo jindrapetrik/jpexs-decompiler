@@ -59,8 +59,30 @@ public class EasyPanel extends JPanel {
         tabSwitcher.setValue(swf);
     }
 
+    public int indexOf(SWF swf) {
+        return tabSwitcher.indexOf(swf);
+    }
+    
+    public void setSwfIndex(int index) {
+        if (index < 0) {
+            return;
+        }
+        if (index >= tabSwitcher.getValueCount()) {
+            return;
+        }
+        tabSwitcher.setSelectedIndex(index);
+    }
+    
+    public SWF getSwfAtIndex(int index) {
+        if (index < 0 || index >= tabSwitcher.getValueCount()) {
+            return null;
+        }
+        return tabSwitcher.getValueAtIndex(index);                
+    }
+    
     public void setNoSwf() {
         easySwfPanel.setTimelined(null);
+        tabSwitcher.setValue(null);
     }
 
     public SWF getSwf() {

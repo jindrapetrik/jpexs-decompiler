@@ -1461,7 +1461,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             easyPanel.setSwf((SWF) openable);
         }
         if (openable != null) {
-            updateUi(openable);
+            //updateUi(openable);
         }
 
         gcClipboard();
@@ -1481,11 +1481,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         easyPanel.setSwfs(new ArrayList<>(getAllSwfs()));
 
-        Openable openable = newOpenables.size() > 0 ? newOpenables.get(0) : null;
-        if (openable != null) {
-            updateUi(openable);
-        }
-
+        hideWelcomeScreen();
+                
         gcClipboard();
 
         reload(false);
@@ -1521,6 +1518,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (resourcesOpenable != null) {
                         updateUi(resourcesOpenable);
                     }
+                } else {
+                    updateUi(null);
                 }
                 break;
             case VIEW_TAGLIST:
@@ -1530,6 +1529,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (tagListOpenable != null) {
                         updateUi(tagListOpenable);
                     }
+                } else {
+                    updateUi(null);
                 }
                 break;
             case VIEW_DUMP:
@@ -1539,6 +1540,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (dumpOpenable != null) {
                         updateUi(dumpOpenable);
                     }
+                } else {
+                    updateUi(null);
                 }
                 break;
             case VIEW_EASY:
@@ -1546,10 +1549,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 break;
         }
     }
-
-    private void updateUi(final Openable openable) {
-        View.checkAccess();
-
+        
+    private void hideWelcomeScreen() {
         if (isWelcomeScreen) {
             if (currentView == VIEW_EASY) {
                 showContentPanelCard(EASY_PANEL);
@@ -1558,6 +1559,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             isWelcomeScreen = false;
         }
+    }
+    
+    private void updateUi(final Openable openable) {
+        View.checkAccess();        
         SWF swf = null;
         if (openable instanceof SWF) {
             swf = (SWF) openable;
@@ -1767,6 +1772,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 i--;
             }
         }
+        int minEasyIndex = Integer.MAX_VALUE;
         for (SWF swf : swfsToClose) {
             Main.searchResultsStorage.destroySwf(swf);
             pinsPanel.removeOpenable(swf);
@@ -1786,14 +1792,41 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (breakpointsListDialog != null) {
                 breakpointsListDialog.setVisible(false);
                 breakpointsListDialogs.remove(swf);
+            }                        
+            int index = easyPanel.indexOf(swf);
+            if (index < minEasyIndex) {
+                minEasyIndex = index;
+            }
+        }          
+        
+        minEasyIndex--;
+        if (minEasyIndex < 0) {
+            minEasyIndex = 0;
+            SWF s = easyPanel.getSwfAtIndex(minEasyIndex);
+            while (s != null && swfsToClose.contains(s)) {
+                minEasyIndex++;
+                s = easyPanel.getSwfAtIndex(minEasyIndex);                
             }
         }
-
+        
         openables.remove(openableList);
         oldItem = null;
         clear();
-        updateUi();
-
+        
+        easyPanel.setSwfIndex(minEasyIndex);
+        
+        SWF newEasySwf = easyPanel.getSwf();
+        
+        if (currentView == VIEW_EASY) {            
+            Set<SWF> swfs = getAllSwfs();
+            easyPanel.setSwfs(new ArrayList<>(swfs));
+            easyPanel.setSwf(newEasySwf);            
+            updateUi(newEasySwf);
+        } else {        
+            updateUi();
+        }
+        
+        
         for (SWF swf : swfsToClose) {
             swf.clearTagSwfs();
         }
@@ -1802,7 +1835,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         gcClipboard();
 
-        mainMenu.updateComponents(null);
+        if (currentView == VIEW_EASY) {
+            mainMenu.updateComponents(easyPanel.getSwf());
+        } else {
+            mainMenu.updateComponents();
+        }
         previewPanel.clear();
         dumpPreviewPanel.clear();
         doFilter();
@@ -5414,9 +5451,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void valueChanged(Object source, TreePath selectedPath) {
-        TreeItem treeItem = (TreeItem) selectedPath.getLastPathComponent();
+        TreeItem treeItem = selectedPath == null ? null : (TreeItem) selectedPath.getLastPathComponent();
 
         if (treeItem == null) {
+            updateUi(null);
+            reload(false);
             return;
         }
 
@@ -5426,13 +5465,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 // show welcome panel after closing swfs
                 updateUi();
             } else {
-                if (openable == null && openables.get(0) != null) {
+                /*if (openable == null && openables.get(0) != null) {
                     openable = openables.get(0).get(0);
-                }
+                }*/
 
-                if (openable != null) {
+                /*if (openable != null) {
                     updateUi(openable);
-                }
+                }*/
+                updateUi(openable);
             }
         } else {
             updateUi();
@@ -5464,8 +5504,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        Object source = e.getSource();
-        valueChanged(source, e.getPath());
+        JTree source = (JTree) e.getSource();           
+        valueChanged(source, source.getSelectionPath());
     }
 
     private int getFrameForTreeItem(TreeItem treeItem) {
@@ -5672,6 +5712,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 Configuration.lastView.set(currentView);
                 Set<SWF> swfs = getAllSwfs();
                 easyPanel.setSwfs(new ArrayList<>(swfs));
+                if (swf == null && !swfs.isEmpty()) {
+                    swf = swfs.iterator().next();
+                }
                 easyPanel.setSwf(swf);
                 if (!isWelcomeScreen) {
                     showContentPanelCard(EASY_PANEL);
