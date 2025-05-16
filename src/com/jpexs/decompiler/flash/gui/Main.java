@@ -53,7 +53,9 @@ import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.soleditor.CookiesChangedListener;
 import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
+import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -1820,7 +1822,8 @@ public class Main {
 
                     if (isInited()) {
                         if (resourcesPathStr == null) {
-                            TreePath tp = mainFrame.getPanel().tagTree.getFullModel().getTreePath(fopenable);
+                            TagTreeModel model = mainFrame.getPanel().tagTree.getFullModel();
+                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
                             if (tp != null) {
                                 mainFrame.getPanel().tagTree.setSelectionPath(tp);
                             }
@@ -1828,7 +1831,8 @@ public class Main {
                             mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
                         }
                         if (tagListPathStr == null) {
-                            TreePath tp = mainFrame.getPanel().tagListTree.getFullModel().getTreePath(fopenable);
+                            TagListTreeModel model = mainFrame.getPanel().tagListTree.getFullModel();
+                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
                             if (tp != null) {
                                 mainFrame.getPanel().tagListTree.setSelectionPath(tp);
                             }

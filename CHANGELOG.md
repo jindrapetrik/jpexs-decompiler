@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Nullpointer exception during SWF opening when Simple editor is active
 
 ## [23.0.0] - 2025-05-15
 ### Added
