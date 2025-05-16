@@ -65,6 +65,14 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="23.0.1" date="2025-05-16">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Nullpointer exception during SWF opening when Simple editor is active</li>
+				</ul>
+			</description>
+		</release>
 		<release version="23.0.0" date="2025-05-15">
 			<description>
 				<p>Added</p>
