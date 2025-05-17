@@ -962,9 +962,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 DepthState ds = null;
 
                 if (!(timelined instanceof ButtonTag) && fframe >= timelined.getFrameCount()) {
-                    if (timelined instanceof ButtonTag) {
-
-                    }
                     int lastFrame = timelined.getFrameCount() - 1;
                     for (int d = 1; d <= timeline.maxDepth; d++) {
                         ds = timeline.getDepthState(lastFrame, d);

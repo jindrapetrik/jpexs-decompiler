@@ -101,7 +101,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         g.setColor(borderColor);
         int xofs = -scrollOffset % frameWidth;
         for (int f = 0; f <= end_f; f++) {
-            g.drawLine(xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * frameWidth+ 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength);
+            g.drawLine(xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength);
         }
         g.setFont(g.getFont().deriveFont(fontSize));
         for (int f = 0; f <= end_f; f++) {
