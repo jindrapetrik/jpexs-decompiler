@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -46,6 +47,8 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
 
     private int selectedFrame = -1;
     private int leftPos = 0;
+    
+    private Timeline timeline;
 
     private final List<FrameSelectionListener> listeners = new ArrayList<>();   
 
@@ -62,6 +65,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         setFont(getFont().deriveFont(TimelineDepthPanel.FONT_SIZE));
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
         leftPos = maxDepthW + 2 * TimelineDepthPanel.PADDING;
+        this.timeline = timeline;
     }
     
     
@@ -89,29 +93,53 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     @Override
     protected void paintComponent(Graphics g) {
         Rectangle clip = g.getClipBounds();
-        int start_f = (scrollOffset + clip.x) / TimelineBodyPanel.FRAME_WIDTH;
-        int end_f = (scrollOffset + clip.x + clip.width) / TimelineBodyPanel.FRAME_WIDTH;
+        int frameWidth = TimelineBodyPanel.getFrameWidthForTimeline(timeline);
+        int start_f = (scrollOffset + clip.x) / frameWidth;
+        int end_f = (scrollOffset + clip.x + clip.width) / frameWidth;
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(borderColor);
-        int xofs = leftPos - TimelineBodyPanel.FRAME_WIDTH - scrollOffset % TimelineBodyPanel.FRAME_WIDTH;
+        int xofs = -scrollOffset % frameWidth;
         for (int f = 0; f <= end_f; f++) {
-            g.drawLine(xofs + f * TimelineBodyPanel.FRAME_WIDTH + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * TimelineBodyPanel.FRAME_WIDTH + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength);
+            g.drawLine(xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * frameWidth+ 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength);
         }
         g.setFont(g.getFont().deriveFont(fontSize));
         for (int f = 0; f <= end_f; f++) {
             int cur_f = start_f + f;
             if (selectedFrame == cur_f) {
                 g.setColor(TimelineBodyPanel.SELECTED_COLOR);
-                g.fillRect(xofs + (f - 1) * TimelineBodyPanel.FRAME_WIDTH + 1, 0, TimelineBodyPanel.FRAME_WIDTH, TimelineBodyPanel.FRAME_HEIGHT - 1);
+                g.fillRect(xofs + f * frameWidth + 1, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
                 g.setColor(TimelineBodyPanel.SELECTED_BORDER_COLOR);
-                g.drawRect(xofs + (f - 1) * TimelineBodyPanel.FRAME_WIDTH + 1, 0, TimelineBodyPanel.FRAME_WIDTH, TimelineBodyPanel.FRAME_HEIGHT - 1);
+                g.drawRect(xofs + f * frameWidth + 1, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
             }
             g.setColor(fontColor);
-            if ((cur_f + 1) % 5 == 0 || cur_f == 0) {
-                String timeStr = Integer.toString(cur_f + 1);
-                int w = g.getFontMetrics().stringWidth(timeStr);
-                g.drawString(timeStr, xofs + (f - 1) * TimelineBodyPanel.FRAME_WIDTH + TimelineBodyPanel.FRAME_WIDTH / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength - lineTextSpace);
+            
+            if (timeline != null && timeline.timelined instanceof ButtonTag) {
+                if (f < 5) {
+                    String timeStr = "";
+                    switch (f) {
+                        case ButtonTag.FRAME_UP:
+                            timeStr = "Up";
+                            break;
+                        case ButtonTag.FRAME_OVER:
+                            timeStr = "Over";
+                            break;
+                        case ButtonTag.FRAME_DOWN:
+                            timeStr = "Down";
+                            break;
+                        case ButtonTag.FRAME_HITTEST:
+                            timeStr = "Hit";
+                            break;
+                    }
+                    int w = g.getFontMetrics().stringWidth(timeStr);
+                    g.drawString(timeStr, xofs + f * frameWidth + frameWidth / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength - lineTextSpace);
+                }
+            } else {
+                if ((cur_f + 1) % 5 == 0 || cur_f == 0) {
+                    String timeStr = Integer.toString(cur_f + 1);
+                    int w = g.getFontMetrics().stringWidth(timeStr);
+                    g.drawString(timeStr, xofs + f * frameWidth + frameWidth / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength - lineTextSpace);
+                }
             }
         }
     }
@@ -122,7 +150,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        int frame = (scrollOffset + e.getX()) / TimelineBodyPanel.FRAME_WIDTH;
+        int frame = (scrollOffset + e.getX()) / TimelineBodyPanel.getFrameWidthForTimeline(timeline);
         frameSelect(frame);
         for (FrameSelectionListener l : listeners) {
             l.frameSelected(frame, new ArrayList<>());

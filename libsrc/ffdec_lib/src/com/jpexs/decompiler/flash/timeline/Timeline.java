@@ -746,7 +746,7 @@ public class Timeline {
         for (int d = 0; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f); 
+                    depthMaxFrame.put(d, f);                    
                     break;
                 }
             }
@@ -766,6 +766,8 @@ public class Timeline {
                     }
                 }
             }
+        } else {
+            depthMaxFrameButtons.putAll(depthMaxFrame);
         }
     }
 

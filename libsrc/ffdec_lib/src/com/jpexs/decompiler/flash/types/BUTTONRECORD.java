@@ -161,7 +161,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public BUTTONRECORD(BUTTONRECORD source) {
         this.buttonHasBlendMode = source.buttonHasBlendMode;
         this.buttonHasFilterList = source.buttonHasFilterList;
-        this.buttonStateHitTest =source. buttonStateHitTest;
+        this.buttonStateHitTest = source.buttonStateHitTest;
         this.buttonStateDown = source.buttonStateDown;
         this.buttonStateOver = source.buttonStateOver;
         this.buttonStateUp = source.buttonStateUp;
@@ -175,8 +175,6 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
         this.tag = source.tag;
         this.modified = source.modified;
     }
-    
-    
 
     /**
      * Constructor.
@@ -349,5 +347,5 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
             return false;
         }
         return true;
-    }       
+    }
 }

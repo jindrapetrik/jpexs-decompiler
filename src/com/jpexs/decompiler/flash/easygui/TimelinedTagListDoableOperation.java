@@ -43,14 +43,14 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
         this.swfPanel = swfPanel;
         this.timelined = timelined;
         this.fframe = swfPanel.getFrame();
-        this.fdepths = swfPanel.getDepths();        
+        this.fdepths = swfPanel.getDepths();
     }
 
     @Override
     public void doOperation() {
         swfPanel.setTimelined(timelined);
         swfPanel.setFrame(fframe, fdepths);
-       
+
         saveTagList();
         wasModified = timelined.isModified();
         timelined.setModified(true);
@@ -59,7 +59,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
     protected void saveTagList() {
         if (timelined instanceof ButtonTag) {
             List<BUTTONRECORD> recordsCopy = new ArrayList<>();
-            for (BUTTONRECORD rec :((ButtonTag) timelined).getRecords()) {
+            for (BUTTONRECORD rec : ((ButtonTag) timelined).getRecords()) {
                 recordsCopy.add(new BUTTONRECORD(rec));
             }
             buttonRecords = recordsCopy;
@@ -87,7 +87,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
                 timelined.addTag(tags.get(i));
             }
             timelined.resetTimeline();
-            timelined.setFrameCount(timelined.getTimeline().getFrameCount());                            
+            timelined.setFrameCount(timelined.getTimeline().getFrameCount());
         }
     }
 
