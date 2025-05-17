@@ -1956,13 +1956,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Double snapOffsetY = null;
 
                         double zoomDouble = getRealZoom();
+                        Matrix parentMatrix = getParentMatrix();
 
                         if (Configuration.snapAlign.get() && timelined != null && points == null && transform != null) {
                             Frame fr = timelined.getTimeline().getFrame(frame);
                             if (fr != null) {
-                                Timeline timeline = timelined.getTimeline();
-
-                                Matrix parentMatrix = getParentMatrix();
+                                Timeline timeline = timelined.getTimeline();                               
 
                                 Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                                 double ex = mouseTransPoint.getX();
@@ -2141,8 +2140,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                                 Matrix dsMatrix = new Matrix();
                                                 if (ds.matrix != null) {
-                                                    dsMatrix = new Matrix(ds.matrix);
+                                                    dsMatrix = new Matrix(ds.matrix);                                                    
                                                 }
+                                                dsMatrix = dsMatrix.concatenate(parentMatrix);
 
                                                 Rectangle2D bounds = dsMatrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
                                                 bounds = new Rectangle2D.Double(
@@ -2304,6 +2304,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     if (depthStateUnderCursor.matrix != null) {
                                         matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
                                     }
+                                    matrix = matrix.concatenate(parentMatrix);
 
                                     Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
 
