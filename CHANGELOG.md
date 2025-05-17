@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- "Starting Flash content debugger" in status bar when debugging starts
+
 ### Fixed
 - Resize export dialogs labels to match localized strings
 - AS1/2 debugger - deletion of SWD file after debugging

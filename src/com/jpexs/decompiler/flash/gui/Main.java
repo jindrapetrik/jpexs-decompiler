@@ -497,6 +497,7 @@ public class Main {
             instrSWF.addEventListener(prepEventListener);
             try {
                 File fTempFile = new File(instrSWF.getFile());
+                startWork(AppStrings.translate("work.injecting_debuginfo"), swfPrepareWorker, true);
                 instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
                 try (FileOutputStream fos = new FileOutputStream(fTempFile)) {
                     instrSWF.saveTo(fos);
@@ -534,6 +535,7 @@ public class Main {
                                 }
                             }
                         });
+                        startWork(AppStrings.translate("work.generating_swd"), swfPrepareWorker, true);
                         if (doPCode) {
                             instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         } else {
@@ -830,6 +832,7 @@ public class Main {
                         runningPreparation = new SwfDebugPrepare(doPCode);
                     }
                     Main.stopWork();
+                    Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
                     Main.startDebugger();
                     runPlayer(AppStrings.translate("work.debugging.wait"), playerLocation, fTempFile.getAbsolutePath(), flashVars);
                 }
@@ -1004,10 +1007,16 @@ public class Main {
     }
 
     public static void startWork(String name, CancellableWorker worker) {
-        startWork(name, -1, worker);
+        startWork(name, -1, worker, false);
+    }
+    public static void startWork(String name, CancellableWorker worker, boolean force) {
+        startWork(name, -1, worker, force);
     }
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
+        startWork(name, percent, worker, false);
+    }
+    public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean force) {
         working = true;
         long nowTime = System.currentTimeMillis();
         if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {
@@ -1036,6 +1045,7 @@ public class Main {
 
     public static void stopWork() {
         working = false;
+        lastTimeStartWork = 0;
         View.execInEventDispatchLater(() -> {
             if (mainFrame != null) {
                 mainFrame.getPanel().setWorkStatus("", null);
