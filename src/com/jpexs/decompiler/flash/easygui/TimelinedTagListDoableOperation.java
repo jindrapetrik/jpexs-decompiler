@@ -18,7 +18,10 @@ package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +34,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
 
     private final Timelined timelined;
     protected List<Tag> tags;
+    protected List<BUTTONRECORD> buttonRecords;
     protected boolean wasModified = false;
     protected int fframe;
     protected List<Integer> fdepths;
@@ -53,10 +57,26 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
     }
 
     protected void saveTagList() {
-        tags = timelined.getTags().toArrayList();
+        if (timelined instanceof ButtonTag) {
+            List<BUTTONRECORD> recordsCopy = new ArrayList<>();
+            for (BUTTONRECORD rec :((ButtonTag) timelined).getRecords()) {
+                recordsCopy.add(new BUTTONRECORD(rec));
+            }
+            buttonRecords = recordsCopy;
+        } else {
+            tags = timelined.getTags().toArrayList();
+        }
     }
 
-    protected void restoreTagList() {        
+    protected void restoreTagList() {
+        if (buttonRecords != null) {
+            if (timelined instanceof ButtonTag) {
+                ButtonTag button = (ButtonTag) timelined;
+                button.getRecords().clear();
+                button.getRecords().addAll(buttonRecords);
+            }
+            timelined.resetTimeline();
+        }
         if (tags != null) {
             ReadOnlyTagList newTags = timelined.getTags();
             int size = newTags.size();

@@ -298,15 +298,21 @@ public class EasySwfPanel extends JPanel {
                                 place.matrix = new MATRIX();
                                 place.placeFlagHasMatrix = true;
                                 place.setTimelined(timelined);
-                                if (showFrameTag == null) {
-                                    timelined.addTag(place);
+                                
+                                if (timelined instanceof ButtonTag) {
+                                    ButtonTag button = (ButtonTag) timelined;
+                                    button.getButtonRecordAt(fframe, newDepth, true).fromPlaceObject(place);
                                 } else {
-                                    timelined.addTag(timelined.indexOfTag(showFrameTag), place);
+                                    if (showFrameTag == null) {
+                                        timelined.addTag(place);
+                                    } else {
+                                        timelined.addTag(timelined.indexOfTag(showFrameTag), place);
 
-                                    if (fframe < timelined.getFrameCount() - 1) {
-                                        RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
-                                        remove.depth = newDepth;
-                                        timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
+                                        if (fframe < timelined.getFrameCount() - 1) {
+                                            RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
+                                            remove.depth = newDepth;
+                                            timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
+                                        }
                                     }
                                 }
 

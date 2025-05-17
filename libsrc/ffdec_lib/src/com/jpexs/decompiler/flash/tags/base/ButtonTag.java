@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -278,7 +279,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
                     break;
             }
         }
-        
+
         if (addIfNotExists) {
             BUTTONRECORD newRecord = new BUTTONRECORD(swf, this);
             switch (frame) {
@@ -295,11 +296,51 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
                     newRecord.buttonStateHitTest = true;
                     break;
             }
+            newRecord.placeDepth = depth;
             getRecords().add(newRecord);
             return newRecord;
         }
-        
+
         return null;
+    }
+    
+    public void packRecords() {
+        List<BUTTONRECORD> records = new ArrayList<>();
+        for (int i = records.size() - 1; i >= 0; i--) {
+            BUTTONRECORD rec = records.get(i);
+            if (rec.isEmpty()) {
+                records.remove(i);
+            }
+        }
+    }
+    
+    public Set<Integer> getEmptyFrames() {        
+        Set<Integer> ret = new LinkedHashSet<>();
+        ret.add(FRAME_UP);
+        ret.add(FRAME_OVER);
+        ret.add(FRAME_DOWN);
+        ret.add(FRAME_HITTEST);
+        for (BUTTONRECORD rec : getRecords()) {
+            if (rec.buttonStateUp) {
+                ret.remove(FRAME_UP);
+            }
+            if (rec.buttonStateOver) {
+                ret.remove(FRAME_OVER);
+            }
+            if (rec.buttonStateDown) {
+                ret.remove(FRAME_DOWN);
+            }
+            if (rec.buttonStateHitTest) {
+                ret.remove(FRAME_HITTEST);
+            }
+        }
+        return ret;
+    }
+    
+    
+    public boolean isFrameEmpty(int frame) {
+        
+        return true;
     }
 
     public void setRecordFromPlaceObject(int frame, PlaceObjectTypeTag placeTag) {

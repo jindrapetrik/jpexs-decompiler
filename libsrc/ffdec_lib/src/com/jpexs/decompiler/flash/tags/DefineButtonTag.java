@@ -264,14 +264,23 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
             if (r.buttonStateUp) {
                 frameUp.layers.put(r.placeDepth, new DepthState(layer, frameUp, frameUp, false));
             }
-            if (r.buttonStateDown) {
-                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, frameDown, false));
-            }
             if (r.buttonStateOver) {
                 frameOver.layers.put(r.placeDepth, new DepthState(layer, frameOver, frameOver, false));
+                if (!r.buttonStateUp) {
+                    frameOver.layers.get(r.placeDepth).key = true;
+                }
+            }
+            if (r.buttonStateDown) {
+                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, frameDown, false));
+                if (!r.buttonStateOver) {
+                    frameDown.layers.get(r.placeDepth).key = true;
+                }
             }
             if (r.buttonStateHitTest) {
                 frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, frameHit, false));
+                if (!r.buttonStateDown) {
+                    frameDown.layers.get(r.placeDepth).key = true;
+                }
             }
 
         }

@@ -3454,6 +3454,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             BoundedTag bounded = (BoundedTag) timelined;
             RECT rect = bounded.getRect();
+            if (rect == null) {
+                return;
+            }
             int width = rect.getWidth();
             double scale = 1.0;
             /*if (width > swf.displayRect.getWidth()) {
@@ -4140,6 +4143,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         RECT timRect = timelined.getRect();
+        
+        if (timRect == null) {
+            return;
+        }
 
         /*
         int h_value = horizontalScrollBar.getValue();
@@ -4813,6 +4820,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Matrix parentMatrix = new Matrix();
             for (int i = 0; i < parentTimelineds.size(); i++) {
                 DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
+                if (parentDepthState == null) {
+                    continue;
+                }
 
                 parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             }
@@ -4851,7 +4861,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         for (int i = 0; i < selectedDepths.size(); i++) {
             if (newMatrix != null) {
-                DepthState ds = timeline.getFrame(frame).layers.get(selectedDepths.get(i));
+                Frame fr = timeline.getFrame(frame);
+                if (fr == null) {
+                    continue;
+                }
+                DepthState ds = fr.layers.get(selectedDepths.get(i));
                 if (ds != null) {
                     ds.temporaryMatrix = newMatrix.concatenate(new Matrix(ds.matrix)).toMATRIX();
                 }

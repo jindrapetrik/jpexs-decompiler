@@ -84,6 +84,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -144,6 +145,11 @@ public class Timeline {
      * Map of depth to maximum frame.
      */
     private final Map<Integer, Integer> depthMaxFrame = new HashMap<>();
+    
+    /**
+     * Map of depth to maximum frame including buttons
+     */
+    private final Map<Integer, Integer> depthMaxFrameButtons = new HashMap<>();
 
     /**
      * List of all ASMSources.
@@ -283,6 +289,16 @@ public class Timeline {
         ensureInitialized();
         return depthMaxFrame;
     }
+    
+    /**
+     * Gets map of depth to max frame including buttons
+     *
+     * @return Map of depth to max frame
+     */
+    public Map<Integer, Integer> getDepthMaxFrameButtons() {
+        ensureInitialized();
+        return depthMaxFrameButtons;
+    }
 
     /**
      * Gets map of soundStream id to SoundStreamFrameRanges.
@@ -325,6 +341,7 @@ public class Timeline {
         initialized = false;
         frames.clear();
         depthMaxFrame.clear();
+        depthMaxFrameButtons.clear();
         asmSources.clear();
         asmSourceContainers.clear();
         actionFrames.clear();
@@ -725,11 +742,28 @@ public class Timeline {
      */
     private synchronized void calculateMaxDepthFrames() {
         depthMaxFrame.clear();
+        depthMaxFrameButtons.clear();
         for (int d = 0; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f);
+                    depthMaxFrame.put(d, f); 
                     break;
+                }
+            }
+        }
+        
+        if (timelined instanceof ButtonTag) {
+            ButtonTag button = (ButtonTag) timelined;
+            Set<Integer> emptyFrames = button.getEmptyFrames();
+            
+            for (int d = 0; d <= maxDepth; d++) {
+                for (int f = frames.size() - 1; f >= 0; f--) {
+                    if (frames.get(f).layers.get(d) != null) {
+                        if (!emptyFrames.contains(f)) {
+                            depthMaxFrameButtons.put(d, f);
+                            break;
+                        }                     
+                    }
                 }
             }
         }
