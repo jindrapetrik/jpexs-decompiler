@@ -1655,6 +1655,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (depthStateUnderCursor.matrix != null) {
                                 matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
                             }
+                            matrix = matrix.concatenate(getParentMatrix());
                             Matrix scaleMatrix = Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor);
 
                             matrix = matrix.preConcatenate(scaleMatrix);
