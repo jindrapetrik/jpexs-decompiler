@@ -54,12 +54,16 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -232,6 +236,10 @@ public class ExportDialog extends AppDialog {
         }
         return false;
     }
+    
+    private String translateTitle(String title) {
+        return translate("titleFormat").replace("%title%", translate(title));
+    }
 
     public ExportDialog(Window owner, List<TreeItem> exportables) {
         super(owner);
@@ -240,7 +248,11 @@ public class ExportDialog extends AppDialog {
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        JPanel comboPanel = new JPanel(null);
+        JPanel comboPanel = new JPanel(new GridBagLayout());
+        comboPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+        
         int labWidth = 0;
         boolean[] exportableExistsArray = new boolean[optionNames.length];
         for (int i = 0; i < optionNames.length; i++) {
@@ -282,16 +294,10 @@ public class ExportDialog extends AppDialog {
 
         }
 
-        int comboWidth = 200;
-        int checkBoxWidth;
-        int top = 10;
-
         List<String> exportFormats = Arrays.asList(exportFormatsArr);
         combos = new JComboBox[optionNames.length];
         checkBoxes = new JCheckBox[optionNames.length];
         selectAllCheckBox = new JCheckBox();
-        checkBoxWidth = selectAllCheckBox.getPreferredSize().width;
-        selectAllCheckBox.setBounds(10 + labWidth + 10 + comboWidth + 10, top, checkBoxWidth, selectAllCheckBox.getPreferredSize().height);
         selectAllCheckBox.setSelected(true);
         selectAllCheckBox.addActionListener((ActionEvent e) -> {
             boolean selected = selectAllCheckBox.isSelected();
@@ -301,9 +307,10 @@ public class ExportDialog extends AppDialog {
                 }
             }
         });
-        comboPanel.add(selectAllCheckBox);
-        top += selectAllCheckBox.getHeight();
-
+        gbc.gridy = 0;
+        gbc.gridx = 3;
+        comboPanel.add(selectAllCheckBox, gbc);        
+        
         List<Class> visibleOptionClasses = new ArrayList<>();
 
         boolean zoomable = false;
@@ -325,11 +332,8 @@ public class ExportDialog extends AppDialog {
             if (itemIndex > -1) {
                 combos[i].setSelectedIndex(itemIndex);
             }
-
-            combos[i].setBounds(10 + labWidth + 10, top, comboWidth, combos[i].getPreferredSize().height);
-
+            
             checkBoxes[i] = new JCheckBox();
-            checkBoxes[i].setBounds(10 + labWidth + 10 + comboWidth + 10, top, checkBoxWidth, checkBoxes[i].getPreferredSize().height);
             checkBoxes[i].setSelected(true);
 
             if (!exportableExistsArray[i]) {
@@ -342,13 +346,23 @@ public class ExportDialog extends AppDialog {
 
             visibleOptionClasses.add(c);
 
-            JLabel lab = new JLabel(translate(optionNames[i]));
-            lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
-            comboPanel.add(lab);
-            comboPanel.add(checkBoxes[i]);
-            comboPanel.add(combos[i]);
-            top += combos[i].getHeight();
-        }
+            JLabel lab = new JLabel(translateTitle(optionNames[i]));
+            gbc.gridy++;
+            gbc.gridx = 0;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            comboPanel.add(lab, gbc);
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.gridwidth = 2;
+            comboPanel.add(combos[i], gbc);
+            gbc.gridx += 2;      
+            gbc.gridwidth = 1;
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.anchor = GridBagConstraints.CENTER;
+            comboPanel.add(checkBoxes[i], gbc);
+            lab.setLabelFor(combos[i]);
+        }                
 
         embedCheckBox = new JCheckBox(translate("embed"));
         embedCheckBox.setVisible(false);
@@ -364,19 +378,16 @@ public class ExportDialog extends AppDialog {
                 }
             }
         }
-
-        int w = 10 + labWidth + 10 + checkBoxWidth + 10 + comboWidth + 10;
-
+        
+        gbc.gridx = 0;            
+        gbc.gridwidth = 4;   
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        
         if (hasAs3 && visibleOptionClasses.contains(ScriptExportMode.class)) {
+            gbc.gridy++;
             embedCheckBox.setVisible(true);
-            top += 2;
-            embedCheckBox.setBounds(10, top, embedCheckBox.getPreferredSize().width, embedCheckBox.getPreferredSize().height);
-            comboPanel.add(embedCheckBox);
-            top += embedCheckBox.getHeight();
-
-            if (embedCheckBox.getWidth() + 10 > w) {
-                w = embedCheckBox.getWidth() + 10;
-            }
+            comboPanel.add(embedCheckBox, gbc);         
             if (Configuration.lastExportEnableEmbed.get()) {
                 embedCheckBox.setSelected(true);
             }
@@ -386,57 +397,42 @@ public class ExportDialog extends AppDialog {
         resampleWavCheckBox.setVisible(false);
 
         if (embedCheckBox.isVisible() || visibleOptionClasses.contains(SoundExportMode.class)) {
-            top += 2;
+            gbc.gridy++;
             resampleWavCheckBox.setVisible(true);
-            comboPanel.add(resampleWavCheckBox);
+            comboPanel.add(resampleWavCheckBox, gbc);
             if (Configuration.lastExportResampleWav.get()) {
                 resampleWavCheckBox.setSelected(true);
-            }
-
-            resampleWavCheckBox.setBounds(10, top, resampleWavCheckBox.getPreferredSize().width, resampleWavCheckBox.getPreferredSize().height);
-            top += resampleWavCheckBox.getHeight();
-
-            if (resampleWavCheckBox.getWidth() + 10 > w) {
-                w = resampleWavCheckBox.getWidth() + 10;
             }
         }
 
         transparentFrameBackgroundCheckBox = new JCheckBox(translate("transparentFrameBackground"));
         transparentFrameBackgroundCheckBox.setVisible(false);
         if (visibleOptionClasses.contains(FrameExportMode.class)) {
-            top += 2;
+            gbc.gridy++;
             transparentFrameBackgroundCheckBox.setVisible(true);
-            comboPanel.add(transparentFrameBackgroundCheckBox);
+            comboPanel.add(transparentFrameBackgroundCheckBox, gbc);
             if (Configuration.lastExportTransparentBackground.get()) {
                 transparentFrameBackgroundCheckBox.setSelected(true);
             }
-
-            transparentFrameBackgroundCheckBox.setBounds(10, top, transparentFrameBackgroundCheckBox.getPreferredSize().width, transparentFrameBackgroundCheckBox.getPreferredSize().height);
-            top += transparentFrameBackgroundCheckBox.getHeight();
-
-            if (transparentFrameBackgroundCheckBox.getWidth() + 10 > w) {
-                w = transparentFrameBackgroundCheckBox.getWidth() + 10;
-            }
         }
 
-        int zoomWidth = 50;
         if (zoomable) {
-            top += 2;
-            JLabel zlab = new JLabel(translate("zoom"));
-            zlab.setBounds(10, top + 4, zlab.getPreferredSize().width, zlab.getPreferredSize().height);
-            zoomTextField.setBounds(10 + labWidth + 10, top, zoomWidth, zoomTextField.getPreferredSize().height);
-            JLabel pctLabel = new JLabel(translate("zoom.percent"));
-            pctLabel.setBounds(10 + labWidth + 10 + zoomWidth + 5, top + 4, 20, pctLabel.getPreferredSize().height);
-
-            comboPanel.add(zlab);
-            comboPanel.add(zoomTextField);
-            comboPanel.add(pctLabel);
-            top += zoomTextField.getHeight();
+            JLabel zlab = new JLabel(translateTitle("zoom"));
+            JLabel pctLabel = new JLabel(translate("zoom.percent"));   
+            zlab.setLabelFor(zoomTextField);
+            gbc.gridy++;
+            gbc.gridx = 0;
+            gbc.gridwidth = 1;            
+            gbc.anchor = GridBagConstraints.LINE_END;
+            comboPanel.add(zlab, gbc);
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            comboPanel.add(zoomTextField, gbc);
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;            
+            comboPanel.add(pctLabel, gbc);
         }
 
-        Dimension dim = new Dimension(w, top + 10);
-        comboPanel.setMinimumSize(dim);
-        comboPanel.setPreferredSize(dim);
         cnt.add(comboPanel, BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());

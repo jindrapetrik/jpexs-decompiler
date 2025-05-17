@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Resize export dialogs labels to match localized strings
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
