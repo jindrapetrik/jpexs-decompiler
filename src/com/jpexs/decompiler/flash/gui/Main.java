@@ -451,13 +451,13 @@ public class Main {
 
     private static interface SwfPreparation {
 
-        public SWF prepare(SWF swf, String swfHash) throws InterruptedException;
+        public SWF prepare(SWF swf, String swfHash, List<File> tempFiles) throws InterruptedException;
     }
 
     private static class SwfRunPrepare implements SwfPreparation {
 
         @Override
-        public SWF prepare(SWF swf, String swfHash) throws InterruptedException {
+        public SWF prepare(SWF swf, String swfHash, List<File> tempFiles) throws InterruptedException {
             if (Configuration.autoOpenLoadedSWFs.get()) {
                 if (!DebuggerTools.hasDebugger(swf)) {
                     DebuggerTools.switchDebugger(swf);
@@ -477,7 +477,7 @@ public class Main {
         }
 
         @Override
-        public SWF prepare(SWF instrSWF, String swfHash) throws InterruptedException {
+        public SWF prepare(SWF instrSWF, String swfHash, List<File> tempFiles) throws InterruptedException {
             EventListener prepEventListener = new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -539,6 +539,7 @@ public class Main {
                         } else {
                             instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         }
+                        tempFiles.add(swdFile);
                     }
                 }
             } catch (IOException ex) {
@@ -583,7 +584,9 @@ public class Main {
                 }
             }
             if (prep != null) {
-                instrSWF = prep.prepare(instrSWF, swfHash);
+                List<File> prepTempFiles = new ArrayList<>();
+                instrSWF = prep.prepare(instrSWF, swfHash, prepTempFiles);
+                tempFiles.addAll(prepTempFiles);
             }
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);

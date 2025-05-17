@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - Resize export dialogs labels to match localized strings
+- AS1/2 debugger - deletion of SWD file after debugging
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
