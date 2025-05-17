@@ -651,7 +651,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             if (frame > 0) {
                 fr = timeline.getFrame(frame - 1);
                 ds = fr == null ? null : fr.layers.get(depth);
-                previousEmpty = ds == null || ds.getCharacter() == null;
+                previousEmpty = emptyFrames.contains(frame - 1) || ds == null || ds.getCharacter() == null;
             }
             for (int f = frame - 1; f >= 0; f--) {
                 fr = timeline.getFrame(f);
