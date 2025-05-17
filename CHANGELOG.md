@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - Simple editor - add/remove frames in buttons, button timeline header
 
 ### Fixed
+- [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
+
+### Fixed
 - Resize export dialogs labels to match localized strings
 - AS1/2 debugger - deletion of SWD file after debugging
 
@@ -3792,6 +3795,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448

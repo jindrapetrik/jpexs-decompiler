@@ -6020,7 +6020,9 @@ public class XFLConverter {
         }
 
         if (cbfFlaVersion != null) {
-            progressListener.status("Converting to " + cbfFlaVersion + " ...");
+            if (progressListener != null) {
+                progressListener.status("Converting to " + cbfFlaVersion + " ...");
+            }
             try {
                 InputStorageInterface inputStorage = new ZippedInputStorage(new File(zipfile));
                 OutputStorageInterface outputStorage = new CfbOutputStorage(new File(outfile));
