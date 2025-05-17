@@ -5394,7 +5394,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             } else {
                 depthStateUnderCursor = null;
             }
-
+            
             if (showObjectsUnderCursor && autoPlayed) {
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -1093,13 +1094,20 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             for (int i = 0; i < fdepths.size(); i++) {
                 PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
                 PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
-
-                int index = timelined.indexOfTag(placeObjectBefore);
-                timelined.removeTag(index);
-                timelined.addTag(index, placeObjectAfter);
-                timelined.setModified(true);
+                
+                if (!(timelined instanceof ButtonTag)) {
+                    int index = timelined.indexOfTag(placeObjectBefore);
+                    timelined.removeTag(index);
+                    timelined.addTag(index, placeObjectAfter);
+                    timelined.setModified(true);
+                }
                 DepthState depthStateBefore = depthStatesBefore.get(i);
                 doPlaceOperation(placeObjectAfter, depthStateBefore);
+                
+                if (timelined instanceof ButtonTag) {
+                    ButtonTag button = (ButtonTag) timelined;
+                    button.setRecordFromPlaceObject(fframe, placeObjectAfter);
+                }
             }
 
             timelined.resetTimeline();
@@ -1113,9 +1121,14 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             for (int i = 0; i < placeObjectsAfter.size(); i++) {
                 PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
                 PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
-                int index = timelined.indexOfTag(placeObjectAfter);
-                timelined.removeTag(index);
-                timelined.addTag(index, placeObjectBefore);
+                if (timelined instanceof ButtonTag) {
+                    ButtonTag button = (ButtonTag) timelined;
+                    button.setRecordFromPlaceObject(fframe, placeObjectBefore);                    
+                } else {
+                    int index = timelined.indexOfTag(placeObjectAfter);
+                    timelined.removeTag(index);
+                    timelined.addTag(index, placeObjectBefore);
+                }
             }
             if (!timelinedModifiedBefore) {
                 timelined.setModified(false);

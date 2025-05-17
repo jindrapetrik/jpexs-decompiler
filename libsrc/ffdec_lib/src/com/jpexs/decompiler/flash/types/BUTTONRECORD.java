@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -210,6 +211,18 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
         this.characterId = characterId;
     }
 
+    public void fromPlaceObject(PlaceObjectTypeTag placeObject) {
+        placeDepth = placeObject.getDepth();
+        characterId = placeObject.getCharacterId();
+        ColorTransform importedColorTrans = placeObject.getColorTransform();        
+        colorTransform = importedColorTrans == null ? null : new CXFORMWITHALPHA(placeObject.getColorTransform());
+        placeMatrix = placeObject.getMatrix();
+        blendMode = placeObject.getBlendMode();
+        buttonHasBlendMode = blendMode > 0;
+        filterList = placeObject.getFilters();
+        buttonHasFilterList = filterList != null && !filterList.isEmpty();
+    }
+    
     /**
      * Converts this BUTTONRECORD to a place tag.
      * @return Place tag

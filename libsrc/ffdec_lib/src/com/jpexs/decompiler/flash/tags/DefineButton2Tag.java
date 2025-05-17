@@ -200,6 +200,9 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
+        if (swf == null) {
+            return null;
+        }
         Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
         RECT ret = cache == null ? null : cache.get(this);
         if (ret != null) {
@@ -267,6 +270,8 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             layer.filters = r.filterList;
             layer.matrix = r.placeMatrix;
             layer.characterId = r.characterId;
+            layer.depth = r.placeDepth;
+            
             if (r.placeDepth > maxDepth) {
                 maxDepth = r.placeDepth;
             }
@@ -313,7 +318,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public void setFrameCount(int frameCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        
     }
 
     @Override

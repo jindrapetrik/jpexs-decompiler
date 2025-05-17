@@ -48,22 +48,22 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     /**
      * Frame up
      */
-    public static int FRAME_UP = 0;
+    public static final int FRAME_UP = 0;
 
     /**
      * Frame over
      */
-    public static int FRAME_OVER = 1;
+    public static final int FRAME_OVER = 1;
 
     /**
      * Frame down
      */
-    public static int FRAME_DOWN = 2;
+    public static final int FRAME_DOWN = 2;
 
     /**
      * Frame hit test
      */
-    public static int FRAME_HITTEST = 3;
+    public static final int FRAME_HITTEST = 3;
 
     private transient Timeline timeline;
 
@@ -85,12 +85,14 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
 
     /**
      * Gets button records.
+     *
      * @return Button records
      */
     public abstract List<BUTTONRECORD> getRecords();
 
     /**
      * Checks if the button is tracked as a menu.
+     *
      * @return True if the button is tracked as a menu, otherwise false
      */
     public abstract boolean trackAsMenu();
@@ -134,6 +136,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
 
     /**
      * Gets the sounds.
+     *
      * @return Sounds
      */
     public DefineButtonSoundTag getSounds() {
@@ -184,6 +187,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
 
     /**
      * Initializes the timeline.
+     *
      * @param timeline Timeline
      */
     protected abstract void initTimeline(Timeline timeline);
@@ -243,5 +247,116 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
         for (BUTTONRECORD record : getRecords()) {
             record.setModified(value);
         }
+    }
+
+    public BUTTONRECORD getButtonRecordAt(int frame, int depth, boolean addIfNotExists) {
+        for (BUTTONRECORD rec : getRecords()) {
+            if (rec.placeDepth != depth) {
+                continue;
+            }
+
+            switch (frame) {
+                case FRAME_UP:
+                    if (rec.buttonStateUp) {
+                        return rec;
+                    }
+                    break;
+                case FRAME_OVER:
+                    if (rec.buttonStateOver) {
+                        return rec;
+                    }
+                    break;
+                case FRAME_DOWN:
+                    if (rec.buttonStateDown) {
+                        return rec;
+                    }
+                    break;
+                case FRAME_HITTEST:
+                    if (rec.buttonStateHitTest) {
+                        return rec;
+                    }
+                    break;
+            }
+        }
+        
+        if (addIfNotExists) {
+            BUTTONRECORD newRecord = new BUTTONRECORD(swf, this);
+            switch (frame) {
+                case FRAME_UP:
+                    newRecord.buttonStateUp = true;
+                    break;
+                case FRAME_OVER:
+                    newRecord.buttonStateOver = true;
+                    break;
+                case FRAME_DOWN:
+                    newRecord.buttonStateDown = true;
+                    break;
+                case FRAME_HITTEST:
+                    newRecord.buttonStateHitTest = true;
+                    break;
+            }
+            getRecords().add(newRecord);
+            return newRecord;
+        }
+        
+        return null;
+    }
+
+    public void setRecordFromPlaceObject(int frame, PlaceObjectTypeTag placeTag) {
+        BUTTONRECORD selectedRecord = null;
+        List<BUTTONRECORD> records = getRecords();
+        loopRecords:
+        for (BUTTONRECORD rec : records) {
+            if (rec.placeDepth != placeTag.getDepth()) {
+                continue;
+            }
+
+            switch (frame) {
+                case FRAME_UP:
+                    if (rec.buttonStateUp) {
+                        selectedRecord = rec;
+                        break loopRecords;
+                    }
+                    break;
+                case FRAME_OVER:
+                    if (rec.buttonStateOver) {
+                        selectedRecord = rec;
+                        break loopRecords;
+                    }
+                    break;
+                case FRAME_DOWN:
+                    if (rec.buttonStateDown) {
+                        selectedRecord = rec;
+                        break loopRecords;
+                    }
+                    break;
+                case FRAME_HITTEST:
+                    if (rec.buttonStateHitTest) {
+                        selectedRecord = rec;
+                        break loopRecords;
+                    }
+                    break;
+            }
+        }
+
+        if (selectedRecord == null) {
+            selectedRecord = new BUTTONRECORD(swf, this);
+            switch (frame) {
+                case FRAME_UP:
+                    selectedRecord.buttonStateUp = true;
+                    break;
+                case FRAME_OVER:
+                    selectedRecord.buttonStateOver = true;
+                    break;
+                case FRAME_DOWN:
+                    selectedRecord.buttonStateDown = true;
+                    break;
+                case FRAME_HITTEST:
+                    selectedRecord.buttonStateHitTest = true;
+                    break;
+            }
+            records.add(selectedRecord);
+        }
+        selectedRecord.fromPlaceObject(placeTag);
     }
 }
