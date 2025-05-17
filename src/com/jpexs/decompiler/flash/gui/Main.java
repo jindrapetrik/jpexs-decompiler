@@ -1009,6 +1009,7 @@ public class Main {
     public static void startWork(String name, CancellableWorker worker) {
         startWork(name, -1, worker, false);
     }
+
     public static void startWork(String name, CancellableWorker worker, boolean force) {
         startWork(name, -1, worker, force);
     }
@@ -1016,6 +1017,7 @@ public class Main {
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         startWork(name, percent, worker, false);
     }
+
     public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean force) {
         working = true;
         long nowTime = System.currentTimeMillis();
