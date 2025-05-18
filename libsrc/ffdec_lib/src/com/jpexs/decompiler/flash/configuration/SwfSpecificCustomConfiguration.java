@@ -36,6 +36,10 @@ public class SwfSpecificCustomConfiguration implements Serializable {
 
     public static final String LIST_SEPARATOR = "{*sep*}";
 
+    public Map<String, String> getAllCustomData() {
+        return customData;
+    }        
+
     public List<String> getCustomDataAsList(String key) {
         String data = getCustomData(key, "");
         String[] parts = (data + LIST_SEPARATOR).split(Pattern.quote(LIST_SEPARATOR));

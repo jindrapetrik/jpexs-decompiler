@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,11 +62,13 @@ import javax.swing.JOptionPane;
  */
 public final class Configuration {
 
-    private static final String CONFIG_NAME = "config.bin";
+    private static final ConfigurationStorage legacyStorage = new LegacyConfigurationStorage();
 
-    private static final File unspecifiedFile = new File("unspecified");
+    private static final ConfigurationStorage storage = new TomlConfigurationStorage();
 
-    private static File directory = unspecifiedFile;
+    private static final File UNSPECIFIED_FILE = new File("unspecified");
+
+    private static File directory = UNSPECIFIED_FILE;
 
     /**
      * Log level
@@ -168,6 +171,7 @@ public final class Configuration {
     public static ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
 
     @ConfigurationCategory("export")
+    @ConfigurationDefaultString("")
     public static ConfigurationItem<String> overrideTextExportFileName = null;
 
     @ConfigurationDefaultBoolean(false)
@@ -1144,8 +1148,30 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
         
+    
+    private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
+    private static Map<String, String> configurationTitles = new LinkedHashMap<>();
+
     private enum OSId {
         WINDOWS, OSX, UNIX
+    }
+
+    
+    public static void setConfigurationDescriptions(Map<String, String> configurationDescriptions) {
+        Configuration.configurationDescriptions = configurationDescriptions;
+    }
+
+    public static void setConfigurationTitles(Map<String, String> configurationTitles) {
+        Configuration.configurationTitles = configurationTitles;
+    }
+        
+    
+    public static String getConfigurationTitle(String confirationName) {
+        return configurationTitles.get(confirationName);
+    }
+    
+    public static String getConfigurationDescription(String confirationName) {
+        return configurationDescriptions.get(confirationName);
     }
 
     private static OSId getOSId() {
@@ -1165,7 +1191,7 @@ public final class Configuration {
      * @return FFDec home directory
      */
     public static String getFFDecHome() {
-        if (directory == unspecifiedFile) {
+        if (directory == UNSPECIFIED_FILE) {
             directory = null;
             String userHome = null;
             try {
@@ -1379,52 +1405,24 @@ public final class Configuration {
     }
 
     private static String getConfigFile() throws IOException {
-        return getFFDecHome() + CONFIG_NAME;
+        return getFFDecHome() + storage.getConfigName();
     }
-
-    private static HashMap<String, Object> loadFromFile(String file) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-
-            @SuppressWarnings("unchecked")
-            HashMap<String, Object> cfg = (HashMap<String, Object>) ois.readObject();
-            return cfg;
-        } catch (ClassNotFoundException | IOException ex) {
-            // ignore
-        }
-
-        return new HashMap<>();
+    
+    private static String getLegacyConfigFile() throws IOException {
+        return getFFDecHome() + legacyStorage.getConfigName();
     }
-
-    private static void saveToFile(String file) {
-        HashMap<String, Object> config = new HashMap<>();
-        for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
-            try {
-                String name = entry.getKey();
-                Field field = entry.getValue();
-                ConfigurationItem item = (ConfigurationItem) field.get(null);
-                if (item.hasValue) {
-                    config.put(name, item.get());
-                }
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
-            oos.writeObject(config);
-        } catch (IOException ex) {
-            //TODO: move this to GUI
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(Configuration.class.getName()).severe("Configuration directory is read only.");
-        }
-    }
-
+    
     /**
      * Save configuration to file
      */
     public static void saveConfig() {
         try {
-            saveToFile(getConfigFile());
+            storage.saveToFile(getConfigFile());            
+        } catch (IOException ex) {
+            // ignore
+        }
+        try {
+            legacyStorage.saveToFile(getLegacyConfigFile());
         } catch (IOException ex) {
             // ignore
         }
@@ -1449,7 +1447,14 @@ public final class Configuration {
     @SuppressWarnings("unchecked")
     public static void setConfigurationFields() {
         try {
-            HashMap<String, Object> config = loadFromFile(getConfigFile());
+            Map<String, Object> config;
+            
+            if (new File(getConfigFile()).exists()) {
+                config = storage.loadFromFile(getConfigFile());            
+            } else {
+                config = legacyStorage.loadFromFile(getLegacyConfigFile());
+            }
+            
             for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();
@@ -1544,6 +1549,18 @@ public final class Configuration {
                 defaultValue = Color.black;
             }
         }
+        
+        if (defaultValue == null) {
+            Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
+            if (type.isEnum()) {
+                @SuppressWarnings("unchecked")
+                Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) type;
+                defaultValue = enumClass.getEnumConstants()[0];
+            }
+            if (type == String.class) {
+                defaultValue = "";
+            }
+        }
         return defaultValue;
     }
 
@@ -1562,7 +1579,7 @@ public final class Configuration {
      */
     public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames, boolean alsoRemoved) {
         Field[] fields = Configuration.class.getDeclaredFields();
-        Map<String, Field> result = new HashMap<>();
+        Map<String, Field> result = new LinkedHashMap<>();
         for (Field field : fields) {
             if (!alsoRemoved) {
                 ConfigurationRemoved removedAnnotation = field.getAnnotation(ConfigurationRemoved.class);

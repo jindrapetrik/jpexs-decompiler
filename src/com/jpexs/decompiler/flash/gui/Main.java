@@ -132,6 +132,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -3068,6 +3069,21 @@ public class Main {
         AppStrings.updateLanguage();
 
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
+        
+        ResourceBundle advancedSettingsBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
+        Set<String> confirationNames = Configuration.getConfigurationFields(false, true).keySet();
+        Map<String, String> titles = new LinkedHashMap<>();
+        Map<String, String> descriptions = new LinkedHashMap<>();
+        for (String name : confirationNames) {
+            if (advancedSettingsBundle.containsKey("config.name." + name)) {
+                titles.put(name, advancedSettingsBundle.getString("config.name." + name));
+            }
+            if (advancedSettingsBundle.containsKey("config.description." + name)) {
+                descriptions.put(name, advancedSettingsBundle.getString("config.description." + name));            
+            }
+        }
+        Configuration.setConfigurationDescriptions(descriptions);
+        Configuration.setConfigurationTitles(titles);
     }
 
     /**
@@ -3421,6 +3437,7 @@ public class Main {
             }
             String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
             if (currentTagName.equals(latestTagName) || stableTagName.equals(latestTagName)) {
+                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
                 //no new version
                 return false;
             }
