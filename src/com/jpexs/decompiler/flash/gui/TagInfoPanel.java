@@ -109,6 +109,11 @@ public class TagInfoPanel extends JPanel {
         buildHtmlContent();
     }
 
+    public void clear() {
+        this.tagInfo = new TagInfo(null);
+        buildHtmlContent();
+    }
+    
     private void updateHtmlContent(boolean expand, boolean showDetails) {
         String categoryName = "general";
         StringBuilder result = new StringBuilder();
@@ -117,6 +122,10 @@ public class TagInfoPanel extends JPanel {
 
         List<TagInfo.TagInfoItem> items = tagInfo.getInfos().get(categoryName);
 
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+        
         if (View.isOceanic()) {
             result.append("<tr bgcolor='#FDFDFD'>");
         } else {

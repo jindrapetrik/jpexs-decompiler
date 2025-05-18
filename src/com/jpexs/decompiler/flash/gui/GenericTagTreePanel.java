@@ -103,6 +103,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -761,6 +762,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         tag = null;
         editedTag = null;
         tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("root")));
+        tree.setSelectionModel(new DefaultTreeSelectionModel());
         revalidate();
         repaint();
     }

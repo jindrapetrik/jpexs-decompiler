@@ -1727,7 +1727,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         gcClipboard();
         mainMenu.updateComponents(null);
-        previewPanel.clear();
+        folderPreviewPanel.clear();
+        folderListPanel.clear();
+        previewPanel.clear();    
+        tagInfoPanel.clear();
+        dumpPreviewPanel.clear();
 
         return true;
     }
@@ -1849,8 +1853,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             mainMenu.updateComponents();
         }
-        previewPanel.clear();
+
+        folderPreviewPanel.clear();
+        folderListPanel.clear();
+        previewPanel.clear();    
+        tagInfoPanel.clear();
         dumpPreviewPanel.clear();
+       
+        List<List<String>> nodes;
+        
+        //To properly clear cached TreePaths
+        nodes = View.getExpandedNodes(tagTree);
+        tagTree.setModel(tagTree.getFullModel());
+        View.expandTreeNodes(tagTree, nodes);
+        
+        nodes = View.getExpandedNodes(tagListTree);
+        tagListTree.setModel(tagListTree.getFullModel());
+        View.expandTreeNodes(tagListTree, nodes);
+        
         doFilter();
         return true;
     }
@@ -6135,7 +6155,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         folderPreviewPanel.clear();
         folderListPanel.clear();
-        previewPanel.clear();
+        previewPanel.clear();    
+        tagInfoPanel.clear();
 
         previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, false);
 

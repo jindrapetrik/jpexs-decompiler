@@ -1810,6 +1810,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
+        displayEditGenericPanel.clear();
         fontPanel.clear();
     }
 

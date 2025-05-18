@@ -171,7 +171,7 @@ public class FolderPreviewPanel extends JPanel {
         repaint();
         ((JScrollPane) getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
-
+            
     public void clear() {
         items = new ArrayList<>();
         executor.shutdownNow();

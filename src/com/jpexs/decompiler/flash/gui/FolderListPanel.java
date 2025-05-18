@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -174,12 +175,13 @@ public class FolderListPanel extends JPanel {
         selectedItems.clear();
         selectedIndex = -1;
         ((JScrollPane) getParent().getParent()).getVerticalScrollBar().setValue(0);
-    }
-
+    }   
+    
     public void clear() {
         items = new ArrayList<>();
         selectedItems.clear();
         selectedIndex = -1;
+        parentPath = null;
     }
 
     @Override

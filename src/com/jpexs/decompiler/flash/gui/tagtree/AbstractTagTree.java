@@ -107,6 +107,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -221,6 +222,40 @@ public abstract class AbstractTagTree extends JTree {
                     setHashColor(Color.gray);
                 }
             }
+
+            @Override
+            protected MouseListener createMouseListener() {
+                MouseListener handler = super.createMouseListener();
+                return new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        handler.mouseClicked(e);
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        handler.mousePressed(e);
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        handler.mouseReleased(e);
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        handler.mouseEntered(e);
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        handler.mouseReleased(e); //crucial to properly free nodes
+                        handler.mouseExited(e);
+                    }
+                    
+                };
+            }
+            
         });
         ToolTipManager.sharedInstance().registerComponent(this);
         addMouseListener(new MouseAdapter() {
