@@ -1590,13 +1590,6 @@ public final class Configuration {
         return defaultValue;
     }
 
-    /*
-     * Get configuration fields
-     * @return Configuration fields
-     */
- /*public static Map<String, Field> getConfigurationFields(boolean alsoRemoved) {
-        return getConfigurationFields(false, alsoRemoved);
-    }*/
     /**
      * Get configuration fields
      *
