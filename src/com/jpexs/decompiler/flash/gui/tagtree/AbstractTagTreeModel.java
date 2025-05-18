@@ -26,9 +26,11 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -47,6 +49,17 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     private Map<TreeItem, Integer> indices = new WeakHashMap<>();
 
     protected Map<TreeItem, TreeItem> itemToParentCache = new WeakHashMap<>();
+
+    protected void removeFromCache(TreeItem itemToRemove) {
+        itemToParentCache.remove(itemToRemove);
+        Set<TreeItem> tSet = new HashSet<>(itemToParentCache.keySet());
+        for (TreeItem item : tSet) {
+            TreeItem parent = itemToParentCache.get(item);
+            if (parent == itemToRemove) {
+                removeFromCache(item);
+            }
+        }
+    }
 
     public final void calculateCollisions() {
         Map<TreeItem, Integer> indices = new WeakHashMap<>();

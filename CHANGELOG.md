@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
 - Touch point, snap align and snap to objects incorrect position when editing nested layers
+- Proper freeing memory after SWF close
 
 ### Fixed
 - Resize export dialogs labels to match localized strings

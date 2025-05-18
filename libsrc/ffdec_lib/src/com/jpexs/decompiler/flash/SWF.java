@@ -6239,4 +6239,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public SWF getSwf() {
         return this;
     }
+
+    /**
+     * Checks whether SWF was freed
+     * @return True if destroyed
+     */
+    public boolean isDestroyed() {
+        return destroyed;
+    }        
 }

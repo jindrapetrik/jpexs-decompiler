@@ -57,6 +57,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +147,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         return AppStrings.translate(key);
     }
 
+    @Override
     public void updateSwfs(CollectionChangedEvent e) {
         if (e.getAction() != CollectionChangedAction.ADD
                 && e.getAction() != CollectionChangedAction.MOVE) {
@@ -159,6 +161,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
             for (SWF swf : toRemove) {
                 swfInfos.remove(swf);
+                removeFromCache(swf);
             }
         }
 

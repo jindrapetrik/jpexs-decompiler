@@ -365,7 +365,14 @@ public class PinsPanel extends JPanel {
                 i--;
             }
         }
+        
+        if (current != null && current.getOpenable() == openable) {
+            current = null;
+            lastSelectedButton = null;
+        }
+        
         save();
+        rebuild();
     }
 
     public void replaceItem(TreeItem oldItem, TreeItem newItem) {
