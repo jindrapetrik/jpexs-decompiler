@@ -241,8 +241,9 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
 
     @Override
     public void saveToFile(String file) {
-        saveToFile(file, null, null);        
+        saveToFile(file, null, null);
     }
+
     public void saveToFile(String file, Boolean showComments, Boolean modifiedOnly) {
         if (new File(file).exists() && (showComments == null || modifiedOnly == null)) {
             TomlParseResult tomlResult;

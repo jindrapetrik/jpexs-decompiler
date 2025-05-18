@@ -943,12 +943,12 @@ public class CommandLineArgumentParser {
 
         setConfigurations(args.pop());
     }
-    
-    private static void parseStoreConfigFile(Stack<String> args) {        
+
+    private static void parseStoreConfigFile(Stack<String> args) {
         boolean comments = false;
         boolean all = false;
         String configFile;
-        while(true) {
+        while (true) {
             if (args.isEmpty()) {
                 System.err.println("Configuration file expected");
                 badArguments("configfile");
@@ -969,7 +969,7 @@ public class CommandLineArgumentParser {
         storage.saveToFile(configFile, comments, !all);
         System.out.println("Configuration saved to \"" + configFile + "\"");
     }
-    
+
     private static void parseConfigFile(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("Configuration file expected");

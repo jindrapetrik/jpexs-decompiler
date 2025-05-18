@@ -1462,7 +1462,7 @@ public final class Configuration {
                 Object value = null;
                 if (config.containsKey(name)) {
                     value = config.get(name);
-                    
+
                     Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
                     if (value != null && !type.isAssignableFrom(value.getClass())) {
                         System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
@@ -1496,8 +1496,9 @@ public final class Configuration {
     }
 
     /**
-     * Loads configuration from specific file. If it has .bin extension, 
-     * it uses legacy storage, else it uses TOML storage.
+     * Loads configuration from specific file. If it has .bin extension, it uses
+     * legacy storage, else it uses TOML storage.
+     *
      * @param file File to load from
      */
     public static void loadFromFile(String file) {
