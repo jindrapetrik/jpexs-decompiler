@@ -545,7 +545,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
                     if (showComments) {
                         pw.println();
                     }
-                    if (!item.hasValue || savedValue.isEmpty()) {
+                    if (!item.hasValue || savedValue == null || savedValue.isEmpty()) {
                         pw.print("# ");
                     }
                     pw.print(key + " = ");
