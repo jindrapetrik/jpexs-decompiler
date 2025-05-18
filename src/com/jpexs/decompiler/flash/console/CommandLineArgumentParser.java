@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.configuration.TomlConfigurationStorage;
 import com.jpexs.decompiler.flash.docs.As12PCodeDocs;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -282,7 +283,7 @@ public class CommandLineArgumentParser {
             if (ConfigurationItem.isInternal(field)) {
                 continue;
             }
-            
+
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             Object value = item.get();
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -562,6 +563,9 @@ public class CommandLineArgumentParser {
                         return null;
                     }
                     break;
+                case "-configfile":
+                    parseConfigFile(args);
+                    break;
                 case "-onerror":
                     handler = parseOnError(args);
                     break;
@@ -779,6 +783,9 @@ public class CommandLineArgumentParser {
             printHeader();
             printConfigurationSettings();
             System.exit(0);
+        } else if (nextParam.equals("-storeconfigfile")) {
+            parseStoreConfigFile(args);
+            System.exit(0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             parseHelp(args);
             System.exit(0);
@@ -859,7 +866,8 @@ public class CommandLineArgumentParser {
                 cp = new String[]{cp[0], "1"};
             }
 
-            Field field = fields.get(cp[0].toLowerCase(Locale.ENGLISH));
+            String nameLowerCase = cp[0].toLowerCase(Locale.ENGLISH);
+            Field field = fields.get(nameLowerCase);
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             String stringValue = cp[1];
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -903,6 +911,9 @@ public class CommandLineArgumentParser {
                 ConfigurationItem uncheckedItem = (ConfigurationItem) item;
                 uncheckedItem.set(enumValue);
             }
+            if ("locale".equals(nameLowerCase)) {
+                Main.initLang();
+            }
         }
     }
 
@@ -931,6 +942,46 @@ public class CommandLineArgumentParser {
         }
 
         setConfigurations(args.pop());
+    }
+    
+    private static void parseStoreConfigFile(Stack<String> args) {        
+        boolean comments = false;
+        boolean all = false;
+        String configFile;
+        while(true) {
+            if (args.isEmpty()) {
+                System.err.println("Configuration file expected");
+                badArguments("configfile");
+            }
+            configFile = args.pop();
+            if (configFile.equals("-comments")) {
+                comments = true;
+            } else if (configFile.equals("-all")) {
+                all = true;
+            } else {
+                if (!args.isEmpty()) {
+                    badArguments("configfile");
+                }
+                break;
+            }
+        }
+        TomlConfigurationStorage storage = new TomlConfigurationStorage();
+        storage.saveToFile(configFile, comments, !all);
+        System.out.println("Configuration saved to \"" + configFile + "\"");
+    }
+    
+    private static void parseConfigFile(Stack<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("Configuration file expected");
+            badArguments("configfile");
+        }
+        String configFile = args.pop();
+        if (!new File(configFile).exists()) {
+            System.err.println("Configuration file \"" + configFile + "\" does not exist!");
+            badArguments("configfile");
+        }
+        Configuration.loadFromFile(configFile);
+        System.out.println("Configuration loaded from the file \"" + configFile + "\"");
     }
 
     private static void parseSwf2Exe(Stack<String> args, String charset) {

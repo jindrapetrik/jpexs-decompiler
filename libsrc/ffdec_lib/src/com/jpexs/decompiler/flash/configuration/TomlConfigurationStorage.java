@@ -241,21 +241,32 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
 
     @Override
     public void saveToFile(String file) {
-        boolean showComments = false;
-        boolean modifiedOnly = true;
-        if (new File(file).exists()) {
+        saveToFile(file, null, null);        
+    }
+    public void saveToFile(String file, Boolean showComments, Boolean modifiedOnly) {
+        if (new File(file).exists() && (showComments == null || modifiedOnly == null)) {
             TomlParseResult tomlResult;
             try {
                 tomlResult = Toml.parse(Paths.get(file));
                 TomlTable metaTable = tomlResult.getTable("meta");
                 if (metaTable != null) {
-                    showComments = metaTable.getBoolean("showComments") == Boolean.TRUE;
-                    modifiedOnly = metaTable.getBoolean("modifiedOnly") == Boolean.TRUE;
+                    if (showComments == null) {
+                        showComments = metaTable.getBoolean("showComments") == Boolean.TRUE;
+                    }
+                    if (modifiedOnly == null) {
+                        modifiedOnly = metaTable.getBoolean("modifiedOnly") == Boolean.TRUE;
+                    }
                 }
 
             } catch (IOException ex) {
                 //ignore
             }
+        }
+        if (showComments == null) {
+            showComments = false;
+        }
+        if (modifiedOnly == null) {
+            modifiedOnly = true;
         }
         try (
                 Writer w = new FileWriter(file); PrintWriter pw = new PrintWriter(w)) {

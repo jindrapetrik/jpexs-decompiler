@@ -295,6 +295,11 @@ alias /?
     List all available configuration keys and current values.
     These keys can be used in -config pre-option.
 
+-storeConfigFile [-comments] [-all] <file>
+    Stores current configuration to a file <file>.
+    With -comments argument it adds titles and descriptions.
+    With -all argument it exports all configs, not even modified.
+
 -translator
     Runs the Translator app for FFDec localization
 
@@ -393,6 +398,11 @@ Pre-options:
     If no other parameters passed, configuration is saved.
     Otherwise it is used only once.
     DO NOT PUT space between comma (,) and next value.
+
+-configFile <file>
+    Applies to: *
+    Use configuration from a file <file>. TOML file format is expected.
+    When it has .bin extension, legacy storage is used.
 
 -onerror (abort|retry <N>|ignore)
     Applies to: -export, -importScript

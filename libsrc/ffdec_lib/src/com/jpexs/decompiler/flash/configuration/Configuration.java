@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
 
 /**
  * Configuration of FFDec.
@@ -1030,125 +1029,123 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningAddFunction = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> linkAllClasses = null;
-    
+
     @ConfigurationDefaultString("")
     @ConfigurationInternal
     public static ConfigurationItem<String> recentColors = null;
-    
-    
+
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.splitPaneEasyVertical.dividerLocationPercent")
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiSplitPaneEasyVerticalDividerLocationPercent = null;
-    
+
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.splitPaneEasyHorizontal.dividerLocationPercent")
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiSplitPaneEasyHorizontalDividerLocationPercent = null;
-    
+
     public static ConfigurationItem<String> lastSessionEasySwf = null;
-    
+
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> maxScriptLineLength = null;
-    
+
     @ConfigurationDefaultString(".")
     @ConfigurationDirectory
     public static ConfigurationItem<String> lastSolEditorDirectory = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> halfTransparentParentLayersEasy = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> showRuler = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapToGuides = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapToObjects = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapToPixels = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlign = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> showGuides = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> lockGuides = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static ConfigurationItem<Boolean> showGrid = null;        
-    
+    public static ConfigurationItem<Boolean> showGrid = null;
+
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Integer> gridVerticalSpace = null;
-    
+
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Integer> gridHorizontalSpace = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapToGrid = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> gridOverObjects = null;
-    
+
     @ConfigurationDefaultColor("#949494")
     @ConfigurationCategory("display")
-    public static ConfigurationItem<Color> gridColor = null;    
-    
+    public static ConfigurationItem<Color> gridColor = null;
+
     @ConfigurationDefaultColor("#00FF00")
     @ConfigurationCategory("display")
     public static ConfigurationItem<Color> guidesColor = null;
-    
+
     @ConfigurationCategory("display")
     @ConfigurationDefaultString("NORMAL")
     public static ConfigurationItem<GridSnapAccuracy> gridSnapAccuracy = null;
-    
+
     @ConfigurationCategory("display")
     @ConfigurationDefaultString("NORMAL")
     public static ConfigurationItem<GuidesSnapAccuracy> guidesSnapAccuracy = null;
-    
+
     @ConfigurationDefaultInt(0)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Integer> snapAlignObjectHorizontalSpace = null;
-    
+
     @ConfigurationDefaultInt(0)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Integer> snapAlignObjectVerticalSpace = null;
-    
+
     @ConfigurationDefaultInt(0)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Integer> snapAlignStageBorder = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlignCenterAlignmentHorizontal = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
-        
-    
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
@@ -1156,7 +1153,6 @@ public final class Configuration {
         WINDOWS, OSX, UNIX
     }
 
-    
     public static void setConfigurationDescriptions(Map<String, String> configurationDescriptions) {
         Configuration.configurationDescriptions = configurationDescriptions;
     }
@@ -1164,12 +1160,11 @@ public final class Configuration {
     public static void setConfigurationTitles(Map<String, String> configurationTitles) {
         Configuration.configurationTitles = configurationTitles;
     }
-        
-    
+
     public static String getConfigurationTitle(String confirationName) {
         return configurationTitles.get(confirationName);
     }
-    
+
     public static String getConfigurationDescription(String confirationName) {
         return configurationDescriptions.get(confirationName);
     }
@@ -1275,6 +1270,7 @@ public final class Configuration {
 
     /**
      * Get recent files
+     *
      * @return List of recent files
      */
     public static List<String> getRecentFiles() {
@@ -1287,6 +1283,7 @@ public final class Configuration {
 
     /**
      * Add recent file
+     *
      * @param path Path to file
      */
     public static void addRecentFile(String path) {
@@ -1304,6 +1301,7 @@ public final class Configuration {
 
     /**
      * Remove recent file
+     *
      * @param path Path to file
      */
     public static void removeRecentFile(String path) {
@@ -1317,6 +1315,7 @@ public final class Configuration {
 
     /**
      * Get font to name map
+     *
      * @return Font to name map
      */
     public static Map<String, String> getFontToNameMap() {
@@ -1331,6 +1330,7 @@ public final class Configuration {
 
     /**
      * Add font pair
+     *
      * @param fileName File name
      * @param fontId Font ID
      * @param fontName Font name
@@ -1346,6 +1346,7 @@ public final class Configuration {
 
     /**
      * Get per-swf configuration.
+     *
      * @param fileName SWF File name
      * @return SWF specific configuration, null if not found
      */
@@ -1361,6 +1362,7 @@ public final class Configuration {
 
     /**
      * Get or create per-swf configuration.
+     *
      * @param fileName SWF File name
      * @return SWF specific configuration
      */
@@ -1376,6 +1378,7 @@ public final class Configuration {
 
     /**
      * Get per-swf custom configuration.
+     *
      * @param fileName SWF File name
      * @return SWF specific custom configuration, null if not found
      */
@@ -1391,6 +1394,7 @@ public final class Configuration {
 
     /**
      * Get or create per-swf custom configuration.
+     *
      * @param fileName SWF File name
      * @return SWF specific custom configuration
      */
@@ -1407,17 +1411,17 @@ public final class Configuration {
     private static String getConfigFile() throws IOException {
         return getFFDecHome() + storage.getConfigName();
     }
-    
+
     private static String getLegacyConfigFile() throws IOException {
         return getFFDecHome() + legacyStorage.getConfigName();
     }
-    
+
     /**
      * Save configuration to file
      */
     public static void saveConfig() {
         try {
-            storage.saveToFile(getConfigFile());            
+            storage.saveToFile(getConfigFile());
         } catch (IOException ex) {
             // ignore
         }
@@ -1441,20 +1445,9 @@ public final class Configuration {
         //int processorCount = Runtime.getRuntime().availableProcessors();
     }
 
-    /**
-     * Set configuration fields.
-     */
     @SuppressWarnings("unchecked")
-    public static void setConfigurationFields() {
+    private static void loadFromMap(Map<String, Object> config) {
         try {
-            Map<String, Object> config;
-            
-            if (new File(getConfigFile()).exists()) {
-                config = storage.loadFromFile(getConfigFile());            
-            } else {
-                config = legacyStorage.loadFromFile(getLegacyConfigFile());
-            }
-            
             for (Entry<String, Field> entry : getConfigurationFields(false, true).entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();
@@ -1469,7 +1462,7 @@ public final class Configuration {
                 Object value = null;
                 if (config.containsKey(name)) {
                     value = config.get(name);
-
+                    
                     Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
                     if (value != null && !type.isAssignableFrom(value.getClass())) {
                         System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
@@ -1486,9 +1479,8 @@ public final class Configuration {
         } catch (IllegalArgumentException | IllegalAccessException | SecurityException ex) {
             // Reflection exceptions. This should never happen
             throw new Error(ex.getMessage());
-        } catch (IOException ex) {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         if (playerLibLocation.get("").isEmpty()) {
             File swcFile = getPlayerSwcOld();
             if (swcFile != null) {
@@ -1504,12 +1496,45 @@ public final class Configuration {
     }
 
     /**
+     * Loads configuration from specific file. If it has .bin extension, 
+     * it uses legacy storage, else it uses TOML storage.
+     * @param file File to load from
+     */
+    public static void loadFromFile(String file) {
+        Map<String, Object> config;
+        if (file.toLowerCase(Locale.ENGLISH).endsWith(".bin")) {
+            config = legacyStorage.loadFromFile(file);
+        } else {
+            config = storage.loadFromFile(file);
+        }
+        loadFromMap(config);
+    }
+
+    /**
+     * Set configuration fields.
+     */
+    public static void setConfigurationFields() {
+        try {
+            Map<String, Object> config;
+            if (new File(getConfigFile()).exists()) {
+                config = storage.loadFromFile(getConfigFile());
+            } else {
+                config = legacyStorage.loadFromFile(getLegacyConfigFile());
+            }
+            loadFromMap(config);
+        } catch (IOException ex) {
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
      * Get default value for field
+     *
      * @param field Field
      * @return Default value
      */
     @SuppressWarnings("unchecked")
-    public static Object getDefaultValue(Field field) {        
+    public static Object getDefaultValue(Field field) {
         Object defaultValue = null;
         ConfigurationDefaultBoolean aBool = field.getAnnotation(ConfigurationDefaultBoolean.class);
         if (aBool != null) {
@@ -1522,11 +1547,11 @@ public final class Configuration {
         ConfigurationDefaultString aString = field.getAnnotation(ConfigurationDefaultString.class);
         if (aString != null) {
             defaultValue = aString.value();
-            
+
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
             if (type.isEnum()) {
                 return Enum.valueOf(type.asSubclass(Enum.class), (String) defaultValue);
-            }                            
+            }
         }
         ConfigurationDefaultDouble aDouble = field.getAnnotation(ConfigurationDefaultDouble.class);
         if (aDouble != null) {
@@ -1538,7 +1563,7 @@ public final class Configuration {
             mingc.setTime(new Date(aCalendar.value()));
             defaultValue = mingc;
         }
-        
+
         ConfigurationDefaultColor aColor = field.getAnnotation(ConfigurationDefaultColor.class);
         if (aColor != null) {
             Pattern p = Pattern.compile("#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$");
@@ -1549,7 +1574,7 @@ public final class Configuration {
                 defaultValue = Color.black;
             }
         }
-        
+
         if (defaultValue == null) {
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
             if (type.isEnum()) {
@@ -1568,12 +1593,12 @@ public final class Configuration {
      * Get configuration fields
      * @return Configuration fields
      */
-    /*public static Map<String, Field> getConfigurationFields(boolean alsoRemoved) {
+ /*public static Map<String, Field> getConfigurationFields(boolean alsoRemoved) {
         return getConfigurationFields(false, alsoRemoved);
     }*/
-
     /**
      * Get configuration fields
+     *
      * @param lowerCaseNames Lower case names
      * @return Configuration fields
      */
@@ -1601,6 +1626,7 @@ public final class Configuration {
 
     /**
      * Get code formatting
+     *
      * @return Code formatting
      */
     public static CodeFormatting getCodeFormatting() {
@@ -1616,26 +1642,28 @@ public final class Configuration {
 
     /**
      * Get number of parallel threads
+     *
      * @return Number of parallel threads
      */
     public static int getParallelThreadCount() {
         int processorCount = Runtime.getRuntime().availableProcessors();
-        
+
         int threadCount = parallelSpeedUpThreadCount.get();
-        
+
         if (threadCount <= 0) {
             threadCount = processorCount - 1;
         }
-        
+
         if (threadCount < 2) {
             threadCount = 2;
         }
-        
+
         return threadCount;
     }
 
     /**
      * Get folder in FFDec home
+     *
      * @param folder Folder
      * @return Folder
      */
@@ -1650,6 +1678,7 @@ public final class Configuration {
 
     /**
      * Get flashlib path
+     *
      * @return Flashlib path
      */
     public static File getFlashLibPath() {
@@ -1658,6 +1687,7 @@ public final class Configuration {
 
     /**
      * Get projector path
+     *
      * @return Projector path
      */
     public static File getProjectorPath() {
@@ -1730,6 +1760,7 @@ public final class Configuration {
 
     /**
      * Get player SWC
+     *
      * @return Player SWC
      */
     public static File getPlayerSWC() {
@@ -1752,6 +1783,7 @@ public final class Configuration {
 
     /**
      * Get AIR SWC
+     *
      * @return AIR SWC
      */
     public static File getAirSWC() {
@@ -1809,6 +1841,7 @@ public final class Configuration {
 
     /**
      * Get projector file
+     *
      * @param exportMode Export mode
      * @return Projector file
      */
