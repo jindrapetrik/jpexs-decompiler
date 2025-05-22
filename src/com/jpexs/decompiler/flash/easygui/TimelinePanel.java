@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -48,22 +48,22 @@ public class TimelinePanel extends JPanel {
     private Timeline timeline;
 
     private Timelined timelined;
-    
+
     public static final int FRAME_WIDTH = 8;
 
     public static final int FRAME_HEIGHT = 18;
 
-    
-    private JScrollPane timelineBodyScrollPane;
+    private final JScrollPane timelineBodyScrollPane;
 
     public TimelinePanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         timelineBodyPanel = new TimelineBodyPanel(swfPanel, undoManager);
-        setLayout(new BorderLayout());
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
         depthPanel = new TimelineDepthPanel();
-        
+
         timelineBodyPanel.addChangeListener(new Runnable() {
             @Override
             public void run() {
@@ -73,23 +73,29 @@ public class TimelinePanel extends JPanel {
             }
         });
 
-        timePanel = new TimelineTimePanel();
+        timePanel = new TimelineTimePanel(depthPanel);
 
-        JPanel row1Panel = new JPanel();
-        row1Panel.setLayout(new BorderLayout());
-        JPanel sepPanel = new JPanel();
-        sepPanel.setBackground(getBackgroundColor());
-        sepPanel.setPreferredSize(new Dimension(depthPanel.getWidth(), timePanel.getHeight()));
-        row1Panel.add(sepPanel, BorderLayout.WEST);
-        row1Panel.add(timePanel, BorderLayout.CENTER);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        add(timePanel, gbc);
 
-        JPanel row2Panel = new JPanel();
-        row2Panel.setLayout(new BorderLayout());
-        row2Panel.add(depthPanel, BorderLayout.WEST);
-        row2Panel.add(timelineBodyScrollPane, BorderLayout.CENTER);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.weightx = 0;
+        gbc.weighty = 1;
+        add(depthPanel, gbc);
 
-        add(row1Panel, BorderLayout.NORTH);
-        add(row2Panel, BorderLayout.CENTER);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        add(timelineBodyScrollPane, gbc);
 
         timelineBodyScrollPane.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -122,13 +128,13 @@ public class TimelinePanel extends JPanel {
             }
         });
     }
-    
+
     public static Color getBackgroundColor() {
         if (Configuration.useRibbonInterface.get()) {
             return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
         } else {
             return SystemColor.control;
-        }   
+        }
     }
 
     public Timeline getTimeline() {
@@ -146,31 +152,31 @@ public class TimelinePanel extends JPanel {
     public void setDepth(int depth) {
         timelineBodyPanel.depthSelect(depth);
     }
-    
+
     public void setDepths(List<Integer> depths) {
         timelineBodyPanel.depthsSelect(depths);
     }
-    
+
     public void setFrame(int frame, int depth) {
         timelineBodyPanel.frameSelect(frame, depth);
     }
-    
+
     public void setFrame(int frame, List<Integer> depths) {
         timelineBodyPanel.frameSelect(frame, depths);
     }
-    
+
     public void refresh() {
         timelineBodyPanel.refresh();
     }
-    
+
     public void addChangeListener(Runnable l) {
         timelineBodyPanel.addChangeListener(l);
     }
-    
+
     public void removeChangeListener(Runnable l) {
         timelineBodyPanel.removeChangeListener(l);
     }
-    
+
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
         if (timelined == null) {
@@ -182,6 +188,6 @@ public class TimelinePanel extends JPanel {
             depthPanel.setTimeline(timelined.getTimeline());
             timePanel.setTimeline(timelined.getTimeline());
             timelineBodyPanel.frameSelect(0, 0);
-        }        
+        }
     }
 }

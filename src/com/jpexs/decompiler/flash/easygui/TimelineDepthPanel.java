@@ -48,10 +48,14 @@ public class TimelineDepthPanel extends JPanel {
         maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
         String maxDepthStr = Integer.toString(maxDepth);
         setFont(getFont().deriveFont(FONT_SIZE));
+        int yofs = TimelineBodyPanel.FRAME_HEIGHT - (scrollOffset % TimelineBodyPanel.FRAME_HEIGHT);
+        int height = yofs + maxDepth * TimelineBodyPanel.FRAME_HEIGHT + 1;
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
-        Dimension dim = new Dimension(maxDepthW + 2 * PADDING, Integer.MAX_VALUE);
+        Dimension dim = new Dimension(maxDepthW + 2 * PADDING, height);
         setSize(dim);
         setPreferredSize(dim);
+        setMinimumSize(new Dimension(maxDepthW + 2 * PADDING, 0));
+        revalidate();
     }
 
     public void scroll(int offset) {
