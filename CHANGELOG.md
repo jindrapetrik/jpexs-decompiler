@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
    the new TOML file, when exists)
 - `-configFile` and `-storeConfigFile` commandline parameters for loading/storing configuration file
 - Option to .bat and .sh file to enable J2D_D3D_NO_HWCHECK
+- [#2404] Quick find in text/script editors - show number of occurences
 
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
@@ -18,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Resize export dialogs labels to match localized strings
 - AS1/2 debugger - deletion of SWD file after debugging
 - Proper freeing memory after SWF close
+- AS1/2 improper selection of search result
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
@@ -3800,6 +3802,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826

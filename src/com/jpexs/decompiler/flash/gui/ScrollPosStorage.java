@@ -252,12 +252,18 @@ public class ScrollPosStorage {
                     return;
                 }
                 actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getCaretPosition();
+                if (mainPanel.getABCPanel().decompiledTextArea.getSelectionStart() > 0) {
+                    actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getSelectionStart();
+                }
                 
                 actionScriptScrollHorizontal = mainPanel.getABCPanel().decompiledScrollPane.getHorizontalScrollBar().getValue();
                 actionScriptScrollVertical = mainPanel.getABCPanel().decompiledScrollPane.getVerticalScrollBar().getValue();
                 pcodeScrollHorizontal = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getHorizontalScrollBar().getValue();
                 pcodeScrollVertical = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getVerticalScrollBar().getValue();
                 pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getCaretPosition();
+                if (mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getSelectionStart() > 0) {
+                    pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getSelectionStart();
+                }
             }
                                     
         } else if (asmItem instanceof ASMSource) {       
@@ -272,9 +278,15 @@ public class ScrollPosStorage {
                 actionScriptScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getHorizontalScrollBar().getValue();
                 actionScriptScrollVertical = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getVerticalScrollBar().getValue();
                 actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getCaretPosition();
+                if (mainPanel.getActionPanel().decompiledEditor.getSelectionStart() > 0) {
+                    actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getSelectionStart();
+                }
                 pcodeScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getHorizontalScrollBar().getValue();
                 pcodeScrollVertical = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getVerticalScrollBar().getValue();
                 pcodeCaret = mainPanel.getActionPanel().editor.getCaretPosition();
+                if (mainPanel.getActionPanel().editor.getSelectionStart() > 0) {
+                    pcodeCaret = mainPanel.getActionPanel().editor.getSelectionStart();
+                }
             }            
         }
         int folderPreviewScrollVertical = 0;

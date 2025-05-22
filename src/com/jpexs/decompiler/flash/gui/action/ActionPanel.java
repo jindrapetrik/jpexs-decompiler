@@ -86,6 +86,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1391,14 +1393,27 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         searchPanel.setSearchText(searchedText);
         Runnable onScriptComplete = new Runnable() {
             @Override
-            public void run() {
-                decompiledEditor.setCaretPosition(0);
+            public void run() {                
+                Timer tim = new Timer();
+                tim.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                decompiledEditor.setSelectionStart(0);
+                                decompiledEditor.setSelectionEnd(0);
+                                decompiledEditor.setCaretPosition(0);
+                                if (result.isPcode()) {
+                                    searchPanel.showQuickFindDialog(editor);
+                                } else {
+                                    searchPanel.showQuickFindDialog(decompiledEditor);
+                                }
+                            }
+                        });
+                    }
+                }, 100);
 
-                if (result.isPcode()) {
-                    searchPanel.showQuickFindDialog(editor);
-                } else {
-                    searchPanel.showQuickFindDialog(decompiledEditor);
-                }
                 removeScriptListener(this);
             }
         };
@@ -1406,10 +1421,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         addScriptListener(onScriptComplete);
 
         AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getFullModel();
+        mainPanel.getCurrentTree().getSelectionModel().clearSelection();
         TreePath tp = ttm.getTreePath(result.getSrc());
         mainPanel.getCurrentTree().setSelectionPath(tp);
         mainPanel.getCurrentTree().scrollPathToVisible(tp);
-
     }
 
     @Override
