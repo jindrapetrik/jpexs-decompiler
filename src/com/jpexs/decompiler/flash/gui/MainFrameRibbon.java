@@ -38,9 +38,22 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.util.List;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JTree;
+import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceColorScheme;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
+import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
+import org.pushingpixels.substance.internal.utils.SubstanceTitleButton;
+import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
+import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
 /**
  * @author JPEXS
@@ -168,10 +181,70 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             }
         });
 
-        View.centerScreenMain(this);
+        View.centerScreenMain(this);   
+        /*addWindowListener(new WindowAdapter() {                        
+            @Override
+            public void windowOpened(WindowEvent e) {
+                RootPaneUI ui = getRootPane().getUI();
+                if (ui instanceof SubstanceRibbonRootPaneUI) {
+                    SubstanceRibbonRootPaneUI sui = (SubstanceRibbonRootPaneUI) ui;
+                    JComponent titlePane = sui.getTitlePane();
+                    final String EXTRA_COMPONENT_KIND = "substancelaf.internal.titlePane.extraComponentKind";
+                    Object trailing = null;
+                    int i = 0;
+                    int cnt = titlePane.getComponentCount();
+                    for (; i < cnt; i++) {
+                        Component c = titlePane.getComponent(i);
+                        
+                        if (c instanceof JComponent) {
+                            JComponent jc = (JComponent) c;
+                            Object o = jc.getClientProperty(EXTRA_COMPONENT_KIND);
+                            if ("TRAILING".equals("" + o)) {
+                                trailing = o;
+                                break;
+                            }
+                        }
+                    }
+                    if (trailing != null) {
+                        JButton button = new SubstanceTitleButton();
+                        button.setFocusPainted(false);
+                        button.setFocusable(false);
+                        button.setOpaque(true);
 
-    }
-
+                        button.putClientProperty(EXTRA_COMPONENT_KIND, trailing);
+                        button.setText(null);
+                        button.setBorder(null);                        
+                        
+                        Icon minIcon = new TransitionAwareIcon(button,
+					new TransitionAwareIcon.Delegate() {
+						@Override
+                        public Icon getColorSchemeIcon(
+								SubstanceColorScheme scheme) {
+							return SubstanceIconFactory
+									.getTitlePaneIcon(
+											SubstanceIconFactory.IconKind.MINIMIZE,
+											scheme,
+											SubstanceCoreUtilities
+													.getSkin(rootPane)
+													.getBackgroundColorScheme(
+															DecorationAreaType.PRIMARY_TITLE_PANE));
+						}
+					}, "substance.titlePane.minIcon");
+                        
+                        button.setIcon(minIcon);
+                        button.setToolTipText("Zkouska");
+                        button.putClientProperty(SubstanceLookAndFeel.FLAT_PROPERTY,
+                                        Boolean.TRUE);
+                        
+                        titlePane.remove(i);
+                        titlePane.add(button, i);
+                        titlePane.revalidate();
+                    }           
+                }
+            }            
+        });*/
+    }   
+    
     @Override
     public void setExtendedState(int state) {
         if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
