@@ -29,6 +29,9 @@
  */
 package org.pushingpixels.substance.internal.utils;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -52,6 +55,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -72,6 +76,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -97,6 +102,7 @@ import org.pushingpixels.substance.api.skin.SkinInfo;
 import org.pushingpixels.substance.internal.painter.BackgroundPaintingUtils;
 import org.pushingpixels.substance.internal.ui.SubstanceButtonUI;
 import org.pushingpixels.substance.internal.ui.SubstanceRootPaneUI;
+import org.pushingpixels.substance.internal.utils.filters.NegatedFilter;
 import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
 import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
@@ -136,11 +142,21 @@ public class SubstanceTitlePane extends JComponent {
 	 */
 	private Action maximizeAction;
 
+        /**
+	 * Action to set frame as Always on top.
+	 */
+	private Action alwaysOnTopAction;
+        
 	/**
 	 * Button used to maximize or restore the frame.
 	 */
 	protected JButton toggleButton;
 
+        /**
+	 * Button used to set always on top
+	 */
+	protected JButton alwaysOnTopButton;
+        
 	/**
 	 * Button used to minimize the frame
 	 */
@@ -728,6 +744,7 @@ public class SubstanceTitlePane extends JComponent {
 				this.add(this.menuBar);
 			}
 			this.createButtons();
+                        this.add(this.alwaysOnTopButton);
 			this.add(this.minimizeButton);
 			this.add(this.toggleButton);
 			this.add(this.closeButton);
@@ -805,6 +822,7 @@ public class SubstanceTitlePane extends JComponent {
 	private void createActions() {
 		this.closeAction = new CloseAction();
 		if (this.getWindowDecorationStyle() == JRootPane.FRAME) {
+                        this.alwaysOnTopAction = new AlwaysOnTopAction();
 			this.iconifyAction = new IconifyAction();
 			this.restoreAction = new RestoreAction();
 			this.maximizeAction = new MaximizeAction();
@@ -835,6 +853,7 @@ public class SubstanceTitlePane extends JComponent {
 	 *            Menu.
 	 */
 	private void addMenuItems(JMenu menu) {
+                menu.add(this.alwaysOnTopAction);
 		menu.add(this.restoreAction);
 
 		menu.add(this.iconifyAction);
@@ -929,6 +948,34 @@ public class SubstanceTitlePane extends JComponent {
 				SubstanceButtonUI.IS_TITLE_CLOSE_BUTTON, Boolean.TRUE);
 
 		if (this.getWindowDecorationStyle() == JRootPane.FRAME) {
+                        this.alwaysOnTopButton = this.createTitleButton();
+			this.alwaysOnTopButton.setAction(this.alwaysOnTopAction);
+			this.alwaysOnTopButton.setText(null);
+			this.alwaysOnTopButton.setBorder(null);
+
+			Icon alwaysOnTopIcon = new TransitionAwareIcon(this.alwaysOnTopButton,
+					new TransitionAwareIcon.Delegate() {
+						@Override
+                        public Icon getColorSchemeIcon(
+								SubstanceColorScheme scheme) {
+							return getAlwaysOnTopIcon(scheme,
+											SubstanceCoreUtilities
+													.getSkin(rootPane)
+													.getBackgroundColorScheme(
+															DecorationAreaType.PRIMARY_TITLE_PANE),
+                                                                                        false);
+						}
+					}, "substance.titlePane.alwaysOnTopIcon");
+			this.alwaysOnTopButton.setIcon(alwaysOnTopIcon);
+
+			this.alwaysOnTopButton.setFocusable(false);
+			this.alwaysOnTopButton.putClientProperty(
+					SubstanceLookAndFeel.FLAT_PROPERTY, Boolean.TRUE);
+			this.alwaysOnTopButton.setToolTipText(SubstanceCoreUtilities
+					.getResourceBundle(rootPane)
+					.getString("SystemMenu.alwaysOnTop"));
+                    
+                    
 			this.minimizeButton = this.createTitleButton();
 			this.minimizeButton.setAction(this.iconifyAction);
 			this.minimizeButton.setText(null);
@@ -1042,6 +1089,9 @@ public class SubstanceTitlePane extends JComponent {
 			if (frame != null) {
 				final JRootPane rootPane = this.getRootPane();
 
+                                
+                                updateAlwaysOnTopButton();
+                                
 				if (((state & Frame.MAXIMIZED_BOTH) != 0)
 						&& ((rootPane.getBorder() == null) || (rootPane
 								.getBorder() instanceof UIResource))
@@ -1133,6 +1183,7 @@ public class SubstanceTitlePane extends JComponent {
 				this.revalidate();
 				this.repaint();
 			}
+                        this.alwaysOnTopAction.setEnabled(true);
 			this.closeAction.setEnabled(true);
 			this.state = state;
 		}
@@ -1152,6 +1203,41 @@ public class SubstanceTitlePane extends JComponent {
 		this.toggleButton.setIcon(icon);
 		this.toggleButton.setText(null);
 	}
+        
+        private void updateAlwaysOnTopButton() {
+            Frame frame = this.getFrame();
+            if (frame.isAlwaysOnTop()) {
+                Icon alwaysOnTopIconEnabled = new TransitionAwareIcon(this.alwaysOnTopButton,
+                    new TransitionAwareIcon.Delegate() {
+                            @Override
+                    public Icon getColorSchemeIcon(
+                                                            SubstanceColorScheme scheme) {
+                                                    return getAlwaysOnTopIcon(scheme,
+                                                                                    SubstanceCoreUtilities
+                                                                                                    .getSkin(rootPane)
+                                                                                                    .getBackgroundColorScheme(
+                                                                                                                    DecorationAreaType.PRIMARY_TITLE_PANE),
+                                                                                    true);
+                                            }
+                                    }, "substance.titlePane.alwaysOnTopIconEnabled");
+                    this.alwaysOnTopButton.setIcon(alwaysOnTopIconEnabled);
+            } else {
+                Icon alwaysOnTopIcon = new TransitionAwareIcon(this.alwaysOnTopButton,
+                    new TransitionAwareIcon.Delegate() {
+                            @Override
+                    public Icon getColorSchemeIcon(
+                                                            SubstanceColorScheme scheme) {
+                                                    return getAlwaysOnTopIcon(scheme,
+                                                                                    SubstanceCoreUtilities
+                                                                                                    .getSkin(rootPane)
+                                                                                                    .getBackgroundColorScheme(
+                                                                                                                    DecorationAreaType.PRIMARY_TITLE_PANE),
+                                                                                    false);
+                                            }
+                                    }, "substance.titlePane.alwaysOnTopIcon");
+                    this.alwaysOnTopButton.setIcon(alwaysOnTopIcon);
+            }
+        }
 
 	/**
 	 * Returns the Frame rendering in. This will return null if the
@@ -1424,6 +1510,42 @@ public class SubstanceTitlePane extends JComponent {
 			}
 		}
 	}
+        
+        private class AlwaysOnTopAction extends AbstractAction {
+		/**
+		 * Creates a new restore action.
+		 */
+		public AlwaysOnTopAction() {
+			super(
+					/*SubstanceCoreUtilities.getResourceBundle(rootPane)
+							.getString("SystemMenu.restore"),*/
+                                        //"Always on top",
+                                    SubstanceCoreUtilities.getResourceBundle(rootPane)
+							.getString("SystemMenu.alwaysOnTop"),
+					SubstanceImageCreator
+							.getRestoreIcon(
+									SubstanceCoreUtilities
+											.getSkin(rootPane)
+											.getActiveColorScheme(
+													DecorationAreaType.PRIMARY_TITLE_PANE),
+									SubstanceCoreUtilities
+											.getSkin(rootPane)
+											.getBackgroundColorScheme(
+													DecorationAreaType.PRIMARY_TITLE_PANE)));
+		}
+
+		@Override
+                public void actionPerformed(ActionEvent e) {
+			Frame frame = SubstanceTitlePane.this.getFrame();
+
+			if (frame == null) {
+				return;
+			}
+
+			frame.setAlwaysOnTop(!frame.isAlwaysOnTop());       
+                        updateAlwaysOnTopButton();
+		}
+	}
 
 	/**
 	 * Actions used to <code>restore</code> the <code>Frame</code>.
@@ -1681,6 +1803,17 @@ public class SubstanceTitlePane extends JComponent {
 						x += buttonWidth;
 					}
 				}
+                                
+                                if ((SubstanceTitlePane.this.alwaysOnTopButton != null)
+						&& (SubstanceTitlePane.this.alwaysOnTopButton.getParent() != null)) {
+					spacing = 2;
+					x += leftToRight ? -spacing - buttonWidth : spacing;
+					SubstanceTitlePane.this.alwaysOnTopButton.setBounds(x, y,
+							buttonWidth, buttonHeight);
+					if (!leftToRight) {
+						x += buttonWidth;
+					}
+				}
 
 				if ((SubstanceTitlePane.this.heapStatusPanel != null)
 						&& SubstanceTitlePane.this.heapStatusPanel.isVisible()) {
@@ -1817,5 +1950,79 @@ public class SubstanceTitlePane extends JComponent {
 
 	public AbstractButton getCloseButton() {
 		return this.closeButton;
+	}
+        
+        
+        public static Icon getAlwaysOnTopIcon(SubstanceColorScheme scheme,
+			SubstanceColorScheme backgroundScheme, boolean enabled) {
+               int iSize = SubstanceSizeUtils.getTitlePaneIconSize();
+		BufferedImage image = SubstanceCoreUtilities
+				.getBlankImage(iSize, iSize);
+		Graphics2D graphics = (Graphics2D) image.getGraphics();
+		Color color = SubstanceColorUtilities.getMarkColor(scheme, true);
+		graphics.setColor(color);
+		//graphics.fillRect(start + 2, end - 2, size, 3);
+                Ellipse2D ellipse = new Ellipse2D.Double(iSize / 3, iSize / 3, iSize / 3, iSize / 3);
+                if (enabled) {
+                    graphics.fill(ellipse);
+                }
+                graphics.draw(ellipse);
+                
+                graphics.drawLine(iSize / 2, iSize * 2 / 3, iSize / 2, iSize - 4);
+
+		int fgStrength = SubstanceColorUtilities.getColorBrightness(color
+				.getRGB());
+		int fgNegativeStrength = SubstanceColorUtilities
+				.getColorBrightness(SubstanceColorUtilities
+						.getNegativeColor(color.getRGB()));
+		int bgStrength = SubstanceColorUtilities
+				.getColorBrightness(backgroundScheme.getLightColor().getRGB());
+		boolean noEcho = (fgStrength > fgNegativeStrength)
+				&& (fgStrength < bgStrength);
+
+		return new ImageIcon(overlayEcho(image,
+				noEcho ? 0 : SubstanceColorUtilities.getColorStrength(color),
+				1, 1));
+	}
+        
+        private static BufferedImage getNegated(BufferedImage bi) {
+		return new NegatedFilter().filter(bi, null);
+	}
+        
+        private static BufferedImage overlayEcho(BufferedImage image,
+			float echoAlpha, int offsetX, int offsetY) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+
+		// blur the original image
+		// ConvolveOp convolve = new ConvolveOp(new Kernel(3, 3, new float[] {
+		// .4f, .4f, .4f, .4f, .0f, .4f, .4f, .4f, .4f }),
+		// ConvolveOp.EDGE_NO_OP, null);
+		offsetX = offsetY = 0;
+		BufferedImage negated = getNegated(image);
+		BufferedImage result = SubstanceCoreUtilities.getBlankImage(width,
+				height);
+		Graphics2D graphics = (Graphics2D) result.getGraphics().create();
+		graphics.setComposite(AlphaComposite.getInstance(
+				AlphaComposite.SRC_OVER, 0.2f * echoAlpha * echoAlpha
+						* echoAlpha));
+		graphics.drawImage(negated, offsetX - 1, offsetY - 1, null);
+		graphics.drawImage(negated, offsetX + 1, offsetY - 1, null);
+		graphics.drawImage(negated, offsetX - 1, offsetY + 1, null);
+		graphics.drawImage(negated, offsetX + 1, offsetY + 1, null);
+		graphics.setComposite(AlphaComposite.getInstance(
+				AlphaComposite.SRC_OVER, 0.7f * echoAlpha * echoAlpha
+						* echoAlpha));
+		graphics.drawImage(negated, offsetX, offsetY - 1, null);
+		graphics.drawImage(negated, offsetX, offsetY + 1, null);
+		graphics.drawImage(negated, offsetX - 1, offsetY, null);
+		graphics.drawImage(negated, offsetX + 1, offsetY, null);
+
+		graphics.setComposite(AlphaComposite.getInstance(
+				AlphaComposite.SRC_OVER, 1.0f));
+		graphics.drawImage(image, 0, 0, null);
+
+		graphics.dispose();
+		return result;
 	}
 }
