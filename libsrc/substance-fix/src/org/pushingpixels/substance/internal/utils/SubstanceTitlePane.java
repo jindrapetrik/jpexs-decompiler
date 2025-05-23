@@ -1157,13 +1157,17 @@ public class SubstanceTitlePane extends JComponent {
 						this.restoreAction.setEnabled(false);
 					}
 					if ((this.toggleButton.getParent() == null)
-							|| (this.minimizeButton.getParent() == null)) {
+							|| (this.minimizeButton.getParent() == null)
+                                                        || (this.alwaysOnTopButton.getParent() == null)
+                                                ) {
+                                                this.add(this.alwaysOnTopButton);
 						this.add(this.toggleButton);
 						this.add(this.minimizeButton);
 						this.revalidate();
 						this.repaint();
 					}
 					this.toggleButton.setText(null);
+                                        this.alwaysOnTopAction.setEnabled(true);
 				} else {
 					this.maximizeAction.setEnabled(false);
 					this.restoreAction.setEnabled(false);
@@ -1175,9 +1179,11 @@ public class SubstanceTitlePane extends JComponent {
 				}
 			} else {
 				// Not contained in a Frame
+                                this.alwaysOnTopAction.setEnabled(false);
 				this.maximizeAction.setEnabled(false);
 				this.restoreAction.setEnabled(false);
 				this.iconifyAction.setEnabled(false);
+                                this.remove(this.alwaysOnTopButton);
 				this.remove(this.toggleButton);
 				this.remove(this.minimizeButton);
 				this.revalidate();
