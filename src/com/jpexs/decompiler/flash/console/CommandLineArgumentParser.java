@@ -190,7 +190,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.Process;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
-import com.sun.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.Font;
