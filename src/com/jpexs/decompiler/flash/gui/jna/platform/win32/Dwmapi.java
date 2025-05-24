@@ -25,6 +25,8 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
 import com.sun.jna.win32.W32APIOptions;
+import java.util.Arrays;
+import java.util.List;
 
 public interface Dwmapi extends Library {
 
@@ -38,8 +40,8 @@ public interface Dwmapi extends Library {
         public int cyBottomHeight;
 
         @Override
-        protected java.util.List<String> getFieldOrder() {
-            return java.util.List.of("cxLeftWidth", "cxRightWidth", "cyTopHeight", "cyBottomHeight");
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("cxLeftWidth", "cxRightWidth", "cyTopHeight", "cyBottomHeight");
         }
     }
 
