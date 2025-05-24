@@ -48,13 +48,20 @@ import java.awt.event.WindowStateListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.List;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
+import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
+import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
+import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
 /**
  * @author JPEXS
@@ -212,7 +219,8 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         addWindowListener(new WindowAdapter() {
             private BaseTSD.LONG_PTR oldWndProc;
             private StdCallLibrary.StdCallCallback newProc;
-            private Rectangle activeRect = new Rectangle();
+            private Rectangle dragRect = new Rectangle();
+            private Rectangle toggleRect = new Rectangle();
             private AffineTransform trans;
 
             @Override
@@ -242,20 +250,26 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                         private void updateRect() {
                             int appButtonSize = (int) Math.round(trans.getScaleX() * Integer.getInteger("peacock.appButtonSize", 24));
                             int titleIconsWidth
-                                    = 3 + SubstanceSizeUtils.getTitlePaneIconSize() //close
+                                    = 3 + SubstanceSizeUtils.getTitlePaneIconSize() //close                                    
                                     + 10 + SubstanceSizeUtils.getTitlePaneIconSize() //maximize / restore
                                     + 2 + SubstanceSizeUtils.getTitlePaneIconSize() //minimize
-                                    + 2 + SubstanceSizeUtils.getTitlePaneIconSize(); //always on top
+                                    + 2 + SubstanceSizeUtils.getTitlePaneIconSize() //always on top
+                                    ;
 
-                            Insets insets = titlePane.getInsets();
-                            if (insets == null) {
-                                insets = new Insets(0, 0, 0, 0);
-                            }
-                            activeRect = new Rectangle(
-                                    insets.left + appButtonSize,
+                            dragRect = new Rectangle(
+                                    5 + appButtonSize,
                                     4,
-                                    titlePane.getWidth() - titleIconsWidth - insets.right - (insets.left + appButtonSize),
+                                    titlePane.getWidth() - titleIconsWidth - appButtonSize,
                                     titlePane.getHeight()
+                            );
+
+                            toggleRect = new Rectangle(
+                                    titlePane.getWidth() - (3 + SubstanceSizeUtils.getTitlePaneIconSize() // close
+                                    + 10 + SubstanceSizeUtils.getTitlePaneIconSize() //maximize / restore
+                                    ),
+                                    4,
+                                    SubstanceSizeUtils.getTitlePaneIconSize(),
+                                    SubstanceSizeUtils.getTitlePaneIconSize()
                             );
                         }
                     };
@@ -274,6 +288,9 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                             }
                             if (uMsg == WinUser.WM_NCCALCSIZE) {
                                 return new WinDef.LRESULT(0);
+                            }
+                            if (uMsg == WinUser.WM_NCMOUSEMOVE) {
+                                User32.INSTANCE.PostMessage(hWnd, WinUser.WM_MOUSEMOVE, wParam, lParam);
                             }
                             if (uMsg == WinUser.WM_NCHITTEST) {
                                 int y = (short) ((lParam.longValue() >> 16) & 0xFFFF);
@@ -320,8 +337,12 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                                 p.x -= posOnScreen.x;
                                 p.y -= posOnScreen.y;
-                                if (activeRect.contains(p)) {
+                                if (dragRect.contains(p)) {
                                     return new WinDef.LRESULT(WinUser.HTCAPTION);
+                                }
+
+                                if (toggleRect.contains(p)) {
+                                    return new WinDef.LRESULT(WinUser.HTMAXBUTTON);
                                 }
 
                                 //return new WinDef.LRESULT(WinUser.HTCLIENT);

@@ -446,9 +446,13 @@ public interface WinUser extends StdCallLibrary, WinDef {
     
     int WM_NCCALCSIZE = 0x0083;
     int WM_NCHITTEST = 0x0084;
+    int WM_NCMOUSEMOVE = 0x00A0;
+    
+    int WM_MOUSEMOVE = 0x0200;
     
     int HTCLIENT = 1;
     int HTCAPTION = 2;
+    int HTMAXBUTTON = 9;
     int HTLEFT = 10;
     int HTRIGHT = 11;
     int HTTOP = 12;
