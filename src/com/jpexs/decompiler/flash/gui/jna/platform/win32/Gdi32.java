@@ -16,9 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.DWORD;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HBITMAP;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HDC;
@@ -27,6 +24,9 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinGDI.BITMAPINFO;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinGDI.BITMAPINFOHEADER;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinGDI.RGNDATA;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;

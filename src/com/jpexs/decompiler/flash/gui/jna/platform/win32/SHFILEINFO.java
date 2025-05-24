@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HICON;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinDef.DWORD;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HICON;
 import java.util.Arrays;
 import java.util.List;
 

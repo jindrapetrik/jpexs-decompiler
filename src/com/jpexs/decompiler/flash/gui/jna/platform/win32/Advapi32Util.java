@@ -19,12 +19,12 @@ package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 /**
  * @author JPEXS
  */
-import com.sun.jna.Memory;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.EVENTLOGRECORD;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEYByReference;
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import java.util.ArrayList;
 import java.util.Map;

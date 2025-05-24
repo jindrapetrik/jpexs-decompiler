@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
-import com.sun.jna.WString;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HINSTANCE;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HWND;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+import com.sun.jna.WString;
 import java.util.Arrays;
 import java.util.List;
 

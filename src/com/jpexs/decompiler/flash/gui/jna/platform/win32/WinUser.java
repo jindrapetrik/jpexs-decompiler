@@ -187,6 +187,8 @@ public interface WinUser extends StdCallLibrary, WinDef {
     int WS_EX_LAYERED = 0x80000;
 
     int WS_EX_TRANSPARENT = 32;
+    
+    int WS_THICKFRAME = 0x00040000;
 
     int LWA_COLORKEY = 1;
 
@@ -441,6 +443,20 @@ public interface WinUser extends StdCallLibrary, WinDef {
     int WM_SIZE = 0x0005;
 
     int WM_DESTROY = 0x0002;
+    
+    int WM_NCCALCSIZE = 0x0083;
+    int WM_NCHITTEST = 0x0084;
+    
+    int HTCLIENT = 1;
+    int HTCAPTION = 2;
+    int HTLEFT = 10;
+    int HTRIGHT = 11;
+    int HTTOP = 12;
+    int HTTOPLEFT = 13;
+    int HTTOPRIGHT = 14;
+    int HTBOTTOM = 15;
+    int HTBOTTOMLEFT = 16;
+    int HTBOTTOMRIGHT = 17;
 
     public static final int WM_DEVICECHANGE = 0x0219;
 
@@ -713,6 +729,10 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
     int RDW_NOFRAME = 0x0800;
 
+    int SWP_NOSIZE = 0x0001;
+    int SWP_NOMOVE = 0x0002;
+    int SWP_FRAMECHANGED = 0x0020;
+    
     /**
      * The retrieved handle identifies the window of the same type that is
      * highest in the Z order.

@@ -16,9 +16,6 @@
  */
 package com.jpexs.decompiler.flash.console;
 
-import com.jpexs.helpers.utf8.Utf8Helper;
-import com.sun.jna.Platform;
-import com.sun.jna.WString;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
@@ -26,6 +23,9 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Win32Exception;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import com.sun.jna.Platform;
+import com.sun.jna.WString;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,9 +107,9 @@ public class ContextMenuTools {
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
-                registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);                               
+                registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
             }
-            
+
             for (String ext : extensions) {
 
                 // 1) Add to context menu of SWF
@@ -124,9 +124,8 @@ public class ContextMenuTools {
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
                     }
-                                        
+
                     //Open with per extension
-                    
                     exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
                     if ((!exists) && add) { //add
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
@@ -134,7 +133,7 @@ public class ContextMenuTools {
                     if (exists && (!add)) { //remove
                         registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
                     }
-                    
+
                     if (add) {
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, clsName, verb);
                     }
@@ -175,8 +174,8 @@ public class ContextMenuTools {
                     }
                     if (add) {
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "", verbName);
-                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");                    
-                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "MUIVerb", "@" + appDir + exeName + ",-" + muiVerbCode);                                       
+                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");
+                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "MUIVerb", "@" + appDir + exeName + ",-" + muiVerbCode);
                     }
                     if (exists && (!add)) { //remove        
                         registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command");

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.jna.platform.win32;
 
+import com.jpexs.decompiler.flash.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
@@ -23,7 +24,6 @@ import com.sun.jna.Structure;
 import com.sun.jna.Union;
 import com.sun.jna.platform.win32.BaseTSD;
 import com.sun.jna.platform.win32.WinDef;
-import com.jpexs.decompiler.flash.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import java.util.Arrays;

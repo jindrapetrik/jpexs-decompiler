@@ -16,11 +16,11 @@
  */
 package com.jpexs.video;
 
+import com.jpexs.decompiler.flash.jna.platform.win32.Advapi32Util;
+import com.jpexs.decompiler.flash.jna.platform.win32.WinReg;
 import com.jpexs.helpers.Helper;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
-import com.jpexs.decompiler.flash.jna.platform.win32.Advapi32Util;
-import com.jpexs.decompiler.flash.jna.platform.win32.WinReg;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

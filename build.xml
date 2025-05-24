@@ -80,9 +80,11 @@
             <fileset dir="src/com/jpexs" includes="**/*.java">
                 <exclude name="**/FontPreviewDialog.java" />
                 <exclude name="**/*Lexer.java" />
+                <exclude name="**/jna/" />
             </fileset>
             <fileset dir="libsrc/ffdec_lib/src/com/jpexs" includes="**/*.java">
                 <exclude name="**/*Lexer.java" />
+                <exclude name="**/jna/" />
             </fileset>
         </checkstyle>
     </target>

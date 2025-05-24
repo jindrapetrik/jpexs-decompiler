@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
-import com.sun.jna.Native;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
 
 /**

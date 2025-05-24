@@ -16,9 +16,9 @@
  */
 package com.jpexs.process.win32;
 
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.DWORD;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.process.Process;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.DWORD;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;

@@ -16,11 +16,6 @@
  */
 package com.jpexs.process.win32;
 
-import com.jpexs.helpers.ProgressListener;
-import com.jpexs.process.ProcessTools;
-import com.sun.jna.Memory;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.BITMAP;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD;
@@ -37,6 +32,11 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinBase;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
+import com.jpexs.helpers.ProgressListener;
+import com.jpexs.process.ProcessTools;
+import com.sun.jna.Memory;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
