@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.Dwmapi;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.User32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
@@ -48,20 +47,13 @@ import java.awt.event.WindowStateListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.List;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
-import org.pushingpixels.substance.api.DecorationAreaType;
-import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
-import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
-import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
-import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
 /**
  * @author JPEXS
@@ -359,13 +351,13 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     User32.INSTANCE.SetWindowPos(hwnd, null, 0, 0, 0, 0,
                             WinUser.SWP_NOMOVE | WinUser.SWP_NOSIZE | WinUser.SWP_NOZORDER | WinUser.SWP_FRAMECHANGED);
 
-                    Dwmapi.MARGINS margins = new Dwmapi.MARGINS();
+                    /*Dwmapi.MARGINS margins = new Dwmapi.MARGINS();
                     margins.cxLeftWidth = 0;
                     margins.cxRightWidth = 0;
                     margins.cyTopHeight = 0;
                     margins.cyBottomHeight = 0;
 
-                    Dwmapi.INSTANCE.DwmExtendFrameIntoClientArea(hwnd, margins);
+                    Dwmapi.INSTANCE.DwmExtendFrameIntoClientArea(hwnd, margins);*/
                 }
             }
         });
