@@ -19,14 +19,18 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Dwmapi;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.NtDll;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.User32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.helpers.Helper;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.win32.StdCallLibrary;
+import com.sun.jna.win32.W32APIOptions;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -47,13 +51,20 @@ import java.awt.event.WindowStateListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.List;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
+import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
+import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
+import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
 /**
  * @author JPEXS
@@ -185,10 +196,42 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         enableAeroSnap();
     }
 
-    private void enableAeroSnap() {
+    private boolean isAeroSnapAvailable() {
         if (!Platform.isWindows()) {
+            return false;
+        }
+
+        WinNT.OSVERSIONINFOEX version = new WinNT.OSVERSIONINFOEX();
+        if (NtDll.INSTANCE.RtlGetVersion(version) != 0) {
+            return false;
+        }
+
+        int major = version.dwMajorVersion.intValue();
+        //int minor = version.dwMinorVersion.intValue();
+
+        if (major < 6) {
+            // Windows XP or older
+            return false;
+        }
+
+        try {
+            WinNT.BOOLbyReference enabled = new WinNT.BOOLbyReference();
+            if (Dwmapi.INSTANCE.DwmIsCompositionEnabled(enabled).intValue() == 0) {
+                if (enabled.getValue().intValue() != 1) {
+                    return false;
+                }
+            }
+        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+            return false;
+        }
+        return true;
+    }
+
+    private void enableAeroSnap() {
+        if (!isAeroSnapAvailable()) {
             return;
         }
+
         Point posOnScreen = new Point();
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -351,13 +394,13 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     User32.INSTANCE.SetWindowPos(hwnd, null, 0, 0, 0, 0,
                             WinUser.SWP_NOMOVE | WinUser.SWP_NOSIZE | WinUser.SWP_NOZORDER | WinUser.SWP_FRAMECHANGED);
 
-                    /*Dwmapi.MARGINS margins = new Dwmapi.MARGINS();
+                    Dwmapi.MARGINS margins = new Dwmapi.MARGINS();
                     margins.cxLeftWidth = 0;
                     margins.cxRightWidth = 0;
                     margins.cyTopHeight = 0;
                     margins.cyBottomHeight = 0;
 
-                    Dwmapi.INSTANCE.DwmExtendFrameIntoClientArea(hwnd, margins);*/
+                    Dwmapi.INSTANCE.DwmExtendFrameIntoClientArea(hwnd, margins);
                 }
             }
         });

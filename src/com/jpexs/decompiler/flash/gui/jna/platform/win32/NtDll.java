@@ -16,35 +16,15 @@
  */
 package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.win32.W32APIOptions;
+
 /**
  *
  * @author JPEXS
  */
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.Structure;
-import com.sun.jna.win32.W32APIOptions;
-import java.util.Arrays;
-import java.util.List;
-
-public interface Dwmapi extends Library {
-        
-    Dwmapi INSTANCE = (Dwmapi) Native.loadLibrary("dwmapi", Dwmapi.class, W32APIOptions.DEFAULT_OPTIONS);    
-
-    class MARGINS extends Structure {
-
-        public int cxLeftWidth;
-        public int cxRightWidth;
-        public int cyTopHeight;
-        public int cyBottomHeight;
-
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList("cxLeftWidth", "cxRightWidth", "cyTopHeight", "cyBottomHeight");
-        }
+ public interface NtDll extends Library {
+        NtDll INSTANCE = (NtDll) Native.loadLibrary("ntdll", NtDll.class, W32APIOptions.DEFAULT_OPTIONS);
+        int RtlGetVersion(WinNT.OSVERSIONINFOEX info);
     }
-
-    int DwmExtendFrameIntoClientArea(HWND hWnd, MARGINS pMarInset);
-    WinNT.HRESULT DwmIsCompositionEnabled(WinNT.BOOLbyReference pfEnabled);
-}
