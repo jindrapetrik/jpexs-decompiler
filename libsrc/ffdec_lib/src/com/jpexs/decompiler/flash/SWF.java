@@ -351,8 +351,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Map of characterId to CharacterTag including imported tags. The
-     * CharacterTags.getCharacterId() does not necessarily be the characterId
-     * in the map since there can be imported CharacterTags from other SWFs.
+     * CharacterTags.getCharacterId() does not necessarily be the characterId in
+     * the map since there can be imported CharacterTags from other SWFs.
      */
     @Internal
     private volatile Map<Integer, CharacterTag> charactersWithImported;
@@ -3219,6 +3219,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Map<String, ASMSource> asmsToExport = new LinkedHashMap<>();
         for (TreeItem treeItem : getFirstLevelASMNodes(null)) {
+            if (treeItem instanceof AS2Package) {
+                AS2Package pkg = (AS2Package) treeItem;
+                if (pkg.isDefaultPackage()) {
+                    getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport,
+                            "",
+                            ""
+                    );
+                    continue;
+                }
+            }
             getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport,
                     File.separator + getASMPath(true, treeItem),
                     File.separator + getASMPath(false, treeItem)
@@ -3325,9 +3335,6 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         if (treeItem instanceof AS2Package) {
             AS2Package pkg = (AS2Package) treeItem;
-            if (pkg.isDefaultPackage() && exportFileName) {
-                return "__defaultPackage";
-            }
             if (pkg.isFlat()) {
                 String[] parts = pkg.toString().split("\\.");
                 for (int i = 0; i < parts.length; i++) {
@@ -5119,7 +5126,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         setModified(true);
         tags.remove(tag);
         updateCharacters();
-        readOnlyTags = null;        
+        readOnlyTags = null;
     }
 
     /**
@@ -6220,12 +6227,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
-        if (uninitializedAs2ClassTraits == null) {            
+        if (uninitializedAs2ClassTraits == null) {
             calculateAs2UninitializedClassTraits();
         }
         return uninitializedAs2ClassTraits;
     }
-    
+
     public boolean needsCalculatingAS2UninitializeClassTraits(ASMSource src) {
         if (!isAS3()) {
             if (src instanceof DoInitActionTag) {
@@ -6249,9 +6256,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Checks whether SWF was freed
+     *
      * @return True if destroyed
      */
     public boolean isDestroyed() {
         return destroyed;
-    }        
+    }
 }

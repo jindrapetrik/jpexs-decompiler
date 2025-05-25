@@ -22,10 +22,11 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
   so there is no longer need to expand frame nodes (useful for fast switching scripts)
 - AS1/2 - Scripts from default package (not these inside `__Packages`) are now
-  exported/imported to/from the folder named `__defaultPackage` for all languages
-  instead of localized `<default package>` before.
+  exported/imported to/from main scripts folder instead of localized `<default package>` before.
+  (Only happened when package flattening was on)
   This may break backwards compatibility. For importing scripts from older
-  versions of FFDec, you should rename the folder to the new name.
+  versions of FFDec, you should move the scripts from `<default package>`
+  to main scripts folder.
   
 
 ### Fixed
