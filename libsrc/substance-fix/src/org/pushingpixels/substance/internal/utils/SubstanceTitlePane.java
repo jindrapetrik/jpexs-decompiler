@@ -1189,8 +1189,7 @@ public class SubstanceTitlePane extends JComponent {
 				this.revalidate();
 				this.repaint();
 			}
-                        this.alwaysOnTopAction.setEnabled(true);
-			this.closeAction.setEnabled(true);
+                        this.closeAction.setEnabled(true);
 			this.state = state;
 		}
 	}
@@ -1241,7 +1240,7 @@ public class SubstanceTitlePane extends JComponent {
                                                                                     false);
                                             }
                                     }, "substance.titlePane.alwaysOnTopIcon");
-                    this.alwaysOnTopButton.setIcon(alwaysOnTopIcon);
+                    this.alwaysOnTopButton.setIcon(alwaysOnTopIcon);                    
             }
         }
 
@@ -1519,17 +1518,13 @@ public class SubstanceTitlePane extends JComponent {
         
         private class AlwaysOnTopAction extends AbstractAction {
 		/**
-		 * Creates a new restore action.
+		 * Creates a new always on top action.
 		 */
 		public AlwaysOnTopAction() {
 			super(
-					/*SubstanceCoreUtilities.getResourceBundle(rootPane)
-							.getString("SystemMenu.restore"),*/
-                                        //"Always on top",
                                     SubstanceCoreUtilities.getResourceBundle(rootPane)
 							.getString("SystemMenu.alwaysOnTop"),
-					SubstanceImageCreator
-							.getRestoreIcon(
+					                           getAlwaysOnTopIcon(
 									SubstanceCoreUtilities
 											.getSkin(rootPane)
 											.getActiveColorScheme(
@@ -1537,7 +1532,8 @@ public class SubstanceTitlePane extends JComponent {
 									SubstanceCoreUtilities
 											.getSkin(rootPane)
 											.getBackgroundColorScheme(
-													DecorationAreaType.PRIMARY_TITLE_PANE)));
+													DecorationAreaType.PRIMARY_TITLE_PANE),
+                                                                        false));
 		}
 
 		@Override
@@ -1549,7 +1545,7 @@ public class SubstanceTitlePane extends JComponent {
 			}
 
 			frame.setAlwaysOnTop(!frame.isAlwaysOnTop());       
-                        updateAlwaysOnTopButton();
+                        updateAlwaysOnTopButton();                        
 		}
 	}
 
