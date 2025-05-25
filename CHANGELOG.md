@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - Proper freeing memory after SWF close
 - AS1/2 improper selection of search result
 - [#2459] AS1/2 StoreRegister improper declaration position
+- AS2 Class names not showing in Folder list view
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
