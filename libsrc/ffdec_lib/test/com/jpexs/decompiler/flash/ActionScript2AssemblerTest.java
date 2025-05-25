@@ -167,7 +167,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         res = cleanPCode(res);
         assertEquals(res, "function test(p)\n"
                 + "{\n"
-                + "var _loc0_ = null;\n"
+                + "var _loc0_;\n"
                 + "if((_loc0_ = p.type) === 1)\n"
                 + "{\n"
                 + "trace(\"Hello\");\n"
@@ -323,7 +323,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "Push \"after\"\n"
                 + "Trace");
         res = cleanPCode(res);
-        assertEquals(res, "var _loc1_ = null;\n"
+        assertEquals(res, "var _loc1_;\n"
                 + "x = _loc1_ = new Object();\n"
                 + "var _loc2_ = _global.x;\n"
                 + "for(var _loc0_ in _loc2_)\n"

@@ -1143,7 +1143,7 @@ public class ActionScript2Parser {
                     ret = new VariableActionItem(varIdentifier, varval, true);
                     variables.add((VariableActionItem) ret);
                 } else {
-                    ret = new VariableActionItem(varIdentifier, null, true);
+                    ret = new VariableActionItem(varIdentifier, new DirectValueActionItem(Undefined.INSTANCE), true);
                     variables.add((VariableActionItem) ret);
                     lexer.pushback(s);
                 }

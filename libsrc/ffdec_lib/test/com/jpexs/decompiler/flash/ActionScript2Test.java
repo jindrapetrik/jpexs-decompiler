@@ -1989,9 +1989,10 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "{\r\n"
                 + "var _loc3_ = {};\r\n"
                 + "var _loc2_ = {};\r\n"
+                + "var _loc1_;\r\n"
                 + "for(var _loc4_ in _loc3_)\r\n"
                 + "{\r\n"
-                + "var _loc1_ = _loc2_[_loc4_];\r\n"
+                + "_loc1_ = _loc2_[_loc4_];\r\n"
                 + "switch(_loc1_)\r\n"
                 + "{\r\n"
                 + "case \"A\":\r\n"
@@ -2493,6 +2494,25 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var r = 5;\r\n"
                 + "getURL(\"file\" + r + \".swf\",\"_blank\",\"POST\");\r\n"
                 + "fscommand(\"test\" + r,\"xx\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame92_Test() {
+        compareSrc(92, "function f(tst)\r\n"
+                + "{\r\n"
+                + "var _loc1_;\r\n"
+                + "if(tst)\r\n"
+                + "{\r\n"
+                + "_loc1_ = 1;\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "_loc1_ = 2;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"testVarDefineInFunc\");\r\n"
+                + "f(tst);\r\n"
         );
     }
 }

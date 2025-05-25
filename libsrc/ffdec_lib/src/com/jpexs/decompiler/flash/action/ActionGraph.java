@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
@@ -272,6 +273,8 @@ public class ActionGraph extends Graph {
         return !isSwitch;
     }
 
+    
+    
     @Override
     protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
@@ -288,7 +291,7 @@ public class ActionGraph extends Graph {
                 }
             }
             list.addAll(0, removed);
-        }
+        }                
 
         int targetStart;
         int targetEnd;
@@ -672,7 +675,7 @@ public class ActionGraph extends Graph {
                             sr.define = !definedRegisters.contains(sr.register.number);
                             definedRegisters.add(sr.register.number);                            
                             if (sr.define && sr != ti) {
-                                list.add(ri.getVal(), new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Null.INSTANCE), true));
+                                list.add(ri.getVal(), new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Undefined.INSTANCE), true));
                                 sr.define = false;  
                                 ri.setVal(ri.getVal() + 1);
                             }
@@ -703,7 +706,27 @@ public class ActionGraph extends Graph {
                 for (List<GraphTargetItem> items : b.getSubs()) {
                     makeDefineRegistersUp(items, definedRegisters);
                 }
+                
+                
+                for (List<GraphTargetItem> items : b.getSubs()) {
+                    for (int j = 0; j < items.size(); j++) {
+                        GraphTargetItem item  = items.get(j);
+                        if (item instanceof StoreRegisterActionItem) {
+                            StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                            if (sr.define) {
+                                list.add(ri.getVal(), new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Undefined.INSTANCE), true));
+                                sr.define = false;  
+                                if ((sr.value instanceof DirectValueActionItem) && (((DirectValueActionItem) sr.value).value == Undefined.INSTANCE)) {
+                                    items.remove(j);
+                                    j--;
+                                }
+                                ri.setVal(ri.getVal() + 1);
+                            }
+                        }
+                    }
+                }
             }
+            i = ri.getVal();
         }
     }
 

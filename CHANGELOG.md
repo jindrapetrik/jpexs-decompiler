@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 debugger - deletion of SWD file after debugging
 - Proper freeing memory after SWF close
 - AS1/2 improper selection of search result
+- [#2459] AS1/2 StoreRegister improper declaration position
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
@@ -3808,6 +3809,7 @@ Major version of SWF to XML export changed to 2.
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
 [#289]: https://www.free-decompiler.com/flash/issues/289
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
+[#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448

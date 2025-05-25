@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -104,7 +105,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         } else {
             stripQuotes(name, localData, writer);
         }
-        if (value == null) {
+        if (value == null || ((value instanceof DirectValueActionItem) && ((DirectValueActionItem) value).value == Undefined.INSTANCE)) {
             return writer;
         }
         writer.append(" = ");
@@ -126,7 +127,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        if (value == null) {
+        if (value == null || (value instanceof DirectValueActionItem && ((DirectValueActionItem) value).value == Undefined.INSTANCE)) {
             return toSourceMerge(localData, generator, name, new ActionDefineLocal2());
         } else {
             return toSourceMerge(localData, generator, name, value, new ActionDefineLocal());
