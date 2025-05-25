@@ -14,7 +14,8 @@ All notable changes to this project will be documented in this file.
 - [#2404] Quick find in text/script editors - show number of occurences
 - [#1418] Option to make main window Always on top
 - [#289] Support for Aero Snap on Windows
-
+- [#2412] Show coordinates on stage mouse move for up to 2 decimal places
+ 
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
 - Touch point, snap align and snap to objects incorrect position when editing nested layers
@@ -3808,6 +3809,7 @@ Major version of SWF to XML export changed to 2.
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
 [#289]: https://www.free-decompiler.com/flash/issues/289
+[#2412]: https://www.free-decompiler.com/flash/issues/2412
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
