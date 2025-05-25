@@ -3276,18 +3276,22 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         } else if (treeItem instanceof FrameScript) {
             FrameScript frameScript = (FrameScript) treeItem;
-            Frame parentFrame = frameScript.getFrame();
-            for (TreeItem subItem : parentFrame.actionContainers) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
-                        pathExportFilenames + File.separator + getASMPath(true, subItem),
-                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
-                );
-            }
-            for (TreeItem subItem : parentFrame.actions) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
-                        pathExportFilenames + File.separator + getASMPath(true, subItem),
-                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
-                );
+            if (frameScript.getSingleDoActionTag() != null && !exportFileNames) {
+                asmsToExport.put(pathNoExportFilenames, frameScript.getSingleDoActionTag());
+            } else {
+                Frame parentFrame = frameScript.getFrame();
+                for (TreeItem subItem : parentFrame.actionContainers) {
+                    getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                            pathExportFilenames + File.separator + getASMPath(true, subItem),
+                            pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    );
+                }
+                for (TreeItem subItem : parentFrame.actions) {
+                    getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                            pathExportFilenames + File.separator + getASMPath(true, subItem),
+                            pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    );
+                }
             }
         } else if (treeItem instanceof AS2Package) {
             AS2Package as2Package = (AS2Package) treeItem;

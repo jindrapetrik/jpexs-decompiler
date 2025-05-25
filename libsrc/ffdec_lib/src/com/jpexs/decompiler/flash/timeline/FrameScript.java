@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -70,7 +71,21 @@ public class FrameScript implements TreeItem, Exportable {
 
     @Override
     public String toString() {
+        if (getSingleDoActionTag() != null) {
+            return frame.toString() + " - " + "DoAction";
+        }
         return frame.toString();
+    }
+    
+    public DoActionTag getSingleDoActionTag() {
+        if (!frame.actionContainers.isEmpty()) {
+            return null;
+        }
+        if (frame.actions.size() != 1) {
+            return null;
+        }
+        
+        return frame.actions.get(0);                
     }
 
     /**

@@ -182,6 +182,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.Scene;
 import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
@@ -2957,6 +2958,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 TagScript ts = (TagScript) t;
                 if (ts.getTag() instanceof ASMSource) {
                     as = (ASMSource) ts.getTag();
+                }
+            } else if (t instanceof FrameScript) {
+                FrameScript fs = (FrameScript) t;
+                if (fs.getSingleDoActionTag() != null) {
+                    as = fs.getSingleDoActionTag();
                 }
             }
             if (as != null) {
@@ -6151,6 +6157,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem instanceof TagScript) {
             treeItem = ((TagScript) treeItem).getTag();
             preferScript = true;
+        }
+        
+        if (treeItem instanceof FrameScript) {
+            FrameScript fs = (FrameScript) treeItem;
+            DoActionTag doAction = fs.getSingleDoActionTag();
+            if (doAction != null) {
+                treeItem = doAction;
+            }
         }
 
         folderPreviewPanel.clear();

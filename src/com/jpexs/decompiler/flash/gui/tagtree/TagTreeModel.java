@@ -404,14 +404,14 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
         }
-        
+
         List<String> ret = new ArrayList<>();
         for (String f : FOLDERS_ORDER) {
             if (folderNames.contains(f)) {
                 ret.add(f);
             }
         }
-        
+
         return ret;
     }
 
@@ -579,6 +579,20 @@ public class TagTreeModel extends AbstractTagTreeModel {
             if (objNoTs == nNoTs) {
                 return true;
             }
+
+            TreeItem objNoFs = obj;
+            if ((obj instanceof FrameScript) && ((FrameScript) obj).getSingleDoActionTag() != null) {
+                objNoFs = ((FrameScript) obj).getSingleDoActionTag();
+            }
+
+            TreeItem nNoFs = n;
+            if ((n instanceof FrameScript) && ((FrameScript) n).getSingleDoActionTag() != null) {
+                nNoFs = ((FrameScript) n).getSingleDoActionTag();
+            }
+
+            if (objNoFs == nNoFs) {
+                return true;
+            }
         }
         return false;
     }
@@ -710,6 +724,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getAllChildren();
         } else if (parentNode instanceof FrameScript) {
+            if (((FrameScript) parentNode).getSingleDoActionTag() != null) {
+                return new ArrayList<>();
+            }
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
             result.addAll(parentFrame.actionContainers);
             result.addAll(parentFrame.actions);
@@ -807,6 +824,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChild(index);
         } else if (parentNode instanceof FrameScript) {
+            if (((FrameScript) parentNode).getSingleDoActionTag() != null) {
+                return null;
+            }
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
             TreeItem result;
             if (index < parentFrame.actionContainers.size()) {
@@ -884,6 +904,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof AS2Package) {
             return mappedSize + ((AS2Package) parentNode).getChildCount();
         } else if (parentNode instanceof FrameScript) {
+            if (((FrameScript) parentNode).getSingleDoActionTag() != null) {
+                return 0;
+            }
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
             return mappedSize + parentFrame.actionContainers.size() + parentFrame.actions.size();
         } else if (parentNode instanceof TagScript) {
@@ -956,6 +979,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof AS2Package) {
             return indexOfAdd(baseIndex, ((AS2Package) parentNode).getIndexOfChild(childNode));
         } else if (parentNode instanceof FrameScript) {
+            if (((FrameScript) parentNode).getSingleDoActionTag() != null) {
+                return -1;
+            }
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
             if (childNode instanceof TagScript) {
                 childNode = ((TagScript) childNode).getTag();

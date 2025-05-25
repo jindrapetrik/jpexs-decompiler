@@ -18,6 +18,10 @@ All notable changes to this project will be documented in this file.
 - "Show detail" context menu item for items in folder preview
 - [#1682] AS2 - Adding class by context menu on packages
  
+### Changed
+- AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
+  so there is no longer need to expand frame nodes (useful for fast switching scripts)
+
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
 - Touch point, snap align and snap to objects incorrect position when editing nested layers

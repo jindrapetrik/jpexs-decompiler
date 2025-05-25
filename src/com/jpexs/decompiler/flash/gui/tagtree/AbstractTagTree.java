@@ -189,8 +189,17 @@ public abstract class AbstractTagTree extends JTree {
             return View.getIcon("folderscripts16");
         }
         
+        
+        
         TreeNodeType type = getTreeNodeType(val);
 
+        if (val instanceof FrameScript) {
+            FrameScript fs = (FrameScript) val;
+            if (fs.getSingleDoActionTag() != null) {
+                type = TreeNodeType.AS_FRAME;
+            }
+        }
+        
         if (type == TreeNodeType.FOLDER && folderExpanded) {
             type = TreeNodeType.FOLDER_OPEN;
         }
@@ -650,6 +659,12 @@ public abstract class AbstractTagTree extends JTree {
             if (d instanceof TagScript) {
                 Tag tag = ((TagScript) d).getTag();
                 if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                    d = tag;
+                }
+            }
+            if (d instanceof FrameScript) {
+                DoActionTag tag = ((FrameScript) d).getSingleDoActionTag();
+                if (tag != null) {
                     d = tag;
                 }
             }

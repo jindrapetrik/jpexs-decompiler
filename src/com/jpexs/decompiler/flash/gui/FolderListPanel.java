@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -242,6 +243,10 @@ public class FolderListPanel extends JPanel {
                     TreeItem treeItem = items.get(index);
 
                     TreeNodeType type = AbstractTagTree.getTreeNodeType(treeItem);
+                    if ((treeItem instanceof FrameScript) && ((FrameScript) treeItem).getSingleDoActionTag() != null) {
+                        type = TreeNodeType.AS_FRAME;
+                    }
+                    
                     Icon icon = ICONS.get(type);
                     icon.paintIcon(l, g, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconHeight() / 2);
                     String s = null;

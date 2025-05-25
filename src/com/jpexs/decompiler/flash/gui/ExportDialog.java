@@ -47,12 +47,12 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -103,7 +103,7 @@ public class ExportDialog extends AppDialog {
         {ImageTag.class},
         {DefineVideoStreamTag.class},
         {SoundTag.class},
-        {ASMSource.class, ScriptPack.class, TagScript.class},
+        {ASMSource.class, ScriptPack.class, TagScript.class, FrameScript.class},
         {BinaryDataInterface.class},
         {Frame.class},
         {Frame.class},

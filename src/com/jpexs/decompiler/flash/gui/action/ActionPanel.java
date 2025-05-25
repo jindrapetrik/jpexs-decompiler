@@ -541,9 +541,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 @Override
                 protected Void doInBackground() throws Exception {
 
+                    if (isCancelled()) {
+                        return null;
+                    }
                     ActionList innerActions = actions;
                     if (disassemblingNeeded) {
                         View.execInEventDispatch(() -> {
+                            if (isCancelled()) {
+                                return;
+                            }
                             editor.setShowMarkers(false);
                             setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                             if (decompileNeeded) {
@@ -552,12 +558,18 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                             }
                         });
 
+                        if (isCancelled()) {
+                            return null;
+                        }
                         DisassemblyListener listener = getDisassemblyListener();
                         asm.addDisassemblyListener(listener);
                         innerActions = asm.getActions();
                         asm.removeDisassemblyListener(listener);
                     }
 
+                    if (isCancelled()) {
+                        return null;
+                    }
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);

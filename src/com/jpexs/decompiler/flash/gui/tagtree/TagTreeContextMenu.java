@@ -374,6 +374,24 @@ public class TagTreeContextMenu extends JPopupMenu {
         return items;
     }
 
+    private List<TreeItem> filterOutScriptItems(List<TreeItem> items) {
+        List<TreeItem> noScriptItems = new ArrayList<>();
+        for (TreeItem item : items) {
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
+            noScriptItems.add(item);
+        }
+        return noScriptItems;
+    }
+
+    private List<TreeItem> getSelectedNoScriptItems() {
+        return filterOutScriptItems(items);
+    }
+
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
 
@@ -1163,6 +1181,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                         continue;
                     }
                 }
+                if (item instanceof FrameScript) {
+                    DoActionTag tag = ((FrameScript) item).getSingleDoActionTag();
+                    if (tag != null) {
+                        continue;
+                    }
+                }
 
                 allSelectedIsTag = false;
                 allSelectedIsTagWithClassName = false;
@@ -1177,6 +1201,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (item instanceof TagScript) {
                     Tag tag = ((TagScript) item).getTag();
                     if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        continue;
+                    }
+                } else if (item instanceof FrameScript) {
+                    DoActionTag tag = ((FrameScript) item).getSingleDoActionTag();
+                    if (tag != null) {
                         continue;
                     }
                 } else if (item instanceof Frame) {
@@ -1352,6 +1381,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (allSelectedIsTag) {
             boolean canUndo = false;
             for (TreeItem item : items) {
+                if (item instanceof TagScript) {
+                    item = ((TagScript) item).getTag();
+                }
+                if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                    item = ((FrameScript) item).getSingleDoActionTag();
+                }
                 if (item instanceof Tag) {
                     Tag tag = (Tag) item;
                     if (tag.canUndo()) {
@@ -1695,7 +1730,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if ((firstItem instanceof SWF) || (firstItem instanceof DefineSpriteTag) || (firstItem instanceof Frame)) {
                     pasteInsideMenuItem.setVisible(true);
                 }
-                if ((firstItem instanceof Tag) || (firstItem instanceof Frame)) {
+                if ((firstItem instanceof Tag)
+                        || (firstItem instanceof Frame)
+                        || (firstItem instanceof TagScript)
+                        || ((firstItem instanceof FrameScript) && ((FrameScript) firstItem).getSingleDoActionTag() != null)) {
                     pasteAfterMenuItem.setVisible(true);
                     pasteBeforeMenuItem.setVisible(true);
                 }
@@ -1760,6 +1798,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (TreeItem item : items) {
                 if (item instanceof TagScript) {
                     tagItems.add(((TagScript) item).getTag());
+                } else if (item instanceof FrameScript) {
+                    tagItems.add(((FrameScript) item).getSingleDoActionTag());
                 } else {
                     tagItems.add((Tag) item);
                 }
@@ -2260,6 +2300,13 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             Timelined timelined = null;
             int index = -1;
+
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Tag) {
                 Tag itemTag = (Tag) item;
                 timelined = itemTag.getTimelined();
@@ -2301,6 +2348,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             Timelined timelined = null;
             int index = -1;
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Tag) {
                 Tag itemTag = (Tag) item;
                 timelined = itemTag.getTimelined();
@@ -3485,8 +3538,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (subItem instanceof FrameScript) {
                     if (((FrameScript) subItem).getFrame().frame + 1 == targetFrame) {
                         TreePath framePath = scriptsPath.pathByAddingChild(subItem);
-                        List<? extends TreeItem> doActionTags = mainPanel.tagTree.getFullModel().getAllChildren(subItem);
-                        TreePath doActionPath = framePath.pathByAddingChild(doActionTags.get(doActionTags.size() - 1));
+                        TreePath doActionPath = framePath;
+                        if (((FrameScript) subItem).getSingleDoActionTag() == null) {
+                            List<? extends TreeItem> doActionTags = mainPanel.tagTree.getFullModel().getAllChildren(subItem);
+                            doActionPath = framePath.pathByAddingChild(doActionTags.get(doActionTags.size() - 1));
+                        }
                         mainPanel.tagTree.setSelectionPath(doActionPath);
                         mainPanel.tagTree.scrollPathToVisible(doActionPath);
                         break;
@@ -3982,6 +4038,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                 out.add(t);
             } else if (t instanceof ASMSource) {
                 out.add(t);
+            } else if ((t instanceof FrameScript) && (((FrameScript) t).getSingleDoActionTag() != null)) {
+                out.add(t);
             } else {
                 populateScriptSubs(t, out);
             }
@@ -4038,6 +4096,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                 tagsToRemove.add((Tag) item);
             } else if ((item instanceof TagScript) && (((TagScript) item).getTag() instanceof ASMSource)) {
                 tagsToRemove.add(((TagScript) item).getTag());
+            } else if ((item instanceof FrameScript) && (((FrameScript) item).getSingleDoActionTag() != null)) {
+                tagsToRemove.add(((FrameScript) item).getSingleDoActionTag());
             } else if (item instanceof Frame) {
                 Frame frameNode = (Frame) item;
                 Frame frame = frameNode.timeline.getFrame(frameNode.frame);
@@ -4334,6 +4394,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         Set<SWF> computeSWFs = new LinkedIdentityHashSet<>();
 
         for (TreeItem item : sel) {
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Tag) {
                 try {
                     Tag tag = (Tag) item;
@@ -4389,7 +4455,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void cloneActionPerformed(ActionEvent e) {
-        List<TreeItem> items = getSelectedItems();
+        List<TreeItem> items = getSelectedNoScriptItems();
         /* Currently useless since all selected items must have the same parent
          * but a better way to detect for parent/child selection
          * could remove that limitation */
@@ -4499,6 +4565,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
+        }
+        if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+            item = ((FrameScript) item).getSingleDoActionTag();
         }
         if (item instanceof SceneFrame) {
             item = ((SceneFrame) item).getFrame();
@@ -4802,12 +4871,12 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void copyTagOrFrameToClipboardActionPerformed(ActionEvent evt) {
-        List<TreeItem> items = getSelectedItems();
+        List<TreeItem> items = getSelectedNoScriptItems();
         copyTagOrFrameToClipboardActionPerformed(evt, items);
     }
 
     public void copyTagOrFrameToClipboardActionPerformed(ActionEvent evt, List<TreeItem> items) {
-        mainPanel.copyToClipboard(items);
+        mainPanel.copyToClipboard(filterOutScriptItems(items));
     }
 
     private Set<TreeItem> getDependenciesSet(List<TreeItem> items) {
@@ -4846,17 +4915,17 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void copyTagToClipboardWithDependenciesActionPerformed(ActionEvent evt, List<TreeItem> items) {
-        mainPanel.copyToClipboard(getDependenciesSet(items));
+        mainPanel.copyToClipboard(getDependenciesSet(filterOutScriptItems(items)));
     }
 
     public void cutTagOrFrameToClipboardActionPerformed(ActionEvent evt) {
-        List<TreeItem> items = getSelectedItems();
+        List<TreeItem> items = getSelectedNoScriptItems();
         mainPanel.cutToClipboard(items);
         mainPanel.repaintTree();
     }
 
     public void cutTagToClipboardWithDependenciesActionPerformed(ActionEvent evt) {
-        List<TreeItem> items = getSelectedItems();
+        List<TreeItem> items = getSelectedNoScriptItems();
         mainPanel.cutToClipboard(getDependenciesSet(items));
         mainPanel.repaintTree();
     }
@@ -4873,6 +4942,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             Timelined timelined;
             Tag position;
             int positionInt;
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Frame) {
                 Frame frame = (Frame) item;
                 timelined = frame.timeline.timelined;
@@ -4901,6 +4976,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             Timelined timelined;
             Tag position;
             int positionInt;
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Frame) {
                 Frame frame = (Frame) item;
                 timelined = frame.timeline.timelined;
@@ -4928,6 +5009,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         } else {
             Timelined timelined;
             Tag position;
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
+            }
+            if ((item instanceof FrameScript) && ((FrameScript) item).getSingleDoActionTag() != null) {
+                item = ((FrameScript) item).getSingleDoActionTag();
+            }
             if (item instanceof Frame) {
                 Frame frame = (Frame) item;
                 position = frame.allInnerTags.get(frame.allInnerTags.size() - 1);
