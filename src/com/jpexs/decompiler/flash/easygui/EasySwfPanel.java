@@ -373,7 +373,7 @@ public class EasySwfPanel extends JPanel {
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        undoButton = new JButton(View.getIcon("rotateanticlockwise16"));
+        undoButton = new JButton(View.getIcon("undo16"));
         //undoButton.setToolTipText("Undo");
         undoButton.setMargin(new Insets(5, 5, 5, 5));
         undoButton.addActionListener(new ActionListener() {
@@ -383,7 +383,7 @@ public class EasySwfPanel extends JPanel {
             }
         });
 
-        redoButton = new JButton(View.getIcon("rotateclockwise16"));
+        redoButton = new JButton(View.getIcon("redo16"));
         //redoButton.setToolTipText("Redo");
         redoButton.setMargin(new Insets(5, 5, 5, 5));
         redoButton.addActionListener(new ActionListener() {
