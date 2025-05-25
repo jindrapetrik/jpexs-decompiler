@@ -389,7 +389,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
-    
+
     private static int getSnapGuidesDistance() {
         return Configuration.guidesSnapAccuracy.get().getDistance();
     }
@@ -724,12 +724,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized void selectDepths(List<Integer> depths) {
 
         depths = new ArrayList<>(depths);
-        
-        
+
         if (timelined == null) {
             depths = new ArrayList<>();
         } else {
-            Frame fr = timelined.getTimeline().getFrame(frame);            
+            Frame fr = timelined.getTimeline().getFrame(frame);
 
             for (int i = 0; i < depths.size(); i++) {
                 int depth = depths.get(i);
@@ -1962,7 +1961,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (Configuration.snapAlign.get() && timelined != null && points == null && transform != null) {
                             Frame fr = timelined.getTimeline().getFrame(frame);
                             if (fr != null) {
-                                Timeline timeline = timelined.getTimeline();                               
+                                Timeline timeline = timelined.getTimeline();
 
                                 Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                                 double ex = mouseTransPoint.getX();
@@ -2141,7 +2140,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                                 Matrix dsMatrix = new Matrix();
                                                 if (ds.matrix != null) {
-                                                    dsMatrix = new Matrix(ds.matrix);                                                    
+                                                    dsMatrix = new Matrix(ds.matrix);
                                                 }
                                                 dsMatrix = dsMatrix.concatenate(parentMatrix);
 
@@ -3834,7 +3833,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 if (!selectedDepths.isEmpty() && transform != null) {
-                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    Rectangle2D transformBounds = transformUpdated == null ? getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
                     g2.setColor(getForeground());
 
                     Rectangle2D imgBounds = toImageRect(transformBounds);
@@ -3914,9 +3913,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     g2.setColor(Configuration.guidesColor.get());
                     g2.drawLine(0, guideDragY, GUIDE_THICKNESS, guideDragY);
                 }
-                
+
                 if (!selectedDepths.isEmpty() && transform != null) {
-                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    Rectangle2D transformBounds = transformUpdated == null ? getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
                     g2.setColor(getForeground());
 
                     Rectangle2D imgBounds = toImageRect(transformBounds);
@@ -4145,7 +4144,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         RECT timRect = timelined.getRect();
-        
+
         if (timRect == null) {
             return;
         }
@@ -5393,7 +5392,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             StringBuilder ret = new StringBuilder();
 
             if (cursorPosition != null && autoPlayed) {
-                ret.append(" [").append(formatDouble(cursorPosition.getX() )).append(";").append(formatDouble(cursorPosition.getY())).append("]");
+                ret.append(" [").append(formatDouble(cursorPosition.getX())).append(";").append(formatDouble(cursorPosition.getY())).append("]");
                 if (showObjectsUnderCursor) {
                     ret.append(" : ");
                 }
@@ -5410,7 +5409,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             } else {
                 depthStateUnderCursor = null;
             }
-            
+
             if (showObjectsUnderCursor && autoPlayed) {
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
@@ -6086,7 +6085,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         if (totalBounds == null) {
             return new Rectangle2D.Double(0, 0, 1, 1);
-        }        
+        }
         return totalBounds;
     }
 
