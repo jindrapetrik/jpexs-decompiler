@@ -3325,6 +3325,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         if (treeItem instanceof AS2Package) {
             AS2Package pkg = (AS2Package) treeItem;
+            if (pkg.isDefaultPackage() && exportFileName) {
+                return "__defaultPackage";
+            }
             if (pkg.isFlat()) {
                 String[] parts = pkg.toString().split("\\.");
                 for (int i = 0; i < parts.length; i++) {

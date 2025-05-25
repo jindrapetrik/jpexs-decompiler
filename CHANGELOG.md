@@ -21,6 +21,12 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
   so there is no longer need to expand frame nodes (useful for fast switching scripts)
+- AS1/2 - Scripts from default package (not these inside `__Packages`) are now
+  exported/imported to/from the folder named `__defaultPackage` for all languages
+  instead of localized `<default package>` before.
+  This may break backwards compatibility. For importing scripts from older
+  versions of FFDec, you should rename the folder to the new name.
+  
 
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
