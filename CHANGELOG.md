@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#289] Support for Aero Snap on Windows
 - [#2412] Show coordinates on stage mouse move for up to 2 decimal places
 - "Show detail" context menu item for items in folder preview
+- [#1682] AS2 - Adding class by context menu on packages
  
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
@@ -3811,6 +3812,7 @@ Major version of SWF to XML export changed to 2.
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
 [#289]: https://www.free-decompiler.com/flash/issues/289
 [#2412]: https://www.free-decompiler.com/flash/issues/2412
+[#1682]: https://www.free-decompiler.com/flash/issues/1682
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
@@ -4073,7 +4075,6 @@ Major version of SWF to XML export changed to 2.
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355
-[#1682]: https://www.free-decompiler.com/flash/issues/1682
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986

@@ -305,12 +305,14 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem addAs12SpriteInitScriptMenuItem;
 
+    private JMenuItem addAs12ClassMenuItem;
+
     private JMenuItem addAs3ClassMenuItem;
 
     private JMenuItem textSearchMenuItem;
 
     private JMenuItem moveTagMenuItem;
-    
+
     private JMenuItem showDetailMenuItem;
 
     private JMenuItem showInResourcesViewTagMenuItem;
@@ -318,7 +320,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInTagListViewTagMenuItem;
 
     private JMenuItem showInHexDumpViewTagMenuItem;
-    
+
     private JMenuItem showInEasyViewTagMenuItem;
 
     private JMenuItem showInFramesFolderMenuItem;
@@ -380,7 +382,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showDetailMenuItem.setIcon(View.getIcon("detail16"));
         add(showDetailMenuItem);
         addSeparator();
-        
+
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
@@ -415,17 +417,17 @@ public class TagTreeContextMenu extends JPopupMenu {
         configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
         add(configurePathResolvingMenuItem);
 
-        addSeparator();                        
+        addSeparator();
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
-        add(jumpToCharacterMenuItem);       
-        
+        add(jumpToCharacterMenuItem);
+
         showInFramesFolderMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInFramesFolder"));
         showInFramesFolderMenuItem.addActionListener(this::showInFramesFolderActionPerformed);
         showInFramesFolderMenuItem.setIcon(View.getIcon("frame16"));
         add(showInFramesFolderMenuItem);
-        
+
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
         showInResourcesViewTagMenuItem.setIcon(View.getIcon("folder16"));
@@ -440,7 +442,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInHexDumpViewTagMenuItem.addActionListener(this::showInHexDumpViewActionPerformed);
         showInHexDumpViewTagMenuItem.setIcon(View.getIcon("viewhex16"));
         add(showInHexDumpViewTagMenuItem);
-        
+
         showInEasyViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInEasy"));
         showInEasyViewTagMenuItem.addActionListener(this::showInEasyViewActionPerformed);
         showInEasyViewTagMenuItem.setIcon(View.getIcon("easy16"));
@@ -621,6 +623,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs12SpriteInitScriptMenuItem.addActionListener(this::addAs12SpriteInitScriptActionPerformed);
         addAs12SpriteInitScriptMenuItem.setIcon(View.getIcon("scriptadd16"));
         add(addAs12SpriteInitScriptMenuItem);
+
+        addAs12ClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addClass"));
+        addAs12ClassMenuItem.addActionListener(this::addAs12ClassActionPerformed);
+        addAs12ClassMenuItem.setIcon(View.getIcon("scriptadd16"));
+        add(addAs12ClassMenuItem);
 
         addAs3ClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addClass"));
         addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
@@ -1326,6 +1333,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs12ButtonEventScriptMenuItem.setVisible(false);
         addAs12InstanceEventScriptMenuItem.setVisible(false);
         addAs12SpriteInitScriptMenuItem.setVisible(false);
+        addAs12ClassMenuItem.setVisible(false);
         addAs3ClassMenuItem.setVisible(false);
         textSearchMenuItem.setVisible(hasScripts || hasTexts);
         moveTagMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
@@ -1417,6 +1425,24 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if ((firstItem instanceof DefineSpriteTag) || ((firstItem instanceof TagScript) && ((TagScript) firstItem).getTag() instanceof DefineSpriteTag)) {
                 addAs12SpriteInitScriptMenuItem.setVisible(true);
+            }
+            if (firstItem instanceof AS2Package) {
+                AS2Package pkg = (AS2Package) firstItem;
+                AbstractTagTreeModel model = mainPanel.getCurrentTree().getFullModel();
+                TreeItem it = pkg;
+                String firstPkg = null;
+                while (it instanceof AS2Package) {
+                    pkg = (AS2Package) it;
+                    if (pkg.isDefaultPackage()) {
+                        firstPkg = "";
+                    } else {
+                        firstPkg = pkg.getName();
+                    }
+                    it = model.getParent(it);
+                }
+                if ("__Packages".equals(firstPkg)) {
+                    addAs12ClassMenuItem.setVisible(true);
+                }
             }
             if (firstItem instanceof ClassesListTreeModel) {
                 addAs3ClassMenuItem.setVisible(true);
@@ -1615,7 +1641,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 addFramesBeforeMenuItem.setVisible(true);
                 addFramesAfterMenuItem.setVisible(true);
             }
-            
+
             if (inFolder) {
                 showDetailMenuItem.setVisible(true);
             }
@@ -1636,7 +1662,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof Timelined) {
                 showInEasyViewTagMenuItem.setVisible(true);
             }
-            
+
             if ((firstItem instanceof Tag)
                     || (firstItem instanceof CLIPACTIONRECORD)
                     || (firstItem instanceof BUTTONRECORD)
@@ -3224,6 +3250,33 @@ public class TagTreeContextMenu extends JPopupMenu {
         Main.getMainFrame().getPanel().searchInActionScriptOrText(null, getCurrentItem().getOpenable(), true);
     }
 
+    private void addAs12ClassActionPerformed(ActionEvent evt) {
+        AS2Package pkg = (AS2Package) getCurrentItem();
+        AbstractTagTreeModel model = mainPanel.getCurrentTree().getFullModel();
+        TreeItem it = pkg;
+        List<String> pkgParts = new ArrayList<>();
+        while (it instanceof AS2Package) {
+            pkg = (AS2Package) it;
+            if (!pkg.isDefaultPackage()) {
+                pkgParts.add(0, pkg.getName());
+            }
+            it = model.getParent(it);
+        }
+        pkgParts.remove(0);
+        String fullPkgName = String.join(".", pkgParts);
+        SWF swf = (SWF) pkg.getOpenable();
+        AddScriptDialog addScriptDialog = new AddScriptDialog(Main.getDefaultDialogsOwner(), swf);
+        String prefix = fullPkgName;
+        if (!prefix.isEmpty()) {
+            prefix += ".";
+        }
+        addScriptDialog.setCreateClassOnly(prefix);
+        if (addScriptDialog.showDialog() != JOptionPane.OK_OPTION) {
+            return;
+        }
+        createClass(addScriptDialog.getClassName(), swf);
+    }
+
     private void addAs3ClassActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
         //using tagTree only here is safe since tagListTree does not have AS3 classes
@@ -3729,6 +3782,130 @@ public class TagTreeContextMenu extends JPopupMenu {
         addSpriteInitScript(sprite.getSwf(), sprite);
     }
 
+    private void createClass(String className, SWF swf) {
+        ReadOnlyTagList tags = swf.getTags();
+        List<Integer> exportedIds = new ArrayList<>();
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i) instanceof ExportAssetsTag) {
+                ExportAssetsTag ea = (ExportAssetsTag) tags.get(i);
+                exportedIds.addAll(ea.tags);
+            }
+        }
+
+        int insertPos = -1;
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i) instanceof DoInitActionTag) {
+                DoInitActionTag doinit = (DoInitActionTag) tags.get(i);
+                if (!exportedIds.contains(doinit.spriteId)) {
+                    //this is #initpragma, make sure class is inserted before it
+                    insertPos = i;
+                    break;
+                }
+            }
+        }
+        if (insertPos == -1) {
+            for (int i = 0; i < tags.size(); i++) {
+                if (tags.get(i) instanceof ShowFrameTag) {
+                    insertPos = i;
+                    break;
+                }
+            }
+        }
+
+        if (insertPos > -1) {
+            int characterId = swf.getNextCharacterId();
+            DefineSpriteTag sprite = new DefineSpriteTag(swf);
+            sprite.spriteId = characterId;
+            sprite.hasEndTag = true;
+            sprite.setTimelined(swf);
+
+            String exportName = "__Packages." + className;
+
+            ExportAssetsTag exportAssets = new ExportAssetsTag(swf);
+            exportAssets.names = new ArrayList<>();
+            exportAssets.names.add(exportName);
+            exportAssets.tags = new ArrayList<>();
+            exportAssets.tags.add(characterId);
+            exportAssets.setTimelined(swf);
+
+            DoInitActionTag doInit = new DoInitActionTag(swf);
+            doInit.spriteId = characterId;
+            doInit.setTimelined(swf);
+
+            ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
+
+            String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
+            DottedChain dc = new DottedChain(parts);
+
+            try {
+                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}", swf.getCharset());
+                doInit.setActions(actions);
+            } catch (ActionParseException | IOException | CompilationException
+                    | InterruptedException ex) {
+                //ignore
+            }
+
+            sprite.setExportName(exportName);
+
+            swf.addTag(insertPos, sprite);
+            swf.addTag(insertPos + 1, exportAssets);
+            swf.addTag(insertPos + 2, doInit);
+
+            swf.clearAllCache();
+            swf.setModified(true);
+            mainPanel.refreshTree(swf);
+
+            FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
+            TreePath scriptsPath = mainPanel.tagTree.getFullModel().getTreePath(scriptsNode);
+            String[] classParts = className.contains(".") ? className.split("\\.") : new String[]{className};
+            String pkgName = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
+
+            for (TreeItem subItem : scriptsNode.subItems) {
+                if (subItem instanceof AS2Package) {
+                    AS2Package pkg = (AS2Package) subItem;
+                    if (pkg.getName().equals("__Packages")) {
+                        TreePath classPath = scriptsPath.pathByAddingChild(pkg);
+
+                        if (Configuration.flattenASPackages.get()) {
+                            List<TreeItem> subs = pkg.getAllChildren();
+                            for (TreeItem s : subs) {
+                                if (s instanceof AS2Package) {
+                                    AS2Package p = (AS2Package) s;
+
+                                    if ((!p.isDefaultPackage() && pkgName.equals(p.getName()))
+                                            || (p.isDefaultPackage() && pkgName.isEmpty())) {
+                                        pkg = p;
+                                        classPath = classPath.pathByAddingChild(pkg);
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            loopi:
+                            for (int i = 0; i < classParts.length - 1; i++) {
+                                List<TreeItem> subs = pkg.getAllChildren();
+                                for (TreeItem s : subs) {
+                                    if (s instanceof AS2Package) {
+                                        AS2Package p = (AS2Package) s;
+                                        if (p.getName().equals(classParts[i])) {
+                                            pkg = (AS2Package) s;
+                                            classPath = classPath.pathByAddingChild(pkg);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        classPath = classPath.pathByAddingChild(doInit);
+                        mainPanel.tagTree.setSelectionPath(classPath);
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+
     private void addAs12ScriptActionPerformed(ActionEvent evt) {
         List<TreeItem> sel = getSelectedItems();
         if (!sel.isEmpty()) {
@@ -3761,110 +3938,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                         addInstanceEventScript(swf, tim, placeType, frame);
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_CLASS) {
-                        String className = addScriptDialog.getClassName();
-                        ReadOnlyTagList tags = swf.getTags();
-                        List<Integer> exportedIds = new ArrayList<>();
-                        for (int i = 0; i < tags.size(); i++) {
-                            if (tags.get(i) instanceof ExportAssetsTag) {
-                                ExportAssetsTag ea = (ExportAssetsTag) tags.get(i);
-                                exportedIds.addAll(ea.tags);
-                            }
-                        }
-
-                        int insertPos = -1;
-                        for (int i = 0; i < tags.size(); i++) {
-                            if (tags.get(i) instanceof DoInitActionTag) {
-                                DoInitActionTag doinit = (DoInitActionTag) tags.get(i);
-                                if (!exportedIds.contains(doinit.spriteId)) {
-                                    //this is #initpragma, make sure class is inserted before it
-                                    insertPos = i;
-                                    break;
-                                }
-                            }
-                        }
-                        if (insertPos == -1) {
-                            for (int i = 0; i < tags.size(); i++) {
-                                if (tags.get(i) instanceof ShowFrameTag) {
-                                    insertPos = i;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (insertPos > -1) {
-                            int characterId = swf.getNextCharacterId();
-                            DefineSpriteTag sprite = new DefineSpriteTag(swf);
-                            sprite.spriteId = characterId;
-                            sprite.hasEndTag = true;
-                            sprite.setTimelined(swf);
-
-                            String exportName = "__Packages." + className;
-
-                            ExportAssetsTag exportAssets = new ExportAssetsTag(swf);
-                            exportAssets.names = new ArrayList<>();
-                            exportAssets.names.add(exportName);
-                            exportAssets.tags = new ArrayList<>();
-                            exportAssets.tags.add(characterId);
-                            exportAssets.setTimelined(swf);
-
-                            DoInitActionTag doInit = new DoInitActionTag(swf);
-                            doInit.spriteId = characterId;
-                            doInit.setTimelined(swf);
-
-                            ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
-
-                            String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
-                            DottedChain dc = new DottedChain(parts);
-
-                            try {
-                                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}", swf.getCharset());
-                                doInit.setActions(actions);
-                            } catch (ActionParseException | IOException | CompilationException
-                                    | InterruptedException ex) {
-                                //ignore
-                            }
-
-                            sprite.setExportName(exportName);
-
-                            swf.addTag(insertPos, sprite);
-                            swf.addTag(insertPos + 1, exportAssets);
-                            swf.addTag(insertPos + 2, doInit);
-
-                            swf.clearAllCache();
-                            swf.setModified(true);
-                            mainPanel.refreshTree(swf);
-
-                            TreePath selection = mainPanel.tagTree.getSelectionPath();
-                            TreePath swfPath = selection.getParentPath();
-                            FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
-                            TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
-                            String[] classParts = className.contains(".") ? className.split("\\.") : new String[]{className};
-
-                            for (TreeItem subItem : scriptsNode.subItems) {
-                                if (subItem instanceof AS2Package) {
-                                    AS2Package pkg = (AS2Package) subItem;
-                                    if (pkg.getName().equals("__Packages")) {
-                                        TreePath classPath = scriptsPath.pathByAddingChild(pkg);
-                                        for (int i = 0; i < classParts.length - 1; i++) {
-                                            List<TreeItem> subs = pkg.getAllChildren();
-                                            for (TreeItem s : subs) {
-                                                if (s instanceof AS2Package) {
-                                                    if (((AS2Package) s).getName().equals(classParts[i])) {
-                                                        pkg = (AS2Package) s;
-                                                        classPath = classPath.pathByAddingChild(pkg);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        classPath = classPath.pathByAddingChild(doInit);
-                                        mainPanel.tagTree.setSelectionPath(classPath);
-                                        break;
-                                    }
-                                }
-                            }
-
-                        }
+                        createClass(addScriptDialog.getClassName(), swf);
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_INIT) {
                         DefineSpriteTag sprite = addScriptDialog.getSprite();
                         addSpriteInitScript(swf, sprite);
@@ -4411,7 +4485,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.folderPreviewPanel.goToSelection();
         mainPanel.folderListPanel.goToSelection();
     }
-    
+
     private void showInResourcesViewActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         mainPanel.showView(MainPanel.VIEW_RESOURCES);
@@ -4434,7 +4508,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
         mainPanel.updateMenu();
-    }    
+    }
 
     private void showInHexDumpViewActionPerformed(ActionEvent evt) {
         if (mainPanel.isModified()) {
@@ -4448,7 +4522,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.dumpTree.setSelectedItem(item);
         mainPanel.updateMenu();
     }
-    
+
     private void showInEasyViewActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         if (item instanceof TagScript) {

@@ -46,6 +46,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -122,6 +124,11 @@ public class AddScriptDialog extends AppDialog {
     private List<String> existingClasses = new ArrayList<>();
     private List<Integer> spriteIdsWithDoInitAction;
 
+    private boolean createClassSet = false;
+
+    private final JPanel classPanel;
+    private final JPanel topPanel;
+
     public AddScriptDialog(Window owner, SWF swf) {
         super(owner);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -151,7 +158,7 @@ public class AddScriptDialog extends AppDialog {
         panButtons.add(okButton);
         panButtons.add(cancelButton);
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         JLabel typeLabel = new JLabel(translate("type"));
         typeComboBox = new JComboBox<>(new String[]{
@@ -196,7 +203,7 @@ public class AddScriptDialog extends AppDialog {
         centerPanel.add(createSpriteInitPanel(), "" + TYPE_SPRITE_INIT);
         centerPanel.add(createButtonPanel(), "" + TYPE_BUTTON_EVENT);
         centerPanel.add(createInstancePanel(), "" + TYPE_INSTANCE_EVENT);
-        centerPanel.add(createClassPanel(), "" + TYPE_CLASS);
+        centerPanel.add(classPanel = createClassPanel(), "" + TYPE_CLASS);
         cnt.add(centerPanel, BorderLayout.CENTER);
 
         cnt.add(panButtons, BorderLayout.SOUTH);
@@ -204,10 +211,33 @@ public class AddScriptDialog extends AppDialog {
         setSize(900, 600);
         setModal(true);
         setResizable(true);
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "scriptadd");
         View.centerScreen(this);
 
         checkEnabled();
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                if (createClassSet) {
+                    classNameTextField.requestFocusInWindow();
+                }
+            }
+        });
+    }
+
+    public void setCreateClassOnly(String prefillClassName) {
+        setTitle(translate("dialog.title.combined").replace("%title%", translate("dialog.title")).replace("%type%", translate("type.class")));
+        typeComboBox.setSelectedIndex(5);
+        centerPanel.removeAll();
+        centerPanel.add(classPanel, "" + TYPE_CLASS);
+        ((CardLayout) centerPanel.getLayout()).show(centerPanel, "" + TYPE_CLASS);
+        topPanel.setVisible(false);
+        pack();
+        classNameTextField.setText(prefillClassName);
+        classNameTextField.setSelectionStart(prefillClassName.length());
+        createClassSet = true;
+        checkEnabled();
+        View.centerScreen(this);
     }
 
     private JPanel createFramePanel(DocumentListener checkEnabledDocumentListener) {
@@ -973,6 +1003,9 @@ public class AddScriptDialog extends AppDialog {
         }
 
         if (type == TYPE_CLASS) {
+            if (classNameTextField.getText().trim().endsWith(".")) {
+                okButton.setEnabled(false);
+            }
             if (classNameTextField.getText().trim().isEmpty()) {
                 okButton.setEnabled(false);
             }
