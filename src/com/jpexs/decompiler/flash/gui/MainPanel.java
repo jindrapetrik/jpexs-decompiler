@@ -636,7 +636,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if ((e.getKeyCode() == KeyEvent.VK_DELETE) && !e.isControlDown() && !e.isAltDown()) {
             if (contextPopupMenu.canRemove(items)) {
-                contextPopupMenu.update(items);
+                contextPopupMenu.update(items, false);
                 contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());
             }
         }
@@ -682,10 +682,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             if (e.getKeyCode() == 'X' && allWritable) {
                 if (!frameItems.isEmpty()) {
-                    contextPopupMenu.update(frameItems);
+                    contextPopupMenu.update(frameItems, false);
                     contextPopupMenu.cutTagOrFrameToClipboardActionPerformed(null);
                 } else {
-                    contextPopupMenu.update(tagItems);
+                    contextPopupMenu.update(tagItems, false);
                     if (e.isShiftDown()) {
                         contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
                     } else {
@@ -712,7 +712,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     return;
                 }
             }
-            contextPopupMenu.update(items);
+            contextPopupMenu.update(items, false);
             if (e.isShiftDown()) {
                 contextPopupMenu.pasteAfterActionPerformed(null);
             } else {

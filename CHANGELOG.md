@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1418] Option to make main window Always on top
 - [#289] Support for Aero Snap on Windows
 - [#2412] Show coordinates on stage mouse move for up to 2 decimal places
+- "Show detail" context menu item for items in folder preview
  
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline

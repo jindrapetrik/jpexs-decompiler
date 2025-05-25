@@ -129,7 +129,7 @@ public class PinButton extends JPanel {
                     }
                     List<TreeItem> itemList = new ArrayList<>();
                     itemList.add(item);
-                    mainPanel.getContextPopupMenu().update(itemList);
+                    mainPanel.getContextPopupMenu().update(itemList, false);
                     mainPanel.getContextPopupMenu().show(PinButton.this, 0, PinButton.this.getHeight());
                 }
             }

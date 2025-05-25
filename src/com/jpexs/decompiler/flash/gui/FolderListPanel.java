@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -110,11 +109,7 @@ public class FolderListPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
-                    if (selectedIndex > -1) {
-                        TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);
-                        TreePath subPath = parentPath.pathByAddingChild(selectedItem);
-                        mainPanel.getCurrentTree().setSelectionPath(subPath);
-                    }
+                    goToSelection();
                 }
             }
 
@@ -158,13 +153,21 @@ public class FolderListPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted(), true);
                     mainPanel.getContextPopupMenu().show(FolderListPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
         });
         setFocusable(true);
+    }
+    
+    public void goToSelection() {
+        if (selectedIndex > -1) {
+            TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);
+            TreePath subPath = parentPath.pathByAddingChild(selectedItem);
+            mainPanel.getCurrentTree().setSelectionPath(subPath);
+        }
     }
 
     public synchronized void setItems(TreePath parentPath, List<TreeItem> items) {

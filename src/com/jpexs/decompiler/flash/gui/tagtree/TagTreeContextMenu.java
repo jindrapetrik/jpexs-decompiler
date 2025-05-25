@@ -310,6 +310,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem textSearchMenuItem;
 
     private JMenuItem moveTagMenuItem;
+    
+    private JMenuItem showDetailMenuItem;
 
     private JMenuItem showInResourcesViewTagMenuItem;
 
@@ -373,6 +375,12 @@ public class TagTreeContextMenu extends JPopupMenu {
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
 
+        showDetailMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showDetail"));
+        showDetailMenuItem.addActionListener(this::showDetailActionPerformed);
+        showDetailMenuItem.setIcon(View.getIcon("detail16"));
+        add(showDetailMenuItem);
+        addSeparator();
+        
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
@@ -407,17 +415,17 @@ public class TagTreeContextMenu extends JPopupMenu {
         configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
         add(configurePathResolvingMenuItem);
 
-        addSeparator();
+        addSeparator();                        
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
-        add(jumpToCharacterMenuItem);
-
+        add(jumpToCharacterMenuItem);       
+        
         showInFramesFolderMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInFramesFolder"));
         showInFramesFolderMenuItem.addActionListener(this::showInFramesFolderActionPerformed);
         showInFramesFolderMenuItem.setIcon(View.getIcon("frame16"));
         add(showInFramesFolderMenuItem);
-
+        
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
         showInResourcesViewTagMenuItem.setIcon(View.getIcon("folder16"));
@@ -905,7 +913,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         li.add(item);
                     }
 
-                    update(li);
+                    update(li, false);
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -1002,7 +1010,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         return true;
     }
 
-    public void update(final List<TreeItem> items) {
+    public void update(final List<TreeItem> items, boolean inFolder) {
 
         if (items.isEmpty()) {
             return;
@@ -1321,6 +1329,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs3ClassMenuItem.setVisible(false);
         textSearchMenuItem.setVisible(hasScripts || hasTexts);
         moveTagMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
+        showDetailMenuItem.setVisible(false);
         showInResourcesViewTagMenuItem.setVisible(false);
         showInTagListViewTagMenuItem.setVisible(false);
         showInHexDumpViewTagMenuItem.setVisible(false);
@@ -1531,9 +1540,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
 
-            if (tree.getModel().getChildCount(firstItem) > 0) {
-                expandRecursiveMenuItem.setVisible(true);
-                collapseRecursiveMenuItem.setVisible(true);
+            if (!inFolder) {
+                if (tree.getModel().getChildCount(firstItem) > 0) {
+                    expandRecursiveMenuItem.setVisible(true);
+                    collapseRecursiveMenuItem.setVisible(true);
+                }
             }
 
             if (firstItem instanceof SWF) {
@@ -1603,6 +1614,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof Frame) {
                 addFramesBeforeMenuItem.setVisible(true);
                 addFramesAfterMenuItem.setVisible(true);
+            }
+            
+            if (inFolder) {
+                showDetailMenuItem.setVisible(true);
             }
 
             if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST
@@ -4391,6 +4406,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.updateMenu();
     }
 
+    private void showDetailActionPerformed(ActionEvent evt) {
+        //Go to one of the panels. The other is always empty, so call both.
+        mainPanel.folderPreviewPanel.goToSelection();
+        mainPanel.folderListPanel.goToSelection();
+    }
+    
     private void showInResourcesViewActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         mainPanel.showView(MainPanel.VIEW_RESOURCES);

@@ -105,9 +105,7 @@ public class FolderPreviewPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
-                    if (selectedIndex > -1) {
-                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
-                    }
+                    goToSelection();
                 }
             }
 
@@ -151,13 +149,19 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted(), true);
                     mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
         });
         setFocusable(true);
+    }
+    
+    public void goToSelection() {
+        if (selectedIndex > -1) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
+        }
     }
 
     public synchronized void setItems(List<TreeItem> items) {
