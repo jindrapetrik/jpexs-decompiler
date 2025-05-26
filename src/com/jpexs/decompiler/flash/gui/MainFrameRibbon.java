@@ -30,7 +30,6 @@ import com.jpexs.helpers.Helper;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.win32.StdCallLibrary;
-import com.sun.jna.win32.W32APIOptions;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -51,20 +50,13 @@ import java.awt.event.WindowStateListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.List;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
-import org.pushingpixels.substance.api.DecorationAreaType;
-import org.pushingpixels.substance.api.SubstanceColorScheme;
 import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
-import org.pushingpixels.substance.internal.utils.SubstanceCoreUtilities;
 import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
-import org.pushingpixels.substance.internal.utils.icon.SubstanceIconFactory;
-import org.pushingpixels.substance.internal.utils.icon.TransitionAwareIcon;
 
 /**
  * @author JPEXS

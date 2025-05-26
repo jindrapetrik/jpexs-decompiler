@@ -898,7 +898,7 @@ public class ActionScript2VariableParser {
                 break;
             case TARGETPATH:
                 expectedType(SymbolType.PARENT_OPEN);
-                //ret = new TargetPathActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -1389,6 +1389,7 @@ public class ActionScript2VariableParser {
             case THROW:
                 //ret = new ThrowActionItem(null, null, ;
                 expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                ret = true;
                 break;
             case SEMICOLON: //empty command
                 if (debugMode) {
