@@ -145,7 +145,7 @@ public class Timeline {
      * Map of depth to maximum frame.
      */
     private final Map<Integer, Integer> depthMaxFrame = new HashMap<>();
-    
+
     /**
      * Map of depth to maximum frame including buttons
      */
@@ -289,7 +289,7 @@ public class Timeline {
         ensureInitialized();
         return depthMaxFrame;
     }
-    
+
     /**
      * Gets map of depth to max frame including buttons
      *
@@ -746,23 +746,23 @@ public class Timeline {
         for (int d = 0; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f);                    
+                    depthMaxFrame.put(d, f);
                     break;
                 }
             }
         }
-        
+
         if (timelined instanceof ButtonTag) {
             ButtonTag button = (ButtonTag) timelined;
             Set<Integer> emptyFrames = button.getEmptyFrames();
-            
+
             for (int d = 0; d <= maxDepth; d++) {
                 for (int f = frames.size() - 1; f >= 0; f--) {
                     if (frames.get(f).layers.get(d) != null) {
                         if (!emptyFrames.contains(f)) {
                             depthMaxFrameButtons.put(d, f);
                             break;
-                        }                     
+                        }
                     }
                 }
             }
@@ -1657,11 +1657,13 @@ public class Timeline {
                 Tag drawableTag = (Tag) drawable;
                 RECT boundRect = drawable.getRect();
                 boolean createNew = false;
-                if (exporter.exportedTags.containsKey(drawableTag)) {
-                    assetName = exporter.exportedTags.get(drawableTag);
+                SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio);
+
+                if (exporter.exportedTags.containsKey(exportKey)) {
+                    assetName = exporter.exportedTags.get(exportKey);
                 } else {
                     assetName = getTagIdPrefix(drawableTag, exporter);
-                    exporter.exportedTags.put(drawableTag, assetName);
+                    exporter.exportedTags.put(exportKey, assetName);
                     createNew = true;
                 }
                 ExportRectangle rect = new ExportRectangle(boundRect);

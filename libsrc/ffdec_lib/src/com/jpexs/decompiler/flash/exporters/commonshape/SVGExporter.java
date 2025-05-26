@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.BlendMode;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +80,7 @@ public class SVGExporter {
 
     protected int lastClipId;
 
-    public Map<Tag, String> exportedTags = new HashMap<>();
+    public Map<ExportKey, String> exportedTags = new HashMap<>();
 
     public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
@@ -87,6 +89,49 @@ public class SVGExporter {
     private final HashSet<String> fontFaces = new HashSet<>();
 
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
+
+    public static class ExportKey {
+
+        private final Tag tag;
+        public final ColorTransform colorTransform;
+        public final int ratio;
+
+        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio) {
+            this.tag = tag;
+            this.colorTransform = colorTransform;
+            this.ratio = ratio;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 43 * hash + Objects.hashCode(this.tag);
+            hash = 43 * hash + Objects.hashCode(this.colorTransform);
+            hash = 43 * hash + this.ratio;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ExportKey other = (ExportKey) obj;
+            if (this.ratio != other.ratio) {
+                return false;
+            }
+            if (!Objects.equals(this.tag, other.tag)) {
+                return false;
+            }
+            return Objects.equals(this.colorTransform, other.colorTransform);
+        }
+    }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {
         this(bounds, zoom, objectType, null);

@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
 - [#2459] AS1/2 StoreRegister improper declaration position
 - AS2 Class names not showing in Folder list view
 - AS1/2 - Incorrect DefineFunction2 parameter names when parameter name is empty
+- [#2460] SVG export - incorrect caching colorTransform and ratio for the same tag
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
@@ -3831,6 +3832,7 @@ Major version of SWF to XML export changed to 2.
 [#1682]: https://www.free-decompiler.com/flash/issues/1682
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
+[#2460]: https://www.free-decompiler.com/flash/issues/2460
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448
