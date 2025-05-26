@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -34,7 +33,7 @@ import javax.swing.border.BevelBorder;
  */
 public class ColorSelectionButton extends FocusablePanel {
     private JPanel colorPanel;
-    private JLabel colorLabel;
+    private final JLabel colorLabel;
 
     public ColorSelectionButton(Color value, String description) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -85,7 +84,12 @@ public class ColorSelectionButton extends FocusablePanel {
     }
     
     public void setValue(Color color) {
-        colorLabel.setText(colorToHex(color));
+        String colorName = ColorNames.getNameOfColor(color);
+        String text = colorToHex(color);
+        if (colorName != null) {
+            text += " (" + colorName + ")";
+        }
+        colorLabel.setText(text);
         colorPanel.setBackground(color);
     }
     

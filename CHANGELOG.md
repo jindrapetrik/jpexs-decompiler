@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2412] Show coordinates on stage mouse move for up to 2 decimal places
 - "Show detail" context menu item for items in folder preview
 - [#1682] AS2 - Adding class by context menu on packages
+- Simple editor - detection of english color name (based on CSS names)
  
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

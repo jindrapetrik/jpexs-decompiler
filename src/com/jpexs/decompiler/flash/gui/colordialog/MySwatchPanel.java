@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.colordialog;
 
+import com.jpexs.decompiler.flash.gui.ColorNames;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -159,7 +160,12 @@ class MySwatchPanel extends JPanel {
 
     public String getToolTipText(MouseEvent e) {
         Color color = getColorForLocation(e.getX(), e.getY());
-        return color.getRed() + ", " + color.getGreen() + ", " + color.getBlue();
+        String colorName = ColorNames.getNameOfColor(color);
+        String result = color.getRed() + ", " + color.getGreen() + ", " + color.getBlue();
+        if (colorName != null) {
+            result += " (" + colorName + ")";
+        }
+        return result;
     }
 
     public void setSelectedColorFromLocation(int x, int y) {
