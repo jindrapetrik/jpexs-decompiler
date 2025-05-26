@@ -23,24 +23,31 @@ package com.jpexs.decompiler.flash.action.parser.script;
  */
 public class ParsedSymbol {
 
+    /**
+     * Position (characters) in source text
+     */
+    public int position;
+    
     public SymbolGroup group;
 
     public Object value;
 
     public SymbolType type;
 
-    public ParsedSymbol(SymbolGroup group, SymbolType type) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = null;
     }
 
-    public ParsedSymbol(SymbolGroup group, SymbolType type, Object value) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type, Object value) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = value;
-    }
-
+    }  
+    
     @Override
     public String toString() {
         return group.toString() + " " + type.toString() + " " + (value != null ? value.toString() : "");

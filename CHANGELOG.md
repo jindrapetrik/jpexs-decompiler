@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - "Show detail" context menu item for items in folder preview
 - [#1682] AS2 - Adding class by context menu on packages
 - Simple editor - detection of english color name (based on CSS names)
+- AS1/2 - highlight variable definition and all its instances on cursor place
+  (also in edit mode)
  
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
@@ -39,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 improper selection of search result
 - [#2459] AS1/2 StoreRegister improper declaration position
 - AS2 Class names not showing in Folder list view
+- AS1/2 - Incorrect DefineFunction2 parameter names when parameter name is empty
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

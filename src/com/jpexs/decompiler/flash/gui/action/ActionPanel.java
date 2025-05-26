@@ -115,6 +115,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
 import javax.swing.tree.TreePath;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -639,6 +640,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         editor.setShowMarkers(true);
         decompiledEditor.setShowMarkers(Configuration.decompile.get());
+        decompiledEditor.setSwf(asm.getSwf());
         lastASM = asm;
         lastCode = actions;
         lastDecompiled = decompiledText;
@@ -1030,6 +1032,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.setFont(Configuration.getSourceFont());
         decompiledEditor.setFont(Configuration.getSourceFont());
         decompiledEditor.changeContentType("text/actionscript");
+        DefaultSyntaxKit kit = (DefaultSyntaxKit) decompiledEditor.getEditorKit();
+        kit.installComponent(decompiledEditor, ActionVariableMarker.class.getName());
 
         editor.addCaretListener(new CaretListener() {
             @Override

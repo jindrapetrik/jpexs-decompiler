@@ -146,6 +146,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -2590,7 +2591,7 @@ public class Main {
         initUiLang();
 
         initLookAndFeel();
-
+                
         View.execInEventDispatch(() -> {
             ErrorLogFrame.createNewInstance();
 

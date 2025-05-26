@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -42,6 +41,11 @@ public class VariableActionItem extends ActionItem {
     private GraphTargetItem storeValue;
 
     private boolean definition;
+    
+    /**
+     * Position in code
+     */
+    private int position = -1;
 
     public void setDefinition(boolean definition) {
         this.definition = definition;
@@ -60,6 +64,14 @@ public class VariableActionItem extends ActionItem {
         this.storeValue = storeValue;
         this.definition = definition;
     }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }    
+
+    public int getPosition() {
+        return position;
+    }        
 
     public boolean isDefinition() {
         return definition;

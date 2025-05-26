@@ -429,7 +429,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
                 funcList.add((FunctionActionItem) val);
             }
         }
-        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, getFirstRegister(), new ArrayList<>(), funcList, false /*actually unknown*/);
+        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, getFirstRegister(), new ArrayList<>(), funcList, false /*actually unknown*/, new ArrayList<>(), paramRegisters);
         functions.put(functionName, fti);
         stack.push(fti);
     }

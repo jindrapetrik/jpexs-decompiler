@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.Main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Set;
 import javax.swing.UIManager;
@@ -77,6 +79,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     private LineNumbersBreakpointsRuler ruler;
 
     private boolean showMarkers = true;
+    
+    private WeakReference<SWF> swfRef = new WeakReference(null);
 
     public DebuggableEditorPane() {
 
@@ -88,6 +92,14 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         }
     }
 
+    public void setSwf(SWF swf) {
+        this.swfRef = new WeakReference<>(swf);
+    }
+    
+    public SWF getSwf() {
+        return swfRef.get();
+    }
+    
     public synchronized void setScriptName(String scriptName, String breakPointScriptName) {
         this.scriptName = scriptName;
         this.breakPointScriptName = breakPointScriptName;

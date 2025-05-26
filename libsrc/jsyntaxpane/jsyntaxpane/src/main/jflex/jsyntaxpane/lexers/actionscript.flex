@@ -103,8 +103,6 @@ SlashVariable = {Path} ":" {Identifier}
 
 /* identifiers */
 
-IdentifierNs = {Identifier} ":" {Identifier}
-
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
 
@@ -295,8 +293,6 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {WhiteSpace}                   { }  
   /* identifiers */
   "#" {Identifier}               { return token(TokenType.KEYWORD); }
-  {SlashVariable}                { return token(TokenType.IDENTIFIER); }
-  {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
   
 }
