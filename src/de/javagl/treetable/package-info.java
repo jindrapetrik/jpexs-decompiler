@@ -1,9 +1,17 @@
-/**
- * A JTreeTable based on the example code from the article "Creating TreeTables"
- * by Sun Microsystems.<br>
- * <br>
- * See <a href="http://java.sun.com/products/jfc/tsc/articles/treetable2/index.html">http://java.sun.com/products/jfc/tsc/articles/treetable2/index.html</a>
- * (only available via the web archive link 
- * <a href="https://web.archive.org/web/20120626135631/http://java.sun.com/products/jfc/tsc/articles/treetable2/index.html">https://web.archive.org/web/20120626135631/http://java.sun.com/products/jfc/tsc/articles/treetable2/index.html</a> now)
+/*
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.javagl.treetable;

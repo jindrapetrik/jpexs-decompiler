@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -74,15 +74,32 @@ public class LicenseUpdater {
 
          */
         int defaultStartYear = 2010;
-        int defaultFinalYear = 2024;
+        int defaultFinalYear = 2025;
         String defaultAuthor = "JPEXS";
         String defaultYearStr = Integer.toString(defaultStartYear);
         if (defaultFinalYear != defaultStartYear) {
             defaultYearStr += "-" + defaultFinalYear;
         }
-        String gplLicense = "/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */";
+        String gplLicense = "/*\r\n"
+                + " *  Copyright (C) {year} {author}\r\n"
+                + " * \r\n"
+                + " *  This program is free software: you can redistribute it and/or modify\r\n"
+                + " *  it under the terms of the GNU General Public License as published by\r\n"
+                + " *  the Free Software Foundation, either version 3 of the License, or\r\n"
+                + " *  (at your option) any later version.\r\n"
+                + " * \r\n"
+                + " *  This program is distributed in the hope that it will be useful,\r\n"
+                + " *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n"
+                + " *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n"
+                + " *  GNU General Public License for more details.\r\n"
+                + " * \r\n"
+                + " *  You should have received a copy of the GNU General Public License\r\n"
+                + " *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n"
+                + " */";
 
-        String lgplLicense = "/*\r\n *  Copyright (C) {year} {author}, All rights reserved.\r\n * \r\n"
+        String lgplLicense = "/*\r\n"
+                + " *  Copyright (C) {year} {author}, All rights reserved.\r\n"
+                + " * \r\n"
                 + " * This library is free software; you can redistribute it and/or\r\n"
                 + " * modify it under the terms of the GNU Lesser General Public\r\n"
                 + " * License as published by the Free Software Foundation; either\r\n"
