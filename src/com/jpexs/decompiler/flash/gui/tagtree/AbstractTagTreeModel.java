@@ -50,13 +50,11 @@ public abstract class AbstractTagTreeModel implements TreeModel {
 
     protected Map<TreeItem, TreeItem> itemToParentCache = new WeakHashMap<>();
 
-    protected void removeFromCache(TreeItem itemToRemove) {
-        itemToParentCache.remove(itemToRemove);
+    protected void uncacheSwf(SWF swf) {
         Set<TreeItem> tSet = new HashSet<>(itemToParentCache.keySet());
         for (TreeItem item : tSet) {
-            TreeItem parent = itemToParentCache.get(item);
-            if (parent == itemToRemove) {
-                removeFromCache(item);
+            if (item.getOpenable() == swf) {
+                itemToParentCache.remove(item);
             }
         }
     }

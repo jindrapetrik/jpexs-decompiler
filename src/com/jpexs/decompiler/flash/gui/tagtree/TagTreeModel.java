@@ -161,7 +161,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
             for (SWF swf : toRemove) {
                 swfInfos.remove(swf);
-                removeFromCache(swf);
+                uncacheSwf(swf);
             }
         }
 
