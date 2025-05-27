@@ -1294,7 +1294,7 @@ public class ActionScript2VariableParser {
                  break;
                  }
                  }*/
-                /*List<List<ActionIf>> caseIfs = new ArrayList<>();
+ /*List<List<ActionIf>> caseIfs = new ArrayList<>();
                 List<List<GraphTargetItem>> caseCmds = new ArrayList<>();
                 List<GraphTargetItem> caseExprsAll = new ArrayList<>();
                 List<Integer> valueMapping = new ArrayList<>();*/
@@ -1352,9 +1352,9 @@ public class ActionScript2VariableParser {
                  */
                 while (s.type == SymbolType.CATCH) {
                     expectedType(SymbolType.PARENT_OPEN);
-                    s = lex();
-                    expectedIdentifier(s, lexer.yyline(), SymbolType.STRING);
-                    //catchExceptionNames.add(pushConst((String) s.value));
+                    ParsedSymbol si = lex();
+                    expectedIdentifier(si, lexer.yyline(), SymbolType.STRING);
+                    //catchExceptionNames.add(pushConst((String) si.value));
                     s = lex();
                     if (s.type == SymbolType.COLON) {
                         //catchExceptionTypes.add(;
@@ -1366,7 +1366,16 @@ public class ActionScript2VariableParser {
                     expectedType(SymbolType.PARENT_CLOSE);
                     //List<GraphTargetItem> cc = new ArrayList<>();
                     //cc.add(;
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
+
+                    List<VariableActionItem> subvariables = new ArrayList<>();
+                    List<FunctionActionItem> subfunctions = new ArrayList<>();
+
+                    command(inFunction, inMethod, forinlevel, inTellTarget, true, subvariables, subfunctions, hasEval);
+
+                    //Treat Catch as function - it is closure for variables
+                    FunctionActionItem retf = new FunctionActionItem(null, null, "catch", Arrays.asList((String) si.value), new HashMap<>() /*?*/, null, constantPool, -1, subvariables, subfunctions, false, Arrays.asList(si.position), null);
+                    functions.add(retf);
+
                     //catchCommands.add(cc);
                     s = lex();
                     found = true;
