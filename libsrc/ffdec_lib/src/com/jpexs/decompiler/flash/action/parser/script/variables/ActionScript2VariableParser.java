@@ -46,7 +46,7 @@ public class ActionScript2VariableParser {
      * Swf version
      */
     private final int swfVersion;
-    
+
     /**
      * Constructor
      *
@@ -57,7 +57,7 @@ public class ActionScript2VariableParser {
     }
 
     private final boolean debugMode = false;
-   
+
     private void commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("commands:");
@@ -67,22 +67,29 @@ public class ActionScript2VariableParser {
         }
         if (debugMode) {
             System.out.println("/commands");
-        }       
+        }
     }
 
-    private boolean type(List<VariableOrScope> variables) throws IOException, ActionParseException, InterruptedException {
+    private String type(boolean definition, List<VariableOrScope> variables) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol s = lex();
         expectedIdentifier(s, lexer.yyline());
+        ParsedSymbol lastIdent = s;
         Variable vret = new Variable(false, s.value.toString(), s.position);
         variables.add(vret);
+        String ret = s.value.toString();
         s = lex();
         while (s.type == SymbolType.DOT) {
+            ret += ".";
             s = lex();
             expectedIdentifier(s, lexer.yyline());
+            lastIdent = s;
+            ret += s.value.toString();
             s = lex();
         }
         lexer.pushback(s);
-        return true;
+        Type t = new Type(definition, ret, lastIdent.position);
+        variables.add(t);
+        return ret;
     }
 
     private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, ActionParseException {
@@ -157,7 +164,7 @@ public class ActionScript2VariableParser {
             paramPositions.add(s.position);
             s = lex();
             if (s.type == SymbolType.COLON) {
-                type(variables);
+                type(false, variables);
                 s = lex();
             }
 
@@ -168,13 +175,16 @@ public class ActionScript2VariableParser {
         List<VariableOrScope> subvariables = new ArrayList<>();
         Reference<Boolean> subHasEval = new Reference<>(false);
 
+        if (!functionName.isEmpty()) {
+            variables.add(new Variable(true, functionName, functionNamePosition));
+        }
+
         for (int i = 0; i < paramNames.size(); i++) {
             subvariables.add(new Variable(true, paramNames.get(i), paramPositions.get(i)));
         }
 
         if (withBody) {
             expectedType(SymbolType.CURLY_OPEN);
-            //body = ;
             commands(true, isMethod, 0, inTellTarget, subvariables, subHasEval);
             expectedType(SymbolType.CURLY_CLOSE);
         }
@@ -184,18 +194,20 @@ public class ActionScript2VariableParser {
         }
 
         variables.add(new FunctionScope(subvariables));
-        if (!functionName.isEmpty()) {
-            variables.add(new Variable(true, functionName, functionNamePosition));
-        }
     }
 
-    private boolean traits(boolean isInterface, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean traits(boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
 
         ParsedSymbol s;
+
         looptrait:
         while (true) {
+            boolean isStatic = false;
             s = lex();
             while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE)) {
+                if (s.type == SymbolType.STATIC) {
+                    isStatic = true;
+                }
                 s = lex();
             }
             switch (s.type) {
@@ -209,17 +221,18 @@ public class ActionScript2VariableParser {
                     }
 
                     expectedIdentifier(s, lexer.yyline());
+
                     if (!isInterface) {
-                        function(!isInterface, "", -1, true, variables, inTellTarget, hasEval);  
+                        function(!isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, variables, inTellTarget, hasEval);
                     }
                     break;
                 case VAR:
                     s = lex();
                     expectedIdentifier(s, lexer.yyline());
-                    //String ident = s.value.toString();
+                    variables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position));
                     s = lex();
                     if (s.type == SymbolType.COLON) {
-                        type(variables);
+                        type(false, variables);
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
@@ -245,7 +258,7 @@ public class ActionScript2VariableParser {
             System.out.println("expressionCommands:");
         }
         boolean ret;
-        
+
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
             case FSCOMMAND:
@@ -293,7 +306,7 @@ public class ActionScript2VariableParser {
                 variables.add(new Variable(false, (String) s.value, s.position));
                 break;
         }
-        
+
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -436,7 +449,7 @@ public class ActionScript2VariableParser {
                 expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(SymbolType.COMMA);
                 expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);                
+                expectedType(SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case LOADVARIABLES:
@@ -498,7 +511,7 @@ public class ActionScript2VariableParser {
                             }
                         } else {
                             lexer.pushback(s);
-                
+
                         }
                     } else {
                         lexer.pushback(s);
@@ -724,35 +737,39 @@ public class ActionScript2VariableParser {
                 ret = true;
                 break;
             case CLASS:
-                type(variables);
+                String className = type(true, variables);
                 s = lex();
                 if (s.type == SymbolType.EXTENDS) {
-                    type(variables);
+                    type(false, variables);
                     s = lex();
                 }
                 if (s.type == SymbolType.IMPLEMENTS) {
                     do {
-                        type(variables);
+                        type(false, variables);
                         s = lex();
                     } while (s.type == SymbolType.COMMA);
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                traits(false, variables, inTellTarget, hasEval);
+                List<VariableOrScope> subVariables = new ArrayList<>();
+                traits(false, className, subVariables, inTellTarget, hasEval);
+                ClassScope cs = new ClassScope(subVariables);
+                variables.add(cs);
+
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case INTERFACE:
-                type(variables);
+                String interfaceName = type(true, variables);
                 s = lex();
 
                 if (s.type == SymbolType.EXTENDS) {
                     do {
-                        type(variables);
+                        type(false, variables);
                         s = lex();
                     } while (s.type == SymbolType.COMMA);
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                traits(true, variables, inTellTarget, hasEval);
+                traits(true, interfaceName, variables, inTellTarget, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
@@ -768,7 +785,7 @@ public class ActionScript2VariableParser {
                 int varPosition = s.position;
                 s = lex();
                 if (s.type == SymbolType.COLON) {
-                    type(variables);
+                    type(false, variables);
                     s = lex();
                     //TODO: handle value type
                 }
@@ -928,12 +945,12 @@ public class ActionScript2VariableParser {
                     expectedIdentifier(si, lexer.yyline(), SymbolType.STRING);
                     s = lex();
                     if (s.type == SymbolType.COLON) {
-                        type(variables);
+                        type(false, variables);
                     } else {
                         lexer.pushback(s);
                     }
                     expectedType(SymbolType.PARENT_CLOSE);
-                
+
                     List<VariableOrScope> subvariables = new ArrayList<>();
 
                     command(inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
@@ -1124,7 +1141,7 @@ public class ActionScript2VariableParser {
                 case ASSIGN_SHIFT_LEFT:
                 case ASSIGN_SHIFT_RIGHT:
                 case ASSIGN_USHIFT_RIGHT:
-                case ASSIGN_XOR:                    
+                case ASSIGN_XOR:
                     lhs = true;
                     break;
                 case IDENTIFIER:
@@ -1148,7 +1165,7 @@ public class ActionScript2VariableParser {
         }
         return lhs;
     }
-  
+
     private int brackets(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
@@ -1183,6 +1200,38 @@ public class ActionScript2VariableParser {
             Variable vret = new Variable(false, varName, s.position);
             variables.add(vret);
             allowMemberOrCall.setVal(true);
+
+            if (varName.equals("this")) {
+                ParsedSymbol s2 = lex();
+                if (s2.type == SymbolType.DOT) {
+                    ParsedSymbol s3 = lex();
+                    if (s3.group == SymbolGroup.IDENTIFIER) {
+                        Variable thisVar = new Variable(false, "this." + s3.value.toString(), s3.position);
+                        variables.add(thisVar);
+                    } else {
+                        lexer.pushback(s3);
+                        lexer.pushback(s2);
+                    }
+                } else {
+                    lexer.pushback(s2);
+                }
+            }
+            ParsedSymbol ss = lex();
+            String fullName = varName;
+            while (ss.type == SymbolType.DOT) {
+                ParsedSymbol si = lex();
+                if (!isIdentifier(si)) {
+                    lexer.pushback(si);
+                    break;
+                }
+                fullName += ".";
+                fullName += si.value.toString();
+                Variable v = new Variable(false, fullName, si.position);
+                variables.add(v);
+                ss = lex();
+            }
+            lexer.pushback(ss);
+
             ret = true;
         }
         return ret;
@@ -1231,7 +1280,7 @@ public class ActionScript2VariableParser {
                     case "goto":
                         s = lexer.lex();
                         ret = true;
-                        //throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
+                    //throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
                     default:
                         throw new ActionParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline());
 
@@ -1367,7 +1416,7 @@ public class ActionScript2VariableParser {
                     expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 }
                 expectedType(SymbolType.PARENT_OPEN);
-                call(inFunction, inMethod, inTellTarget, variables, hasEval);                
+                call(inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
 
@@ -1419,7 +1468,7 @@ public class ActionScript2VariableParser {
         }
         return ret;
     }
-  
+
     private boolean memberOrCall(boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
@@ -1427,7 +1476,7 @@ public class ActionScript2VariableParser {
                 if (!allowCall) {
                     break;
                 }
-                call(inFunction, inMethod, inTellTarget, variables, hasEval);                
+                call(inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
             }
             if (op.type == SymbolType.BRACKET_OPEN) {
@@ -1551,7 +1600,7 @@ public class ActionScript2VariableParser {
         Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
 
         parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
-     
+
         if (inOnHandler) {
             expectedType(SymbolType.CURLY_CLOSE);
         }
@@ -1578,14 +1627,16 @@ public class ActionScript2VariableParser {
                     privateVarNameToDefinitionPosition.put(v.name, v.position);
                     definitionPosToReferences.put(v.position, new ArrayList<>());
                 } else {
-                    if (privateVarNameToDefinitionPosition.containsKey(v.name)) {
+                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
+                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
+                        definitionPosToReferences.get(-v.position - 1).add(v.position);
+                        referenceToDefinition.put(v.position, -v.position - 1);
+                    } else {
                         int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
                         definitionPosToReferences.get(definitionPos).add(v.position);
                         referenceToDefinition.put(v.position, definitionPos);
-                    } else {
-                        //first usage, take as definition (?)
-                        privateVarNameToDefinitionPosition.put(v.name, v.position);
-                        definitionPosToReferences.put(v.position, new ArrayList<>());
                     }
                 }
             }
@@ -1602,15 +1653,16 @@ public class ActionScript2VariableParser {
                     privateVarNameToDefinitionPosition.put(v.name, v.position);
                     definitionPosToReferences.put(v.position, new ArrayList<>());
                 } else {
-                    if (privateVarNameToDefinitionPosition.containsKey(v.name)) {
+                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
+                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
+                        definitionPosToReferences.get(-v.position - 1).add(v.position);
+                        referenceToDefinition.put(v.position, -v.position - 1);
+                    } else {
                         int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
                         definitionPosToReferences.get(definitionPos).add(v.position);
                         referenceToDefinition.put(v.position, definitionPos);
-                    } else {
-                        //first usage, take as definition (?)
-                        parentVarNameToDefinitionPosition.put(v.name, v.position);
-                        privateVarNameToDefinitionPosition.put(v.name, v.position);
-                        definitionPosToReferences.put(v.position, new ArrayList<>());
                     }
                 }
             }
@@ -1623,7 +1675,7 @@ public class ActionScript2VariableParser {
 
     private void versionRequired(ParsedSymbol s, int min) throws ActionParseException {
         versionRequired(s.value.toString(), min, Integer.MAX_VALUE);
-    }  
+    }
 
     private void versionRequired(String type, int min, int max) throws ActionParseException {
         if (min == max && swfVersion != min) {

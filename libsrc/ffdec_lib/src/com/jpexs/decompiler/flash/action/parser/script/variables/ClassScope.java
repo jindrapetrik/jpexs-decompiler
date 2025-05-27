@@ -16,24 +16,28 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script.variables;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
  */
-public class Variable implements VariableOrScope {
+public class ClassScope implements Scope {
 
-    public boolean definition;
-    public String name;
-    public int position;
+    private final List<VariableOrScope> privateItems;
 
-    public Variable(boolean definition, String name, int position) {
-        this.definition = definition;
-        this.name = name;
-        this.position = position;
+    public ClassScope(List<VariableOrScope> traits) {
+        this.privateItems = traits;
     }
 
     @Override
-    public String toString() {
-        return (definition ? "definition of " : "") + name + " at " + position;
-    }        
+    public List<VariableOrScope> getSharedItems() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<VariableOrScope> getPrivateItems() {
+        return privateItems;
+    }
 }

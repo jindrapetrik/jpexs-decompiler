@@ -20,20 +20,9 @@ package com.jpexs.decompiler.flash.action.parser.script.variables;
  *
  * @author JPEXS
  */
-public class Variable implements VariableOrScope {
-
-    public boolean definition;
-    public String name;
-    public int position;
-
-    public Variable(boolean definition, String name, int position) {
-        this.definition = definition;
-        this.name = name;
-        this.position = position;
-    }
-
-    @Override
-    public String toString() {
-        return (definition ? "definition of " : "") + name + " at " + position;
-    }        
+public class Type extends Variable {
+    
+    public Type(boolean definition, String name, int position) {
+        super(definition, name, position);
+    }    
 }

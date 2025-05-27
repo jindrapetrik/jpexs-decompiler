@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.variables.ActionScript2VariableParser;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,6 +38,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Highlighter;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -47,9 +50,9 @@ import jsyntaxpane.util.Configuration;
 /**
  * This class highlights Variable tokens of ActionScript 1/2
  */
-public class ActionVariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener {
+public class ActionVariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener, LinkHandler {
 
-    public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, REGEX";
+    public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, KEYWORD, REGEX";
     public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
     public static final String PROPERTY_TOKENTYPES = "ActionVariableMarker.TokenTypes";
     private static final Color DEFAULT_COLOR = new Color(0xf8e7d6);
@@ -92,17 +95,21 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
 
     private Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
         Token thisToken = sDoc.getTokenAt(pos);
-        if (thisToken != null && (thisToken.type == TokenType.IDENTIFIER || thisToken.type == TokenType.REGEX)) {
+        if (thisToken != null && (thisToken.type == TokenType.IDENTIFIER || thisToken.type == TokenType.REGEX || thisToken.type == TokenType.KEYWORD)) {
             return thisToken;
         }
 
         Token token = sDoc.getTokenAt(pos - 1);
-        if (token != null && (token.type == TokenType.IDENTIFIER || token.type == TokenType.REGEX) && (token.start + token.length == pos)) {
+        if (token != null
+                && (token.type == TokenType.IDENTIFIER || token.type == TokenType.REGEX || token.type == TokenType.KEYWORD)
+                && (token.start + token.length == pos)) {
             return token;
         }
 
         token = sDoc.getTokenAt(pos + 1);
-        if (token != null && (token.type == TokenType.IDENTIFIER || token.type == TokenType.REGEX)) {
+        if (token != null
+                && (token.type == TokenType.IDENTIFIER || token.type == TokenType.REGEX || token.type == TokenType.KEYWORD)
+                && (token.start == pos)) {
             return token;
         }
         return null;
@@ -120,7 +127,7 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         if (referenceToDefinition.containsKey(tok.start)) {
             definitionPos = referenceToDefinition.get(tok.start);
         }
-        Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos);
+        Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos < 0 ? -(definitionPos + 1) : definitionPos);
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
                 Markers.markToken(pane, definitionToken, marker);
@@ -161,6 +168,9 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         editor.addCaretListener(this);
         editor.addPropertyChangeListener(this);
         editor.getDocument().addDocumentListener(this);
+        if (editor instanceof LineMarkedEditorPane) {
+            ((LineMarkedEditorPane) editor).setLinkHandler(this);
+        }
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
         status = Status.INSTALLING;
@@ -173,8 +183,11 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         pane.removePropertyChangeListener(this);
         pane.getDocument().removeDocumentListener(this);
         pane.removeCaretListener(this);
+        if (editor instanceof LineMarkedEditorPane) {
+            ((LineMarkedEditorPane) editor).setLinkHandler(null);
+        }
     }
-    
+
     private static final Logger LOG = Logger.getLogger(ActionVariableMarker.class.getName());
 
     @Override
@@ -212,9 +225,11 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             varParser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition);
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
+            markTokenAt(pane.getCaretPosition());
         } catch (BadLocationException | ActionParseException | IOException | InterruptedException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
+            //ex.printStackTrace();
         }
     }
 
@@ -231,5 +246,23 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     @Override
     public void changedUpdate(DocumentEvent e) {
         documentUpdated();
+    }
+
+    @Override
+    public boolean isLink(Token token) {
+        return referenceToDefinition.containsKey(token.start) && referenceToDefinition.get(token.start) >= 0;
+    }
+
+    @Override
+    public void handleLink(Token token) {
+        Integer definition = referenceToDefinition.get(token.start);
+        if (definition != null) {
+            pane.setCaretPosition(definition);
+        }
+    }
+
+    @Override
+    public Highlighter.HighlightPainter linkPainter() {
+        return ((LineMarkedEditorPane) pane).linkPainter();
     }
 }

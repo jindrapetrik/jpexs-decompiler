@@ -712,7 +712,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.setEditable(false);
         decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
-        decompiledEditor.setLinkHandler(new LinkHandler() {
+        /*decompiledEditor.setLinkHandler(new LinkHandler() {
             @Override
             public boolean isLink(Token token) {
                 int pos = token.start;
@@ -741,7 +741,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             public Highlighter.HighlightPainter linkPainter() {
                 return decompiledEditor.linkPainter();
             }
-        });
+        });*/
 
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
@@ -1409,7 +1409,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         searchPanel.setSearchText(searchedText);
         Runnable onScriptComplete = new Runnable() {
             @Override
-            public void run() {                
+            public void run() {
                 Timer tim = new Timer();
                 tim.schedule(new TimerTask() {
                     @Override
