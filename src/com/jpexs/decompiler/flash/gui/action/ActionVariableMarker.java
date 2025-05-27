@@ -50,9 +50,9 @@ import jsyntaxpane.util.Configuration;
 public class ActionVariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener {
 
     public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, REGEX";
-    public static final String PROPERTY_COLOR = "TokenMarker.Color";
+    public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
     public static final String PROPERTY_TOKENTYPES = "ActionVariableMarker.TokenTypes";
-    private static final Color DEFAULT_COLOR = new Color(0xFFEE66);
+    private static final Color DEFAULT_COLOR = new Color(0xf8e7d6);
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
     private Markers.SimpleMarker marker;
