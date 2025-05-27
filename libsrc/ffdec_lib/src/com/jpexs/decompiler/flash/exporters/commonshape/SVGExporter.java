@@ -95,19 +95,22 @@ public class SVGExporter {
         private final Tag tag;
         public final ColorTransform colorTransform;
         public final int ratio;
+        public final boolean clipped;
 
-        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio) {
+        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio, boolean clipped) {
             this.tag = tag;
             this.colorTransform = colorTransform;
             this.ratio = ratio;
+            this.clipped = clipped;
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 43 * hash + Objects.hashCode(this.tag);
-            hash = 43 * hash + Objects.hashCode(this.colorTransform);
-            hash = 43 * hash + this.ratio;
+            hash = 79 * hash + Objects.hashCode(this.tag);
+            hash = 79 * hash + Objects.hashCode(this.colorTransform);
+            hash = 79 * hash + this.ratio;
+            hash = 79 * hash + (this.clipped ? 1 : 0);
             return hash;
         }
 
@@ -126,11 +129,14 @@ public class SVGExporter {
             if (this.ratio != other.ratio) {
                 return false;
             }
+            if (this.clipped != other.clipped) {
+                return false;
+            }
             if (!Objects.equals(this.tag, other.tag)) {
                 return false;
             }
             return Objects.equals(this.colorTransform, other.colorTransform);
-        }
+        }       
     }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {

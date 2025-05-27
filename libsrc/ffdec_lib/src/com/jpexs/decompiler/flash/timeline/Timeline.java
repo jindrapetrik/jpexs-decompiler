@@ -1623,7 +1623,7 @@ public class Timeline {
                     clipGroup = null;
                 }
 
-                if (clips.size() > 0) {
+                if (!clips.isEmpty()) {
                     String clip = clips.get(clips.size() - 1).shape; // todo: merge clip areas
                     clipGroup = exporter.createSubGroup(null, null);
                     clipGroup.setAttribute("clip-path", "url(#" + clip + ")");
@@ -1656,16 +1656,7 @@ public class Timeline {
                 String assetName;
                 Tag drawableTag = (Tag) drawable;
                 RECT boundRect = drawable.getRect();
-                boolean createNew = false;
-                SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio);
 
-                if (exporter.exportedTags.containsKey(exportKey)) {
-                    assetName = exporter.exportedTags.get(exportKey);
-                } else {
-                    assetName = getTagIdPrefix(drawableTag, exporter);
-                    exporter.exportedTags.put(exportKey, assetName);
-                    createNew = true;
-                }
                 ExportRectangle rect = new ExportRectangle(boundRect);
 
                 DefineScalingGridTag scalingGrid = character.getScalingGridTag();
@@ -1681,6 +1672,16 @@ public class Timeline {
                     drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 } else {
+                    boolean createNew = false;
+
+                    SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1);
+                    if (exporter.exportedTags.containsKey(exportKey)) {
+                        assetName = exporter.exportedTags.get(exportKey);
+                    } else {
+                        assetName = getTagIdPrefix(drawableTag, exporter);
+                        exporter.exportedTags.put(exportKey, assetName);
+                        createNew = true;
+                    }
                     if (createNew) {
                         exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
                         drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
