@@ -245,6 +245,55 @@ public class ActionScript2VariableParser {
             System.out.println("expressionCommands:");
         }
         boolean ret;
+        
+        switch (s.type) {
+            case DUPLICATEMOVIECLIP:
+            case FSCOMMAND:
+            case FSCOMMAND2:
+            case SET:
+            case TRACE:
+            case GETURL:
+            case GOTOANDSTOP:
+            case GOTOANDPLAY:
+            case NEXTFRAME:
+            case PLAY:
+            case PREVFRAME:
+            case STOP:
+            case STOPALLSOUNDS:
+            case TOGGLEHIGHQUALITY:
+            case STOPDRAG:
+            case UNLOADMOVIE:
+            case UNLOADMOVIENUM:
+            case PRINT:
+            case PRINTASBITMAP:
+            case PRINTASBITMAPNUM:
+            case PRINTNUM:
+            case LOADVARIABLES:
+            case LOADMOVIE:
+            case LOADVARIABLESNUM:
+            case LOADMOVIENUM:
+            case REMOVEMOVIECLIP:
+            case STARTDRAG:
+            case CALL:
+            case GETVERSION:
+            case MBORD:
+            case MBCHR:
+            case MBLENGTH:
+            case MBSUBSTRING:
+            case SUBSTR:
+            case LENGTH:
+            case RANDOM:
+            case INT:
+            case NUMBER_OP:
+            case STRING_OP:
+            case ORD:
+            case CHR:
+            case GETTIMER:
+            case TARGETPATH:
+                variables.add(new Variable(false, (String) s.value, s.position));
+                break;
+        }
+        
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
