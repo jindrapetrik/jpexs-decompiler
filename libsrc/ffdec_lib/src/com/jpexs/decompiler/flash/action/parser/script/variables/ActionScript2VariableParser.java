@@ -1280,7 +1280,8 @@ public class ActionScript2VariableParser {
                     case "goto":
                         s = lexer.lex();
                         ret = true;
-                    //throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
+                        //throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
+                        break;
                     default:
                         throw new ActionParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline());
 
