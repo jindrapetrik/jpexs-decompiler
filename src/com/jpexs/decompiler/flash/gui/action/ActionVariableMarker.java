@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.gui.action;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScript2VariableParser;
+import com.jpexs.decompiler.flash.action.parser.script.variables.ActionScript2VariableParser;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
