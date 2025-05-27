@@ -17,15 +17,12 @@
 package com.jpexs.decompiler.flash.action.parser.script.variables;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.LexBufferer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolGroup;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
-import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
@@ -59,15 +56,13 @@ public class ActionScript2VariableParser {
         this.swfVersion = swf.version;
     }
 
-    private long uniqLast = 0;
-
     private final boolean debugMode = false;
    
     private void commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("commands:");
         }
-        while (command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval)) {
+        while (command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval)) {
             //empty
         }
         if (debugMode) {
@@ -145,7 +140,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private void function(boolean withBody, String functionName, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private void function(boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
         s = lex();
@@ -189,11 +184,12 @@ public class ActionScript2VariableParser {
         }
 
         variables.add(new FunctionScope(subvariables));
+        if (!functionName.isEmpty()) {
+            variables.add(new Variable(true, functionName, functionNamePosition));
+        }
     }
 
-    private boolean traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
-
-        GraphTargetItem ret = null;
+    private boolean traits(boolean isInterface, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
 
         ParsedSymbol s;
         looptrait:
@@ -213,9 +209,8 @@ public class ActionScript2VariableParser {
                     }
 
                     expectedIdentifier(s, lexer.yyline());
-                    String fname = s.value.toString();                    
                     if (!isInterface) {
-                        function(!isInterface, "", true, variables, inTellTarget, hasEval);  
+                        function(!isInterface, "", -1, true, variables, inTellTarget, hasEval);  
                     }
                     break;
                 case VAR:
@@ -245,11 +240,11 @@ public class ActionScript2VariableParser {
         return true;
     }
 
-    private boolean expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, int forinlevel, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
-        boolean ret = false;
+        boolean ret;
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -379,7 +374,6 @@ public class ActionScript2VariableParser {
 
             case UNLOADMOVIE:
             case UNLOADMOVIENUM:
-                SymbolType unloadType = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
                 expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -619,7 +613,7 @@ public class ActionScript2VariableParser {
         }
     }
 
-    private boolean command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         if (debugMode) {
@@ -694,7 +688,7 @@ public class ActionScript2VariableParser {
                     } while (s.type == SymbolType.COMMA);
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                traits(false, null, null, new ArrayList<>(), variables, inTellTarget, hasEval);
+                traits(false, variables, inTellTarget, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
@@ -709,14 +703,14 @@ public class ActionScript2VariableParser {
                     } while (s.type == SymbolType.COMMA);
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                traits(true, null, null, new ArrayList<>(), variables, inTellTarget, hasEval);
+                traits(true, variables, inTellTarget, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case FUNCTION:
                 s = lexer.lex();
                 expectedIdentifier(s, lexer.yyline());
-                function(true, s.value.toString(), false, variables, inTellTarget, hasEval);
+                function(true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval);
                 break;
             case VAR:
                 s = lex();
@@ -754,7 +748,7 @@ public class ActionScript2VariableParser {
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
-                    List<GraphTargetItem> args = call(inFunction, inMethod, inTellTarget, variables, hasEval);
+                    call(inFunction, inMethod, inTellTarget, variables, hasEval);
                     Variable supItem = new Variable(false, s.value.toString(), s.position);
                     variables.add(supItem);
                     ret = true;
@@ -767,10 +761,10 @@ public class ActionScript2VariableParser {
                 expectedType(SymbolType.PARENT_OPEN);
                 expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 if (s.type == SymbolType.ELSE) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -780,11 +774,11 @@ public class ActionScript2VariableParser {
                 expectedType(SymbolType.PARENT_OPEN);
                 expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case DO:
-                command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 expectedType(SymbolType.WHILE);
                 expectedType(SymbolType.PARENT_OPEN);
                 expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
@@ -834,13 +828,13 @@ public class ActionScript2VariableParser {
                     lexer.pushback(s);
                 }
                 if (!forin) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     expectedType(SymbolType.SEMICOLON);
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, true, variables, hasEval);
+                command(inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case SWITCH:
@@ -876,7 +870,7 @@ public class ActionScript2VariableParser {
                 ret = true;
                 break;
             case TRY:
-                command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 boolean found = false;
                 while (s.type == SymbolType.CATCH) {
@@ -893,14 +887,14 @@ public class ActionScript2VariableParser {
                 
                     List<VariableOrScope> subvariables = new ArrayList<>();
 
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, subvariables, hasEval);
+                    command(inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
 
                     variables.add(new CatchScope(new Variable(true, (String) si.value, si.position), subvariables));
                     s = lex();
                     found = true;
                 }
                 if (s.type == SymbolType.FINALLY) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, hasEval);
+                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     found = true;
                     s = lex();
                 }
@@ -954,7 +948,7 @@ public class ActionScript2VariableParser {
         }
         ParsedSymbol symb;
         do {
-            boolean prim = expressionPrimary(false, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            boolean prim = expressionPrimary(inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (!prim) {
                 return false;
             }
@@ -1006,7 +1000,6 @@ public class ActionScript2VariableParser {
     private boolean expression1(boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op;
         boolean rhs;
-        boolean mhs = false;
         ParsedSymbol lookahead = peekLex();
         if (debugMode) {
             System.out.println("expression1:");
@@ -1023,14 +1016,14 @@ public class ActionScript2VariableParser {
                 if (debugMode) {
                     System.out.println("ternar-middle:");
                 }
-                mhs = expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                 expectedType(SymbolType.COLON);
                 if (debugMode) {
                     System.out.println("/ternar-middle");
                 }
             }
 
-            rhs = expressionPrimary(allowRemainder, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            rhs = expressionPrimary(inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (rhs == false) {
                 lexer.pushback(op);
                 break;
@@ -1133,7 +1126,7 @@ public class ActionScript2VariableParser {
 
     private boolean handleVariable(ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (s.value.equals("not")) {
-            expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+            expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
             ret = true;
         } else {
             String varName = s.value.toString();
@@ -1146,7 +1139,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expressionPrimary(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1198,7 +1191,7 @@ public class ActionScript2VariableParser {
                 break;
             case NEGATE:
                 versionRequired(s, 5);
-                expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case MINUS:
@@ -1211,12 +1204,12 @@ public class ActionScript2VariableParser {
 
                 } else {
                     lexer.pushback(s);
-                    expressionPrimary(false, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                    expressionPrimary(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                     ret = true;
                 }
                 break;
             case TYPEOF:
-                expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1263,12 +1256,14 @@ public class ActionScript2VariableParser {
             case FUNCTION:
                 s = lex();
                 String fname = "";
+                int fnamePos = -1;
                 if (isIdentifier(s)) {
                     fname = s.value.toString();
+                    fnamePos = s.position;
                 } else {
                     lexer.pushback(s);
                 }
-                function(true, fname, false, variables, inTellTarget, hasEval);
+                function(true, fname, fnamePos, false, variables, inTellTarget, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1286,16 +1281,16 @@ public class ActionScript2VariableParser {
                 allowMemberOrCall = true;
                 break;
             case DELETE:
-                expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case NOT:
-                expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case PARENT_OPEN:
@@ -1316,11 +1311,11 @@ public class ActionScript2VariableParser {
                     } else {
                         lexer.pushback(s2);
                         lexer.pushback(s1);
-                        expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                        expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                     }
                 } else {
                     lexer.pushback(s1);
-                    expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                    expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 }
                 expectedType(SymbolType.PARENT_OPEN);
                 call(inFunction, inMethod, inTellTarget, variables, hasEval);                
@@ -1357,7 +1352,7 @@ public class ActionScript2VariableParser {
                 }
 
                 if (!isGlobalFuncVar) {
-                    boolean excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, -1, variables, hasEval);
+                    boolean excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, variables, hasEval);
                     if (excmd) {
                         ret = excmd;
                         allowMemberOrCall = true;
@@ -1415,32 +1410,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private DirectValueActionItem pushConst(String s) throws IOException, ActionParseException {
-
-        //ActionConstantPool was introduced in SWF 5
-        if (swfVersion < 5) {
-            return new DirectValueActionItem(null, null, 0, s, constantPool);
-        }
-
-        int index = constantPool.indexOf(s);
-        if (index == -1) {
-            if (ActionConstantPool.calculateSize(constantPool) + ActionConstantPool.calculateSize(s) <= 0xffff) {
-                // constant pool is not full
-                constantPool.add(s);
-                index = constantPool.indexOf(s);
-            }
-        }
-
-        if (index == -1) {
-            return new DirectValueActionItem(null, null, 0, s, constantPool);
-        }
-
-        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);
-    }
-
     private ActionScriptLexer lexer = null;
-
-    private List<String> constantPool;
 
     /**
      * Convert a string to a high-level model.
@@ -1451,7 +1421,6 @@ public class ActionScript2VariableParser {
      * @throws InterruptedException On interrupt
      */
     public void parse(String str, Map<Integer, List<Integer>> definitionPosToReferences, Map<Integer, Integer> referenceToDefinition) throws ActionParseException, IOException, InterruptedException {
-        this.constantPool = new ArrayList<>();
         lexer = new ActionScriptLexer(new StringReader(str));
         if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
             lexer.setCaseSensitiveIdentifiers(true);
