@@ -1204,9 +1204,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         View.checkAccess();
 
         if (src != null) {
-            if (val) {
-                setDecompiledText(src.getScriptName(), src.getExportedScriptName(), lastDecompiled.text);
-            } else {
+            if (!val) {
                 setDecompiledText(src.getScriptName(), src.getExportedScriptName(), lastDecompiled.text);
             }
         }

@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - Incorrect DefineFunction2 parameter names when parameter name is empty
 - [#2460] SVG export - incorrect caching colorTransform and ratio for the same tag
 - [#2461] SVG export - incorrect clipping / missing shapes
+- AS1/2 direct editation - Position in the code should stay same after clicking Edit button
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
