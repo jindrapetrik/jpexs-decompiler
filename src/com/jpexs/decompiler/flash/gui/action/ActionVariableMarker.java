@@ -23,7 +23,10 @@ import com.jpexs.decompiler.flash.action.parser.script.variables.ActionVariableP
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.editor.ScrollbarOverlay;
+import com.jpexs.decompiler.flash.gui.editor.TrackRectSubstanceScrollbarUI;
 import com.jpexs.decompiler.flash.gui.editor.WavyUnderLinePainter;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -38,12 +41,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
+import javax.swing.JLayer;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.ScrollBarUI;
+import javax.swing.plaf.ScrollPaneUI;
+import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import jsyntaxpane.SyntaxDocument;
@@ -53,6 +66,7 @@ import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.SyntaxComponent;
 import jsyntaxpane.util.Configuration;
+import org.pushingpixels.substance.internal.ui.SubstanceScrollBarUI;
 
 /**
  * This class highlights Variable tokens of ActionScript 1/2
@@ -64,7 +78,10 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     public static final String PROPERTY_ERRORCOLOR = "ActionVariableMarker.ErrorColor";
     public static final String PROPERTY_TOKENTYPES = "ActionVariableMarker.TokenTypes";
     private static final Color DEFAULT_COLOR = new Color(0xffeedd);
-    private static final Color DEFAULT_ERRORCOLOR = new Color(0xffaaaa);
+    private static final Color DEFAULT_ERRORCOLOR = new Color(0xff0000);
+
+    private static final Color SCROLLBAR_VARIABLE_COLOR = new Color(0xb59070);
+    private static final Color SCROLLBAR_ERROR_COLOR = new Color(0xff0000);
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
     private Markers.SimpleMarker marker;
@@ -80,6 +97,14 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     private Map<Integer, Integer> referenceToDefinition = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
+
+    private JLayer<JScrollBar> layer;
+
+    private ScrollbarOverlay scrollbarOverlay;
+
+    private ScrollPaneUI originalScrollPaneUI;
+
+    private ScrollBarUI originalScrollBarUI;
 
     /**
      * Constructs a new Token highlighter
@@ -106,6 +131,7 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             if (token != null && tokenTypes.contains(token.type)) {
                 addMarkers(token);
             }
+            layer.repaint();
         }
     }
 
@@ -114,11 +140,13 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
      */
     public void removeMarkers() {
         Markers.removeMarkers(pane, marker);
+        scrollbarOverlay.removeMarkers(SCROLLBAR_VARIABLE_COLOR);
     }
 
     public void removeErrorMarkers() {
         Markers.removeMarkers(pane, errorMarker);
         errorsShown = false;
+        scrollbarOverlay.removeMarkers(SCROLLBAR_ERROR_COLOR);
     }
 
     private Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
@@ -173,8 +201,10 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             Token token = getNearestTokenAt(doc, position);
             if (token != null) {
                 Markers.markToken(pane, token, errorMarker);
+                markPositionOnScrollbar(position, SCROLLBAR_ERROR_COLOR);
             }
         }
+        layer.repaint();
         doc.readUnlock();
         errorsShown = true;
     }
@@ -195,10 +225,12 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
                 Markers.markToken(pane, definitionToken, marker);
+                markPositionOnScrollbar(definitionToken.start, SCROLLBAR_VARIABLE_COLOR);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
                         Markers.markToken(pane, referenceToken, marker);
+                        markPositionOnScrollbar(referenceToken.start, SCROLLBAR_VARIABLE_COLOR);
                     }
                 }
             }
@@ -206,12 +238,20 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         sDoc.readUnlock();
     }
 
+    private void markPositionOnScrollbar(int position, Color color) {
+        try {
+            scrollbarOverlay.addMarker(ActionUtils.getLineNumber(pane, position), color);
+        } catch (BadLocationException ex) {
+            //ignore
+        }
+    }
+
     @Override
     public void config(Configuration config) {
         Color markerColor = config.getColor(PROPERTY_COLOR, DEFAULT_COLOR);
         Color errorColor = config.getColor(PROPERTY_ERRORCOLOR, DEFAULT_ERRORCOLOR);
         this.marker = new Markers.SimpleMarker(markerColor);
-        this.errorMarker = new WavyUnderLinePainter(Color.red); //Markers.SimpleMarker(errorColor);
+        this.errorMarker = new WavyUnderLinePainter(errorColor); //Markers.SimpleMarker(errorColor);
         String types = config.getString(
                 PROPERTY_TOKENTYPES, DEFAULT_TOKENTYPES);
 
@@ -236,8 +276,6 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         if (editor instanceof LineMarkedEditorPane) {
             ((LineMarkedEditorPane) editor).setLinkHandler(this);
         }
-        documentUpdated();
-        markTokenAt(editor.getCaretPosition());
         mouseMotionAdapter = new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -245,6 +283,28 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             }
         };
         editor.addMouseMotionListener(mouseMotionAdapter);
+
+        JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
+
+        originalScrollPaneUI = scrollPane.getUI();
+        scrollPane.setUI(new BasicScrollPaneUI());
+
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        originalScrollBarUI = verticalScrollBar.getUI();
+        if (originalScrollBarUI instanceof SubstanceScrollBarUI) {
+            verticalScrollBar.setUI(new TrackRectSubstanceScrollbarUI(verticalScrollBar));
+        }
+
+        scrollbarOverlay = new ScrollbarOverlay((LineMarkedEditorPane) pane);
+
+        layer = new JLayer<>(verticalScrollBar, scrollbarOverlay);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
+        panel.add(layer, BorderLayout.EAST);
+
+        documentUpdated();
+        markTokenAt(editor.getCaretPosition());
         status = Status.INSTALLING;
     }
 
@@ -278,6 +338,14 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         if (editor instanceof LineMarkedEditorPane) {
             ((LineMarkedEditorPane) editor).setLinkHandler(null);
         }
+        JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
+        JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
+        panel.remove(layer);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        panel.revalidate();
+        panel.repaint();
+        scrollPane.setUI(originalScrollPaneUI);
+        scrollPane.getVerticalScrollBar().setUI(originalScrollBarUI);
     }
 
     private static final Logger LOG = Logger.getLogger(ActionVariableMarker.class.getName());
@@ -299,6 +367,7 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     private void documentUpdated() {
         errors.clear();
         removeErrorMarkers();
+        layer.repaint();
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 

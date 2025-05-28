@@ -57,7 +57,6 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -96,7 +95,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -111,7 +109,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
 import javax.swing.tree.TreePath;
@@ -947,8 +944,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
 
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
-        panelWithHint.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
-
+        
+        JPanel panelDecompiled = new JPanel(new BorderLayout(0, 0));
+        panelDecompiled.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
+        panelWithHint.add(panelDecompiled, BorderLayout.CENTER);
+        
         brokenHintPanel.setVisible(false);
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
