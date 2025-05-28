@@ -1914,7 +1914,7 @@ public final class ActionScriptLexer {
           }
         case 253: break;
         case 74: 
-          { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
+          { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1, yychar());
           }
         case 254: break;
         case 75: 

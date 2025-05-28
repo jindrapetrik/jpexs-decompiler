@@ -20,7 +20,8 @@ All notable changes to this project will be documented in this file.
 - Simple editor - detection of english color name (based on CSS names)
 - AS1/2 - highlight variable definition and all its instances on cursor place
   (also in edit mode)
- 
+- AS1/2 - underline errors in the code (also in edit mode) 
+
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
   so there is no longer need to expand frame nodes (useful for fast switching scripts)

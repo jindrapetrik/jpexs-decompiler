@@ -78,6 +78,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
 
     private LinkHandler linkHandler = this;
+    
+    private Point lastCursorPos = new Point(0, 0);
 
     public static class LineMarker implements Comparable<LineMarker> {
 
@@ -381,11 +383,13 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
         return null;
     }
+    
+    public Token getTokenUnderCursor() {
+        return tokenAtPos(lastCursorPos);
+    }
 
     private class LinkAdapter extends MouseAdapter implements KeyListener {
-
-        private Point lastPos = new Point(0, 0);
-
+        
         private boolean ctrlDown = false;
 
         @Override
@@ -411,7 +415,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
         private void update() {
             if (ctrlDown) {
-                Token t = tokenAtPos(lastPos);
+                Token t = tokenAtPos(lastCursorPos);
 
                 if (t != lastUnderlined) {
                     if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
@@ -446,7 +450,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         @Override
         public void mouseClicked(MouseEvent e) {
             if (ctrlDown) {
-                Token t = tokenAtPos(lastPos);
+                Token t = tokenAtPos(lastCursorPos);
                 if (t != null && linkHandler.isLink(t)) {
                     linkHandler.handleLink(t);
                 }
@@ -457,7 +461,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         public void mouseMoved(MouseEvent e) {
 
             ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
-            lastPos = e.getPoint();
+            lastCursorPos = e.getPoint();
             update();
 
         }

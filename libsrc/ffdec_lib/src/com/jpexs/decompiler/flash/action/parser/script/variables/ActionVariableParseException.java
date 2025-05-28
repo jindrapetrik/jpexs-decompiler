@@ -14,53 +14,33 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.action.parser.script.variables;
+
+import com.jpexs.decompiler.flash.ParseException;
 
 /**
- * Parse exception.
+ * Exception for action parsing errors
  *
  * @author JPEXS
  */
-public abstract class ParseException extends Exception {
-
-    /**
-     * Line number where the exception occurred.
-     */
-    public long line;
-    
-    /**
-     * Position in the code where the exception occured. -1 where unknown
-     */
-    public long position = -1;
-
-    /**
-     * Text of the exception.
-     */
-    public String text;
+public class ActionVariableParseException extends ParseException {
 
     /**
      * Constructs a new parse exception.
-     *
      * @param text Text of the exception
      * @param line Line number where the exception occurred
      */
-    public ParseException(String text, long line) {
-        super("ParseException:" + text + " on line " + line);
-        this.line = line;
-        this.text = text;
-        this.position = -1;
+    public ActionVariableParseException(String text, long line) {
+        super(text, line);
     }
     
     /**
      * Constructs a new parse exception.
-     *
      * @param text Text of the exception
      * @param line Line number where the exception occurred
+     * @param position Position where the exception occured
      */
-    public ParseException(String text, long line, long position) {
-        super("ParseException:" + text + " on line " + line);
-        this.line = line;
-        this.text = text;
-        this.position = position;
+    public ActionVariableParseException(String text, long line, long position) {
+        super(text, line, position);
     }
 }

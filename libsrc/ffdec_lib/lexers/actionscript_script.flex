@@ -474,7 +474,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
 
   /* escape sequences */
 
-  \\.                            { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);  }
+  \\.                            { throw new ActionParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1, yychar());  }
   {LineTerminator}               { yybegin(YYINITIAL);  yyline++;}
 }
 

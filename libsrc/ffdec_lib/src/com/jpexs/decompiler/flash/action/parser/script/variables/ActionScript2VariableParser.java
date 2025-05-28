@@ -58,11 +58,11 @@ public class ActionScript2VariableParser {
 
     private final boolean debugMode = false;
 
-    private void commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private void commands(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         if (debugMode) {
             System.out.println("commands:");
         }
-        while (command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval)) {
+        while (command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval)) {
             //empty
         }
         if (debugMode) {
@@ -70,9 +70,11 @@ public class ActionScript2VariableParser {
         }
     }
 
-    private String type(boolean definition, List<VariableOrScope> variables) throws IOException, ActionParseException, InterruptedException {
+    private String type(List<ActionVariableParseException> errors, boolean definition, List<VariableOrScope> variables) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol s = lex();
-        expectedIdentifier(s, lexer.yyline());
+        if (!expectedIdentifier(errors, s, lexer.yyline())) {
+            return null;
+        }
         ParsedSymbol lastIdent = s;
         Variable vret = new Variable(false, s.value.toString(), s.position);
         variables.add(vret);
@@ -81,7 +83,9 @@ public class ActionScript2VariableParser {
         while (s.type == SymbolType.DOT) {
             ret += ".";
             s = lex();
-            expectedIdentifier(s, lexer.yyline());
+            if (!expectedIdentifier(errors, s, lexer.yyline())) {
+                return null;
+            }
             lastIdent = s;
             ret += s.value.toString();
             s = lex();
@@ -92,7 +96,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, ActionParseException {
+    private boolean expected(List<ActionVariableParseException> errors, ParsedSymbol symb, int line, Object... expected) throws IOException {
         boolean found = false;
         for (Object t : expected) {
             if (symb.type == t) {
@@ -112,17 +116,21 @@ public class ActionScript2VariableParser {
                 expStr += e;
                 first = false;
             }
-            throw new ActionParseException("" + expStr + " expected but " + symb.type + " found", line);
+            errors.add(new ActionVariableParseException("" + expStr + " expected but " + symb.type + " found", line, symb.position));
+            return false;
         }
+        return true;
     }
 
-    private ParsedSymbol expectedType(Object... type) throws IOException, ActionParseException, InterruptedException {
+    private ParsedSymbol expectedType(List<ActionVariableParseException> errors, Object... type) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol symb = lex();
-        expected(symb, lexer.yyline(), type);
+        if (!expected(errors, symb, lexer.yyline(), type)) {
+            return null;
+        }
         return symb;
     }
 
-    private ParsedSymbol lex() throws IOException, ActionParseException, InterruptedException {
+    private ParsedSymbol lex() throws IOException, InterruptedException, ActionParseException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
@@ -133,23 +141,23 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private List<GraphTargetItem> call(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
             }
-            expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
+            expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
         }
         return ret;
     }
 
-    private void function(boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private void function(List<ActionVariableParseException> errors, boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol s;
-        expectedType(SymbolType.PARENT_OPEN);
+        expectedType(errors, SymbolType.PARENT_OPEN);
         s = lex();
         List<String> paramNames = new ArrayList<>();
         List<Integer> paramPositions = new ArrayList<>();
@@ -159,17 +167,18 @@ public class ActionScript2VariableParser {
                 lexer.pushback(s);
             }
             s = lex();
-            expectedIdentifier(s, lexer.yyline());
-            paramNames.add(s.value.toString());
-            paramPositions.add(s.position);
+            if (expectedIdentifier(errors, s, lexer.yyline())) {
+                paramNames.add(s.value.toString());
+                paramPositions.add(s.position);
+            }
             s = lex();
             if (s.type == SymbolType.COLON) {
-                type(false, variables);
+                type(errors, false, variables);
                 s = lex();
             }
 
             if (!s.isType(SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
-                expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
+                expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
             }
         }
         List<VariableOrScope> subvariables = new ArrayList<>();
@@ -184,9 +193,9 @@ public class ActionScript2VariableParser {
         }
 
         if (withBody) {
-            expectedType(SymbolType.CURLY_OPEN);
-            commands(true, isMethod, 0, inTellTarget, subvariables, subHasEval);
-            expectedType(SymbolType.CURLY_CLOSE);
+            expectedType(errors, SymbolType.CURLY_OPEN);
+            commands(errors, true, isMethod, 0, inTellTarget, subvariables, subHasEval);
+            expectedType(errors, SymbolType.CURLY_CLOSE);
         }
 
         if (subHasEval.getVal()) {
@@ -196,7 +205,7 @@ public class ActionScript2VariableParser {
         variables.add(new FunctionScope(subvariables));
     }
 
-    private boolean traits(boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean traits(List<ActionVariableParseException> errors, boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
 
         ParsedSymbol s;
 
@@ -220,23 +229,24 @@ public class ActionScript2VariableParser {
                         s = lex();
                     }
 
-                    expectedIdentifier(s, lexer.yyline());
-
-                    if (!isInterface) {
-                        function(!isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, variables, inTellTarget, hasEval);
+                    if (expectedIdentifier(errors, s, lexer.yyline())) {
+                        if (!isInterface) {
+                            function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, variables, inTellTarget, hasEval);
+                        }
                     }
                     break;
                 case VAR:
                     s = lex();
-                    expectedIdentifier(s, lexer.yyline());
-                    variables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position));
+                    if (expectedIdentifier(errors, s, lexer.yyline())) {
+                        variables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position));
+                    }
                     s = lex();
                     if (s.type == SymbolType.COLON) {
-                        type(false, variables);
+                        type(errors, false, variables);
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
-                        expression(false, false, false, true, variables, false, hasEval);
+                        expression(errors, false, false, false, true, variables, false, hasEval);
                         s = lex();
                     }
                     if (s.type != SymbolType.SEMICOLON) {
@@ -253,7 +263,7 @@ public class ActionScript2VariableParser {
         return true;
     }
 
-    private boolean expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expressionCommands(List<ActionVariableParseException> errors, ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
@@ -309,71 +319,71 @@ public class ActionScript2VariableParser {
 
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case FSCOMMAND:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.isType(SymbolType.COMMA)) {
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case FSCOMMAND2:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 while (s.isType(SymbolType.COMMA)) {
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                 }
-                expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
+                expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case SET:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 hasEval.setVal(true); //FlashPro does this (using definelocal for funcs) only for eval func, but we will also use set since it is generated by obfuscated identifiers
                 ret = true;
                 break;
             case TRACE:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
 
             case GETURL:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
-                expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
+                expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 if (s.type == SymbolType.COMMA) {
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         s = lex();
-                        expected(s, lexer.yyline(), SymbolType.STRING);
+                        expected(errors, s, lexer.yyline(), SymbolType.STRING);
                         if (s.value.equals("GET")) {
                             //empty
                         } else if (s.value.equals("POST")) {
                             //empty
                         } else {
-                            throw new ActionParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
+                            errors.add(new ActionVariableParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
                         }
                     } else {
                         lexer.pushback(s);
@@ -381,128 +391,128 @@ public class ActionScript2VariableParser {
                 } else {
                     lexer.pushback(s);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case GOTOANDSTOP:
             case GOTOANDPLAY:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.type == SymbolType.COMMA) { //Handle scene?
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case NEXTFRAME:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case PLAY:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case PREVFRAME:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case STOP:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case STOPALLSOUNDS:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case TOGGLEHIGHQUALITY:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
 
             case STOPDRAG:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
 
             case UNLOADMOVIE:
             case UNLOADMOVIENUM:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case PRINT:
             case PRINTASBITMAP:
             case PRINTASBITMAPNUM:
             case PRINTNUM:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case LOADVARIABLES:
             case LOADMOVIE:
             case LOADVARIABLESNUM:
             case LOADMOVIENUM:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
 
                 s = lex();
-                expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
+                expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 if (s.type == SymbolType.COMMA) {
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.STRING);
+                    expected(errors, s, lexer.yyline(), SymbolType.STRING);
                     if (s.value.equals("POST")) {
                         //empty
                     } else if (s.value.equals("GET")) {
                         //empty
                     } else {
-                        throw new ActionParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
+                        errors.add(new ActionVariableParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
                     }
                 } else {
                     lexer.pushback(s);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case REMOVEMOVIECLIP:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case STARTDRAG:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                        expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
-                            expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                             s = lex();
                             if (s.type == SymbolType.COMMA) {
-                                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                                 s = lex();
                                 if (s.type == SymbolType.COMMA) {
-                                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                                 } else {
                                     lexer.pushback(s);
                                 }
@@ -519,74 +529,74 @@ public class ActionScript2VariableParser {
                 } else {
                     lexer.pushback(s);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case CALL:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case GETVERSION:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBORD:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBCHR:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBLENGTH:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBSUBSTRING:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case SUBSTR:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.COMMA);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.COMMA);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case LENGTH:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case RANDOM:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case INT:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case NUMBER_OP:
@@ -598,9 +608,9 @@ public class ActionScript2VariableParser {
                     variables.add(vi);
                     ret = true;
                 } else {
-                    expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                    expectedType(SymbolType.PARENT_CLOSE);
+                    expected(errors, s, lexer.yyline(), SymbolType.PARENT_OPEN);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expectedType(errors, SymbolType.PARENT_CLOSE);
                     ret = true;
                 }
                 break;
@@ -613,33 +623,33 @@ public class ActionScript2VariableParser {
                     variables.add(vi2);
                     ret = true;
                 } else {
-                    expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                    expectedType(SymbolType.PARENT_CLOSE);
+                    expected(errors, s, lexer.yyline(), SymbolType.PARENT_OPEN);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expectedType(errors, SymbolType.PARENT_CLOSE);
                     ret = true;
                 }
                 break;
             case ORD:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case CHR:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case GETTIMER:
-                expectedType(SymbolType.PARENT_OPEN);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case TARGETPATH:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             default:
@@ -664,18 +674,20 @@ public class ActionScript2VariableParser {
                 SymbolType.NUMBER_OP, SymbolType.STRING_OP);
     }
 
-    private void expectedIdentifier(ParsedSymbol s, int line, Object... exceptions) throws IOException, ActionParseException {
+    private boolean expectedIdentifier(List<ActionVariableParseException> errors, ParsedSymbol s, int line, Object... exceptions) throws IOException {
         for (Object ex : exceptions) {
             if (s.isType(ex)) {
-                return;
+                return true;
             }
         }
         if (!isIdentifier(s)) {
-            throw new ActionParseException(SymbolType.IDENTIFIER + " expected but " + s.type + " found", line);
+            errors.add(new ActionVariableParseException(SymbolType.IDENTIFIER + " expected but " + s.type + " found", line, s.position));
+            return false;
         }
+        return true;
     }
 
-    private boolean command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean command(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         if (debugMode) {
@@ -692,7 +704,7 @@ public class ActionScript2VariableParser {
                 lexer.removeListener(buf);
                 buf.pushAllBack(lexer);
 
-                ret = expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
                     lexer.pushback(s);
@@ -705,116 +717,122 @@ public class ActionScript2VariableParser {
 
         switch (s.type) {
             case WITH:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                expectedType(SymbolType.CURLY_OPEN);
-                commands(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                expectedType(SymbolType.CURLY_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.CURLY_OPEN);
+                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case DELETE:
-                expression(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 ret = true;
                 break;
             case TELLTARGET:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                expectedType(SymbolType.CURLY_OPEN);
-                commands(inFunction, inMethod, forinlevel, true, variables, hasEval);
-                expectedType(SymbolType.CURLY_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.CURLY_OPEN);
+                commands(errors, inFunction, inMethod, forinlevel, true, variables, hasEval);
+                expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
 
             case IFFRAMELOADED:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                expectedType(SymbolType.CURLY_OPEN);
-                commands(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                expectedType(SymbolType.CURLY_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.CURLY_OPEN);
+                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case CLASS:
-                String className = type(true, variables);
-                s = lex();
-                if (s.type == SymbolType.EXTENDS) {
-                    type(false, variables);
+                String className = type(errors, true, variables);
+                if (className != null) {
                     s = lex();
-                }
-                if (s.type == SymbolType.IMPLEMENTS) {
-                    do {
-                        type(false, variables);
+                    if (s.type == SymbolType.EXTENDS) {
+                        type(errors, false, variables);
                         s = lex();
-                    } while (s.type == SymbolType.COMMA);
-                }
-                expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                List<VariableOrScope> subVariables = new ArrayList<>();
-                traits(false, className, subVariables, inTellTarget, hasEval);
-                ClassScope cs = new ClassScope(subVariables);
-                variables.add(cs);
+                    }
+                    if (s.type == SymbolType.IMPLEMENTS) {
+                        do {
+                            type(errors, false, variables);
+                            s = lex();
+                        } while (s.type == SymbolType.COMMA);
+                    }
+                    expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                    List<VariableOrScope> subVariables = new ArrayList<>();
+                    traits(errors, false, className, subVariables, inTellTarget, hasEval);
+                    ClassScope cs = new ClassScope(subVariables);
+                    variables.add(cs);
 
-                expectedType(SymbolType.CURLY_CLOSE);
-                ret = true;
+                    expectedType(errors, SymbolType.CURLY_CLOSE);
+                    ret = true;
+                }
                 break;
             case INTERFACE:
-                String interfaceName = type(true, variables);
-                s = lex();
+                String interfaceName = type(errors, true, variables);
+                if (interfaceName != null) {
+                    s = lex();
 
-                if (s.type == SymbolType.EXTENDS) {
-                    do {
-                        type(false, variables);
-                        s = lex();
-                    } while (s.type == SymbolType.COMMA);
+                    if (s.type == SymbolType.EXTENDS) {
+                        do {
+                            type(errors, false, variables);
+                            s = lex();
+                        } while (s.type == SymbolType.COMMA);
+                    }
+                    expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                    traits(errors, true, interfaceName, variables, inTellTarget, hasEval);
+                    expectedType(errors, SymbolType.CURLY_CLOSE);
+                    ret = true;
                 }
-                expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                traits(true, interfaceName, variables, inTellTarget, hasEval);
-                expectedType(SymbolType.CURLY_CLOSE);
-                ret = true;
                 break;
             case FUNCTION:
                 s = lexer.lex();
-                expectedIdentifier(s, lexer.yyline());
-                function(true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval);
+                if (expectedIdentifier(errors, s, lexer.yyline())) {                
+                    function(errors, true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval);
+                }
                 break;
             case VAR:
                 s = lex();
-                expectedIdentifier(s, lexer.yyline());
-                String varIdentifier = s.value.toString();
-                int varPosition = s.position;
-                s = lex();
-                if (s.type == SymbolType.COLON) {
-                    type(false, variables);
+                if (expectedIdentifier(errors, s, lexer.yyline())) {
+                    String varIdentifier = s.value.toString();
+                    int varPosition = s.position;
                     s = lex();
-                    //TODO: handle value type
-                }
+                    if (s.type == SymbolType.COLON) {
+                        type(errors, false, variables);
+                        s = lex();
+                        //TODO: handle value type
+                    }
 
-                if (s.type == SymbolType.ASSIGN) {
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                    Variable vret = new Variable(true, varIdentifier, varPosition);
-                    variables.add(vret);
-                } else {
-                    Variable vret = new Variable(true, varIdentifier, varPosition);
-                    variables.add(vret);
-                    lexer.pushback(s);
+                    if (s.type == SymbolType.ASSIGN) {
+                        expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                        Variable vret = new Variable(true, varIdentifier, varPosition);
+                        variables.add(vret);
+                    } else {
+                        Variable vret = new Variable(true, varIdentifier, varPosition);
+                        variables.add(vret);
+                        lexer.pushback(s);
+                    }
+                    ret = true;
                 }
-                ret = true;
                 break;
             case CURLY_OPEN:
-                commands(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                expectedType(SymbolType.CURLY_CLOSE);
+                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case INCREMENT: //preincrement
             case DECREMENT: //predecrement
-                expression(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 ret = true;
                 break;
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
-                    call(inFunction, inMethod, inTellTarget, variables, hasEval);
+                    call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
                     Variable supItem = new Variable(false, s.value.toString(), s.position);
                     variables.add(supItem);
                     ret = true;
@@ -824,35 +842,35 @@ public class ActionScript2VariableParser {
                 }
                 break;
             case IF:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 if (s.type == SymbolType.ELSE) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
                 ret = true;
                 break;
             case WHILE:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case DO:
-                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                expectedType(SymbolType.WHILE);
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.WHILE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case FOR:
-                expectedType(SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_OPEN);
                 s = lex();
                 boolean forin = false;
                 String objIdent;
@@ -875,7 +893,7 @@ public class ActionScript2VariableParser {
                             item = new Variable(define, objIdent, ssel.position);
                             variables.add(item);
 
-                            expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                             forin = true;
                         } else {
                             lexer.pushback(s3);
@@ -894,35 +912,35 @@ public class ActionScript2VariableParser {
                     lexer.pushback(s);
                 }
                 if (!forin) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                    expectedType(SymbolType.SEMICOLON);
-                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expectedType(errors, SymbolType.SEMICOLON);
+                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
-                command(inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                command(errors, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case SWITCH:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
-                expectedType(SymbolType.CURLY_OPEN);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.CURLY_OPEN);
                 s = lex();
                 while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                     //List<GraphTargetItem> caseExprs; = new ArrayList<>();
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                         if (s.type != SymbolType.DEFAULT) {
-                            expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                         }
-                        expectedType(SymbolType.COLON);
+                        expectedType(errors, SymbolType.COLON);
                         s = lex();
                     }
                     lexer.pushback(s);
-                    commands(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     s = lex();
                 }
-                expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
+                expected(errors, s, lexer.yyline(), SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case BREAK:
@@ -932,46 +950,47 @@ public class ActionScript2VariableParser {
                 ret = true;
                 break;
             case RETURN:
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 ret = true;
                 break;
             case TRY:
-                command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 boolean found = false;
                 while (s.type == SymbolType.CATCH) {
-                    expectedType(SymbolType.PARENT_OPEN);
+                    expectedType(errors, SymbolType.PARENT_OPEN);
                     ParsedSymbol si = lex();
-                    expectedIdentifier(si, lexer.yyline(), SymbolType.STRING);
-                    s = lex();
-                    if (s.type == SymbolType.COLON) {
-                        type(false, variables);
-                    } else {
-                        lexer.pushback(s);
+                    if (expectedIdentifier(errors, si, lexer.yyline(), SymbolType.STRING)) {
+                        s = lex();
+                        if (s.type == SymbolType.COLON) {
+                            type(errors, false, variables);
+                        } else {
+                            lexer.pushback(s);
+                        }
+                        expectedType(errors, SymbolType.PARENT_CLOSE);
+
+                        List<VariableOrScope> subvariables = new ArrayList<>();
+
+                        command(errors, inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
+
+                        variables.add(new CatchScope(new Variable(true, (String) si.value, si.position), subvariables));
                     }
-                    expectedType(SymbolType.PARENT_CLOSE);
-
-                    List<VariableOrScope> subvariables = new ArrayList<>();
-
-                    command(inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
-
-                    variables.add(new CatchScope(new Variable(true, (String) si.value, si.position), subvariables));
                     s = lex();
                     found = true;
                 }
                 if (s.type == SymbolType.FINALLY) {
-                    command(inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     found = true;
                     s = lex();
                 }
                 if (!found) {
-                    expected(s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
+                    expected(errors, s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
                 }
                 lexer.pushback(s);
                 ret = true;
                 break;
             case THROW:
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 ret = true;
                 break;
             case SEMICOLON: //empty command
@@ -985,12 +1004,12 @@ public class ActionScript2VariableParser {
                         ret = true;
                         break;
                     default:
-                        throw new ActionParseException("Unknown directive: #" + s.value, lexer.yyline());
+                        errors.add(new ActionVariableParseException("Unknown directive: #" + s.value, lexer.yyline(), s.position));
                 }
                 break;
             default:
                 lexer.pushback(s);
-                ret = expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
         }
         if (debugMode) {
             System.out.println("/command");
@@ -998,27 +1017,27 @@ public class ActionScript2VariableParser {
         lexer.removeListener(buf);
         if (!ret) {  //can be popped expression
             buf.pushAllBack(lexer);
-            ret = expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+            ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
         }
         s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
             lexer.pushback(s);
         }
-
+              
         return ret;
     }
 
-    private boolean expression(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expression(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         if (debugMode) {
             System.out.println("expression:");
         }
         ParsedSymbol symb;
         do {
-            boolean prim = expressionPrimary(inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            boolean prim = expressionPrimary(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (!prim) {
                 return false;
             }
-            expression1(prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
+            expression1(errors, prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
             symb = lex();
         } while (allowComma && symb != null && symb.type == SymbolType.COMMA);
         if (symb != null) {
@@ -1030,7 +1049,7 @@ public class ActionScript2VariableParser {
         return true;
     }
 
-    private ParsedSymbol peekLex() throws IOException, ActionParseException, InterruptedException {
+    private ParsedSymbol peekLex() throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol lookahead = lex();
         lexer.pushback(lookahead);
         return lookahead;
@@ -1063,7 +1082,7 @@ public class ActionScript2VariableParser {
         return s.type.getPrecedence();
     }
 
-    private boolean expression1(boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expression1(List<ActionVariableParseException> errors, boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol op;
         boolean rhs;
         ParsedSymbol lookahead = peekLex();
@@ -1082,14 +1101,14 @@ public class ActionScript2VariableParser {
                 if (debugMode) {
                     System.out.println("ternar-middle:");
                 }
-                expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
-                expectedType(SymbolType.COLON);
+                expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                expectedType(errors, SymbolType.COLON);
                 if (debugMode) {
                     System.out.println("/ternar-middle");
                 }
             }
 
-            rhs = expressionPrimary(inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            rhs = expressionPrimary(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (rhs == false) {
                 lexer.pushback(op);
                 break;
@@ -1098,7 +1117,7 @@ public class ActionScript2VariableParser {
             lookahead = peekLex();
             while ((isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) < /* > on wiki */ getSymbPrecedence(op))
                     || (lookahead.type.isRightAssociative() && getSymbPrecedence(lookahead) == getSymbPrecedence(op))) {
-                rhs = expression1(rhs, getSymbPrecedence(lookahead), inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
+                rhs = expression1(errors, rhs, getSymbPrecedence(lookahead), inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
                 lookahead = peekLex();
             }
 
@@ -1166,7 +1185,7 @@ public class ActionScript2VariableParser {
         return lhs;
     }
 
-    private int brackets(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private int brackets(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1177,10 +1196,10 @@ public class ActionScript2VariableParser {
                     lexer.pushback(s);
                 }
                 arrCnt++;
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
-                    expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
+                    expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
                 }
             }
         } else {
@@ -1190,9 +1209,9 @@ public class ActionScript2VariableParser {
         return arrCnt;
     }
 
-    private boolean handleVariable(ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean handleVariable(List<ActionVariableParseException> errors, ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         if (s.value.equals("not")) {
-            expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+            expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
             ret = true;
         } else {
             String varName = s.value.toString();
@@ -1205,7 +1224,7 @@ public class ActionScript2VariableParser {
                 ParsedSymbol s2 = lex();
                 if (s2.type == SymbolType.DOT) {
                     ParsedSymbol s3 = lex();
-                    if (s3.group == SymbolGroup.IDENTIFIER) {
+                    if (isIdentifier(s3)) {
                         Variable thisVar = new Variable(false, "this." + s3.value.toString(), s3.position);
                         variables.add(thisVar);
                     } else {
@@ -1237,7 +1256,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean expressionPrimary(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean expressionPrimary(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1247,26 +1266,26 @@ public class ActionScript2VariableParser {
 
         switch (s.type) {
             case PREPROCESSOR:
-                expectedType(SymbolType.PARENT_OPEN);
+                expectedType(errors, SymbolType.PARENT_OPEN);
                 switch ("" + s.value) {
                     //AS 1/2:
                     //AS2:
                     case "constant":
                         s = lexer.lex();
-                        expected(s, lexer.yyline(), SymbolType.INTEGER);
+                        expected(errors, s, lexer.yyline(), SymbolType.INTEGER);
                         ret = true;
                         break;
                     case "enumerate":
-                        expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     //Both ASs
                     case "dup":
-                        expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     case "push":
-                        expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     case "pop":
@@ -1274,23 +1293,24 @@ public class ActionScript2VariableParser {
                         break;
                     case "strict":
                         s = lexer.lex();
-                        expected(s, lexer.yyline(), SymbolType.INTEGER);
+                        expected(errors, s, lexer.yyline(), SymbolType.INTEGER);
                         ret = true;
                         break;
                     case "goto":
                         s = lexer.lex();
+                        expectedIdentifier(errors, s, lexer.yyline());
                         ret = true;
-                        //throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
+                        //errors.add(new ActionVariableParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline()));
                         break;
                     default:
-                        throw new ActionParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline());
+                        errors.add(new ActionVariableParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline(), s.position));
 
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 break;
             case NEGATE:
-                versionRequired(s, 5);
-                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                versionRequired(errors, s, 5);
+                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case MINUS:
@@ -1303,12 +1323,12 @@ public class ActionScript2VariableParser {
 
                 } else {
                     lexer.pushback(s);
-                    expressionPrimary(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                    expressionPrimary(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                     ret = true;
                 }
                 break;
             case TYPEOF:
-                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1335,12 +1355,12 @@ public class ActionScript2VariableParser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expectedIdentifier(s, lexer.yyline());
-                    expectedType(SymbolType.COLON);
-                    expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expectedIdentifier(errors, s, lexer.yyline());
+                    expectedType(errors, SymbolType.COLON);
+                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
-                        expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
+                        expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
                     }
                 }
                 ret = true;
@@ -1348,7 +1368,7 @@ public class ActionScript2VariableParser {
                 break;
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
-                brackets(inFunction, inMethod, inTellTarget, variables, hasEval);
+                brackets(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1362,7 +1382,7 @@ public class ActionScript2VariableParser {
                 } else {
                     lexer.pushback(s);
                 }
-                function(true, fname, fnamePos, false, variables, inTellTarget, hasEval);
+                function(errors, true, fname, fnamePos, false, variables, inTellTarget, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1380,24 +1400,24 @@ public class ActionScript2VariableParser {
                 allowMemberOrCall = true;
                 break;
             case DELETE:
-                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case NOT:
-                expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case PARENT_OPEN:
-                boolean pexpr = expression(inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                boolean pexpr = expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 if (!pexpr) {
-                    throw new ActionParseException("Expression expected", lexer.yyline());
+                    errors.add(new ActionVariableParseException("Expression expected", lexer.yyline(), s.position));
                 }
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 allowMemberOrCall = true;
                 ret = true;
                 break;
@@ -1410,22 +1430,22 @@ public class ActionScript2VariableParser {
                     } else {
                         lexer.pushback(s2);
                         lexer.pushback(s1);
-                        expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                        expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                     }
                 } else {
                     lexer.pushback(s1);
-                    expressionPrimary(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                    expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 }
-                expectedType(SymbolType.PARENT_OPEN);
-                call(inFunction, inMethod, inTellTarget, variables, hasEval);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
 
                 break;
             case EVAL:
-                expectedType(SymbolType.PARENT_OPEN);
-                expression(inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
-                expectedType(SymbolType.PARENT_CLOSE);
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expectedType(errors, SymbolType.PARENT_CLOSE);
                 hasEval.setVal(true);
                 allowMemberOrCall = true;
                 ret = true;
@@ -1434,7 +1454,7 @@ public class ActionScript2VariableParser {
             case THIS:
             case SUPER:
                 Reference<Boolean> allowMemberOrCallRef = new Reference<>(allowMemberOrCall);
-                ret = handleVariable(s, ret, variables, allowMemberOrCallRef, inFunction, inMethod, inTellTarget, hasEval);
+                ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef, inFunction, inMethod, inTellTarget, hasEval);
                 allowMemberOrCall = allowMemberOrCallRef.getVal();
                 break;
             default:
@@ -1444,14 +1464,14 @@ public class ActionScript2VariableParser {
                     ParsedSymbol s2 = peekLex();
                     if (s2.type != SymbolType.PARENT_OPEN) {
                         Reference<Boolean> allowMemberOrCallRef2 = new Reference<>(allowMemberOrCall);
-                        ret = handleVariable(s, ret, variables, allowMemberOrCallRef2, inFunction, inMethod, inTellTarget, hasEval);
+                        ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef2, inFunction, inMethod, inTellTarget, hasEval);
                         allowMemberOrCall = allowMemberOrCallRef2.getVal();
                         isGlobalFuncVar = true;
                     }
                 }
 
                 if (!isGlobalFuncVar) {
-                    boolean excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, variables, hasEval);
+                    boolean excmd = expressionCommands(errors, s, inFunction, inMethod, inTellTarget, variables, hasEval);
                     if (excmd) {
                         ret = excmd;
                         allowMemberOrCall = true;
@@ -1462,7 +1482,7 @@ public class ActionScript2VariableParser {
         }
 
         if (allowMemberOrCall && ret) {
-            ret = memberOrCall(ret, inFunction, inMethod, inTellTarget, variables, allowCall, hasEval);
+            ret = memberOrCall(errors, ret, inFunction, inMethod, inTellTarget, variables, allowCall, hasEval);
         }
         if (debugMode) {
             System.out.println("/primary");
@@ -1470,24 +1490,24 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean memberOrCall(boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private boolean memberOrCall(List<ActionVariableParseException> errors, boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
                 if (!allowCall) {
                     break;
                 }
-                call(inFunction, inMethod, inTellTarget, variables, hasEval);
+                call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
             }
             if (op.type == SymbolType.BRACKET_OPEN) {
-                expression(inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
-                expectedType(SymbolType.BRACKET_CLOSE);
+                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expectedType(errors, SymbolType.BRACKET_CLOSE);
                 ret = true;
             }
             if (op.type == SymbolType.DOT) {
                 ParsedSymbol s = lex();
-                expectedIdentifier(s, lexer.yyline(), SymbolType.THIS, SymbolType.SUPER);
+                expectedIdentifier(errors, s, lexer.yyline(), SymbolType.THIS, SymbolType.SUPER);
 
                 ret = true;
             }
@@ -1519,7 +1539,12 @@ public class ActionScript2VariableParser {
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
      */
-    public void parse(String str, Map<Integer, List<Integer>> definitionPosToReferences, Map<Integer, Integer> referenceToDefinition) throws ActionParseException, IOException, InterruptedException {
+    public void parse(
+            String str, 
+            Map<Integer, List<Integer>> definitionPosToReferences,
+            Map<Integer, Integer> referenceToDefinition,
+            List<ActionVariableParseException> errors
+    ) throws ActionParseException, IOException, InterruptedException {
         lexer = new ActionScriptLexer(new StringReader(str));
         if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
             lexer.setCaseSensitiveIdentifiers(true);
@@ -1529,7 +1554,7 @@ public class ActionScript2VariableParser {
         boolean inOnHandler = false;
 
         if (symb.type == SymbolType.IDENTIFIER && ("on".equals(symb.value) || "onClipEvent".equals(symb.value))) {
-            expectedType(SymbolType.PARENT_OPEN);
+            expectedType(errors, SymbolType.PARENT_OPEN);
             symb = lexer.lex();
             boolean condEmpty = true;
             while (symb.type == SymbolType.IDENTIFIER) {
@@ -1551,10 +1576,10 @@ public class ActionScript2VariableParser {
                         break;
                     case "keyPress":
                         symb = lexer.lex();
-                        expected(symb, lexer.yyline(), SymbolType.STRING);
+                        expected(errors, symb, lexer.yyline(), SymbolType.STRING);
                         Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
                         if (key == null) {
-                            throw new ActionParseException("Invalid key", lexer.yyline());
+                            errors.add(new ActionVariableParseException("Invalid key", lexer.yyline(), symb.position));
                         }
                         break;
                     case "keyUp":
@@ -1576,20 +1601,20 @@ public class ActionScript2VariableParser {
                     case "data":
                         break;
                     default:
-                        throw new ActionParseException("Unrecognized event type", lexer.yyline());
+                        errors.add(new ActionVariableParseException("Unrecognized event type", lexer.yyline(), symb.position));
                 }
                 symb = lexer.lex();
                 if (symb.type == SymbolType.PARENT_CLOSE) {
                     break;
                 }
-                expected(symb, lexer.yyline(), SymbolType.COMMA);
+                expected(errors, symb, lexer.yyline(), SymbolType.COMMA);
                 symb = lexer.lex();
             }
-            expected(symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
+            expected(errors, symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
             if (condEmpty) {
-                throw new ActionParseException("condition must be non empty", lexer.yyline());
+                errors.add(new ActionVariableParseException("condition must be non empty", lexer.yyline(), symb.position));
             }
-            expectedType(SymbolType.CURLY_OPEN);
+            expectedType(errors, SymbolType.CURLY_OPEN);
             inOnHandler = true;
         } else {
             lexer.pushback(symb);
@@ -1597,17 +1622,17 @@ public class ActionScript2VariableParser {
 
         List<VariableOrScope> vars = new ArrayList<>();
         Reference<Boolean> hasEval = new Reference<>(false);
-        commands(false, false, 0, false, vars, hasEval);
+        commands(errors, false, false, 0, false, vars, hasEval);
         Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
 
         parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
 
         if (inOnHandler) {
-            expectedType(SymbolType.CURLY_CLOSE);
+            expectedType(errors, SymbolType.CURLY_CLOSE);
         }
 
         if (lexer.lex().type != SymbolType.EOF) {
-            throw new ActionParseException("Parsing finished before end of the file", lexer.yyline());
+            errors.add(new ActionVariableParseException("Parsing finished before end of the file", lexer.yyline(), lexer.yychar()));
         }
     }
 
@@ -1674,19 +1699,19 @@ public class ActionScript2VariableParser {
         }
     }
 
-    private void versionRequired(ParsedSymbol s, int min) throws ActionParseException {
-        versionRequired(s.value.toString(), min, Integer.MAX_VALUE);
+    private void versionRequired(List<ActionVariableParseException> errors, ParsedSymbol s, int min) throws ActionParseException {
+        versionRequired(errors, s.value.toString(), min, Integer.MAX_VALUE, s.position);
     }
 
-    private void versionRequired(String type, int min, int max) throws ActionParseException {
+    private void versionRequired(List<ActionVariableParseException> errors, String type, int min, int max, long position) throws ActionParseException {
         if (min == max && swfVersion != min) {
-            throw new ActionParseException(type + " requires SWF version " + min, lexer.yyline());
+            errors.add(new ActionVariableParseException(type + " requires SWF version " + min, lexer.yyline(), position));
         }
         if (swfVersion < min) {
-            throw new ActionParseException(type + " requires at least SWF version " + min, lexer.yyline());
+            errors.add(new ActionVariableParseException(type + " requires at least SWF version " + min, lexer.yyline(), position));
         }
         if (swfVersion > max) {
-            throw new ActionParseException(type + " requires SWF version lower than " + max, lexer.yyline());
+            errors.add(new ActionVariableParseException(type + " requires SWF version lower than " + max, lexer.yyline(), position));
         }
     }
 }

@@ -19,18 +19,25 @@ package com.jpexs.decompiler.flash.gui.action;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.variables.ActionScript2VariableParser;
+import com.jpexs.decompiler.flash.action.parser.script.variables.ActionVariableParseException;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.editor.WavyUnderLinePainter;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
 import javax.swing.event.CaretEvent;
@@ -54,15 +61,25 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
 
     public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, KEYWORD, REGEX";
     public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
+    public static final String PROPERTY_ERRORCOLOR = "ActionVariableMarker.ErrorColor";
     public static final String PROPERTY_TOKENTYPES = "ActionVariableMarker.TokenTypes";
-    private static final Color DEFAULT_COLOR = new Color(0xf8e7d6);
+    private static final Color DEFAULT_COLOR = new Color(0xffeedd);
+    private static final Color DEFAULT_ERRORCOLOR = new Color(0xffaaaa);
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
     private Markers.SimpleMarker marker;
+    private Markers.SimpleMarker errorMarker;
     private Status status;
+    private Map<Integer, String> errors = new LinkedHashMap<>();
+    private boolean errorsShown = false;
+
+    public static final long ERROR_DELAY = 2000;
+    private Timer errorsTimer;
 
     private Map<Integer, List<Integer>> definitionPosToReferences = new LinkedHashMap<>();
     private Map<Integer, Integer> referenceToDefinition = new LinkedHashMap<>();
+
+    private MouseMotionAdapter mouseMotionAdapter;
 
     /**
      * Constructs a new Token highlighter
@@ -78,6 +95,12 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     public void markTokenAt(int pos) {
         SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
         if (doc != null) {
+            Token everyToken = getNearestTokenAt(doc, pos);
+            if (everyToken != null) {
+                if (errors.containsKey(everyToken.start)) {
+                    //System.err.println(errors.get(everyToken.start));
+                }
+            }
             Token token = getIdentifierTokenAt(doc, pos);
             removeMarkers();
             if (token != null && tokenTypes.contains(token.type)) {
@@ -91,6 +114,11 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
      */
     public void removeMarkers() {
         Markers.removeMarkers(pane, marker);
+    }
+
+    public void removeErrorMarkers() {
+        Markers.removeMarkers(pane, errorMarker);
+        errorsShown = false;
     }
 
     private Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
@@ -113,6 +141,42 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             return token;
         }
         return null;
+    }
+
+    private Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
+        Token thisToken = sDoc.getTokenAt(pos);
+        if (thisToken != null) {
+            return thisToken;
+        }
+
+        Token token = sDoc.getTokenAt(pos - 1);
+        if (token != null
+                && (token.start + token.length == pos)) {
+            return token;
+        }
+
+        token = sDoc.getTokenAt(pos + 1);
+        if (token != null
+                && (token.start == pos)) {
+            return token;
+        }
+        return null;
+    }
+
+    void addErrorMarkers() {
+        SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
+        if (doc == null) {
+            return;
+        }
+        doc.readLock();
+        for (int position : errors.keySet()) {
+            Token token = getNearestTokenAt(doc, position);
+            if (token != null) {
+                Markers.markToken(pane, token, errorMarker);
+            }
+        }
+        doc.readUnlock();
+        errorsShown = true;
     }
 
     /**
@@ -144,9 +208,10 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
 
     @Override
     public void config(Configuration config) {
-        Color markerColor = config.getColor(
-                PROPERTY_COLOR, DEFAULT_COLOR);
+        Color markerColor = config.getColor(PROPERTY_COLOR, DEFAULT_COLOR);
+        Color errorColor = config.getColor(PROPERTY_ERRORCOLOR, DEFAULT_ERRORCOLOR);
         this.marker = new Markers.SimpleMarker(markerColor);
+        this.errorMarker = new WavyUnderLinePainter(Color.red); //Markers.SimpleMarker(errorColor);
         String types = config.getString(
                 PROPERTY_TOKENTYPES, DEFAULT_TOKENTYPES);
 
@@ -173,16 +238,43 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         }
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
+        mouseMotionAdapter = new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                editorMouseMoved(e);
+            }
+        };
+        editor.addMouseMotionListener(mouseMotionAdapter);
         status = Status.INSTALLING;
+    }
+
+    private void editorMouseMoved(MouseEvent e) {
+        if (pane instanceof LineMarkedEditorPane) {
+            Token token = ((LineMarkedEditorPane) pane).getTokenUnderCursor();
+            if (token != null) {
+                String err = errors.get(token.start);
+                pane.setToolTipText(err);
+            } else {
+                pane.setToolTipText(null);
+            }
+        }
     }
 
     @Override
     public void deinstall(JEditorPane editor) {
         status = Status.DEINSTALLING;
         removeMarkers();
+        removeErrorMarkers();
+        Timer tim = errorsTimer;
+        if (tim != null) {
+            tim.cancel();
+            errorsTimer = null;
+        }
         pane.removePropertyChangeListener(this);
         pane.getDocument().removeDocumentListener(this);
         pane.removeCaretListener(this);
+        pane.removeMouseMotionListener(mouseMotionAdapter);
+        mouseMotionAdapter = null;
         if (editor instanceof LineMarkedEditorPane) {
             ((LineMarkedEditorPane) editor).setLinkHandler(null);
         }
@@ -205,6 +297,8 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     }
 
     private void documentUpdated() {
+        errors.clear();
+        removeErrorMarkers();
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 
@@ -222,15 +316,37 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
             Map<Integer, List<Integer>> newDefinitionPosToReferences = new LinkedHashMap<>();
             Map<Integer, Integer> newReferenceToDefinition = new LinkedHashMap<>();
             ActionScript2VariableParser varParser = new ActionScript2VariableParser(swf);
-            varParser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition);
+            List<ActionVariableParseException> newErrors = new ArrayList<>();
+            varParser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors);
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
-            markTokenAt(pane.getCaretPosition());
-        } catch (BadLocationException | ActionParseException | IOException | InterruptedException ex) {
+            for (ActionVariableParseException ex : newErrors) {
+                errors.put((int) ex.position, ex.getMessage());
+            }
+        } catch (BadLocationException | IOException | InterruptedException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
             //ex.printStackTrace();
+        } catch (ActionParseException ex) {
+            definitionPosToReferences.clear();
+            referenceToDefinition.clear();
+            errors.put((int) ex.position, ex.getMessage());
         }
+        Timer tim = errorsTimer;
+        if (tim != null) {
+            tim.cancel();
+            errorsTimer = null;
+        }
+        tim = new Timer();
+        tim.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeErrorMarkers();
+                addErrorMarkers();
+            }
+        }, ERROR_DELAY);
+        errorsTimer = tim;
+        markTokenAt(pane.getCaretPosition());
     }
 
     @Override
