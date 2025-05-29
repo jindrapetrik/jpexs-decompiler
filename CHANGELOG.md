@@ -18,10 +18,10 @@ All notable changes to this project will be documented in this file.
 - "Show detail" context menu item for items in folder preview
 - [#1682] AS2 - Adding class by context menu on packages
 - Simple editor - detection of english color name (based on CSS names)
-- AS1/2 - highlight variable definition and all its instances on cursor place
+- AS1/2/3 - highlight variable definition and all its instances on cursor place
   (also in edit mode)
-- AS1/2 - underline errors in the code (also in edit mode) 
-- AS1/2 - highlight variables and errors on scrollbar
+- AS1/2/3 - underline errors in the code (also in edit mode) 
+- AS1/2/3 - highlight variables and errors on scrollbar
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

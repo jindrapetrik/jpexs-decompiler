@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3SimpleParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -140,6 +142,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
@@ -249,6 +252,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
         }
         this.abc = abc;
+        decompiledTextArea.setParser(new ActionScript3SimpleParser(abc));
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
         updateLinksLabel();
@@ -993,8 +997,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 popupMenu.add(simplifyExpressionsMenuItem);
                 //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
 
-                return popupMenu;            
-            }          
+                return popupMenu;
+            }
         };
         deobfuscateOptionsButton.setToolTipText(AppStrings.translate("button.deobfuscate_options"));
         deobfuscateOptionsButton.setMargin(new Insets(0, 0, 0, 0));
@@ -1021,7 +1025,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         JPanel libraryAndLinkPanel = new JPanel(new FlowLayout());
 
         JToggleButton linkButton = new JToggleButton(View.getIcon("link16"));
-        
+
         LinkDialog linkDialog = new LinkDialog(mainPanel, linkButton);
 
         libraryComboBox = new JComboBox<>();
@@ -1047,8 +1051,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         libraryAndLinkPanel.add(linksLabel);
 
-        linkButton.setToolTipText(AppStrings.translate("button.abc.linkedSwfs.hint"));       
-        
+        linkButton.setToolTipText(AppStrings.translate("button.abc.linkedSwfs.hint"));
+
         linkDialog.addSaveListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1153,6 +1157,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
         decompiledTextArea.changeContentType("text/actionscript3");
+        DefaultSyntaxKit kit = (DefaultSyntaxKit) decompiledTextArea.getEditorKit();
+        kit.installComponent(decompiledTextArea, VariableMarker.class.getName());
         decompiledTextArea.setFont(Configuration.getSourceFont());
 
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
@@ -1757,7 +1763,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 TreeItem sel = mainPanel.getCurrentTree().getCurrentTreeItem();
                 if ((sel instanceof ScriptPack) && (sel != pack)) {
                     mainPanel.replaceItemPin(pack, sel);
-                }               
+                }
             }
             reload();
             mainPanel.clearEditingStatus();
@@ -1819,7 +1825,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         } else {
             toggleButton.setSelected(Configuration.autoDeobfuscate.get());
         }
-    }   
+    }
 
     private void simplifyExpressionsMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
@@ -2110,13 +2116,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         flexLabel.setVisible(useFlex && !value);
         editDecompiledButton.setEnabled(!value);
     }
-    
+
     public void setScript(ScriptPack scriptPack) {
         setDecompiledEditMode(false);
-        detailPanel.setEditMode(false);        
+        detailPanel.setEditMode(false);
         detailPanel.methodTraitPanel.methodCodePanel.clear();
-        decompiledTextArea.setNoTrait();        
+        decompiledTextArea.setNoTrait();
         setAbc(scriptPack.abc);
-        decompiledTextArea.setScript(scriptPack, true);                
+        decompiledTextArea.setScript(scriptPack, true);
     }
 }

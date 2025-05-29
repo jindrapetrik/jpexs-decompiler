@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.parser.script.variables;
+package com.jpexs.decompiler.flash.simpleparser;
 
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- * Exception for action parsing errors
+ * Exception for Simple parsing errors
  *
  * @author JPEXS
  */
-public class ActionVariableParseException extends ParseException {
+public class SimpleParseException extends ParseException {
 
     /**
      * Constructs a new parse exception.
      * @param text Text of the exception
      * @param line Line number where the exception occurred
      */
-    public ActionVariableParseException(String text, long line) {
+    public SimpleParseException(String text, long line) {
         super(text, line);
     }
     
@@ -40,7 +40,7 @@ public class ActionVariableParseException extends ParseException {
      * @param line Line number where the exception occurred
      * @param position Position where the exception occured
      */
-    public ActionVariableParseException(String text, long line, long position) {
+    public SimpleParseException(String text, long line, long position) {
         super(text, line, position);
     }
 }

@@ -34,4 +34,15 @@ public class AVM2ParseException extends ParseException {
     public AVM2ParseException(String text, long line) {
         super(text, line);
     }
+    
+    /**
+     * Constructor.
+     *
+     * @param text Text
+     * @param line Line
+     * @param position Position
+     */
+    public AVM2ParseException(String text, long line, long position) {
+        super(text, line, position);
+    }
 }

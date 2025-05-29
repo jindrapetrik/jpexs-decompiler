@@ -60,8 +60,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -101,8 +99,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
-    }   
-    
+    }
+
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
     }
@@ -882,18 +880,17 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public void setScript(ScriptPack scriptLeaf, boolean force) {
         View.checkAccess();
-        
+
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
             setSourceWorker = null;
         }
-        
+
         synchronized (this) {
             scriptLoaded = false;
         }
-        
 
-        if (!force && this.script == scriptLeaf) {                            
+        if (!force && this.script == scriptLeaf) {
             synchronized (this) {
                 scriptLoaded = true;
             }
@@ -1004,8 +1001,6 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 abcPanel.brokenHintPanel.setVisible(false);
             }
             setText(hilightedCode);
-            
-            
 
             if (highlightedText.getClassHighlights().size() > 0) {
                 try {
@@ -1018,7 +1013,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
         }
 
-        scriptLoaded = true;                
+        scriptLoaded = true;
 
         fireScript();
     }
@@ -1079,9 +1074,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
         setCaretPosition(position);
     }
-    
+
     @Override
     public synchronized void setCaretPosition(int position) {
         super.setCaretPosition(position);
-    }        
+    }
 }

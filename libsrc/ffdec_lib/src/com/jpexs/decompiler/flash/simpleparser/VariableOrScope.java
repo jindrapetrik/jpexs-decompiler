@@ -14,30 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.parser.script.variables;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.jpexs.decompiler.flash.simpleparser;
 
 /**
  *
  * @author JPEXS
  */
-public class FunctionScope implements Scope {
+public interface VariableOrScope {
 
-    private final List<VariableOrScope> privateItems;
-
-    public FunctionScope(List<VariableOrScope> functionBody) {
-        this.privateItems = functionBody;
-    }
-
-    @Override
-    public List<VariableOrScope> getSharedItems() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<VariableOrScope> getPrivateItems() {
-        return privateItems;
-    }
 }

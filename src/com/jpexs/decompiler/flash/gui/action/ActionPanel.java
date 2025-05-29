@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
+import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3SimpleParser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -29,6 +31,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2SimpleParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
@@ -637,7 +640,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         editor.setShowMarkers(true);
         decompiledEditor.setShowMarkers(Configuration.decompile.get());
-        decompiledEditor.setSwf(asm.getSwf());
+        decompiledEditor.setParser(new ActionScript2SimpleParser(asm.getSwf()));
         lastASM = asm;
         lastCode = actions;
         lastDecompiled = decompiledText;
@@ -1033,7 +1036,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         decompiledEditor.setFont(Configuration.getSourceFont());
         decompiledEditor.changeContentType("text/actionscript");
         DefaultSyntaxKit kit = (DefaultSyntaxKit) decompiledEditor.getEditorKit();
-        kit.installComponent(decompiledEditor, ActionVariableMarker.class.getName());
+        kit.installComponent(decompiledEditor, VariableMarker.class.getName());
 
         editor.addCaretListener(new CaretListener() {
             @Override

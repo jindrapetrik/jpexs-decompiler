@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -80,7 +81,9 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private LinkHandler linkHandler = this;
     
     private Point lastCursorPos = new Point(0, 0);
-
+    
+    private SimpleParser parser;
+    
     public static class LineMarker implements Comparable<LineMarker> {
 
         private final Color bgColor;
@@ -147,6 +150,15 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 
+    public SimpleParser getParser() {
+        return parser;
+    }
+    
+    public void setParser(SimpleParser parser) {
+        this.parser = parser;
+    }
+   
+    
     private Map<Integer, SortedSet<LineMarker>> lineMarkers = Collections.synchronizedMap(new HashMap<Integer, SortedSet<LineMarker>>());
 
     public void setLineMarkers(Map<Integer, SortedSet<LineMarker>> colorMarkers) {

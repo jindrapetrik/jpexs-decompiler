@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.parser.script.variables;
+package com.jpexs.decompiler.flash.simpleparser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +23,12 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ClassScope implements Scope {
+public class FunctionScope implements Scope {
 
     private final List<VariableOrScope> privateItems;
 
-    public ClassScope(List<VariableOrScope> traits) {
-        this.privateItems = traits;
+    public FunctionScope(List<VariableOrScope> functionBody) {
+        this.privateItems = functionBody;
     }
 
     @Override

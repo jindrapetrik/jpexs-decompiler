@@ -14,21 +14,26 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.parser.script.variables;
+package com.jpexs.decompiler.flash.action.parser.script;
 
+import com.jpexs.decompiler.flash.simpleparser.Variable;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
+import com.jpexs.decompiler.flash.simpleparser.Type;
+import com.jpexs.decompiler.flash.simpleparser.Scope;
+import com.jpexs.decompiler.flash.simpleparser.CatchScope;
+import com.jpexs.decompiler.flash.simpleparser.ClassScope;
+import com.jpexs.decompiler.flash.simpleparser.VariableOrScope;
+import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
-import com.jpexs.decompiler.flash.action.parser.script.LexBufferer;
-import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
-import com.jpexs.decompiler.flash.action.parser.script.SymbolGroup;
-import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -40,25 +45,25 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class ActionScript2VariableParser {
+public class ActionScript2SimpleParser implements SimpleParser {
 
     /**
      * Swf version
      */
     private final int swfVersion;
-
+    
     /**
      * Constructor
      *
      * @param swf Swf
      */
-    public ActionScript2VariableParser(SWF swf) {
+    public ActionScript2SimpleParser(SWF swf) {
         this.swfVersion = swf.version;
     }
 
     private final boolean debugMode = false;
 
-    private void commands(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private void commands(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("commands:");
         }
@@ -70,7 +75,7 @@ public class ActionScript2VariableParser {
         }
     }
 
-    private String type(List<ActionVariableParseException> errors, boolean definition, List<VariableOrScope> variables) throws IOException, InterruptedException, ActionParseException {
+    private String type(List<SimpleParseException> errors, boolean definition, List<VariableOrScope> variables) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol s = lex();
         if (!expectedIdentifier(errors, s, lexer.yyline())) {
             return null;
@@ -96,7 +101,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean expected(List<ActionVariableParseException> errors, ParsedSymbol symb, int line, Object... expected) throws IOException {
+    private boolean expected(List<SimpleParseException> errors, ParsedSymbol symb, int line, Object... expected) throws IOException {
         boolean found = false;
         for (Object t : expected) {
             if (symb.type == t) {
@@ -116,13 +121,13 @@ public class ActionScript2VariableParser {
                 expStr += e;
                 first = false;
             }
-            errors.add(new ActionVariableParseException("" + expStr + " expected but " + symb.type + " found", line, symb.position));
+            errors.add(new SimpleParseException("" + expStr + " expected but " + symb.type + " found", line, symb.position));
             return false;
         }
         return true;
     }
 
-    private ParsedSymbol expectedType(List<ActionVariableParseException> errors, Object... type) throws IOException, InterruptedException, ActionParseException {
+    private ParsedSymbol expectedType(List<SimpleParseException> errors, Object... type) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol symb = lex();
         if (!expected(errors, symb, lexer.yyline(), type)) {
             return null;
@@ -130,7 +135,7 @@ public class ActionScript2VariableParser {
         return symb;
     }
 
-    private ParsedSymbol lex() throws IOException, InterruptedException, ActionParseException {
+    private ParsedSymbol lex() throws IOException, InterruptedException, SimpleParseException, ActionParseException, ActionParseException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
@@ -141,7 +146,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private List<GraphTargetItem> call(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         while (s.type != SymbolType.PARENT_CLOSE) {
@@ -155,7 +160,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private void function(List<ActionVariableParseException> errors, boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private void function(List<SimpleParseException> errors, boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol s;
         expectedType(errors, SymbolType.PARENT_OPEN);
         s = lex();
@@ -205,7 +210,7 @@ public class ActionScript2VariableParser {
         variables.add(new FunctionScope(subvariables));
     }
 
-    private boolean traits(List<ActionVariableParseException> errors, boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean traits(List<SimpleParseException> errors, boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
 
         ParsedSymbol s;
 
@@ -263,7 +268,7 @@ public class ActionScript2VariableParser {
         return true;
     }
 
-    private boolean expressionCommands(List<ActionVariableParseException> errors, ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean expressionCommands(List<SimpleParseException> errors, ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
@@ -383,7 +388,7 @@ public class ActionScript2VariableParser {
                         } else if (s.value.equals("POST")) {
                             //empty
                         } else {
-                            errors.add(new ActionVariableParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
+                            errors.add(new SimpleParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
                         }
                     } else {
                         lexer.pushback(s);
@@ -481,7 +486,7 @@ public class ActionScript2VariableParser {
                     } else if (s.value.equals("GET")) {
                         //empty
                     } else {
-                        errors.add(new ActionVariableParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
+                        errors.add(new SimpleParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline(), s.position));
                     }
                 } else {
                     lexer.pushback(s);
@@ -674,20 +679,20 @@ public class ActionScript2VariableParser {
                 SymbolType.NUMBER_OP, SymbolType.STRING_OP);
     }
 
-    private boolean expectedIdentifier(List<ActionVariableParseException> errors, ParsedSymbol s, int line, Object... exceptions) throws IOException {
+    private boolean expectedIdentifier(List<SimpleParseException> errors, ParsedSymbol s, int line, Object... exceptions) throws IOException {
         for (Object ex : exceptions) {
             if (s.isType(ex)) {
                 return true;
             }
         }
         if (!isIdentifier(s)) {
-            errors.add(new ActionVariableParseException(SymbolType.IDENTIFIER + " expected but " + s.type + " found", line, s.position));
+            errors.add(new SimpleParseException(SymbolType.IDENTIFIER + " expected but " + s.type + " found", line, s.position));
             return false;
         }
         return true;
     }
 
-    private boolean command(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean command(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         if (debugMode) {
@@ -791,7 +796,7 @@ public class ActionScript2VariableParser {
                 break;
             case FUNCTION:
                 s = lexer.lex();
-                if (expectedIdentifier(errors, s, lexer.yyline())) {                
+                if (expectedIdentifier(errors, s, lexer.yyline())) {
                     function(errors, true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval);
                 }
                 break;
@@ -1004,7 +1009,7 @@ public class ActionScript2VariableParser {
                         ret = true;
                         break;
                     default:
-                        errors.add(new ActionVariableParseException("Unknown directive: #" + s.value, lexer.yyline(), s.position));
+                        errors.add(new SimpleParseException("Unknown directive: #" + s.value, lexer.yyline(), s.position));
                 }
                 break;
             default:
@@ -1023,11 +1028,11 @@ public class ActionScript2VariableParser {
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
             lexer.pushback(s);
         }
-              
+
         return ret;
     }
 
-    private boolean expression(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean expression(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("expression:");
         }
@@ -1049,7 +1054,7 @@ public class ActionScript2VariableParser {
         return true;
     }
 
-    private ParsedSymbol peekLex() throws IOException, InterruptedException, ActionParseException {
+    private ParsedSymbol peekLex() throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol lookahead = lex();
         lexer.pushback(lookahead);
         return lookahead;
@@ -1082,7 +1087,7 @@ public class ActionScript2VariableParser {
         return s.type.getPrecedence();
     }
 
-    private boolean expression1(List<ActionVariableParseException> errors, boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean expression1(List<SimpleParseException> errors, boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol op;
         boolean rhs;
         ParsedSymbol lookahead = peekLex();
@@ -1185,7 +1190,7 @@ public class ActionScript2VariableParser {
         return lhs;
     }
 
-    private int brackets(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private int brackets(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1209,7 +1214,7 @@ public class ActionScript2VariableParser {
         return arrCnt;
     }
 
-    private boolean handleVariable(List<ActionVariableParseException> errors, ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean handleVariable(List<SimpleParseException> errors, ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (s.value.equals("not")) {
             expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
             ret = true;
@@ -1256,7 +1261,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean expressionPrimary(List<ActionVariableParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean expressionPrimary(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1303,7 +1308,7 @@ public class ActionScript2VariableParser {
                         //errors.add(new ActionVariableParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline()));
                         break;
                     default:
-                        errors.add(new ActionVariableParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline(), s.position));
+                        errors.add(new SimpleParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline(), s.position));
 
                 }
                 expectedType(errors, SymbolType.PARENT_CLOSE);
@@ -1415,7 +1420,7 @@ public class ActionScript2VariableParser {
             case PARENT_OPEN:
                 boolean pexpr = expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 if (!pexpr) {
-                    errors.add(new ActionVariableParseException("Expression expected", lexer.yyline(), s.position));
+                    errors.add(new SimpleParseException("Expression expected", lexer.yyline(), s.position));
                 }
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 allowMemberOrCall = true;
@@ -1490,7 +1495,7 @@ public class ActionScript2VariableParser {
         return ret;
     }
 
-    private boolean memberOrCall(List<ActionVariableParseException> errors, boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, ActionParseException {
+    private boolean memberOrCall(List<SimpleParseException> errors, boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
@@ -1531,108 +1536,106 @@ public class ActionScript2VariableParser {
 
     private ActionScriptLexer lexer = null;
 
-    /**
-     * Convert a string to a high-level model.
-     *
-     * @param str The string to convert
-     * @throws ActionParseException On parse error
-     * @throws IOException On I/O error
-     * @throws InterruptedException On interrupt
-     */
+    
+    @Override
     public void parse(
-            String str, 
+            String str,
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
-            List<ActionVariableParseException> errors
-    ) throws ActionParseException, IOException, InterruptedException {
-        lexer = new ActionScriptLexer(new StringReader(str));
-        if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
-            lexer.setCaseSensitiveIdentifiers(true);
-        }
-
-        ParsedSymbol symb = lexer.lex();
-        boolean inOnHandler = false;
-
-        if (symb.type == SymbolType.IDENTIFIER && ("on".equals(symb.value) || "onClipEvent".equals(symb.value))) {
-            expectedType(errors, SymbolType.PARENT_OPEN);
-            symb = lexer.lex();
-            boolean condEmpty = true;
-            while (symb.type == SymbolType.IDENTIFIER) {
-                condEmpty = false;
-                switch ((String) symb.value) {
-                    case "press":
-                        break;
-                    case "release":
-                        break;
-                    case "releaseOutside":
-                        break;
-                    case "rollOver":
-                        break;
-                    case "rollOut":
-                        break;
-                    case "dragOut":
-                        break;
-                    case "dragOver":
-                        break;
-                    case "keyPress":
-                        symb = lexer.lex();
-                        expected(errors, symb, lexer.yyline(), SymbolType.STRING);
-                        Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
-                        if (key == null) {
-                            errors.add(new ActionVariableParseException("Invalid key", lexer.yyline(), symb.position));
-                        }
-                        break;
-                    case "keyUp":
-                        break;
-                    case "keyDown":
-                        break;
-                    case "mouseUp":
-                        break;
-                    case "mouseDown":
-                        break;
-                    case "mouseMove":
-                        break;
-                    case "unload":
-                        break;
-                    case "enterFrame":
-                        break;
-                    case "load":
-                        break;
-                    case "data":
-                        break;
-                    default:
-                        errors.add(new ActionVariableParseException("Unrecognized event type", lexer.yyline(), symb.position));
-                }
-                symb = lexer.lex();
-                if (symb.type == SymbolType.PARENT_CLOSE) {
-                    break;
-                }
-                expected(errors, symb, lexer.yyline(), SymbolType.COMMA);
-                symb = lexer.lex();
+            List<SimpleParseException> errors
+    ) throws SimpleParseException, IOException, InterruptedException {
+        try {
+            lexer = new ActionScriptLexer(new StringReader(str));
+            if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
+                lexer.setCaseSensitiveIdentifiers(true);
             }
-            expected(errors, symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
-            if (condEmpty) {
-                errors.add(new ActionVariableParseException("condition must be non empty", lexer.yyline(), symb.position));
+
+            ParsedSymbol symb = lexer.lex();
+            boolean inOnHandler = false;
+
+            if (symb.type == SymbolType.IDENTIFIER && ("on".equals(symb.value) || "onClipEvent".equals(symb.value))) {
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                symb = lexer.lex();
+                boolean condEmpty = true;
+                while (symb.type == SymbolType.IDENTIFIER) {
+                    condEmpty = false;
+                    switch ((String) symb.value) {
+                        case "press":
+                            break;
+                        case "release":
+                            break;
+                        case "releaseOutside":
+                            break;
+                        case "rollOver":
+                            break;
+                        case "rollOut":
+                            break;
+                        case "dragOut":
+                            break;
+                        case "dragOver":
+                            break;
+                        case "keyPress":
+                            symb = lexer.lex();
+                            expected(errors, symb, lexer.yyline(), SymbolType.STRING);
+                            Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
+                            if (key == null) {
+                                errors.add(new SimpleParseException("Invalid key", lexer.yyline(), symb.position));
+                            }
+                            break;
+                        case "keyUp":
+                            break;
+                        case "keyDown":
+                            break;
+                        case "mouseUp":
+                            break;
+                        case "mouseDown":
+                            break;
+                        case "mouseMove":
+                            break;
+                        case "unload":
+                            break;
+                        case "enterFrame":
+                            break;
+                        case "load":
+                            break;
+                        case "data":
+                            break;
+                        default:
+                            errors.add(new SimpleParseException("Unrecognized event type", lexer.yyline(), symb.position));
+                    }
+                    symb = lexer.lex();
+                    if (symb.type == SymbolType.PARENT_CLOSE) {
+                        break;
+                    }
+                    expected(errors, symb, lexer.yyline(), SymbolType.COMMA);
+                    symb = lexer.lex();
+                }
+                expected(errors, symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
+                if (condEmpty) {
+                    errors.add(new SimpleParseException("condition must be non empty", lexer.yyline(), symb.position));
+                }
+                expectedType(errors, SymbolType.CURLY_OPEN);
+                inOnHandler = true;
+            } else {
+                lexer.pushback(symb);
             }
-            expectedType(errors, SymbolType.CURLY_OPEN);
-            inOnHandler = true;
-        } else {
-            lexer.pushback(symb);
-        }
 
-        List<VariableOrScope> vars = new ArrayList<>();
-        Reference<Boolean> hasEval = new Reference<>(false);
-        commands(errors, false, false, 0, false, vars, hasEval);
-        Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
+            List<VariableOrScope> vars = new ArrayList<>();
+            Reference<Boolean> hasEval = new Reference<>(false);
+            commands(errors, false, false, 0, false, vars, hasEval);
+            Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
 
-        parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
+            parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
 
-        if (inOnHandler) {
-            expectedType(errors, SymbolType.CURLY_CLOSE);
-        }
+            if (inOnHandler) {
+                expectedType(errors, SymbolType.CURLY_CLOSE);
+            }
 
-        if (lexer.lex().type != SymbolType.EOF) {
-            errors.add(new ActionVariableParseException("Parsing finished before end of the file", lexer.yyline(), lexer.yychar()));
+            if (lexer.lex().type != SymbolType.EOF) {
+                errors.add(new SimpleParseException("Parsing finished before end of the file", lexer.yyline(), lexer.yychar()));
+            }
+        } catch (ActionParseException ex) {
+            errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
     }
 
@@ -1699,19 +1702,19 @@ public class ActionScript2VariableParser {
         }
     }
 
-    private void versionRequired(List<ActionVariableParseException> errors, ParsedSymbol s, int min) throws ActionParseException {
+    private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {
         versionRequired(errors, s.value.toString(), min, Integer.MAX_VALUE, s.position);
     }
 
-    private void versionRequired(List<ActionVariableParseException> errors, String type, int min, int max, long position) throws ActionParseException {
+    private void versionRequired(List<SimpleParseException> errors, String type, int min, int max, long position) throws SimpleParseException {
         if (min == max && swfVersion != min) {
-            errors.add(new ActionVariableParseException(type + " requires SWF version " + min, lexer.yyline(), position));
+            errors.add(new SimpleParseException(type + " requires SWF version " + min, lexer.yyline(), position));
         }
         if (swfVersion < min) {
-            errors.add(new ActionVariableParseException(type + " requires at least SWF version " + min, lexer.yyline(), position));
+            errors.add(new SimpleParseException(type + " requires at least SWF version " + min, lexer.yyline(), position));
         }
         if (swfVersion > max) {
-            errors.add(new ActionVariableParseException(type + " requires SWF version lower than " + max, lexer.yyline(), position));
+            errors.add(new SimpleParseException(type + " requires SWF version lower than " + max, lexer.yyline(), position));
         }
     }
 }

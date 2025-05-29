@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.parser.script.variables;
+package com.jpexs.decompiler.flash.simpleparser;
 
 /**
  *

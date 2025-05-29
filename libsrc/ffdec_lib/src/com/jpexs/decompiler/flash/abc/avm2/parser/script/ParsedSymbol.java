@@ -37,13 +37,20 @@ public class ParsedSymbol {
      * Type
      */
     public SymbolType type;
+    
+    /**
+     * Position in source text
+     */
+    public int position;
 
     /**
      * Constructor.
+     * @param position Position
      * @param group Group
      * @param type Type
      */
-    public ParsedSymbol(SymbolGroup group, SymbolType type) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = null;
@@ -51,11 +58,13 @@ public class ParsedSymbol {
 
     /**
      * Constructor.
+     * @param position Position
      * @param group Group
      * @param type Type
      * @param value Value
      */
-    public ParsedSymbol(SymbolGroup group, SymbolType type, Object value) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type, Object value) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = value;

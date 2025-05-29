@@ -80,7 +80,6 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
     private boolean showMarkers = true;
     
-    private WeakReference<SWF> swfRef = new WeakReference(null);
 
     public DebuggableEditorPane() {
 
@@ -90,14 +89,6 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             BG_BREAKPOINT_COLOR = new Color(0x88, 0x00, 0x00);
             BREAKPOINT_MARKER = new LineMarker(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
         }
-    }
-
-    public void setSwf(SWF swf) {
-        this.swfRef = new WeakReference<>(swf);
-    }
-    
-    public SWF getSwf() {
-        return swfRef.get();
     }
     
     public synchronized void setScriptName(String scriptName, String breakPointScriptName) {

@@ -14,18 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.action;
+package com.jpexs.decompiler.flash.gui.editor;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.variables.ActionScript2VariableParser;
-import com.jpexs.decompiler.flash.action.parser.script.variables.ActionVariableParseException;
-import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
-import com.jpexs.decompiler.flash.gui.editor.ScrollbarOverlay;
-import com.jpexs.decompiler.flash.gui.editor.TrackRectSubstanceScrollbarUI;
-import com.jpexs.decompiler.flash.gui.editor.WavyUnderLinePainter;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -41,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
 import javax.swing.JLayer;
@@ -69,9 +60,9 @@ import jsyntaxpane.util.Configuration;
 import org.pushingpixels.substance.internal.ui.SubstanceScrollBarUI;
 
 /**
- * This class highlights Variable tokens of ActionScript 1/2
+ * This class highlights Variable and error tokens.
  */
-public class ActionVariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener, LinkHandler {
+public class VariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener, LinkHandler {
 
     public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, KEYWORD, REGEX";
     public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
@@ -88,8 +79,6 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     private Markers.SimpleMarker errorMarker;
     private Status status;
     private Map<Integer, String> errors = new LinkedHashMap<>();
-    private boolean errorsShown = false;
-
     public static final long ERROR_DELAY = 2000;
     private Timer errorsTimer;
 
@@ -109,7 +98,7 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
     /**
      * Constructs a new Token highlighter
      */
-    public ActionVariableMarker() {
+    public VariableMarker() {
     }
 
     @Override
@@ -145,7 +134,6 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
 
     public void removeErrorMarkers() {
         Markers.removeMarkers(pane, errorMarker);
-        errorsShown = false;
         scrollbarOverlay.removeMarkers(SCROLLBAR_ERROR_COLOR);
     }
 
@@ -206,7 +194,6 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         }
         layer.repaint();
         doc.readUnlock();
-        errorsShown = true;
     }
 
     /**
@@ -348,7 +335,7 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
         scrollPane.getVerticalScrollBar().setUI(originalScrollBarUI);
     }
 
-    private static final Logger LOG = Logger.getLogger(ActionVariableMarker.class.getName());
+    private static final Logger LOG = Logger.getLogger(VariableMarker.class.getName());
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -373,30 +360,28 @@ public class ActionVariableMarker implements SyntaxComponent, CaretListener, Pro
 
             String fullText = sDoc.getText(0, sDoc.getLength());
 
-            SWF swf = null;
-            if (pane instanceof DebuggableEditorPane) {
-                DebuggableEditorPane dpane = (DebuggableEditorPane) pane;
-                swf = dpane.getSwf();
+            if (!(pane instanceof LineMarkedEditorPane)) {
+                return;
             }
-            if (swf == null) {
+            SimpleParser parser = ((LineMarkedEditorPane) pane).getParser();
+            if (parser == null) {
                 return;
             }
 
             Map<Integer, List<Integer>> newDefinitionPosToReferences = new LinkedHashMap<>();
             Map<Integer, Integer> newReferenceToDefinition = new LinkedHashMap<>();
-            ActionScript2VariableParser varParser = new ActionScript2VariableParser(swf);
-            List<ActionVariableParseException> newErrors = new ArrayList<>();
-            varParser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors);
+            List<SimpleParseException> newErrors = new ArrayList<>();
+            parser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors);
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
-            for (ActionVariableParseException ex : newErrors) {
+            for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }
         } catch (BadLocationException | IOException | InterruptedException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
             //ex.printStackTrace();
-        } catch (ActionParseException ex) {
+        } catch (SimpleParseException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
             errors.put((int) ex.position, ex.getMessage());
