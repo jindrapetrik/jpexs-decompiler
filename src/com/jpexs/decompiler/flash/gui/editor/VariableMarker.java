@@ -75,7 +75,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private static final Color SCROLLBAR_ERROR_COLOR = new Color(0xff0000);
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
-    private Markers.SimpleMarker marker;
+    private OccurencesMarker marker;
     private Markers.SimpleMarker errorMarker;
     private Status status;
     private Map<Integer, String> errors = new LinkedHashMap<>();
@@ -87,9 +87,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private MouseMotionAdapter mouseMotionAdapter;
 
-    private JLayer<JScrollBar> layer;
-
-    private ScrollbarOverlay scrollbarOverlay;
+    private HighlightsPanel highlightsPanel;
 
     private ScrollPaneUI originalScrollPaneUI;
 
@@ -120,7 +118,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             if (token != null && tokenTypes.contains(token.type)) {
                 addMarkers(token);
             }
-            layer.repaint();
+            highlightsPanel.repaint();
         }
     }
 
@@ -129,12 +127,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
      */
     public void removeMarkers() {
         Markers.removeMarkers(pane, marker);
-        scrollbarOverlay.removeMarkers(SCROLLBAR_VARIABLE_COLOR);
     }
 
     public void removeErrorMarkers() {
         Markers.removeMarkers(pane, errorMarker);
-        scrollbarOverlay.removeMarkers(SCROLLBAR_ERROR_COLOR);
     }
 
     private Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
@@ -188,6 +184,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     }
 
     void addErrorMarkers() {
+        highlightsPanel.setErrors(errors);
+        
         SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
         if (doc == null) {
             return;
@@ -197,10 +195,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Token token = getNearestTokenAt(doc, position);
             if (token != null) {
                 Markers.markToken(pane, token, errorMarker);
-                markPositionOnScrollbar(position, SCROLLBAR_ERROR_COLOR);
             }
         }
-        layer.repaint();
+        highlightsPanel.repaint();
         doc.readUnlock();
     }
 
@@ -220,12 +217,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
                 Markers.markToken(pane, definitionToken, marker);
-                markPositionOnScrollbar(definitionToken.start, SCROLLBAR_VARIABLE_COLOR);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
                         Markers.markToken(pane, referenceToken, marker);
-                        markPositionOnScrollbar(referenceToken.start, SCROLLBAR_VARIABLE_COLOR);
                     }
                 }
             }
@@ -233,19 +228,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         sDoc.readUnlock();
     }
 
-    private void markPositionOnScrollbar(int position, Color color) {
-        try {
-            scrollbarOverlay.addMarker(ActionUtils.getLineNumber(pane, position), color);
-        } catch (BadLocationException ex) {
-            //ignore
-        }
-    }
-
     @Override
     public void config(Configuration config) {
         Color markerColor = config.getColor(PROPERTY_COLOR, DEFAULT_COLOR);
         Color errorColor = config.getColor(PROPERTY_ERRORCOLOR, DEFAULT_ERRORCOLOR);
-        this.marker = new Markers.SimpleMarker(markerColor);
+        this.marker = new OccurencesMarker(markerColor);
         this.errorMarker = new WavyUnderLinePainter(errorColor); //Markers.SimpleMarker(errorColor);
         String types = config.getString(
                 PROPERTY_TOKENTYPES, DEFAULT_TOKENTYPES);
@@ -290,13 +277,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             verticalScrollBar.setUI(new TrackRectSubstanceScrollbarUI(verticalScrollBar));
         }
 
-        scrollbarOverlay = new ScrollbarOverlay((LineMarkedEditorPane) pane);
-
-        layer = new JLayer<>(verticalScrollBar, scrollbarOverlay);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-
+        highlightsPanel = new HighlightsPanel((LineMarkedEditorPane) pane);
+        //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
-        panel.add(layer, BorderLayout.EAST);
+        panel.add(highlightsPanel, BorderLayout.EAST);
 
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
@@ -335,8 +319,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
         JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
         JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
-        panel.remove(layer);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        panel.remove(highlightsPanel);
+        //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         panel.revalidate();
         panel.repaint();
         scrollPane.setUI(originalScrollPaneUI);
@@ -362,7 +346,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private void documentUpdated() {
         errors.clear();
         removeErrorMarkers();
-        layer.repaint();
+        highlightsPanel.repaint();
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 
@@ -392,8 +376,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         } catch (SimpleParseException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
-            errors.put((int) ex.position, ex.getMessage());
-            ex.printStackTrace();
+            errors.put((int) ex.position, ex.getMessage());            
         }
         Timer tim = errorsTimer;
         if (tim != null) {

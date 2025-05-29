@@ -153,7 +153,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             }
             expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
             s = lex();
-            expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
+            if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
+                break;
+            }
         }
         return ret;
     }
@@ -181,7 +183,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             }
 
             if (!s.isType(SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
-                expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
+                if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
+                    break;
+                }                        
             }
         }
         List<VariableOrScope> subvariables = new ArrayList<>();
@@ -1619,17 +1623,16 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 inOnHandler = true;
             } else {
                 lexer.pushback(symb);
-            }
+            }            
+            Reference<Boolean> hasEval = new Reference<>(false);
+            commands(errors, false, false, 0, false, vars, hasEval);
+            
             if (inOnHandler) {
                 expectedType(errors, SymbolType.CURLY_CLOSE);
-            }
+            }            
             if (lexer.lex().type != SymbolType.EOF) {
                 errors.add(new SimpleParseException("Parsing finished before end of the file", lexer.yyline(), lexer.yychar()));
             }
-
-            Reference<Boolean> hasEval = new Reference<>(false);
-            commands(errors, false, false, 0, false, vars, hasEval);
-
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }

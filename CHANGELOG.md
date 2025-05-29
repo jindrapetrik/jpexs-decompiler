@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2/3 - highlight variable definition and all its instances on cursor place
   (also in edit mode)
 - AS1/2/3 - underline errors in the code (also in edit mode) 
-- AS1/2/3 - highlight variables and errors on scrollbar
+- AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

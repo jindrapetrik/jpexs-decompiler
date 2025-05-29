@@ -45,7 +45,7 @@ public abstract class ParseException extends Exception {
      * @param line Line number where the exception occurred
      */
     public ParseException(String text, long line) {
-        super("ParseException:" + text + " on line " + line);
+        super(text + " on line " + line);
         this.line = line;
         this.text = text;
         this.position = -1;
@@ -58,7 +58,7 @@ public abstract class ParseException extends Exception {
      * @param line Line number where the exception occurred
      */
     public ParseException(String text, long line, long position) {
-        super("ParseException:" + text + " on line " + line);
+        super(text + " on line " + line);
         this.line = line;
         this.text = text;
         this.position = position;
