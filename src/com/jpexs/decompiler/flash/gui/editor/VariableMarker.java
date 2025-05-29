@@ -162,6 +162,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
         Token thisToken = sDoc.getTokenAt(pos);
         if (thisToken != null) {
+            
+            if (thisToken.length == 1) {
+                Token nextToken = sDoc.getTokenAt(pos + 1);
+                if (nextToken != null && nextToken.start == pos && nextToken.length > 1) {
+                    return nextToken;
+                }
+            }
+            
             return thisToken;
         }
 
@@ -385,6 +393,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
             errors.put((int) ex.position, ex.getMessage());
+            ex.printStackTrace();
         }
         Timer tim = errorsTimer;
         if (tim != null) {

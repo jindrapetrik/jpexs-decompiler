@@ -16,24 +16,22 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script;
 
-import com.jpexs.decompiler.flash.simpleparser.Variable;
-import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
-import com.jpexs.decompiler.flash.simpleparser.Type;
-import com.jpexs.decompiler.flash.simpleparser.Scope;
-import com.jpexs.decompiler.flash.simpleparser.CatchScope;
-import com.jpexs.decompiler.flash.simpleparser.ClassScope;
-import com.jpexs.decompiler.flash.simpleparser.VariableOrScope;
-import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.simpleparser.CatchScope;
+import com.jpexs.decompiler.flash.simpleparser.ClassScope;
+import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
+import com.jpexs.decompiler.flash.simpleparser.Type;
+import com.jpexs.decompiler.flash.simpleparser.Variable;
+import com.jpexs.decompiler.flash.simpleparser.VariableOrScope;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,7 +49,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
      * Swf version
      */
     private final int swfVersion;
-    
+
     /**
      * Constructor
      *
@@ -1536,7 +1534,6 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
     private ActionScriptLexer lexer = null;
 
-    
     @Override
     public void parse(
             String str,
@@ -1544,6 +1541,10 @@ public class ActionScript2SimpleParser implements SimpleParser {
             Map<Integer, Integer> referenceToDefinition,
             List<SimpleParseException> errors
     ) throws SimpleParseException, IOException, InterruptedException {
+
+        List<VariableOrScope> vars = new ArrayList<>();
+        Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
+
         try {
             lexer = new ActionScriptLexer(new StringReader(str));
             if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
@@ -1619,87 +1620,20 @@ public class ActionScript2SimpleParser implements SimpleParser {
             } else {
                 lexer.pushback(symb);
             }
-
-            List<VariableOrScope> vars = new ArrayList<>();
-            Reference<Boolean> hasEval = new Reference<>(false);
-            commands(errors, false, false, 0, false, vars, hasEval);
-            Map<String, Integer> varNameToDefinitionPosition = new LinkedHashMap<>();
-
-            parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
-
             if (inOnHandler) {
                 expectedType(errors, SymbolType.CURLY_CLOSE);
             }
-
             if (lexer.lex().type != SymbolType.EOF) {
                 errors.add(new SimpleParseException("Parsing finished before end of the file", lexer.yyline(), lexer.yychar()));
             }
+
+            Reference<Boolean> hasEval = new Reference<>(false);
+            commands(errors, false, false, 0, false, vars, hasEval);
+
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-    }
-
-    private void parseVariablesList(
-            List<VariableOrScope> privateVariables,
-            List<VariableOrScope> sharedVariables,
-            Map<Integer, List<Integer>> definitionPosToReferences,
-            Map<Integer, Integer> referenceToDefinition,
-            Map<String, Integer> parentVarNameToDefinitionPosition
-    ) {
-        Map<String, Integer> privateVarNameToDefinitionPosition = new LinkedHashMap<>();
-        privateVarNameToDefinitionPosition.putAll(parentVarNameToDefinitionPosition);
-
-        for (VariableOrScope vt : privateVariables) {
-            if (vt instanceof Variable) {
-                Variable v = (Variable) vt;
-                if (v.definition) {
-                    privateVarNameToDefinitionPosition.put(v.name, v.position);
-                    definitionPosToReferences.put(v.position, new ArrayList<>());
-                } else {
-                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
-                        definitionPosToReferences.get(-v.position - 1).add(v.position);
-                        referenceToDefinition.put(v.position, -v.position - 1);
-                    } else {
-                        int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
-                        definitionPosToReferences.get(definitionPos).add(v.position);
-                        referenceToDefinition.put(v.position, definitionPos);
-                    }
-                }
-            }
-            if (vt instanceof Scope) {
-                Scope vs = (Scope) vt;
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarNameToDefinitionPosition);
-            }
-        }
-        for (VariableOrScope vt : sharedVariables) {
-            if (vt instanceof Variable) {
-                Variable v = (Variable) vt;
-                if (v.definition) {
-                    parentVarNameToDefinitionPosition.put(v.name, v.position);
-                    privateVarNameToDefinitionPosition.put(v.name, v.position);
-                    definitionPosToReferences.put(v.position, new ArrayList<>());
-                } else {
-                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
-                        definitionPosToReferences.get(-v.position - 1).add(v.position);
-                        referenceToDefinition.put(v.position, -v.position - 1);
-                    } else {
-                        int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
-                        definitionPosToReferences.get(definitionPos).add(v.position);
-                        referenceToDefinition.put(v.position, definitionPos);
-                    }
-                }
-            }
-            if (vt instanceof Scope) {
-                Scope vs = (Scope) vt;
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarNameToDefinitionPosition);
-            }
-        }
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, varNameToDefinitionPosition);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {
