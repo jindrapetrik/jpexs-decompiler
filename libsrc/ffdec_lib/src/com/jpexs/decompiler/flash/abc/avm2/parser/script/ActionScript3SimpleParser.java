@@ -43,7 +43,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle;
 
 /**
  * ActionScript 3 parser.
@@ -512,7 +511,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
     }
 
     private void classTraits(List<SimpleParseException> errors, boolean outsidePackage, Reference<Boolean> cinitNeedsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, DottedChain pkg, String classNameStr, boolean isInterface, Reference<Boolean> iinitNeedsActivation, ABC abc, List<VariableOrScope> classVariables) throws AVM2ParseException, SimpleParseException, IOException, CompilationException, InterruptedException {
-
+        
         Stack<Loop> cinitLoops = new Stack<>();
         Map<Loop, String> cinitLoopLabels = new HashMap<>();
     
@@ -921,8 +920,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (s.type == SymbolType.INTERFACE) {
                         isInterface = true;
                     }
-                    String subNameStr;
-
+                    String subNameStr;                   
+                            
                     s = lex();
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
@@ -964,7 +963,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     Reference<Boolean> cinitNeedsActivation = new Reference<>(false);
                     Reference<Boolean> iinitNeedsActivation = new Reference<>(false);
                     List<VariableOrScope> classVariables = new ArrayList<>();
-
+                    classVariables.add(new Variable(true, "this", s.position));
+                    
                     classTraits(errors, !inPackage, cinitNeedsActivation, importedClasses, subOpenedNamespaces, pkgName, subNameStr, isInterface, iinitNeedsActivation, abc, classVariables);
 
                     sinitVariables.add(new ClassScope(classVariables));

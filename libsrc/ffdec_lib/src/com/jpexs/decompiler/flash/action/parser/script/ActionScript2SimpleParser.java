@@ -774,6 +774,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         } while (s.type == SymbolType.COMMA);
                     }
                     expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                    variables.add(new Variable(true, "this", s.position));
                     List<VariableOrScope> subVariables = new ArrayList<>();
                     traits(errors, false, className, subVariables, inTellTarget, hasEval);
                     ClassScope cs = new ClassScope(subVariables);
