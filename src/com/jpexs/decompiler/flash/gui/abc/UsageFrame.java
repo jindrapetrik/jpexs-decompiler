@@ -156,7 +156,8 @@ public class UsageFrame extends AppDialog implements MouseListener {
             };
 
             Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(false);
-            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == newAbc) {
+            if (decompiledTextArea.getScriptIndex() == icu.getScriptIndex() &&
+                    (decompiledTextArea.getClassIndex() == icu.getClassIndex() || icu.getClassIndex() == -1) && abcPanel.abc == newAbc) {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);

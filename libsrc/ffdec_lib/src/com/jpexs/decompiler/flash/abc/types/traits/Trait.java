@@ -628,10 +628,10 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.append("§§namespace(\"");
                 writer.append(Helper.escapeActionScriptString(m.getSimpleNamespaceName(abc.constants).toRawString()));
                 writer.append("\") ");
-            } else if (nsname != null) {
+            } else if (dc != null && nsname != null) {
                 String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
                 if (identifier != null && !identifier.isEmpty()) {
-                    writer.appendNoHilight(identifier).appendNoHilight(" ");
+                    writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, dc.toRawString()).appendNoHilight(" ");
                 }
             } else if (nskind != 0) {
 

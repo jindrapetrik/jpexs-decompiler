@@ -1034,6 +1034,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     public int getClassIndex() {
         return classIndex;
     }
+    
+    public int getScriptIndex() {
+        ScriptPack pack = getScriptLeaf();
+        if (pack == null) {
+            return -1;
+        }
+        return pack.scriptIndex;
+    }
 
     private ABC getABC() {
         return script == null ? null : script.abc;

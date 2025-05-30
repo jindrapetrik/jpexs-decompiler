@@ -68,7 +68,7 @@ import org.pushingpixels.substance.internal.ui.SubstanceScrollBarUI;
 /**
  * This class highlights Variable and error tokens.
  */
-public class VariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener, LinkHandler {
+public class VariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener {
 
     public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, KEYWORD, REGEX";
     public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
@@ -107,8 +107,18 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private UnderlinePainter underLinePainter = new UnderlinePainter(new Color(0, 0, 255), null);
     private UnderlinePainter underLineMarkOccurencesPainter = new UnderlinePainter(new Color(0, 0, 255), DEFAULT_COLOR);
+    private UnderlinePainter underLineExternalPainter = new UnderlinePainter(new Color(0, 255, 0), null);
+    private UnderlinePainter underLineExternalMarkOccurencesPainter = new UnderlinePainter(new Color(0, 255, 0), DEFAULT_COLOR);
 
     private Token lastUnderlined;
+    private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;
+    
+    
+    public static enum LinkType {
+        NO_LINK,
+        LINK_THIS_SCRIPT,
+        LINK_OTHER_SCRIPT;
+    }
 
     /**
      * Constructs a new Token highlighter
@@ -146,6 +156,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         Markers.removeMarkers(pane, marker);
         Markers.removeMarkers(pane, underLinePainter);
         Markers.removeMarkers(pane, underLineMarkOccurencesPainter);
+        Markers.removeMarkers(pane, underLineExternalPainter);
+        Markers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
         occurencesPositions.clear();
     }
 
@@ -236,12 +248,29 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos < 0 ? -(definitionPos + 1) : definitionPos);
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
-                Markers.markToken(pane, definitionToken, lastUnderlined == definitionToken ? underLineMarkOccurencesPainter : marker);
+                
+                Markers.SimpleMarker markerKind = marker;
+                if (lastUnderlined == definitionToken) {
+                    if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                        markerKind = underLineExternalMarkOccurencesPainter;
+                    } else {
+                        markerKind = underLineMarkOccurencesPainter;
+                    }
+                }
+                Markers.markToken(pane, definitionToken, markerKind);
                 occurencesPositions.add(definitionToken.start);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
-                        Markers.markToken(pane, referenceToken, lastUnderlined == referenceToken ? underLineMarkOccurencesPainter : marker);
+                        markerKind = marker;
+                        if (lastUnderlined == referenceToken) {
+                            if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                                markerKind = underLineExternalMarkOccurencesPainter;
+                            } else {
+                                markerKind = underLineMarkOccurencesPainter;
+                            }
+                        }
+                        Markers.markToken(pane, referenceToken, markerKind);
                         occurencesPositions.add(referenceToken.start);
                     }
                 }
@@ -367,30 +396,40 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
                         MyMarkers.removeMarkers(pane, underLinePainter);
                         MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
-
-                        if (t != null && isLink(t)) {
+                        MyMarkers.removeMarkers(pane, underLineExternalPainter);
+                        MyMarkers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
+                        
+                        lastUnderlinedLinkType = t == null ? LinkType.NO_LINK : getLinkType(t);
+                        if (t != null && lastUnderlinedLinkType != LinkType.NO_LINK) {
                             lastUnderlined = t;
                             pane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                         } else {
                             lastUnderlined = null;
-
                             removeMarkers();
                             markTokenAt(pane.getCaretPosition());
                         }
                     } else {
                         lastUnderlined = null;
+                        lastUnderlinedLinkType = LinkType.NO_LINK;
                     }
                 }
 
                 if (lastUnderlined != null) {
                     Highlighter.HighlightPainter painter = underLinePainter;
                     if (occurencesPositions.contains(lastUnderlined.start)) {
-                        painter = underLineMarkOccurencesPainter;
+                        if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                            painter = underLineExternalMarkOccurencesPainter;
+                        } else {
+                            painter = underLineMarkOccurencesPainter;
+                        }
                         removeMarkers();
                         markTokenAt(pane.getCaretPosition());
                     } else {
-                        MyMarkers.markToken(pane, lastUnderlined, painter);
+                        if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                            painter = underLineExternalPainter;
+                        } 
+                        MyMarkers.markToken(pane, lastUnderlined, painter);                        
                     }
                 } else {
                     pane.setCursor(Cursor.getDefaultCursor());
@@ -400,6 +439,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     lastUnderlined = null;
                     MyMarkers.removeMarkers(pane, underLinePainter);
                     MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+                    MyMarkers.removeMarkers(pane, underLineExternalPainter);
+                    MyMarkers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
+                    
+                    
                     removeMarkers();
                     markTokenAt(pane.getCaretPosition());
                 }
@@ -411,7 +454,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         public void mouseClicked(MouseEvent e) {
             if (ctrlDown) {
                 Token t = ((LineMarkedEditorPane) pane).tokenAtPos(lastCursorPos);
-                if (t != null && isLink(t)) {
+                if (t != null && getLinkType(t) != LinkType.NO_LINK) {
                     e.consume();
                     handleLink(t);
                 }
@@ -554,19 +597,23 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         documentUpdated();
     }
 
-    @Override
-    public boolean isLink(Token token) {
-        boolean linkBasic = referenceToDefinition.containsKey(token.start) && referenceToDefinition.get(token.start) >= 0;
-        if (linkBasic) {
-            return true;
+    private LinkType getLinkType(Token token) {
+        if (definitionPosToReferences.containsKey(token.start)) {
+            return LinkType.NO_LINK;
+        }
+        boolean linkThisScript = referenceToDefinition.containsKey(token.start) && referenceToDefinition.get(token.start) >= 0;
+        if (linkThisScript) {
+            return LinkType.LINK_THIS_SCRIPT;
         }
         if (pane.isEditable()) {
-            return false;
+            return LinkType.NO_LINK;
         }
-        return ((LineMarkedEditorPane) pane).getLinkHandler().isLink(token);
+        if (((LineMarkedEditorPane) pane).getLinkHandler().isLink(token)) {
+            return LinkType.LINK_OTHER_SCRIPT;
+        }
+        return LinkType.NO_LINK;
     }
 
-    @Override
     public void handleLink(Token token) {
         Integer definition = referenceToDefinition.get(token.start);
         if (definition != null && definition >= 0) {
@@ -580,8 +627,4 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
     }
 
-    @Override
-    public Highlighter.HighlightPainter linkPainter() {
-        return ((LineMarkedEditorPane) pane).linkPainter();
-    }
 }

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -682,7 +683,51 @@ public class Multiname {
                 if (nsname != null && !"AS3".equals(nsname)) {
                     String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
-                        return nsname + "::" + name;
+                        return identifier + "::" + name;
+                    }
+                }
+            }
+
+            if (nskind == Namespace.KIND_PACKAGE && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+                DottedChain dc = getNameWithNamespace(abc.constants, withSuffix);
+                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
+            }
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(true, name)) + (withSuffix ? getNamespaceSuffix() : "");
+        }
+    }
+    
+    /**
+     * Gets the name with custom namespace.
+     *
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @param dontDeobfuscate Don't deobfuscate flag
+     * @param withSuffix With suffix flag
+     * @param customNamespaceRef Custom namespace
+     * @return Name with custom namespace
+     */
+    public String getNameAndCustomNamespace(ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix, Reference<DottedChain> customNamespaceRef) {
+        if (kind == TYPENAME) {
+            return typeNameToStr(abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
+        }
+        if (name_index == -1) {
+            return "";
+        }
+        if (name_index == 0) {
+            return isAttribute() ? "@*" : "*";
+        } else {
+            String name = abc.constants.getString(name_index);
+
+            int nskind = getSimpleNamespaceKind(abc.constants);
+            if (nskind == Namespace.KIND_NAMESPACE || nskind == Namespace.KIND_PACKAGE_INTERNAL) {
+                DottedChain dc = abc.findCustomNsOfMultiname(this);
+                String nsname = dc != null ? dc.getLast() : null;
+
+                if (nsname != null && !"AS3".equals(nsname)) {
+                    String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                    if (identifier != null && !identifier.isEmpty()) {
+                        customNamespaceRef.setVal(dc);
+                        return name;
                     }
                 }
             }

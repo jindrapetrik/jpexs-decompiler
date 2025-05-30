@@ -16,17 +16,20 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +210,17 @@ public class FullMultinameAVM2Item extends AVM2Item {
                 if ("*".equals(simpleName)) {
                     writer.append("*");
                 } else {
-                    writer.append(constants.getMultiname(multinameIndex).getNameWithCustomNamespace(localData.abc, fullyQualifiedNames, false, true));
+                    Reference<DottedChain> customNsRef = new Reference<>(null);
+                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+                    DottedChain customNs = customNsRef.getVal();
+                    if (customNs != null) {
+                        String nsname = customNs.getLast();
+                        String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+                        writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
+                        writer.appendNoHilight("::");
+                    }
+        
+                    writer.append(localName);
                 }
             } else {
                 writer.append("§§multiname(").append(multinameIndex).append(")");

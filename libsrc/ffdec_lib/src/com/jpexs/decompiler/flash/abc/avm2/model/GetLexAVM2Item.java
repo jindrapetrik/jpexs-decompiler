@@ -16,13 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Reference;
 import java.util.Objects;
 
 /**
@@ -86,9 +89,21 @@ public class GetLexAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        String localName = propertyName.getNameWithCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true);
+        Reference<DottedChain> customNsRef = new Reference<>(null);
+        String localName = propertyName.getNameAndCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+        DottedChain customNs = customNsRef.getVal();
+        if (customNs != null) {
+            String nsname = customNs.getLast();
+            String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+            writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
+            writer.appendNoHilight("::");
+            getSrcData().localName = nsname + "::" + localName;            
+            return writer.append(localName);
+        }
+        
+        
         getSrcData().localName = localName;
-        return writer.append(propertyName.getNameWithCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true));
+        return writer.append(localName);
     }
 
     @Override
