@@ -21,19 +21,11 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.KeyEventPostProcessor;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,8 +67,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private boolean error = false;
 
     private Token lastUnderlined = null;
-
-    private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
 
     private LinkHandler linkHandler = this;
     
@@ -338,29 +328,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 }
 
             }
-        });
-        final LinkAdapter la = new LinkAdapter();
-        addMouseMotionListener(la);
-        addMouseListener(la);
-
-        //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addKeyEventPostProcessor(new KeyEventPostProcessor() {
-                    @Override
-                    public boolean postProcessKeyEvent(KeyEvent e) {
-                        if (e.getID() == KeyEvent.KEY_PRESSED) {
-                            la.keyPressed(e);
-                        }
-                        if (e.getID() == KeyEvent.KEY_RELEASED) {
-                            la.keyReleased(e);
-                        }
-                        if (e.getID() == KeyEvent.KEY_TYPED) {
-                            la.keyTyped(e);
-                        }
-                        return false;
-                    }
-                });
-
+        });                
     }
 
     public Token tokenAtPos(Point lastPos) {
@@ -399,85 +367,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     public Token getTokenUnderCursor() {
         return tokenAtPos(lastCursorPos);
     }
-
-    private class LinkAdapter extends MouseAdapter implements KeyListener {
-        
-        private boolean ctrlDown = false;
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                ctrlDown = true;
-                update();
-            }
-        }
-
-        @Override
-        public void keyTyped(KeyEvent e) {
-
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                ctrlDown = false;
-                update();
-            }
-        }
-
-        private void update() {
-            if (ctrlDown) {
-                Token t = tokenAtPos(lastCursorPos);
-
-                if (t != lastUnderlined) {
-                    if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
-                        MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
-
-                        if (t != null && linkHandler.isLink(t)) {
-                            lastUnderlined = t;
-                            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-                        } else {
-                            lastUnderlined = null;
-                        }
-                    } else {
-                        lastUnderlined = null;
-                    }
-                }
-
-                if (lastUnderlined != null) {
-                    MyMarkers.markToken(LineMarkedEditorPane.this, lastUnderlined, underLinePainter);
-                } else {
-                    setCursor(Cursor.getDefaultCursor());
-                }
-                repaint();
-            } else {
-                lastUnderlined = null;
-                MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
-                setCursor(Cursor.getDefaultCursor());
-                repaint();
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (ctrlDown) {
-                Token t = tokenAtPos(lastCursorPos);
-                if (t != null && linkHandler.isLink(t)) {
-                    linkHandler.handleLink(t);
-                }
-            }
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-
-            ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
-            lastCursorPos = e.getPoint();
-            update();
-
-        }
-    }
+   
 
     public void setLinkHandler(LinkHandler linkHandler) {
         if (linkHandler == null) {
@@ -492,7 +382,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     @Override
     public HighlightPainter linkPainter() {
-        return underLinePainter;
+        return null;
     }
 
     @Override
@@ -586,78 +476,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 
-    public static class UnderLinePainter extends DefaultHighlighter.DefaultHighlightPainter {
-
-        public UnderLinePainter(Color color) {
-            super(color);
-        }
-
-        @Override
-        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
-            try {
-                // --- determine locations ---
-                TextUI mapper = c.getUI();
-
-                Color col = getColor();
-                if (col == null) {
-                    col = Color.black;
-                }
-                g.setColor(col);
-                for (int i = offs0; i < offs1; i++) {
-
-                    Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i, Position.Bias.Forward);
-                    Rectangle2D r1 = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i + 1, Position.Bias.Forward);
-                    if (r1.getY() == r.getY()) {
-                        g.drawLine((int) r.getX(), (int) (r.getY() + r.getHeight() - 3), (int) r1.getX(), (int) (r.getY() + r.getHeight() - 3));
-                    }
-                }
-
-            } catch (BadLocationException e) {
-                // can't render
-            }
-        }
-
-        @Override
-        public Shape paintLayer(Graphics g, int offs0, int offs1,
-                Shape bounds, JTextComponent c, View view) {
-
-            g.setColor(c.getSelectionColor());
-
-            Rectangle r;
-
-            if (offs0 == view.getStartOffset()
-                    && offs1 == view.getEndOffset()) {
-                // Contained in view, can just use bounds.
-                if (bounds instanceof Rectangle) {
-                    r = (Rectangle) bounds;
-                } else {
-                    r = bounds.getBounds();
-                }
-            } else {
-                // Should only render part of View.
-                try {
-                    // --- determine locations ---
-                    Shape shape = view.modelToView(offs0, Position.Bias.Forward,
-                            offs1, Position.Bias.Backward,
-                            bounds);
-                    r = (shape instanceof Rectangle)
-                            ? (Rectangle) shape : shape.getBounds();
-                } catch (BadLocationException e) {
-                    // can't render
-                    r = null;
-                }
-            }
-
-            if (r != null) {
-                r.width = Math.max(r.width, 1);
-
-                paint(g, offs0, offs1, r, c);
-
-            }
-
-            return r;
-        }
-    }
+    
 
     private int cut(double val) {
         int ival = (int) Math.round(val);

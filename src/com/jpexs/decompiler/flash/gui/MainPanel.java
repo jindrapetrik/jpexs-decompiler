@@ -435,7 +435,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private Map<Openable, ABCExplorerDialog> abcExplorerDialogs = new WeakHashMap<>();
 
     private Map<SWF, BreakpointListDialog> breakpointsListDialogs = new WeakHashMap<>();
+    
+    private boolean loadingScrollPosEnabled = true;
 
+    public synchronized void setLoadingScrollPosEnabled(boolean loadingScrollPosEnabled) {
+        this.loadingScrollPosEnabled = loadingScrollPosEnabled;
+    }   
+    
     public void savePins() {
         pinsPanel.save();
     }
@@ -6361,16 +6367,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             folderPreviewPanel.setSelectedItems(folderItems);
             folderPreviewScrollBar.setValue(scrollValue);
         }
-
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollPosStorage.loadScrollPos(oldItem);
-            }
-        });
-
+        
+        if (loadingScrollPosEnabled) {
+            View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    scrollPosStorage.loadScrollPos(oldItem);
+                }
+            });
+        }
     }
 
+    
+    
     public void repaintTree() {
         tagTree.repaint();
         tagListTree.repaint();

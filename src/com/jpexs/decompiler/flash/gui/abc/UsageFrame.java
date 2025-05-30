@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.multinames.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
@@ -36,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -142,9 +145,17 @@ public class UsageFrame extends AppDialog implements MouseListener {
                     } else {
                         decompiledTextArea.gotoClassHeader();
                     }
+                    Timer tim = new Timer();
+                    tim.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(true);
+                        }
+                    }, 500);                    
                 }
             };
 
+            Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(false);
             if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == newAbc) {
                 setTrait.run();
             } else {

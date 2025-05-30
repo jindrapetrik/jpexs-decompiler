@@ -1040,7 +1040,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     @Override
-    public synchronized void setText(String t) {
+    public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
     }
@@ -1076,7 +1076,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     @Override
-    public synchronized void setCaretPosition(int position) {
+    public void setCaretPosition(int position) {
         super.setCaretPosition(position);
     }
 }

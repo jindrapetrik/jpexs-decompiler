@@ -20,6 +20,14 @@ import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.KeyEventPostProcessor;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
@@ -35,11 +43,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
-import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -93,6 +99,17 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private ScrollBarUI originalScrollBarUI;
 
+    private LinkAdapter linkAdapter;
+
+    private KeyEventPostProcessor kevEventPostProcessor;
+
+    private Set<Integer> occurencesPositions = new HashSet<>();
+
+    private UnderlinePainter underLinePainter = new UnderlinePainter(new Color(0, 0, 255), null);
+    private UnderlinePainter underLineMarkOccurencesPainter = new UnderlinePainter(new Color(0, 0, 255), DEFAULT_COLOR);
+
+    private Token lastUnderlined;
+
     /**
      * Constructs a new Token highlighter
      */
@@ -127,6 +144,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
      */
     public void removeMarkers() {
         Markers.removeMarkers(pane, marker);
+        Markers.removeMarkers(pane, underLinePainter);
+        Markers.removeMarkers(pane, underLineMarkOccurencesPainter);
+        occurencesPositions.clear();
     }
 
     public void removeErrorMarkers() {
@@ -158,14 +178,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
         Token thisToken = sDoc.getTokenAt(pos);
         if (thisToken != null) {
-            
+
             if (thisToken.length == 1) {
                 Token nextToken = sDoc.getTokenAt(pos + 1);
                 if (nextToken != null && nextToken.start == pos && nextToken.length > 1) {
                     return nextToken;
                 }
             }
-            
+
             return thisToken;
         }
 
@@ -185,7 +205,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     void addErrorMarkers() {
         highlightsPanel.setErrors(errors);
-        
+
         SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
         if (doc == null) {
             return;
@@ -216,11 +236,13 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos < 0 ? -(definitionPos + 1) : definitionPos);
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
-                Markers.markToken(pane, definitionToken, marker);
+                Markers.markToken(pane, definitionToken, lastUnderlined == definitionToken ? underLineMarkOccurencesPainter : marker);
+                occurencesPositions.add(definitionToken.start);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
-                        Markers.markToken(pane, referenceToken, marker);
+                        Markers.markToken(pane, referenceToken, lastUnderlined == referenceToken ? underLineMarkOccurencesPainter : marker);
+                        occurencesPositions.add(referenceToken.start);
                     }
                 }
             }
@@ -255,9 +277,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         editor.addCaretListener(this);
         editor.addPropertyChangeListener(this);
         editor.getDocument().addDocumentListener(this);
-        if (editor instanceof LineMarkedEditorPane) {
+        /*if (editor instanceof LineMarkedEditorPane) {
             ((LineMarkedEditorPane) editor).setLinkHandler(this);
-        }
+        }*/
         mouseMotionAdapter = new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -282,9 +304,126 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
         panel.add(highlightsPanel, BorderLayout.EAST);
 
+        linkAdapter = new LinkAdapter();
+
+        pane.addMouseListener(linkAdapter);
+        pane.addMouseMotionListener(linkAdapter);
+
+        //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus                
+        kevEventPostProcessor = new KeyEventPostProcessor() {
+            @Override
+            public boolean postProcessKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    linkAdapter.keyPressed(e);
+                }
+                if (e.getID() == KeyEvent.KEY_RELEASED) {
+                    linkAdapter.keyReleased(e);
+                }
+                if (e.getID() == KeyEvent.KEY_TYPED) {
+                    linkAdapter.keyTyped(e);
+                }
+                return false;
+            }
+        };
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(kevEventPostProcessor);
+
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
         status = Status.INSTALLING;
+    }
+
+    private class LinkAdapter extends MouseAdapter implements KeyListener {
+
+        private boolean ctrlDown = false;
+
+        private Point lastCursorPos;
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                ctrlDown = true;
+                update();
+            }
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                ctrlDown = false;
+                update();
+            }
+        }
+
+        private void update() {
+            if (ctrlDown) {
+                Token t = ((LineMarkedEditorPane) pane).tokenAtPos(lastCursorPos);
+
+                if (t != lastUnderlined) {
+                    if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
+                        MyMarkers.removeMarkers(pane, underLinePainter);
+                        MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+
+                        if (t != null && isLink(t)) {
+                            lastUnderlined = t;
+                            pane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                        } else {
+                            lastUnderlined = null;
+
+                            removeMarkers();
+                            markTokenAt(pane.getCaretPosition());
+                        }
+                    } else {
+                        lastUnderlined = null;
+                    }
+                }
+
+                if (lastUnderlined != null) {
+                    Highlighter.HighlightPainter painter = underLinePainter;
+                    if (occurencesPositions.contains(lastUnderlined.start)) {
+                        painter = underLineMarkOccurencesPainter;
+                        removeMarkers();
+                        markTokenAt(pane.getCaretPosition());
+                    } else {
+                        MyMarkers.markToken(pane, lastUnderlined, painter);
+                    }
+                } else {
+                    pane.setCursor(Cursor.getDefaultCursor());
+                }
+            } else {
+                lastUnderlined = null;
+                MyMarkers.removeMarkers(pane, underLinePainter);
+                MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+                removeMarkers();
+                markTokenAt(pane.getCaretPosition());
+                pane.setCursor(Cursor.getDefaultCursor());
+            }
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (ctrlDown) {
+                Token t = ((LineMarkedEditorPane) pane).tokenAtPos(lastCursorPos);
+                if (t != null && isLink(t)) {
+                    e.consume();
+                    handleLink(t);
+                }
+            }
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+
+            ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
+            lastCursorPos = e.getPoint();
+            update();
+
+        }
     }
 
     private void editorMouseMoved(MouseEvent e) {
@@ -313,10 +452,13 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         pane.getDocument().removeDocumentListener(this);
         pane.removeCaretListener(this);
         pane.removeMouseMotionListener(mouseMotionAdapter);
+        pane.removeMouseMotionListener(linkAdapter);
+        pane.removeMouseListener(linkAdapter);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventPostProcessor(kevEventPostProcessor);
         mouseMotionAdapter = null;
-        if (editor instanceof LineMarkedEditorPane) {
+        /*if (editor instanceof LineMarkedEditorPane) {
             ((LineMarkedEditorPane) editor).setLinkHandler(null);
-        }
+        }*/
         JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
         JPanel panel = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, scrollPane);
         panel.remove(highlightsPanel);
@@ -376,7 +518,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         } catch (SimpleParseException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
-            errors.put((int) ex.position, ex.getMessage());            
+            errors.put((int) ex.position, ex.getMessage());
         }
         Timer tim = errorsTimer;
         if (tim != null) {
@@ -412,14 +554,27 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     @Override
     public boolean isLink(Token token) {
-        return referenceToDefinition.containsKey(token.start) && referenceToDefinition.get(token.start) >= 0;
+        boolean linkBasic = referenceToDefinition.containsKey(token.start) && referenceToDefinition.get(token.start) >= 0;
+        if (linkBasic) {
+            return true;
+        }
+        if (pane.isEditable()) {
+            return false;
+        }
+        return ((LineMarkedEditorPane) pane).getLinkHandler().isLink(token);
     }
 
     @Override
     public void handleLink(Token token) {
         Integer definition = referenceToDefinition.get(token.start);
-        if (definition != null) {
+        if (definition != null && definition >= 0) {
             pane.setCaretPosition(definition);
+        } else if (!pane.isEditable()) {
+            lastUnderlined = null;
+            removeErrorMarkers();
+            removeMarkers();
+            pane.repaint();
+            ((LineMarkedEditorPane) pane).getLinkHandler().handleLink(token);
         }
     }
 
