@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
+import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import java.awt.BorderLayout;
@@ -24,6 +26,7 @@ import java.awt.Cursor;
 import java.awt.KeyEventPostProcessor;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -42,6 +45,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -356,6 +360,17 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         };
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(kevEventPostProcessor);
 
+        View.addEditorAction(pane, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
+                int pos = pane.getCaretPosition();
+                Token token = getIdentifierTokenAt(doc, pos);
+                handleLink(token);
+            }
+        }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
+        
+        
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
         status = Status.INSTALLING;
@@ -389,6 +404,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
 
         private void update() {
+            if (lastCursorPos == null) {
+                return;
+            }
             if (ctrlDown) {
                 Token t = ((LineMarkedEditorPane) pane).tokenAtPos(lastCursorPos);
 
@@ -493,6 +511,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             tim.cancel();
             errorsTimer = null;
         }
+        View.removeEditorAction(pane, "find-declaration");
         pane.removePropertyChangeListener(this);
         pane.getDocument().removeDocumentListener(this);
         pane.removeCaretListener(this);

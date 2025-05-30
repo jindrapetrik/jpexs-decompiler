@@ -711,15 +711,41 @@ public class View {
         a.putValue(Action.ACCELERATOR_KEY, ks);
         a.putValue(Action.NAME, name);
 
-        String actionName = key;
         ActionMap amap = editor.getActionMap();
         InputMap imap = editor.getInputMap(JTextComponent.WHEN_FOCUSED);
-        imap.put(ks, actionName);
-        amap.put(actionName, a);
+        imap.put(ks, key);
+        amap.put(key, a);
 
         JPopupMenu pmenu = editor.getComponentPopupMenu();
         JMenuItem findUsagesMenu = new JMenuItem(a);
         pmenu.add(findUsagesMenu);
+    }
+    
+    public static void removeEditorAction(JEditorPane editor, String key) {
+        ActionMap amap = editor.getActionMap();
+        InputMap imap = editor.getInputMap(JTextComponent.WHEN_FOCUSED);
+        for (KeyStroke ks : imap.keys()) {
+            if (key.equals(imap.get(ks))) {
+                imap.remove(ks);
+                break;
+            }
+        }
+        Action a  = amap.get(key);
+        if (a == null) {
+            return;
+        }
+        amap.remove(key);        
+        JPopupMenu menu = editor.getComponentPopupMenu();
+        for (int i = 0; i < menu.getComponentCount(); i++) {
+            Component c = menu.getComponent(i);
+            if (c instanceof JMenuItem) {
+                JMenuItem mi = (JMenuItem) c;
+                if (mi.getAction() == a) {
+                    menu.remove(i);
+                    break;
+                }
+            }
+        }
     }
 
     public static boolean navigateUrl(String url) {

@@ -1171,14 +1171,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     usageFrame.setVisible(true);
                 }
             }
-        }, "find-usages", AppStrings.translate("abc.action.find-usages"), "control U");
-
-        View.addEditorAction(decompiledTextArea, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gotoDeclaration(decompiledTextArea.getCaretPosition());
-            }
-        }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
+        }, "find-usages", AppStrings.translate("abc.action.find-usages"), "control U");        
 
         CtrlClickHandler cch = new CtrlClickHandler();
         decompiledTextArea.addKeyListener(cch);

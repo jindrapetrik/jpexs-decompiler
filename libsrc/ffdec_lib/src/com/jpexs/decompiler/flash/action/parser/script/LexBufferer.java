@@ -35,6 +35,9 @@ public class LexBufferer implements LexListener {
 
     @Override
     public void onPushBack(ParsedSymbol s) {
+        if (items.isEmpty()) {
+            return;
+        }
         if (items.get(items.size() - 1) == s) {
             items.remove(items.size() - 1);
         }

@@ -160,7 +160,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private void function(List<SimpleParseException> errors, boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private FunctionScope function(List<SimpleParseException> errors, boolean withBody, String functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol s;
         expectedType(errors, SymbolType.PARENT_OPEN);
         s = lex();
@@ -192,7 +192,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         Reference<Boolean> subHasEval = new Reference<>(false);
 
         if (!functionName.isEmpty()) {
-            variables.add(new Variable(true, functionName, functionNamePosition));
+            variables.add(0, new Variable(true, functionName, functionNamePosition));
         }
 
         for (int i = 0; i < paramNames.size(); i++) {
@@ -209,13 +209,15 @@ public class ActionScript2SimpleParser implements SimpleParser {
             hasEval.setVal(true);
         }
 
-        variables.add(new FunctionScope(subvariables));
+        return new FunctionScope(subvariables);
     }
 
     private boolean traits(List<SimpleParseException> errors, boolean isInterface, String className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
 
         ParsedSymbol s;
 
+        List<VariableOrScope> traitVariables = new ArrayList<>();
+        
         looptrait:
         while (true) {
             boolean isStatic = false;
@@ -238,14 +240,14 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
                     if (expectedIdentifier(errors, s, lexer.yyline())) {
                         if (!isInterface) {
-                            function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, variables, inTellTarget, hasEval);
+                            variables.add(function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, traitVariables, inTellTarget, hasEval));
                         }
                     }
                     break;
                 case VAR:
                     s = lex();
                     if (expectedIdentifier(errors, s, lexer.yyline())) {
-                        variables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position));
+                        traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position));
                     }
                     s = lex();
                     if (s.type == SymbolType.COLON) {
@@ -266,6 +268,8 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
             }
         }
+        
+        variables.addAll(0, traitVariables);
 
         return true;
     }
@@ -799,7 +803,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case FUNCTION:
                 s = lexer.lex();
                 if (expectedIdentifier(errors, s, lexer.yyline())) {
-                    function(errors, true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval);
+                    variables.add(function(errors, true, s.value.toString(), s.position, false, variables, inTellTarget, hasEval));
                 }
                 break;
             case VAR:
@@ -1389,7 +1393,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 } else {
                     lexer.pushback(s);
                 }
-                function(errors, true, fname, fnamePos, false, variables, inTellTarget, hasEval);
+                variables.add(function(errors, true, fname, fnamePos, false, variables, inTellTarget, hasEval));
                 ret = true;
                 allowMemberOrCall = true;
                 break;

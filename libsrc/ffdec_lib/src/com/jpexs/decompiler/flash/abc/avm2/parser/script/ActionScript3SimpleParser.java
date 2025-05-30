@@ -515,6 +515,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
         Stack<Loop> cinitLoops = new Stack<>();
         Map<Loop, String> cinitLoopLabels = new HashMap<>();
+    
+        List<VariableOrScope> traitVariables = new ArrayList<>();
         
         looptraits:
         while (true) {
@@ -660,7 +662,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     } else {
                         fname = s.value.toString();
                     }
-                    classVariables.add(new Variable(true, prefix + fname, fnamePos));
+                    traitVariables.add(new Variable(true, prefix + fname, fnamePos));
                     if (fname.equals(classNameStr)) { //constructor
                         if (isStatic) {
                             errors.add(new SimpleParseException("Constructor cannot be static", lexer.yyline(), s.position));
@@ -721,7 +723,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     String nname = s.value.toString();
                     int npos = s.position;
 
-                    classVariables.add(new Variable(true, prefix + nname, npos));
+                    traitVariables.add(new Variable(true, prefix + nname, npos));
                     s = lex();
 
                     if (s.type == SymbolType.ASSIGN) {
@@ -752,7 +754,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    classVariables.add(new Variable(true, prefix + s.value.toString(), s.position));
+                    traitVariables.add(new Variable(true, prefix + s.value.toString(), s.position));
                     s = lex();
 
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
@@ -789,6 +791,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     }
             }
         }
+        classVariables.addAll(0, traitVariables);
     }
 
     private void scriptTraits(
