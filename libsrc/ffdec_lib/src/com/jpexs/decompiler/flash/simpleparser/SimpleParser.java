@@ -51,60 +51,132 @@ public interface SimpleParser {
             List<VariableOrScope> sharedVariables,
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
-            Map<String, Integer> parentVarNameToDefinitionPosition
+            List<SimpleParseException> errors
+    ) {
+        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), true, errors);
+    }
+
+    public static void parseVariablesList(
+            List<VariableOrScope> privateVariables,
+            List<VariableOrScope> sharedVariables,
+            Map<Integer, List<Integer>> definitionPosToReferences,
+            Map<Integer, Integer> referenceToDefinition,
+            Map<String, Integer> parentVarFullNameToDefinitionPosition,
+            Map<String, Integer> parentVarNameToDefinitionPosition,
+            Map<Integer, Boolean> positionToStatic,
+            boolean isStatic,
+            List<SimpleParseException> errors
     ) {
         Map<String, Integer> privateVarNameToDefinitionPosition = new LinkedHashMap<>();
         privateVarNameToDefinitionPosition.putAll(parentVarNameToDefinitionPosition);
+
+        Map<String, Integer> privateVarFullNameToDefinitionPosition = new LinkedHashMap<>();
+        privateVarFullNameToDefinitionPosition.putAll(parentVarFullNameToDefinitionPosition);
 
         for (VariableOrScope vt : privateVariables) {
             if (vt instanceof Variable) {
                 Variable v = (Variable) vt;
                 if (v.definition) {
-                    privateVarNameToDefinitionPosition.put(v.name, v.position);
+                    privateVarFullNameToDefinitionPosition.put(v.name, v.position);
+                    privateVarNameToDefinitionPosition.put(v.getLastName(), v.position);
                     definitionPosToReferences.put(v.position, new ArrayList<>());
+                    positionToStatic.put(v.position, v.isStatic != null ? v.isStatic : isStatic);
                 } else {
-                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                    if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
+                            && !privateVarNameToDefinitionPosition.containsKey(v.getFirstName())) {
+                        parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
+                        privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        privateVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
                         definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
                         definitionPosToReferences.get(-v.position - 1).add(v.position);
                         referenceToDefinition.put(v.position, -v.position - 1);
                     } else {
-                        int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
-                        definitionPosToReferences.get(definitionPos).add(v.position);
-                        referenceToDefinition.put(v.position, definitionPos);
+
+                        if ("this".equals(v.name) && isStatic) {
+                            errors.add(new SimpleParseException("Cannot use this in static context", -1, v.position));
+                        } else {
+                            int definitionPos;
+                            if (privateVarFullNameToDefinitionPosition.containsKey(v.name)) {
+                                definitionPos = privateVarFullNameToDefinitionPosition.get(v.name);
+                            } else {
+                                definitionPos = privateVarNameToDefinitionPosition.get(v.getFirstName());
+                            }
+                            boolean staticDefinition = definitionPos >= 0 ? positionToStatic.get(definitionPos) : true;
+                            if (!(!staticDefinition && isStatic)) {
+                                definitionPosToReferences.get(definitionPos).add(v.position);
+                                referenceToDefinition.put(v.position, definitionPos);
+                            } else {
+                                errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
+                            }
+                        }
                     }
                 }
             }
             if (vt instanceof Scope) {
                 Scope vs = (Scope) vt;
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarNameToDefinitionPosition);
+                boolean subStatic = isStatic;
+                if (vs instanceof FunctionScope) {
+                    subStatic = ((FunctionScope) vs).isStatic();
+                }
+                if (vs instanceof TraitVarConstValueScope) {
+                    subStatic = ((TraitVarConstValueScope) vs).isStatic();
+                }
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors);
             }
         }
         for (VariableOrScope vt : sharedVariables) {
             if (vt instanceof Variable) {
                 Variable v = (Variable) vt;
                 if (v.definition) {
-                    parentVarNameToDefinitionPosition.put(v.name, v.position);
-                    privateVarNameToDefinitionPosition.put(v.name, v.position);
+                    parentVarFullNameToDefinitionPosition.put(v.name, v.position);
+                    parentVarNameToDefinitionPosition.put(v.getLastName(), v.position);
+                    privateVarFullNameToDefinitionPosition.put(v.name, v.position);
+                    privateVarNameToDefinitionPosition.put(v.getLastName(), v.position);
                     definitionPosToReferences.put(v.position, new ArrayList<>());
+                    positionToStatic.put(v.position, v.isStatic != null ? v.isStatic : isStatic);
                 } else {
-                    if (!privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.name, -v.position - 1);
+                    if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
+                            && !privateVarNameToDefinitionPosition.containsKey(v.getFirstName())) {
+                        parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
+                        privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                        privateVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
                         definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
                         definitionPosToReferences.get(-v.position - 1).add(v.position);
                         referenceToDefinition.put(v.position, -v.position - 1);
                     } else {
-                        int definitionPos = privateVarNameToDefinitionPosition.get(v.name);
-                        definitionPosToReferences.get(definitionPos).add(v.position);
-                        referenceToDefinition.put(v.position, definitionPos);
+
+                        if ("this".equals(v.name) && isStatic) {
+                            errors.add(new SimpleParseException("Cannot use this in static context", -1, v.position));
+                        } else {
+                            int definitionPos;
+                            if (privateVarFullNameToDefinitionPosition.containsKey(v.name)) {
+                                definitionPos = privateVarFullNameToDefinitionPosition.get(v.name);
+                            } else {
+                                definitionPos = privateVarNameToDefinitionPosition.get(v.getFirstName());
+                            }
+                            boolean staticDefinition = definitionPos >= 0 ? positionToStatic.get(definitionPos) : true;
+                            if (!(!staticDefinition && isStatic)) {
+                                definitionPosToReferences.get(definitionPos).add(v.position);
+                                referenceToDefinition.put(v.position, definitionPos);
+                            } else {
+                                errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
+                            }
+                        }
                     }
                 }
             }
             if (vt instanceof Scope) {
                 Scope vs = (Scope) vt;
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarNameToDefinitionPosition);
+                boolean subStatic = isStatic;
+                if (vs instanceof FunctionScope) {
+                    subStatic = ((FunctionScope) vs).isStatic();
+                }
+                if (vs instanceof TraitVarConstValueScope) {
+                    subStatic = ((TraitVarConstValueScope) vs).isStatic();
+                }
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors);
             }
         }
     }

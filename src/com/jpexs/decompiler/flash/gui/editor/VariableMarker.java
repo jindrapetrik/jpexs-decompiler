@@ -491,7 +491,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private void editorMouseMoved(MouseEvent e) {
         if (pane instanceof LineMarkedEditorPane) {
-            Token token = ((LineMarkedEditorPane) pane).getTokenUnderCursor();
+            Token token = ((LineMarkedEditorPane) pane).tokenAtPos(e.getPoint());
             if (token != null) {
                 String err = errors.get(token.start);
                 pane.setToolTipText(err);

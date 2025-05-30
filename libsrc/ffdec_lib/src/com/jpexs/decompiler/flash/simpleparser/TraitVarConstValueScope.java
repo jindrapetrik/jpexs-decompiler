@@ -23,13 +23,13 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class FunctionScope implements Scope {
+public class TraitVarConstValueScope implements Scope {
 
-    private final List<VariableOrScope> privateItems;
+    private List<VariableOrScope> sharedItems;
     private final boolean isStatic;
 
-    public FunctionScope(List<VariableOrScope> functionBody, boolean isStatic) {
-        this.privateItems = functionBody;
+    public TraitVarConstValueScope(List<VariableOrScope> sharedItems, boolean isStatic) {
+        this.sharedItems = sharedItems;
         this.isStatic = isStatic;
     }
 
@@ -39,11 +39,11 @@ public class FunctionScope implements Scope {
 
     @Override
     public List<VariableOrScope> getSharedItems() {
-        return new ArrayList<>();
+        return sharedItems;
     }
 
     @Override
     public List<VariableOrScope> getPrivateItems() {
-        return privateItems;
+        return new ArrayList<>();
     }
 }

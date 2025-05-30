@@ -362,11 +362,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             return t;
         }
         return null;
-    }
-    
-    public Token getTokenUnderCursor() {
-        return tokenAtPos(lastCursorPos);
-    }
+    }    
    
 
     public void setLinkHandler(LinkHandler linkHandler) {
