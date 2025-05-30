@@ -396,11 +396,13 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     pane.setCursor(Cursor.getDefaultCursor());
                 }
             } else {
-                lastUnderlined = null;
-                MyMarkers.removeMarkers(pane, underLinePainter);
-                MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
-                removeMarkers();
-                markTokenAt(pane.getCaretPosition());
+                if (lastUnderlined != null) {
+                    lastUnderlined = null;
+                    MyMarkers.removeMarkers(pane, underLinePainter);
+                    MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+                    removeMarkers();
+                    markTokenAt(pane.getCaretPosition());
+                }
                 pane.setCursor(Cursor.getDefaultCursor());
             }
         }

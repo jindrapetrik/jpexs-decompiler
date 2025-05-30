@@ -18,10 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.simpleparser.CatchScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassScope;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
+import com.jpexs.decompiler.flash.simpleparser.Import;
+import com.jpexs.decompiler.flash.simpleparser.Namespace;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.decompiler.flash.simpleparser.Type;
@@ -42,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle;
 
 /**
  * ActionScript 3 parser.
@@ -302,10 +304,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
             fullName += "." + lastName;
         }
         if (s.type == SymbolType.NAMESPACE_OP) {
+            variables.add(new Namespace(false, lastName, identPos));
             s = lex();
             if (s.group == SymbolGroup.IDENTIFIER) {
                 String nsprop = s.value.toString();
-                variables.add(new Variable(false, lastName + "::" + nsprop, s.position));
+                variables.add(new Variable(false, fullName + "::" + nsprop, s.position));
             } else if (s.type == SymbolType.BRACKET_OPEN) {
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc);
                 expectedType(errors, SymbolType.BRACKET_CLOSE);
@@ -524,7 +527,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             boolean isPrivate = false;
             boolean isNative = false;
 
-            String customNs = null;
+            String customNs = null;            
             List<ParsedSymbol> preSymbols = new ArrayList<>();
             parseMetadata(errors);
 
@@ -565,6 +568,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     isNative = true;
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
                     customNs = s.value.toString();
+                    classVariables.add(new Namespace(false, s.value.toString(), s.position));
                     if (isInterface) {
                         errors.add(new SimpleParseException("Namespace attributes are not permitted on interface methods", lexer.yyline(), s.position));
                     }
@@ -621,7 +625,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
             }
 
             String prefix = isStatic ? pkg.addWithSuffix(classNameStr).toPrintableString(true) + "." : "this.";
-
+            if (customNs != null) {
+                prefix += customNs + "::";
+            }
             switch (s.type) {
                 case FUNCTION:
                     s = lex();
@@ -853,7 +859,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
         allOpenedNamespaces.add(openedNamespaces);
 
-        parseImportsUsages(errors, importedClasses, openedNamespaces, abc);
+        parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc);
 
         boolean isEmpty = true;
 
@@ -1028,7 +1034,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         lexer.pushback(preSymbols.get(i));
                     }
 
-                    if (parseImportsUsages(errors, importedClasses, openedNamespaces, abc)) {
+                    if (parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc)) {
                         break;
                     }
                     boolean cmd = command(errors, null, sinitNeedsActivation, importedClasses, openedNamespaces, sinitLoops, sinitLoopLabels, sinitRegisterVars, true, false, 0, false, sinitVariables, abc);
@@ -1970,7 +1976,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
     private ActionScriptLexer lexer = null;
 
-    private boolean parseImportsUsages(List<SimpleParseException> errors, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private boolean parseImportsUsages(List<SimpleParseException> errors, List<VariableOrScope> variables, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
 
         boolean isEmpty = true;
         ParsedSymbol s;
@@ -1982,10 +1988,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 isEmpty = false;
                 s = lex();
                 expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                DottedChain fullName = new DottedChain(new String[]{});
-                fullName = fullName.add(s.value.toString(), "");
+                String fullName = s.value.toString();
+                String lastName = s.value.toString();
                 s = lex();
                 boolean isStar = false;
+                int varPos = -1;
                 while (s.type == SymbolType.DOT) {
                     s = lex();
                     if (s.type == SymbolType.MULTIPLY) {
@@ -1994,14 +2001,17 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         break;
                     }
                     expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                    fullName = fullName.add(s.value.toString(), "");
+                    fullName = fullName + "." + s.value.toString();
+                    lastName = s.value.toString();
+                    varPos = s.position;
                     s = lex();
                 }
 
                 if (isStar) {
-                    openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
+                    //openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
                 } else {
-                    importedClasses.add(fullName);
+                    //importedClasses.add(fullName);
+                    variables.add(new Import(fullName, lastName, varPos));
                 }
                 expected(errors, s, lexer.yyline(), SymbolType.SEMICOLON);
             } else if (s.isType(SymbolType.USE)) {
@@ -2011,8 +2021,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (s.isType(SymbolType.NAMESPACE)) {
                         s = lex();
                         expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                        DottedChain fullName = new DottedChain(new String[]{});
-                        fullName = fullName.add(s.value.toString(), "");
+                        String fullName = s.value.toString();
+                        int lastPos = s.position;
                         s = lex();
                         while (s.type == SymbolType.DOT) {
                             s = lex();
@@ -2021,9 +2031,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                                 break;
                             }
                             expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                            fullName = fullName.add(s.value.toString(), "");
+                            fullName = fullName + "." + s.value.toString();
+                            lastPos = s.position;
                             s = lex();
                         }
+                        variables.add(new Namespace(false, fullName, lastPos));
                         lexer.pushback(s);
                     } else {
                         if (!abc.hasDecimalSupport()) {
