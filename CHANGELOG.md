@@ -53,6 +53,7 @@ All notable changes to this project will be documented in this file.
 - Pin header for AS2 script in the Resources view should show Class name in 
   the title instead of tag full description
 - AS1/2/3 for decompilation with multiple variables
+- AS3 native functions outside class allowed
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

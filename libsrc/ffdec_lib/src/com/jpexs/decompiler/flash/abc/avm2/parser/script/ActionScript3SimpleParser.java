@@ -887,7 +887,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             boolean isNative = false;
             boolean isInternal = false;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
-            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL)) {
+            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL, SymbolType.NATIVE)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         errors.add(new SimpleParseException("Only one final keyword allowed", lexer.yyline(), s.position));

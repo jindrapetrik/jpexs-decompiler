@@ -1104,7 +1104,7 @@ public class ActionScript3Parser {
             boolean isInternal = false;
             NamespaceItem ns = packageInternalNs;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
-            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL)) {
+            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL, SymbolType.NATIVE)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
