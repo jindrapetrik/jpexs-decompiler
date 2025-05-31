@@ -6670,7 +6670,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public String itemToString(TreeItem item) {
         int index = getCurrentTree().getFullModel().getItemIndex(item);
-        String itemToStr = item.toString();
+        String itemToStr = getCurrentTree().convertValueToText(item, false, false, true, 0, false);
         if (index > 1) {
             return itemToStr + " [" + index + "]";
         }

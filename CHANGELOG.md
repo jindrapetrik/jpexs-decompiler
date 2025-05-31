@@ -34,7 +34,6 @@ All notable changes to this project will be documented in this file.
   This may break backwards compatibility. For importing scripts from older
   versions of FFDec, you should move the scripts from `<default package>`
   to main scripts folder.
-  
 
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
@@ -51,6 +50,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2 direct editation - Position in the code should stay same after clicking Edit button
 - AS3 direct editation - Allow internal keyword on script traits (e.g. classes)
 - AS3 direct editation - NaN can be used as identifier
+- Pin header for AS2 script in the Resources view should show Class name in 
+  the title instead of tag full description
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
