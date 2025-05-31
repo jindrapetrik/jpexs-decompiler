@@ -821,9 +821,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             List<Object> code2 = new ArrayList<>();
 
-            int dpos = 0;
             code2.add(new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
-            dpos++;
             Set<Integer> regs = bodyToRegToName.containsKey(bodyIndex) ? bodyToRegToName.get(bodyIndex).keySet() : new TreeSet<>();
             for (int r : regs) {
                 String name = bodyToRegToName.get(bodyIndex).get(r);
@@ -864,12 +862,12 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (addedLines.contains(line)) {
                     continue;
                 }
-                if (!origPosToNewPos.containsKey(i + dpos)) {
+                if (!origPosToNewPos.containsKey(i)) {
                     continue;
                 }
                 addedLines.add(line);
                 logger.log(Level.FINE, "Script {0}: Insert debugline({1}) at pos {2} to body {3}", new Object[]{path, line, i, bodyIndex});
-                code2.add(origPosToNewPos.get(i + dpos), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
+                code2.add(origPosToNewPos.get(i), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
             long adr = 0;
             Map<Long, Long> mapOffsets = new HashMap<>();
