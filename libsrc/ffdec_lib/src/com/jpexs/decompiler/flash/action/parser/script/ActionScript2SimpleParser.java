@@ -193,7 +193,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         List<VariableOrScope> subvariables = new ArrayList<>();
         Reference<Boolean> subHasEval = new Reference<>(false);
 
-        if (!functionName.isEmpty()) {
+        if (!isMethod && !functionName.isEmpty()) {
             variables.add(0, new Variable(true, functionName, functionNamePosition));
         }
 
@@ -243,17 +243,20 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         s = lex();
                     }
 
-                    if (expectedIdentifier(errors, s, lexer.yyline())) {
-                        if (!isInterface) {
-                            variables.add(function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, traitVariables, inTellTarget, hasEval, isStatic));
-                        }
+                    if (!expectedIdentifier(errors, s, lexer.yyline())) {
+                        break;
                     }
+                    traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position, isStatic));
+                    if (!isInterface) {
+                        variables.add(function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, traitVariables, inTellTarget, hasEval, isStatic));
+                    }                    
                     break;
                 case VAR:
                     s = lex();
-                    if (expectedIdentifier(errors, s, lexer.yyline())) {
-                        traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position, isStatic));
+                    if (!expectedIdentifier(errors, s, lexer.yyline())) {
+                        break;
                     }
+                    traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position, isStatic));                    
                     s = lex();
                     if (s.type == SymbolType.COLON) {
                         type(errors, false, variables);

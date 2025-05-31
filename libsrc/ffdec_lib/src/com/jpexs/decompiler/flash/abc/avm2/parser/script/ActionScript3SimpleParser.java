@@ -452,7 +452,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             lexer.pushback(s);
         }
         List<VariableOrScope> subvariables = new ArrayList<>();
-        if (functionName != null && !functionName.isEmpty()) {
+        if (!isMethod && functionName != null && !functionName.isEmpty()) {
             subvariables.add(new Variable(true, functionName, functionNamePos));
         }
         for (int i = 0; i < paramNames.size() - (hasRest ? 1 : 0); i++) {
