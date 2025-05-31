@@ -1192,7 +1192,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             saveButton.setVisible(val);
             saveButton.setEnabled(false);
             editButton.setVisible(!val);
-            cancelButton.setVisible(val);            
+            cancelButton.setVisible(val);
+            
+            editDecompiledButton.setEnabled(!val);
         }
 
         editor.getCaret().setVisible(true);

@@ -553,5 +553,5 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 fgp.paint(g, lineStart.getVal(), lineEnd.getVal(), null, this);
             }
         }
-    }
+    }   
 }

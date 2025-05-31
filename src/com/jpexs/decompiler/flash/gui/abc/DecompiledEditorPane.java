@@ -620,6 +620,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     @Override
     public void caretUpdate(final CaretEvent e) {
+        if (!isEnabled()) {
+            return;
+        }
         ABC abc = getABC();
         if (abc == null) {
             return;

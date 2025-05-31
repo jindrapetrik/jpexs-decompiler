@@ -216,6 +216,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public ScriptPack getPack() {
         return decompiledTextArea.getScriptLeaf();
     }
+    
+    public void setDecompiledEditEnabled(boolean value) {
+        decompiledTextArea.setEnabled(value);
+        editDecompiledButton.setEnabled(value);
+        toolbarPanel.setEnabled(value);
+    }
 
     public List<ABCSearchResult> search(final Openable openable, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker, List<ScriptPack> scope) {
         if (txt != null && !txt.isEmpty()) {
