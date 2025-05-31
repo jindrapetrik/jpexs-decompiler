@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.simpleparser.CatchScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassScope;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
 import com.jpexs.decompiler.flash.simpleparser.Import;
+import com.jpexs.decompiler.flash.simpleparser.MethodScope;
 import com.jpexs.decompiler.flash.simpleparser.Namespace;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
@@ -472,8 +473,13 @@ public class ActionScript3SimpleParser implements SimpleParser {
             expectedType(errors, SymbolType.SEMICOLON);
         }
 
-        FunctionScope fs = new FunctionScope(subvariables, isStatic);
-        variables.add(fs);
+        if (isMethod) {
+            MethodScope ms = new MethodScope(subvariables, isStatic);
+            variables.add(ms);
+        } else {
+            FunctionScope fs = new FunctionScope(subvariables, isStatic);
+            variables.add(fs);
+        }
     }
 
     private void parseMetadata(List<SimpleParseException> errors) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
@@ -1227,7 +1233,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     s = lexer.lex();
                     expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
-                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc, s.position, true /*???*/);
+                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc, s.position, false);
                     ret = true;
                     break;
                 case VAR:
@@ -1849,7 +1855,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     lexer.pushback(s);
                 }
                 needsActivation.setVal(true);
-                function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc, fnamePos, true /*???*/);
+                function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc, fnamePos, false);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1933,7 +1939,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         lexer.pushback(s);
                     }
                     needsActivation.setVal(true);
-                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables, abc, ffnamePos, isStatic);
+                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables, abc, ffnamePos, false);
                     ret = true;
                 } else if (s.type == SymbolType.LOWER_THAN) {
                     type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
@@ -2166,7 +2172,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true);
     }
 
     /**

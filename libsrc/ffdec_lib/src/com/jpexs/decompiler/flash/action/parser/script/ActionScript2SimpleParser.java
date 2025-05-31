@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.simpleparser.CatchScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassScope;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
+import com.jpexs.decompiler.flash.simpleparser.MethodScope;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.decompiler.flash.simpleparser.TraitVarConstValueScope;
@@ -210,6 +211,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             hasEval.setVal(true);
         }
 
+        if (isMethod) {
+            return new MethodScope(subvariables, isStatic);
+        }
         return new FunctionScope(subvariables, isStatic);
     }
 
@@ -1642,7 +1646,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {
