@@ -206,6 +206,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private String lastDecompiled = null;
 
     private JLabel linksLabel = new JLabel("");
+    
+    private boolean compound = false;
 
     public MainPanel getMainPanel() {
         View.checkAccess();
@@ -219,7 +221,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     
     public void setDecompiledEditEnabled(boolean value) {
         decompiledTextArea.setEnabled(value);
-        editDecompiledButton.setEnabled(value);
+        editDecompiledButton.setEnabled(value && !compound);
         toolbarPanel.setEnabled(value);
     }
 
@@ -2117,6 +2119,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         experimentalLabel.setVisible(!useFlex && !value);
         flexLabel.setVisible(useFlex && !value);
         editDecompiledButton.setEnabled(!value);
+        this.compound = value;
     }
 
     public void setScript(ScriptPack scriptPack) {
