@@ -44,6 +44,8 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
 
     private boolean enableWhiteSpace = false;
 
+    private int yyStartOffset = 0;
+
     private final Pattern float4Pattern = Pattern.compile("float4.*\\([\r\n \t\f]*(?<f1>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f2>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f3>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f4>[^\r\n \t\f]+)[\r\n \t\f]*\\)", Pattern.MULTILINE);
 
     public ActionScriptLexer(String sourceCode){
@@ -51,10 +53,11 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
         this.sourceCode = sourceCode;
     }
 
-    public void yypushbackstr(String s, int state)
+    public void yypushbackstr(String s, int state, int skipNumChars)
     {
         int numLines = count(s, "\n");
         int newYyline = yyline - numLines;
+        yyStartOffset = yyStartOffset + skipNumChars + yychar;
         sourceCode = s + sourceCode.substring(yychar + yylength());
         yyreset(new StringReader(sourceCode));
         yybegin(state);
@@ -72,11 +75,6 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
         yybegin(state);
     }
 
-    public void yypushbackstr(String s)
-    {
-        yypushbackstr(s, YYINITIAL);
-    }
-
     StringBuilder string = new StringBuilder();
 
     private static String xmlTagName = "";
@@ -84,7 +82,7 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
     private int startPos = -1;
 
     public int yychar() {
-        return yychar;
+        return yyStartOffset + yychar;
     }
 
     private Stack<ParsedSymbol> pushedBack = new Stack<>();

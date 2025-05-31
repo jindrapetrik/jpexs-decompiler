@@ -2140,17 +2140,18 @@ public class ActionScript3Parser {
      */
     private void xmlToLowerThanFix(ParsedSymbol symb) {
         if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {
-            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as LOWER_THAN
             String pb = symb.value.toString().substring(1);
             symb.type = SymbolType.LOWER_THAN;
             symb.group = SymbolGroup.OPERATOR;
             symb.value = "<";
+            int pos = 1;
             if (pb.charAt(0) == '=') {
                 symb.type = SymbolType.LOWER_EQUAL;
                 symb.value = "<=";
                 pb = pb.substring(1);
+                pos++;
             }
-            lexer.yypushbackstr(pb); //parse again as LOWER_THAN
+            lexer.yypushbackstr(pb, ActionScriptLexer.YYINITIAL, pos); //parse again as LOWER_THAN
         }
     }
 
@@ -2160,12 +2161,14 @@ public class ActionScript3Parser {
             symb.type = SymbolType.DIVIDE;
             symb.group = SymbolGroup.OPERATOR;
             symb.value = "/";
+            int pos = 1;
             if (pb.charAt(0) == '=') {
                 symb.type = SymbolType.ASSIGN_DIVIDE;
                 symb.value = "/=";
                 pb = pb.substring(1);
+                pos++;
             }
-            lexer.yypushbackstr(pb); //parse again as DIVIDE
+            lexer.yypushbackstr(pb, ActionScriptLexer.YYINITIAL, pos); //parse again as DIVIDE
 
         }
     }
@@ -2619,7 +2622,7 @@ public class ActionScript3Parser {
             case FLOAT4:
                 if (!abc.hasFloat4Support()) {
                     //parse again as method call
-                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()));
+                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()), ActionScriptLexer.YYINITIAL, "float4".length());
                     lexer.pushback(new ParsedSymbol(-1, SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
                     ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);
                 } else {
@@ -2663,7 +2666,7 @@ public class ActionScript3Parser {
             case NEW:
                 s = lex();
                 if (s.type == SymbolType.XML_STARTTAG_BEGIN) {
-                    lexer.yypushbackstr(s.value.toString().substring(1), ActionScriptLexer.YYINITIAL);
+                    lexer.yypushbackstr(s.value.toString().substring(1), ActionScriptLexer.YYINITIAL, 1);
                     s = new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.LOWER_THAN);
                 }
                 if (s.type == SymbolType.FUNCTION) {
