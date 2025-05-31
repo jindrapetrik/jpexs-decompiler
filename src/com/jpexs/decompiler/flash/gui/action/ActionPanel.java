@@ -195,8 +195,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private CancellableWorker setSourceWorker;
 
     private List<Runnable> scriptListeners = new ArrayList<>();
-
+    
     private boolean scriptLoaded = true;
+    
+    private JPanel pcodePanel;
 
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
@@ -879,12 +881,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
         panCode.add(topButtonsPan, BorderLayout.NORTH);
 
-        JPanel panB = new JPanel();
-        panB.setLayout(new BorderLayout());
+        pcodePanel = new JPanel();
+        pcodePanel.setLayout(new BorderLayout());
         asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        panB.add(asmLabel, BorderLayout.NORTH);
-        panB.add(panCode, BorderLayout.CENTER);
+        pcodePanel.add(asmLabel, BorderLayout.NORTH);
+        pcodePanel.add(panCode, BorderLayout.CENTER);
 
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
@@ -907,7 +909,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         //buttonsPan.add(saveHexButton);
         //buttonsPan.add(loadHexButton);
-        panB.add(buttonsPan, BorderLayout.SOUTH);
+        pcodePanel.add(buttonsPan, BorderLayout.SOUTH);
 
         saveButton.addActionListener(this::saveActionButtonActionPerformed);
         editButton.addActionListener(this::editActionButtonActionPerformed);
@@ -1025,7 +1027,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         setLayout(new BorderLayout());
 
         if (Configuration.displayAs12PCodePanel.get()) {
-            add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+            add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, pcodePanel, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         } else {
             splitPane = null;
             add(panA, BorderLayout.CENTER);
@@ -1190,7 +1192,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             saveButton.setVisible(val);
             saveButton.setEnabled(false);
             editButton.setVisible(!val);
-            cancelButton.setVisible(val);
+            cancelButton.setVisible(val);            
         }
 
         editor.getCaret().setVisible(true);
@@ -1224,6 +1226,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             saveDecompiledButton.setEnabled(false);
             editDecompiledButton.setVisible(!val);
             cancelDecompiledButton.setVisible(val);
+            pcodePanel.setVisible(!val);
         }
         decompiledEditor.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);

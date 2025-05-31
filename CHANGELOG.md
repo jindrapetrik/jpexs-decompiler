@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
   (also in edit mode)
 - AS1/2/3 - underline errors in the code (also in edit mode) 
 - AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar
+- AS1/2 direct editation - hide P-code panel when editing
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
