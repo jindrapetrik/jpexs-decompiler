@@ -83,7 +83,7 @@ public interface SimpleParser {
                     positionToStatic.put(v.position, v.isStatic != null ? v.isStatic : isStatic);
                 } else {
                     if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
-                            && !privateVarNameToDefinitionPosition.containsKey(v.getFirstName())) {
+                            && !privateVarNameToDefinitionPosition.containsKey(v.name)) {
                         parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                         parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
                         privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
@@ -100,7 +100,7 @@ public interface SimpleParser {
                             if (privateVarFullNameToDefinitionPosition.containsKey(v.name)) {
                                 definitionPos = privateVarFullNameToDefinitionPosition.get(v.name);
                             } else {
-                                definitionPos = privateVarNameToDefinitionPosition.get(v.getFirstName());
+                                definitionPos = privateVarNameToDefinitionPosition.get(v.name);
                             }
                             boolean staticDefinition = definitionPos >= 0 ? positionToStatic.get(definitionPos) : true;
                             if (!(!staticDefinition && isStatic)) {
@@ -137,7 +137,7 @@ public interface SimpleParser {
                     positionToStatic.put(v.position, v.isStatic != null ? v.isStatic : isStatic);
                 } else {
                     if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
-                            && !privateVarNameToDefinitionPosition.containsKey(v.getFirstName())) {
+                            && !privateVarNameToDefinitionPosition.containsKey(v.name)) {
                         parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                         parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
                         privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
@@ -154,7 +154,7 @@ public interface SimpleParser {
                             if (privateVarFullNameToDefinitionPosition.containsKey(v.name)) {
                                 definitionPos = privateVarFullNameToDefinitionPosition.get(v.name);
                             } else {
-                                definitionPos = privateVarNameToDefinitionPosition.get(v.getFirstName());
+                                definitionPos = privateVarNameToDefinitionPosition.get(v.name);
                             }
                             boolean staticDefinition = definitionPos >= 0 ? positionToStatic.get(definitionPos) : true;
                             if (!(!staticDefinition && isStatic)) {

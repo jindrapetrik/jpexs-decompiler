@@ -461,10 +461,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
         if (hasRest) {
             subvariables.add(new Variable(true, paramNames.get(paramNames.size() - 1), paramPositions.get(paramNames.size() - 1)));
         }
-        subvariables.add(new Variable(true, "arguments", -1)); //??? FIXME
         Reference<Boolean> needsActivation2 = new Reference<>(false);
         if (!isInterface && !isNative) {
-            expectedType(errors, SymbolType.CURLY_OPEN);
+            s = lex();
+            expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
+            subvariables.add(new Variable(true, "arguments", -s.position - 1));
             commands(errors, thisType, needsActivation2, importedClasses, openedNamespaces, new Stack<>(), new HashMap<>(), new HashMap<>(), true, isMethod, isStatic, 0, subvariables, abc);
             expectedType(errors, SymbolType.CURLY_CLOSE);
         } else {

@@ -188,7 +188,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 && (token.start == pos)) {
             return token;
         }
-        return null;
+        return getNearestTokenAt(sDoc, pos);
     }
 
     private Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
@@ -261,7 +261,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         markerKind = underLineMarkOccurencesPainter;
                     }
                 }
-                Markers.markToken(pane, definitionToken, markerKind);
+                if (tokenTypes.contains(definitionToken.type)) {
+                    Markers.markToken(pane, definitionToken, markerKind);
+                }
                 occurencesPositions.add(definitionToken.start);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
