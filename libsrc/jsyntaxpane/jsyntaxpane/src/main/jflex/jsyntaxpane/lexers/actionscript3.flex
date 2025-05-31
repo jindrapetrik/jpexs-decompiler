@@ -108,8 +108,6 @@ Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
 
 IdentifierNs = {Identifier} ":" {Identifier}
 
-TypeNameSpec = ".<" {Identifier} ">"
-
 /* XML */
 LetterColon = [:jletter] | ":"
 XMLIdentifier = {Identifier} | {IdentifierNs}
@@ -249,6 +247,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   "..."                          |
   "."                            |
   "="                            |
+  ".<"                           |
   "<"                            |
   "!"                            |
   "~"                            |
@@ -330,7 +329,6 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
   /* whitespace */
   {WhiteSpace}                   { }
-  {TypeNameSpec}                 { return token(TokenType.IDENTIFIER); }
   {XMLBeginOneTag}                  {  yybegin(XML);
                                     tokenStart = yychar;
                                     tokenLength = yylength();
