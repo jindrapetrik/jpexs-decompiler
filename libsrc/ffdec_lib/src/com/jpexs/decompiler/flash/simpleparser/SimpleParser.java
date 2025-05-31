@@ -127,12 +127,12 @@ public interface SimpleParser {
                 if (vs instanceof TraitVarConstValueScope) {
                     subStatic = ((TraitVarConstValueScope) vs).isStatic();
                 }
-                
+
                 //if its inner function (not a method), remove all this variables
                 Map<String, Integer> subPrivateVarFullNameToDefinitionPosition = privateVarFullNameToDefinitionPosition;
                 Map<String, Integer> subPrivateVarNameToDefinitionPosition = privateVarNameToDefinitionPosition;
-                if ((vs instanceof FunctionScope) &&(!(vs instanceof MethodScope))) {
-                    subPrivateVarFullNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarFullNameToDefinitionPosition);                   
+                if ((vs instanceof FunctionScope) && (!(vs instanceof MethodScope))) {
+                    subPrivateVarFullNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarFullNameToDefinitionPosition);
                     subPrivateVarNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarNameToDefinitionPosition);
                     Set<String> keys = new HashSet<>(subPrivateVarFullNameToDefinitionPosition.keySet());
                     for (String vName : keys) {
@@ -145,10 +145,10 @@ public interface SimpleParser {
                                 String lastName = vName.contains(".") ? vName.substring(vName.lastIndexOf(".") + 1) : vName;
                                 subPrivateVarNameToDefinitionPosition.remove(lastName);
                             }
-                        }                        
+                        }
                     }
                 }
-                
+
                 parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits);
             }
         }
@@ -203,28 +203,28 @@ public interface SimpleParser {
                 if (vs instanceof TraitVarConstValueScope) {
                     subStatic = ((TraitVarConstValueScope) vs).isStatic();
                 }
-                
+
                 //if its inner function (not a method), remove all this variables                
                 Map<String, Integer> subPrivateVarFullNameToDefinitionPosition = privateVarFullNameToDefinitionPosition;
                 Map<String, Integer> subPrivateVarNameToDefinitionPosition = privateVarNameToDefinitionPosition;
-                if ((vs instanceof FunctionScope) &&(!(vs instanceof MethodScope))) {
-                    subPrivateVarFullNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarFullNameToDefinitionPosition);                   
+                if ((vs instanceof FunctionScope) && (!(vs instanceof MethodScope))) {
+                    subPrivateVarFullNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarFullNameToDefinitionPosition);
                     subPrivateVarNameToDefinitionPosition = new LinkedHashMap<>(subPrivateVarNameToDefinitionPosition);
                     Set<String> keys = new HashSet<>(subPrivateVarFullNameToDefinitionPosition.keySet());
                     for (String vName : keys) {
                         if (vName.equals("this") || vName.startsWith("this.")) {
                             subPrivateVarFullNameToDefinitionPosition.remove(vName);
-                            if (vName.equals("this")) {                            
+                            if (vName.equals("this")) {
                                 subPrivateVarNameToDefinitionPosition.remove("this");
                             }
                             if (!innerFunctionCanUseTraits) {
                                 String lastName = vName.contains(".") ? vName.substring(vName.lastIndexOf(".") + 1) : vName;
                                 subPrivateVarNameToDefinitionPosition.remove(lastName);
                             }
-                        }                        
+                        }
                     }
                 }
-                
+
                 parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits);
             }
         }

@@ -1980,7 +1980,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         cai.pkg.resolveCustomNs(abcIndex, importedClasses, localData.pkg, openedNamespaces, localData);
                     }
                     namespace = cai.pkg == null ? 0 : cai.pkg.getCpoolIndex(abcIndex);
-                    isNamespace = type.toString().equals("Namespace");
+                    isNamespace = cai.ns;
                     isStatic = cai.isStatic();
                 }
                 tsc.type_index = isNamespace ? 0 : (type == null ? 0 : typeName(localData, type));

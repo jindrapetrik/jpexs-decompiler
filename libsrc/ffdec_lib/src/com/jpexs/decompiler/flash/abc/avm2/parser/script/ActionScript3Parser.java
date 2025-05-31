@@ -40,7 +40,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
-import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
@@ -149,7 +148,7 @@ import macromedia.asc.util.Decimal128;
  * @author JPEXS
  */
 public class ActionScript3Parser {
-    
+
     private static final GraphTargetDialect DIALECT = AVM2GraphTargetDialect.INSTANCE;
 
     private long uniqLast = 0;
@@ -919,7 +918,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs);
+                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), true, generatedNs);
                     traits.add(ns);
                     break;
                 case CONST:
@@ -961,7 +960,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline(), false);
+                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline(), false, false);
                     } else {
                         tar = new SlotAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline());
                     }
@@ -1275,7 +1274,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline(), false);
+                        tar = new ConstAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline(), false, false);
                     } else {
                         tar = new SlotAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline());
                     }
@@ -1309,7 +1308,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
 
-                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs));
+                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), true, generatedNs));
                     break;
                 default:
                     lexer.pushback(s);

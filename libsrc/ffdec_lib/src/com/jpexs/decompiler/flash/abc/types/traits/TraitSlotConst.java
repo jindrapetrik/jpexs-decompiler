@@ -132,7 +132,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (kindType == TRAIT_CONST) {
             slotconst = "const";
         }
-        if (val != null && val.isNamespace()) {
+        if (val != null && type_index == 0 && val.isNamespace()) {
             slotconst = "namespace";
             typeStr = "";
         }
