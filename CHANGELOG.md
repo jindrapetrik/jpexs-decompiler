@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 - [#2460] SVG export - incorrect caching colorTransform and ratio for the same tag
 - [#2461] SVG export - incorrect clipping / missing shapes
 - AS1/2 direct editation - Position in the code should stay same after clicking Edit button
+- AS3 direct editation - Allow internal keyword on script traits (e.g. classes)
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

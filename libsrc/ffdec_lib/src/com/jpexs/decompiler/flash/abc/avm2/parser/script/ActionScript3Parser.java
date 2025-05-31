@@ -1101,9 +1101,10 @@ public class ActionScript3Parser {
             boolean isDynamic = false;
             boolean isPublic = false;
             boolean isNative = false;
+            boolean isInternal = false;
             NamespaceItem ns = packageInternalNs;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
-            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC)) {
+            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -1111,13 +1112,24 @@ public class ActionScript3Parser {
                     isFinal = true;
                     preSymbols.add(s);
                 }
+                if (s.type == SymbolType.INTERNAL) {
+                    if (!inPackage) {
+                        throw new AVM2ParseException("internal only allowed inside package", lexer.yyline());
+                    }
+                    if (isPublic || isInternal) {
+                        throw new AVM2ParseException("Only one of public/internal keyword allowed", lexer.yyline());
+                    }
+                    isInternal = true;
+                    ns = packageInternalNs;
+                    preSymbols.add(s);
+                }
                 if (s.type == SymbolType.PUBLIC) {
                     if (!inPackage) {
                         throw new AVM2ParseException("public only allowed inside package", lexer.yyline());
 
                     }
-                    if (isPublic) {
-                        throw new AVM2ParseException("Only one public keyword allowed", lexer.yyline());
+                    if (isPublic || isInternal) {
+                        throw new AVM2ParseException("Only one of public/internal keyword allowed", lexer.yyline());
                     }
                     isPublic = true;
                     ns = publicNs;

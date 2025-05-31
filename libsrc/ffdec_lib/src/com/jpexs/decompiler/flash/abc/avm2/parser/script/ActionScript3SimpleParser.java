@@ -883,8 +883,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
             boolean isDynamic = false;
             boolean isPublic = false;
             boolean isNative = false;
+            boolean isInternal = false;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
-            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC)) {
+            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         errors.add(new SimpleParseException("Only one final keyword allowed", lexer.yyline(), s.position));
@@ -892,13 +893,25 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     isFinal = true;
                     preSymbols.add(s);
                 }
+                if (s.type == SymbolType.INTERNAL) {
+                    if (!inPackage) {
+                        errors.add(new SimpleParseException("internal only allowed inside package", lexer.yyline(), s.position));
+
+                    }
+                    if (isPublic || isInternal) {
+                        errors.add(new SimpleParseException("Only one public/internal keyword allowed", lexer.yyline(), s.position));
+                    }
+                    isInternal = true;
+                    //ns = internalNs;
+                    preSymbols.add(s);
+                }
                 if (s.type == SymbolType.PUBLIC) {
                     if (!inPackage) {
                         errors.add(new SimpleParseException("public only allowed inside package", lexer.yyline(), s.position));
 
                     }
-                    if (isPublic) {
-                        errors.add(new SimpleParseException("Only one public keyword allowed", lexer.yyline(), s.position));
+                    if (isPublic || isInternal) {
+                        errors.add(new SimpleParseException("Only one public/internal keyword allowed", lexer.yyline(), s.position));
                     }
                     isPublic = true;
                     //ns = publicNs;
