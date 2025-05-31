@@ -52,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - NaN can be used as identifier
 - Pin header for AS2 script in the Resources view should show Class name in 
   the title instead of tag full description
+- AS1/2/3 for decompilation with multiple variables
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

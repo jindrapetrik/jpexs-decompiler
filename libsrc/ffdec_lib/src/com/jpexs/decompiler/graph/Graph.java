@@ -1463,10 +1463,11 @@ public class Graph {
                         if (list.get(j).getLine() == exprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
                             toDelete[j] = true;
+                            break; //do not allow more than 1
                         } else {
                             break;
                         }
-                    }
+                    }                    
                     fori.firstCommands.addAll(0, forFirstCommands);
                 }
             }
@@ -1495,8 +1496,8 @@ public class Graph {
                         }
                     }
                     if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
-                        //Do not allow more than 2 first/final commands, since it can be obfuscated
-                        if (forFirstCommands.size() > 2 || forFinalCommands.size() > 2) {
+                        //Do not allow more than 1 first/final command, since it can be obfuscated
+                        if (forFirstCommands.size() > 1 || forFinalCommands.size() > 1) {
                             //put it back
                             for (int k = 0; k < forFirstCommands.size(); k++) {
                                 toDelete[i - 1 - k] = false;
