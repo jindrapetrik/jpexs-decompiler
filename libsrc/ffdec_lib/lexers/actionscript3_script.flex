@@ -297,7 +297,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "true"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.TRUE, yytext()); }
   "undefined"                    { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
   "Infinity"                     { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
-  "NaN"                          { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
+  /* "NaN"                          { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); } */
   "final"                        { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext()); }
   "native"                       { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.NATIVE, yytext()); }
 

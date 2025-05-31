@@ -503,10 +503,9 @@ public enum SymbolType {
      * Other: undefined
      */
     UNDEFINED(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    /**
-     * Other: NaN
-     */
-    NAN(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    
+    //NAN(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    
     /**
      * Keyword: final
      */

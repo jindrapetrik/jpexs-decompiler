@@ -1872,9 +1872,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 ret = true;
                 allowMemberOrCall = true;
                 break;
-            case NAN:
+            /*case NAN:
                 ret = true;
-                break;
+                break;*/
             case INFINITY:
                 ret = true;
                 break;

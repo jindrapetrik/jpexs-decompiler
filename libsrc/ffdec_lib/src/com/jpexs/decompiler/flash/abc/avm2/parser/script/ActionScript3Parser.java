@@ -2587,10 +2587,10 @@ public class ActionScript3Parser {
                 ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc);
                 allowMemberOrCall = true;
                 break;
-            case NAN:
+            /*case NAN:
                 ret = new NanAVM2Item(null, null);
 
-                break;
+                break;*/
             case INFINITY:
                 ret = new DoubleValueAVM2Item(null, null, Double.POSITIVE_INFINITY);
 
