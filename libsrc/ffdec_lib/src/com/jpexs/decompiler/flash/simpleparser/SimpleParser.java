@@ -112,7 +112,7 @@ public interface SimpleParser {
                                 definitionPosToReferences.get(definitionPos).add(v.position);
                                 referenceToDefinition.put(v.position, definitionPos);
                             } else {
-                                errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
+                                //errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
                             }
                         }
                     }
@@ -188,7 +188,7 @@ public interface SimpleParser {
                                 definitionPosToReferences.get(definitionPos).add(v.position);
                                 referenceToDefinition.put(v.position, definitionPos);
                             } else {
-                                errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
+                                //errors.add(new SimpleParseException("Cannot reference instance variable from static context", -1, v.position));
                             }
                         }
                     }
