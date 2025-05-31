@@ -227,9 +227,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
         while (true) {
             boolean isStatic = false;
             s = lex();
+            int staticPos = -1;
             while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE)) {
                 if (s.type == SymbolType.STATIC) {
                     isStatic = true;
+                    staticPos = s.position;
                 }
                 s = lex();
             }
@@ -245,8 +247,18 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
                     if (!expectedIdentifier(errors, s, lexer.yyline())) {
                         break;
+                    }                    
+                    
+                    String simpleClassName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
+                    
+                    if (!simpleClassName.equals(s.value.toString())) { //not constructor
+                        traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position, isStatic));                    
+                    } else {
+                        if (isStatic) {
+                            errors.add(new SimpleParseException("Constructor cannot be static", lexer.yyline(), staticPos));                            
+                        }
                     }
-                    traitVariables.add(new Variable(true, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), s.position, isStatic));
+                    
                     if (!isInterface) {
                         variables.add(function(errors, !isInterface, isStatic ? className + "." + s.value.toString() : "this." + s.value.toString(), isStatic ? -1 : s.position, true, traitVariables, inTellTarget, hasEval, isStatic));
                     }                    

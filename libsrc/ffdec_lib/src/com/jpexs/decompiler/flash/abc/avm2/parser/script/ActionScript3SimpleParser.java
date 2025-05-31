@@ -669,7 +669,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     } else {
                         fname = s.value.toString();
                     }
-                    traitVariables.add(new Variable(true, prefix + fname, fnamePos, isStatic));
+                    if (!fname.equals(classNameStr)) { //ignore constructor
+                        traitVariables.add(new Variable(true, prefix + fname, fnamePos, isStatic));
+                    }
                     if (fname.equals(classNameStr)) { //constructor
                         if (isStatic) {
                             errors.add(new SimpleParseException("Constructor cannot be static", lexer.yyline(), s.position));
@@ -951,7 +953,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     }
                     subNameStr = s.value.toString();
                     int subNamePos = s.position;
-                    sinitVariables.add(new Variable(true, pkgName.addWithSuffix(subNameStr).toPrintableString(true), subNamePos));
+                    sinitVariables.add(new Type(true, pkgName.addWithSuffix(subNameStr).toPrintableString(true), subNamePos));
                     s = lex();
 
                     if (s.type == SymbolType.NOT) {
@@ -986,7 +988,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     Reference<Boolean> cinitNeedsActivation = new Reference<>(false);
                     Reference<Boolean> iinitNeedsActivation = new Reference<>(false);
                     List<VariableOrScope> classVariables = new ArrayList<>();
-                    classVariables.add(new Variable(true, "this", s.position));
+                    classVariables.add(new Variable(true, "this", s.position, false));
                     
                     classTraits(errors, !inPackage, cinitNeedsActivation, importedClasses, subOpenedNamespaces, pkgName, subNameStr, isInterface, iinitNeedsActivation, abc, classVariables);
 
