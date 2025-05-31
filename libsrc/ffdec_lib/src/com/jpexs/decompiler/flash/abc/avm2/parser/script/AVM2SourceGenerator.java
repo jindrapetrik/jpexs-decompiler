@@ -2520,7 +2520,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
         if (sp == null) {
-            sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true);
+            Reference<Boolean> foundStatic = new Reference<>(null);                
+            sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
         }
         if (sp != null) {
             if (sp.trait instanceof TraitClass) {

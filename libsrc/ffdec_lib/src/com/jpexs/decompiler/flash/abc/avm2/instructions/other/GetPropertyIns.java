@@ -178,7 +178,8 @@ public class GetPropertyIns extends InstructionDefinition {
                     if (localData.abcIndex != null) {
                         String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
                         if (currentClassName != null) {
-                            localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType);
+                            Reference<Boolean> foundStatic = new Reference<>(null);                
+                            localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType, foundStatic);
                         }
                         if (type.getVal().equals(TypeItem.UNKNOWN)) {
                             GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);
@@ -256,7 +257,8 @@ public class GetPropertyIns extends InstructionDefinition {
                             return;
                         }
                     }
-                    localData.abcIndex.findPropertyTypeOrCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false, type, callType);
+                    Reference<Boolean> foundStatic = new Reference<>(null);                
+                    localData.abcIndex.findPropertyTypeOrCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false, type, callType, foundStatic);
                     if (receiverType.equals(new TypeItem("XML")) && !type.getVal().equals(new TypeItem("Function"))) {
                         type.setVal(new TypeItem("XMLList"));
                     }

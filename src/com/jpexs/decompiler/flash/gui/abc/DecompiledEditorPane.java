@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
+import com.jpexs.decompiler.flash.gui.editor.LinkType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -337,14 +338,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         return -1;
-    }
-
-    public boolean getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed) {
+    } 
+    
+    public LinkType getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed, boolean currentSwfOnly) {
 
         int m = getMultinameAtPos(pos, true, abcUsed);
 
         if (indexing == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
         /*int m = getMultinameAtPos(pos, true, abcUsed);
         if (m <= 0) {
@@ -356,64 +357,68 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         Token prev;
         String propName = t.getString(sd);
         if (!(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX)) {
-            return false;
+            return LinkType.NO_LINK;
         }
         prev = sd.getPrevToken(t);
         if (prev == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
         if (!".".equals(prev.getString(sd))) {
-            return false;
+            return LinkType.NO_LINK;
         }
         Highlighting sh = Highlighting.search(highlightedText.getSpecialHighlights(), new HighlightData(), prev.start, prev.start);
         if (sh == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
 
         HighlightData data = sh.getProperties();
 
         String parentType = data.propertyType;
         if (parentType.equals("*")) {
-            return false;
+            return LinkType.NO_LINK;
         }
-        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), data.isStatic, !data.isStatic, true);
+        Reference<Boolean> foundStatic = new Reference<>(null);
+        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), true, !data.isStatic, true, foundStatic);
         if (propertyTraitIndex == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
 
         List<ABCContainerTag> abcs = getABC().getSwf().getAbcList();
         int index = 0;
-        boolean found = false;
+        boolean isCurrentSwf = false;
         for (ABCContainerTag cnt : abcs) {
             if (cnt.getABC() == propertyTraitIndex.abc) {
                 abcIndex.setVal(index);
-                found = true;
+                isCurrentSwf = true;
                 break;
             }
             index++;
         }
-        if (!found) {
-            return false;
+
+        if (currentSwfOnly) {
+            if (!isCurrentSwf) {
+                return LinkType.NO_LINK;
+            }
         }
 
         abcUsed.setVal(propertyTraitIndex.abc);
 
         index = propertyTraitIndex.abc.findClassByName(propertyTraitIndex.objType.toString());
         if (index == -1) {
-            return false;
+            return LinkType.NO_LINK;
         }
         classIndex.setVal(index);
 
-        classTrait.setVal(data.isStatic);
+        classTrait.setVal(foundStatic.getVal());
 
         Traits ts;
-        if (data.isStatic) {
+        if (foundStatic.getVal()) {
             ts = propertyTraitIndex.abc.class_info.get(index).static_traits;
         } else {
             ts = propertyTraitIndex.abc.instance_info.get(index).instance_traits;
         }
-
-        found = false;
+        
+        boolean found = false;
         for (int i = 0; i < ts.traits.size(); i++) {
             if (ts.traits.get(i) == propertyTraitIndex.trait) {
                 traitIndex.setVal(i);
@@ -422,12 +427,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
         }
         if (!found) {
-            return false;
+            return LinkType.NO_LINK;
         }
 
         multinameIndex.setVal(propertyTraitIndex.trait.name_index);
 
-        return true;
+        return isCurrentSwf ? LinkType.LINK_OTHER_SCRIPT : LinkType.LINK_OTHER_FILE;
         /*
         if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX) {
             return false;

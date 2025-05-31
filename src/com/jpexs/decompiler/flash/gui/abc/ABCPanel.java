@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.editor.LinkType;
 import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
@@ -905,7 +906,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
             @Override
-            public boolean isLink(Token token) {
+            public LinkType isLink(Token token) {
                 return hasDeclaration(token);
             }
 
@@ -1233,13 +1234,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         cancelDecompiledButton.setEnabled(value);
     }
 
-    private boolean hasDeclaration(Token t) {
+    private LinkType hasDeclaration(Token t) {
         if (decompiledTextArea == null) {
-            return false; //?
+            return LinkType.NO_LINK; //?
         }
 
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
-            return false;
+            return LinkType.NO_LINK;
         }
         int pos = t.start;
         Reference<Integer> abcIndex = new Reference<>(0);
@@ -1249,21 +1250,22 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Reference<Boolean> classTrait = new Reference<>(false);
         Reference<ABC> usedAbcRef = new Reference<>(null);
         if (getSwf() == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
-        if (decompiledTextArea.getPropertyTypeAtPos(getSwf().getAbcIndex(), pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef)) {
-            return true;
-        }
+        LinkType propLinkType = decompiledTextArea.getPropertyTypeAtPos(getSwf().getAbcIndex(), pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef, false);
+        if (propLinkType != LinkType.NO_LINK) {
+            return propLinkType;  
+        }                  
         ABC usedAbc = usedAbcRef.getVal();
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos, usedAbcRef);
         if (multinameIndex > -1) {
             if (multinameIndex == 0) {
-                return false;
+                return LinkType.NO_LINK;
             }
 
             Multiname m = usedAbc.constants.getMultiname(multinameIndex);
             if (m == null) {
-                return false;
+                return LinkType.NO_LINK;
             }
             if (m.kind == Multiname.TYPENAME) {  //Assuming it's a Vector with single parameter
                 multinameIndex = m.params[0];
@@ -1288,11 +1290,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             //more than one? display list
             if (!usages.isEmpty()) {
-                return true;
+                return LinkType.NO_LINK;
             }
         }
 
-        return decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null)) != -1;
+        return decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null)) != -1 ? LinkType.LINK_OTHER_SCRIPT : LinkType.NO_LINK;
     }
 
     private void gotoDeclaration(int pos) {
@@ -1304,7 +1306,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Reference<Boolean> classTrait = new Reference<>(false);
         Reference<Integer> multinameIndexRef = new Reference<>(0);
         Reference<ABC> usedAbcRef = new Reference<>(null);
-        if (decompiledTextArea.getPropertyTypeAtPos(getSwf().getAbcIndex(), pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef)) {
+        if (decompiledTextArea.getPropertyTypeAtPos(getSwf().getAbcIndex(), pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef, false) != LinkType.NO_LINK) {
             UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), decompiledTextArea.getScriptLeaf().scriptIndex, classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
             });
             return;

@@ -115,14 +115,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private UnderlinePainter underLineExternalMarkOccurencesPainter = new UnderlinePainter(new Color(0, 255, 0), DEFAULT_COLOR);
 
     private Token lastUnderlined;
-    private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;
-    
-    
-    public static enum LinkType {
-        NO_LINK,
-        LINK_THIS_SCRIPT,
-        LINK_OTHER_SCRIPT;
-    }
+    private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;            
 
     /**
      * Constructs a new Token highlighter
@@ -629,10 +622,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         if (pane.isEditable()) {
             return LinkType.NO_LINK;
         }
-        if (((LineMarkedEditorPane) pane).getLinkHandler().isLink(token)) {
-            return LinkType.LINK_OTHER_SCRIPT;
-        }
-        return LinkType.NO_LINK;
+        return ((LineMarkedEditorPane) pane).getLinkHandler().isLink(token);
     }
 
     public void handleLink(Token token) {

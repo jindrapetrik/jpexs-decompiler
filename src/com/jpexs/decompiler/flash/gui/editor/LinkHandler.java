@@ -24,7 +24,7 @@ import jsyntaxpane.Token;
  */
 public interface LinkHandler {
 
-    public boolean isLink(Token token);
+    public LinkType isLink(Token token);
 
     public void handleLink(Token token);
 

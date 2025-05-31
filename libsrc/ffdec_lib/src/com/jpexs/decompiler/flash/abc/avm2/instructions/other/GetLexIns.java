@@ -80,7 +80,8 @@ public class GetLexIns extends InstructionDefinition {
         if (localData.abcIndex != null) {
             String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
             if (currentClassName != null) {
-                localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true, type, callType);
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true, type, callType, foundStatic);
             }
 
             if (type.getVal().equals(TypeItem.UNKNOWN)) {

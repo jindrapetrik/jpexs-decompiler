@@ -49,6 +49,7 @@ import javax.swing.text.View;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 
 /**
@@ -382,8 +383,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     @Override
-    public boolean isLink(Token token) {
-        return false;
+    public LinkType isLink(Token token) {
+        return LinkType.NO_LINK;
     }
 
     @Override

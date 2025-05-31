@@ -644,8 +644,8 @@ public final class AbcIndexing {
      * @param type Property type
      * @param callType Call type
      */
-    public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
-        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
+    public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType, Reference<Boolean> foundStatic) {
+        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected, foundStatic);
         if (traitIndex == null) {
             type.setVal(TypeItem.UNKNOWN);
             callType.setVal(TypeItem.UNKNOWN);
@@ -666,8 +666,8 @@ public final class AbcIndexing {
      * @param findProtected Find protected namespace properties
      * @return Trait index or null
      */
-    public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected) {
-        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
+    public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<Boolean> foundStatic) {
+        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected, foundStatic);
         if (traitIndex == null) {
             return TypeItem.UNBOUNDED;
         }
@@ -685,8 +685,8 @@ public final class AbcIndexing {
      * @param findProtected Find protected namespace properties
      * @return Trait index or null
      */
-    public GraphTargetItem findPropertyCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected) {
-        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
+    public GraphTargetItem findPropertyCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<Boolean> foundStatic) {
+        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected, foundStatic);
         if (traitIndex == null) {
             return TypeItem.UNBOUNDED;
         }
@@ -761,9 +761,10 @@ public final class AbcIndexing {
      * @param findStatic Find static properties
      * @param findInstance Find instance properties
      * @param findProtected Find protected namespace properties
+     * @param foundStatic  Whether result is static
      * @return Trait index or null
      */
-    public TraitIndex findProperty(PropertyDef prop, boolean findStatic, boolean findInstance, boolean findProtected) {
+    public TraitIndex findProperty(PropertyDef prop, boolean findStatic, boolean findInstance, boolean findProtected, Reference<Boolean> foundStatic) {
         /*System.out.println("searching " + prop);
         for (PropertyDef p : instanceProperties.keySet()) {
             if (p.parent.equals(new TypeItem("tests_classes.TestConvertParent"))) {
@@ -776,11 +777,12 @@ public final class AbcIndexing {
         if (findStatic && classProperties.containsKey(prop)) {
             TraitIndex ti = classProperties.get(prop);
             if (ti != null) {
+                foundStatic.setVal(true);
                 return ti;
             }
             if (parent != null) {
-                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
-                if (ret != null) {
+                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected, foundStatic);
+                if (ret != null) {                    
                     return ret;
                 }
             }
@@ -790,11 +792,12 @@ public final class AbcIndexing {
         if (findInstance && instanceProperties.containsKey(prop)) {
             TraitIndex ti = instanceProperties.get(prop);
             if (ti != null) {
+                foundStatic.setVal(false);
                 return ti;
             }
             if (parent != null) {
-                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
-                if (ret != null) {
+                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected, foundStatic);
+                if (ret != null) {                    
                     return ret;
                 }
             }
@@ -805,7 +808,7 @@ public final class AbcIndexing {
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
             DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);
-            TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), prop.getPropNsString()), findStatic, findInstance, findProtected);
+            TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), prop.getPropNsString()), findStatic, findInstance, findProtected, foundStatic);
             if (pti != null) {
                 return pti;
             }
@@ -815,14 +818,14 @@ public final class AbcIndexing {
             if (ci != null) {
                 int protNs = ci.abc.instance_info.get(ci.index).protectedNS;
                 PropertyDef prop2 = new PropertyDef(prop.propName, prop.parent, ci.abc, protNs);
-                TraitIndex pti = findProperty(prop2, findStatic, findInstance, false);
+                TraitIndex pti = findProperty(prop2, findStatic, findInstance, false, foundStatic);
                 if (pti != null) {
                     return pti;
                 }
             }
         }
         if (parent != null) {
-            TraitIndex pti = parent.findProperty(prop, findStatic, findInstance, findProtected);
+            TraitIndex pti = parent.findProperty(prop, findStatic, findInstance, findProtected, foundStatic);
             if (pti != null) {
                 return pti;
             }
