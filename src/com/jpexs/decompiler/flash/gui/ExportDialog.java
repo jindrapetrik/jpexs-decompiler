@@ -147,7 +147,7 @@ public class ExportDialog extends AppDialog {
 
     private final JCheckBox selectAllCheckBox;
 
-    private JTextField zoomTextField = new JTextField();
+    private JTextField zoomTextField = new JTextField(4);
 
     private JCheckBox embedCheckBox;
 
