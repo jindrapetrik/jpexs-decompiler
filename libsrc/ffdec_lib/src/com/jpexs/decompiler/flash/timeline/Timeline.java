@@ -1597,7 +1597,7 @@ public class Timeline {
      * @param level Level
      * @throws IOException On I/O error
      */
-    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level) throws IOException {
+    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException {
         if (getFrameCount() <= frame) {
             return;
         }
@@ -1650,6 +1650,9 @@ public class Timeline {
                 clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
+            Matrix layerMatrix = new Matrix(layer.getDrawingMatrix());
+            Matrix absMat = strokeTransformation.concatenate(layerMatrix);
+            
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
 
@@ -1669,26 +1672,32 @@ public class Timeline {
                     exporter.createClipPath(mat, clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, transformation, strokeTransformation);
                     exporter.endGroup();
                 } else {
                     boolean createNew = false;
 
                     SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1);
-                    if (exporter.exportedTags.containsKey(exportKey)) {
+                    if (exporter.exportedTags.containsKey(exportKey)
+                            && !exporter.exportedSmallStrokesTags.contains(exportKey)) {
                         assetName = exporter.exportedTags.get(exportKey);
                     } else {
                         assetName = getTagIdPrefix(drawableTag, exporter);
                         exporter.exportedTags.put(exportKey, assetName);
                         createNew = true;
                     }
+                    boolean hasSmallStrokes = false;
                     if (createNew) {
                         exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                        drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
-                        exporter.endGroup();
+                        drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, transformation, absMat);
+                        hasSmallStrokes = exporter.hasSmallStrokes();                       
+                        exporter.endGroup();                        
                     }
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter, String.valueOf(drawable.getCharacterId()), String.join("___", drawable.getClassNames()), layer.blendMode, layer.filters);
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter, String.valueOf(drawable.getCharacterId()), String.join("___", drawable.getClassNames()), layer.blendMode, layer.filters, hasSmallStrokes);                                        
+                    if (hasSmallStrokes) {
+                        exporter.exportedSmallStrokesTags.add(exportKey);
+                    }
                 }
             }
         }

@@ -420,16 +420,16 @@ public abstract class MorphShapeTag extends DrawableTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
 
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, 1);
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, exporter.getZoom());
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD /*??? FIXME*/, getShapeNum() == 2 ? 4 : 1, swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD /*??? FIXME*/, getShapeNum() == 2 ? 4 : 1, swf, shapes, getCharacterId(), exporter, null, colorTransform, 1, exporter.getZoom(), strokeTransformation);
             shapeExporter.export();
         }
     }

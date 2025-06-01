@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +53,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * SVG exporter.
@@ -82,6 +84,8 @@ public class SVGExporter {
 
     public Map<ExportKey, String> exportedTags = new HashMap<>();
 
+    public Set<ExportKey> exportedSmallStrokesTags = new HashSet<>();
+
     public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
     private final Map<String, Integer> lastIds = new HashMap<>();
@@ -89,6 +93,8 @@ public class SVGExporter {
     private final HashSet<String> fontFaces = new HashSet<>();
 
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
+
+    private double zoom;
 
     public static class ExportKey {
 
@@ -136,7 +142,7 @@ public class SVGExporter {
                 return false;
             }
             return Objects.equals(this.colorTransform, other.colorTransform);
-        }       
+        }
     }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {
@@ -144,6 +150,7 @@ public class SVGExporter {
     }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType, Color backgroundColor) {
+        this.zoom = zoom;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -185,6 +192,10 @@ public class SVGExporter {
         gradients = new ArrayList<>();
     }
 
+    public double getZoom() {
+        return zoom;
+    }
+
     private Element getDefs() {
         if (_svgDefs == null) {
             _svgDefs = _svg.createElement("defs");
@@ -202,10 +213,28 @@ public class SVGExporter {
         }
         return _svgStyle;
     }
+    
+    public final boolean hasSmallStrokes() {
+        NodeList nodes = _svgGs.peek().getElementsByTagName("path");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            if ("true".equals(e.getAttribute("ffdec:has-small-stroke"))) {
+                return true;
+            }
+        }
+        nodes = _svgGs.peek().getElementsByTagName("use");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            if ("true".equals(e.getAttribute("ffdec:has-small-stroke"))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public final void createDefGroup(ExportRectangle bounds, String id) {
         createDefGroup(bounds, id, 1);
-    }
+    }   
 
     public final void createDefGroup(ExportRectangle bounds, String id, double zoom) {
         Element g = _svg.createElement("g");
@@ -521,11 +550,11 @@ public class SVGExporter {
         _svgGs.peek().appendChild(filtersElement);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
-        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, boolean hasSmallStrokes) {
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>(), hasSmallStrokes);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters, boolean hasSmallStrokes) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
             addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode, filters);
             return null; //??
@@ -544,6 +573,9 @@ public class SVGExporter {
         }
         if (characterName != null && !characterName.isEmpty()) {
             image.setAttribute("ffdec:characterName", characterName);
+        }
+        if (hasSmallStrokes) {
+            image.setAttribute("ffdec:has-small-stroke", "true");
         }
 
         setBlendMode(image, blendMode);

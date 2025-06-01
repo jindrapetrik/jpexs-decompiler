@@ -312,7 +312,7 @@ public class FrameExporter {
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
 
-                            tim.toSVG(frame, 0, null, 0, exporter, null, 0);
+                            tim.toSVG(frame, 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                         ret.add(f);

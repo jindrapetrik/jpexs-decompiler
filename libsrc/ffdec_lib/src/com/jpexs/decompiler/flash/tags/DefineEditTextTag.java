@@ -1040,7 +1040,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
         render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
     }
 
@@ -1062,7 +1062,7 @@ public class DefineEditTextTag extends TextTag {
                     drawBorderHtmlCanvas(swf, htmlCanvasBuilder, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
                     break;
                 case SVG:
-                    drawBorderSVG(swf, svgExporter, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
+                    drawBorderSVG(swf, svgExporter, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform, zoom);
                     break;
             }
         }
@@ -1076,7 +1076,7 @@ public class DefineEditTextTag extends TextTag {
                     staticTextToHtmlCanvas(zoom, swf, allTextRecords, 2, htmlCanvasBuilder, getBounds(), getTextMatrix(), colorTransform);
                     break;
                 case SVG:
-                    staticTextToSVG(swf, allTextRecords, 2, svgExporter, getBounds(), getTextMatrix(), colorTransform, zoom);
+                    staticTextToSVG(swf, allTextRecords, 2, svgExporter, getBounds(), getTextMatrix(), colorTransform, zoom, transformation);
                     break;
             }
         }

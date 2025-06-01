@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -74,6 +75,16 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
      * Exporter
      */
     private final SVGExporter exporter;
+    
+    /**
+     * Display zoom
+     */
+    private final double displayZoom;
+    
+    /**
+     * Thickness scale
+     */
+    private final double thicknessScale;
 
     /**
      * Constructor.
@@ -85,14 +96,21 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
      * @param exporter Exporter
      * @param defaultColor Default color
      * @param colorTransform Color transform
-     * @param zoom Zoom
+     * @param zoom Zoom - shape zoom
+     * @param displayZoom Display zoom - overal SVG zoom
+     * @param strokeTransformation Stroke transformation
      */
-    public SVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+    public SVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom, double displayZoom, Matrix strokeTransformation) {
         super(windingRule, shapeNum, swf, shape, colorTransform, zoom);
         this.swf = swf;
         this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
+        this.displayZoom = displayZoom;
+        
+        com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
+        com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
+        thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);        
     }
 
     @Override
@@ -217,11 +235,19 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         }
         path.setAttribute("fill", "#ff0000");
     }
-
+    
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         finalizePath();
-        thickness *= zoom / SWF.unitDivisor;
+        
+        //always display minimum stroke of 1 pixel, no matter how zoomed it is
+        if (thickness * displayZoom * thicknessScale < 1 * SWF.unitDivisor) {
+            path.setAttribute("ffdec:has-small-stroke", "true");
+            path.setAttribute("ffdec:original-stroke-width", Double.toString(thickness * displayZoom / SWF.unitDivisor));
+            thickness = 1 * SWF.unitDivisor / displayZoom / thicknessScale;
+        }
+        
+        thickness *= zoom / SWF.unitDivisor;        
         path.setAttribute("fill", "none");
         if (color != null) {
             path.setAttribute("stroke", color.toHexRGB());

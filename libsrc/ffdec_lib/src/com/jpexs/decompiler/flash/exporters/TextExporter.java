@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
@@ -86,10 +87,11 @@ public class TextExporter {
                     final TextTag textTag = (TextTag) t;
                     final File file = new File(outdir + File.separator + Helper.makeFileName(textTag.getCharacterExportFileName() + ".svg"));
                     new RetryTask(() -> {
+                        Matrix m = Matrix.getScaleInstance(settings.zoom);
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                             ExportRectangle rect = new ExportRectangle(textTag.getRect());
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "text");
-                            textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                            textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                     }, handler).run();

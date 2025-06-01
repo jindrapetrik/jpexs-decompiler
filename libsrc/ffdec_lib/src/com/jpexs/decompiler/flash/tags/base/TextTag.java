@@ -558,10 +558,14 @@ public abstract class TextTag extends DrawableTag {
      * @param colorTransform Color transform
      * @param zoom Zoom
      */
-    public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
+    public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom);
+        
+        Matrix mat = transformation.clone();
+        mat = mat.concatenate(new Matrix(textMatrix));        
+        //??FIXME
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, 1, zoom, mat);
         shapeExporter.export();
         exporter.endGroup();
     }
@@ -838,8 +842,9 @@ public abstract class TextTag extends DrawableTag {
      * @param textMatrix Text matrix
      * @param colorTransform Color transform
      * @param zoom Zoom
+     * @param transformation Transformation
      */
-    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
+    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom, Matrix transformation) {
         int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
@@ -914,8 +919,19 @@ public abstract class TextTag extends DrawableTag {
                     exporter.endGroup();
                 }
             } else {
+                Matrix mat0 = transformation.clone();
+                mat0 = mat0.concatenate(new Matrix(textMatrix));
+                Matrix matScale = Matrix.getScaleInstance(rat);
+
+                
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
+                    
+                    
+                    matScale.translateX = x;
+                    matScale.translateY = y;
+                    
+                    Matrix matX = mat0.concatenate(matScale);
                     if (entry.glyphIndex != -1) {
                         // shapeNum: 1
                         SHAPE shape = glyphs.get(entry.glyphIndex);
@@ -936,7 +952,7 @@ public abstract class TextTag extends DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom, zoom, matX);
                             shapeExporter.export();
                             if (!exporter.endGroup()) {
                                 charId = "";
@@ -946,7 +962,7 @@ public abstract class TextTag extends DrawableTag {
                         }
 
                         if (!"".equals(charId)) {
-                            Element charImage = exporter.addUse(mat, bounds, charId, null, null);
+                            Element charImage = exporter.addUse(mat, bounds, charId, null, null, false);
                             RGBA colorA = new RGBA(textColor);
                             charImage.setAttribute("fill", colorA.toHexRGB());
                             if (colorA.alpha != 255) {

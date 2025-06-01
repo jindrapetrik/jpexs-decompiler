@@ -207,13 +207,7 @@ public class BitmapExporter extends ShapeExporterBase {
         com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
         thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
         thicknessScaleX = Math.abs(p11.x - p00.x);
-        thicknessScaleY = Math.abs(p11.y - p00.y);
-
-        /*Matrix transPre = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        p00 = transPre.transform(0, 0);
-        p11 = transPre.transform(1, 1);
-        realZoom = p00.distanceTo(p11) / Math.sqrt(2);
-        System.out.println("realZoom=" + realZoom);*/
+        thicknessScaleY = Math.abs(p11.y - p00.y);      
     }
 
     /**
