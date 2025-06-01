@@ -2001,7 +2001,9 @@ public class Main {
             OpenFileResult openResult = openFile(sourceInfo, new OpenableOpened() {
                 @Override
                 public void opened(Openable openable) {
-                    executeAfterOpen.run();
+                    if (executeAfterOpen != null) {
+                        executeAfterOpen.run();
+                    }
                 }
             }  
             );
