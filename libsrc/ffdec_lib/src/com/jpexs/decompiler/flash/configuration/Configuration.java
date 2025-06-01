@@ -27,14 +27,9 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -1145,6 +1140,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.linkTypes")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningLinkTypes = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

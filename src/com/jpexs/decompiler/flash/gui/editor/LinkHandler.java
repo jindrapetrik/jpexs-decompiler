@@ -24,9 +24,13 @@ import jsyntaxpane.Token;
  */
 public interface LinkHandler {
 
-    public LinkType isLink(Token token);
+    public LinkType getLinkType(Token token);
+    
+    public LinkType getExternalTypeLinkType(String className);
 
     public void handleLink(Token token);
 
+    public void handleExternalTypeLink(String className);
+    
     public Highlighter.HighlightPainter linkPainter();
 }

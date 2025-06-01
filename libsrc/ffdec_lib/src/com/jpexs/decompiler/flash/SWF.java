@@ -797,7 +797,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getPlayerSWC() != null) {
                 SWC swc = new SWC(Configuration.getPlayerSWC());
                 //set allowRenameIdentifiers parameter to FALSE otherwise there will be an infinite loop
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, "__playerglobal", null, true, false, true, null, "WINDOWS-1252", false);
                 playerGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
@@ -805,12 +805,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getAirSWC() != null) {
                 SWC swc = new SWC(Configuration.getAirSWC());
                 //set allowRenameIdentifiers to FALSE
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, "__airglobal", null, true, false, true, null, "WINDOWS-1252", false);
                 airGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
     }
-
+        
     /**
      * Gets SWF charset. SWF version 5 or lower were non-unicode. SWF object has
      * assigned charset.

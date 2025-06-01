@@ -811,7 +811,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
             List<List<NamespaceItem>> allOpenedNamespaces,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
-            List<VariableOrScope> sinitVariables
+            List<VariableOrScope> sinitVariables,
+            List<String> externalTypes
     ) throws AVM2ParseException, SimpleParseException, IOException, CompilationException, InterruptedException {
 
         Stack<Loop> sinitLoops = new Stack<>();
@@ -828,7 +829,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 sinitLoops,
                 sinitLoopLabels,
                 sinitRegisterVars,
-                sinitVariables
+                sinitVariables,
+                externalTypes
         )) {
             //empty
         }
@@ -844,7 +846,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
             Stack<Loop> sinitLoops,
             Map<Loop, String> sinitLoopLabels,
             HashMap<String, Integer> sinitRegisterVars,
-            List<VariableOrScope> sinitVariables
+            List<VariableOrScope> sinitVariables,
+            List<String> externalTypes
     ) throws AVM2ParseException, SimpleParseException, SimpleParseException, IOException, CompilationException, InterruptedException {
         ParsedSymbol s;
         boolean inPackage = false;
@@ -872,7 +875,13 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
         allOpenedNamespaces.add(openedNamespaces);
 
-        parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc);
+        for (String name : abc.getSwf().getAbcIndex().getPackageObjects(pkgName)) {
+            externalTypes.add(pkgName.add(name, "").toRawString());        
+        }
+        
+        
+        
+        parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc, externalTypes);
 
         boolean isEmpty = true;
 
@@ -1061,7 +1070,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         lexer.pushback(preSymbols.get(i));
                     }
 
-                    if (parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc)) {
+                    if (parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc, externalTypes)) {
                         break;
                     }
                     boolean cmd = command(errors, null, sinitNeedsActivation, importedClasses, openedNamespaces, sinitLoops, sinitLoopLabels, sinitRegisterVars, true, false, true, 0, false, sinitVariables, abc);
@@ -2006,7 +2015,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
     private ActionScriptLexer lexer = null;
 
-    private boolean parseImportsUsages(List<SimpleParseException> errors, List<VariableOrScope> variables, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private boolean parseImportsUsages(List<SimpleParseException> errors, List<VariableOrScope> variables, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, ABC abc, List<String> externalTypes) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
 
         boolean isEmpty = true;
         ParsedSymbol s;
@@ -2023,6 +2032,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 s = lex();
                 boolean isStar = false;
                 int varPos = -1;
+                List<String> nameParts = new ArrayList<>();
+                nameParts.add(lastName);
                 while (s.type == SymbolType.DOT) {
                     s = lex();
                     if (s.type == SymbolType.MULTIPLY) {
@@ -2034,13 +2045,16 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     fullName = fullName + "." + s.value.toString();
                     lastName = s.value.toString();
                     varPos = s.position;
+                    nameParts.add(lastName);                
                     s = lex();
                 }
 
                 if (isStar) {
-                    //openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
+                    for (String n : abc.getSwf().getAbcIndex().getPackageObjects(new DottedChain(nameParts))) {
+                        externalTypes.add(fullName + "." + n);
+                    }
                 } else {
-                    //importedClasses.add(fullName);
+                    externalTypes.add(fullName);
                     variables.add(new Import(fullName, lastName, varPos));
                 }
                 expected(errors, s, lexer.yyline(), SymbolType.SEMICOLON);
@@ -2128,9 +2142,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
             List<List<NamespaceItem>> allOpenedNamespaces,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
-            List<VariableOrScope> sinitVariables
+            List<VariableOrScope> sinitVariables,
+            List<String> externalTypes
     ) throws IOException, AVM2ParseException, SimpleParseException, CompilationException, InterruptedException {
-        scriptTraits(errors, importedClasses, openedNamespaces, allOpenedNamespaces, abc, sinitNeedsActivation, sinitVariables);
+        scriptTraits(errors, importedClasses, openedNamespaces, allOpenedNamespaces, abc, sinitNeedsActivation, sinitVariables, externalTypes);
     }
 
     /**
@@ -2157,11 +2172,12 @@ public class ActionScript3SimpleParser implements SimpleParser {
             String str,
             ABC abc,
             Reference<Boolean> sinitNeedsActivation,
-            List<VariableOrScope> sinitVariables
+            List<VariableOrScope> sinitVariables,
+            List<String> externalTypes
     ) throws AVM2ParseException, SimpleParseException, IOException, CompilationException, InterruptedException {
         lexer = new ActionScriptLexer(str);
 
-        parseScript(errors, importedClasses, openedNamespaces, allOpenedNamespaces, abc, sinitNeedsActivation, sinitVariables);
+        parseScript(errors, importedClasses, openedNamespaces, allOpenedNamespaces, abc, sinitNeedsActivation, sinitVariables, externalTypes);
         ParsedSymbol s = lexer.lex();
         if (s.type != SymbolType.EOF) {
             errors.add(new SimpleParseException("Parsing finished before end of the file", lexer.yyline(), s.position));
@@ -2173,15 +2189,22 @@ public class ActionScript3SimpleParser implements SimpleParser {
             String str,
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
-            List<SimpleParseException> errors
+            List<SimpleParseException> errors,
+            List<String> externalTypes,
+            Map<Integer, Integer> referenceToExternalTypeIndex,
+            Map<Integer, List<Integer>> externalTypeIndexToReference
     ) throws SimpleParseException, IOException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Boolean> sinitNeedsActivation = new Reference<>(false);
         List<VariableOrScope> vars = new ArrayList<>();
         List<DottedChain> importedClasses = new ArrayList<>();
         List<NamespaceItem> openedNamespaces = new ArrayList<>();
+        for (String name : abc.getSwf().getAbcIndex().getPackageObjects(DottedChain.TOPLEVEL)) {
+            externalTypes.add(name);
+        }
+        externalTypes.add("__AS3__.vec.Vector");
         try {
-            scriptTraitsFromString(errors, importedClasses, openedNamespaces, allOpenedNamespaces, str, abc, sinitNeedsActivation, vars);
+            scriptTraitsFromString(errors, importedClasses, openedNamespaces, allOpenedNamespaces, str, abc, sinitNeedsActivation, vars, externalTypes);
         } catch (AVM2ParseException ex) {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line, ex.position);
@@ -2189,7 +2212,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference);
     }
 
     /**

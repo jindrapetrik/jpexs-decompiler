@@ -285,16 +285,18 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return getMultinameAtPos(getCaretPosition(), abcUsed);
     }
 
-    public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type) {
+    public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type, Reference<LinkType> linkTypeRef) {
         Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
         Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
 
         if (h == null) {
+            linkTypeRef.setVal(LinkType.NO_LINK);
             return -1;
         }
 
         List<Highlighting> tms = Highlighting.searchAllPos(highlightedText.getMethodHighlights(), pos);
         if (tms.isEmpty()) {
+            linkTypeRef.setVal(LinkType.NO_LINK);
             return -1;
         }
         for (Highlighting tm : tms) {
@@ -302,6 +304,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             List<Highlighting> tm_tms = Highlighting.searchAllIndexes(highlightedText.getMethodHighlights(), tm.getProperties().index);
             //is it already declaration?
             if (h.getProperties().declaration || (sh != null && sh.getProperties().declaration)) {
+                linkTypeRef.setVal(LinkType.NO_LINK);            
                 return -1; //no jump
             }
 
@@ -311,6 +314,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
                 type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
+                linkTypeRef.setVal(LinkType.LINK_THIS_SCRIPT);
                 return ch.startPos;
             }
 
@@ -321,6 +325,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             search.localName = hData.localName;
             search.specialValue = hData.specialValue;
             if (search.isEmpty()) {
+                linkTypeRef.setVal(LinkType.NO_LINK);
                 return -1;
             }
             search.declaration = true;
@@ -332,15 +337,17 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
                 if (rh != null) {
                     type.setVal(rh.getProperties().declaredType);
+                    linkTypeRef.setVal(LinkType.LINK_OTHER_SCRIPT);
                     return rh.startPos;
                 }
             }
         }
 
+        linkTypeRef.setVal(LinkType.NO_LINK);            
         return -1;
     } 
     
-    public LinkType getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed, boolean currentSwfOnly) {
+    public LinkType getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed, boolean currentSwfOnly, Reference<Integer> scriptIndexRef) {
 
         int m = getMultinameAtPos(pos, true, abcUsed);
 
@@ -353,7 +360,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }*/
         SyntaxDocument sd = (SyntaxDocument) getDocument();
         Token t = sd.getTokenAt(pos + 1);
-        Token lastToken = t;
+        Token lastToken = t;        
         Token prev;
         String propName = t.getString(sd);
         if (!(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX)) {
@@ -382,7 +389,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (propertyTraitIndex == null) {
             return LinkType.NO_LINK;
         }
-
+        scriptIndexRef.setVal(propertyTraitIndex.scriptIndex);
+        
         List<ABCContainerTag> abcs = getABC().getSwf().getAbcList();
         int index = 0;
         boolean isCurrentSwf = false;

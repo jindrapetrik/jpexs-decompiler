@@ -17,12 +17,21 @@
 package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
+import com.sun.java.swing.action.ViewMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.KeyEventPostProcessor;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -46,7 +55,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -60,6 +74,7 @@ import javax.swing.plaf.ScrollPaneUI;
 import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Segment;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -81,8 +96,6 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private static final Color DEFAULT_COLOR = new Color(0xffeedd);
     private static final Color DEFAULT_ERRORCOLOR = new Color(0xff0000);
 
-    private static final Color SCROLLBAR_VARIABLE_COLOR = new Color(0xb59070);
-    private static final Color SCROLLBAR_ERROR_COLOR = new Color(0xff0000);
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
     private OccurencesMarker marker;
@@ -94,6 +107,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private Map<Integer, List<Integer>> definitionPosToReferences = new LinkedHashMap<>();
     private Map<Integer, Integer> referenceToDefinition = new LinkedHashMap<>();
+    private List<String> externalTypes = new ArrayList<>();
+    private Map<Integer, Integer> referenceToExternalTypeIndex = new LinkedHashMap<>();
+    private Map<Integer, List<Integer>> externalTypeIndexToReference = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -109,13 +125,23 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private Set<Integer> occurencesPositions = new HashSet<>();
 
-    private UnderlinePainter underLinePainter = new UnderlinePainter(new Color(0, 0, 255), null);
-    private UnderlinePainter underLineMarkOccurencesPainter = new UnderlinePainter(new Color(0, 0, 255), DEFAULT_COLOR);
-    private UnderlinePainter underLineExternalPainter = new UnderlinePainter(new Color(0, 255, 0), null);
-    private UnderlinePainter underLineExternalMarkOccurencesPainter = new UnderlinePainter(new Color(0, 255, 0), DEFAULT_COLOR);
+    private Color basicUnderlineColor = new Color(0, 0, 255);
+    private Color otherScriptUnderlineColor = new Color(0, 255, 0);
+    private Color otherFileUnderlineColor = new Color(255, 0, 255);
+
+    private UnderlinePainter underLinePainter = new UnderlinePainter(basicUnderlineColor, null);
+    private UnderlinePainter underLineMarkOccurencesPainter = new UnderlinePainter(basicUnderlineColor, DEFAULT_COLOR);
+
+    private UnderlinePainter underLineOtherScriptPainter = new UnderlinePainter(otherScriptUnderlineColor, null);
+    private UnderlinePainter underLineOtherScriptMarkOccurencesPainter = new UnderlinePainter(otherScriptUnderlineColor, DEFAULT_COLOR);
+
+    private UnderlinePainter underLineOtherFilePainter = new UnderlinePainter(otherFileUnderlineColor, null);
+    private UnderlinePainter underLineOtherFileMarkOccurencesPainter = new UnderlinePainter(otherFileUnderlineColor, DEFAULT_COLOR);
 
     private Token lastUnderlined;
-    private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;            
+    private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;
+
+    private boolean goingOut = false;
 
     /**
      * Constructs a new Token highlighter
@@ -131,12 +157,6 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     public void markTokenAt(int pos) {
         SyntaxDocument doc = ActionUtils.getSyntaxDocument(pane);
         if (doc != null) {
-            Token everyToken = getNearestTokenAt(doc, pos);
-            if (everyToken != null) {
-                if (errors.containsKey(everyToken.start)) {
-                    //System.err.println(errors.get(everyToken.start));
-                }
-            }
             Token token = getIdentifierTokenAt(doc, pos);
             removeMarkers();
             if (token != null && tokenTypes.contains(token.type)) {
@@ -153,8 +173,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         Markers.removeMarkers(pane, marker);
         Markers.removeMarkers(pane, underLinePainter);
         Markers.removeMarkers(pane, underLineMarkOccurencesPainter);
-        Markers.removeMarkers(pane, underLineExternalPainter);
-        Markers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
+        Markers.removeMarkers(pane, underLineOtherScriptPainter);
+        Markers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+        Markers.removeMarkers(pane, underLineOtherFilePainter);
+        Markers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
         occurencesPositions.clear();
     }
 
@@ -241,15 +263,38 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         int definitionPos = tok.start;
         if (referenceToDefinition.containsKey(tok.start)) {
             definitionPos = referenceToDefinition.get(tok.start);
+        } else {
+            if (referenceToExternalTypeIndex.containsKey(tok.start)) {
+                int typeIndex = referenceToExternalTypeIndex.get(tok.start);
+                for (int i : externalTypeIndexToReference.get(typeIndex)) {
+                    Token referenceToken = getIdentifierTokenAt(sDoc, i);
+                    if (referenceToken != null) {
+                        Markers.SimpleMarker markerKind = marker;
+                        if (lastUnderlined == referenceToken) {
+                            if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                                markerKind = underLineOtherScriptMarkOccurencesPainter;
+                            } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                                markerKind = underLineOtherFileMarkOccurencesPainter;
+                            } else {
+                                markerKind = underLineMarkOccurencesPainter;
+                            }
+                        }
+                        Markers.markToken(pane, referenceToken, markerKind);
+                        occurencesPositions.add(referenceToken.start);
+                    }
+                }
+                sDoc.readUnlock();
+                return;
+            }
         }
         Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos < 0 ? -(definitionPos + 1) : definitionPos);
         if (definitionToken != null) {
             if (definitionPosToReferences.containsKey(definitionPos)) {
-                
+
                 Markers.SimpleMarker markerKind = marker;
                 if (lastUnderlined == definitionToken) {
                     if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                        markerKind = underLineExternalMarkOccurencesPainter;
+                        markerKind = underLineOtherScriptMarkOccurencesPainter;
                     } else {
                         markerKind = underLineMarkOccurencesPainter;
                     }
@@ -264,7 +309,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         markerKind = marker;
                         if (lastUnderlined == referenceToken) {
                             if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                                markerKind = underLineExternalMarkOccurencesPainter;
+                                markerKind = underLineOtherScriptMarkOccurencesPainter;
+                            } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                                markerKind = underLineOtherFileMarkOccurencesPainter;
                             } else {
                                 markerKind = underLineMarkOccurencesPainter;
                             }
@@ -364,8 +411,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 handleLink(token);
             }
         }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
-        
-        
+
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
         status = Status.INSTALLING;
@@ -399,6 +445,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
 
         private void update() {
+            if (goingOut) {
+                return;
+            }
             if (lastCursorPos == null) {
                 return;
             }
@@ -409,9 +458,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
                         MyMarkers.removeMarkers(pane, underLinePainter);
                         MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
-                        MyMarkers.removeMarkers(pane, underLineExternalPainter);
-                        MyMarkers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
-                        
+                        MyMarkers.removeMarkers(pane, underLineOtherScriptPainter);
+                        MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+                        MyMarkers.removeMarkers(pane, underLineOtherFilePainter);
+                        MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
+
                         lastUnderlinedLinkType = t == null ? LinkType.NO_LINK : getLinkType(t);
                         if (t != null && lastUnderlinedLinkType != LinkType.NO_LINK) {
                             lastUnderlined = t;
@@ -432,7 +483,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     Highlighter.HighlightPainter painter = underLinePainter;
                     if (occurencesPositions.contains(lastUnderlined.start)) {
                         if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                            painter = underLineExternalMarkOccurencesPainter;
+                            painter = underLineOtherScriptMarkOccurencesPainter;
+                        } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                            painter = underLineOtherFileMarkOccurencesPainter;
                         } else {
                             painter = underLineMarkOccurencesPainter;
                         }
@@ -440,9 +493,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         markTokenAt(pane.getCaretPosition());
                     } else {
                         if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                            painter = underLineExternalPainter;
-                        } 
-                        MyMarkers.markToken(pane, lastUnderlined, painter);                        
+                            painter = underLineOtherScriptPainter;
+                        } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                            painter = underLineOtherFilePainter;
+                        }
+                        MyMarkers.markToken(pane, lastUnderlined, painter);
                     }
                 } else {
                     pane.setCursor(Cursor.getDefaultCursor());
@@ -452,10 +507,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     lastUnderlined = null;
                     MyMarkers.removeMarkers(pane, underLinePainter);
                     MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
-                    MyMarkers.removeMarkers(pane, underLineExternalPainter);
-                    MyMarkers.removeMarkers(pane, underLineExternalMarkOccurencesPainter);
-                    
-                    
+                    MyMarkers.removeMarkers(pane, underLineOtherScriptPainter);
+                    MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+                    MyMarkers.removeMarkers(pane, underLineOtherFilePainter);
+                    MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
+
                     removeMarkers();
                     markTokenAt(pane.getCaretPosition());
                 }
@@ -465,6 +521,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
         @Override
         public void mouseClicked(MouseEvent e) {
+            if (lastCursorPos == null) {
+                return;
+            }
             if (ctrlDown) {
                 Token t = ((LineMarkedEditorPane) pane).tokenAtPos(lastCursorPos);
                 if (t != null && getLinkType(t) != LinkType.NO_LINK) {
@@ -476,7 +535,6 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
         @Override
         public void mouseMoved(MouseEvent e) {
-
             ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
             lastCursorPos = e.getPoint();
             update();
@@ -533,6 +591,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("document")) {
+            goingOut = false;
             pane.removeCaretListener(this);
             pane.getDocument().removeDocumentListener(this);
             if (status.equals(Status.INSTALLING)) {
@@ -564,9 +623,15 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Integer, List<Integer>> newDefinitionPosToReferences = new LinkedHashMap<>();
             Map<Integer, Integer> newReferenceToDefinition = new LinkedHashMap<>();
             List<SimpleParseException> newErrors = new ArrayList<>();
-            parser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors);
+            List<String> newExternalTypes = new ArrayList<>();
+            Map<Integer, Integer> newReferenceToExternalTypeIndex = new LinkedHashMap<>();
+            Map<Integer, List<Integer>> newExternalTypeIndexToReference = new LinkedHashMap<>();
+            parser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors, newExternalTypes, newReferenceToExternalTypeIndex, newExternalTypeIndexToReference);
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
+            externalTypes = newExternalTypes;
+            referenceToExternalTypeIndex = newReferenceToExternalTypeIndex;
+            externalTypeIndexToReference = newExternalTypeIndexToReference;
             for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }
@@ -619,10 +684,41 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         if (linkThisScript) {
             return LinkType.LINK_THIS_SCRIPT;
         }
+
         if (pane.isEditable()) {
             return LinkType.NO_LINK;
         }
-        return ((LineMarkedEditorPane) pane).getLinkHandler().isLink(token);
+        if (referenceToExternalTypeIndex.containsKey(token.start)) {
+            String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+            return ((LineMarkedEditorPane) pane).getLinkHandler().getExternalTypeLinkType(externalType);
+        }
+        return ((LineMarkedEditorPane) pane).getLinkHandler().getLinkType(token);
+    }
+
+    private class UnderlinedLabel extends JLabel {
+
+        private final Color underlineColor;
+
+        public UnderlinedLabel(String text, Color underlineColor) {
+            super(text);
+            this.underlineColor = underlineColor;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            FontMetrics fm = g.getFontMetrics();
+            g.setColor(underlineColor);
+            g.drawLine(0, fm.getHeight() - 3, fm.stringWidth(getText()), fm.getHeight() - 3);
+        }
+    }
+
+    private class CommentLabel extends JLabel {
+
+        public CommentLabel(String text) {
+            super(text);
+            setForeground(new Color(0x339933));
+        }
     }
 
     public void handleLink(Token token) {
@@ -630,10 +726,94 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         if (definition != null && definition >= 0) {
             pane.setCaretPosition(definition);
         } else if (!pane.isEditable()) {
+
+            if (referenceToExternalTypeIndex.containsKey(token.start)
+                    && com.jpexs.decompiler.flash.configuration.Configuration.warningLinkTypes.get()) {
+
+                String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+                LinkType lt = ((LineMarkedEditorPane) pane).getLinkHandler().getExternalTypeLinkType(externalType);
+
+                if (lt == LinkType.LINK_OTHER_FILE) {
+                    JPanel msgPanel = new JPanel();
+                    msgPanel.setLayout(new BoxLayout(msgPanel, BoxLayout.Y_AXIS));
+                    JLabel bewareLabel = new JLabel(AppStrings.translate("message.link.clicked"));
+                    bewareLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    msgPanel.add(bewareLabel);
+
+                    JLabel beware2Label = new JLabel(AppStrings.translate("message.link.bewareTypes"));
+                    beware2Label.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    msgPanel.add(beware2Label);
+
+                    JPanel linksPanel = new JPanel(new GridBagLayout());
+                    linksPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                    linksPanel.setBackground(Color.white);
+                    GridBagConstraints gbc = new GridBagConstraints();
+                    gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+                    gbc.insets = new Insets(2, 2, 2, 2);
+                    gbc.gridx = 0;
+                    gbc.gridy = 0;
+
+                    linksPanel.add(new UnderlinedLabel(AppStrings.translate("message.link.type.currentScript.sample"), basicUnderlineColor), gbc);
+                    gbc.gridx++;
+                    linksPanel.add(new CommentLabel("//" + AppStrings.translate("message.link.type.currentScript")), gbc);
+                    gbc.gridx = 0;
+                    gbc.gridy++;
+                    linksPanel.add(new UnderlinedLabel(AppStrings.translate("message.link.type.otherScript.sample"), otherScriptUnderlineColor), gbc);
+                    gbc.gridx++;
+                    linksPanel.add(new CommentLabel("//" + AppStrings.translate("message.link.type.otherScript")), gbc);
+                    gbc.gridx = 0;
+                    gbc.gridy++;
+                    linksPanel.add(new UnderlinedLabel(AppStrings.translate("message.link.type.otherFile.sample"), otherFileUnderlineColor), gbc);
+                    gbc.gridx++;
+                    linksPanel.add(new CommentLabel("//" + AppStrings.translate("message.link.type.otherFile")), gbc);
+
+                    gbc.gridx = 2;
+                    gbc.gridy = 0;
+                    gbc.gridheight = 3;
+                    gbc.weightx = 1;
+                    gbc.weighty = 1;
+                    JPanel finalPanel = new JPanel();
+                    finalPanel.setOpaque(false);
+                    linksPanel.add(finalPanel);
+
+                    linksPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                    msgPanel.add(linksPanel);
+                    JLabel reallyLabel = new JLabel(AppStrings.translate("message.link.reallyGo"));
+                    reallyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    msgPanel.add(reallyLabel);
+                    JCheckBox doNotShowAgainCheckbox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
+                    doNotShowAgainCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    msgPanel.add(doNotShowAgainCheckbox);
+
+                    int result = ViewMessages.showOptionDialog(Main.getDefaultMessagesComponent(),
+                            msgPanel,
+                            AppStrings.translate("message.warning"),
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null, null, null);
+                    if (doNotShowAgainCheckbox.isSelected()) {
+                        com.jpexs.decompiler.flash.configuration.Configuration.warningLinkTypes.set(false);
+                    }
+                    if (result != JOptionPane.OK_OPTION) {
+                        return;
+                    }
+                }
+
+            }
             lastUnderlined = null;
             removeErrorMarkers();
             removeMarkers();
             pane.repaint();
+
+            if (referenceToExternalTypeIndex.containsKey(token.start)) {
+                goingOut = true;
+                pane.setCursor(Cursor.getDefaultCursor());
+                String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+                ((LineMarkedEditorPane) pane).getLinkHandler().handleExternalTypeLink(externalType);
+                return;
+            }
+
             ((LineMarkedEditorPane) pane).getLinkHandler().handleLink(token);
         }
     }

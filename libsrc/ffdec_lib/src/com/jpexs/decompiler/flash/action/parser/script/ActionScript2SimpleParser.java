@@ -1570,9 +1570,12 @@ public class ActionScript2SimpleParser implements SimpleParser {
             String str,
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
-            List<SimpleParseException> errors
+            List<SimpleParseException> errors,
+            List<String> externalTypes,
+            Map<Integer, Integer> referenceToExternalTypeIndex,
+            Map<Integer, List<Integer>> externalTypeIndexToReference
     ) throws SimpleParseException, IOException, InterruptedException {
-
+        
         List<VariableOrScope> vars = new ArrayList<>();
         try {
             lexer = new ActionScriptLexer(new StringReader(str));
@@ -1661,7 +1664,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {

@@ -67,13 +67,20 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     private boolean error = false;
 
-    private Token lastUnderlined = null;
-
     private LinkHandler linkHandler = this;
     
-    private Point lastCursorPos = new Point(0, 0);
     
     private SimpleParser parser;
+
+    @Override
+    public LinkType getExternalTypeLinkType(String className) {
+        return LinkType.NO_LINK;
+    }
+
+    @Override
+    public void handleExternalTypeLink(String className) {
+        
+    }
     
     public static class LineMarker implements Comparable<LineMarker> {
 
@@ -383,7 +390,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     @Override
-    public LinkType isLink(Token token) {
+    public LinkType getLinkType(Token token) {
         return LinkType.NO_LINK;
     }
 

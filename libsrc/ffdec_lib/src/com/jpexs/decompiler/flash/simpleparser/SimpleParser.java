@@ -45,7 +45,10 @@ public interface SimpleParser {
             String str,
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
-            List<SimpleParseException> errors
+            List<SimpleParseException> errors,
+            List<String> externalTypes,
+            Map<Integer, Integer> referenceToExternalTypeIndex,
+            Map<Integer, List<Integer>> externalTypeIndexToReference
     ) throws SimpleParseException, IOException, InterruptedException;
 
     public static void parseVariablesList(
@@ -54,9 +57,22 @@ public interface SimpleParser {
             Map<Integer, List<Integer>> definitionPosToReferences,
             Map<Integer, Integer> referenceToDefinition,
             List<SimpleParseException> errors,
-            boolean innerFunctionCanUseTraits
+            boolean innerFunctionCanUseTraits,
+            List<String> externalTypes,
+            Map<Integer, Integer> referenceToExternalTypeIndex,
+            Map<Integer, List<Integer>> externalTypeIndexToReference
     ) {
-        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), true, errors, null, innerFunctionCanUseTraits);
+        List<String> externalSimpleTypes = new ArrayList<>();
+        for (String type : externalTypes) {
+            externalSimpleTypes.add(type.contains(".") ? type.substring(type.lastIndexOf(".") + 1) : type);
+        }
+        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex);
+        for (Map.Entry<Integer, Integer> entry : referenceToExternalTypeIndex.entrySet()) {
+            if (!externalTypeIndexToReference.containsKey(entry.getValue())) {
+                externalTypeIndexToReference.put(entry.getValue(), new ArrayList<>());
+            }
+            externalTypeIndexToReference.get(entry.getValue()).add(entry.getKey());
+        }
     }
 
     public static void parseVariablesList(
@@ -70,7 +86,9 @@ public interface SimpleParser {
             boolean isStatic,
             List<SimpleParseException> errors,
             Scope scope,
-            boolean innerFunctionCanUseTraits
+            boolean innerFunctionCanUseTraits,
+            List<String> externalSimpleTypes,
+            Map<Integer, Integer> referenceToExternalTypeIndex          
     ) {
         Map<String, Integer> privateVarNameToDefinitionPosition = new LinkedHashMap<>();
         privateVarNameToDefinitionPosition.putAll(parentVarNameToDefinitionPosition);
@@ -89,13 +107,18 @@ public interface SimpleParser {
                 } else {
                     if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
                             && !privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
-                        privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
-                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
-                        definitionPosToReferences.get(-v.position - 1).add(v.position);
-                        referenceToDefinition.put(v.position, -v.position - 1);
+                        
+                        if (externalSimpleTypes.contains(v.name)) {
+                            referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
+                        } else {
+                            parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                            parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
+                            privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                            privateVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
+                            definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
+                            definitionPosToReferences.get(-v.position - 1).add(v.position);
+                            referenceToDefinition.put(v.position, -v.position - 1);
+                        }
                     } else {
 
                         if ("this".equals(v.name) && isStatic) {
@@ -149,7 +172,7 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex);
             }
         }
         for (VariableOrScope vt : sharedVariables) {
@@ -165,13 +188,18 @@ public interface SimpleParser {
                 } else {
                     if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
                             && !privateVarNameToDefinitionPosition.containsKey(v.name)) {
-                        parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
-                        privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
-                        privateVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
-                        definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
-                        definitionPosToReferences.get(-v.position - 1).add(v.position);
-                        referenceToDefinition.put(v.position, -v.position - 1);
+                        
+                        if (externalSimpleTypes.contains(v.name)) {
+                            referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
+                        } else {
+                            parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                            parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
+                            privateVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
+                            privateVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
+                            definitionPosToReferences.put(-v.position - 1, new ArrayList<>());
+                            definitionPosToReferences.get(-v.position - 1).add(v.position);
+                            referenceToDefinition.put(v.position, -v.position - 1);
+                        }
                     } else {
 
                         if ("this".equals(v.name) && isStatic) {
@@ -225,7 +253,7 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex);
             }
         }
     }

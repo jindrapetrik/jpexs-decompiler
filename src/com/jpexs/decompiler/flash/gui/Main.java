@@ -1998,7 +1998,13 @@ public class Main {
             }
             swfFile = file.getCanonicalPath();
             OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, swfFile, fileTitle);
-            OpenFileResult openResult = openFile(sourceInfo);
+            OpenFileResult openResult = openFile(sourceInfo, new OpenableOpened() {
+                @Override
+                public void opened(Openable openable) {
+                    executeAfterOpen.run();
+                }
+            }  
+            );
             return openResult;
         } catch (IOException ex) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);

@@ -384,6 +384,11 @@ public final class AbcIndexing {
          * Object type
          */
         public GraphTargetItem objType;
+        
+        /**
+         * Script index
+         */
+        public int scriptIndex;
 
         /**
          * Constructs trait index
@@ -393,14 +398,16 @@ public final class AbcIndexing {
          * @param callType Call type
          * @param value Value
          * @param objType Object type
+         * @param scriptIndex Script index
          */
-        public TraitIndex(Trait trait, ABC abc, GraphTargetItem type, GraphTargetItem callType, ValueKind value, GraphTargetItem objType) {
+        public TraitIndex(Trait trait, ABC abc, GraphTargetItem type, GraphTargetItem callType, ValueKind value, GraphTargetItem objType, int scriptIndex) {
             this.trait = trait;
             this.abc = abc;
             this.returnType = type;
             this.callReturnType = callType;
             this.value = value;
             this.objType = objType;
+            this.scriptIndex = scriptIndex;
         }
     }
 
@@ -775,7 +782,7 @@ public final class AbcIndexing {
          */
         //search all static first
         if (findStatic && classProperties.containsKey(prop)) {
-            TraitIndex ti = classProperties.get(prop);
+            TraitIndex ti = classProperties.get(prop);            
             if (ti != null) {
                 foundStatic.setVal(true);
                 return ti;
@@ -933,7 +940,7 @@ public final class AbcIndexing {
      * @param map Map to index
      * @param mapNs Map to index
      */
-    protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs) {
+    protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs, int scriptIndex) {
         for (Trait t : ts.traits) {
             ValueKind propValue = null;
             if (t instanceof TraitSlotConst) {
@@ -942,12 +949,12 @@ public final class AbcIndexing {
             }
             if (map != null) {
                 PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
-                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
+                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants), scriptIndex));
             }
             if (mapNs != null) {
                 Multiname m = abc.constants.getMultiname(t.name_index);
                 PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, true/*FIXME ???*/), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m == null ? 0 : m.namespace_index);
-                TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants));
+                TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants), scriptIndex);
                 if (!mapNs.containsKey(ndp)) {
                     mapNs.put(ndp, ti);
                 }
@@ -1038,7 +1045,7 @@ public final class AbcIndexing {
         List<ClassIndex> addedClasses = new ArrayList<>();
 
         for (int i = 0; i < abc.script_info.size(); i++) {
-            indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties);
+            indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties, i);
             for (int t = 0; t < abc.script_info.get(i).traits.traits.size(); t++) {
                 Trait tr = abc.script_info.get(i).traits.traits.get(t);
                 if (tr instanceof TraitClass) {
@@ -1055,8 +1062,8 @@ public final class AbcIndexing {
                     GraphTargetItem cname = multinameToType(ii.name_index, abc.constants);
                     classes.put(new ClassDef(cname, abc, classScriptIndex), cindex);
 
-                    indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties);
-                    indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties);
+                    indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties, i);
+                    indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties, i);
                 }
             }
         }

@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar
 - AS1/2 direct editation - hide P-code panel when editing
 - Disable AS1/2/3 direct editation when editing P-code
+- AS3 - navigation to definition in other SWF file and also player/airglobal
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
