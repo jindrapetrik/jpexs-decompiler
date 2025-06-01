@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
-import com.sun.java.swing.action.ViewMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -74,7 +73,6 @@ import javax.swing.plaf.ScrollPaneUI;
 import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
-import javax.swing.text.Segment;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -295,6 +293,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 if (lastUnderlined == definitionToken) {
                     if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
                         markerKind = underLineOtherScriptMarkOccurencesPainter;
+                    } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                        markerKind = underLineOtherFileMarkOccurencesPainter;
                     } else {
                         markerKind = underLineMarkOccurencesPainter;
                     }
@@ -502,6 +502,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 } else {
                     pane.setCursor(Cursor.getDefaultCursor());
                 }
+                highlightsPanel.repaint();
             } else {
                 if (lastUnderlined != null) {
                     lastUnderlined = null;

@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -930,7 +931,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             public LinkType getExternalTypeLinkType(String className) {
                 AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(className), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
-                    return LinkType.NO_LINK;
+
+                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(className));
+                    if (ti == null) {
+                        return LinkType.NO_LINK;
+                    }
+                    if (ti.abc.getSwf() == abc.getSwf()) {
+                        if (ti.abc == abc
+                                && ti.scriptIndex == decompiledTextArea.getScriptIndex()) {
+                            return LinkType.LINK_THIS_SCRIPT;
+                        }
+                        return LinkType.LINK_OTHER_SCRIPT;
+                    }
+                    return LinkType.LINK_OTHER_FILE;
                 }
                 if (ci.abc.getSwf() == abc.getSwf()) {
                     if (ci.abc == abc
@@ -945,49 +958,26 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public void handleExternalTypeLink(String className) {
-                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(className), abc, decompiledTextArea.getScriptIndex());
+            public void handleExternalTypeLink(String scriptName) {
+                Reference<SWF> swfRef = new Reference<>(null);
+                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(scriptName), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
-                    return;
+                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(scriptName));
+                    if (ti == null) {
+                        return;
+                    }
+                    swfRef.setVal(ti.abc.getSwf());
+                } else {
+                    //scriptName = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants, true).toPrintableString(true);
+                    swfRef.setVal(ci.abc.getSwf());
                 }
-                String scriptName = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants, true).toPrintableString(true);
-                if (ci.abc.getSwf() == abc.getSwf()) {
+
+                if (swfRef.getVal() == abc.getSwf()) {
                     hilightScript(getOpenable(), scriptName);
                     return;
                 }
-                Reference<SWF> swfRef = new Reference<>(null);
-                Runnable gotoScriptRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        hilightScript(swfRef.getVal(), scriptName);
-                    }
-                };
 
-                OpenableListLoaded afterOpen = new OpenableListLoaded() {
-                    @Override
-                    public void openableListLoaded(OpenableList openableList) {
-                        for (Openable op : openableList.items) {
-                            if (op instanceof SWF) {
-                                SWF swf = (SWF) op;
-                                if ("library.swf".equals(swf.getFileTitle())) {
-                                    swfRef.setVal(swf);
-                                    gotoScriptRunnable.run();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                };
-
-                SWF swf = ci.abc.getSwf();
-                if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
-                    mainPanel.findOrLoadOpanableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen);
-                } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
-                    mainPanel.findOrLoadOpanableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen);
-                } else {
-                    swfRef.setVal(swf);
-                    gotoScriptRunnable.run();
-                }
+                hilightScript(swfRef.getVal(), scriptName);
 
                 //other file
             }
@@ -1387,7 +1377,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Reference<Integer> scriptIndexRef = new Reference<>(-1);
         Reference<ABC> usedAbcRef = new Reference<>(null);
         if (decompiledTextArea.getPropertyTypeAtPos(getSwf().getAbcIndex(), pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef, false, scriptIndexRef) != LinkType.NO_LINK) {
-            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), decompiledTextArea.getScriptLeaf().scriptIndex, classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
+            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(usedAbcRef.getVal(), multinameIndexRef.getVal(), scriptIndexRef.getVal(), classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
             });
             return;
         }
@@ -1585,7 +1575,32 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         TreeItem scriptNode = null;
         if (openable instanceof SWF) {
-            SWF swf = (SWF) openable;
+            
+            SWF swf = (SWF) openable;            
+            
+            OpenableListLoaded afterOpen = new OpenableListLoaded() {
+                @Override
+                public void openableListLoaded(OpenableList openableList) {
+                    for (Openable op : openableList.items) {
+                        if (op instanceof SWF) {
+                            SWF swf = (SWF) op;
+                            if ("library.swf".equals(swf.getFileTitle())) {
+                                hilightScript(swf, name);
+                                return;
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
+                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen);
+                return;
+            } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
+                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen);
+                return;
+            }
+                        
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
                 scriptNode = mainPanel.tagTree.getFullModel().getScriptsNode(swf);
             } else {

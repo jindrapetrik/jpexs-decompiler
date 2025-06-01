@@ -41,6 +41,10 @@ public class UnderlinePainter extends OccurencesMarker {
         this.underlineColor = underLineColor;
     }
 
+    public Color getUnderlineColor() {
+        return underlineColor;
+    }        
+
     @Override
     public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
         if (getColor() != null) {

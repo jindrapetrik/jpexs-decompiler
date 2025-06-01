@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.ScrollBarUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import jsyntaxpane.actions.ActionUtils;
@@ -75,6 +74,9 @@ public class HighlightsPanel extends JPanel {
 
                 for (Highlighter.Highlight highlight : editorPane.getHighlighter().getHighlights()) {
                     Highlighter.HighlightPainter painter = highlight.getPainter();
+                    if ((painter instanceof UnderlinePainter) && ((UnderlinePainter) painter).getColor() == null) {
+                        continue;
+                    }
                     if (painter instanceof Markers.SimpleMarker) {
                         try {
                             int lineNum = ActionUtils.getLineNumber(editorPane, highlight.getStartOffset());
@@ -116,6 +118,9 @@ public class HighlightsPanel extends JPanel {
 
                 for (Highlighter.Highlight highlight : editorPane.getHighlighter().getHighlights()) {
                     Highlighter.HighlightPainter painter = highlight.getPainter();
+                    if ((painter instanceof UnderlinePainter) && ((UnderlinePainter) painter).getColor() == null) {
+                        continue;
+                    }
                     if (painter instanceof Markers.SimpleMarker) {
                         try {
                             int lineNum = ActionUtils.getLineNumber(editorPane, highlight.getStartOffset());
@@ -175,10 +180,12 @@ public class HighlightsPanel extends JPanel {
 
         for (Highlighter.Highlight highlight : highlights) {
             Highlighter.HighlightPainter painter = highlight.getPainter();
+            if ((painter instanceof UnderlinePainter) && ((UnderlinePainter) painter).getColor() == null) {
+                continue;
+            }
             if (painter instanceof Markers.SimpleMarker) {
                 Markers.SimpleMarker simpleMarker = (Markers.SimpleMarker) painter;
-                g.setColor(simpleMarker.getColor());
-
+                g.setColor(simpleMarker.getColor());                
                 try {
                     int line = ActionUtils.getLineNumber(editorPane, highlight.getStartOffset());
 
