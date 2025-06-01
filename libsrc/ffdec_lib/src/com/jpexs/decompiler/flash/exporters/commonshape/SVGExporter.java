@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,8 +82,6 @@ public class SVGExporter {
     protected int lastClipId;
 
     public Map<ExportKey, String> exportedTags = new HashMap<>();
-
-    public Set<ExportKey> exportedSmallStrokesTags = new HashSet<>();
 
     public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
@@ -550,11 +547,11 @@ public class SVGExporter {
         _svgGs.peek().appendChild(filtersElement);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, boolean hasSmallStrokes) {
-        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>(), hasSmallStrokes);
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters, boolean hasSmallStrokes) {
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
             addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode, filters);
             return null; //??
@@ -574,10 +571,7 @@ public class SVGExporter {
         if (characterName != null && !characterName.isEmpty()) {
             image.setAttribute("ffdec:characterName", characterName);
         }
-        if (hasSmallStrokes) {
-            image.setAttribute("ffdec:has-small-stroke", "true");
-        }
-
+        
         setBlendMode(image, blendMode);
 
         handleFilters(image, filters);
