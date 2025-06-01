@@ -56,6 +56,8 @@ import java.util.List;
 
     private Token prevToken = null;
 
+    private boolean prevNew = false;
+
     @Override
     public void parse(Segment segment, int ofst, List<Token> tokens) {
         try {
@@ -102,8 +104,6 @@ Identifier = {IdentFirst}{IdentNext}*
 
 IdentifierOrParent = {Identifier} | ".."
 
-Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
-
 /* identifiers */
 
 IdentifierNs = {Identifier} ":" {Identifier}
@@ -132,8 +132,6 @@ FLit1    = [0-9]+ \. [0-9]*
 FLit2    = \. [0-9]+
 FLit3    = [0-9]+
 Exponent = [eE] [+-]? [0-9]+
-
-NewVector = "new" {WhiteSpace}* "<"
 
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
@@ -208,12 +206,13 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   "delete"                       |
   "instanceof"                   |
   "is"                           |
-  "new"                          |
   "typeof"                       |
-  "void"                         { return token(TokenType.KEYWORD); }
+  "void"                         { prevNew = false; return token(TokenType.KEYWORD); }
 
+  "new"                          { prevNew = true; return token(TokenType.KEYWORD); }
 
   {RegExp}                       { 
+                                    prevNew = false; 
                                     if (prevToken == null || (prevToken.type == TokenType.OPERATOR && prevToken.pairValue >= 0)) {
                                         return token(TokenType.REGEX);
                                     } else {    
@@ -225,23 +224,25 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
                                  }
 
   {XmlCommentStart}                 {
+                                     prevNew = false; 
                                      yybegin(XMLCOMMENT);
                                      return token(TokenType.STRING);
                                  }
   {XmlCDataStart}                   {
+                                     prevNew = false; 
                                      yybegin(XMLCDATA);
                                      return token(TokenType.STRING);
                                  }
 
-  {VerbatimString}              { return token(TokenType.STRING); }
+  {VerbatimString}              { prevNew = false; return token(TokenType.STRING); }
 
   /* operators */
 
-  "("                            { return  token(TokenType.OPERATOR,  PAREN); }
-  ")"                            { return token(TokenType.OPERATOR, -PAREN); }
-  "}"                            { return token(TokenType.OPERATOR, -CURLY); }
-  "["                            { return token(TokenType.OPERATOR,  BRACKET); }
-  "]"                            { return token(TokenType.OPERATOR, -BRACKET); }
+  "("                            { prevNew = false; return  token(TokenType.OPERATOR,  PAREN); }
+  ")"                            { prevNew = false; return token(TokenType.OPERATOR, -PAREN); }
+  "}"                            { prevNew = false; return token(TokenType.OPERATOR, -CURLY); }
+  "["                            { prevNew = false; return token(TokenType.OPERATOR,  BRACKET); }
+  "]"                            { prevNew = false; return token(TokenType.OPERATOR, -BRACKET); }
   ";"                            |
   ","                            |
   "..."                          |
@@ -286,19 +287,20 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   ">>="                          |
   ">>>="                         |
   "::"                           |
-  {NewVector}                     |
-  "@"                            { return token(TokenType.OPERATOR); }
+  "@"                            { prevNew = false; return token(TokenType.OPERATOR); }
 
   /* string literal */
   \"                             {
+                                    prevNew = false; 
                                     yybegin(STRING);
                                     tokenStart = yychar;
                                     tokenLength = 1;
                                  }
   {Preprocessor}                 {
-                                    return token(TokenType.ERROR);
+                                    prevNew = false; return token(TokenType.ERROR);
                                  }
  "\u00A7"                        {
+                                    prevNew = false;
                                     yybegin(OIDENTIFIER);
                                     tokenStart = yychar;
                                     tokenLength = 1;
@@ -306,6 +308,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
   /* character literal */
   \'                             {
+                                    prevNew = false;
                                     yybegin(CHARLITERAL);
                                     tokenStart = yychar;
                                     tokenLength = 1;
@@ -320,16 +323,22 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   {OctIntegerLiteral}            |
 
   {DoubleLiteral}                |
-  {DoubleLiteral}[dD]            { return token(TokenType.NUMBER); }
+  {DoubleLiteral}[dD]            { prevNew = false; return token(TokenType.NUMBER); }
 
   // JavaDoc comments need a state so that we can highlight the @ controls
 
   /* comments */
-  {Comment}                      { return token(TokenType.COMMENT); }
+  {Comment}                      { prevNew = false; return token(TokenType.COMMENT); }
 
   /* whitespace */
   {WhiteSpace}                   { }
-  {XMLBeginOneTag}                  {  yybegin(XML);
+  {XMLBeginOneTag}               { 
+                                    if (prevNew) {
+                                        prevNew = false;
+                                        yypushback(yytext().length() - 1);
+                                        return token(TokenType.OPERATOR, yychar, 1);
+                                    }
+                                    yybegin(XML);
                                     tokenStart = yychar;
                                     tokenLength = yylength();
                                     String s=yytext();
@@ -340,13 +349,13 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
                                     xmlTagName = s;
                                  }
 
-  ">"                            { return token(TokenType.OPERATOR); }
+  ">"                            { prevNew = false; return token(TokenType.OPERATOR); }
   
-  "{"                            { return token(TokenType.OPERATOR,  CURLY); }
+  "{"                            { prevNew = false; return token(TokenType.OPERATOR,  CURLY); }
   
   /* identifiers */
-  {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
-  {Identifier}                   { return token(TokenType.IDENTIFIER); }
+  {Identifier}{NamespaceSuffix}  { prevNew = false; return token(TokenType.REGEX); }
+  {Identifier}                   { prevNew = false; return token(TokenType.IDENTIFIER); }
   
 }
 
