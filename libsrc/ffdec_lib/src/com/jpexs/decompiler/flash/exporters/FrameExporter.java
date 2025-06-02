@@ -260,7 +260,7 @@ public class FrameExporter {
         List<String> paths = new ArrayList<>();
         String subPath = "";
         if (subFramesLength > 1) {
-            subPath = File.separator + frames.get(0);
+            subPath = File.separator + (frames.get(0) + 1);
         }
 
         if (containerId == 0) {
