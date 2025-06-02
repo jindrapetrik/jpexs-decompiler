@@ -50,7 +50,7 @@ public class ExportSubspriteAnimationDialog extends AppDialog {
     
     private int result = ERROR_OPTION;
     
-    private JTextField lengthTextField = new JTextField("1", 3);
+    private JTextField lengthTextField = new JTextField("2", 3);
     private JComboBox<String> formatComboBox;
     private final MainPanel mainPanel;
     private JButton okButton;
@@ -210,7 +210,7 @@ public class ExportSubspriteAnimationDialog extends AppDialog {
     private void check() {
         try {
             int len = Integer.parseInt(lengthTextField.getText());
-            okButton.setEnabled(len > 0);
+            okButton.setEnabled(len > 1);
         } catch (NumberFormatException nfe) {
             okButton.setEnabled(false);
         }
