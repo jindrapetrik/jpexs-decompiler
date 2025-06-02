@@ -189,7 +189,11 @@ public class ExportDialog extends AppDialog {
     }
 
     public double getZoom() {
-        return Double.parseDouble(zoomTextField.getText()) / 100;
+        try {
+            return Double.parseDouble(zoomTextField.getText()) / 100;
+        } catch (NumberFormatException nfe) {
+            return 1;
+        }
     }
 
     private void saveConfig() {

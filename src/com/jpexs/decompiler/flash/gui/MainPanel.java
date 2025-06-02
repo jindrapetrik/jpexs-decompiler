@@ -2296,7 +2296,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom(), export.isTransparentFrameBackgroundEnabled());
                 if (frames.containsKey(0)) {
                     String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
-                    ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, 0, frames.get(0), fes, evl));
+                    ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, 0, frames.get(0), 1, fes, evl));
                 }
             }
 
@@ -2306,7 +2306,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     int containerId = entry.getKey();
                     if (containerId != 0) {
                         String subFolder = SpriteExportSettings.EXPORT_FOLDER_NAME;
-                        ret.addAll(frameExporter.exportSpriteFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
+                        ret.addAll(frameExporter.exportSpriteFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), 1, ses, evl));
                     }
                 }
             }
@@ -2407,14 +2407,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(FrameExportMode.class)) {
             FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom(), export.isTransparentFrameBackgroundEnabled());
-            frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME), swf, 0, null, fes, evl);
+            frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME), swf, 0, null, 1, fes, evl);
         }
 
         if (export.isOptionEnabled(SpriteExportMode.class)) {
             SpriteExportSettings ses = new SpriteExportSettings(export.getValue(SpriteExportMode.class), export.getZoom());
             for (CharacterTag c : swf.getCharacters(false).values()) {
                 if (c instanceof DefineSpriteTag) {
-                    frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, ses, evl);
+                    frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, 1, ses, evl);
                 }
             }
         }
@@ -2518,7 +2518,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(FrameExportMode.class)) {
             for (FrameExportMode exportMode : FrameExportMode.values()) {
                 FrameExportSettings fes = new FrameExportSettings(exportMode, export.getZoom(), export.isTransparentFrameBackgroundEnabled());
-                frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, 0, null, fes, evl);
+                frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, 0, null, 1, fes, evl);
             }
         }
 
@@ -2527,7 +2527,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 SpriteExportSettings ses = new SpriteExportSettings(exportMode, export.getZoom());
                 for (CharacterTag c : swf.getCharacters(false).values()) {
                     if (c instanceof DefineSpriteTag) {
-                        frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, ses, evl);
+                        frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, 1, ses, evl);
                     }
                 }
             }
@@ -5390,6 +5390,67 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         export(true, selected);
+    }
+
+    public void exportSubspriteAnimationActionPerformed(TreeItem frame) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        int frameNum = ((Frame) frame).frame;
+        TreeItem parent = getCurrentTree().getFullModel().getParent(frame);
+        int containerId = 0;
+        if (parent instanceof DefineSpriteTag) {
+            containerId = ((DefineSpriteTag) parent).getCharacterId();
+        }
+        final int fContainerId = containerId;
+
+        ExportSubspriteAnimationDialog dialog = new ExportSubspriteAnimationDialog(this, Main.getDefaultDialogsOwner());
+        if (dialog.showDialog() != JOptionPane.OK_OPTION) {
+            return;
+        }
+
+        FrameExportMode mode = dialog.getFormat();
+        int length = dialog.getLength();
+        final String selFile = selectExportDir("export");
+        if (selFile != null) {
+            final long timeBefore = System.currentTimeMillis();
+
+            new CancellableWorker<Void>("export") {
+                @Override
+                public Void doInBackground() throws Exception {
+                    try {
+                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+
+                        FrameExporter frameExporter = new FrameExporter();
+                        FrameExportSettings fes = new FrameExportSettings(mode, dialog.getZoom(), dialog.isTransparentFrameBackgroundEnabled());
+                        String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
+                        frameExporter.exportFrames(errorHandler, selFile + File.separator + subFolder, (SWF) frame.getOpenable(), fContainerId, Arrays.asList(frameNum), length, fes, null);
+
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "Error during export", ex);
+                        ViewMessages.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.exporting") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                    });
+                }
+            }.execute();
+        }
     }
 
     public File showImportFileChooser(String filter, boolean imagePreview, String icon) {

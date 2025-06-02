@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 direct editation - hide P-code panel when editing
 - Disable AS1/2/3 direct editation when editing P-code
 - AS3 - navigation to definition in other SWF file and also player/airglobal
+- [#2463] Export subsprites animation context menu on frames
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
@@ -3845,6 +3846,7 @@ Major version of SWF to XML export changed to 2.
 [#289]: https://www.free-decompiler.com/flash/issues/289
 [#2412]: https://www.free-decompiler.com/flash/issues/2412
 [#1682]: https://www.free-decompiler.com/flash/issues/1682
+[#2463]: https://www.free-decompiler.com/flash/issues/2463
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2460]: https://www.free-decompiler.com/flash/issues/2460

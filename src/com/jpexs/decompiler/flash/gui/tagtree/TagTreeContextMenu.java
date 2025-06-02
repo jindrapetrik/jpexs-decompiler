@@ -202,6 +202,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem undoTagMenuItem;
 
     private JMenuItem exportSelectionMenuItem;
+    
+    private JMenuItem exportSubspriteAnimationMenuItem;
 
     private JMenuItem exportABCMenuItem;
 
@@ -482,6 +484,17 @@ public class TagTreeContextMenu extends JPopupMenu {
         });
         exportSelectionMenuItem.setIcon(View.getIcon("exportsel16"));
         add(exportSelectionMenuItem);
+        
+        exportSubspriteAnimationMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportSubspriteAnimation"));
+        exportSubspriteAnimationMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.exportSubspriteAnimationActionPerformed(getCurrentItem());
+            }
+        });
+        exportSubspriteAnimationMenuItem.setIcon(View.getIcon("exportsubsprites16"));
+        add(exportSubspriteAnimationMenuItem);
+        
 
         exportABCMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportAbc"));
         exportABCMenuItem.addActionListener(this::exportABCActionPerformed);
@@ -1304,6 +1317,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         cloneMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(hasExportableNodes); //?
+        exportSubspriteAnimationMenuItem.setVisible(false);
         exportABCMenuItem.setVisible(false);
         replaceMenuItem.setVisible(false);
         replaceNoFillMenuItem.setVisible(false);
@@ -1774,6 +1788,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     changeCharsetMenu.setText(mainPanel.translate("contextmenu.changeCharset").replace("%charset%", firstSwf.getCharset()));
                     changeCharsetMenu.setVisible(true);
                 }
+            }
+            
+            if (firstItem instanceof Frame) {
+                exportSubspriteAnimationMenuItem.setVisible(true);
             }
         }
 

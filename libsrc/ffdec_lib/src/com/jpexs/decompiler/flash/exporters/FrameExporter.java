@@ -131,10 +131,10 @@ public class FrameExporter {
         }
 
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
-        return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
+        return exportFrames(handler, outdir, swf, containerId, frames, 1, fes, evl);
     }
 
-    public List<File> exportSpriteFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportSpriteFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, int subframesLength, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         FrameExportMode fem;
         switch (settings.mode) {
             case PNG:
@@ -166,7 +166,7 @@ public class FrameExporter {
         }
 
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
-        return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
+        return exportFrames(handler, outdir, swf, containerId, frames, subframesLength, fes, evl);
     }
 
     private class MyFrameIterator implements Iterator<BufferedImage> {
@@ -178,6 +178,8 @@ public class FrameExporter {
         private final boolean usesTransparency;
         private final Color backgroundColor;
         private final FrameExportSettings settings;
+        private final int subframeLength;
+        private final boolean subFrameMode;
 
         public MyFrameIterator(
                 Timeline tim,
@@ -185,7 +187,8 @@ public class FrameExporter {
                 final EventListener evl,
                 boolean usesTransparency,
                 Color backgroundColor,
-                FrameExportSettings settings
+                FrameExportSettings settings,
+                int subframeLength
         ) {
             this.tim = tim;
             this.fframes = fframes;
@@ -193,6 +196,8 @@ public class FrameExporter {
             this.usesTransparency = usesTransparency;
             this.backgroundColor = backgroundColor;
             this.settings = settings;
+            this.subframeLength = subframeLength;
+            this.subFrameMode = this.subframeLength > 1;
         }
 
         public void reset() {
@@ -203,6 +208,9 @@ public class FrameExporter {
         public boolean hasNext() {
             if (CancellableWorker.isInterrupted()) {
                 return false;
+            }
+            if (subframeLength > 1) {
+                return subframeLength > pos;
             }
             return fframes.size() > pos;
         }
@@ -224,21 +232,22 @@ public class FrameExporter {
             if (evl != null) {
                 evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
             }
+            int max = subFrameMode ? subframeLength : fframes.size();
 
-            int fframe = fframes.get(pos++);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true).getBufferedImage();
+            int fframe = subFrameMode ? fframes.get(0) : fframes.get(pos++);
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true).getBufferedImage();
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }
             if (evl != null) {
-                evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
+                evl.handleExportedEvent("frame", pos, max, tagName);
             }
 
             return result;
         }
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
             return ret;
@@ -249,19 +258,24 @@ public class FrameExporter {
         }
         Timeline tim0;
         List<String> paths = new ArrayList<>();
+        String subPath = "";
+        if (subFramesLength > 1) {
+            subPath = File.separator + frames.get(0);
+        }
+
         if (containerId == 0) {
             tim0 = swf.getTimeline();
-            paths.add("");
+            paths.add(subPath);
         } else {
             tim0 = ((Timelined) swf.getCharacter(containerId)).getTimeline();
 
             Set<String> classNames = swf.getCharacter(containerId).getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
-                    paths.add(File.separator + Helper.makeFileName(className));
+                    paths.add(File.separator + Helper.makeFileName(className) + subPath);
                 }
             } else {
-                paths.add(File.separator + Helper.makeFileName(swf.getCharacter(containerId).getExportFileName()));
+                paths.add(File.separator + Helper.makeFileName(swf.getCharacter(containerId).getExportFileName()) + subPath);
             }
         }
 
@@ -292,18 +306,22 @@ public class FrameExporter {
         }
 
         if (settings.mode == FrameExportMode.SVG) {
-            for (int i = 0; i < frames.size(); i++) {
+            int max = frames.size();
+            if (subFramesLength > 1) {
+                max = subFramesLength;
+            }
+            for (int i = 0; i < max; i++) {
                 if (evl != null) {
                     Tag parentTag = tim.getParentTag();
-                    evl.handleExportingEvent("frame", i + 1, frames.size(), parentTag == null ? "" : parentTag.getName());
+                    evl.handleExportingEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
                 }
 
                 final int fi = i;
                 final Color fbackgroundColor = backgroundColor;
                 for (File foutdir : foutdirs) {
                     new RetryTask(() -> {
-                        int frame = fframes.get(fi);
-                        File f = new File(foutdir + File.separator + (frame + 1) + ".svg");
+                        int frame = subFramesLength > 1 ? fframes.get(0) : fframes.get(fi);
+                        File f = new File(foutdir + File.separator + ((subFramesLength > 1 ? fi : fframes.get(fi)) + 1) + ".svg");
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             ExportRectangle rect = new ExportRectangle(tim.displayRect);
                             rect.xMax *= settings.zoom;
@@ -312,7 +330,7 @@ public class FrameExporter {
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
 
-                            tim.toSVG(frame, 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
+                            tim.toSVG(frame, subFramesLength > 1 ? fi : 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                         ret.add(f);
@@ -325,7 +343,7 @@ public class FrameExporter {
 
                 if (evl != null) {
                     Tag parentTag = tim.getParentTag();
-                    evl.handleExportedEvent("frame", i + 1, frames.size(), parentTag == null ? "" : parentTag.getName());
+                    evl.handleExportedEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
                 }
             }
 
@@ -460,7 +478,7 @@ public class FrameExporter {
                             try {
                                 new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
                             } catch (ActionParseException ex) {
-                                Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
 
@@ -478,7 +496,7 @@ public class FrameExporter {
                                 try {
                                     new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
                                 } catch (ActionParseException ex) {
-                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
 
@@ -491,7 +509,7 @@ public class FrameExporter {
 
         final Color fbackgroundColor = backgroundColor;
         final boolean usesTransparency = settings.mode == FrameExportMode.PNG || settings.mode == FrameExportMode.GIF;
-        final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings);
+        final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
         switch (settings.mode) {
             case GIF:
@@ -510,7 +528,9 @@ public class FrameExporter {
                     for (int i = 0; frameImages.hasNext(); i++) {
                         final int fi = i;
                         new RetryTask(() -> {
-                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
+                            int fileNum = subFramesLength > 1 ? fi + 1 : (fframes.get(fi) + 1);
+
+                            File f = new File(foutdir + File.separator + fileNum + ".bmp");
                             BufferedImage img = frameImages.next();
                             if (img != null) {
                                 BMPFile.saveBitmap(img, f);
@@ -526,7 +546,8 @@ public class FrameExporter {
                     for (int i = 0; frameImages.hasNext(); i++) {
                         final int fi = i;
                         new RetryTask(() -> {
-                            File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
+                            int fileNum = subFramesLength > 1 ? fi + 1 : (fframes.get(fi) + 1);
+                            File file = new File(foutdir + File.separator + fileNum + ".png");
                             BufferedImage img = frameImages.next();
                             if (img != null) {
                                 ImageHelper.write(img, ImageFormat.PNG, file);
@@ -562,14 +583,19 @@ public class FrameExporter {
                             Matrix transformation = m;
                             Map<Integer, Font> existingFonts = new HashMap<>();
 
-                            while (pos < fframes.size()) {
+                            int maxPos = fframes.size();
+                            if (subFramesLength > 1) {
+                                maxPos = subFramesLength;
+                            }
+
+                            while (pos < maxPos) {
 
                                 if (evl != null) {
                                     Tag parentTag = tim.getParentTag();
                                     String tagName = parentTag == null ? "" : parentTag.getName();
-                                    evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
+                                    evl.handleExportingEvent("frame", pos + 1, maxPos, tagName);
                                 }
-                                int fframe = fframes.get(pos);
+                                int fframe = subFramesLength > 1 ? fframes.get(0) : fframes.get(pos);
                                 final Graphics2D g = (Graphics2D) job.getGraphics(pf);
                                 //g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
 
@@ -609,7 +635,7 @@ public class FrameExporter {
                                 renderContext.stateUnderCursor = new ArrayList<>();
 
                                 try {
-                                    tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>());
+                                    tim.toImage(fframe, subFramesLength > 1 ? pos : 0, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>());
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
