@@ -5425,6 +5425,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         FrameExporter frameExporter = new FrameExporter();
                         FrameExportSettings fes = new FrameExportSettings(mode, dialog.getZoom(), dialog.isTransparentFrameBackgroundEnabled());
                         String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
+                        if (fContainerId != 0) {
+                            subFolder = SpriteExportSettings.EXPORT_FOLDER_NAME;
+                        }
                         frameExporter.exportFrames(errorHandler, selFile + File.separator + subFolder, (SWF) frame.getOpenable(), fContainerId, Arrays.asList(frameNum), length, fes, null);
 
                     } catch (Exception ex) {
