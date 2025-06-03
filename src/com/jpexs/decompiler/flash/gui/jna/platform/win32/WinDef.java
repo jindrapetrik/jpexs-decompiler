@@ -1054,7 +1054,7 @@ public interface WinDef extends StdCallLibrary {
         public static final int SIZE = 4;
 
         public BOOL() {
-            super(0);
+            this(0); // JPEXS fix
         }
 
         public BOOL(long value) {

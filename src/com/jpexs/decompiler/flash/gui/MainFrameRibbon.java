@@ -297,10 +297,10 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                                     4,
                                     SubstanceSizeUtils.getTitlePaneIconSize(),
                                     SubstanceSizeUtils.getTitlePaneIconSize()
-                            );
+                            );                            
                         }
-                    };
-                    titlePane.addComponentListener(ad);
+                    };                    
+                    titlePane.addComponentListener(ad);                    
 
                     ad.componentShown(null);
 
@@ -317,8 +317,35 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                                 return new WinDef.LRESULT(0);
                             }
                             if (uMsg == WinUser.WM_NCMOUSEMOVE) {
-                                User32.INSTANCE.PostMessage(hWnd, WinUser.WM_MOUSEMOVE, wParam, lParam);
+                                if (wParam.intValue() == WinUser.HTMAXBUTTON) {
+                                    User32.INSTANCE.PostMessage(hwnd, WinUser.WM_MOUSEMOVE, new WinDef.WPARAM(0), lParam);
+                                    return new WinDef.LRESULT(0);
+                                }
                             }
+                            if (uMsg == WinUser.WM_NCMOUSEHOVER) {
+                                if (wParam.intValue() == WinUser.HTMAXBUTTON) {                                    
+                                    User32.INSTANCE.PostMessage(hwnd, WinUser.WM_MOUSEHOVER, new WinDef.WPARAM(0), lParam);
+                                    return new WinDef.LRESULT(0);
+                                }
+                            }
+                            if (uMsg == WinUser.WM_NCMOUSELEAVE) {
+                                if (wParam.intValue() == WinUser.HTMAXBUTTON) {
+                                    User32.INSTANCE.PostMessage(hwnd, WinUser.WM_MOUSELEAVE, new WinDef.WPARAM(0), lParam);
+                                    return new WinDef.LRESULT(0);
+                                }
+                            }
+                            if (uMsg == WinUser.WM_NCLBUTTONDOWN) {
+                                if (wParam.intValue() == WinUser.HTMAXBUTTON) {
+                                    User32.INSTANCE.PostMessage(hwnd, WinUser.WM_LBUTTONDOWN, new WinDef.WPARAM(WinUser.MK_LBUTTON), lParam);
+                                    return new WinDef.LRESULT(0);
+                                }
+                            }
+                            if (uMsg == WinUser.WM_NCLBUTTONUP) {
+                                if (wParam.intValue() == WinUser.HTMAXBUTTON) {
+                                    User32.INSTANCE.PostMessage(hwnd, WinUser.WM_LBUTTONUP, new WinDef.WPARAM(WinUser.MK_LBUTTON), lParam);
+                                    return new WinDef.LRESULT(0);
+                                }
+                            }                            
                             if (uMsg == WinUser.WM_NCHITTEST) {
                                 int y = (short) ((lParam.longValue() >> 16) & 0xFFFF);
                                 int x = (short) (lParam.longValue() & 0xFFFF);

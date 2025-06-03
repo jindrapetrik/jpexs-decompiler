@@ -1483,4 +1483,6 @@ public interface User32 extends StdCallLibrary, WinUser {
     
     Pointer SetWindowLongPtr(WinDef.HWND hWnd, int nIndex, Callback wndProc);
 
+    
+    BOOL ScreenToClient(WinDef.HWND hWnd, POINT lpPoint);
 }
