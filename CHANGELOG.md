@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - Disable AS1/2/3 direct editation when editing P-code
 - AS3 - navigation to definition in other SWF file and also player/airglobal
 - [#2463] Export subsprites animation context menu on frames
+- Open in the Flash Player context menu on graphic/sound tags and frames
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

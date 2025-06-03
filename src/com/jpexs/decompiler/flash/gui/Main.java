@@ -607,12 +607,12 @@ public class Main {
         }
     }
 
-    public static void runAsync(File swfFile) {
+    public static boolean runAsync(File swfFile) {
         String playerLocation = Configuration.playerLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             advancedSettings("paths");
-            return;
+            return false;
         }
         try {
             final Process process = Runtime.getRuntime().exec(new String[]{playerLocation, swfFile.getAbsolutePath()});
@@ -624,8 +624,10 @@ public class Main {
                     }
                 }
             });
+            return true;
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 

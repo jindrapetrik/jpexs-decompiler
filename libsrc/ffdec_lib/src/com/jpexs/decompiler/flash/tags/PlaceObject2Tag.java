@@ -260,6 +260,39 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUB(1, 0); //no clip actions
+        sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
+        sos.writeUB(1, placeFlagHasName ? 1 : 0);
+        sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
+        sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
+        sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
+        sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
+        sos.writeUB(1, placeFlagMove ? 1 : 0);
+        sos.writeUI16(depth);
+        if (placeFlagHasCharacter) {
+            sos.writeUI16(characterId);
+        }
+        if (placeFlagHasMatrix) {
+            sos.writeMatrix(matrix);
+        }
+        if (placeFlagHasColorTransform) {
+            sos.writeCXFORMWITHALPHA(colorTransform);
+        }
+        if (placeFlagHasRatio) {
+            sos.writeUI16(ratio);
+        }
+        if (placeFlagHasName) {
+            sos.writeString(name);
+        }
+        if (placeFlagHasClipDepth) {
+            sos.writeUI16(clipDepth);
+        }
+    }
+    
+    
+
+    @Override
     public int getPlaceObjectNum() {
         return 2;
     }

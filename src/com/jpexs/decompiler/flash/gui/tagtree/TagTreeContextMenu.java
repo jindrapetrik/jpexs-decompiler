@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFHeader;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.TagRemoveListener;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.exporters.PreviewExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
@@ -99,16 +101,21 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DepthTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PackedBinaryData;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -140,14 +147,17 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -202,7 +212,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem undoTagMenuItem;
 
     private JMenuItem exportSelectionMenuItem;
-    
+
     private JMenuItem exportSubspriteAnimationMenuItem;
 
     private JMenuItem exportABCMenuItem;
@@ -324,6 +334,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInHexDumpViewTagMenuItem;
 
     private JMenuItem showInEasyViewTagMenuItem;
+
+    private JMenuItem showInFlashPlayerMenuItem;
 
     private JMenuItem showInFramesFolderMenuItem;
 
@@ -468,6 +480,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInEasyViewTagMenuItem.setIcon(View.getIcon("easy16"));
         add(showInEasyViewTagMenuItem);
 
+        showInFlashPlayerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInFlashPlayer"));
+        showInFlashPlayerMenuItem.addActionListener(this::showInFlashPlayerActionPerformed);
+        showInFlashPlayerMenuItem.setIcon(View.getIcon("playflash16"));
+        add(showInFlashPlayerMenuItem);
+
         textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
         textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
         textSearchMenuItem.setIcon(View.getIcon("search16"));
@@ -484,7 +501,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         });
         exportSelectionMenuItem.setIcon(View.getIcon("exportsel16"));
         add(exportSelectionMenuItem);
-        
+
         exportSubspriteAnimationMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportSubspriteAnimation"));
         exportSubspriteAnimationMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -494,7 +511,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         });
         exportSubspriteAnimationMenuItem.setIcon(View.getIcon("exportsubsprites16"));
         add(exportSubspriteAnimationMenuItem);
-        
 
         exportABCMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportAbc"));
         exportABCMenuItem.addActionListener(this::exportABCActionPerformed);
@@ -1385,6 +1401,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInTagListViewTagMenuItem.setVisible(false);
         showInHexDumpViewTagMenuItem.setVisible(false);
         showInEasyViewTagMenuItem.setVisible(false);
+        showInFlashPlayerMenuItem.setVisible(false);
         showInFramesFolderMenuItem.setVisible(false);
         addFramesMenuItem.setVisible(false);
         addFramesBeforeMenuItem.setVisible(false);
@@ -1711,6 +1728,20 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof Timelined) {
                 showInEasyViewTagMenuItem.setVisible(true);
             }
+            if (((firstItem instanceof DrawableTag)
+                    || (firstItem instanceof Frame)
+                    || (firstItem instanceof TagScript)
+                    || (firstItem instanceof SoundStreamHeadTypeTag)
+                    || (firstItem instanceof DefineSoundTag)
+                    || (firstItem instanceof DefineExternalSound)
+                    || (firstItem instanceof DefineExternalStreamSound))
+                    && !(firstItem instanceof ImageTag)
+                    && ((firstItem instanceof SoundStreamHeadTypeTag)
+                    || (firstItem instanceof DefineExternalStreamSound)
+                    || !((firstItem instanceof CharacterIdTag) && !(firstItem instanceof CharacterTag)))
+                    && !(firstItem instanceof FontTag)) {
+                showInFlashPlayerMenuItem.setVisible(true);
+            }
 
             if ((firstItem instanceof Tag)
                     || (firstItem instanceof CLIPACTIONRECORD)
@@ -1789,7 +1820,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     changeCharsetMenu.setVisible(true);
                 }
             }
-            
+
             if (firstItem instanceof Frame) {
                 exportSubspriteAnimationMenuItem.setVisible(true);
             }
@@ -4621,6 +4652,49 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.showView(MainPanel.VIEW_EASY);
         mainPanel.easyPanel.setTimelined((Timelined) item);
         mainPanel.updateMenu();
+    }
+
+    private void showInFlashPlayerActionPerformed(ActionEvent evt) {
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("ffdec_view_", ".swf");
+            tempFile.deleteOnExit();
+
+            Color backgroundColor = View.getSwfBackgroundColor();
+            TreeItem treeItem = getCurrentItem();
+
+            if (treeItem instanceof PlaceObjectTypeTag) {
+                treeItem = Main.getMainFrame().getPanel().getCurrentTree().getFullModel().getParent(treeItem); //should be a frame
+            } else if (treeItem instanceof Tag) {
+                Tag tag = (Tag) treeItem;
+                if (tag instanceof FontTag) { //Fonts are always black on white
+                    backgroundColor = View.getDefaultBackgroundColor();
+                }
+            } else if (treeItem instanceof Frame) {
+                Frame fn = (Frame) treeItem;
+                SWF sourceSwf = (SWF) fn.getOpenable();
+                if (fn.timeline.timelined == sourceSwf) {
+                    SetBackgroundColorTag setBgColorTag = sourceSwf.getBackgroundColor();
+                    if (setBgColorTag != null) {
+                        backgroundColor = setBgColorTag.backgroundColor.toColor();
+                    }
+                }
+            }
+
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, 1/*fontPageNum ???*/, false);
+            } catch (ActionParseException ex) {
+                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (!Main.runAsync(tempFile)) {
+                tempFile.delete();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
+        }
     }
 
     private void moveTagActionPerformed(ActionEvent evt) {

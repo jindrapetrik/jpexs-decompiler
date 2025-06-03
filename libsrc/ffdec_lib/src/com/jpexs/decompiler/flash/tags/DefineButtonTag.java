@@ -119,6 +119,12 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeBUTTONRECORDList(characters, false);
+    }        
+
+    @Override
     public int getCharacterId() {
         return buttonId;
     }

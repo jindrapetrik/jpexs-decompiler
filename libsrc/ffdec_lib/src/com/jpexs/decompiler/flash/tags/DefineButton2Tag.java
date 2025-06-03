@@ -142,6 +142,21 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeUB(7, reserved);
+        sos.writeUB(1, trackAsMenu ? 1 : 0);
+
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset())) {
+            sos2.writeBUTTONRECORDList(characters, true);
+        }
+        byte[] brdata = baos2.toByteArray();
+        sos.writeUI16(0);
+        sos.write(brdata);        
+    }        
+
+    @Override
     public int getCharacterId() {
         return buttonId;
     }
