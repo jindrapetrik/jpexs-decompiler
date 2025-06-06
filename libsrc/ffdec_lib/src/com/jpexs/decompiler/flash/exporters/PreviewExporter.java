@@ -342,7 +342,15 @@ public class PreviewExporter {
 
             FileAttributesTag fa = swf.getFileAttributes();
             if (fa != null) {
-                fa.writeTag(sos2);
+                FileAttributesTag fa2;
+                try {
+                    fa2 = (FileAttributesTag) fa.cloneTag();
+                    fa2.actionScript3 = false;
+                    fa2.setModified(true);
+                    fa2.writeTag(sos2);
+                } catch (InterruptedException ex) {
+                    //ignored
+                }                
             }
 
             SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
