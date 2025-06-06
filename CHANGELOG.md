@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 - [#2463] Export subsprites animation context menu on frames
 - Open in the Flash Player context menu on graphic/sound tags and frames
 - [#2451] Replacing sound stream block ranges
+- Importing sound stream block ranges
+- Commandline replacing sound stream block ranges
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

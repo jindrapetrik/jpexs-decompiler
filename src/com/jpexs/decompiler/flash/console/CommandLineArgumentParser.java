@@ -3001,7 +3001,7 @@ public class CommandLineArgumentParser {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
                 while (true) {
-                    String objectToReplace = args.pop();
+                    String objectToReplace = args.pop();                    
 
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
@@ -3104,10 +3104,29 @@ public class CommandLineArgumentParser {
                             }).importText(textTag, new String(data, Utf8Helper.charset));
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
+                            Integer startFrame = null;
+                            if (!args.isEmpty()) {
+                                if (args.peek().toLowerCase(Locale.ENGLISH).equals("-startframe")) {
+                                    args.pop();
+                                    if (args.isEmpty()) {
+                                        System.err.println("Frame number must be specified");
+                                        badArguments("replace");
+                                    }
+                                    try {
+                                        startFrame = Integer.parseInt(args.pop());
+                                    } catch (NumberFormatException nfe) {
+                                        System.err.println("Frame number should be integer");
+                                        badArguments("replace");
+                                    }
+                                }
+                            }
                             boolean ok = false;
                             SoundImporter soundImporter = new SoundImporter();
                             try {
-                                ok = soundImporter.importSound(st, new ByteArrayInputStream(data), soundFormat);
+                                ok = soundImporter.importSound(st, new ByteArrayInputStream(data), soundFormat, startFrame);
+                            } catch (SoundParametersMismatchException spm) {
+                                System.err.println("Import FAILED. " + spm.getMessage());
+                                System.exit(3);
                             } catch (UnsupportedSamplingRateException usre) {
                                 List<String> supportedRatesStr = new ArrayList<>();
                                 for (int i : usre.getSupportedRates()) {

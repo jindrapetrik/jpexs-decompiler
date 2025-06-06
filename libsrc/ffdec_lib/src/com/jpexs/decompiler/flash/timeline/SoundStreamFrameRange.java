@@ -80,7 +80,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     @Override
     public boolean importSupported() {
-        return true;
+        return head.getSoundFormatId() == SoundFormat.FORMAT_MP3
+                || head.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN
+                || head.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN;
     }
 
     @Override
@@ -132,7 +134,6 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
         return "SoundStreamBlocks";
     }
 
-
     @Override
     public SoundFormat getSoundFormat() {
         return head.getSoundFormat();
@@ -176,7 +177,6 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     public SoundStreamHeadTypeTag getHead() {
         return head;
     }
-
 
     @Override
     public String toString() {

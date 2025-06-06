@@ -5175,7 +5175,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             boolean ok = false;
             try {
-                ok = soundImporter.importSound(st, new FileInputStream(selfile), soundFormat);
+                ok = soundImporter.importSound(st, new FileInputStream(selfile), soundFormat, null);
                 ((SWF) ((TreeItem) st).getOpenable()).clearSoundCache();
             } catch (IOException ex) {
                 //ignore

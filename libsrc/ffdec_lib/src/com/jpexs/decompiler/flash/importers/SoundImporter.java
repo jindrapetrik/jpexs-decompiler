@@ -370,9 +370,9 @@ public class SoundImporter {
                     || newSoundType != streamHead.getSoundType()
                     || newSoundRate != streamHead.getSoundRate()) {
                 throw new SoundParametersMismatchException(
-                        streamHead.getSoundType(), 
-                        streamHead.getSoundSize(), 
-                        streamHead.getSoundRate(), 
+                        streamHead.getSoundType(),
+                        streamHead.getSoundSize(),
+                        streamHead.getSoundRate(),
                         streamHead.getSoundFormatId(),
                         newSoundType,
                         newSoundSize,
@@ -405,8 +405,8 @@ public class SoundImporter {
                         break;
                     }
                 }
-            }            
-        } else {            
+            }
+        } else {
             for (SoundStreamFrameRange range : ranges) {
                 if (range.startFrame == startFrame) {
                     existingBlocks.addAll(range.blocks);
@@ -414,7 +414,7 @@ public class SoundImporter {
                 }
             }
         }
-        
+
         for (SoundStreamBlockTag block : existingBlocks) {
             timelined.removeTag(block);
         }
@@ -552,15 +552,16 @@ public class SoundImporter {
      * @param soundTag Sound tag
      * @param is Input stream
      * @param newSoundFormat New sound format
+     * @param startFrame Starting frame. null = autodetect, replace all
      * @return True if sound was imported successfully
      * @throws SoundImportException On sound import error
      */
-    public boolean importSound(SoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
+    public boolean importSound(SoundTag soundTag, InputStream is, int newSoundFormat, Integer startFrame) throws SoundImportException {
         if (soundTag instanceof DefineSoundTag) {
             return importDefineSound((DefineSoundTag) soundTag, is, newSoundFormat);
         }
         if (soundTag instanceof SoundStreamHeadTypeTag) {
-            return importSoundStream((SoundStreamHeadTypeTag) soundTag, is, newSoundFormat);
+            return importSoundStreamAtFrame((SoundStreamHeadTypeTag) soundTag, is, newSoundFormat, startFrame);
         }
         if (soundTag instanceof SoundStreamFrameRange) {
             return importSoundStreamAtFrame(((SoundStreamFrameRange) soundTag).getHead(), is, newSoundFormat, ((SoundStreamFrameRange) soundTag).startFrame);
@@ -595,16 +596,21 @@ public class SoundImporter {
         });
 
         List<SoundTag> soundTags = new ArrayList<>();
+
+        List<List<SoundStreamFrameRange>> ranges = new ArrayList<>();
         for (int characterId : characters.keySet()) {
             CharacterTag tag = characters.get(characterId);
             if (tag instanceof DefineSoundTag) {
                 soundTags.add((DefineSoundTag) tag);
+                ranges.add(new ArrayList<>());
             }
             if (tag instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) tag;
                 for (Tag subTag : sprite.getTags()) {
                     if (subTag instanceof SoundStreamHeadTypeTag) {
                         soundTags.add((SoundStreamHeadTypeTag) subTag);
+                        ranges.add(sprite.getTimeline().getSoundStreamBlocks((SoundStreamHeadTypeTag) subTag));
+                        break;
                     }
                 }
             }
@@ -612,10 +618,14 @@ public class SoundImporter {
         for (Tag tag : swf.getTags()) {
             if (tag instanceof SoundStreamHeadTypeTag) {
                 soundTags.add((SoundStreamHeadTypeTag) tag);
+                ranges.add(swf.getTimeline().getSoundStreamBlocks((SoundStreamHeadTypeTag) tag));
+                break;
             }
         }
 
-        for (SoundTag tag : soundTags) {
+        int pos = -1;
+        loopChars: for (SoundTag tag : soundTags) {
+            pos++;
             int characterId = tag.getCharacterId();
             List<File> existingFilesForSoundTag = new ArrayList<>();
 
@@ -656,8 +666,38 @@ public class SoundImporter {
                 continue;
             }
 
+            if (!ranges.get(pos).isEmpty()) {
+                for (SoundStreamFrameRange r : ranges.get(pos)) {
+                    for (File sourceFile : existingFilesForSoundTag) {
+                        if (sourceFile.getName().startsWith("" + characterId + "_" + (r.startFrame + 1) + "-")) {
+                            
+                            try {
+                                if (printOut) {
+                                    System.out.println("Importing character " + characterId + ", start frame " + r.startFrame + " from file " + sourceFile.getName());
+                                }
+                                int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                                if (sourceFile.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
+                                    soundFormat = SoundFormat.FORMAT_MP3;
+                                }
+                                try (FileInputStream fis = new FileInputStream(sourceFile)) {
+                                    importSound(tag, fis, soundFormat, r.startFrame);
+                                    soundCount++;
+                                }
+                            } catch (IOException | SoundImportException ex) {
+                                Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sound " + characterId + " from file " + sourceFile.getName(), ex);
+                            }
+                            if (CancellableWorker.isInterrupted()) {
+                                break loopChars;
+                            }
+                            break;
+                        }
+                    }
+                }
+                continue;
+            }
+
             if (existingFilesForSoundTag.size() > 1) {
-                Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sound tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSoundTag.get(0).getName()});
+                Logger.getLogger(SoundImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sound tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSoundTag.get(0).getName()});
             }
             File sourceFile = existingFilesForSoundTag.get(0);
 
@@ -670,7 +710,7 @@ public class SoundImporter {
                     soundFormat = SoundFormat.FORMAT_MP3;
                 }
                 try (FileInputStream fis = new FileInputStream(sourceFile)) {
-                    importSound(tag, fis, soundFormat);
+                    importSound(tag, fis, soundFormat, null);
                     soundCount++;
                 }
             } catch (IOException | SoundImportException ex) {
