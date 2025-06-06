@@ -80,7 +80,7 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     @Override
     public boolean importSupported() {
-        return false; //??
+        return true;
     }
 
     @Override

@@ -163,6 +163,7 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.SoundParametersMismatchException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
@@ -3055,6 +3056,8 @@ public class CommandLineArgumentParser {
                                 }
                                 System.err.println("Import FAILED. Input file has unsupported sampling rate (" + usre.getSoundRate() + "). Supported rates for this sound format: " + String.join(", ", supportedRatesStr) + ".");
                                 System.exit(2);
+                            } catch (SoundParametersMismatchException ex) {
+                                System.err.println("Import FAILED. Input file has different format that target stream. Target stream format: " + ex.getMessage());
                             }
                             if (!ok) {
                                 System.err.println("Import FAILED. Maybe unsupported media type? Only MP3 and uncompressed WAV are available.");

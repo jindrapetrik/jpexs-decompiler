@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.SoundParametersMismatchException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
@@ -69,6 +70,7 @@ public class SoundImporter {
 
     /**
      * Imports sound from input stream.
+     *
      * @param soundTag Sound tag
      * @param is Input stream
      * @param newSoundFormat New sound format
@@ -236,13 +238,29 @@ public class SoundImporter {
 
     /**
      * Imports sound stream from input stream.
+     *
      * @param streamHead Sound stream head
      * @param is Input stream
      * @param newSoundFormat New sound format
      * @return True if sound stream was imported successfully
      * @throws UnsupportedSamplingRateException On unsupported sampling rate
      */
-    public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException {
+    public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException, SoundParametersMismatchException {
+        return importSoundStreamAtFrame(streamHead, is, newSoundFormat, null);
+    }
+
+    /**
+     * Imports sound stream from input stream.
+     *
+     * @param streamHead Sound stream head
+     * @param is Input stream
+     * @param newSoundFormat New sound format
+     * @param startFrame Starting frame. null = autodetect, replace whole
+     * timeline
+     * @return True if sound stream was imported successfully
+     * @throws UnsupportedSamplingRateException On unsupported sampling rate
+     */
+    public boolean importSoundStreamAtFrame(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat, Integer startFrame) throws UnsupportedSamplingRateException, SoundParametersMismatchException {
         List<MP3FRAME> mp3Frames = null;
         int newSoundRate = -1;
         boolean newSoundSize = false;
@@ -346,28 +364,57 @@ public class SoundImporter {
                 return false;
         }
 
+        if (startFrame != null) {
+            if (newSoundFormat != streamHead.getSoundFormatId()
+                    || newSoundSize != streamHead.getSoundSize()
+                    || newSoundType != streamHead.getSoundType()
+                    || newSoundRate != streamHead.getSoundRate()) {
+                throw new SoundParametersMismatchException(
+                        streamHead.getSoundType(), 
+                        streamHead.getSoundSize(), 
+                        streamHead.getSoundRate(), 
+                        streamHead.getSoundFormatId(),
+                        newSoundType,
+                        newSoundSize,
+                        newSoundRate,
+                        newSoundFormat
+                );
+            }
+        }
+
         ByteArrayInputStream bais = uncompressedSoundData == null ? null : new ByteArrayInputStream(uncompressedSoundData);
 
         List<SoundStreamFrameRange> ranges = streamHead.getRanges();
 
         List<SoundStreamBlockTag> existingBlocks = new ArrayList<>();
-        for (SoundStreamFrameRange range : ranges) {
-            existingBlocks.addAll(range.blocks);
-        }
-
-        int startFrame = 0;
         Timelined timelined = streamHead.getTimelined();
-        if (!existingBlocks.isEmpty()) {
-            ReadOnlyTagList tags = timelined.getTags();
-            for (Tag t : tags) {
-                if (t instanceof ShowFrameTag) {
-                    startFrame++;
+        if (startFrame == null) {
+
+            for (SoundStreamFrameRange range : ranges) {
+                existingBlocks.addAll(range.blocks);
+            }
+
+            startFrame = 0;
+            if (!existingBlocks.isEmpty()) {
+                ReadOnlyTagList tags = timelined.getTags();
+                for (Tag t : tags) {
+                    if (t instanceof ShowFrameTag) {
+                        startFrame++;
+                    }
+                    if (t instanceof SoundStreamBlockTag) {
+                        break;
+                    }
                 }
-                if (t instanceof SoundStreamBlockTag) {
+            }            
+        } else {            
+            for (SoundStreamFrameRange range : ranges) {
+                if (range.startFrame == startFrame) {
+                    existingBlocks.addAll(range.blocks);
                     break;
                 }
             }
         }
+        
         for (SoundStreamBlockTag block : existingBlocks) {
             timelined.removeTag(block);
         }
@@ -451,7 +498,18 @@ public class SoundImporter {
         ReadOnlyTagList tags = timelined.getTags();
         int frame = -1;
         for (int i = 0; i < tags.size(); i++) {
+            if (blocks.isEmpty()) {
+                break;
+            }
             Tag t = tags.get(i);
+            if (t instanceof SoundStreamBlockTag) {
+                if (frame + 1 >= startFrame) {
+                    timelined.removeTag(i);
+                    tags = timelined.getTags();
+                    i--;
+                    continue;
+                }
+            }
             if (t instanceof ShowFrameTag) {
                 frame++;
                 if (frame >= startFrame && !blocks.isEmpty()) {
@@ -490,6 +548,7 @@ public class SoundImporter {
 
     /**
      * Imports sound from input stream.
+     *
      * @param soundTag Sound tag
      * @param is Input stream
      * @param newSoundFormat New sound format
@@ -503,11 +562,15 @@ public class SoundImporter {
         if (soundTag instanceof SoundStreamHeadTypeTag) {
             return importSoundStream((SoundStreamHeadTypeTag) soundTag, is, newSoundFormat);
         }
+        if (soundTag instanceof SoundStreamFrameRange) {
+            return importSoundStreamAtFrame(((SoundStreamFrameRange) soundTag).getHead(), is, newSoundFormat, ((SoundStreamFrameRange) soundTag).startFrame);
+        }
         return false;
     }
 
     /**
      * Bulk imports sounds from directory.
+     *
      * @param soundDir Sound directory
      * @param swf SWF
      * @param printOut Print out

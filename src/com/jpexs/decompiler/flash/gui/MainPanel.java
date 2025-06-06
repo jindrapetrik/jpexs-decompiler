@@ -172,6 +172,7 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.SoundParametersMismatchException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
@@ -5120,7 +5121,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreeItem ti0 = items.get(0);
         File file = null;
         if (ti0 instanceof SoundTag) {
-            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false, "importsound");
+            if (ti0 instanceof SoundStreamFrameRange) {
+                SoundStreamFrameRange r = (SoundStreamFrameRange) ti0;
+                if (r.getSoundFormatId() == SoundFormat.FORMAT_MP3) {
+                    file = showImportFileChooser("filter.sounds.mp3|*.mp3", false, "importsound");
+                } else {
+                    file = showImportFileChooser("filter.sounds.wav|*.wav", false, "importsound");
+                }
+            } else {
+                file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false, "importsound");
+            }
         }
         if (ti0 instanceof ImageTag) {
             file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp", true, "importimage");
@@ -5166,7 +5176,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             boolean ok = false;
             try {
                 ok = soundImporter.importSound(st, new FileInputStream(selfile), soundFormat);
-                ((Tag) st).getSwf().clearSoundCache();
+                ((SWF) ((TreeItem) st).getOpenable()).clearSoundCache();
             } catch (IOException ex) {
                 //ignore
             } catch (UnsupportedSamplingRateException ex) {
@@ -5177,6 +5187,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ViewMessages.showMessageDialog(this, translate("error.sound.rate").replace("%saplingRate%", samplingRateKhz).replace("%supportedRates%", String.join(", ", supportedRatesKhz)), translate("error"), JOptionPane.ERROR_MESSAGE);
                 return;
+            } catch (SoundParametersMismatchException ex) {
+                ViewMessages.showMessageDialog(this, ex.getMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                return;
             } catch (SoundImportException ex) {
                 //ignore
             }
@@ -5184,7 +5197,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!ok) {
                 ViewMessages.showMessageDialog(this, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
             } else {
-                refreshTree(((Tag) st).getSwf());
+                refreshTree((SWF) ((TreeItem) st).getOpenable());
                 reload(true);
             }
         }
