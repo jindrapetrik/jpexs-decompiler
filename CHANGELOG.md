@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - "Show detail" context menu item for items in folder preview
 - [#1682] AS2 - Adding class by context menu on packages
 - Simple editor - detection of english color name (based on CSS names)
-- AS1/2/3 - highlight variable definition and all its instances on cursor place
+- [#2050] AS1/2/3 - highlight variable definition and all its instances on cursor place
   (also in edit mode)
 - AS1/2/3 - underline errors in the code (also in edit mode) 
 - AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar
@@ -3851,6 +3851,7 @@ Major version of SWF to XML export changed to 2.
 [#289]: https://www.free-decompiler.com/flash/issues/289
 [#2412]: https://www.free-decompiler.com/flash/issues/2412
 [#1682]: https://www.free-decompiler.com/flash/issues/1682
+[#2050]: https://www.free-decompiler.com/flash/issues/2050
 [#2463]: https://www.free-decompiler.com/flash/issues/2463
 [#2236]: https://www.free-decompiler.com/flash/issues/2236
 [#2451]: https://www.free-decompiler.com/flash/issues/2451
