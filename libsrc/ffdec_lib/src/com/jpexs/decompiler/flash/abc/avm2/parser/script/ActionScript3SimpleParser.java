@@ -512,18 +512,18 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 s = lex();
             }
             expected(errors, s, lexer.yyline(), SymbolType.BRACKET_CLOSE);
-            s = lex();         
+            s = lex();
         }
         lexer.pushback(s);
     }
 
     private void classTraits(List<SimpleParseException> errors, boolean outsidePackage, Reference<Boolean> cinitNeedsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, DottedChain pkg, String classNameStr, boolean isInterface, Reference<Boolean> iinitNeedsActivation, ABC abc, List<VariableOrScope> classVariables) throws AVM2ParseException, SimpleParseException, IOException, CompilationException, InterruptedException {
-        
+
         Stack<Loop> cinitLoops = new Stack<>();
         Map<Loop, String> cinitLoopLabels = new HashMap<>();
-    
+
         List<VariableOrScope> traitVariables = new ArrayList<>();
-        
+
         looptraits:
         while (true) {
             TypeItem thisType = null;
@@ -535,7 +535,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             boolean isPrivate = false;
             boolean isNative = false;
 
-            String customNs = null;            
+            String customNs = null;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
             parseMetadata(errors);
 
@@ -778,7 +778,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     }
 
                     if (s.type == SymbolType.ASSIGN) {
-                        List<VariableOrScope> constVarVariables = new ArrayList<>();                   
+                        List<VariableOrScope> constVarVariables = new ArrayList<>();
                         expression(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<>(), false, false, isStatic, true, constVarVariables, false, abc);
                         classVariables.add(new TraitVarConstValueScope(constVarVariables, isStatic));
                         s = lex();
@@ -876,11 +876,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
         allOpenedNamespaces.add(openedNamespaces);
 
         for (String name : abc.getSwf().getAbcIndex().getPackageObjects(pkgName)) {
-            externalTypes.add(pkgName.add(name, "").toRawString());        
+            externalTypes.add(pkgName.add(name, "").toRawString());
         }
-        
-        
-        
+
+        List<VariableOrScope> sinitTraitVariables = new ArrayList<>();
+
         parseImportsUsages(errors, sinitVariables, importedClasses, openedNamespaces, abc, externalTypes);
 
         boolean isEmpty = true;
@@ -953,15 +953,15 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (s.type == SymbolType.INTERFACE) {
                         isInterface = true;
                     }
-                    String subNameStr;                   
-                            
+                    String subNameStr;
+
                     s = lex();
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
                     subNameStr = s.value.toString();
                     int subNamePos = s.position;
-                    sinitVariables.add(new Type(true, pkgName.addWithSuffix(subNameStr).toPrintableString(true), subNamePos));
+                    sinitTraitVariables.add(new Type(true, pkgName.addWithSuffix(subNameStr).toPrintableString(true), subNamePos));
                     s = lex();
 
                     if (s.type == SymbolType.NOT) {
@@ -997,7 +997,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     Reference<Boolean> iinitNeedsActivation = new Reference<>(false);
                     List<VariableOrScope> classVariables = new ArrayList<>();
                     classVariables.add(new Variable(true, "this", s.position, false));
-                    
+
                     classTraits(errors, !inPackage, cinitNeedsActivation, importedClasses, subOpenedNamespaces, pkgName, subNameStr, isInterface, iinitNeedsActivation, abc, classVariables);
 
                     sinitVariables.add(new ClassScope(classVariables));
@@ -1010,7 +1010,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String fname = s.value.toString();
 
-                    method(errors, !inPackage, false, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, fname, true, sinitVariables, abc, s.position);
+                    sinitTraitVariables.add(new Variable(true, fname, s.position, true));
+
+                    method(errors, !inPackage, false, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, "", true, sinitVariables, abc, s.position);
                     break;
                 case CONST:
                 case VAR:
@@ -1024,7 +1026,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    sinitVariables.add(new Variable(true, s.value.toString(), s.position));
+                    sinitTraitVariables.add(new Variable(true, s.value.toString(), s.position));
                     s = lex();
                     if (s.type == SymbolType.COLON) {
                         type(errors, null, new Reference<>(false), importedClasses, openedNamespaces, sinitVariables, abc);
@@ -1050,7 +1052,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    sinitVariables.add(new Variable(true, s.value.toString(), s.position));
+                    sinitTraitVariables.add(new Variable(true, s.value.toString(), s.position));
 
                     s = lex();
 
@@ -1085,6 +1087,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         if (inPackage) {
             expectedType(errors, SymbolType.CURLY_CLOSE);
         }
+        sinitVariables.addAll(0, sinitTraitVariables);
         return !isEmpty;
     }
 
@@ -2045,7 +2048,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     fullName = fullName + "." + s.value.toString();
                     lastName = s.value.toString();
                     varPos = s.position;
-                    nameParts.add(lastName);                
+                    nameParts.add(lastName);
                     s = lex();
                 }
 
