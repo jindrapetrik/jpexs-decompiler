@@ -337,12 +337,13 @@ public class ErrorLogFrame extends AppFrame {
                 expandButton.setMargin(new Insets(2, 2, 2, 2));
                 expandButton.setToolTipText(translate("details"));
 
-                final JScrollPane scrollPane;
+                final JPanel detailPanel;
                 if (detailComponent != null) {
-                    scrollPane = new FasterScrollPane(detailComponent);
-                    scrollPane.setAlignmentX(0f);
+                    detailPanel = new JPanel(new BorderLayout());
+                    detailPanel.add(detailComponent, BorderLayout.CENTER);
+                    detailPanel.setAlignmentX(0f);
                 } else {
-                    scrollPane = null;
+                    detailPanel = null;
                 }
 
                 if (detailComponent != null) {
@@ -350,7 +351,7 @@ public class ErrorLogFrame extends AppFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             expandButton.setIcon(expandButton.isSelected() ? expandIcon : collapseIcon);
-                            scrollPane.setVisible(expandButton.isSelected());
+                            detailPanel.setVisible(expandButton.isSelected());
                             revalidate();
                             repaint();
                         }
@@ -380,8 +381,8 @@ public class ErrorLogFrame extends AppFrame {
                 header.add(copyButton);
                 pan.add(header);
                 if (detailComponent != null) {
-                    pan.add(scrollPane);
-                    scrollPane.setVisible(false);
+                    pan.add(detailPanel);
+                    detailPanel.setVisible(false);
                 }
                 pan.setAlignmentX(0f);
                 if (logViewInner != null) { //may be disposed or what? #1904
