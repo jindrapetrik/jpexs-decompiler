@@ -52,7 +52,6 @@ public class MP3SOUNDDATA {
         long initLen = mis.getPosition();
         MarkingPushbackInputStream mpis = bitstream.getSource();
         while (true) {
-            //System.err.println("initLen = "+initLen);
             long posBefore = initLen + mpis.getPosition();
             MP3FRAME frame = MP3FRAME.readFrame(bitstream, decoder);
             if (frame == null) {
@@ -60,7 +59,7 @@ public class MP3SOUNDDATA {
             }
             long posAfter = initLen + mpis.getPosition();
             frame.setFullData(Arrays.copyOfRange(data, (int) posBefore, (int) posAfter));
-            frames.add(frame);
+            frames.add(frame);            
         }
     }
 

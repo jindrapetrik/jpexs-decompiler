@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
-import com.jpexs.decompiler.flash.tags.base.SoundParametersMismatchException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
@@ -245,7 +244,7 @@ public class SoundImporter {
      * @return True if sound stream was imported successfully
      * @throws UnsupportedSamplingRateException On unsupported sampling rate
      */
-    public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException, SoundParametersMismatchException {
+    public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException {
         return importSoundStreamAtFrame(streamHead, is, newSoundFormat, null);
     }
 
@@ -260,30 +259,50 @@ public class SoundImporter {
      * @return True if sound stream was imported successfully
      * @throws UnsupportedSamplingRateException On unsupported sampling rate
      */
-    public boolean importSoundStreamAtFrame(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat, Integer startFrame) throws UnsupportedSamplingRateException, SoundParametersMismatchException {
+    public boolean importSoundStreamAtFrame(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat, Integer startFrame) throws UnsupportedSamplingRateException {
         List<MP3FRAME> mp3Frames = null;
         int newSoundRate = -1;
         boolean newSoundSize = false;
         boolean newSoundType = false;
         long newSoundSampleCount = -1;
         byte[] uncompressedSoundData = null;
-        int bytesPerSwfFrame = -1;
+        byte[] mp3data = null;
         SWF swf = streamHead.getSwf();
         int sampleLen = 0;
         int soundRateHz = 0;
+
+        int bitRateOriginal = -1;
+        int newBitRate = -1;
+        if (streamHead.getSoundFormatId() == SoundFormat.FORMAT_MP3) {
+            List<SoundStreamFrameRange> ranges = streamHead.getRanges();
+            if (!ranges.isEmpty()) {
+                SWFInputStream sis;
+                try {
+                    sis = new SWFInputStream(swf, ranges.get(0).blocks.get(0).streamSoundData.getRangeData());
+                    MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                    if (!s.frames.isEmpty()) {
+                        bitRateOriginal = s.frames.get(0).getBitRate();
+                    }
+                } catch (IOException ex) {
+                    //ignore
+                }
+            }
+        }
+
         switch (newSoundFormat) {
             case SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
                 try (AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
                     AudioFormat fmt = audioIs.getFormat();
                     newSoundType = fmt.getChannels() == 2;
                     newSoundSize = fmt.getSampleSizeInBits() == 16;
+                    bitRateOriginal = -1;
                     //newSoundSampleCount = audioIs.getFrameLength();
                     uncompressedSoundData = Helper.readStream(audioIs);
                     sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
                     soundRateHz = (int) Math.round(fmt.getSampleRate());
                     newSoundSampleCount = (int) Math.ceil(soundRateHz / swf.frameRate);
 
-                    bytesPerSwfFrame = (int) Math.ceil(soundRateHz / swf.frameRate) * sampleLen;
+                    //bytesPerSwfFrame = (int) Math.ceil(soundRateHz / swf.frameRate) * sampleLen;
                     switch (soundRateHz) {
                         case 5512:
                             newSoundRate = 0;
@@ -308,7 +327,7 @@ public class SoundImporter {
             case SoundFormat.FORMAT_MP3:
                 BufferedInputStream bis = new BufferedInputStream(is);
                 loadID3v2(bis);
-                byte[] mp3data = Helper.readStream(bis);
+                mp3data = Helper.readStream(bis);
 
                 final int ID3_V1_LENTGH = 128;
                 final int ID3_V1_EXT_LENGTH = 227;
@@ -330,6 +349,7 @@ public class SoundImporter {
                     if (!snd.frames.isEmpty()) {
                         MP3FRAME fr = snd.frames.get(0);
                         soundRateHz = fr.getSamplingRate();
+                        newBitRate = fr.getBitRate();
                         switch (soundRateHz) {
                             case 11025:
                                 newSoundRate = 1;
@@ -368,20 +388,85 @@ public class SoundImporter {
             if (newSoundFormat != streamHead.getSoundFormatId()
                     || newSoundSize != streamHead.getSoundSize()
                     || newSoundType != streamHead.getSoundType()
-                    || newSoundRate != streamHead.getSoundRate()) {
-                throw new SoundParametersMismatchException(
-                        streamHead.getSoundType(),
-                        streamHead.getSoundSize(),
-                        streamHead.getSoundRate(),
-                        streamHead.getSoundFormatId(),
-                        newSoundType,
-                        newSoundSize,
-                        newSoundRate,
-                        newSoundFormat
-                );
+                    || newSoundRate != streamHead.getSoundRate()
+                    || newBitRate != bitRateOriginal) {
+                List<ByteArrayRange> data = streamHead.getRawSoundData();
+                byte[] wholeStreamUncompressedData;
+                try {
+                    wholeStreamUncompressedData = streamHead.getSoundFormat().decode(null, data, 0);
+                } catch (IOException ex) {
+                    return false;
+                }
+                if (mp3data != null) {
+                    final int[] rateMap = {5512, 11025, 22050, 44100};
+                    SoundFormat mp3SoundFormat = new SoundFormat(SoundFormat.FORMAT_MP3, rateMap[newSoundRate], newSoundType);
+                    try {
+                        uncompressedSoundData = mp3SoundFormat.decode(null, Arrays.asList(new ByteArrayRange(mp3data)), 0);
+                    } catch (IOException ex) {
+                        return false;
+                    }
+                    mp3Frames = null;
+                }
+
+                newSoundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+
+                //16bit<>8bit does not match, convert to 16bit
+                if (newSoundSize && !streamHead.getSoundSize()) {
+                    wholeStreamUncompressedData = to16bit(wholeStreamUncompressedData);
+                } else if (streamHead.getSoundSize() && !newSoundSize) {
+                    uncompressedSoundData = to16bit(uncompressedSoundData);;
+                    newSoundSize = true;
+                }
+
+                //stereo<>mono does not match, convert to stereo
+                if (newSoundType && !streamHead.getSoundType()) {
+                    wholeStreamUncompressedData = toStereo(wholeStreamUncompressedData, newSoundSize);
+                } else if (streamHead.getSoundType() && !newSoundType) {
+                    uncompressedSoundData = toStereo(uncompressedSoundData, newSoundSize);
+                    newSoundType = true;
+                }
+
+                //sound rate does not match, convert to the higher one
+                if (newSoundRate > streamHead.getSoundRate()) {
+                    for (int i = streamHead.getSoundRate(); i < newSoundRate; i++) {
+                        wholeStreamUncompressedData = toHigherRate(wholeStreamUncompressedData, newSoundSize, newSoundType);
+                    }
+                } else if (streamHead.getSoundRate() > newSoundRate) {
+                    for (int i = newSoundRate; i < streamHead.getSoundRate(); i++) {
+                        uncompressedSoundData = toHigherRate(uncompressedSoundData, newSoundSize, newSoundType);
+                    }
+                    newSoundRate = streamHead.getSoundRate();
+                }
+
+                sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
+                final int[] rateMap = {5512, 11025, 22050, 44100};
+                addStream(streamHead, wholeStreamUncompressedData, swf, rateMap[newSoundRate], sampleLen, null, null, true);
             }
         }
 
+        addStream(streamHead, uncompressedSoundData, swf, soundRateHz, sampleLen, mp3Frames, startFrame, false);
+        streamHead.setSoundCompression(newSoundFormat);
+        streamHead.setSoundSampleCount((int) newSoundSampleCount);
+        streamHead.setSoundSize(newSoundSize);
+        streamHead.setSoundType(newSoundType);
+        streamHead.setSoundRate(newSoundRate);
+
+        streamHead.setModified(true);
+        streamHead.getTimelined().resetTimeline();
+        swf.resetTimeline(); //to reload blocks
+        return true;
+    }
+
+    private void addStream(
+            SoundStreamHeadTypeTag streamHead,
+            byte[] uncompressedSoundData,
+            SWF swf,
+            int soundRateHz,
+            int sampleLen,
+            List<MP3FRAME> mp3Frames,
+            Integer startFrame,
+            boolean matchRanges
+    ) {
         ByteArrayInputStream bais = uncompressedSoundData == null ? null : new ByteArrayInputStream(uncompressedSoundData);
 
         List<SoundStreamFrameRange> ranges = streamHead.getRanges();
@@ -418,7 +503,6 @@ public class SoundImporter {
         for (SoundStreamBlockTag block : existingBlocks) {
             timelined.removeTag(block);
         }
-
         List<SoundStreamBlockTag> blocks = new ArrayList<>();
         if (bais != null) { //Uncompressed
             DataInputStream dais = new DataInputStream(bais);
@@ -512,7 +596,18 @@ public class SoundImporter {
             }
             if (t instanceof ShowFrameTag) {
                 frame++;
-                if (frame >= startFrame && !blocks.isEmpty()) {
+                boolean match = false;
+                if (matchRanges) {
+                    for (SoundStreamFrameRange range : ranges) {
+                        if (frame >= range.startFrame && frame <= range.endFrame) {
+                            match = true;
+                            break;
+                        }
+                    }
+                } else if (frame >= startFrame) {
+                    match = true;
+                }
+                if (match && !blocks.isEmpty()) {
                     SoundStreamBlockTag block = blocks.remove(0);
                     block.setTimelined(timelined);
                     timelined.addTag(i, block);
@@ -534,16 +629,107 @@ public class SoundImporter {
             framesBefore++;
         }
         timelined.setFrameCount(framesBefore);
-        streamHead.setSoundCompression(newSoundFormat);
-        streamHead.setSoundSampleCount((int) newSoundSampleCount);
-        streamHead.setSoundSize(newSoundSize);
-        streamHead.setSoundType(newSoundType);
-        streamHead.setSoundRate(newSoundRate);
-
-        streamHead.setModified(true);
         timelined.resetTimeline();
-        swf.resetTimeline(); //to reload blocks
-        return true;
+    }
+
+    private byte[] toStereo(byte[] data, boolean soundSize) {
+        byte[] ret = new byte[data.length * 2];
+        for (int i = 0; i < data.length; i += (soundSize ? 2 : 1)) {
+            if (soundSize) {
+                ret[i * 2] = data[i];
+                ret[i * 2 + 1] = data[i + 1];
+                ret[i * 2 + 2] = data[i];
+                ret[i * 2 + 3] = data[i + 1];
+            } else {
+                ret[i * 2] = data[i];
+                ret[i * 2 + 1] = data[i];
+            }
+        }
+        return ret;
+    }
+
+    private byte[] to16bit(byte[] data) {
+        byte[] ret = new byte[data.length * 2];
+        for (int i = 0; i < data.length; i++) {
+            int val = data[i] & 0xFF;
+            val = val * 65535 / 255;
+            ret[i * 2] = (byte) (val & 0xFF);
+            ret[i * 2 + 1] = (byte) ((val >> 8) & 0xFF);
+        }
+        return ret;
+    }
+
+    /**
+     * Resamples sound data to higher sound rate (doubles sound rate) 5512,
+     * 11025, 22050, 44100
+     *
+     * @param data Input data
+     * @param soundSize True = 2 bytes little endian per channel, False = 1 byte
+     * per channel
+     * @param soundType True = Stereo = two channels, False = mono = single
+     * channel
+     * @return Resampled data
+     */
+    private byte[] toHigherRate(byte[] data, boolean soundSize, boolean soundType) {
+        int sampleLen = (soundType ? 2 : 1) * (soundSize ? 2 : 1);
+        byte[] ret = new byte[data.length * 2 - sampleLen];
+        int prevLeft = 0;
+        int prevRight = 0;
+        int retPos = 0;
+        for (int i = 0; i < data.length; i += sampleLen) {
+            int left;
+            int right;
+            if (soundSize) {
+                left = (short) ((data[i] & 0xFF) + ((data[i + 1] & 0xFF) << 8));
+                if (soundType) {
+                    right = (short) ((data[i + 2] & 0xFF) + ((data[i + 3] & 0xFF) << 8));
+                } else {
+                    right = left;
+                }
+            } else {
+                left = data[i];
+                if (soundType) {
+                    right = data[i + 1];
+                } else {
+                    right = left;
+                }
+            }
+            if (i > 0) {
+                int midLeft = (prevLeft + left) / 2;
+                int midRight = (prevRight + right) / 2;
+                if (soundSize) {
+                    ret[retPos] = (byte) (midLeft & 0xFF);
+                    ret[retPos + 1] = (byte) ((midLeft >> 8) & 0xFF);
+                    if (soundType) {
+                        ret[retPos + 2] = (byte) (midRight & 0xFF);
+                        ret[retPos + 3] = (byte) ((midRight >> 8) & 0xFF);
+                    }
+                } else {
+                    ret[retPos] = (byte) (midLeft & 0xFF);
+                    if (soundType) {
+                        ret[retPos + 1] = (byte) (midRight & 0xFF);
+                    }
+                }
+                retPos += sampleLen;
+            }
+            if (soundSize) {
+                ret[retPos] = (byte) (left & 0xFF);
+                ret[retPos + 1] = (byte) ((left >> 8) & 0xFF);
+                if (soundType) {
+                    ret[retPos + 2] = (byte) (right & 0xFF);
+                    ret[retPos + 3] = (byte) ((right >> 8) & 0xFF);
+                }
+            } else {
+                ret[retPos] = (byte) (left & 0xFF);
+                if (soundType) {
+                    ret[retPos + 1] = (byte) (right & 0xFF);
+                }
+            }
+            prevLeft = left;
+            prevRight = right;
+            retPos += sampleLen;
+        }
+        return ret;
     }
 
     /**
@@ -624,7 +810,8 @@ public class SoundImporter {
         }
 
         int pos = -1;
-        loopChars: for (SoundTag tag : soundTags) {
+        loopChars:
+        for (SoundTag tag : soundTags) {
             pos++;
             int characterId = tag.getCharacterId();
             List<File> existingFilesForSoundTag = new ArrayList<>();
@@ -670,7 +857,7 @@ public class SoundImporter {
                 for (SoundStreamFrameRange r : ranges.get(pos)) {
                     for (File sourceFile : existingFilesForSoundTag) {
                         if (sourceFile.getName().startsWith("" + characterId + "_" + (r.startFrame + 1) + "-")) {
-                            
+
                             try {
                                 if (printOut) {
                                     System.out.println("Importing character " + characterId + ", start frame " + r.startFrame + " from file " + sourceFile.getName());
