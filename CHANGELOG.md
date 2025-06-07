@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - [#2236], [#2451] Replacing sound stream block ranges
 - Importing sound stream block ranges
 - Commandline replacing sound stream block ranges
+- [#1625] Error log frame - Save all to file button
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
@@ -3855,6 +3856,7 @@ Major version of SWF to XML export changed to 2.
 [#2463]: https://www.free-decompiler.com/flash/issues/2463
 [#2236]: https://www.free-decompiler.com/flash/issues/2236
 [#2451]: https://www.free-decompiler.com/flash/issues/2451
+[#1625]: https://www.free-decompiler.com/flash/issues/1625
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2460]: https://www.free-decompiler.com/flash/issues/2460
