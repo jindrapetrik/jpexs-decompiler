@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file.
 - [#2464] SVG export - minimum stroke width of 1 px
 - [#2405] Incorrect saving tags after Cloning / Copy-pasting
 - [#1646] Scrolling in Error log frame inside log texts
+- JLayer stripping last byte of MP3 data
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

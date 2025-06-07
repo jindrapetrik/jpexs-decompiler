@@ -17,9 +17,7 @@ public class MarkingPushbackInputStream extends PushbackInputStream {
     public long getPosition() {
         return pos;
     }
-    
-    
-    
+            
     public MarkingPushbackInputStream(InputStream in, int size) {
         super(in, size);
         is = new PushbackInputStream(in, size);
@@ -47,22 +45,29 @@ public class MarkingPushbackInputStream extends PushbackInputStream {
 
     @Override
     public int read() throws IOException {
-        pos++;
-        return is.read();
+        int ret = is.read();
+        if (ret > -1) {
+            pos++;
+        }
+        return ret;
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         
         int ret = is.read(b, off, len);
-        pos += ret;
+        if (ret > -1) {
+            pos += ret;
+        }
         return ret;
     }
 
     @Override
     public int read(byte[] b) throws IOException {
         int ret = is.read(b);
-        pos += ret;
+        if (ret > -1) {
+            pos += ret;
+        }        
         return ret;
     }
 
