@@ -1189,7 +1189,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     break;
                 case EOF:
                     errors.add(new SimpleParseException("End of file before XML finish", lexer.yyline(), s.position));
-                    break;
+                    return;
                 default:
                     sb.append(s.value.toString());
                     break;
