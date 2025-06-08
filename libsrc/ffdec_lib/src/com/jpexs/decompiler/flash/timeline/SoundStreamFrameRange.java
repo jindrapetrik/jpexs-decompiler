@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -24,8 +25,11 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * SoundStream blocks across frame range.
@@ -107,6 +111,24 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
             }
         }
         return ret;
+    }
+
+    public int getSeekSamples() {
+        if (blocks.isEmpty()) {
+            return 0;
+        }
+        if (getSoundFormatId() != SoundFormat.FORMAT_MP3) {
+            return 0;
+        }
+        ByteArrayRange data = blocks.get(0).streamSoundData;
+        SWFInputStream sis;
+        try {
+            sis = new SWFInputStream(null, data.getRangeData(0, 4));
+            sis.readUI16("numSamples");
+            return sis.readSI16("seekSamples");
+        } catch (IOException ex) {
+            return 0;
+        }
     }
 
     @Override

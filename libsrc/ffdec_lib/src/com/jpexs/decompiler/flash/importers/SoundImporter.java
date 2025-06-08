@@ -473,6 +473,7 @@ public class SoundImporter {
 
         List<SoundStreamBlockTag> existingBlocks = new ArrayList<>();
         Timelined timelined = streamHead.getTimelined();
+        int firstSeekSamples = 0;
         if (startFrame == null) {
 
             for (SoundStreamFrameRange range : ranges) {
@@ -494,6 +495,7 @@ public class SoundImporter {
         } else {
             for (SoundStreamFrameRange range : ranges) {
                 if (range.startFrame == startFrame) {
+                    firstSeekSamples = range.getSeekSamples();
                     existingBlocks.addAll(range.blocks);
                     break;
                 }
@@ -538,27 +540,30 @@ public class SoundImporter {
                 //ignore
             }
         }
-        if (mp3Frames != null) {
+        if (mp3Frames != null && !mp3Frames.isEmpty()) {
+            MP3FRAME firstMp3Frame = mp3Frames.get(0);
+            int sampleCountPerMp3Frame = firstMp3Frame.getSampleCount();
 
-            int frame = 0;
+            int frame = startFrame;
 
             int mp3FrameNum = 0;
-            long lastNumSamplesLong = 0;
+            long lastNumSamplesLong = Math.round(startFrame * soundRateHz / swf.frameRate) - firstSeekSamples;
             while (mp3FrameNum < mp3Frames.size()) {
-                float timeAfterFrame = (frame + 1) / swf.frameRate;
-                float numSamplesAfterFrame = (frame + 1) * soundRateHz / swf.frameRate;
+                float idealNumberOfSamplesAfterFrame = (frame + 1) * soundRateHz / swf.frameRate;
                 long numSamplesBeforeFrameLong = Math.round(frame * soundRateHz / swf.frameRate);
 
-                int seekSamples = (int) (lastNumSamplesLong - numSamplesBeforeFrameLong);
+                int seekSamples = (int) (numSamplesBeforeFrameLong - lastNumSamplesLong);
 
                 SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
+                block.forceWriteAsLong = true;
 
                 List<MP3FRAME> blockMp3Frames = new ArrayList<>();
                 int blockSamples = 0;
-                while (lastNumSamplesLong < numSamplesAfterFrame && mp3FrameNum < mp3Frames.size()) {
+                while (mp3FrameNum < mp3Frames.size()
+                        && (lastNumSamplesLong + sampleCountPerMp3Frame < idealNumberOfSamplesAfterFrame)) {
                     MP3FRAME mp3Frame = mp3Frames.get(mp3FrameNum);
-                    lastNumSamplesLong += mp3Frame.getSampleCount();
-                    blockSamples += mp3Frame.getSampleCount();
+                    lastNumSamplesLong += sampleCountPerMp3Frame;
+                    blockSamples += sampleCountPerMp3Frame;
                     blockMp3Frames.add(mp3Frame);
                     mp3FrameNum++;
                 }
@@ -571,11 +576,14 @@ public class SoundImporter {
                         sos.write(mp3Frame.getBytes());
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(SoundStreamHeadTypeTag.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SoundImporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 block.streamSoundData = new ByteArrayRange(baos.toByteArray());
                 blocks.add(block);
                 frame++;
+
+                //TODO: maybe last frame empty? But how to calculate seekSamples
+                //lastNumSamplesLong - ((frame + 1) * soundRateHz / swf.frameRate));
             }
         }
 
