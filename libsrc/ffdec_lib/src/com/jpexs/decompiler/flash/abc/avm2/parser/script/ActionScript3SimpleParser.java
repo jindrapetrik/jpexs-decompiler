@@ -121,7 +121,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     break;
                 case PARENT_OPEN:
                     call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
-                    lastVarName += "()";
+                    lastVarName += ".()";
                     ret = true;
                     break;
                 case DESCENDANTS:
@@ -215,7 +215,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 ret = true;
                 s = lex();
             } else if (s.type == SymbolType.BRACKET_OPEN) {
-                lastVarName += "[]";
+                lastVarName += ".[]";
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                 expectedType(errors, SymbolType.BRACKET_CLOSE);
                 ret = true;

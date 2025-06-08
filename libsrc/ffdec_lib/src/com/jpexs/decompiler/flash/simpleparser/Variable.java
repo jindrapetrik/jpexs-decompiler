@@ -61,11 +61,7 @@ public class Variable implements VariableOrScope {
         String ret = name;
         if (ret.contains(".")) {
             ret = ret.substring(ret.lastIndexOf(".") + 1);
-        }
-        
-        if (ret.endsWith("()") || ret.endsWith("[]")) {
-            ret = ret.substring(0, ret.length() - 2);
-        }
+        }        
         return ret;
     }
     
@@ -73,21 +69,10 @@ public class Variable implements VariableOrScope {
         String ret = name;
         if (ret.contains(".")) {
             ret = ret.substring(0, ret.indexOf("."));
-        }
-        if (ret.endsWith("()") || ret.endsWith("[]")) {
-            ret = ret.substring(0, ret.length() - 2);
-        }
+        }       
         return ret;
     }
-    
-    public boolean firstNameIsCall() {
-        String ret = name;
-        if (ret.contains(".")) {
-            ret = ret.substring(0, ret.indexOf("."));
-        }
-        return ret.endsWith("()");
-    }
-    
+   
     public String getParentName() {
         if (name.contains(".")) {
             return name.substring(0, name.lastIndexOf("."));
@@ -96,24 +81,10 @@ public class Variable implements VariableOrScope {
     }
     
     public List<String> getParts() {
-        List<String> ret = new ArrayList<>();
-        
-        String[] dotSplit = name.split("\\.", -1);
-        Pattern pat = Pattern.compile("[^\\(\\)\\[\\]]+|\\(\\)|\\[\\]");
-        for (String s : dotSplit) {
-            Matcher m = pat.matcher(s);        
-            while (m.find()) {
-                ret.add(m.group());
-            }
-        }
-        return ret;    
+        return Arrays.asList(name.split("\\.", -1));
     }
     
     public boolean hasParent() {
         return name.contains(".");
-    }
-    
-    public static void main(String[] args) {
-        String v = "v.getPoint().x";
-    }
+    }    
 }
