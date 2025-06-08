@@ -87,7 +87,6 @@ public class ActionScript3SimpleParser implements SimpleParser {
             lexer.pushback(s);
         }
 
-        
         int varLenBefore = variables.size();
         boolean t = true;
         name(errors, thisType, needsActivation, openedNamespaces, null, false, false, true, variables, importedClasses, abc);
@@ -240,9 +239,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     }
                     lastVarName += propName + "::" + s.value.toString();
-                    variables.add(new Variable(false, lastVarName, s.position, null));                    
+                    variables.add(new Variable(false, lastVarName, s.position, null));
                 } else {
-                    lastVarName += propName;                
+                    lastVarName += propName;
                     variables.add(new Variable(false, lastVarName, propPosition, null));
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
                         //nsSuffix = "#" + s.value;
@@ -711,7 +710,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         method(errors, outsidePackage, isPrivate, isInterface, isNative, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, classVariables, abc, fnamePos, returnTypeRef);
 
                         traitVariables.add(new ClassTrait(fullClassName, fname, customNs, fnamePos, isStatic, "Function", returnTypeRef.getVal()));
-                    
+
                         /*
                         if (isGetter) {
                             if (!ft.paramTypes.isEmpty()) {
@@ -785,14 +784,14 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
                     String traitType = "*";
                     if (s.type == SymbolType.COLON) {
-                        traitType = type(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, classVariables, abc);                        
+                        traitType = type(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, classVariables, abc);
                         s = lex();
                     } else {
                         //*
                     }
 
                     traitVariables.add(new ClassTrait(fullClassName, nameSymbol.value.toString(), customNs, nameSymbol.position, isStatic, traitType, "Function".equals(traitType) ? "*" : null));
-                    
+
                     if (s.type == SymbolType.ASSIGN) {
                         List<VariableOrScope> constVarVariables = new ArrayList<>();
                         expression(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<>(), false, false, isStatic, true, constVarVariables, false, abc);
@@ -834,7 +833,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         Stack<Loop> sinitLoops = new Stack<>();
         Map<Loop, String> sinitLoopLabels = new HashMap<>();
 
-        HashMap<String, Integer> sinitRegisterVars = new HashMap<>();        
+        HashMap<String, Integer> sinitRegisterVars = new HashMap<>();
         while (scriptTraitsBlock(
                 errors,
                 importedClasses,
@@ -846,7 +845,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 sinitLoopLabels,
                 sinitRegisterVars,
                 sinitVariables,
-                externalTypes                
+                externalTypes
         )) {
             //empty
         }
@@ -1028,7 +1027,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
                     Reference<String> returnTypeRef = new Reference<>(null);
                     method(errors, !inPackage, false, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, "", true, sinitVariables, abc, s.position, returnTypeRef);
-                    
+
                     sinitTraitVariables.add(new Variable(true, fname, s.position, true, "Function", returnTypeRef.getVal()));
                     break;
                 case CONST:
@@ -1051,7 +1050,6 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         s = lex();
                     }
                     sinitTraitVariables.add(new Variable(true, traitSymb.value.toString(), traitSymb.position, null, traitType, traitType.equals("Function") ? "*" : null));
-                    
 
                     if (s.type == SymbolType.ASSIGN) {
                         expression(errors, null, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<>(), false, false, true, true, sinitVariables, false, abc);
@@ -1671,13 +1669,17 @@ public class ActionScript3SimpleParser implements SimpleParser {
             rhs = expressionPrimary(errors, thisType, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, isStatic, allowRemainder, variables, abc);
             if (!rhs) {
                 lexer.pushback(op);
-                break;
+                errors.add(new SimpleParseException("Missing operand", lexer.yyline(), op.position));
+                return false;
             }
 
             lookahead = peekExprToken();
             while ((lookahead.type.isBinary() && lookahead.type.getPrecedence() < /* > on wiki */ op.type.getPrecedence())
                     || (lookahead.type.isRightAssociative() && lookahead.type.getPrecedence() == op.type.getPrecedence())) {
                 rhs = expression1(errors, rhs, lookahead.type.getPrecedence(), thisType, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, isStatic, allowRemainder, variables, abc);
+                if (!rhs) {
+                    break;
+                }
                 lookahead = peekExprToken();
             }
 

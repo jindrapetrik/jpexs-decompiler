@@ -2213,8 +2213,9 @@ public class ActionScript3Parser {
 
             rhs = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables, abc);
             if (rhs == null) {
-                lexer.pushback(op);
-                break;
+                throw new AVM2ParseException("Missing operand", lexer.yyline());
+                //lexer.pushback(op);
+                //break;
             }
 
             lookahead = peekExprToken();

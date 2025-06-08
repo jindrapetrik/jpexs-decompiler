@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1145,13 +1144,17 @@ public class ActionScript2SimpleParser implements SimpleParser {
             rhs = expressionPrimary(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (rhs == false) {
                 lexer.pushback(op);
-                break;
+                errors.add(new SimpleParseException("Missing operand", lexer.yyline(), op.position));
+                return false;
             }
 
             lookahead = peekLex();
             while ((isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) < /* > on wiki */ getSymbPrecedence(op))
                     || (lookahead.type.isRightAssociative() && getSymbPrecedence(lookahead) == getSymbPrecedence(op))) {
                 rhs = expression1(errors, rhs, getSymbPrecedence(lookahead), inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
+                if (!rhs) {
+                    break;
+                }
                 lookahead = peekLex();
             }
 

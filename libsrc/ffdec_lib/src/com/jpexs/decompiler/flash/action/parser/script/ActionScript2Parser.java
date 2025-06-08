@@ -184,7 +184,7 @@ import java.util.Map;
 public class ActionScript2Parser {
 
     private static final GraphTargetDialect DIALECT = ActionGraphTargetDialect.INSTANCE;
-    
+
     /**
      * Builtin classes that can be casted to
      */
@@ -1531,8 +1531,9 @@ public class ActionScript2Parser {
 
             rhs = expressionPrimary(allowRemainder, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, true, hasEval);
             if (rhs == null) {
-                lexer.pushback(op);
-                break;
+                throw new ActionParseException("Missing operand", lexer.yyline());
+                //lexer.pushback(op);
+                //break;
             }
 
             lookahead = peekLex();
