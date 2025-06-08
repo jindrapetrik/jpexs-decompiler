@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkType;
+import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -359,7 +360,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             return false;
         }*/
         SyntaxDocument sd = (SyntaxDocument) getDocument();
-        Token t = sd.getTokenAt(pos + 1);
+        Token t = VariableMarker.getIdentifierTokenAt(sd, pos); //sd.getTokenAt(pos + 1);
         Token lastToken = t;        
         Token prev;
         String propName = t.getString(sd);

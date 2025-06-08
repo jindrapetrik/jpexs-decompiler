@@ -182,7 +182,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         Markers.removeMarkers(pane, errorMarker);
     }
 
-    private Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
+    public static Token getIdentifierTokenAt(SyntaxDocument sDoc, int pos) {
         Token thisToken = sDoc.getTokenAt(pos);
         if (thisToken != null && (thisToken.type == TokenType.IDENTIFIER || thisToken.type == TokenType.REGEX || thisToken.type == TokenType.KEYWORD)) {
             return thisToken;
@@ -204,7 +204,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         return getNearestTokenAt(sDoc, pos);
     }
 
-    private Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
+    private static Token getNearestTokenAt(SyntaxDocument sDoc, int pos) {
         Token thisToken = sDoc.getTokenAt(pos);
         if (thisToken != null) {
 
