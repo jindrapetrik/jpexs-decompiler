@@ -16,6 +16,12 @@
  */
 package com.jpexs.decompiler.flash.simpleparser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author JPEXS
@@ -26,34 +32,88 @@ public class Variable implements VariableOrScope {
     public String name;
     public int position;
     public Boolean isStatic;
+    public String type;
+    public final String callType;
 
     public Variable(boolean definition, String name, int position) {
         this(definition, name, position, null);
     }
     
     public Variable(boolean definition, String name, int position, Boolean isStatic) {
+        this(definition, name, position, isStatic, null, null);
+    }
+    
+    public Variable(boolean definition, String name, int position, Boolean isStatic, String type, String callType) {
         this.definition = definition;
         this.name = name;
         this.position = position;
         this.isStatic = isStatic;
+        this.type = type;
+        this.callType = callType;
     }
     
     @Override
     public String toString() {
-        return (definition ? "definition of " : "") + (isStatic ? "static " : "") + name + " at " + position;
+        return (definition ? "definition of " : "") + (isStatic == Boolean.TRUE ? "static " : "") + name + " at " + position;
     }        
     
     public String getLastName() {
-        if (name.contains(".")) {
-            return name.substring(name.lastIndexOf(".") + 1);
+        String ret = name;
+        if (ret.contains(".")) {
+            ret = ret.substring(ret.lastIndexOf(".") + 1);
         }
-        return name;
+        
+        if (ret.endsWith("()") || ret.endsWith("[]")) {
+            ret = ret.substring(0, ret.length() - 2);
+        }
+        return ret;
     }
     
     public String getFirstName() {
-        if (name.contains(".")) {
-            return name.substring(0, name.indexOf("."));
+        String ret = name;
+        if (ret.contains(".")) {
+            ret = ret.substring(0, ret.indexOf("."));
         }
-        return name;
+        if (ret.endsWith("()") || ret.endsWith("[]")) {
+            ret = ret.substring(0, ret.length() - 2);
+        }
+        return ret;
+    }
+    
+    public boolean firstNameIsCall() {
+        String ret = name;
+        if (ret.contains(".")) {
+            ret = ret.substring(0, ret.indexOf("."));
+        }
+        return ret.endsWith("()");
+    }
+    
+    public String getParentName() {
+        if (name.contains(".")) {
+            return name.substring(0, name.lastIndexOf("."));
+        }
+        return null;
+    }
+    
+    public List<String> getParts() {
+        List<String> ret = new ArrayList<>();
+        
+        String[] dotSplit = name.split("\\.", -1);
+        Pattern pat = Pattern.compile("[^\\(\\)\\[\\]]+|\\(\\)|\\[\\]");
+        for (String s : dotSplit) {
+            Matcher m = pat.matcher(s);        
+            while (m.find()) {
+                ret.add(m.group());
+            }
+        }
+        return ret;    
+    }
+    
+    public boolean hasParent() {
+        return name.contains(".");
+    }
+    
+    public static void main(String[] args) {
+        String v = "v.getPoint().x";
     }
 }

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.simpleparser.CatchScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassScope;
+import com.jpexs.decompiler.flash.simpleparser.ClassTrait;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
 import com.jpexs.decompiler.flash.simpleparser.Import;
 import com.jpexs.decompiler.flash.simpleparser.MethodScope;
@@ -74,24 +75,30 @@ public class ActionScript3SimpleParser implements SimpleParser {
         }
     }
 
-    private boolean type(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private String type(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         ParsedSymbol s = lex();
         if (s.type == SymbolType.MULTIPLY) {
             variables.add(new Type(false, "*", s.position));
-            return true;
+            return "*";
         } else if (s.type == SymbolType.VOID) {
             variables.add(new Type(false, "void", s.position));
-            return true;
+            return "void";
         } else {
             lexer.pushback(s);
         }
 
-        boolean t = name(errors, thisType, needsActivation, openedNamespaces, null, false, false, true, variables, importedClasses, abc);
+        
+        int varLenBefore = variables.size();
+        boolean t = true;
+        name(errors, thisType, needsActivation, openedNamespaces, null, false, false, true, variables, importedClasses, abc);
         applyType(errors, thisType, needsActivation, importedClasses, openedNamespaces, t, new HashMap<>(), false, false, true, variables, abc);
-        return true;
+        if (variables.size() > varLenBefore && variables.get(variables.size() - 1) instanceof Variable) {
+            return ((Variable) variables.get(variables.size() - 1)).name;
+        }
+        return "*";
     }
 
-    private boolean memberOrCall(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private String memberOrCall(String lastVarName, List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean newcmds, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         if (debugMode) {
             System.out.println("memberOrCall:");
         }
@@ -104,7 +111,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 case NULL_DOT:
                 case TYPENAME:
                     lexer.pushback(s);
-                    ret = member(errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                    lastVarName = member(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                    ret = true;
                     break;
                 case FILTER:
                     needsActivation.setVal(true);
@@ -114,6 +122,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     break;
                 case PARENT_OPEN:
                     call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                    lastVarName += "()";
                     ret = true;
                     break;
                 case DESCENDANTS:
@@ -147,7 +156,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         if (debugMode) {
             System.out.println("/memberOrCall");
         }
-        return ret;
+        return lastVarName;
     }
 
     private boolean applyType(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
@@ -182,7 +191,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private boolean member(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private String member(String lastVarName, List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean obj, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         if (debugMode) {
             System.out.println("member:");
         }
@@ -207,11 +216,13 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 ret = true;
                 s = lex();
             } else if (s.type == SymbolType.BRACKET_OPEN) {
+                lastVarName += "[]";
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                 expectedType(errors, SymbolType.BRACKET_CLOSE);
                 ret = true;
                 s = lex();
             } else {
+                lastVarName += ".";
                 s = lex();
                 if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.MULTIPLY)) {
                     break;
@@ -228,7 +239,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     } else {
                         expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     }
+                    lastVarName += propName + "::" + s.value.toString();
+                    variables.add(new Variable(false, lastVarName, s.position, null));                    
                 } else {
+                    lastVarName += propName;                
+                    variables.add(new Variable(false, lastVarName, propPosition, null));
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
                         //nsSuffix = "#" + s.value;
                     } else {
@@ -244,10 +259,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
         if (debugMode) {
             System.out.println("/member");
         }
-        return ret;
+        return lastVarName;
     }
 
-    private boolean name(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, List<DottedChain> importedClasses, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private String name(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, List<DottedChain> importedClasses, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         ParsedSymbol s = lex();
 
         String lastName = "";
@@ -256,7 +271,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             s = lex();
         }
         if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP)) {
-            return true;
+            return "";
         }
         lastName += s.value.toString();
         int identPos = s.position;
@@ -291,7 +306,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 }
             } else {
                 if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY)) {
-                    return true;
+                    return "";
                 }
                 lastName = s.value.toString();
                 identPos = s.position;
@@ -318,14 +333,14 @@ public class ActionScript3SimpleParser implements SimpleParser {
             variables.add(new Variable(false, fullName, identPos));
         }
 
-        boolean ret = true;
+        String ret = fullName;
         if (s.type == SymbolType.BRACKET_OPEN) {
             lexer.pushback(s);
             if (attrBracket) {
                 lexer.pushback(new ParsedSymbol(s.position - 1, SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
                 lexer.pushback(new ParsedSymbol(s.position - 2, SymbolGroup.OPERATOR, SymbolType.DOT, "."));
             }
-            ret = member(errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);
+            ret = member(fullName, errors, thisType, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, isStatic, variables, abc);
         } else {
             lexer.pushback(s);
         }
@@ -389,17 +404,18 @@ public class ActionScript3SimpleParser implements SimpleParser {
         }
     }
 
-    private void method(List<SimpleParseException> errors, boolean outsidePackage, boolean isPrivate, boolean isInterface, boolean isNative, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, String functionName, boolean isMethod, List<VariableOrScope> variables, ABC abc, int methodNamePos) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
-        function(errors, isInterface, isNative, needsActivation, importedClasses, thisType, openedNamespaces, functionName, isMethod, variables, abc, methodNamePos, isStatic);
+    private void method(List<SimpleParseException> errors, boolean outsidePackage, boolean isPrivate, boolean isInterface, boolean isNative, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, String functionName, boolean isMethod, List<VariableOrScope> variables, ABC abc, int methodNamePos, Reference<String> returnTypeRef) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+        function(errors, isInterface, isNative, needsActivation, importedClasses, thisType, openedNamespaces, functionName, isMethod, variables, abc, methodNamePos, isStatic, returnTypeRef);
     }
 
-    private void function(List<SimpleParseException> errors, boolean isInterface, boolean isNative, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, TypeItem thisType, List<NamespaceItem> openedNamespaces, String functionName, boolean isMethod, List<VariableOrScope> variables, ABC abc, int functionNamePos, boolean isStatic) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private void function(List<SimpleParseException> errors, boolean isInterface, boolean isNative, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, TypeItem thisType, List<NamespaceItem> openedNamespaces, String functionName, boolean isMethod, List<VariableOrScope> variables, ABC abc, int functionNamePos, boolean isStatic, Reference<String> returnTypeRef) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
 
         ParsedSymbol s;
         expectedType(errors, SymbolType.PARENT_OPEN);
         s = lex();
         List<String> paramNames = new ArrayList<>();
         List<Integer> paramPositions = new ArrayList<>();
+        List<String> paramTypes = new ArrayList<>();
         boolean hasRest = false;
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
@@ -419,10 +435,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
             s = lex();
             if (!hasRest) {
                 if (s.type == SymbolType.COLON) {
-                    type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
+                    paramTypes.add(type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc));
                     s = lex();
                 } else {
-                    //*
+                    paramTypes.add("*");
                 }
                 if (s.type == SymbolType.ASSIGN) {
                     expression(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, isStatic, variables, false, abc);
@@ -446,8 +462,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
         }
         s = lex();
         if (s.type == SymbolType.COLON) {
-            type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
+            returnTypeRef.setVal(type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc));
         } else {
+            returnTypeRef.setVal("*");
             lexer.pushback(s);
         }
         List<VariableOrScope> subvariables = new ArrayList<>();
@@ -455,17 +472,16 @@ public class ActionScript3SimpleParser implements SimpleParser {
             subvariables.add(new Variable(true, functionName, functionNamePos));
         }
         for (int i = 0; i < paramNames.size() - (hasRest ? 1 : 0); i++) {
-            subvariables.add(new Variable(true, paramNames.get(i), paramPositions.get(i)));
-
+            subvariables.add(new Variable(true, paramNames.get(i), paramPositions.get(i), null, paramTypes.get(i), null));
         }
         if (hasRest) {
-            subvariables.add(new Variable(true, paramNames.get(paramNames.size() - 1), paramPositions.get(paramNames.size() - 1)));
+            subvariables.add(new Variable(true, paramNames.get(paramNames.size() - 1), paramPositions.get(paramNames.size() - 1), null, "Array", null));
         }
         Reference<Boolean> needsActivation2 = new Reference<>(false);
         if (!isInterface && !isNative) {
             s = lex();
             expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
-            subvariables.add(new Variable(true, "arguments", -s.position - 1));
+            subvariables.add(new Variable(true, "arguments", -s.position - 1, null, "Array", null));
             commands(errors, thisType, needsActivation2, importedClasses, openedNamespaces, new Stack<>(), new HashMap<>(), new HashMap<>(), true, isMethod, isStatic, 0, subvariables, abc);
             expectedType(errors, SymbolType.CURLY_CLOSE);
         } else {
@@ -632,10 +648,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 s = lex();
             }
 
-            String prefix = isStatic ? pkg.addWithSuffix(classNameStr).toPrintableString(true) + "." : "this.";
-            if (customNs != null) {
-                prefix += customNs + "::";
-            }
+            String fullClassName = pkg.addWithSuffix(classNameStr).toPrintableString(true);
             switch (s.type) {
                 case FUNCTION:
                     s = lex();
@@ -668,9 +681,6 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     } else {
                         fname = s.value.toString();
                     }
-                    if (!fname.equals(classNameStr)) { //ignore constructor
-                        traitVariables.add(new Variable(true, prefix + fname, fnamePos, isStatic));
-                    }
                     if (fname.equals(classNameStr)) { //constructor
                         if (isStatic) {
                             errors.add(new SimpleParseException("Constructor cannot be static", lexer.yyline(), s.position));
@@ -684,7 +694,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         if (isInterface) {
                             errors.add(new SimpleParseException("Interface cannot have constructor", lexer.yyline(), s.position));
                         }
-                        method(errors, outsidePackage, isPrivate, false, false, customNs, iinitNeedsActivation, importedClasses, false, false, thisType, openedNamespaces, false, "", true, classVariables, abc, fnamePos);
+                        method(errors, outsidePackage, isPrivate, false, false, customNs, iinitNeedsActivation, importedClasses, false, false, thisType, openedNamespaces, false, "", true, classVariables, abc, fnamePos, new Reference<>(null));
                     } else {
                         if (classNameStr == null) {
                             isStatic = true;
@@ -697,8 +707,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                             lexer.pushback(s);
                         }
 
-                        method(errors, outsidePackage, isPrivate, isInterface, isNative, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, classVariables, abc, fnamePos);
+                        Reference<String> returnTypeRef = new Reference<>(null);
+                        method(errors, outsidePackage, isPrivate, isInterface, isNative, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, classVariables, abc, fnamePos, returnTypeRef);
 
+                        traitVariables.add(new ClassTrait(fullClassName, fname, customNs, fnamePos, isStatic, "Function", returnTypeRef.getVal()));
+                    
                         /*
                         if (isGetter) {
                             if (!ft.paramTypes.isEmpty()) {
@@ -731,7 +744,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     String nname = s.value.toString();
                     int npos = s.position;
 
-                    traitVariables.add(new Variable(true, prefix + nname, npos, isStatic));
+                    traitVariables.add(new ClassTrait(fullClassName, nname, customNs, npos, isStatic, "Namespace", null));
                     s = lex();
 
                     if (s.type == SymbolType.ASSIGN) {
@@ -762,7 +775,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    traitVariables.add(new Variable(true, prefix + s.value.toString(), s.position, isStatic));
+                    ParsedSymbol nameSymbol = s;
                     s = lex();
 
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
@@ -770,13 +783,16 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         s = lex();
                     }
 
+                    String traitType = "*";
                     if (s.type == SymbolType.COLON) {
-                        type(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, classVariables, abc);
+                        traitType = type(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, classVariables, abc);                        
                         s = lex();
                     } else {
                         //*
                     }
 
+                    traitVariables.add(new ClassTrait(fullClassName, nameSymbol.value.toString(), customNs, nameSymbol.position, isStatic, traitType, "Function".equals(traitType) ? "*" : null));
+                    
                     if (s.type == SymbolType.ASSIGN) {
                         List<VariableOrScope> constVarVariables = new ArrayList<>();
                         expression(errors, thisType, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<>(), false, false, isStatic, true, constVarVariables, false, abc);
@@ -818,7 +834,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         Stack<Loop> sinitLoops = new Stack<>();
         Map<Loop, String> sinitLoopLabels = new HashMap<>();
 
-        HashMap<String, Integer> sinitRegisterVars = new HashMap<>();
+        HashMap<String, Integer> sinitRegisterVars = new HashMap<>();        
         while (scriptTraitsBlock(
                 errors,
                 importedClasses,
@@ -830,7 +846,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 sinitLoopLabels,
                 sinitRegisterVars,
                 sinitVariables,
-                externalTypes
+                externalTypes                
         )) {
             //empty
         }
@@ -996,7 +1012,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     Reference<Boolean> cinitNeedsActivation = new Reference<>(false);
                     Reference<Boolean> iinitNeedsActivation = new Reference<>(false);
                     List<VariableOrScope> classVariables = new ArrayList<>();
-                    classVariables.add(new Variable(true, "this", s.position, false));
+                    classVariables.add(new Variable(true, "this", s.position, false, pkgName.add(subNameStr, null).toPrintableString(true), null));
 
                     classTraits(errors, !inPackage, cinitNeedsActivation, importedClasses, subOpenedNamespaces, pkgName, subNameStr, isInterface, iinitNeedsActivation, abc, classVariables);
 
@@ -1010,9 +1026,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String fname = s.value.toString();
 
-                    sinitTraitVariables.add(new Variable(true, fname, s.position, true));
-
-                    method(errors, !inPackage, false, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, "", true, sinitVariables, abc, s.position);
+                    Reference<String> returnTypeRef = new Reference<>(null);
+                    method(errors, !inPackage, false, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, "", true, sinitVariables, abc, s.position, returnTypeRef);
+                    
+                    sinitTraitVariables.add(new Variable(true, fname, s.position, true, "Function", returnTypeRef.getVal()));
                     break;
                 case CONST:
                 case VAR:
@@ -1026,14 +1043,15 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    sinitTraitVariables.add(new Variable(true, s.value.toString(), s.position));
+                    ParsedSymbol traitSymb = s;
                     s = lex();
+                    String traitType = "*";
                     if (s.type == SymbolType.COLON) {
-                        type(errors, null, new Reference<>(false), importedClasses, openedNamespaces, sinitVariables, abc);
+                        traitType = type(errors, null, new Reference<>(false), importedClasses, openedNamespaces, sinitVariables, abc);
                         s = lex();
-                    } else {
-                        //*
                     }
+                    sinitTraitVariables.add(new Variable(true, traitSymb.value.toString(), traitSymb.position, null, traitType, traitType.equals("Function") ? "*" : null));
+                    
 
                     if (s.type == SymbolType.ASSIGN) {
                         expression(errors, null, new Reference<>(false), importedClasses, openedNamespaces, new HashMap<>(), false, false, true, true, sinitVariables, false, abc);
@@ -1052,7 +1070,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER)) {
                         break;
                     }
-                    sinitTraitVariables.add(new Variable(true, s.value.toString(), s.position));
+                    sinitTraitVariables.add(new Variable(true, s.value.toString(), s.position, null, "Namespace", null));
 
                     s = lex();
 
@@ -1259,7 +1277,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     s = lexer.lex();
                     expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
-                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc, s.position, false);
+                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc, s.position, false, new Reference<>(null));
                     ret = true;
                     break;
                 case VAR:
@@ -1271,20 +1289,18 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     String varIdentifier = s.value.toString();
                     int varPos = s.position;
                     s = lex();
+                    String varType = "*";
                     if (s.type == SymbolType.COLON) {
-                        //type = 
-                        type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
+                        varType = type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
                         s = lex();
-                    } else {
-                        //*
                     }
 
                     if (s.type == SymbolType.ASSIGN) {
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
-                        variables.add(new Variable(true, varIdentifier, varPos));
+                        variables.add(new Variable(true, varIdentifier, varPos, null, varType, null));
                         ret = true;
                     } else {
-                        variables.add(new Variable(true, varIdentifier, varPos));
+                        variables.add(new Variable(true, varIdentifier, varPos, null, varType, null));
                         lexer.pushback(s);
                         ret = true;
                     }
@@ -1732,6 +1748,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         }
         boolean ret = false;
         ParsedSymbol s = lex();
+        String lastVarName = "";
         boolean allowMemberOrCall = false;
         switch (s.type) {
             case PREPROCESSOR:
@@ -1884,7 +1901,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     lexer.pushback(s);
                 }
                 needsActivation.setVal(true);
-                function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc, fnamePos, false);
+                function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc, fnamePos, false, new Reference<>(null));
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1920,7 +1937,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     //parse again as method call
                     lexer.yypushbackstr(lexer.yytext().substring("float4".length()), ActionScriptLexer.YYINITIAL, "float4".length());
                     lexer.pushback(new ParsedSymbol(lexer.yychar() /*???*/, SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
-                    ret = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                    name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                    ret = true;
                 } else {
                     ret = true; //new Float4ValueAVM2Item(null, null, (Float4) s.value);
                 }
@@ -1968,7 +1986,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         lexer.pushback(s);
                     }
                     needsActivation.setVal(true);
-                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables, abc, ffnamePos, false);
+                    function(errors, false, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables, abc, ffnamePos, false, new Reference<>(null));
                     ret = true;
                 } else if (s.type == SymbolType.LOWER_THAN) {
                     type(errors, thisType, needsActivation, importedClasses, openedNamespaces, variables, abc);
@@ -1988,7 +2006,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
                 } else {
                     lexer.pushback(s);
-                    boolean newvar = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                    boolean newvar = true;
+                    name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
                     applyType(errors, thisType, needsActivation, importedClasses, openedNamespaces, newvar, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     expectedType(errors, SymbolType.PARENT_OPEN);
                     call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
@@ -2001,14 +2020,16 @@ public class ActionScript3SimpleParser implements SimpleParser {
             case SUPER:
             case ATTRIBUTE:
                 lexer.pushback(s);
-                ret = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                lastVarName = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                ret = true;
                 allowMemberOrCall = true;
                 break;
             default:
                 lexer.pushback(s);
         }
         if (allowMemberOrCall && ret) {
-            ret = memberOrCall(errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);
+            memberOrCall(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);
+            ret = true;
         }
         if (debugMode) {
             System.out.println("/primary");
