@@ -34,9 +34,11 @@ public class ClassTrait extends Variable {
      * @param isStatic True = static
      * @param type Type
      * @param callType Call type
+     * @param subType Sub type
+     * @param callSubType Call sub type
      */
-    public ClassTrait(String classFullName, String name, String customNs, int position, boolean isStatic, String type, String callType) {
-        super(true, isStatic ? classFullName + "." + name : "this." + (customNs != null ? customNs + "::" : "") + name, position, isStatic, type, callType);
+    public ClassTrait(String classFullName, String name, String customNs, int position, boolean isStatic, String type, String callType, Variable subType, Variable callSubType) {
+        super(true, isStatic ? classFullName + "." + name : "this." + (customNs != null ? customNs + "::" : "") + name, position, isStatic, type, callType, subType, callSubType);
         this.classFullName = classFullName;
         this.customNs = customNs;
         this.simpleName = name;

@@ -16,11 +16,8 @@
  */
 package com.jpexs.decompiler.flash.simpleparser;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -33,7 +30,9 @@ public class Variable implements VariableOrScope {
     public int position;
     public Boolean isStatic;
     public String type;
-    public final String callType;
+    public String callType;
+    public Variable subType;
+    public Variable callSubType;
 
     public Variable(boolean definition, String name, int position) {
         this(definition, name, position, null);
@@ -44,12 +43,18 @@ public class Variable implements VariableOrScope {
     }
     
     public Variable(boolean definition, String name, int position, Boolean isStatic, String type, String callType) {
+        this(definition, name, position, isStatic, type, callType, null, null);
+    }
+    
+    public Variable(boolean definition, String name, int position, Boolean isStatic, String type, String callType, Variable subType, Variable callSubType) {
         this.definition = definition;
         this.name = name;
         this.position = position;
         this.isStatic = isStatic;
         this.type = type;
         this.callType = callType;
+        this.subType = subType;
+        this.callSubType = callSubType;
     }
     
     @Override
