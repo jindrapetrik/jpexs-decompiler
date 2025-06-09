@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.simpleparser.ClassScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassTrait;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
 import com.jpexs.decompiler.flash.simpleparser.Import;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.MethodScope;
 import com.jpexs.decompiler.flash.simpleparser.Namespace;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
@@ -2273,7 +2274,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
             List<SimpleParseException> errors,
             List<String> externalTypes,
             Map<Integer, Integer> referenceToExternalTypeIndex,
-            Map<Integer, List<Integer>> externalTypeIndexToReference
+            Map<Integer, List<Integer>> externalTypeIndexToReference,
+            LinkHandler linkHandler,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) throws SimpleParseException, IOException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Boolean> sinitNeedsActivation = new Reference<>(false);
@@ -2293,7 +2297,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference);
     }
 
     /**

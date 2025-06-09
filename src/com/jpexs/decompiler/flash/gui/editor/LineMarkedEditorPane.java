@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
+import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
@@ -41,7 +43,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
@@ -49,7 +50,6 @@ import javax.swing.text.View;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.Token;
-import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 
 /**
@@ -70,16 +70,44 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private LinkHandler linkHandler = this;
     
     
-    private SimpleParser parser;
+    private SimpleParser parser;   
 
     @Override
-    public LinkType getExternalTypeLinkType(String className) {
+    public LinkType getClassLinkType(String className) {
         return LinkType.NO_LINK;
     }
 
     @Override
-    public void handleExternalTypeLink(String className) {
-        
+    public boolean traitExists(String className, String traitName) {
+        return false;
+    }
+
+    @Override
+    public void handleClassLink(String className) {
+    }
+
+    @Override
+    public void handleTraitLink(String className, String traitName) {
+    }
+
+    @Override
+    public String getTraitType(String className, String traitName) {
+        return "*";
+    }
+
+    @Override
+    public String getTraitSubType(String className, String traitName, int level) {
+        return null;
+    }
+
+    @Override
+    public String getTraitCallType(String className, String traitName) {
+        return null;
+    }
+
+    @Override
+    public String getTraitCallSubType(String className, String traitName, int level) {
+        return null;
     }
     
     public static class LineMarker implements Comparable<LineMarker> {
@@ -382,21 +410,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     public LinkHandler getLinkHandler() {
         return linkHandler;
-    }
-
-    @Override
-    public HighlightPainter linkPainter() {
-        return null;
-    }
-
-    @Override
-    public LinkType getLinkType(Token token) {
-        return LinkType.NO_LINK;
-    }
-
-    @Override
-    public void handleLink(Token token) {
-
     }
 
     @Override

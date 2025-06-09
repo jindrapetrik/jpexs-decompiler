@@ -48,7 +48,10 @@ public interface SimpleParser {
             List<SimpleParseException> errors,
             List<String> externalTypes,
             Map<Integer, Integer> referenceToExternalTypeIndex,
-            Map<Integer, List<Integer>> externalTypeIndexToReference
+            Map<Integer, List<Integer>> externalTypeIndexToReference,
+            LinkHandler linkHandler,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) throws SimpleParseException, IOException, InterruptedException;
 
     public static void parseVariablesList(
@@ -60,11 +63,17 @@ public interface SimpleParser {
             boolean innerFunctionCanUseTraits,
             List<String> externalTypes,
             Map<Integer, Integer> referenceToExternalTypeIndex,
-            Map<Integer, List<Integer>> externalTypeIndexToReference
+            Map<Integer, List<Integer>> externalTypeIndexToReference,
+            LinkHandler linkHandler,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) {
         List<String> externalSimpleTypes = new ArrayList<>();
+        Map<String, String> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
         for (String type : externalTypes) {
-            externalSimpleTypes.add(type.contains(".") ? type.substring(type.lastIndexOf(".") + 1) : type);
+            String simpleName = type.contains(".") ? type.substring(type.lastIndexOf(".") + 1) : type;
+            externalSimpleTypes.add(simpleName);
+            simpleExternalClassNameToFullClassName.put(simpleName, type);            
         }
 
         Map<Integer, String> definitionToType = new LinkedHashMap<>();
@@ -77,7 +86,7 @@ public interface SimpleParser {
         findClassTraits(privateVariables, traitFullNameToDefinition, definitionPosToReferences, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);
         findClassTraits(sharedVariables, traitFullNameToDefinition, definitionPosToReferences, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);
 
-        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), positionToStatic, true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition);
+        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), positionToStatic, true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
         for (Map.Entry<Integer, Integer> entry : referenceToExternalTypeIndex.entrySet()) {
             if (!externalTypeIndexToReference.containsKey(entry.getValue())) {
                 externalTypeIndexToReference.put(entry.getValue(), new ArrayList<>());
@@ -104,7 +113,11 @@ public interface SimpleParser {
             Map<Integer, String> definitionToCallType,
             Map<Integer, Variable> definitionToSubType,
             Map<Integer, Variable> definitionToCallSubType,
-            Map<String, Integer> traitFullNameToDefinition
+            Map<String, Integer> traitFullNameToDefinition,
+            LinkHandler linkHandler,
+            Map<String, String> simpleExternalClassNameToFullClassName,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) {
         Map<String, Integer> privateVarNameToDefinitionPosition = new LinkedHashMap<>();
         privateVarNameToDefinitionPosition.putAll(parentVarNameToDefinitionPosition);
@@ -135,7 +148,7 @@ public interface SimpleParser {
                         if (externalSimpleTypes.contains(v.name)) {
                             referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
                         } else {
-                            boolean traitFound = searchTrait(v, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition);
+                            boolean traitFound = searchTrait(v, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
                             if (!traitFound) {
                                 parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                                 parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
@@ -199,7 +212,7 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
             }
         }
         for (VariableOrScope vt : sharedVariables) {
@@ -227,7 +240,7 @@ public interface SimpleParser {
                         if (externalSimpleTypes.contains(v.name)) {
                             referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
                         } else {
-                            boolean traitFound = searchTrait(v, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition);
+                            boolean traitFound = searchTrait(v, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
                             if (!traitFound) {
                                 parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                                 parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
@@ -291,7 +304,7 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
             }
         }
     }
@@ -343,12 +356,16 @@ public interface SimpleParser {
             Map<Integer, Variable> definitionToCallSubType,
             Map<String, Integer> traitFullNameToDefinition,
             Map<Integer, List<Integer>> definitionPosToReferences,
-            Map<Integer, Integer> referenceToDefinition
+            Map<Integer, Integer> referenceToDefinition,
+            LinkHandler linkHandler,
+            Map<String, String> simpleExternalClassNameToFullClassName,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) {
         boolean traitFound = false;
         if (v.hasParent()) {
             List<String> parts = v.getParts();
-
+            
             Integer definitionPos = null;
             String firstName = parts.get(0);
             if (privateVarFullNameToDefinitionPosition.containsKey(firstName)) {
@@ -361,34 +378,88 @@ public interface SimpleParser {
                     String type = definitionToType.get(definitionPos);
                     traitFound = true;
                     Variable lastSubType = null;
+                    String traitKey = null;
+                    String externalCallType = null;
+                    List<String> externalSubTypes = new ArrayList<>();
+                    List<String> externalCallSubTypes = new ArrayList<>();
+                    String part = null;
                     for (int p = 1; p < parts.size(); p++) {
-                        String part = parts.get(p);
+                        part = parts.get(p);
                         if (part.equals("()")) {
                             if (parts.get(p - 1).equals("[]")) {
                                 traitFound = false;
                                 break;
                             }
-                            type = definitionToCallType.get(definitionPos);
+                            if (definitionPos == null) {
+                                type = externalCallType;
+                                externalSubTypes.clear();
+                                externalSubTypes.addAll(externalCallSubTypes);
+                            } else {
+                                type = definitionToCallType.get(definitionPos);
+                            }
                             lastSubType = null;
                         } else if (part.equals("[]")) {
-                            if (lastSubType != null) {
-                                lastSubType = lastSubType.subType;
-                            } else if (parts.get(p - 1).equals("()")) {
-                                lastSubType = definitionToCallSubType.get(definitionPos);
-                            } else {
-                                lastSubType = definitionToSubType.get(definitionPos);
+                            if (definitionPos != null) {
+                                if (lastSubType != null) {
+                                    lastSubType = lastSubType.subType;
+                                } else if (parts.get(p - 1).equals("()")) {
+                                    lastSubType = definitionToCallSubType.get(definitionPos);
+                                } else {
+                                    lastSubType = definitionToSubType.get(definitionPos);
+                                }
+                                if (lastSubType == null) {
+                                    traitFound = false;
+                                    break;
+                                }
+                                type = lastSubType.name;
+                            } else {                                
+                                if (externalSubTypes.isEmpty()) {
+                                    traitFound = false;
+                                    break;
+                                }
+                                type = externalSubTypes.remove(0);                                
                             }
-                            if (lastSubType == null) {
-                                traitFound = false;
-                                break;
-                            }
-                            type = lastSubType.name;
                         } else {
-                            String traitKey = type + "/" + part;
+                            traitKey = type + "/" + part;
                             if (!traitFullNameToDefinition.containsKey(traitKey)) {
-                                traitFound = false;
-                                break;
+                                if (simpleExternalClassNameToFullClassName.containsKey(type)) {
+                                    type = simpleExternalClassNameToFullClassName.get(type);
+                                }
+                                traitKey = type + "/" + part;
+                                String newType = linkHandler.getTraitType(type, part);                                
+                                if (newType == null) {
+                                    traitFound = false;                                    
+                                    break;
+                                }
+                                externalSubTypes.clear();
+                                int i = 1;
+                                while (true) {
+                                    String st = linkHandler.getTraitSubType(type, part, i);
+                                    if (st == null) {
+                                        break;
+                                    }
+                                    externalSubTypes.add(st);
+                                    i++;
+                                }
+                                externalCallType = linkHandler.getTraitCallType(type, part);
+                                externalCallSubTypes.clear();
+                                i = 1;
+                                while (true) {
+                                    String st = linkHandler.getTraitCallSubType(type, part, i);
+                                    if (st == null) {
+                                        break;
+                                    }
+                                    externalCallSubTypes.add(st);
+                                    i++;
+                                }
+                                type = newType;
+                                definitionPos = null;
+                                lastSubType = null;
+                                continue;
                             }
+                            externalCallSubTypes.clear();
+                            externalSubTypes.clear();
+                            externalCallType = null;                            
                             definitionPos = traitFullNameToDefinition.get(traitKey);
                             type = definitionToType.get(definitionPos);
                             lastSubType = null;
@@ -396,8 +467,16 @@ public interface SimpleParser {
                     }
 
                     if (traitFound) {
-                        definitionPosToReferences.get(definitionPos).add(v.position);
-                        referenceToDefinition.put(v.position, definitionPos);
+                        if (definitionPos != null) {
+                            definitionPosToReferences.get(definitionPos).add(v.position);
+                            referenceToDefinition.put(v.position, definitionPos);
+                        } else if (part != null) {
+                            if (!externalTraitKeyToReference.containsKey(traitKey)) {
+                                externalTraitKeyToReference.put(traitKey, new ArrayList<>());
+                            }
+                            externalTraitKeyToReference.get(traitKey).add(v.position);
+                            referenceToExternalTraitKey.put(v.position, traitKey);
+                        }
                     }
                 }
             }

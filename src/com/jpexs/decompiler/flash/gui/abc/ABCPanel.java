@@ -20,7 +20,6 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
-import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -28,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3SimpleParser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -61,7 +61,6 @@ import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.OpenableListLoaded;
-import com.jpexs.decompiler.flash.gui.OpenableOpened;
 import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
@@ -69,13 +68,10 @@ import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
-import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
-import com.jpexs.decompiler.flash.gui.editor.LinkType;
 import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
@@ -84,6 +80,8 @@ import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionScriptSearch;
 import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
+import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -92,6 +90,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -122,6 +121,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -148,7 +149,6 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.Token;
@@ -903,6 +903,46 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
     }
 
+    private void hilightScriptClassTrait(ABC newAbc, int scriptIndex, int classIndex, Integer traitIndex) {
+        Runnable setTrait = new Runnable() {
+            @Override
+            public void run() {
+                decompiledTextArea.removeScriptListener(this);
+                decompiledTextArea.setClassIndex(classIndex);
+                if (traitIndex != null) {
+                    decompiledTextArea.gotoTrait(traitIndex);
+                } else {
+                    decompiledTextArea.gotoClassHeader();
+                }
+                Timer tim = new Timer();
+                tim.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(true);
+                    }
+                }, 500);
+            }
+        };
+
+        Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(false);
+        if (decompiledTextArea.getScriptIndex() == scriptIndex
+                && (decompiledTextArea.getClassIndex() == classIndex || classIndex == -1)
+                && abc == newAbc) {
+            setTrait.run();
+        } else {
+            decompiledTextArea.addScriptListener(setTrait);
+            String scriptName;
+            if (classIndex > -1) {
+                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(newAbc.constants, true).toPrintableString(true);
+            } else if (scriptIndex > -1) {
+                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc).toPrintableString(true);
+            } else {
+                scriptName = "";
+            }
+            hilightScript(newAbc.getOpenable(), scriptName);
+        }
+    }
+
     public ABCPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
@@ -913,22 +953,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
             @Override
-            public LinkType getLinkType(Token token) {
-                return hasDeclaration(token);
-            }
-
-            @Override
-            public void handleLink(Token token) {
-                gotoDeclaration(token.start);
-            }
-
-            @Override
-            public Highlighter.HighlightPainter linkPainter() {
-                return decompiledTextArea.linkPainter();
-            }
-
-            @Override
-            public LinkType getExternalTypeLinkType(String className) {
+            public LinkType getClassLinkType(String className) {
                 AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(className), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
 
@@ -958,7 +983,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public void handleExternalTypeLink(String scriptName) {
+            public boolean traitExists(String className, String traitName) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                return ti != null;
+            }
+
+            @Override
+            public void handleClassLink(String scriptName) {
                 Reference<SWF> swfRef = new Reference<>(null);
                 AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(scriptName), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
@@ -978,9 +1014,122 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
 
                 hilightScript(swfRef.getVal(), scriptName);
-
-                //other file
             }
+
+            @Override
+            public void handleTraitLink(String className, String traitName) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                if (ti.objType instanceof TypeItem) {
+                    AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(ti.objType, abc, decompiledTextArea.getScriptIndex());
+                    int i = 0;
+                    Integer traitIndex = null;
+                    for (Trait t : ci.abc.class_info.get(ci.index).static_traits.traits) {
+                        if (t == ti.trait) {
+                            traitIndex = i;
+                            break;
+                        }
+                        i++;
+                    }
+                    if (traitIndex == null) {
+                        for (Trait t : ci.abc.instance_info.get(ci.index).instance_traits.traits) {
+                            if (t == ti.trait) {
+                                traitIndex = i;
+                                break;
+                            }
+                            i++;
+                        }
+                    }
+                    if (traitIndex != null) {
+                        hilightScriptClassTrait(ti.abc, ti.scriptIndex, ci.index, traitIndex);
+                    }
+                }
+            }
+
+            @Override
+            public String getTraitType(String className, String traitName) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                if (ti == null) {
+                    return null;
+                }
+                if (ti.returnType instanceof ApplyTypeAVM2Item) {
+                    ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) ti.returnType;
+                    return at.object.toString();
+                }
+                return ti.returnType.toString();
+            }
+
+            @Override
+            public String getTraitSubType(String className, String traitName, int level) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                if (ti == null) {
+                    return null;
+                }
+                GraphTargetItem it = ti.returnType;
+                for (int i = 0; i < level; i++) {
+                    if (!(it instanceof ApplyTypeAVM2Item)) {
+                        return null;
+                    }
+                    it = ((ApplyTypeAVM2Item) it).params.get(0);
+                }
+
+                return it.toString();
+            }
+
+            @Override
+            public String getTraitCallType(String className, String traitName) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                if (ti == null) {
+                    return null;
+                }
+                if (ti.callReturnType instanceof ApplyTypeAVM2Item) {
+                    ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) ti.callReturnType;
+                    return at.object.toString();
+                }
+                return ti.callReturnType.toString();
+            }
+
+            @Override
+            public String getTraitCallSubType(String className, String traitName, int level) {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                        true,
+                        true,
+                        true,
+                        foundStatic);
+                if (ti == null) {
+                    return null;
+                }
+                GraphTargetItem it = ti.callReturnType;
+                for (int i = 0; i < level; i++) {
+                    if (!(it instanceof ApplyTypeAVM2Item)) {
+                        return null;
+                    }
+                    it = ((ApplyTypeAVM2Item) it).params.get(0);
+                }
+
+                return it.toString();
+            }
+
         });
         decompiledTextArea.addScriptListener(new Runnable() {
             @Override
@@ -1575,9 +1724,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         TreeItem scriptNode = null;
         if (openable instanceof SWF) {
-            
-            SWF swf = (SWF) openable;            
-            
+
+            SWF swf = (SWF) openable;
+
             OpenableListLoaded afterOpen = new OpenableListLoaded() {
                 @Override
                 public void openableListLoaded(OpenableList openableList) {
@@ -1600,7 +1749,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 mainPanel.findOrLoadOpanableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen);
                 return;
             }
-                        
+
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
                 scriptNode = mainPanel.tagTree.getFullModel().getScriptsNode(swf);
             } else {

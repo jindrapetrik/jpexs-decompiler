@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.simpleparser.CatchScope;
 import com.jpexs.decompiler.flash.simpleparser.ClassScope;
 import com.jpexs.decompiler.flash.simpleparser.FunctionScope;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.MethodScope;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
@@ -1576,7 +1577,10 @@ public class ActionScript2SimpleParser implements SimpleParser {
             List<SimpleParseException> errors,
             List<String> externalTypes,
             Map<Integer, Integer> referenceToExternalTypeIndex,
-            Map<Integer, List<Integer>> externalTypeIndexToReference
+            Map<Integer, List<Integer>> externalTypeIndexToReference,
+            LinkHandler linkHandler,
+            Map<Integer, String> referenceToExternalTraitKey,
+            Map<String, List<Integer>> externalTraitKeyToReference
     ) throws SimpleParseException, IOException, InterruptedException {
         
         List<VariableOrScope> vars = new ArrayList<>();
@@ -1667,7 +1671,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {

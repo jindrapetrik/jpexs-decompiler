@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import java.awt.BorderLayout;
@@ -108,6 +109,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private List<String> externalTypes = new ArrayList<>();
     private Map<Integer, Integer> referenceToExternalTypeIndex = new LinkedHashMap<>();
     private Map<Integer, List<Integer>> externalTypeIndexToReference = new LinkedHashMap<>();
+    private Map<String, String> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
+    private Map<Integer, String> referenceToExternalTraitKey = new LinkedHashMap<>();
+    private Map<String, List<Integer>> externalTraitKeyToReference = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -283,6 +287,27 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 }
                 sDoc.readUnlock();
                 return;
+            } else {
+                if (referenceToExternalTraitKey.containsKey(tok.start)) {
+                    String traitKey = referenceToExternalTraitKey.get(tok.start);
+                    for (int i : externalTraitKeyToReference.get(traitKey)) {
+                        Token referenceToken = getIdentifierTokenAt(sDoc, i);
+                        if (referenceToken != null) {
+                            Markers.SimpleMarker markerKind = marker;
+                            if (lastUnderlined == referenceToken) {
+                                if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
+                                    markerKind = underLineOtherScriptMarkOccurencesPainter;
+                                } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
+                                    markerKind = underLineOtherFileMarkOccurencesPainter;
+                                } else {
+                                    markerKind = underLineMarkOccurencesPainter;
+                                }
+                            }
+                            Markers.markToken(pane, referenceToken, markerKind);
+                            occurencesPositions.add(referenceToken.start);
+                        }
+                    }
+                }
             }
         }
         Token definitionToken = getIdentifierTokenAt(sDoc, definitionPos < 0 ? -(definitionPos + 1) : definitionPos);
@@ -546,12 +571,32 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private void editorMouseMoved(MouseEvent e) {
         if (pane instanceof LineMarkedEditorPane) {
             Token token = ((LineMarkedEditorPane) pane).tokenAtPos(e.getPoint());
-            if (token != null) {
-                String err = errors.get(token.start);
-                pane.setToolTipText(err);
-            } else {
+            if (token == null) {
                 pane.setToolTipText(null);
+                return;
             }
+            String err = errors.get(token.start);
+            if (err != null) {
+                pane.setToolTipText(err);
+                return;
+            }
+
+            /*
+            String traitKey = referenceToExternalTraitKey.get(token.start);
+            if (traitKey != null) {
+                pane.setToolTipText(traitKey);
+                return;
+            }
+            
+            if (referenceToExternalTypeIndex.containsKey(token.start)) {
+                String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+                if (externalType != null) {
+                    pane.setToolTipText(externalType);
+                    return;
+                }
+            }
+             */
+            pane.setToolTipText(null);
         }
     }
 
@@ -627,12 +672,34 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             List<String> newExternalTypes = new ArrayList<>();
             Map<Integer, Integer> newReferenceToExternalTypeIndex = new LinkedHashMap<>();
             Map<Integer, List<Integer>> newExternalTypeIndexToReference = new LinkedHashMap<>();
-            parser.parse(fullText, newDefinitionPosToReferences, newReferenceToDefinition, newErrors, newExternalTypes, newReferenceToExternalTypeIndex, newExternalTypeIndexToReference);
+            Map<Integer, String> newReferenceToExternalTraitKey = new LinkedHashMap<>();
+            Map<String, List<Integer>> newExternalTraitKeyToReference = new LinkedHashMap<>();
+            parser.parse(
+                    fullText,
+                    newDefinitionPosToReferences,
+                    newReferenceToDefinition,
+                    newErrors,
+                    newExternalTypes,
+                    newReferenceToExternalTypeIndex,
+                    newExternalTypeIndexToReference,
+                    ((LineMarkedEditorPane) pane).getLinkHandler(),
+                    newReferenceToExternalTraitKey, newExternalTraitKeyToReference
+            );
+
+            Map<String, String> newSimpleExternalClassNameToFullClassName = new LinkedHashMap<>();
+            for (int i = 0; i < newExternalTypes.size(); i++) {
+                String type = newExternalTypes.get(i);
+                String simpleName = type.contains(".") ? type.substring(type.lastIndexOf(".") + 1) : type;
+                newSimpleExternalClassNameToFullClassName.put(simpleName, type);
+            }
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
             externalTypes = newExternalTypes;
             referenceToExternalTypeIndex = newReferenceToExternalTypeIndex;
             externalTypeIndexToReference = newExternalTypeIndexToReference;
+            simpleExternalClassNameToFullClassName = newSimpleExternalClassNameToFullClassName;
+            referenceToExternalTraitKey = newReferenceToExternalTraitKey;
+            externalTraitKeyToReference = newExternalTraitKeyToReference;
             for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }
@@ -691,9 +758,19 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
         if (referenceToExternalTypeIndex.containsKey(token.start)) {
             String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
-            return ((LineMarkedEditorPane) pane).getLinkHandler().getExternalTypeLinkType(externalType);
+            return ((LineMarkedEditorPane) pane).getLinkHandler().getClassLinkType(externalType);
         }
-        return ((LineMarkedEditorPane) pane).getLinkHandler().getLinkType(token);
+        if (referenceToExternalTraitKey.containsKey(token.start)) {
+            String traitKey = referenceToExternalTraitKey.get(token.start);
+            //String traitName = traitKey.substring(traitKey.lastIndexOf("/") + 1);
+            String className = traitKey.substring(0, traitKey.lastIndexOf("/"));
+            if (simpleExternalClassNameToFullClassName.containsKey(className)) {
+                className = simpleExternalClassNameToFullClassName.get(className);
+            }
+            return ((LineMarkedEditorPane) pane).getLinkHandler().getClassLinkType(className);
+        }
+
+        return LinkType.NO_LINK;
     }
 
     private class UnderlinedLabel extends JLabel {
@@ -732,7 +809,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     && com.jpexs.decompiler.flash.configuration.Configuration.warningLinkTypes.get()) {
 
                 String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
-                LinkType lt = ((LineMarkedEditorPane) pane).getLinkHandler().getExternalTypeLinkType(externalType);
+
+                LinkType lt = ((LineMarkedEditorPane) pane).getLinkHandler().getClassLinkType(externalType);
 
                 if (lt == LinkType.LINK_OTHER_FILE) {
                     JPanel msgPanel = new JPanel();
@@ -811,11 +889,19 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 goingOut = true;
                 pane.setCursor(Cursor.getDefaultCursor());
                 String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
-                ((LineMarkedEditorPane) pane).getLinkHandler().handleExternalTypeLink(externalType);
+                ((LineMarkedEditorPane) pane).getLinkHandler().handleClassLink(externalType);
                 return;
             }
+            if (referenceToExternalTraitKey.containsKey(token.start)) {
+                String traitKey = referenceToExternalTraitKey.get(token.start);
+                String traitName = traitKey.substring(traitKey.lastIndexOf("/") + 1);
+                String className = traitKey.substring(0, traitKey.lastIndexOf("/"));
 
-            ((LineMarkedEditorPane) pane).getLinkHandler().handleLink(token);
+                if (simpleExternalClassNameToFullClassName.containsKey(className)) {
+                    className = simpleExternalClassNameToFullClassName.get(className);
+                }
+                ((LineMarkedEditorPane) pane).getLinkHandler().handleTraitLink(className, traitName);
+            }
         }
     }
 
