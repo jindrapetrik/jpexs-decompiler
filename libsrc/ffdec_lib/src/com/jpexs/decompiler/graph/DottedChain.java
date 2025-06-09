@@ -33,11 +33,11 @@ import java.util.Objects;
 public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     //Basic dotted chains
-    public static final DottedChain EMPTY = new DottedChain(true);
-
     public static final DottedChain UNBOUNDED = new DottedChain(new String[]{"*"});
 
     public static final DottedChain TOPLEVEL = new DottedChain(new String[]{});
+
+    public static final DottedChain EMPTY = TOPLEVEL;
 
     public static final DottedChain BOOLEAN = new DottedChain(new String[]{"Boolean"});
 
@@ -46,7 +46,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     public static final DottedChain ARRAY = new DottedChain(new String[]{"Array"});
 
     public static final DottedChain NUMBER = new DottedChain(new String[]{"Number"});
-    
+
     public static final DottedChain DECIMAL = new DottedChain(new String[]{"decimal"});
 
     public static final DottedChain OBJECT = new DottedChain(new String[]{"Object"});
@@ -73,11 +73,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * Parts of the chain.
      */
     private List<PathPart> parts;
-
-    /**
-     * Is this chain null?
-     */
-    private boolean isNull = false;
 
     /**
      * Get the namespace suffix of the part at the given index.
@@ -119,7 +114,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
                 newParts.add(new PathPart(part, false, ""));
             }
 
-            return new DottedChain(newParts, false);
+            DottedChain ret = new DottedChain();
+            ret.parts = newParts;
+            return ret;
         }
     }
 
@@ -147,17 +144,17 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
                 newParts.add(new PathPart(nameNoSuffix, false, namespaceSuffix));
             }
 
-            return new DottedChain(newParts, false);
+            DottedChain ret = new DottedChain();
+            ret.parts = newParts;
+            return ret;
         }
     }
 
     /**
      * Constructs a new dotted chain.
      *
-     * @param isNull Whether the chain is null
      */
-    private DottedChain(boolean isNull) {
-        this.isNull = isNull;
+    private DottedChain() {
         this.parts = new ArrayList<>();
     }
 
@@ -168,7 +165,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      */
     public DottedChain(DottedChain src) {
         this.parts = new ArrayList<>(src.parts);
-        this.isNull = src.isNull;
     }
 
     /**
@@ -178,17 +174,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      */
     public DottedChain(String[] parts) {
         this(Arrays.asList(parts));
-    }
-
-    /**
-     * Constructs a new dotted chain.
-     *
-     * @param parts Parts
-     * @param isNull Whether the chain is null
-     */
-    private DottedChain(List<PathPart> parts, boolean isNull) {
-        this.parts = parts;
-        this.isNull = isNull;
     }
 
     /**
@@ -236,7 +221,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return Whether this chain is top-level
      */
     public boolean isTopLevel() {
-        return !isNull && parts.isEmpty();
+        return parts.isEmpty();
     }
 
     /**
@@ -245,7 +230,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return Whether this chain is empty
      */
     public boolean isEmpty() {
-        return isNull;
+        return parts.isEmpty();
     }
 
     /**
@@ -295,7 +280,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        return new DottedChain(new ArrayList<>(parts.subList(0, count)), isNull);
+        DottedChain ret = new DottedChain();
+        ret.parts = new ArrayList<>(parts.subList(0, count));
+        return ret;
     }
 
     /**
@@ -304,9 +291,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return Last part
      */
     public String getLast() {
-        if (isNull) {
-            return null;
-        }
         if (parts.isEmpty()) {
             return "";
         } else {
@@ -320,9 +304,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return Whether the last part is an attribute
      */
     public boolean isLastAttribute() {
-        if (isNull) {
-            return false;
-        }
         if (parts.isEmpty()) {
             return false;
         } else {
@@ -336,11 +317,8 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return Chain without the last part
      */
     public DottedChain getWithoutLast() {
-        if (isNull) {
-            return null;
-        }
         if (parts.size() < 2) {
-            return EMPTY;
+            return TOPLEVEL;
         }
 
         return subChain(parts.size() - 1);
@@ -387,7 +365,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
         List<PathPart> newParts = new ArrayList<>(parts);
         newParts.add(new PathPart(name, attribute, namespaceSuffix));
-        return new DottedChain(newParts, false);
+        DottedChain ret = new DottedChain();
+        ret.parts = newParts;
+        return ret;
     }
 
     /**
@@ -415,7 +395,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
         List<PathPart> newParts = new ArrayList<>(parts);
         newParts.add(0, new PathPart(name, attribute, namespaceSuffix));
-        return new DottedChain(newParts, false);
+        DottedChain ret = new DottedChain();
+        ret.parts = newParts;
+        return ret;
     }
 
     /**
@@ -437,9 +419,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return String
      */
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
-        if (isNull) {
-            return "";
-        }
         if (parts.isEmpty()) {
             return "";
         }
@@ -469,9 +448,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * @return File path
      */
     public String toFilePath() {
-        if (isNull) {
-            return "";
-        }
         if (parts.isEmpty()) {
             return "";
         }
@@ -528,7 +504,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     public int hashCode() {
         int hash = 7;
         hash = 41 * hash + Objects.hashCode(this.parts);
-        hash = 41 * hash + (this.isNull ? 1 : 0);
         return hash;
     }
 
@@ -550,9 +525,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             return false;
         }
         final DottedChain other = (DottedChain) obj;
-        if (this.isNull != other.isNull) {
-            return false;
-        }
         return Objects.equals(this.parts, other.parts);
     }
 
