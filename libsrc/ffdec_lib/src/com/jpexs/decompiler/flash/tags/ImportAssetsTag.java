@@ -67,6 +67,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
         super(swf, ID, NAME, null);
         url = "";
         tags = new ArrayList<>();
+        names = new ArrayList<>();
     }
 
     @Override
@@ -129,5 +130,15 @@ public class ImportAssetsTag extends Tag implements ImportTag {
     @Override
     public String getUrl() {
         return url;
+    }
+    
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        if (names.size() == 1) {
+            ret.put("chid", "" + tags.get(0));
+            ret.put("im", "" + names.get(0));
+        }
+        return ret;
     }
 }
