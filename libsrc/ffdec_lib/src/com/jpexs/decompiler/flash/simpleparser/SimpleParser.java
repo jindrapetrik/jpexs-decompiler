@@ -384,112 +384,117 @@ public interface SimpleParser {
             } else if (privateVarNameToDefinitionPosition.containsKey(firstName)) {
                 definitionPos = privateVarNameToDefinitionPosition.get(firstName);
             }
+            String type = null;
             if (definitionPos != null) {
                 if (definitionToType.containsKey(definitionPos)) {
-                    String type = definitionToType.get(definitionPos);
-                    traitFound = true;
-                    Variable lastSubType = null;
-                    String traitKey = null;
-                    String externalCallType = null;
-                    List<String> externalSubTypes = new ArrayList<>();
-                    List<String> externalCallSubTypes = new ArrayList<>();
-                    String part = null;
-                    for (int p = 1; p < parts.size(); p++) {
-                        part = parts.get(p);
-                        if (part.equals("()")) {
-                            if (parts.get(p - 1).equals("[]")) {
+                    type = definitionToType.get(definitionPos);
+                }
+            } else if (simpleExternalClassNameToFullClassName.containsKey(firstName)) {
+                type = simpleExternalClassNameToFullClassName.get(firstName);
+            }
+            if (type != null) {
+                traitFound = true;
+                Variable lastSubType = null;
+                String traitKey = null;
+                String externalCallType = null;
+                List<String> externalSubTypes = new ArrayList<>();
+                List<String> externalCallSubTypes = new ArrayList<>();
+                String part = null;
+                for (int p = 1; p < parts.size(); p++) {
+                    part = parts.get(p);
+                    if (part.equals("()")) {
+                        if (parts.get(p - 1).equals("[]")) {
+                            traitFound = false;
+                            break;
+                        }
+                        if (definitionPos == null) {
+                            type = externalCallType;
+                            externalSubTypes.clear();
+                            externalSubTypes.addAll(externalCallSubTypes);
+                        } else {
+                            type = definitionToCallType.get(definitionPos);
+                        }
+                        lastSubType = null;
+                    } else if (part.equals("[]")) {
+                        if (definitionPos != null) {
+                            if (lastSubType != null) {
+                                lastSubType = lastSubType.subType;
+                            } else if (parts.get(p - 1).equals("()")) {
+                                lastSubType = definitionToCallSubType.get(definitionPos);
+                            } else {
+                                lastSubType = definitionToSubType.get(definitionPos);
+                            }
+                            if (lastSubType == null) {
                                 traitFound = false;
                                 break;
                             }
-                            if (definitionPos == null) {
-                                type = externalCallType;
-                                externalSubTypes.clear();
-                                externalSubTypes.addAll(externalCallSubTypes);
-                            } else {
-                                type = definitionToCallType.get(definitionPos);
+                            type = lastSubType.name;
+                        } else {                                
+                            if (externalSubTypes.isEmpty()) {
+                                traitFound = false;
+                                break;
                             }
-                            lastSubType = null;
-                        } else if (part.equals("[]")) {
-                            if (definitionPos != null) {
-                                if (lastSubType != null) {
-                                    lastSubType = lastSubType.subType;
-                                } else if (parts.get(p - 1).equals("()")) {
-                                    lastSubType = definitionToCallSubType.get(definitionPos);
-                                } else {
-                                    lastSubType = definitionToSubType.get(definitionPos);
-                                }
-                                if (lastSubType == null) {
-                                    traitFound = false;
-                                    break;
-                                }
-                                type = lastSubType.name;
-                            } else {                                
-                                if (externalSubTypes.isEmpty()) {
-                                    traitFound = false;
-                                    break;
-                                }
-                                type = externalSubTypes.remove(0);                                
+                            type = externalSubTypes.remove(0);                                
+                        }
+                    } else {
+                        traitKey = type + "/" + part;
+                        if (!traitFullNameToDefinition.containsKey(traitKey)) {
+                            if (simpleExternalClassNameToFullClassName.containsKey(type)) {
+                                type = simpleExternalClassNameToFullClassName.get(type);
                             }
-                        } else {
                             traitKey = type + "/" + part;
-                            if (!traitFullNameToDefinition.containsKey(traitKey)) {
-                                if (simpleExternalClassNameToFullClassName.containsKey(type)) {
-                                    type = simpleExternalClassNameToFullClassName.get(type);
-                                }
-                                traitKey = type + "/" + part;
-                                String newType = linkHandler.getTraitType(type, part);                                
-                                if (newType == null) {
-                                    traitFound = false;                                    
+                            String newType = linkHandler.getTraitType(type, part);                                
+                            if (newType == null) {
+                                traitFound = false;                                    
+                                break;
+                            }
+                            externalSubTypes.clear();
+                            int i = 1;
+                            while (true) {
+                                String st = linkHandler.getTraitSubType(type, part, i);
+                                if (st == null) {
                                     break;
                                 }
-                                externalSubTypes.clear();
-                                int i = 1;
-                                while (true) {
-                                    String st = linkHandler.getTraitSubType(type, part, i);
-                                    if (st == null) {
-                                        break;
-                                    }
-                                    externalSubTypes.add(st);
-                                    i++;
-                                }
-                                externalCallType = linkHandler.getTraitCallType(type, part);
-                                externalCallSubTypes.clear();
-                                i = 1;
-                                while (true) {
-                                    String st = linkHandler.getTraitCallSubType(type, part, i);
-                                    if (st == null) {
-                                        break;
-                                    }
-                                    externalCallSubTypes.add(st);
-                                    i++;
-                                }
-                                type = newType;
-                                definitionPos = null;
-                                lastSubType = null;
-                                continue;
+                                externalSubTypes.add(st);
+                                i++;
                             }
+                            externalCallType = linkHandler.getTraitCallType(type, part);
                             externalCallSubTypes.clear();
-                            externalSubTypes.clear();
-                            externalCallType = null;                            
-                            definitionPos = traitFullNameToDefinition.get(traitKey);
-                            type = definitionToType.get(definitionPos);
-                            lastSubType = null;
-                        }
-                    }
-
-                    if (traitFound) {
-                        if (definitionPos != null) {
-                            definitionPosToReferences.get(definitionPos).add(v.position);
-                            referenceToDefinition.put(v.position, definitionPos);
-                        } else if (part != null) {
-                            if (!externalTraitKeyToReference.containsKey(traitKey)) {
-                                externalTraitKeyToReference.put(traitKey, new ArrayList<>());
+                            i = 1;
+                            while (true) {
+                                String st = linkHandler.getTraitCallSubType(type, part, i);
+                                if (st == null) {
+                                    break;
+                                }
+                                externalCallSubTypes.add(st);
+                                i++;
                             }
-                            externalTraitKeyToReference.get(traitKey).add(v.position);
-                            referenceToExternalTraitKey.put(v.position, traitKey);
+                            type = newType;
+                            definitionPos = null;
+                            lastSubType = null;
+                            continue;
                         }
+                        externalCallSubTypes.clear();
+                        externalSubTypes.clear();
+                        externalCallType = null;                            
+                        definitionPos = traitFullNameToDefinition.get(traitKey);
+                        type = definitionToType.get(definitionPos);
+                        lastSubType = null;
                     }
                 }
+
+                if (traitFound) {
+                    if (definitionPos != null) {
+                        definitionPosToReferences.get(definitionPos).add(v.position);
+                        referenceToDefinition.put(v.position, definitionPos);
+                    } else if (part != null) {
+                        if (!externalTraitKeyToReference.containsKey(traitKey)) {
+                            externalTraitKeyToReference.put(traitKey, new ArrayList<>());
+                        }
+                        externalTraitKeyToReference.get(traitKey).add(v.position);
+                        referenceToExternalTraitKey.put(v.position, traitKey);
+                    }
+                }                
             }
         }
         return traitFound;
