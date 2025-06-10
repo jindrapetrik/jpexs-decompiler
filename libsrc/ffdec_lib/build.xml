@@ -264,9 +264,12 @@
         
     <target name="javadoc">
         <mkdir dir="${javadoc.dir}"/>
-        <javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" windowtitle="${project.name}"
+        <javadoc destdir="${javadoc.dir}" windowtitle="${project.name}"
                  useexternalfile="yes">
-            <fileset dir="${src.dir}" includes="**/*.java"/>
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+                <exclude name="**/*Lexer.java" />
+            </fileset>
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
