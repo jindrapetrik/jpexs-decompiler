@@ -31,11 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * AVM1 dialect.
  * @author JPEXS
  */
 public class ActionGraphTargetDialect extends GraphTargetDialect {
 
+    /**
+     * AVM1 dialect instance.
+     */
     public static final GraphTargetDialect INSTANCE = new ActionGraphTargetDialect();
 
     private ActionGraphTargetDialect() {

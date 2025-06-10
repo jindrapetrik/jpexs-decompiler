@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Package.
  * @author JPEXS
  */
 public class PackageAVM2Item extends AVM2Item {

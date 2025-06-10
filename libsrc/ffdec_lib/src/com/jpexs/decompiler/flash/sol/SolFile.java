@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Sol file.
  * @author JPEXS
  */
 public class SolFile {

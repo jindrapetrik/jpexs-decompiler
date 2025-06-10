@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Simple parser used for highlighting in editors.
  * @author JPEXS
  */
 public interface SimpleParser {
@@ -37,6 +37,12 @@ public interface SimpleParser {
      * @param definitionPosToReferences Definition position to references
      * @param referenceToDefinition Reference to definition
      * @param errors Errors
+     * @param externalTypes External types
+     * @param referenceToExternalTypeIndex Reference to external type index
+     * @param externalTypeIndexToReference External type index to reference
+     * @param linkHandler Link handler
+     * @param referenceToExternalTraitKey Reference to external trait key
+     * @param externalTraitKeyToReference External trait key to reference
      * @throws SimpleParseException On parse error
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt

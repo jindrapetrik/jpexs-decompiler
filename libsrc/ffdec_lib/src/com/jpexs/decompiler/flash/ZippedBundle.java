@@ -63,7 +63,6 @@ public class ZippedBundle implements Bundle {
     /**
      * Initializes the bundle.
      *
-     * @param is Input stream
      * @param filename File
      * @throws IOException On I/O error
      */

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.simpleparser;
 import java.util.List;
 
 /**
- *
+ * Method scope.
  * @author JPEXS
  */
 public class MethodScope extends FunctionScope {

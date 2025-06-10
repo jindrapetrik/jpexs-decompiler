@@ -564,8 +564,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     
     /**
      * Writes Tag value to the stream, ignoring all scripts
-     * @param sos
-     * @throws IOException 
+     * @param sos Output stream
+     * @throws IOException On I/O error
      */
     public void writeTagNoScripts(SWFOutputStream sos) throws IOException {
         byte[] newData = getDataNoScript();

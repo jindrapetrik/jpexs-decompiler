@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.simpleparser;
 import java.util.List;
 
 /**
- *
+ * Scope.
  * @author JPEXS
  */
 public interface Scope extends VariableOrScope {

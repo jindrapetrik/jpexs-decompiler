@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.amf.amf0.types;
 
 /**
- *
+ * Reference type.
  * @author JPEXS
  */
 public class ReferenceType {

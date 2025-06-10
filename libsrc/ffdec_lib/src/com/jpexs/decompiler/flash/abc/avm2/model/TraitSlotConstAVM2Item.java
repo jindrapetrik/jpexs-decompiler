@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Trait slot/const.
  * @author JPEXS
  */
 public class TraitSlotConstAVM2Item extends AVM2Item {

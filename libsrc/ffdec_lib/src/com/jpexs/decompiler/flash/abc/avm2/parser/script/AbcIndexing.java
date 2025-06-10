@@ -650,6 +650,7 @@ public final class AbcIndexing {
      * @param findProtected Find protected namespace properties
      * @param type Property type
      * @param callType Call type
+     * @param foundStatic Trait found as static
      */
     public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType, Reference<Boolean> foundStatic) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected, foundStatic);
@@ -671,7 +672,8 @@ public final class AbcIndexing {
      * @param findStatic Find static properties
      * @param findInstance Find instance properties
      * @param findProtected Find protected namespace properties
-     * @return Trait index or null
+     * @param foundStatic Trait found as static
+     * @return Trait index or null     
      */
     public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<Boolean> foundStatic) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected, foundStatic);
@@ -690,6 +692,7 @@ public final class AbcIndexing {
      * @param findStatic Find static properties
      * @param findInstance Find instance properties
      * @param findProtected Find protected namespace properties
+     * @param foundStatic Trait found as static
      * @return Trait index or null
      */
     public GraphTargetItem findPropertyCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<Boolean> foundStatic) {
@@ -939,6 +942,7 @@ public final class AbcIndexing {
      * @param ts Traits
      * @param map Map to index
      * @param mapNs Map to index
+     * @param scriptIndex Script index
      */
     protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs, int scriptIndex) {
         for (Trait t : ts.traits) {

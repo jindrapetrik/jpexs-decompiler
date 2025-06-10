@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
- *
+ * Import statement.
  * @author JPEXS
  */
 public class Import extends Variable {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Scope of value of var or const trait.
  * @author JPEXS
  */
 public class TraitVarConstValueScope implements Scope {

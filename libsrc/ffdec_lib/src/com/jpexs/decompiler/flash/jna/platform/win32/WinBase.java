@@ -138,7 +138,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     int HANDLE_FLAG_INHERIT = 1;
 
     /**
-     * If this flag is set, calling the {@link Kernel32#CloseHandle} function
+     * If this flag is set, calling the Kernel32 - CloseHandle function
      * will not close the object handle.
      */
     int HANDLE_FLAG_PROTECT_FROM_CLOSE = 2;

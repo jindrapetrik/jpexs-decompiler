@@ -231,6 +231,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Constructs GraphTargetItem
+     * @param dialect Dialect
      */
     public GraphTargetItem(GraphTargetDialect dialect) {
         this(dialect, null, null, NOPRECEDENCE);        
@@ -239,9 +240,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Constructs GraphTargetItem
      *
+     * @param dialect Dialect
      * @param src Source item
      * @param lineStartItem Line start item
-     * @param precedence Precedence
+     * @param precedence Precedence     
      */
     public GraphTargetItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, int precedence) {
         this(dialect, src, lineStartItem, precedence, null);
@@ -250,6 +252,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Constructs GraphTargetItem
      *
+     * @param dialect Dialect
      * @param src Source item
      * @param lineStartItem Line start item
      * @param precedence Precedence

@@ -49,7 +49,7 @@ import org.tomlj.TomlParseResult;
 import org.tomlj.TomlTable;
 
 /**
- *
+ * TOML file confiraration storage.
  * @author JPEXS
  */
 public class TomlConfigurationStorage implements ConfigurationStorage {

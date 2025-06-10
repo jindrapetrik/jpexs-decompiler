@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * Variable.
  * @author JPEXS
  */
 public class Variable implements VariableOrScope {

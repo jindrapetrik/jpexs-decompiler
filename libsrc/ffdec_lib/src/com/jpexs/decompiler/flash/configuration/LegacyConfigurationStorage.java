@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Legacy (binary file) configuration storage.
  * @author JPEXS
  */
 public class LegacyConfigurationStorage implements ConfigurationStorage {

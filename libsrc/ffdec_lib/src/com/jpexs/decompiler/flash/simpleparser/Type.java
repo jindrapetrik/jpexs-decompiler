@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
- *
+ * Type.
  * @author JPEXS
  */
 public class Type extends Variable {

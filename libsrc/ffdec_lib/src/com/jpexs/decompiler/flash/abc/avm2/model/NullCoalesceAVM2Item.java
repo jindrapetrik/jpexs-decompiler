@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Null coalesce operator (a ?? b).
  * @author JPEXS
  */
 public class NullCoalesceAVM2Item extends BinaryOpItem {

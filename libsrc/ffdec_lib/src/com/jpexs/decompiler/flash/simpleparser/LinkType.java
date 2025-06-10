@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
- *
+ * Type of link.
  * @author JPEXS
  */
 public enum LinkType {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Function scope.
  * @author JPEXS
  */
 public class FunctionScope implements Scope {

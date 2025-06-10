@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.configuration.enums;
 
 /**
- *
+ * Guides snap accuracy.
  * @author JPEXS
  */
 public enum GuidesSnapAccuracy {

@@ -56,6 +56,7 @@ public abstract class ParseException extends Exception {
      *
      * @param text Text of the exception
      * @param line Line number where the exception occurred
+     * @param position Position in source text
      */
     public ParseException(String text, long line, long position) {
         super(text + (line == -1 ? "" : " on line " + line));

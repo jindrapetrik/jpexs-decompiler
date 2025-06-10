@@ -33,7 +33,7 @@ import com.jpexs.helpers.Helper;
 import java.util.List;
 
 /**
- *
+ * Converter of PlaceObject versions.
  * @author JPEXS
  */
 public class PlaceObjectTypeConverter {

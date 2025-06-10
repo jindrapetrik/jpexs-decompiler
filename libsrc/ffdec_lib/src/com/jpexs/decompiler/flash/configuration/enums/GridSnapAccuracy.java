@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.configuration.enums;
 
 /**
- *
+ * Grid snap accuracy.
  * @author JPEXS
  */
 public enum GridSnapAccuracy {

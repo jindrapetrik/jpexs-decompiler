@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Dialect - high level language type.
  * @author JPEXS
  */
 public abstract class GraphTargetDialect {
@@ -31,8 +31,8 @@ public abstract class GraphTargetDialect {
     /**
      * Conversion of ECMA value (that's used in simplifications)
      * back to GraphTarget item.
-     * @param value
-     * @return 
+     * @param value Ecma value
+     * @return GraphTarget item
      */
     public abstract GraphTargetItem valToItem(Object value);
 }

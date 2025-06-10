@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * AVM2 dialect.
  * @author JPEXS
  */
 public class AVM2GraphTargetDialect extends GraphTargetDialect {

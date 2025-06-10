@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Unknown tag.
  * @author JPEXS
  */
 public class UnknownTag extends Tag {

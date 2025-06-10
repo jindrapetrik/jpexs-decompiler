@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Bin data file output stream.
  * @author JPEXS
  */
 public class BinDataOutputStream extends OutputStream {

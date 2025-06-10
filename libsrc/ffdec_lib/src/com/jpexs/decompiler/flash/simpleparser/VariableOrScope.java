@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
- *
+ * Variable or scope.
  * @author JPEXS
  */
 public interface VariableOrScope {

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
+ * Class trait.
  * @author JPEXS
  */
 public class ClassTrait extends Variable {

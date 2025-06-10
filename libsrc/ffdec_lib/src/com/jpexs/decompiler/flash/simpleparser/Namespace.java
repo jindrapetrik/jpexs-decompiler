@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
- *
+ * Namespace.
  * @author JPEXS
  */
 public class Namespace extends Variable {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Class scope.
  * @author JPEXS
  */
 public class ClassScope implements Scope {

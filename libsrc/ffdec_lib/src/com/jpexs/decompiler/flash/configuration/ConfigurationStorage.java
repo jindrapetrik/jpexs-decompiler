@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.configuration;
 import java.util.Map;
 
 /**
- *
+ * Class for storing configuration.
  * @author JPEXS
  */
 public interface ConfigurationStorage {

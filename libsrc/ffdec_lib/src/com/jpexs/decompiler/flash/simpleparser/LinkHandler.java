@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.simpleparser;
 
 /**
+ * Handler of links.
  * @author JPEXS
  */
 public interface LinkHandler {

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 
 /**
- *
+ * Text record with font class.
  * @author JPEXS
  */
 public class AdvancedTextRecord extends TEXTRECORD {

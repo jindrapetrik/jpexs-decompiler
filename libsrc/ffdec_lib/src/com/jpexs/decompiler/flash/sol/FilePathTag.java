@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * File path tag.
  * @author JPEXS
  */
 public class FilePathTag extends Tag {

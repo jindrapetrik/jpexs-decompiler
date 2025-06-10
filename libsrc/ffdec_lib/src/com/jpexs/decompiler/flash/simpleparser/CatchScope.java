@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Catch (of try..catch) clause scope.
  * @author JPEXS
  */
 public class CatchScope implements Scope {
