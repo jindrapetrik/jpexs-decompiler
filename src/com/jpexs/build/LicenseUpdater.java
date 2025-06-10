@@ -120,6 +120,10 @@ public class LicenseUpdater {
             if (f.isDirectory()) {
                 updateLicenseInDir(f, lgpl);
             } else if (f.getName().endsWith(".java")) {
+                //Leave package info as is
+                if (f.getName().equals("package-info.java")) {
+                    continue;
+                }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 PrintWriter pw = new Utf8PrintWriter(baos);
                 try {
