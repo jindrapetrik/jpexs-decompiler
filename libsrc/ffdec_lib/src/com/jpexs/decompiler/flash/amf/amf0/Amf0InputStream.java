@@ -56,6 +56,10 @@ public class Amf0InputStream extends InputStream {
      */
     public DumpInfo dumpInfo;
 
+    /**
+     * Constructor
+     * @param is Input stream
+     */
     public Amf0InputStream(MemoryInputStream is) {
         this.is = is;
     }
@@ -68,6 +72,12 @@ public class Amf0InputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads bytes from the stream.
+     * @param count Count of bytes
+     * @return Array of bytes
+     * @throws IOException On I/O error
+     */
     public byte[] readBytes(int count) throws IOException {
         DataInputStream dais = new DataInputStream(is);
         byte[] ret = new byte[count];
@@ -485,12 +495,22 @@ public class Amf0InputStream extends InputStream {
         return value;
     }
 
+    /**
+     * Populates complex objects.
+     * @param values Values
+     * @param result Result
+     */
     public void populateComplexObjects(List<Object> values, List<Object> result) {
         for (Object value : values) {
             populateComplexObjects(value, result);
         }
     }
 
+    /**
+     * Populates complex objects.
+     * @param value Value
+     * @param result Result
+     */
     public void populateComplexObjects(Object value, List<Object> result) {
         if (result.contains(value)) {
             return;

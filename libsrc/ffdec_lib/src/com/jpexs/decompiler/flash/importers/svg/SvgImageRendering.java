@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG image rendering.
  * @author JPEXS
  */
 public enum SvgImageRendering {

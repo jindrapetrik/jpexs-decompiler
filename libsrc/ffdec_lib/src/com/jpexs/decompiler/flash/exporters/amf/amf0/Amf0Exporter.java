@@ -41,6 +41,19 @@ import java.util.Map;
  */
 public class Amf0Exporter {
 
+    /**
+     * Constructor.
+     */
+    public Amf0Exporter() {
+    }   
+    
+    /**
+     * Converts AMF map to string.
+     * @param map Map
+     * @param level Level
+     * @param newLine Newline char
+     * @return String result
+     */
     public static String amfMapToString(
             Map<String, Object> map,
             int level,
@@ -81,6 +94,16 @@ public class Amf0Exporter {
         return sb.toString();
     }
 
+    /**
+     * Converts AMF to string
+     * @param value Value
+     * @param level Level
+     * @param newLine New line
+     * @param processedObjects Processed objects
+     * @param referenceCount Reference count
+     * @param objectAlias Object alias
+     * @return String result
+     */
     public static String amfToString(
             Object value,
             int level,

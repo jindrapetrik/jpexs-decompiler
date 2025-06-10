@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- *
+ * AMF0 output stream.
  * @author JPEXS
  */
 public class Amf0OutputStream extends OutputStream {
