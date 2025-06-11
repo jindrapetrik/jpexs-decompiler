@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.simpleparser;
  */
 public class Type extends Variable {
     
-    public Type(boolean definition, String name, int position) {
+    public Type(boolean definition, Path name, int position) {
         super(definition, name, position, true);
     }    
 }

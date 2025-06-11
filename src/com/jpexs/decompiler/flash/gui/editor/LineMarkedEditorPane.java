@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
+import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
@@ -73,40 +74,40 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private SimpleParser parser;   
 
     @Override
-    public LinkType getClassLinkType(String className) {
+    public LinkType getClassLinkType(Path className) {
         return LinkType.NO_LINK;
     }
 
     @Override
-    public boolean traitExists(String className, String traitName) {
+    public boolean traitExists(Path className, String traitName) {
         return false;
     }
 
     @Override
-    public void handleClassLink(String className) {
+    public void handleClassLink(Path className) {
     }
 
     @Override
-    public void handleTraitLink(String className, String traitName) {
+    public void handleTraitLink(Path className, String traitName) {
     }
 
     @Override
-    public String getTraitType(String className, String traitName) {
-        return "*";
+    public Path getTraitType(Path className, String traitName) {
+        return new Path("*");
     }
 
     @Override
-    public String getTraitSubType(String className, String traitName, int level) {
+    public Path getTraitSubType(Path className, String traitName, int level) {
         return null;
     }
 
     @Override
-    public String getTraitCallType(String className, String traitName) {
+    public Path getTraitCallType(Path className, String traitName) {
         return null;
     }
 
     @Override
-    public String getTraitCallSubType(String className, String traitName, int level) {
+    public Path getTraitCallSubType(Path className, String traitName, int level) {
         return null;
     }
     

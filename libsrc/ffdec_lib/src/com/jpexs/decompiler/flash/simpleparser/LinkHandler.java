@@ -22,20 +22,20 @@ package com.jpexs.decompiler.flash.simpleparser;
  */
 public interface LinkHandler {
     
-    public LinkType getClassLinkType(String className);
+    public LinkType getClassLinkType(Path className);
     
-    public boolean traitExists(String className, String traitName);
+    public boolean traitExists(Path className, String traitName);
     
-    public String getTraitType(String className, String traitName);
+    public Path getTraitType(Path className, String traitName);
     
-    public String getTraitSubType(String className, String traitName, int level);    
+    public Path getTraitSubType(Path className, String traitName, int level);    
     
-    public String getTraitCallType(String className, String traitName);   
+    public Path getTraitCallType(Path className, String traitName);   
     
-    public String getTraitCallSubType(String className, String traitName, int level);       
+    public Path getTraitCallSubType(Path className, String traitName, int level);       
     
-    public void handleClassLink(String className);
+    public void handleClassLink(Path className);
     
-    public void handleTraitLink(String className, String traitName);
+    public void handleTraitLink(Path className, String traitName);
         
 }

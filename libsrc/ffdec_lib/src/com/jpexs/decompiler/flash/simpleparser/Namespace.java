@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.simpleparser;
  */
 public class Namespace extends Variable {
     
-    public Namespace(boolean definition, String name, int position) {
+    public Namespace(boolean definition, Path name, int position) {
         super(definition, name, position);
     }
     

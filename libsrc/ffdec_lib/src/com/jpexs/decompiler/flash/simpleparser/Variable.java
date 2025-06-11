@@ -26,27 +26,27 @@ import java.util.List;
 public class Variable implements VariableOrScope {
 
     public boolean definition;
-    public String name;
+    public Path name;
     public int position;
     public Boolean isStatic;
-    public String type;
-    public String callType;
+    public Path type;
+    public Path callType;
     public Variable subType;
     public Variable callSubType;
 
-    public Variable(boolean definition, String name, int position) {
+    public Variable(boolean definition, Path name, int position) {
         this(definition, name, position, null);
     }
     
-    public Variable(boolean definition, String name, int position, Boolean isStatic) {
+    public Variable(boolean definition, Path name, int position, Boolean isStatic) {
         this(definition, name, position, isStatic, null, null);
     }
     
-    public Variable(boolean definition, String name, int position, Boolean isStatic, String type, String callType) {
+    public Variable(boolean definition, Path name, int position, Boolean isStatic, Path type, Path callType) {
         this(definition, name, position, isStatic, type, callType, null, null);
     }
     
-    public Variable(boolean definition, String name, int position, Boolean isStatic, String type, String callType, Variable subType, Variable callSubType) {
+    public Variable(boolean definition, Path name, int position, Boolean isStatic, Path type, Path callType, Variable subType, Variable callSubType) {
         this.definition = definition;
         this.name = name;
         this.position = position;
@@ -62,34 +62,23 @@ public class Variable implements VariableOrScope {
         return (definition ? "definition of " : "") + (isStatic == Boolean.TRUE ? "static " : "") + name + " at " + position;
     }        
     
-    public String getLastName() {
-        String ret = name;
-        if (ret.contains(".")) {
-            ret = ret.substring(ret.lastIndexOf(".") + 1);
-        }        
-        return ret;
+    public Path getLastName() {
+        return name.getLast();
     }
     
-    public String getFirstName() {
-        String ret = name;
-        if (ret.contains(".")) {
-            ret = ret.substring(0, ret.indexOf("."));
-        }       
-        return ret;
+    public Path getFirstName() {
+        return name.getFirst();
     }
    
-    public String getParentName() {
-        if (name.contains(".")) {
-            return name.substring(0, name.lastIndexOf("."));
-        }
-        return null;
+    public Path getParentName() {
+        return name.getParent();
     }
     
     public List<String> getParts() {
-        return Arrays.asList(name.split("\\.", -1));
+        return name.getParts();
     }
     
     public boolean hasParent() {
-        return name.contains(".");
+        return name.hasParent();
     }    
 }

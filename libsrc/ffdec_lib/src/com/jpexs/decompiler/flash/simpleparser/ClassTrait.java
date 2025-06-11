@@ -18,16 +18,18 @@ package com.jpexs.decompiler.flash.simpleparser;
 
 /**
  * Class trait.
+ *
  * @author JPEXS
  */
 public class ClassTrait extends Variable {
 
-    public final String classFullName;
+    public final Path classFullName;
     public final String customNs;
-    public final String simpleName;
-    
+    public final Path simpleName;
+
     /**
      * Constructor
+     *
      * @param classFullName Full class name including package
      * @param name Name
      * @param customNs Custom namespace
@@ -38,19 +40,19 @@ public class ClassTrait extends Variable {
      * @param subType Sub type
      * @param callSubType Call sub type
      */
-    public ClassTrait(String classFullName, String name, String customNs, int position, boolean isStatic, String type, String callType, Variable subType, Variable callSubType) {
-        super(true, isStatic ? classFullName + "." + name : "this." + (customNs != null ? customNs + "::" : "") + name, position, isStatic, type, callType, subType, callSubType);
+    public ClassTrait(Path classFullName, Path name, String customNs, int position, boolean isStatic, Path type, Path callType, Variable subType, Variable callSubType) {
+        super(true, isStatic ? classFullName.add(name) : new Path("this").add((customNs != null ? customNs + "::" : "") + name), position, isStatic, type, callType, subType, callSubType);
         this.classFullName = classFullName;
         this.customNs = customNs;
         this.simpleName = name;
     }
-    
+
     @Override
     public String toString() {
         return (isStatic ? "static " : "") + "trait " + name + " of class " + classFullName + " at " + position;
     }
-    
-    public String getFullIdentifier() {
-        return classFullName + "/" + (customNs != null ? customNs + "::" : "") + simpleName;
+
+    public Path getFullIdentifier() {
+        return classFullName.add((customNs != null ? customNs + "::" : "") + simpleName);
     }
 }

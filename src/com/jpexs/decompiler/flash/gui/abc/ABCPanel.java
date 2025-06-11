@@ -20,6 +20,7 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -82,6 +83,7 @@ import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
+import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -117,6 +119,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -953,11 +956,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
             @Override
-            public LinkType getClassLinkType(String className) {
-                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(className), abc, decompiledTextArea.getScriptIndex());
+            public LinkType getClassLinkType(Path className) {
+                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
 
-                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(className));
+                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(className.toString()));
                     if (ti == null) {
                         return LinkType.NO_LINK;
                     }
@@ -983,9 +986,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public boolean traitExists(String className, String traitName) {
+            public boolean traitExists(Path className, String traitName) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -994,11 +997,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public void handleClassLink(String scriptName) {
+            public void handleClassLink(Path scriptName) {
                 Reference<SWF> swfRef = new Reference<>(null);
-                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(scriptName), abc, decompiledTextArea.getScriptIndex());
+                AbcIndexing.ClassIndex ci = abc.getSwf().getAbcIndex().findClass(new TypeItem(scriptName.toString()), abc, decompiledTextArea.getScriptIndex());
                 if (ci == null) {
-                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(scriptName));
+                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findScriptProperty(DottedChain.parseNoSuffix(scriptName.toString()));
                     if (ti == null) {
                         return;
                     }
@@ -1008,18 +1011,20 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     swfRef.setVal(ci.abc.getSwf());
                 }
 
-                if (swfRef.getVal() == abc.getSwf()) {
-                    hilightScript(getOpenable(), scriptName);
+                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(true);
+                
+                if (swfRef.getVal() == abc.getSwf()) {                    
+                    hilightScript(getOpenable(), scriptNamePrintable);
                     return;
                 }
 
-                hilightScript(swfRef.getVal(), scriptName);
+                hilightScript(swfRef.getVal(), scriptNamePrintable);
             }
 
             @Override
-            public void handleTraitLink(String className, String traitName) {
+            public void handleTraitLink(Path className, String traitName) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -1051,9 +1056,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public String getTraitType(String className, String traitName) {
+            public Path getTraitType(Path className, String traitName) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -1063,15 +1068,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
                 if (ti.returnType instanceof ApplyTypeAVM2Item) {
                     ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) ti.returnType;
-                    return at.object.toString();
+                    return typeToPath(at.object);
                 }
-                return ti.returnType.toString();
+                return typeToPath(ti.returnType);
             }
 
+            private Path typeToPath(GraphTargetItem type) {
+                return new Path(Arrays.asList(type.toString().split("\\.")));
+            }
+            
             @Override
-            public String getTraitSubType(String className, String traitName, int level) {
+            public Path getTraitSubType(Path className, String traitName, int level) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -1087,13 +1096,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     it = ((ApplyTypeAVM2Item) it).params.get(0);
                 }
 
-                return it.toString();
+                return typeToPath(it);
             }
 
             @Override
-            public String getTraitCallType(String className, String traitName) {
+            public Path getTraitCallType(Path className, String traitName) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -1103,15 +1112,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
                 if (ti.callReturnType instanceof ApplyTypeAVM2Item) {
                     ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) ti.callReturnType;
-                    return at.object.toString();
+                    return typeToPath(at.object);
                 }
-                return ti.callReturnType.toString();
+                return typeToPath(ti.callReturnType);
             }
 
             @Override
-            public String getTraitCallSubType(String className, String traitName, int level) {
+            public Path getTraitCallSubType(Path className, String traitName, int level) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
-                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className), abc, -1),
+                AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(new AbcIndexing.PropertyDef(traitName, new TypeItem(className.toString()), abc, -1),
                         true,
                         true,
                         true,
@@ -1127,7 +1136,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     it = ((ApplyTypeAVM2Item) it).params.get(0);
                 }
 
-                return it.toString();
+                return typeToPath(it);
             }
 
         });

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
+import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import java.awt.BorderLayout;
@@ -106,12 +107,12 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private Map<Integer, List<Integer>> definitionPosToReferences = new LinkedHashMap<>();
     private Map<Integer, Integer> referenceToDefinition = new LinkedHashMap<>();
-    private List<String> externalTypes = new ArrayList<>();
+    private List<Path> externalTypes = new ArrayList<>();
     private Map<Integer, Integer> referenceToExternalTypeIndex = new LinkedHashMap<>();
     private Map<Integer, List<Integer>> externalTypeIndexToReference = new LinkedHashMap<>();
-    private Map<String, String> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
-    private Map<Integer, String> referenceToExternalTraitKey = new LinkedHashMap<>();
-    private Map<String, List<Integer>> externalTraitKeyToReference = new LinkedHashMap<>();
+    private Map<Path, Path> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
+    private Map<Integer, Path> referenceToExternalTraitKey = new LinkedHashMap<>();
+    private Map<Path, List<Integer>> externalTraitKeyToReference = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -289,7 +290,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 return;
             } else {
                 if (referenceToExternalTraitKey.containsKey(tok.start)) {
-                    String traitKey = referenceToExternalTraitKey.get(tok.start);
+                    Path traitKey = referenceToExternalTraitKey.get(tok.start);
                     for (int i : externalTraitKeyToReference.get(traitKey)) {
                         Token referenceToken = getIdentifierTokenAt(sDoc, i);
                         if (referenceToken != null) {
@@ -669,11 +670,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Integer, List<Integer>> newDefinitionPosToReferences = new LinkedHashMap<>();
             Map<Integer, Integer> newReferenceToDefinition = new LinkedHashMap<>();
             List<SimpleParseException> newErrors = new ArrayList<>();
-            List<String> newExternalTypes = new ArrayList<>();
+            List<Path> newExternalTypes = new ArrayList<>();
             Map<Integer, Integer> newReferenceToExternalTypeIndex = new LinkedHashMap<>();
             Map<Integer, List<Integer>> newExternalTypeIndexToReference = new LinkedHashMap<>();
-            Map<Integer, String> newReferenceToExternalTraitKey = new LinkedHashMap<>();
-            Map<String, List<Integer>> newExternalTraitKeyToReference = new LinkedHashMap<>();
+            Map<Integer, Path> newReferenceToExternalTraitKey = new LinkedHashMap<>();
+            Map<Path, List<Integer>> newExternalTraitKeyToReference = new LinkedHashMap<>();
             parser.parse(
                     fullText,
                     newDefinitionPosToReferences,
@@ -686,11 +687,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     newReferenceToExternalTraitKey, newExternalTraitKeyToReference
             );
 
-            Map<String, String> newSimpleExternalClassNameToFullClassName = new LinkedHashMap<>();
+            Map<Path, Path> newSimpleExternalClassNameToFullClassName = new LinkedHashMap<>();
             for (int i = 0; i < newExternalTypes.size(); i++) {
-                String type = newExternalTypes.get(i);
-                String simpleName = type.contains(".") ? type.substring(type.lastIndexOf(".") + 1) : type;
-                newSimpleExternalClassNameToFullClassName.put(simpleName, type);
+                Path type = newExternalTypes.get(i);
+                newSimpleExternalClassNameToFullClassName.put(type.getLast(), type);
             }
             definitionPosToReferences = newDefinitionPosToReferences;
             referenceToDefinition = newReferenceToDefinition;
@@ -757,13 +757,13 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             return LinkType.NO_LINK;
         }
         if (referenceToExternalTypeIndex.containsKey(token.start)) {
-            String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+            Path externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
             return ((LineMarkedEditorPane) pane).getLinkHandler().getClassLinkType(externalType);
         }
         if (referenceToExternalTraitKey.containsKey(token.start)) {
-            String traitKey = referenceToExternalTraitKey.get(token.start);
+            Path traitKey = referenceToExternalTraitKey.get(token.start);
             //String traitName = traitKey.substring(traitKey.lastIndexOf("/") + 1);
-            String className = traitKey.substring(0, traitKey.lastIndexOf("/"));
+            Path className = traitKey.getParent();
             if (simpleExternalClassNameToFullClassName.containsKey(className)) {
                 className = simpleExternalClassNameToFullClassName.get(className);
             }
@@ -808,7 +808,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             if (referenceToExternalTypeIndex.containsKey(token.start)
                     && com.jpexs.decompiler.flash.configuration.Configuration.warningLinkTypes.get()) {
 
-                String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+                Path externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
 
                 LinkType lt = ((LineMarkedEditorPane) pane).getLinkHandler().getClassLinkType(externalType);
 
@@ -888,14 +888,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             if (referenceToExternalTypeIndex.containsKey(token.start)) {
                 goingOut = true;
                 pane.setCursor(Cursor.getDefaultCursor());
-                String externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
+                Path externalType = externalTypes.get(referenceToExternalTypeIndex.get(token.start));
                 ((LineMarkedEditorPane) pane).getLinkHandler().handleClassLink(externalType);
                 return;
             }
             if (referenceToExternalTraitKey.containsKey(token.start)) {
-                String traitKey = referenceToExternalTraitKey.get(token.start);
-                String traitName = traitKey.substring(traitKey.lastIndexOf("/") + 1);
-                String className = traitKey.substring(0, traitKey.lastIndexOf("/"));
+                Path traitKey = referenceToExternalTraitKey.get(token.start);
+                String traitName = traitKey.getLast().toString();
+                Path className = traitKey.getParent();
 
                 if (simpleExternalClassNameToFullClassName.containsKey(className)) {
                     className = simpleExternalClassNameToFullClassName.get(className);
