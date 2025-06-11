@@ -435,6 +435,9 @@ public interface SimpleParser {
                             type = externalSubTypes.remove(0);                                
                         }
                     } else {
+                        if (type == null) {
+                            break;
+                        }
                         traitKey = type.add(part);
                         if (!traitFullNameToDefinition.containsKey(traitKey)) {
                             if (simpleExternalClassNameToFullClassName.containsKey(type)) {
