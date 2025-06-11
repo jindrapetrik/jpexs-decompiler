@@ -1672,34 +1672,37 @@ public class Main {
         private final OpenableOpened executeAfterOpen;
 
         private final int[] reloadIndices;
+        
+        private final boolean loadSession;
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo) {
-            this(sourceInfo, -1);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, boolean loadSession) {
+            this(sourceInfo, -1, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, int reloadIndex) {
-            this(sourceInfo, null, reloadIndex);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, int reloadIndex, boolean loadSession) {
+            this(sourceInfo, null, reloadIndex, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
-            this(sourceInfo, executeAfterOpen, -1);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, boolean loadSession) {
+            this(sourceInfo, executeAfterOpen, -1, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex, boolean loadSession) {
             this.sourceInfos = new OpenableSourceInfo[]{sourceInfo};
             this.executeAfterOpen = executeAfterOpen;
             this.reloadIndices = new int[]{reloadIndex};
+            this.loadSession = loadSession;
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos) {
-            this(sourceInfos, null, null);
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, boolean loadSession) {
+            this(sourceInfos, null, null, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen) {
-            this(sourceInfos, executeAfterOpen, null);
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, boolean loadSession) {
+            this(sourceInfos, executeAfterOpen, null, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices, boolean loadSession) {
             this.sourceInfos = sourceInfos;
             this.executeAfterOpen = executeAfterOpen;
             int[] indices = new int[sourceInfos.length];
@@ -1707,6 +1710,7 @@ public class Main {
                 indices[i] = -1;
             }
             this.reloadIndices = reloadIndices == null ? indices : reloadIndices;
+            this.loadSession = loadSession;
         }
 
         @Override
@@ -1837,28 +1841,30 @@ public class Main {
                         }
                     }
 
-                    if (isInited()) {
-                        if (resourcesPathStr == null) {
-                            TagTreeModel model = mainFrame.getPanel().tagTree.getFullModel();
-                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
-                            if (tp != null) {
-                                mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                    if (loadSession) {
+                        if (isInited()) {
+                            if (resourcesPathStr == null) {
+                                TagTreeModel model = mainFrame.getPanel().tagTree.getFullModel();
+                                TreePath tp = model == null ? null : model.getTreePath(fopenable);
+                                if (tp != null) {
+                                    mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                                }
+                            } else {
+                                mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                            }
+                            if (tagListPathStr == null) {
+                                TagListTreeModel model = mainFrame.getPanel().tagListTree.getFullModel();
+                                TreePath tp = model == null ? null : model.getTreePath(fopenable);
+                                if (tp != null) {
+                                    mainFrame.getPanel().tagListTree.setSelectionPath(tp);
+                                }
+                            } else {
+                                mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
                             }
                         } else {
-                            mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                            mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
+                            mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                         }
-                        if (tagListPathStr == null) {
-                            TagListTreeModel model = mainFrame.getPanel().tagListTree.getFullModel();
-                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
-                            if (tp != null) {
-                                mainFrame.getPanel().tagListTree.setSelectionPath(tp);
-                            }
-                        } else {
-                            mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
-                        }
-                    } else {
-                        mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
-                        mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
                     if (fswf != null) {
@@ -1986,10 +1992,10 @@ public class Main {
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
         View.checkAccess();
 
-        return openFile(swfFile, fileTitle, null);
+        return openFile(swfFile, fileTitle, null, true);
     }
 
-    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
+    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen, boolean loadSession) {
         View.checkAccess();
 
         try {
@@ -2007,7 +2013,7 @@ public class Main {
                         executeAfterOpen.run();
                     }
                 }
-            }  
+            }, loadSession  
             );
             return openResult;
         } catch (IOException ex) {
@@ -2018,35 +2024,46 @@ public class Main {
 
     public static OpenFileResult openFile(OpenableSourceInfo sourceInfo) {
         View.checkAccess();
-
-        return openFile(new OpenableSourceInfo[]{sourceInfo});
+        return openFile(sourceInfo, true);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen);
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, loadSession);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, loadSession);
     }
 
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex, boolean loadSession) {
+        View.checkAccess();
+
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex}, loadSession);
+    }
+    
     public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos) {
         View.checkAccess();
 
-        return openFile(newSourceInfos, null);
+        return openFile(newSourceInfos, true);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(newSourceInfos, executeAfterOpen, null);
+        return openFile(newSourceInfos, null, loadSession);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, boolean loadSession) {
+        View.checkAccess();
+
+        return openFile(newSourceInfos, executeAfterOpen, null, loadSession);
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices, boolean loadSession) {
         View.checkAccess();
 
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
@@ -2108,7 +2125,7 @@ public class Main {
             }
         }
 
-        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices);
+        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices, loadSession);
         wrk.execute();
         if (reloadIndices == null) {
             sourceInfos.addAll(Arrays.asList(newSourceInfos));
@@ -2143,7 +2160,7 @@ public class Main {
             }
         }
 
-        openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
+        openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo), true);
     }
 
     public static void reloadFile(File file) {
@@ -2153,7 +2170,7 @@ public class Main {
                 continue;
             }
             if (file.equals(new File(info.getFile()))) {
-                openFile(info, null, i);
+                openFile(info, null, i, true);
             }
         }
     }
@@ -2762,7 +2779,7 @@ public class Main {
                         @Override
                         public void run() {
                             OpenableSourceInfo osi = new OpenableSourceInfo(new ReReadableInputStream(new ByteArrayInputStream(inputData)), null, titleWithHash);
-                            openFile(osi, afterLoad);
+                            openFile(osi, afterLoad, true);
                         }
                     });
                 }
@@ -3263,7 +3280,7 @@ public class Main {
                         setSessionLoaded(true);
                         mainFrame.getPanel().reload(true);
                         mainFrame.getPanel().updateUiWithCurrentOpenable();
-                    });
+                    }, true);
                 }
             }
         }

@@ -1896,7 +1896,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             for (int i = 0; i < droppedFiles.size(); i++) {
                                 sourceInfos[i] = new OpenableSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
                             }
-                            Main.openFile(sourceInfos, null);
+                            Main.openFile(sourceInfos, null, true);
                         }
                     } catch (UnsupportedFlavorException | IOException ex) {
                         //ignored
@@ -2699,7 +2699,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         gotoScriptName(swf, scriptName);
     }
 
-    public void findOrLoadOpanableListByFilePath(String filePath, OpenableListLoaded executeAfterOpen) {
+    public void findOrLoadOpanableListByFilePath(String filePath, OpenableListLoaded executeAfterOpen, boolean loadSession) {
         for (OpenableList ol : openables) {
             String existingFilePath = ol.sourceInfo.getFile();
             if (existingFilePath == null) {
@@ -2713,9 +2713,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Main.openFile(filePath, null, new Runnable() {
             @Override
             public void run() {
-                findOrLoadOpanableListByFilePath(filePath, executeAfterOpen);
+                findOrLoadOpanableListByFilePath(filePath, executeAfterOpen, loadSession);
             }
-        });
+        }, loadSession);
     }
 
     public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex, boolean pcode) {
