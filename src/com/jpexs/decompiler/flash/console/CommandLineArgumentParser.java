@@ -4385,11 +4385,21 @@ public class CommandLineArgumentParser {
         if (args.isEmpty()) {
             badArguments("dumpas2");
         }
+        boolean useExportNames = false;
+        String exportNamesParam = args.pop();
+        if (exportNamesParam.toLowerCase(Locale.ENGLISH).equals("-exportnames")) {
+            useExportNames = true;
+        } else {
+            args.push(exportNamesParam);
+        }
+        if (args.isEmpty()) {
+            badArguments("dumpas2");
+        }
         File file = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
-                Map<String, ASMSource> asms = swf.getASMs(false);
+                Map<String, ASMSource> asms = swf.getASMs(useExportNames);
                 for (String as2 : asms.keySet()) {
                     System.out.println(as2);
                 }

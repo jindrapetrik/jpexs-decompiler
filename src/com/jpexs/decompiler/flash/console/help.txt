@@ -46,8 +46,10 @@ alias /?
 -dumpSWF <infile>
     Dump list of SWF tags to console.
 
--dumpAS2 <infile>
+-dumpAS2 [-exportNames] <infile>
     Dump list of AS1/2 scripts to console.
+    Use -exportNames option to print names in export format
+    (used in -replace command etc.)
 
 -dumpAS3 <infile>
     Dump list of AS3 scripts to console.
