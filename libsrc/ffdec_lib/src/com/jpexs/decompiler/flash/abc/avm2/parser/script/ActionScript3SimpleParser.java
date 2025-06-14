@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.MethodScope;
 import com.jpexs.decompiler.flash.simpleparser.Namespace;
 import com.jpexs.decompiler.flash.simpleparser.Path;
+import com.jpexs.decompiler.flash.simpleparser.Separator;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
 import com.jpexs.decompiler.flash.simpleparser.TraitVarConstValueScope;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -168,8 +170,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     ret = true;
                     break;
                 case PARENT_OPEN:
-                    call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
-                    lastVarName = lastVarName.add(Path.PATH_PARENTHESIS);
+                    lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);                    
                     ret = true;
                     break;
                 case DESCENDANTS:
@@ -246,8 +247,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
         while (s.isType(SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
             ParsedSymbol s2 = lex();
             if (s.type == SymbolType.NULL_DOT) {
+                variables.add(new Separator(lastVarName, s.position));
                 lexer.pushback(s2);
             } else if (s.type == SymbolType.DOT) {
+                variables.add(new Separator(lastVarName, s.position));
                 if (s2.type == SymbolType.ATTRIBUTE) {
                     //attribute
                 } else {
@@ -264,7 +267,10 @@ public class ActionScript3SimpleParser implements SimpleParser {
             } else if (s.type == SymbolType.BRACKET_OPEN) {
                 lastVarName = lastVarName.add(Path.PATH_BRACKETS);
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
-                expectedType(errors, SymbolType.BRACKET_CLOSE);
+                s = lex();
+                if (expected(errors, s, lexer.yyline(), SymbolType.BRACKET_CLOSE)) {
+                    variables.add(new Separator(lastVarName, s.position));
+                }
                 ret = true;
                 s = lex();
             } else {
@@ -331,6 +337,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
         while (s.isType(SymbolType.DOT)) {
             variables.add(new Variable(false, fullName, identPos));
+            variables.add(new Separator(fullName, s.position));
             s = lex();
             lastName = "";
             if (s.type == SymbolType.ATTRIBUTE) {
@@ -351,6 +358,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 }
             } else {
                 if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY)) {
+                    lexer.pushback(s);
                     return new Path();
                 }
                 lastName = s.value.toString();
@@ -434,7 +442,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private void call(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
+    private Path call(Path lastVarName, List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         ParsedSymbol s = lex();
         while (s.type != SymbolType.PARENT_CLOSE) {
@@ -447,6 +455,12 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 break;
             }
         }
+        if (s.type == SymbolType.PARENT_CLOSE) {
+            lastVarName = lastVarName.add(Path.PATH_PARENTHESIS);
+            variables.add(new Separator(lastVarName, s.position));
+        }
+        
+        return lastVarName;
     }
 
     private void method(List<SimpleParseException> errors, boolean outsidePackage, boolean isPrivate, boolean isInterface, boolean isNative, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, Path functionName, boolean isMethod, List<VariableOrScope> variables, ABC abc, int methodNamePos, Reference<Path> returnTypeRef, Reference<Variable> returnSubTypeRef) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
@@ -1369,7 +1383,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 case SUPER: //constructor call
                     ParsedSymbol ss2 = lex();
                     if (ss2.type == SymbolType.PARENT_OPEN) {
-                        call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                        Path lastVarName = new Path("super");
+                        lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
                         ret = true;
                     } else { //no constructor call, but it could be calling parent methods... => handle in expression
                         lexer.pushback(ss2);
@@ -2062,7 +2077,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     applyType(errors, thisType, needsActivation, importedClasses, openedNamespaces, newvar, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     expectedType(errors, SymbolType.PARENT_CLOSE);
                     expectedType(errors, SymbolType.PARENT_OPEN);
-                    call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                    lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     ret = true;
 
                 } else {
@@ -2071,7 +2086,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
                     applyType(errors, thisType, needsActivation, importedClasses, openedNamespaces, newvar, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     expectedType(errors, SymbolType.PARENT_OPEN);
-                    call(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
+                    lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     ret = true;
                 }
                 allowMemberOrCall = true;
@@ -2280,7 +2295,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
             Map<Integer, List<Integer>> externalTypeIndexToReference,
             LinkHandler linkHandler,
             Map<Integer, Path> referenceToExternalTraitKey,
-            Map<Path, List<Integer>> externalTraitKeyToReference
+            Map<Path, List<Integer>> externalTraitKeyToReference,
+            Map<Integer, Path> separatorPosToType,
+            Map<Path, List<String>> localTypeTraitNames,
+            Map<Integer, Path> definitionToType,
+            Map<Integer, Path> definitionToCallType
     ) throws SimpleParseException, IOException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Boolean> sinitNeedsActivation = new Reference<>(false);
@@ -2300,7 +2319,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, localTypeTraitNames, definitionToType, definitionToCallType);
     }
 
     /**

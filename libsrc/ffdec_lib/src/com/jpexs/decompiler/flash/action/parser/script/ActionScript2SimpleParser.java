@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ActionScript 1/2 parser.
@@ -1579,7 +1580,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
             Map<Integer, List<Integer>> externalTypeIndexToReference,
             LinkHandler linkHandler,
             Map<Integer, Path> referenceToExternalTraitKey,
-            Map<Path, List<Integer>> externalTraitKeyToReference
+            Map<Path, List<Integer>> externalTraitKeyToReference,
+            Map<Integer, Path> separatorPosToType,
+            Map<Path, List<String>> localTypeTraitNames,
+            Map<Integer, Path> definitionToType,
+            Map<Integer, Path> definitionToCallType
     ) throws SimpleParseException, IOException, InterruptedException {
 
         List<VariableOrScope> vars = new ArrayList<>();
@@ -1670,7 +1675,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, localTypeTraitNames, definitionToType, definitionToCallType);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {

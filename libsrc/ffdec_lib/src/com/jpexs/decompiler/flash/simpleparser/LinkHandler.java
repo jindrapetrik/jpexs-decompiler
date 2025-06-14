@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.simpleparser;
 
+import java.util.List;
+
 /**
  * Handler of links.
  * @author JPEXS
@@ -37,5 +39,6 @@ public interface LinkHandler {
     public void handleClassLink(Path className);
     
     public void handleTraitLink(Path className, String traitName);
-        
+    
+    public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance);        
 }

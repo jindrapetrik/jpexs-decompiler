@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
@@ -38,33 +39,43 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -113,8 +124,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Map<Path, Path> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
     private Map<Integer, Path> referenceToExternalTraitKey = new LinkedHashMap<>();
     private Map<Path, List<Integer>> externalTraitKeyToReference = new LinkedHashMap<>();
+    private Map<Integer, Path> separatorPosToType = new LinkedHashMap<>();
+    private Map<Path, List<String>> localTypeTraitNames = new LinkedHashMap<>();
+    private Map<Integer, Path> definitionToType = new LinkedHashMap<>();
+    private Map<Integer, Path> definitionToCallType = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
+
+    private KeyAdapter keyAdapter;
 
     private HighlightsPanel highlightsPanel;
 
@@ -146,15 +163,98 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private boolean goingOut = false;
 
+    private JList<String> codeCompletionList;
+    private DefaultListModel<String> codeCompletionListModel;
+    private JPopupMenu codeCompletionPopup;
+
     /**
      * Constructs a new Token highlighter
      */
     public VariableMarker() {
+        codeCompletionListModel = new DefaultListModel<>();
+
+        codeCompletionList = new JList<>();
+        codeCompletionList.setModel(codeCompletionListModel);
+
+        codeCompletionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        codeCompletionList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    String selected = codeCompletionList.getSelectedValue();
+                    if (selected != null) {
+                        completeCode(selected);
+                    }
+                    codeCompletionPopup.setVisible(false);
+                }
+            }
+        });
+
+        JScrollPane scroll = new JScrollPane(codeCompletionList);
+        codeCompletionPopup = new JPopupMenu();
+        codeCompletionPopup.setLayout(new BorderLayout());
+        codeCompletionPopup.add(scroll, BorderLayout.CENTER);
+        codeCompletionPopup.setPopupSize(200, 100);
+
+        codeCompletionList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+                    String selected = codeCompletionList.getSelectedValue();
+                    if (selected != null) {
+                        completeCode(selected);
+                    }
+                    codeCompletionPopup.setVisible(false);
+                    if (selected == null) {
+                        pane.dispatchEvent(e);
+                    }
+                    return;
+                }
+                if (e.getKeyCode() == KeyEvent.VK_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_UP
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+                    return;
+                }
+                pane.dispatchEvent(e);
+                e.consume();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_UP
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+                    return;
+                }
+                pane.dispatchEvent(e);
+                e.consume();
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_UP
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+                    return;
+                }
+                pane.dispatchEvent(e);
+                e.consume();
+            }
+        });
+        //list.setFocusable(false);
     }
 
     @Override
     public void caretUpdate(CaretEvent e) {
         markTokenAt(e.getDot());
+
+        if (codeCompletionPopup.isVisible()) {
+            showCodeCompletion();
+        }
     }
 
     public void markTokenAt(int pos) {
@@ -263,6 +363,12 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     void addMarkers(Token tok) {
         SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
         sDoc.readLock();
+
+        if (separatorPosToType.containsKey(tok.start)) {
+            sDoc.readUnlock();
+            return;
+        }
+
         int definitionPos = tok.start;
         if (referenceToDefinition.containsKey(tok.start)) {
             definitionPos = referenceToDefinition.get(tok.start);
@@ -372,6 +478,146 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
     }
 
+    private void completeCode(String suggestion) {
+        try {
+            SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
+            sDoc.readLock();
+
+            int pos = pane.getCaretPosition();
+            Token tokenAt = getNearestTokenAt(sDoc, pos);
+
+            if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                tokenAt = sDoc.getPrevToken(tokenAt);
+            } else if (tokenAt != null && tokenAt.start >= pos) {
+                tokenAt = sDoc.getPrevToken(tokenAt);
+                if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                    tokenAt = sDoc.getPrevToken(tokenAt);
+                }
+            } else if (tokenAt == null) {
+                while (tokenAt == null && pos >= 0) {
+                    pos--;
+                    tokenAt = getNearestTokenAt(sDoc, pos);
+                }
+                if (tokenAt == null) {
+                    sDoc.readUnlock();
+                    return;
+                }
+                if (tokenAt.type == TokenType.IDENTIFIER) {
+                    tokenAt = sDoc.getPrevToken(tokenAt);
+                }
+            }
+            if (tokenAt == null) {
+                sDoc.readUnlock();
+                return;
+            }
+
+            boolean isDot = tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
+            if (!isDot) {
+                sDoc.readUnlock();
+                return;
+            }
+            int afterDot = tokenAt.start + 1;
+            sDoc.readUnlock();
+            pane.getDocument().remove(afterDot, pane.getCaretPosition() - afterDot);
+            pane.getDocument().insertString(afterDot, suggestion, null);
+        } catch (BadLocationException ex) {
+            //ignore
+        }
+    }
+
+    private void showCodeCompletion() {
+        SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
+        sDoc.readLock();
+        try {
+            int pos = pane.getCaretPosition();
+            Token tokenAt = getNearestTokenAt(sDoc, pos);
+
+            String identText = "";
+            if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
+                tokenAt = sDoc.getPrevToken(tokenAt);
+            } else if (tokenAt != null && tokenAt.start >= pos) {
+                tokenAt = sDoc.getPrevToken(tokenAt);
+                if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                    identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
+                    tokenAt = sDoc.getPrevToken(tokenAt);
+                }
+            } else if (tokenAt == null) {
+                while (tokenAt == null && pos >= 0) {
+                    pos--;
+                    tokenAt = getNearestTokenAt(sDoc, pos);
+                }
+                if (tokenAt == null) {
+                    return;
+                }
+                if (tokenAt.type == TokenType.IDENTIFIER) {
+                    identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
+                    tokenAt = sDoc.getPrevToken(tokenAt);
+                }
+            }
+            if (tokenAt == null) {
+                codeCompletionPopup.setVisible(false);
+                return;
+            }
+
+            boolean isDot = tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
+            if (!isDot) {
+                codeCompletionPopup.setVisible(false);
+                return;
+            }
+
+            Token prevToken = sDoc.getPrevToken(tokenAt);
+            boolean isCall = prevToken.pairValue == -1; //-1 = -PARENT
+
+            pos = tokenAt.start;
+
+            if (!separatorPosToType.containsKey(pos)) {
+                return;
+            }
+
+            List<String> suggestions = new ArrayList<>();
+            if (separatorPosToType.containsKey(pos)) {
+                Path type = separatorPosToType.get(pos);
+                if (localTypeTraitNames.containsKey(type)) {
+                    suggestions.addAll(localTypeTraitNames.get(type));
+                    suggestions.remove(type.getLast().toString()); //remove constructor                
+                } else {
+                    //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
+                    suggestions.addAll(((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true));
+                    suggestions.remove(type.getLast().toString()); //remove constructor
+                }
+            }
+            if (suggestions.isEmpty()) {
+                codeCompletionPopup.setVisible(false);
+                return;
+            }
+            Collections.sort(suggestions);
+            if (!identText.isEmpty()) {
+                for (int i = suggestions.size() - 1; i >= 0; i--) {
+                    String sug = suggestions.get(i);
+                    if (!sug.startsWith(identText)) {
+                        suggestions.remove(i);
+                    }
+                }
+            }
+
+            codeCompletionListModel.clear();
+            codeCompletionListModel.addAll(suggestions);
+
+            codeCompletionList.setSelectedIndex(-1);
+
+            if (!codeCompletionPopup.isVisible() && !suggestions.isEmpty()) {
+                Rectangle2D caretCoords = View.textComponentModelToView(pane, pane.getCaretPosition());
+                codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));
+                pane.requestFocusInWindow();
+            }
+        } catch (BadLocationException ex) {
+            //ignore
+        } finally {
+            sDoc.readUnlock();
+        }
+    }
+
     @Override
     public void install(JEditorPane editor) {
         this.pane = editor;
@@ -407,8 +653,35 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
         linkAdapter = new LinkAdapter();
 
+        keyAdapter = new KeyAdapter() {
+            Timer tim = null;
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (tim != null) {
+                    tim.cancel();
+                    tim = null;
+                }
+                if (e.getKeyChar() == '.') {
+                    tim = new Timer();
+                    tim.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            View.execInEventDispatch(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showCodeCompletion();
+                                }
+                            });
+                        }
+                    }, 100);
+                }
+            }
+        };
+
         pane.addMouseListener(linkAdapter);
         pane.addMouseMotionListener(linkAdapter);
+        pane.addKeyListener(keyAdapter);
 
         //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus                
         kevEventPostProcessor = new KeyEventPostProcessor() {
@@ -437,6 +710,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 handleLink(token);
             }
         }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
+
+        View.addEditorAction(pane, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showCodeCompletion();
+            }
+
+        }, "code-completion", AppStrings.translate("action.code-completion"), "control SPACE");
 
         documentUpdated();
         markTokenAt(editor.getCaretPosition());
@@ -612,12 +893,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             errorsTimer = null;
         }
         View.removeEditorAction(pane, "find-declaration");
+        View.removeEditorAction(pane, "code-completion");
         pane.removePropertyChangeListener(this);
         pane.getDocument().removeDocumentListener(this);
         pane.removeCaretListener(this);
         pane.removeMouseMotionListener(mouseMotionAdapter);
         pane.removeMouseMotionListener(linkAdapter);
         pane.removeMouseListener(linkAdapter);
+        pane.removeKeyListener(keyAdapter);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventPostProcessor(kevEventPostProcessor);
         mouseMotionAdapter = null;
         /*if (editor instanceof LineMarkedEditorPane) {
@@ -675,6 +958,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Integer, List<Integer>> newExternalTypeIndexToReference = new LinkedHashMap<>();
             Map<Integer, Path> newReferenceToExternalTraitKey = new LinkedHashMap<>();
             Map<Path, List<Integer>> newExternalTraitKeyToReference = new LinkedHashMap<>();
+            Map<Integer, Path> newSeparatorPosToType = new LinkedHashMap<>();
+            Map<Path, List<String>> newLocalTypeTraitNames = new LinkedHashMap<>();
+            Map<Integer, Path> newDefinitionToType = new LinkedHashMap<>();
+            Map<Integer, Path> newDefinitionToCallType = new LinkedHashMap<>();
             parser.parse(
                     fullText,
                     newDefinitionPosToReferences,
@@ -684,7 +971,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     newReferenceToExternalTypeIndex,
                     newExternalTypeIndexToReference,
                     ((LineMarkedEditorPane) pane).getLinkHandler(),
-                    newReferenceToExternalTraitKey, newExternalTraitKeyToReference
+                    newReferenceToExternalTraitKey, newExternalTraitKeyToReference,
+                    newSeparatorPosToType,
+                    newLocalTypeTraitNames,
+                    newDefinitionToType,
+                    newDefinitionToCallType
             );
 
             Map<Path, Path> newSimpleExternalClassNameToFullClassName = new LinkedHashMap<>();
@@ -700,6 +991,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             simpleExternalClassNameToFullClassName = newSimpleExternalClassNameToFullClassName;
             referenceToExternalTraitKey = newReferenceToExternalTraitKey;
             externalTraitKeyToReference = newExternalTraitKeyToReference;
+            separatorPosToType = newSeparatorPosToType;
+            localTypeTraitNames = newLocalTypeTraitNames;
+            definitionToType = newDefinitionToType;
+            definitionToCallType = newDefinitionToCallType;
             for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }

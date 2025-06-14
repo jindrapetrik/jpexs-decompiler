@@ -1139,6 +1139,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 return typeToPath(it);
             }
 
+            @Override
+            public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
+                return new ArrayList<>(abc.getSwf().getAbcIndex().getClassTraitNames(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance));
+            }
+
         });
         decompiledTextArea.addScriptListener(new Runnable() {
             @Override

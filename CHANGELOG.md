@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#1625] Error log frame - Save all to file button
 - [#2467] Show ImportAssets name/characterId in the title when there is only single one item
 - [#2468] Option for `-dumpas2` CLI command to use export names (`-exportNames` option)
+- AS3 - code completion (properties and methods)
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

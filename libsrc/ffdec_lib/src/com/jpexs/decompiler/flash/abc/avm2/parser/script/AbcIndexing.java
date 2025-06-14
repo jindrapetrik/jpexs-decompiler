@@ -38,6 +38,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -566,7 +567,7 @@ public final class AbcIndexing {
     private Map<DottedChain, Set<String>> pkgToObjectsName = new LinkedHashMap<>();
 
     private final Map<ClassDef, ClassIndex> classes = new HashMap<>();
-
+    
     private final Map<PropertyDef, TraitIndex> instanceProperties = new HashMap<>();
 
     private final Map<PropertyDef, TraitIndex> classProperties = new HashMap<>();
@@ -613,6 +614,65 @@ public final class AbcIndexing {
             classNames.addAll(parent.getPackageObjects(pkg));
         }
         return classNames;
+    }
+    
+    public Set<String> getClassTraitNames(GraphTargetItem cls, ABC abc, Integer scriptIndex, boolean getStatic, boolean getInstance, boolean getInheritance) {
+        ClassIndex ci = findClass(cls, abc, scriptIndex);
+        if (ci == null) {
+            return new LinkedHashSet<>();
+        }
+        Set<String> ret = new LinkedHashSet<>();
+        getClassIndexTraitNames(ret, ci, getStatic, getInstance, getInheritance);
+        return ret;
+    }
+    
+    private void getClassIndexTraitNames(Set<String> ret, ClassIndex ci, boolean getStatic, boolean getInstance, boolean getInheritance) {
+        GraphTargetItem ciName = multinameToType(ci.abc.instance_info.get(ci.index).name_index, ci.abc.constants);
+                
+        boolean isObject = ciName.equals(new TypeItem("Object"));
+        List<String> ignoredObjectTraits = Arrays.asList("_init", "_dontEnumPrototype", "_setPropertyIsEnumerable");
+        
+        if (getInstance) {
+            for (PropertyDef def : instanceProperties.keySet()) {                
+                if (isObject && ignoredObjectTraits.contains(def.propName)) {
+                    continue;
+                }
+                int nsKind = -1;
+                if (def.propNsIndex != 0) {
+                    nsKind = def.abc.constants.getNamespace(def.propNsIndex).kind;                    
+                }
+                if (nsKind == Namespace.KIND_PRIVATE || nsKind == Namespace.KIND_PROTECTED || nsKind == Namespace.KIND_STATIC_PROTECTED) {
+                    continue;
+                }                                                
+                if (Objects.equals(def.parent, ciName)) {
+                    ret.add(def.propName);
+                }                
+            }
+        }
+        if (getStatic) {
+            for (PropertyDef def : classProperties.keySet()) {
+                if (isObject && ignoredObjectTraits.contains(def.propName)) {
+                    continue;
+                }
+                int nsKind = -1;
+                if (def.propNsIndex != 0) {
+                    nsKind = def.abc.constants.getNamespace(def.propNsIndex).kind;                    
+                }
+                if (nsKind == Namespace.KIND_PRIVATE || nsKind == Namespace.KIND_PROTECTED || nsKind == Namespace.KIND_STATIC_PROTECTED) {
+                    continue;
+                }
+                if (Objects.equals(def.parent, ciName)) {
+                    ret.add(def.propName);
+                }
+            }
+        }
+        
+        if (getInheritance && ci.parent != null) {
+            getClassIndexTraitNames(ret, ci.parent, getStatic, getInstance, getInheritance);
+        }
+        if (parent != null) {
+            parent.getClassIndexTraitNames(ret, ci, getStatic, getInstance, getInheritance);
+        }
     }
 
     /**

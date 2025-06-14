@@ -30,8 +30,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
@@ -109,6 +111,11 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     @Override
     public Path getTraitCallSubType(Path className, String traitName, int level) {
         return null;
+    }
+
+    @Override
+    public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
+        return new ArrayList<>();
     }
     
     public static class LineMarker implements Comparable<LineMarker> {
