@@ -662,7 +662,7 @@ public final class AbcIndexing {
                     continue;
                 }
                 if (Objects.equals(def.parent, ciName)) {
-                    ret.add(def.propName);
+                    ret.add("static::" + def.propName);
                 }
             }
         }

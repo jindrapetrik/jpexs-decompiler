@@ -128,6 +128,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Map<Path, List<String>> localTypeTraitNames = new LinkedHashMap<>();
     private Map<Integer, Path> definitionToType = new LinkedHashMap<>();
     private Map<Integer, Path> definitionToCallType = new LinkedHashMap<>();
+    private Map<Integer, Boolean> separatorIsStatic = new LinkedHashMap<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -578,12 +579,35 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             List<String> suggestions = new ArrayList<>();
             if (separatorPosToType.containsKey(pos)) {
                 Path type = separatorPosToType.get(pos);
+
+                boolean isStatic = false;
+                if (separatorIsStatic.containsKey(pos) && separatorIsStatic.get(pos)) {
+                    isStatic = true;
+                }
+
                 if (localTypeTraitNames.containsKey(type)) {
-                    suggestions.addAll(localTypeTraitNames.get(type));
+                    for (String traitName : localTypeTraitNames.get(type)) {
+                        if (isStatic && !traitName.startsWith("static::")) {
+                            continue;
+                        }
+                        if (traitName.startsWith("static::")) {
+                            traitName = traitName.substring("static::".length());
+                        }
+                        suggestions.add(traitName);
+                    }
                     suggestions.remove(type.getLast().toString()); //remove constructor                
                 } else {
                     //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
-                    suggestions.addAll(((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true));
+                    List<String> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true);
+                    for (String traitName : traitNames) {
+                        if (isStatic && !traitName.startsWith("static::")) {
+                            continue;
+                        }
+                        if (traitName.startsWith("static::")) {
+                            traitName = traitName.substring("static::".length());
+                        }
+                        suggestions.add(traitName);
+                    }
                     suggestions.remove(type.getLast().toString()); //remove constructor
                 }
             }
@@ -962,6 +986,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Path, List<String>> newLocalTypeTraitNames = new LinkedHashMap<>();
             Map<Integer, Path> newDefinitionToType = new LinkedHashMap<>();
             Map<Integer, Path> newDefinitionToCallType = new LinkedHashMap<>();
+            Map<Integer, Boolean> newSeparatorIsStatic = new LinkedHashMap<>();
             parser.parse(
                     fullText,
                     newDefinitionPosToReferences,
@@ -973,6 +998,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     ((LineMarkedEditorPane) pane).getLinkHandler(),
                     newReferenceToExternalTraitKey, newExternalTraitKeyToReference,
                     newSeparatorPosToType,
+                    newSeparatorIsStatic,
                     newLocalTypeTraitNames,
                     newDefinitionToType,
                     newDefinitionToCallType
@@ -995,6 +1021,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             localTypeTraitNames = newLocalTypeTraitNames;
             definitionToType = newDefinitionToType;
             definitionToCallType = newDefinitionToCallType;
+            separatorIsStatic = newSeparatorIsStatic;
             for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }

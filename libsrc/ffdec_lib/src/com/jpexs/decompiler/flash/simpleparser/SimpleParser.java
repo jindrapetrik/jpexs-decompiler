@@ -60,6 +60,7 @@ public interface SimpleParser {
             Map<Integer, Path> referenceToExternalTraitKey,
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
+            Map<Integer, Boolean> separatorIsStatic,
             Map<Path, List<String>> localTypeTraitNames,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType
@@ -79,7 +80,8 @@ public interface SimpleParser {
             Map<Integer, Path> referenceToExternalTraitKey,
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
-            Map<Path, List<String>> localTypeTraitNames,
+            Map<Integer, Boolean> separatorIsStatic,
+            Map<Path, List<String>> localTypeTraitNames,          
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType
     ) {
@@ -101,15 +103,20 @@ public interface SimpleParser {
         findClassTraits(sharedVariables, traitFullNameToDefinition, definitionPosToReferences, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);
 
         for (Path p : traitFullNameToDefinition.keySet()) {
+            int definition = traitFullNameToDefinition.get(p);
+            boolean isStatic = false;
+            if (positionToStatic.containsKey(definition) && positionToStatic.get(definition)) {
+                isStatic = true;
+            }
             Path cls = p.getParent();
             String traitName = p.getLast().toString();
             if (!localTypeTraitNames.containsKey(cls)) {
                 localTypeTraitNames.put(cls, new ArrayList<>());
             }
-            localTypeTraitNames.get(cls).add(traitName);
+            localTypeTraitNames.get(cls).add((isStatic ? "static::" : "") + traitName);
         }
 
-        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), positionToStatic, true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, externalTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType);
+        parseVariablesList(privateVariables, sharedVariables, definitionPosToReferences, referenceToDefinition, new LinkedHashMap<>(), new LinkedHashMap<>(), positionToStatic, true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, externalTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic);
         for (Map.Entry<Integer, Integer> entry : referenceToExternalTypeIndex.entrySet()) {
             if (!externalTypeIndexToReference.containsKey(entry.getValue())) {
                 externalTypeIndexToReference.put(entry.getValue(), new ArrayList<>());
@@ -142,7 +149,8 @@ public interface SimpleParser {
             Map<Path, Path> simpleExternalClassNameToFullClassName,
             Map<Integer, Path> referenceToExternalTraitKey,
             Map<Path, List<Integer>> externalTraitKeyToReference,
-            Map<Integer, Path> separatorPosToType
+            Map<Integer, Path> separatorPosToType,
+            Map<Integer, Boolean> separatorIsStatic
     ) {
         Map<Path, Integer> privateVarNameToDefinitionPosition = new LinkedHashMap<>();
         privateVarNameToDefinitionPosition.putAll(parentVarNameToDefinitionPosition);
@@ -153,7 +161,7 @@ public interface SimpleParser {
         for (VariableOrScope vt : privateVariables) {
             if (vt instanceof Separator) {
                 Separator s = (Separator) vt;
-                searchTrait(s.parentName, s.position, true, separatorPosToType, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
+                searchTrait(s.parentName, s.position, true, separatorPosToType, separatorIsStatic, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
             }
             if (vt instanceof Variable) {
                 Variable v = (Variable) vt;
@@ -179,7 +187,7 @@ public interface SimpleParser {
                         } else if (externalSimpleTypes.contains(v.name)) {
                             referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
                         } else {
-                            boolean traitFound = searchTrait(v.name, v.position, false, separatorPosToType, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
+                            boolean traitFound = searchTrait(v.name, v.position, false, separatorPosToType, separatorIsStatic, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
                             if (!traitFound) {
                                 parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                                 parentVarNameToDefinitionPosition.put(v.getLastName(), -v.position - 1);
@@ -242,13 +250,13 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, subPrivateVarFullNameToDefinitionPosition, subPrivateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic);
             }
         }
         for (VariableOrScope vt : sharedVariables) {
             if (vt instanceof Separator) {
                 Separator s = (Separator) vt;
-                searchTrait(s.parentName, s.position, true, separatorPosToType, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
+                searchTrait(s.parentName, s.position, true, separatorPosToType, separatorIsStatic, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
             }
             if (vt instanceof Variable) {
                 Variable v = (Variable) vt;
@@ -276,7 +284,7 @@ public interface SimpleParser {
                         } else if (externalSimpleTypes.contains(v.name)) {
                             referenceToExternalTypeIndex.put(v.position, externalSimpleTypes.indexOf(v.name));
                         } else {
-                            boolean traitFound = searchTrait(v.name, v.position, false, separatorPosToType, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
+                            boolean traitFound = searchTrait(v.name, v.position, false, separatorPosToType, separatorIsStatic, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, definitionPosToReferences, referenceToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference);
                             if (!traitFound) {
                                 parentVarFullNameToDefinitionPosition.put(v.name, -v.position - 1);
                                 parentVarNameToDefinitionPosition.put(v.getFirstName(), -v.position - 1);
@@ -339,7 +347,7 @@ public interface SimpleParser {
                     }
                 }
 
-                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType);
+                parseVariablesList(vs.getPrivateItems(), vs.getSharedItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic);
             }
         }
     }
@@ -355,6 +363,12 @@ public interface SimpleParser {
             Map<Integer, Variable> definitionToCallSubType
     ) {
         for (VariableOrScope v : variables) {
+            if (v instanceof Type) {
+                Type t = (Type) v;
+                if (t.definition) {
+                    definitionToType.put(t.position, t.name);
+                }
+            }
             if (v instanceof ClassTrait) {
                 ClassTrait ct = (ClassTrait) v;
                 definitionPosToReferences.put(ct.position, new ArrayList<>());
@@ -386,6 +400,7 @@ public interface SimpleParser {
             int vPosition,
             boolean separator,
             Map<Integer, Path> separatorPosToType,
+            Map<Integer, Boolean> separatorIsStatic,
             Map<Path, Integer> privateVarFullNameToDefinitionPosition,
             Map<Path, Integer> privateVarNameToDefinitionPosition,
             Map<Integer, Path> definitionToType,
@@ -413,12 +428,17 @@ public interface SimpleParser {
                 definitionPos = privateVarNameToDefinitionPosition.get(firstName);
             }
             Path type = null;
+            boolean isStatic = false;
             if (definitionPos != null) {
                 if (definitionToType.containsKey(definitionPos)) {
                     type = definitionToType.get(definitionPos);
+                    if (type.getLast().equals(firstName)) {
+                        isStatic = true;
+                    }
                 }
             } else if (simpleExternalClassNameToFullClassName.containsKey(firstName)) {
                 type = simpleExternalClassNameToFullClassName.get(firstName);
+                isStatic = true;
             }
             if (type != null) {
                 traitFound = true;
@@ -527,6 +547,7 @@ public interface SimpleParser {
                     }
                     if (separator) {
                         separatorPosToType.put(vPosition, type);
+                        separatorIsStatic.put(vPosition, isStatic);
                     }
                 }
             }
@@ -539,12 +560,17 @@ public interface SimpleParser {
                 definitionPos = privateVarNameToDefinitionPosition.get(firstName);
             }
             Path type = null;
+            boolean isStatic = false;
             if (definitionPos != null) {
                 if (definitionToType.containsKey(definitionPos)) {
                     type = definitionToType.get(definitionPos);
+                    if (type.getLast().equals(firstName)) {
+                        isStatic = true;
+                    }
                 }
             } else if (simpleExternalClassNameToFullClassName.containsKey(firstName)) {
                 type = simpleExternalClassNameToFullClassName.get(firstName);
+                isStatic = true;
             }
             if (type != null) {
                 if (definitionPos != null) {
@@ -559,6 +585,7 @@ public interface SimpleParser {
                     referenceToExternalTraitKey.put(vPosition, traitKey);
                 }*/
                 separatorPosToType.put(vPosition, type);
+                separatorIsStatic.put(vPosition, isStatic);
             }
         }
         return traitFound;

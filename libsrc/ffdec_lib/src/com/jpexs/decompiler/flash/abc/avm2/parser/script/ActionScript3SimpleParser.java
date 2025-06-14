@@ -2297,6 +2297,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             Map<Integer, Path> referenceToExternalTraitKey,
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
+            Map<Integer, Boolean> separatorIsStatic,
             Map<Path, List<String>> localTypeTraitNames,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType
@@ -2319,7 +2320,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, localTypeTraitNames, definitionToType, definitionToCallType);
+        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraitNames, definitionToType, definitionToCallType);
     }
 
     /**
