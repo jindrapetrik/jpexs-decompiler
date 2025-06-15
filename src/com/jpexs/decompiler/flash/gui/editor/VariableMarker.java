@@ -651,6 +651,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 Rectangle2D caretCoords = View.textComponentModelToView(pane, pane.getCaretPosition());
                 codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));                
             }
+            codeCompletionPopup.setPopupSize(codeCompletionList.getPreferredSize().width + 32, 200);
+            codeCompletionList.setSize(codeCompletionList.getPreferredSize().width, 200);
             pane.requestFocusInWindow();
             pane.getCaret().setVisible(true);
         } catch (BadLocationException ex) {
