@@ -1158,6 +1158,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         type = typeToPath(ti.returnType);
                         callType = typeToPath(ti.callReturnType);                        
                     }
+                    if (ti.trait instanceof TraitSlotConst) {
+                        callType = null;
+                    }
                     if (ti.trait instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) ti.trait;
                         if (tmgs.kindType == Trait.TRAIT_SETTER) {
