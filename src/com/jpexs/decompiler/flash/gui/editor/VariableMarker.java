@@ -628,11 +628,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 }
             }
                         
-            codeCompletionListModel.clear();
-            codeCompletionListModel.addAll(suggestions);
-
             codeCompletionList.setSelectedIndex(-1);
-
+            
+            codeCompletionListModel.clear();
+            
+            for (String s : suggestions) {
+                codeCompletionListModel.addElement(s);
+            }        
+            
             if (!codeCompletionPopup.isVisible() && !suggestions.isEmpty()) {
                 Rectangle2D caretCoords = View.textComponentModelToView(pane, pane.getCaretPosition());
                 codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));
