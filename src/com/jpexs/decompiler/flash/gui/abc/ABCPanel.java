@@ -1144,8 +1144,39 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             @Override
-            public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
-                return new ArrayList<>(abc.getSwf().getAbcIndex().getClassTraitNames(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance));
+            public List<com.jpexs.decompiler.flash.simpleparser.Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
+                List<AbcIndexing.PropertyDef> propertyDefList = new ArrayList<>();
+                List<Boolean> isStaticList = new ArrayList<>();
+                abc.getSwf().getAbcIndex().getClassTraits(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
+                List<com.jpexs.decompiler.flash.simpleparser.Variable> ret = new ArrayList<>();
+                for (int i = 0; i < propertyDefList.size(); i++) {
+                    AbcIndexing.PropertyDef def = propertyDefList.get(i);
+                    AbcIndexing.TraitIndex ti = abc.getSwf().getAbcIndex().findProperty(def, getStatic, getInstance, false, new Reference<>(null));
+                    Path type = null;
+                    Path callType = null;
+                    if (ti != null) {
+                        type = typeToPath(ti.returnType);
+                        callType = typeToPath(ti.callReturnType);                        
+                    }
+                    if (ti.trait instanceof TraitMethodGetterSetter) {
+                        TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) ti.trait;
+                        if (tmgs.kindType == Trait.TRAIT_SETTER) {
+                            int[] paramTypes = ti.abc.method_info.get(tmgs.method_info).param_types;
+                            if (paramTypes.length == 1) {
+                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(ti.abc.constants, false).getStringParts());
+                                callType = null;
+                            } else {
+                                continue;
+                            }
+                        }
+                        if (tmgs.kindType == Trait.TRAIT_GETTER) {
+                            type = callType;
+                            callType = null;                            
+                        }
+                    }
+                    ret.add(new com.jpexs.decompiler.flash.simpleparser.Variable(true, new Path(def.getPropertyName()), 0, isStaticList.get(i), type, callType));
+                }
+                return ret;
             }
 
         });

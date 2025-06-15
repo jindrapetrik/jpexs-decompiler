@@ -616,17 +616,17 @@ public final class AbcIndexing {
         return classNames;
     }
     
-    public Set<String> getClassTraitNames(GraphTargetItem cls, ABC abc, Integer scriptIndex, boolean getStatic, boolean getInstance, boolean getInheritance) {
+    public void getClassTraits(GraphTargetItem cls, ABC abc, Integer scriptIndex, boolean getStatic, boolean getInstance, boolean getInheritance, List<PropertyDef> ret, List<Boolean> staticRet) {
         ClassIndex ci = findClass(cls, abc, scriptIndex);
         if (ci == null) {
-            return new LinkedHashSet<>();
+            return;
         }
-        Set<String> ret = new LinkedHashSet<>();
-        getClassIndexTraitNames(ret, ci, getStatic, getInstance, getInheritance);
-        return ret;
+        ret.clear();
+        staticRet.clear();
+        getClassIndexTraitNames(ret, staticRet, ci, getStatic, getInstance, getInheritance, new HashSet<>());        
     }
     
-    private void getClassIndexTraitNames(Set<String> ret, ClassIndex ci, boolean getStatic, boolean getInstance, boolean getInheritance) {
+    private void getClassIndexTraitNames(List<PropertyDef> ret, List<Boolean> staticRet, ClassIndex ci, boolean getStatic, boolean getInstance, boolean getInheritance, Set<String> used) {
         GraphTargetItem ciName = multinameToType(ci.abc.instance_info.get(ci.index).name_index, ci.abc.constants);
                 
         boolean isObject = ciName.equals(new TypeItem("Object"));
@@ -643,9 +643,16 @@ public final class AbcIndexing {
                 }
                 if (nsKind == Namespace.KIND_PRIVATE || nsKind == Namespace.KIND_PROTECTED || nsKind == Namespace.KIND_STATIC_PROTECTED) {
                     continue;
-                }                                                
-                if (Objects.equals(def.parent, ciName)) {
-                    ret.add(def.propName);
+                }                      
+                if (Objects.equals(def.parent, ciName)) {                    
+                    if (used.contains(def.propName)) {
+                        continue;
+                    }
+                    used.add(def.propName);
+                
+                    
+                    ret.add(def);
+                    staticRet.add(false);
                 }                
             }
         }
@@ -662,17 +669,23 @@ public final class AbcIndexing {
                     continue;
                 }
                 if (Objects.equals(def.parent, ciName)) {
-                    ret.add("static::" + def.propName);
+                    if (used.contains(def.propName)) {
+                        continue;
+                    }
+                    used.add(def.propName);
+                    ret.add(def);
+                    staticRet.add(true);
                 }
             }
         }
         
-        if (getInheritance && ci.parent != null) {
-            getClassIndexTraitNames(ret, ci.parent, getStatic, getInstance, getInheritance);
-        }
         if (parent != null) {
-            parent.getClassIndexTraitNames(ret, ci, getStatic, getInstance, getInheritance);
+            parent.getClassIndexTraitNames(ret, staticRet, ci, getStatic, getInstance, getInheritance, used);
         }
+        
+        if (getInheritance && ci.parent != null) {
+            getClassIndexTraitNames(ret, staticRet, ci.parent, getStatic, getInstance, getInheritance, used);
+        }        
     }
 
     /**

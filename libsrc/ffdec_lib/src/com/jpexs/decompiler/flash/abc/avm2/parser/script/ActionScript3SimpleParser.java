@@ -2310,11 +2310,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
             Map<Integer, Boolean> separatorIsStatic,
-            Map<Path, List<String>> localTypeTraitNames,
+            Map<Path, List<Variable>> localTypeTraits,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType,
             Integer caretPosition,
-            List<String> variableSuggestions
+            List<Variable> variableSuggestions
     ) throws SimpleParseException, IOException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Boolean> sinitNeedsActivation = new Reference<>(false);
@@ -2334,7 +2334,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             //Logger.getLogger(ActionScript3SimpleParser.class.getName()).log(Level.SEVERE, null, ex);
             throw new SimpleParseException(str, ex.line);
         }
-        SimpleParser.parseVariablesList(vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraitNames, definitionToType, definitionToCallType, caretPosition, variableSuggestions);
+        SimpleParser.parseVariablesList(vars, definitionPosToReferences, referenceToDefinition, errors, true, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraits, definitionToType, definitionToCallType, caretPosition, variableSuggestions);
     }
 
     /**

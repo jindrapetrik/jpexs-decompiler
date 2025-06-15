@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
+import com.jpexs.decompiler.flash.simpleparser.Variable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -51,6 +52,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -127,11 +129,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Map<Integer, Path> referenceToExternalTraitKey = new LinkedHashMap<>();
     private Map<Path, List<Integer>> externalTraitKeyToReference = new LinkedHashMap<>();
     private Map<Integer, Path> separatorPosToType = new LinkedHashMap<>();
-    private Map<Path, List<String>> localTypeTraitNames = new LinkedHashMap<>();
+    private Map<Path, List<Variable>> localTypeTraits = new LinkedHashMap<>();
     private Map<Integer, Path> definitionToType = new LinkedHashMap<>();
     private Map<Integer, Path> definitionToCallType = new LinkedHashMap<>();
     private Map<Integer, Boolean> separatorIsStatic = new LinkedHashMap<>();
-    private List<String> variableSuggestions = new ArrayList<>();
+    private List<Variable> variableSuggestions = new ArrayList<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -167,8 +169,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private boolean goingOut = false;
 
-    private JList<String> codeCompletionList;
-    private DefaultListModel<String> codeCompletionListModel;
+    private JList<VariableListItem> codeCompletionList;
+    private DefaultListModel<VariableListItem> codeCompletionListModel;
     private JPopupMenu codeCompletionPopup;
 
     /**
@@ -185,9 +187,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    String selected = codeCompletionList.getSelectedValue();
+                    VariableListItem selected = codeCompletionList.getSelectedValue();
                     if (selected != null) {
-                        completeCode(selected);
+                        completeCode(selected.variable.name.getLast().toString());
                     }
                     codeCompletionPopup.setVisible(false);
                 }
@@ -205,9 +207,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
-                    String selected = codeCompletionList.getSelectedValue();
+                    VariableListItem selected = codeCompletionList.getSelectedValue();
                     if (selected != null) {
-                        completeCode(selected);
+                        completeCode(selected.variable.name.getLast().toString());
                     }
                     codeCompletionPopup.setVisible(false);
                     if (selected == null) {
@@ -565,7 +567,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             }
             
             boolean isDot = tokenAt != null && tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
-            List<String> suggestions = new ArrayList<>();
+            List<Variable> suggestions = new ArrayList<>();
             if (isDot) {
 
                 Token prevToken = sDoc.getPrevToken(tokenAt);
@@ -585,30 +587,33 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         isStatic = true;
                     }
 
-                    if (localTypeTraitNames.containsKey(type)) {
-                        for (String traitName : localTypeTraitNames.get(type)) {
-                            if (isStatic && !traitName.startsWith("static::")) {
+                    if (localTypeTraits.containsKey(type)) {
+                        for (Variable traitName : localTypeTraits.get(type)) {
+                            if (isStatic && !traitName.isStatic) {
                                 continue;
                             }
-                            if (traitName.startsWith("static::")) {
-                                traitName = traitName.substring("static::".length());
+                            //remove constructor
+                            if (traitName.name.toString().equals(type.getLast().toString())) {
+                                continue;
                             }
-                            suggestions.add(traitName);
-                        }
-                        suggestions.remove(type.getLast().toString()); //remove constructor                
+                            suggestions.add(traitName);                            
+                        }                       
                     } else {
                         //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
-                        List<String> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true);
-                        for (String traitName : traitNames) {
-                            if (isStatic && !traitName.startsWith("static::")) {
+                        if(simpleExternalClassNameToFullClassName.containsKey(type)) {
+                            type = simpleExternalClassNameToFullClassName.get(type);
+                        }
+                        List<Variable> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraits(type, true, true, true);
+                        for (Variable traitName : traitNames) {
+                            if (isStatic && !traitName.isStatic) {
                                 continue;
                             }
-                            if (traitName.startsWith("static::")) {
-                                traitName = traitName.substring("static::".length());
+                            //remove constructor
+                            if (traitName.name.toString().equals(type.getLast().toString())) {
+                                continue;
                             }
                             suggestions.add(traitName);
                         }
-                        suggestions.remove(type.getLast().toString()); //remove constructor
                     }
                 }                
             } else {
@@ -618,10 +623,16 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 codeCompletionPopup.setVisible(false);
                 return;
             }            
-            Collections.sort(suggestions, new NaturalOrderComparator());
+            NaturalOrderComparator noc = new NaturalOrderComparator();
+            Collections.sort(suggestions, new Comparator<Variable>() {
+                @Override
+                public int compare(Variable o1, Variable o2) {
+                    return noc.compare(o1.name.getLast().toString(), o2.name.getLast().toString());
+                }                
+            });
             if (!identText.isEmpty()) {
                 for (int i = suggestions.size() - 1; i >= 0; i--) {
-                    String sug = suggestions.get(i);
+                    String sug = suggestions.get(i).name.getLast().toString();
                     if (!sug.startsWith(identText)) {
                         suggestions.remove(i);
                     }
@@ -632,15 +643,16 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             
             codeCompletionListModel.clear();
             
-            for (String s : suggestions) {
-                codeCompletionListModel.addElement(s);
+            for (Variable s : suggestions) {
+                codeCompletionListModel.addElement(new VariableListItem(s));
             }        
             
             if (!codeCompletionPopup.isVisible() && !suggestions.isEmpty()) {
                 Rectangle2D caretCoords = View.textComponentModelToView(pane, pane.getCaretPosition());
-                codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));
-                pane.requestFocusInWindow();
+                codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));                
             }
+            pane.requestFocusInWindow();
+            pane.getCaret().setVisible(true);
         } catch (BadLocationException ex) {
             //ignore
         } finally {
@@ -999,11 +1011,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Integer, Path> newReferenceToExternalTraitKey = new LinkedHashMap<>();
             Map<Path, List<Integer>> newExternalTraitKeyToReference = new LinkedHashMap<>();
             Map<Integer, Path> newSeparatorPosToType = new LinkedHashMap<>();
-            Map<Path, List<String>> newLocalTypeTraitNames = new LinkedHashMap<>();
+            Map<Path, List<Variable>> newLocalTypeTraits = new LinkedHashMap<>();
             Map<Integer, Path> newDefinitionToType = new LinkedHashMap<>();
             Map<Integer, Path> newDefinitionToCallType = new LinkedHashMap<>();
             Map<Integer, Boolean> newSeparatorIsStatic = new LinkedHashMap<>();
-            List<String> newVariableSuggestions = new ArrayList<>();
+            List<Variable> newVariableSuggestions = new ArrayList<>();
             parser.parse(
                     fullText,
                     newDefinitionPosToReferences,
@@ -1016,7 +1028,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     newReferenceToExternalTraitKey, newExternalTraitKeyToReference,
                     newSeparatorPosToType,
                     newSeparatorIsStatic,
-                    newLocalTypeTraitNames,
+                    newLocalTypeTraits,
                     newDefinitionToType,
                     newDefinitionToCallType,
                     pos,
@@ -1037,7 +1049,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             referenceToExternalTraitKey = newReferenceToExternalTraitKey;
             externalTraitKeyToReference = newExternalTraitKeyToReference;
             separatorPosToType = newSeparatorPosToType;
-            localTypeTraitNames = newLocalTypeTraitNames;
+            localTypeTraits = newLocalTypeTraits;
             definitionToType = newDefinitionToType;
             definitionToCallType = newDefinitionToCallType;
             separatorIsStatic = newSeparatorIsStatic;
@@ -1266,4 +1278,29 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
     }
 
+    private class VariableListItem {
+        private Variable variable;
+
+        public VariableListItem(Variable variable) {
+            this.variable = variable;
+        }
+
+        public Variable getVariable() {
+            return variable;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(variable.name.getLast().toString());
+            if (variable.callType != null) {
+                sb.append("() : ");
+                sb.append(variable.callType.getLast().toString());                
+            } else if (variable.type != null) {
+                sb.append(" : ");
+                sb.append(variable.type.getLast().toString());
+            }
+            return sb.toString();
+        }                
+    }
 }

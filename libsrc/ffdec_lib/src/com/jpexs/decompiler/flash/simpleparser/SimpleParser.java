@@ -63,13 +63,60 @@ public interface SimpleParser {
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
             Map<Integer, Boolean> separatorIsStatic,
-            Map<Path, List<String>> localTypeTraitNames,
+            Map<Path, List<Variable>> localTypeTraitNames,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType,
             Integer caretPosition,
-            List<String> variableSuggestions
+            List<Variable> variableSuggestions
     ) throws SimpleParseException, IOException, InterruptedException;
 
+    
+    public static void fillSuggestionsOne(
+            List<Variable> variableSuggestions, 
+            Map<Path, Integer> varNameToDefinition,
+            Map<Integer, Boolean> positionToStatic,
+            Map<Integer, Path> definitionToType,
+            Map<Integer, Path> definitionToCallType,
+            Map<Integer, Variable> definitionToSubType,
+            Map<Integer, Variable> definitionToCallSubType,
+            Set<String> used
+            ) {
+        for (Path p : varNameToDefinition.keySet()) {
+            int definition = varNameToDefinition.get(p);
+            if (definition >= 0) {
+                if (used.contains(p.getLast().toString())) {
+                    continue;
+                }
+                used.add(p.getLast().toString());
+                Path type = definitionToType.get(definition);;
+                Path callType = definitionToCallType.get(definition);
+                Variable subType = definitionToSubType.get(definition);
+                Variable callSubType = definitionToCallSubType.get(definition);
+                Boolean isStatic = positionToStatic.get(definition);
+                variableSuggestions.add(new Variable(true, p, definition, isStatic, type, callType, subType, callSubType));
+            }
+        }
+    }
+    
+    public static void fillSuggestions(List<Variable> variableSuggestions, 
+            Map<Path, Integer> varNameToDefinition1, 
+            Map<Path, Integer> varNameToDefinition2,            
+            Map<Integer, Boolean> positionToStatic,
+            Map<Integer, Path> definitionToType,
+            Map<Integer, Path> definitionToCallType,
+            Map<Integer, Variable> definitionToSubType,
+            Map<Integer, Variable> definitionToCallSubType
+            ) {
+        Set<String> used = new HashSet<>();
+        if (varNameToDefinition1 != null) {
+            fillSuggestionsOne(variableSuggestions, varNameToDefinition1, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, used);
+        }
+        if (varNameToDefinition2 != null) {
+            fillSuggestionsOne(variableSuggestions, varNameToDefinition2, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, used);
+        }
+        variableSuggestions.add(new Variable(true, new Path("--finish--"), 0));
+    }
+    
     public static void parseVariablesList(
             List<VariableOrScope> sharedVariables,
             Map<Integer, List<Integer>> definitionPosToReferences,
@@ -84,11 +131,11 @@ public interface SimpleParser {
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
             Map<Integer, Boolean> separatorIsStatic,
-            Map<Path, List<String>> localTypeTraitNames,
+            Map<Path, List<Variable>> localTypeTraits,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType,
             Integer caretPosition,
-            List<String> variableSuggestions
+            List<Variable> variableSuggestions
     ) {
         List<Path> externalSimpleTypes = new ArrayList<>();
         Map<Path, Path> simpleExternalClassNameToFullClassName = new LinkedHashMap<>();
@@ -121,12 +168,17 @@ public interface SimpleParser {
             if (positionToStatic.containsKey(definition) && positionToStatic.get(definition)) {
                 isStatic = true;
             }
+            Path traitType = definitionToType.get(definition);
+            Path traitCallType = definitionToCallType.get(definition);
+            Variable traitSubType = definitionToSubType.get(definition);
+            Variable traitCallSubType = definitionToCallSubType.get(definition);
+            
             Path cls = p.getParent();
             String traitName = p.getLast().toString();
-            if (!localTypeTraitNames.containsKey(cls)) {
-                localTypeTraitNames.put(cls, new ArrayList<>());
+            if (!localTypeTraits.containsKey(cls)) {
+                localTypeTraits.put(cls, new ArrayList<>());
             }
-            localTypeTraitNames.get(cls).add((isStatic ? "static::" : "") + traitName);
+            localTypeTraits.get(cls).add(new Variable(true, p.getLast(), definition, isStatic, traitType, traitCallType, traitSubType, traitCallSubType));
         }
 
         parseVariablesList(variables, definitionPosToReferences, referenceToDefinition, parentVarFullNameToDefinitionPosition, parentVarNameToDefinitionPosition, positionToStatic, true, errors, null, innerFunctionCanUseTraits, externalSimpleTypes, externalTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, caretPosition, variableSuggestions, null, null);
@@ -139,21 +191,13 @@ public interface SimpleParser {
 
         if (caretPosition != null && variableSuggestions.isEmpty()) {
             if ((variables.isEmpty() || variables.get(variables.size() - 1).var.getPosition() <= caretPosition)) {
-                for (Path p : parentVarNameToDefinitionPosition.keySet()) {
-                    if (parentVarNameToDefinitionPosition.get(p) >= 0) {
-                        variableSuggestions.add(p.getFirst().toString());
-                    }
-                }
-                variableSuggestions.add("--finish--");
+                fillSuggestions(variableSuggestions, parentVarNameToDefinitionPosition, null, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);                
             }
         }
 
         if (!variableSuggestions.isEmpty()) {
             variableSuggestions.remove(variableSuggestions.size() - 1);
-        }
-        Set<String> uniqueSuggestions = new LinkedHashSet<>(variableSuggestions);
-        variableSuggestions.clear();
-        variableSuggestions.addAll(uniqueSuggestions);
+        }        
     }
 
     public static void parseVariablesList(
@@ -182,7 +226,7 @@ public interface SimpleParser {
             Map<Integer, Path> separatorPosToType,
             Map<Integer, Boolean> separatorIsStatic,
             Integer caretPosition,
-            List<String> variableSuggestions,
+            List<Variable> variableSuggestions,
             Integer scopeStartPos,
             Integer scopeEndPos
     ) {
@@ -203,17 +247,7 @@ public interface SimpleParser {
                     && caretPosition >= scopeStartPos
                     && vt.getPosition() > caretPosition
                     && variableSuggestions.isEmpty()) {
-                for (Path p : parentVarNameToDefinitionPosition.keySet()) {
-                    if (parentVarNameToDefinitionPosition.get(p) >= 0) {
-                        variableSuggestions.add(p.getFirst().toString());
-                    }
-                }
-                for (Path p : privateVarNameToDefinitionPosition.keySet()) {
-                    if (privateVarNameToDefinitionPosition.get(p) >= 0) {
-                        variableSuggestions.add(p.getFirst().toString());
-                    }
-                }
-                variableSuggestions.add("--finish--");
+                fillSuggestions(variableSuggestions, parentVarNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);
             }
 
             if (vt instanceof Separator) {
@@ -321,17 +355,7 @@ public interface SimpleParser {
             if (vt2 != null && caretPosition != null && variableSuggestions.isEmpty()) {
                 if (vt.getPosition() <= caretPosition && vt2.getPosition() > caretPosition) {
                     if (vt instanceof Variable) {
-                        for (Path p : parentVarNameToDefinitionPosition.keySet()) {
-                            if (parentVarNameToDefinitionPosition.get(p) >= 0) {
-                                variableSuggestions.add(p.getFirst().toString());
-                            }
-                        }
-                        for (Path p : privateVarNameToDefinitionPosition.keySet()) {
-                            if (privateVarNameToDefinitionPosition.get(p) >= 0) {
-                                variableSuggestions.add(p.getFirst().toString());
-                            }
-                        }
-                        variableSuggestions.add("--finish--");
+                        fillSuggestions(variableSuggestions, parentVarNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);            
                     }
                 }
             }
@@ -339,17 +363,7 @@ public interface SimpleParser {
 
         if (caretPosition != null && variableSuggestions.isEmpty() && scopeEndPos != null) {
             if (scopeEndPos > caretPosition) {
-                for (Path p : parentVarNameToDefinitionPosition.keySet()) {
-                    if (parentVarNameToDefinitionPosition.get(p) >= 0) {
-                        variableSuggestions.add(p.getFirst().toString());
-                    }
-                }
-                for (Path p : privateVarNameToDefinitionPosition.keySet()) {
-                    if (privateVarNameToDefinitionPosition.get(p) >= 0) {
-                        variableSuggestions.add(p.getFirst().toString());
-                    }
-                }
-                variableSuggestions.add("--finish--");
+                fillSuggestions(variableSuggestions, parentVarNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType);
             }
         }
     }

@@ -40,5 +40,5 @@ public interface LinkHandler {
     
     public void handleTraitLink(Path className, String traitName);
     
-    public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance);        
+    public List<Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance);        
 }

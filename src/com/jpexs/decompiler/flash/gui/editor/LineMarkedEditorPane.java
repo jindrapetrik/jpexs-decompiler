@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
+import com.jpexs.decompiler.flash.simpleparser.Variable;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -114,7 +115,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     @Override
-    public List<String> getClassTraitNames(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
+    public List<Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
         return new ArrayList<>();
     }
     

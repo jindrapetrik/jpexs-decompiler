@@ -1595,11 +1595,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
             Map<Path, List<Integer>> externalTraitKeyToReference,
             Map<Integer, Path> separatorPosToType,
             Map<Integer, Boolean> separatorIsStatic,
-            Map<Path, List<String>> localTypeTraitNames,
+            Map<Path, List<Variable>> localTypeTraits,
             Map<Integer, Path> definitionToType,
             Map<Integer, Path> definitionToCallType,
             Integer caretPosition,
-            List<String> variableSuggestions
+            List<Variable> variableSuggestions
     ) throws SimpleParseException, IOException, InterruptedException {
 
         List<VariableOrScope> vars = new ArrayList<>();
@@ -1690,7 +1690,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraitNames, definitionToType, definitionToCallType, caretPosition, variableSuggestions);
+        SimpleParser.parseVariablesList(vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraits, definitionToType, definitionToCallType, caretPosition, variableSuggestions);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {
