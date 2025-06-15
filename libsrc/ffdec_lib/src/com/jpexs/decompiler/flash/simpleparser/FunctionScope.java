@@ -25,13 +25,15 @@ import java.util.List;
  */
 public class FunctionScope implements Scope {
 
-    private final List<VariableOrScope> privateItems;
+    private final List<VariableOrScopeWithAccess> items = new ArrayList<>();
     private final boolean isStatic;
     private final int position;
     private final int endPosition;
 
     public FunctionScope(int position, int endPosition, List<VariableOrScope> functionBody, boolean isStatic) {
-        this.privateItems = functionBody;
+        for (VariableOrScope s : functionBody) {
+            items.add(new VariableOrScopeWithAccess(s, false));
+        }
         this.isStatic = isStatic;
         this.position = position;
         this.endPosition = endPosition;
@@ -41,15 +43,6 @@ public class FunctionScope implements Scope {
         return isStatic;
     }
 
-    @Override
-    public List<VariableOrScope> getSharedItems() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<VariableOrScope> getPrivateItems() {
-        return privateItems;
-    }
 
     @Override
     public int getPosition() {
@@ -60,5 +53,10 @@ public class FunctionScope implements Scope {
     public int getEndPosition() {
         return endPosition;
     }        
+
+    @Override
+    public List<VariableOrScopeWithAccess> getScopeItems() {
+        return items;
+    }
     
 }

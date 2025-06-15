@@ -28,30 +28,22 @@ public class TraitVarConstValueScope implements Scope {
     private final int position;
     private final int endPosition;
 
-    private List<VariableOrScope> sharedItems;
+    private final List<VariableOrScopeWithAccess> items = new ArrayList<>();
     private final boolean isStatic;
 
     public TraitVarConstValueScope(int position, int endPosition, List<VariableOrScope> sharedItems, boolean isStatic) {
         this.position = position;
         this.endPosition = endPosition;
-        this.sharedItems = sharedItems;
+        for (VariableOrScope s : sharedItems) {
+            items.add(new VariableOrScopeWithAccess(s, true));
+        }
         this.isStatic = isStatic;
     }
 
     public boolean isStatic() {
         return isStatic;
     }
-
-    @Override
-    public List<VariableOrScope> getSharedItems() {
-        return sharedItems;
-    }
-
-    @Override
-    public List<VariableOrScope> getPrivateItems() {
-        return new ArrayList<>();
-    }
-
+    
     @Override
     public int getPosition() {
         return position;
@@ -60,6 +52,11 @@ public class TraitVarConstValueScope implements Scope {
     @Override
     public int getEndPosition() {
         return endPosition;
+    }
+
+    @Override
+    public List<VariableOrScopeWithAccess> getScopeItems() {
+        return items;
     }
     
     

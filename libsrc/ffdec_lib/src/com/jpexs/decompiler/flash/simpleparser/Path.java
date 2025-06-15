@@ -32,6 +32,8 @@ public class Path {
     
     public static Path PATH_PARENTHESIS = new Path(PART_PARENTHESIS);
     public static Path PATH_BRACKETS = new Path(PART_BRACKETS);
+    
+    private Integer cachedHashCode = null;
 
     @Override
     public String toString() {
@@ -133,9 +135,12 @@ public class Path {
     
     @Override
     public int hashCode() {
+        if (cachedHashCode != null) {
+            return cachedHashCode;
+        }
         int hash = 5;
         hash = 89 * hash + Objects.hashCode(this.parts);
-        return hash;
+        return cachedHashCode = hash;
     }
 
     @Override

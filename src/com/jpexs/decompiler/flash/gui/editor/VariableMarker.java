@@ -116,6 +116,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Map<Integer, String> errors = new LinkedHashMap<>();
     public static final long ERROR_DELAY = 2000;
     private Timer errorsTimer;
+    private Timer parseTimer;
 
     private Map<Integer, List<Integer>> definitionPosToReferences = new LinkedHashMap<>();
     private Map<Integer, Integer> referenceToDefinition = new LinkedHashMap<>();
@@ -534,6 +535,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void showCodeCompletion() {
         SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
         sDoc.readLock();
@@ -615,7 +617,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             if (suggestions.isEmpty()) {
                 codeCompletionPopup.setVisible(false);
                 return;
-            }
+            }            
             Collections.sort(suggestions, new NaturalOrderComparator());
             if (!identText.isEmpty()) {
                 for (int i = suggestions.size() - 1; i >= 0; i--) {
@@ -698,6 +700,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                             View.execInEventDispatch(new Runnable() {
                                 @Override
                                 public void run() {
+                                    reParse();
                                     showCodeCompletion();
                                 }
                             });
@@ -965,15 +968,17 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }
     }
 
-    private void documentUpdated() {
+    private synchronized void reParse() {
         errors.clear();
         removeErrorMarkers();
         highlightsPanel.repaint();
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 
+            sDoc.readLock();;
+            int pos = pane.getCaretPosition();
             String fullText = sDoc.getText(0, sDoc.getLength());
-
+            sDoc.readUnlock();
             if (!(pane instanceof LineMarkedEditorPane)) {
                 return;
             }
@@ -1011,7 +1016,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     newLocalTypeTraitNames,
                     newDefinitionToType,
                     newDefinitionToCallType,
-                    pane.getCaretPosition(),
+                    pos,
                     newVariableSuggestions
             );
 
@@ -1061,6 +1066,22 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         }, ERROR_DELAY);
         errorsTimer = tim;
         markTokenAt(pane.getCaretPosition());
+    }
+    
+    private void documentUpdated() {
+        Timer pTimer = parseTimer;
+        if (pTimer != null) {
+            pTimer.cancel();
+        }
+        pTimer = new Timer();        
+        
+        pTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                reParse();
+            }            
+        }, 100);
+        parseTimer = pTimer;        
     }
 
     @Override

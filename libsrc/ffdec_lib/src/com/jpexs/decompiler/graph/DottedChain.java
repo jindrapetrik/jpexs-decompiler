@@ -255,6 +255,18 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         return parts.get(index).name;
     }
+    
+    /**
+     * Gets string parts as list.
+     * @return String parts
+     */
+    public List<String> getStringParts() {
+        List<String> ret = new ArrayList<>();
+        for (int i = 0; i < parts.size(); i++) {
+            ret.add(parts.get(i).name);
+        }
+        return ret;
+    }
 
     /**
      * Checks whether the part at the given index is an attribute.

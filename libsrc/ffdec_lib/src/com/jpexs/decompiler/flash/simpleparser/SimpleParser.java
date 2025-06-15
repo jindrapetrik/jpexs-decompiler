@@ -314,21 +314,8 @@ public interface SimpleParser {
                         }
                     }
                 }
-
-                List<VariableOrScopeWithAccess> list = new ArrayList<>();
-                for (VariableOrScope it : vs.getPrivateItems()) {
-                    list.add(new VariableOrScopeWithAccess(it, false));
-                }
-                for (VariableOrScope it : vs.getSharedItems()) {
-                    list.add(new VariableOrScopeWithAccess(it, true));
-                }
-                list.sort(new Comparator<VariableOrScopeWithAccess>() {
-                    @Override
-                    public int compare(VariableOrScopeWithAccess o1, VariableOrScopeWithAccess o2) {
-                        return o1.var.getPosition() - o2.var.getPosition();
-                    }
-                });
-                parseVariablesList(list, definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, caretPosition, variableSuggestions, vs.getPosition(), vs.getEndPosition());
+               
+                parseVariablesList(vs.getScopeItems(), definitionPosToReferences, referenceToDefinition, privateVarFullNameToDefinitionPosition, privateVarNameToDefinitionPosition, positionToStatic, subStatic, errors, vs, innerFunctionCanUseTraits, externalSimpleTypes, externalFullTypes, referenceToExternalTypeIndex, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, traitFullNameToDefinition, linkHandler, simpleExternalClassNameToFullClassName, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, caretPosition, variableSuggestions, vs.getPosition(), vs.getEndPosition());
             }
 
             if (vt2 != null && caretPosition != null && variableSuggestions.isEmpty()) {
@@ -409,15 +396,8 @@ public interface SimpleParser {
                 parentVarNameToDefinitionPosition.put(ct.getLastName(), ct.position);
             }
             if (v instanceof Scope) {
-                Scope s = (Scope) v;
-                List<VariableOrScopeWithAccess> list = new ArrayList<>();
-                for (VariableOrScope it : s.getPrivateItems()) {
-                    list.add(new VariableOrScopeWithAccess(it, false));
-                }
-                for (VariableOrScope it : s.getSharedItems()) {
-                    list.add(new VariableOrScopeWithAccess(it, true));
-                }
-                findClassTraits(list, traitFullNameToDefinition, definitionPosToReferences, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, parentVarFullNameToDefinitionPosition, parentVarNameToDefinitionPosition);
+                Scope s = (Scope) v;                
+                findClassTraits(s.getScopeItems(), traitFullNameToDefinition, definitionPosToReferences, positionToStatic, definitionToType, definitionToCallType, definitionToSubType, definitionToCallSubType, parentVarFullNameToDefinitionPosition, parentVarNameToDefinitionPosition);
             }
         }
     }

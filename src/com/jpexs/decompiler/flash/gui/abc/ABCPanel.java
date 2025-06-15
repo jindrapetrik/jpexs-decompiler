@@ -1074,7 +1074,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             private Path typeToPath(GraphTargetItem type) {
-                return new Path(Arrays.asList(type.toString().split("\\.")));
+                if (type instanceof TypeItem) {
+                    TypeItem ti = (TypeItem) type;                    
+                    return new Path(ti.fullTypeName.getStringParts());
+                }
+                return new Path(Helper.splitString(".", type.toString())); //Arrays.asList(type.toString().split("\\.")));
             }
             
             @Override

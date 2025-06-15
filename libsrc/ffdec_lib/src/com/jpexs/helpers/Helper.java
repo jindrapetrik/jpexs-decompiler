@@ -1779,5 +1779,17 @@ public class Helper {
         }
         return Integer.parseInt(version);
     }
+    
+    public static List<String> splitString(String delimiter, String str) {
+        List<String> result = new ArrayList<>();
+        int start = 0;
+        int end;
+        while ((end = str.indexOf(delimiter, start)) != -1) {
+            result.add(str.substring(start, end));
+            start = end + 1;
+        }
+        result.add(str.substring(start));
+        return result;
+    }
 
 }
