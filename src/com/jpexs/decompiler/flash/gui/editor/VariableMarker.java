@@ -521,11 +521,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     tokenAt = sDoc.getPrevToken(tokenAt);
                 }
             }
-            
+
             boolean isDot = tokenAt != null && tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
             sDoc.readUnlock();
             if (isDot) {
-                int afterDot = tokenAt.start + 1;            
+                int afterDot = tokenAt.start + 1;
                 pane.getDocument().remove(afterDot, pane.getCaretPosition() - afterDot);
                 pane.getDocument().insertString(afterDot, suggestion, null);
             } else {
@@ -565,7 +565,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     tokenAt = sDoc.getPrevToken(tokenAt);
                 }
             }
-            
+
             boolean isDot = tokenAt != null && tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
             List<Variable> suggestions = new ArrayList<>();
             if (isDot) {
@@ -578,7 +578,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 if (!separatorPosToType.containsKey(pos)) {
                     return;
                 }
-               
+
                 if (separatorPosToType.containsKey(pos)) {
                     Path type = separatorPosToType.get(pos);
 
@@ -596,11 +596,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                             if (traitName.name.toString().equals(type.getLast().toString())) {
                                 continue;
                             }
-                            suggestions.add(traitName);                            
-                        }                       
+                            suggestions.add(traitName);
+                        }
                     } else {
                         //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
-                        if(simpleExternalClassNameToFullClassName.containsKey(type)) {
+                        if (simpleExternalClassNameToFullClassName.containsKey(type)) {
                             type = simpleExternalClassNameToFullClassName.get(type);
                         }
                         List<Variable> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraits(type, true, true, true);
@@ -615,20 +615,20 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                             suggestions.add(traitName);
                         }
                     }
-                }                
+                }
             } else {
-                suggestions.addAll(variableSuggestions);                
+                suggestions.addAll(variableSuggestions);
             }
             if (suggestions.isEmpty()) {
                 codeCompletionPopup.setVisible(false);
                 return;
-            }            
+            }
             NaturalOrderComparator noc = new NaturalOrderComparator();
             Collections.sort(suggestions, new Comparator<Variable>() {
                 @Override
                 public int compare(Variable o1, Variable o2) {
                     return noc.compare(o1.name.getLast().toString(), o2.name.getLast().toString());
-                }                
+                }
             });
             if (!identText.isEmpty()) {
                 for (int i = suggestions.size() - 1; i >= 0; i--) {
@@ -638,18 +638,18 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     }
                 }
             }
-                        
+
             codeCompletionList.setSelectedIndex(-1);
-            
+
             codeCompletionListModel.clear();
-            
+
             for (Variable s : suggestions) {
                 codeCompletionListModel.addElement(new VariableListItem(s));
-            }        
-            
+            }
+
             if (!codeCompletionPopup.isVisible() && !suggestions.isEmpty()) {
                 Rectangle2D caretCoords = View.textComponentModelToView(pane, pane.getCaretPosition());
-                codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));                
+                codeCompletionPopup.show(pane, (int) caretCoords.getX(), (int) (caretCoords.getY() + caretCoords.getHeight()));
             }
             codeCompletionPopup.setPopupSize(codeCompletionList.getPreferredSize().width + 32, 200);
             codeCompletionList.setSize(codeCompletionList.getPreferredSize().width, 200);
@@ -1084,21 +1084,21 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         errorsTimer = tim;
         markTokenAt(pane.getCaretPosition());
     }
-    
+
     private void documentUpdated() {
         Timer pTimer = parseTimer;
         if (pTimer != null) {
             pTimer.cancel();
         }
-        pTimer = new Timer();        
-        
+        pTimer = new Timer();
+
         pTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 reParse();
-            }            
+            }
         }, 100);
-        parseTimer = pTimer;        
+        parseTimer = pTimer;
     }
 
     @Override
@@ -1281,6 +1281,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     }
 
     private class VariableListItem {
+
         private Variable variable;
 
         public VariableListItem(Variable variable) {
@@ -1297,12 +1298,12 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             sb.append(variable.name.getLast().toString());
             if (variable.callType != null) {
                 sb.append("() : ");
-                sb.append(variable.callType.getLast().toString());                
+                sb.append(variable.callType.getLast().toString());
             } else if (variable.type != null) {
                 sb.append(" : ");
                 sb.append(variable.type.getLast().toString());
             }
             return sb.toString();
-        }                
+        }
     }
 }
