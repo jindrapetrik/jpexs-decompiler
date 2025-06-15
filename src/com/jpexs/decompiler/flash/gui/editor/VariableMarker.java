@@ -93,6 +93,7 @@ import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.SyntaxComponent;
 import jsyntaxpane.util.Configuration;
+import natorder.NaturalOrderComparator;
 import org.pushingpixels.substance.internal.ui.SubstanceScrollBarUI;
 
 /**
@@ -129,6 +130,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     private Map<Integer, Path> definitionToType = new LinkedHashMap<>();
     private Map<Integer, Path> definitionToCallType = new LinkedHashMap<>();
     private Map<Integer, Boolean> separatorIsStatic = new LinkedHashMap<>();
+    private List<String> variableSuggestions = new ArrayList<>();
 
     private MouseMotionAdapter mouseMotionAdapter;
 
@@ -377,6 +379,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             if (referenceToExternalTypeIndex.containsKey(tok.start)) {
                 int typeIndex = referenceToExternalTypeIndex.get(tok.start);
                 for (int i : externalTypeIndexToReference.get(typeIndex)) {
+                    if (separatorPosToType.containsKey(i)) {
+                        continue;
+                    }
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
                         Markers.SimpleMarker markerKind = marker;
@@ -399,6 +404,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 if (referenceToExternalTraitKey.containsKey(tok.start)) {
                     Path traitKey = referenceToExternalTraitKey.get(tok.start);
                     for (int i : externalTraitKeyToReference.get(traitKey)) {
+                        if (separatorPosToType.containsKey(i)) {
+                            continue;
+                        }
                         Token referenceToken = getIdentifierTokenAt(sDoc, i);
                         if (referenceToken != null) {
                             Markers.SimpleMarker markerKind = marker;
@@ -437,6 +445,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 }
                 occurencesPositions.add(definitionToken.start);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
+                    if (separatorPosToType.containsKey(i)) {
+                        continue;
+                    }
                     Token referenceToken = getIdentifierTokenAt(sDoc, i);
                     if (referenceToken != null) {
                         markerKind = marker;
@@ -487,11 +498,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             int pos = pane.getCaretPosition();
             Token tokenAt = getNearestTokenAt(sDoc, pos);
 
+            String identText = "";
             if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
                 tokenAt = sDoc.getPrevToken(tokenAt);
             } else if (tokenAt != null && tokenAt.start >= pos) {
                 tokenAt = sDoc.getPrevToken(tokenAt);
                 if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                    identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
                     tokenAt = sDoc.getPrevToken(tokenAt);
                 }
             } else if (tokenAt == null) {
@@ -499,28 +513,22 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     pos--;
                     tokenAt = getNearestTokenAt(sDoc, pos);
                 }
-                if (tokenAt == null) {
-                    sDoc.readUnlock();
-                    return;
-                }
-                if (tokenAt.type == TokenType.IDENTIFIER) {
+                if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
+                    identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
                     tokenAt = sDoc.getPrevToken(tokenAt);
                 }
             }
-            if (tokenAt == null) {
-                sDoc.readUnlock();
-                return;
-            }
-
-            boolean isDot = tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
-            if (!isDot) {
-                sDoc.readUnlock();
-                return;
-            }
-            int afterDot = tokenAt.start + 1;
+            
+            boolean isDot = tokenAt != null && tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
             sDoc.readUnlock();
-            pane.getDocument().remove(afterDot, pane.getCaretPosition() - afterDot);
-            pane.getDocument().insertString(afterDot, suggestion, null);
+            if (isDot) {
+                int afterDot = tokenAt.start + 1;            
+                pane.getDocument().remove(afterDot, pane.getCaretPosition() - afterDot);
+                pane.getDocument().insertString(afterDot, suggestion, null);
+            } else {
+                pane.getDocument().remove(pane.getCaretPosition() - identText.length(), identText.length());
+                pane.getDocument().insertString(pane.getCaretPosition(), suggestion, null);
+            }
         } catch (BadLocationException ex) {
             //ignore
         }
@@ -548,74 +556,67 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     pos--;
                     tokenAt = getNearestTokenAt(sDoc, pos);
                 }
-                if (tokenAt == null) {
-                    return;
-                }
-                if (tokenAt.type == TokenType.IDENTIFIER) {
+                if (tokenAt != null && tokenAt.type == TokenType.IDENTIFIER) {
                     identText = sDoc.getText(tokenAt.start, pos - tokenAt.start);
                     tokenAt = sDoc.getPrevToken(tokenAt);
                 }
             }
-            if (tokenAt == null) {
-                codeCompletionPopup.setVisible(false);
-                return;
-            }
-
-            boolean isDot = tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
-            if (!isDot) {
-                codeCompletionPopup.setVisible(false);
-                return;
-            }
-
-            Token prevToken = sDoc.getPrevToken(tokenAt);
-            boolean isCall = prevToken.pairValue == -1; //-1 = -PARENT
-
-            pos = tokenAt.start;
-
-            if (!separatorPosToType.containsKey(pos)) {
-                return;
-            }
-
+            
+            boolean isDot = tokenAt != null && tokenAt.type == TokenType.OPERATOR ? ".".equals(sDoc.getText(tokenAt.start, tokenAt.length)) : false;
             List<String> suggestions = new ArrayList<>();
-            if (separatorPosToType.containsKey(pos)) {
-                Path type = separatorPosToType.get(pos);
+            if (isDot) {
 
-                boolean isStatic = false;
-                if (separatorIsStatic.containsKey(pos) && separatorIsStatic.get(pos)) {
-                    isStatic = true;
-                }
+                Token prevToken = sDoc.getPrevToken(tokenAt);
+                boolean isCall = prevToken.pairValue == -1; //-1 = -PARENT
 
-                if (localTypeTraitNames.containsKey(type)) {
-                    for (String traitName : localTypeTraitNames.get(type)) {
-                        if (isStatic && !traitName.startsWith("static::")) {
-                            continue;
-                        }
-                        if (traitName.startsWith("static::")) {
-                            traitName = traitName.substring("static::".length());
-                        }
-                        suggestions.add(traitName);
-                    }
-                    suggestions.remove(type.getLast().toString()); //remove constructor                
-                } else {
-                    //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
-                    List<String> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true);
-                    for (String traitName : traitNames) {
-                        if (isStatic && !traitName.startsWith("static::")) {
-                            continue;
-                        }
-                        if (traitName.startsWith("static::")) {
-                            traitName = traitName.substring("static::".length());
-                        }
-                        suggestions.add(traitName);
-                    }
-                    suggestions.remove(type.getLast().toString()); //remove constructor
+                pos = tokenAt.start;
+
+                if (!separatorPosToType.containsKey(pos)) {
+                    return;
                 }
+               
+                if (separatorPosToType.containsKey(pos)) {
+                    Path type = separatorPosToType.get(pos);
+
+                    boolean isStatic = false;
+                    if (separatorIsStatic.containsKey(pos) && separatorIsStatic.get(pos)) {
+                        isStatic = true;
+                    }
+
+                    if (localTypeTraitNames.containsKey(type)) {
+                        for (String traitName : localTypeTraitNames.get(type)) {
+                            if (isStatic && !traitName.startsWith("static::")) {
+                                continue;
+                            }
+                            if (traitName.startsWith("static::")) {
+                                traitName = traitName.substring("static::".length());
+                            }
+                            suggestions.add(traitName);
+                        }
+                        suggestions.remove(type.getLast().toString()); //remove constructor                
+                    } else {
+                        //type = externalTypes.get(referenceToExternalTypeIndex.get(pos));
+                        List<String> traitNames = ((LineMarkedEditorPane) pane).getLinkHandler().getClassTraitNames(type, true, true, true);
+                        for (String traitName : traitNames) {
+                            if (isStatic && !traitName.startsWith("static::")) {
+                                continue;
+                            }
+                            if (traitName.startsWith("static::")) {
+                                traitName = traitName.substring("static::".length());
+                            }
+                            suggestions.add(traitName);
+                        }
+                        suggestions.remove(type.getLast().toString()); //remove constructor
+                    }
+                }                
+            } else {
+                suggestions.addAll(variableSuggestions);                
             }
             if (suggestions.isEmpty()) {
                 codeCompletionPopup.setVisible(false);
                 return;
             }
-            Collections.sort(suggestions);
+            Collections.sort(suggestions, new NaturalOrderComparator());
             if (!identText.isEmpty()) {
                 for (int i = suggestions.size() - 1; i >= 0; i--) {
                     String sug = suggestions.get(i);
@@ -624,7 +625,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     }
                 }
             }
-
+                        
             codeCompletionListModel.clear();
             codeCompletionListModel.addAll(suggestions);
 
@@ -687,6 +688,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     tim = null;
                 }
                 if (e.getKeyChar() == '.') {
+                    if (!editor.isEditable()) {
+                        return;
+                    }
                     tim = new Timer();
                     tim.schedule(new TimerTask() {
                         @Override
@@ -738,6 +742,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         View.addEditorAction(pane, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (!pane.isEditable()) {
+                    return;
+                }
+                documentUpdated();
                 showCodeCompletion();
             }
 
@@ -987,6 +995,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             Map<Integer, Path> newDefinitionToType = new LinkedHashMap<>();
             Map<Integer, Path> newDefinitionToCallType = new LinkedHashMap<>();
             Map<Integer, Boolean> newSeparatorIsStatic = new LinkedHashMap<>();
+            List<String> newVariableSuggestions = new ArrayList<>();
             parser.parse(
                     fullText,
                     newDefinitionPosToReferences,
@@ -1001,7 +1010,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     newSeparatorIsStatic,
                     newLocalTypeTraitNames,
                     newDefinitionToType,
-                    newDefinitionToCallType
+                    newDefinitionToCallType,
+                    pane.getCaretPosition(),
+                    newVariableSuggestions
             );
 
             Map<Path, Path> newSimpleExternalClassNameToFullClassName = new LinkedHashMap<>();
@@ -1022,6 +1033,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             definitionToType = newDefinitionToType;
             definitionToCallType = newDefinitionToCallType;
             separatorIsStatic = newSeparatorIsStatic;
+            variableSuggestions = newVariableSuggestions;
             for (SimpleParseException ex : newErrors) {
                 errors.put((int) ex.position, ex.getMessage());
             }
@@ -1067,6 +1079,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     }
 
     private LinkType getLinkType(Token token) {
+        if (separatorPosToType.containsKey(token.start)) {
+            return LinkType.NO_LINK;
+        }
         if (definitionPosToReferences.containsKey(token.start)) {
             return LinkType.NO_LINK;
         }

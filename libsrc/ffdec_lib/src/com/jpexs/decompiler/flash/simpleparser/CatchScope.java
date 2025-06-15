@@ -27,11 +27,15 @@ public class CatchScope implements Scope {
 
     private final List<VariableOrScope> privateItems;
     private final List<VariableOrScope> sharedItems;
+    private final int position;
+    private final int endPosition;
 
-    public CatchScope(Variable catchVariable, List<VariableOrScope> catchBody) {
+    public CatchScope(int position, int endPosition, Variable catchVariable, List<VariableOrScope> catchBody) {
         this.privateItems = new ArrayList<>();
         this.privateItems.add(catchVariable);
         this.sharedItems = catchBody;
+        this.position = position;
+        this.endPosition = endPosition;
     }
 
     @Override
@@ -44,4 +48,14 @@ public class CatchScope implements Scope {
         return privateItems;
     }
 
+    @Override
+    public int getPosition() {
+        return position;
+    }
+
+    @Override
+    public int getEndPosition() {
+        return endPosition;
+    }
+        
 }

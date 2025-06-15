@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class MethodScope extends FunctionScope {
     
-    public MethodScope(List<VariableOrScope> functionBody, boolean isStatic) {
-        super(functionBody, isStatic);
+    public MethodScope(int position, int endPosition, List<VariableOrScope> functionBody, boolean isStatic) {
+        super(position, endPosition, functionBody, isStatic);
     }
     
 }

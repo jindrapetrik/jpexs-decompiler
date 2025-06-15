@@ -164,12 +164,14 @@ public class ActionScript2SimpleParser implements SimpleParser {
     }
 
     private FunctionScope function(List<SimpleParseException> errors, boolean withBody, Path functionName, int functionNamePosition, boolean isMethod, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval, boolean isStatic) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
-        ParsedSymbol s;
-        expectedType(errors, SymbolType.PARENT_OPEN);
+        ParsedSymbol s = lex();
+        int scopePos = s.position;
+        expected(errors, s, lexer.yyline(), SymbolType.PARENT_OPEN);
         s = lex();
         List<Path> paramNames = new ArrayList<>();
         List<Integer> paramPositions = new ArrayList<>();
 
+        int scopeEndPos;
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
@@ -191,6 +193,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 }
             }
         }
+        scopeEndPos = s.position;
         List<VariableOrScope> subvariables = new ArrayList<>();
         Reference<Boolean> subHasEval = new Reference<>(false);
 
@@ -205,7 +208,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
         if (withBody) {
             expectedType(errors, SymbolType.CURLY_OPEN);
             commands(errors, true, isMethod, 0, inTellTarget, subvariables, subHasEval);
-            expectedType(errors, SymbolType.CURLY_CLOSE);
+            s = lex();
+            expected(errors, s, lexer.yyline(), SymbolType.CURLY_CLOSE);
+            scopeEndPos = s.position;
         }
 
         if (subHasEval.getVal()) {
@@ -213,9 +218,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
         }
 
         if (isMethod) {
-            return new MethodScope(subvariables, isStatic);
+            return new MethodScope(scopePos, scopeEndPos, subvariables, isStatic);
         }
-        return new FunctionScope(subvariables, isStatic);
+        return new FunctionScope(scopePos, scopeEndPos, subvariables, isStatic);
     }
 
     private boolean traits(List<SimpleParseException> errors, boolean isInterface, Path className, List<VariableOrScope> variables, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
@@ -276,10 +281,12 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
+                        int scopePos = s.position;
                         List<VariableOrScope> subVariables = new ArrayList<>();
                         expression(errors, false, false, false, true, subVariables, false, hasEval);
-                        variables.add(new TraitVarConstValueScope(subVariables, isStatic));
                         s = lex();
+                        variables.add(new TraitVarConstValueScope(scopePos, s.position, subVariables, isStatic));
+                       
                     }
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
@@ -783,6 +790,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 ret = true;
                 break;
             case CLASS:
+                int scopePos = s.position;
                 Path className = type(errors, true, variables);
                 if (className != null) {
                     s = lex();
@@ -800,10 +808,12 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     variables.add(new Variable(true, new Path("this"), s.position));
                     List<VariableOrScope> subVariables = new ArrayList<>();
                     traits(errors, false, className, subVariables, inTellTarget, hasEval);
-                    ClassScope cs = new ClassScope(subVariables);
+                    
+                    s = lex();
+                    ClassScope cs = new ClassScope(scopePos, s.position, subVariables);
                     variables.add(cs);
 
-                    expectedType(errors, SymbolType.CURLY_CLOSE);
+                    expectedType(errors, s, lexer.yyline(), SymbolType.CURLY_CLOSE);
                     ret = true;
                 }
                 break;
@@ -993,6 +1003,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 s = lex();
                 boolean found = false;
                 while (s.type == SymbolType.CATCH) {
+                    int catchScopePos = s.position;
                     expectedType(errors, SymbolType.PARENT_OPEN);
                     ParsedSymbol si = lex();
                     if (expectedIdentifier(errors, si, lexer.yyline(), SymbolType.STRING)) {
@@ -1007,8 +1018,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         List<VariableOrScope> subvariables = new ArrayList<>();
 
                         command(errors, inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
-
-                        variables.add(new CatchScope(new Variable(true, new Path((String) si.value), si.position), subvariables));
+                        s = lex();
+                        variables.add(new CatchScope(catchScopePos, s.position, new Variable(true, new Path((String) si.value), si.position), subvariables));
+                        lexer.pushback(s);
                     }
                     s = lex();
                     found = true;
@@ -1585,7 +1597,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             Map<Integer, Boolean> separatorIsStatic,
             Map<Path, List<String>> localTypeTraitNames,
             Map<Integer, Path> definitionToType,
-            Map<Integer, Path> definitionToCallType
+            Map<Integer, Path> definitionToCallType,
+            Integer caretPosition,
+            List<String> variableSuggestions
     ) throws SimpleParseException, IOException, InterruptedException {
 
         List<VariableOrScope> vars = new ArrayList<>();
@@ -1676,7 +1690,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         } catch (ActionParseException ex) {
             errors.add(new SimpleParseException(ex.getMessage(), ex.line, ex.position));
         }
-        SimpleParser.parseVariablesList(new ArrayList<>(), vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraitNames, definitionToType, definitionToCallType);
+        SimpleParser.parseVariablesList(vars, definitionPosToReferences, referenceToDefinition, errors, false, externalTypes, referenceToExternalTypeIndex, externalTypeIndexToReference, linkHandler, referenceToExternalTraitKey, externalTraitKeyToReference, separatorPosToType, separatorIsStatic, localTypeTraitNames, definitionToType, definitionToCallType, caretPosition, variableSuggestions);
     }
 
     private void versionRequired(List<SimpleParseException> errors, ParsedSymbol s, int min) throws SimpleParseException {

@@ -26,9 +26,13 @@ import java.util.List;
 public class ClassScope implements Scope {
 
     private final List<VariableOrScope> privateItems;
+    private final int position;
+    private final int endPosition;
 
-    public ClassScope(List<VariableOrScope> traits) {
+    public ClassScope(int position, int endPosition, List<VariableOrScope> traits) {
         this.privateItems = traits;
+        this.position = position;
+        this.endPosition = endPosition;
     }
 
     @Override
@@ -40,4 +44,14 @@ public class ClassScope implements Scope {
     public List<VariableOrScope> getPrivateItems() {
         return privateItems;
     }
+
+    @Override
+    public int getPosition() {
+        return position;
+    }       
+
+    @Override
+    public int getEndPosition() {
+        return endPosition;
+    }        
 }

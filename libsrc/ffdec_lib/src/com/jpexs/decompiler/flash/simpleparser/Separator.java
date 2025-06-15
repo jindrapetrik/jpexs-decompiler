@@ -29,6 +29,9 @@ public class Separator implements VariableOrScope {
         this.position = position;
     }
 
-    
+    @Override
+    public int getPosition() {
+        return position;
+    }   
     
 }

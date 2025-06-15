@@ -21,5 +21,5 @@ package com.jpexs.decompiler.flash.simpleparser;
  * @author JPEXS
  */
 public interface VariableOrScope {
-
+    public int getPosition();        
 }

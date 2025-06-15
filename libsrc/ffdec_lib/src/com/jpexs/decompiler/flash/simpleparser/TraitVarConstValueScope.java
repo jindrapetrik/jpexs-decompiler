@@ -25,10 +25,15 @@ import java.util.List;
  */
 public class TraitVarConstValueScope implements Scope {
 
+    private final int position;
+    private final int endPosition;
+
     private List<VariableOrScope> sharedItems;
     private final boolean isStatic;
 
-    public TraitVarConstValueScope(List<VariableOrScope> sharedItems, boolean isStatic) {
+    public TraitVarConstValueScope(int position, int endPosition, List<VariableOrScope> sharedItems, boolean isStatic) {
+        this.position = position;
+        this.endPosition = endPosition;
         this.sharedItems = sharedItems;
         this.isStatic = isStatic;
     }
@@ -46,4 +51,16 @@ public class TraitVarConstValueScope implements Scope {
     public List<VariableOrScope> getPrivateItems() {
         return new ArrayList<>();
     }
+
+    @Override
+    public int getPosition() {
+        return position;
+    }        
+
+    @Override
+    public int getEndPosition() {
+        return endPosition;
+    }
+    
+    
 }

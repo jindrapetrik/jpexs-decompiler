@@ -27,10 +27,14 @@ public class FunctionScope implements Scope {
 
     private final List<VariableOrScope> privateItems;
     private final boolean isStatic;
+    private final int position;
+    private final int endPosition;
 
-    public FunctionScope(List<VariableOrScope> functionBody, boolean isStatic) {
+    public FunctionScope(int position, int endPosition, List<VariableOrScope> functionBody, boolean isStatic) {
         this.privateItems = functionBody;
         this.isStatic = isStatic;
+        this.position = position;
+        this.endPosition = endPosition;
     }
 
     public boolean isStatic() {
@@ -46,4 +50,15 @@ public class FunctionScope implements Scope {
     public List<VariableOrScope> getPrivateItems() {
         return privateItems;
     }
+
+    @Override
+    public int getPosition() {
+        return position;
+    }
+
+    @Override
+    public int getEndPosition() {
+        return endPosition;
+    }        
+    
 }

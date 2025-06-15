@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.simpleparser;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -81,4 +80,9 @@ public class Variable implements VariableOrScope {
     public boolean hasParent() {
         return name.hasParent();
     }    
+
+    @Override
+    public int getPosition() {
+        return position;
+    }        
 }
