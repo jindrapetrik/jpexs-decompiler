@@ -193,6 +193,14 @@ public class GRADIENT implements Serializable {
                 result.gradientRecords = Arrays.copyOfRange(result.gradientRecords, 0, 8);
             }
         }
+        
+        for (GRADRECORD rec : result.gradientRecords) {
+            if (shapeNum < 3) {
+                rec.color = new RGB(rec.color);
+            } else {
+                rec.color = new RGBA(rec.color);
+            }
+        }
         return result;
     }
 
