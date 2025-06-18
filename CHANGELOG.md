@@ -44,6 +44,8 @@ All notable changes to this project will be documented in this file.
   This may break backwards compatibility. For importing scripts from older
   versions of FFDec, you should move the scripts from `<default package>`
   to main scripts folder.
+- SWF to XML export in GUI dialog selects a XML file instead of directory
+  (and directory when multiple SWFs are selected)
 
 ### Fixed
 - [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline

@@ -36,7 +36,6 @@ import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,12 +69,12 @@ public class SwfXmlExporter {
 
     /**
      * Exports SWF to XML.
+     *
      * @param swf SWF to export
      * @param outFile Target file to save to
-     * @return List of exported files
      * @throws IOException On I/O error
      */
-    public List<File> exportXml(SWF swf, File outFile) throws IOException {
+    public void exportXml(SWF swf, File outFile) throws IOException {
         try {
             File tmp = File.createTempFile("FFDEC", "XML");
 
@@ -92,21 +91,23 @@ public class SwfXmlExporter {
                 xmlWriter.close();
             }
 
+            //Test write to raise IOException
+            try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                fos.write(1);
+            }
+
             if (!new XmlPrettyFormat().prettyFormat(tmp, outFile, 2, true)) {
                 logger.log(Level.SEVERE, "Cannot prettyformat XML");
             }
             tmp.delete();
-        } catch (Exception ex) {
+        } catch (XMLStreamException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-
-        List<File> ret = new ArrayList<>();
-        ret.add(outFile);
-        return ret;
     }
 
     /**
      * Exports SWF to XML.
+     *
      * @param swf SWF to export
      * @param writer XML writer
      * @throws IOException On I/O error

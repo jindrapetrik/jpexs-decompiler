@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.DecompilerPool;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
+import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
@@ -4538,38 +4539,114 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void exportSwfXml(List<TreeItem> items) {
         View.checkAccess();
 
-        Set<SWF> swfs = new LinkedHashSet<>();
+        Set<SWF> usedOpenables = new LinkedHashSet<>();
+        Set<OpenableList> usedOpenableLists = new HashSet<>();
 
         for (TreeItem item : items) {
             if (item instanceof OpenableList) {
                 OpenableList list = (OpenableList) item;
+                usedOpenableLists.add(list);
                 for (Openable openable : list) {
                     if (openable instanceof SWF) {
-                        swfs.add((SWF) openable);
+                        usedOpenables.add((SWF) openable);
                     }
                 }
             } else {
                 Openable openable = item.getOpenable();
                 if (openable instanceof SWF) {
-                    swfs.add((SWF) openable);
+                    usedOpenables.add((SWF) openable);
                 }
             }
         }
 
-        for (SWF swf : swfs) {
-            final String selFile = selectExportDir("exportxml");
+        Map<OpenableList, Map<String, Integer>> usedSwfIdsInBundles = new HashMap<>();
+        Map<String, Integer> usedSwfsIds = new HashMap<>();
+
+        String selFile;
+        if (usedOpenables.size() > 1) {
+            selFile = selectExportDir("exportxml");
+            if (selFile == null) {
+                return;
+            }
+        } else {
+            JFileChooser fc = View.getFileChooserWithIcon("exportxml");
+            fc.setDialogTitle(AppStrings.translate("menu.file.export.xml"));
+            String selDir = Configuration.lastExportDir.get();
+            fc.setCurrentDirectory(new File(selDir));
+            if (!selDir.endsWith(File.separator)) {
+                selDir += File.separator;
+            }
+            SWF swf = usedOpenables.iterator().next();
+            String swfFileName = swf.getTitleOrShortFileName();
+            String xmlFileName = swfFileName + ".xml";
+            if (swfFileName.toLowerCase(Locale.ENGLISH).endsWith(".swf")
+                    || swfFileName.toLowerCase(Locale.ENGLISH).endsWith(".gfx")) {
+                xmlFileName = swfFileName.substring(0, swfFileName.lastIndexOf(".")) + ".xml";
+            }
+            fc.setSelectedFile(new File(selDir + xmlFileName));
+            fc.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().toLowerCase(Locale.ENGLISH).endsWith(".xml");
+                }
+
+                @Override
+                public String getDescription() {
+                    return AppStrings.translate("filter.xml");
+                }
+            });
+            if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+            selFile = Helper.fixDialogFile(fc.getSelectedFile()).getAbsolutePath();
+            if (!selFile.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+                selFile = selFile + ".xml";
+            }
+        }
+
+        AbortRetryIgnoreHandler handler = new GuiAbortRetryIgnoreHandler();
+        for (SWF openable : usedOpenables) {
             if (selFile != null) {
                 Main.startWork(translate("work.exporting") + "...", null);
 
+                String selFile2;
+                if (usedOpenables.size() > 1) {
+                    String swfFileName = openable.getTitleOrShortFileName();
+                    String fileNameNoExt = swfFileName;
+                    if (swfFileName.toLowerCase(Locale.ENGLISH).endsWith(".swf")
+                            || swfFileName.toLowerCase(Locale.ENGLISH).endsWith(".gfx")) {
+                        fileNameNoExt = swfFileName.substring(0, swfFileName.lastIndexOf("."));
+                    }
+
+                    if (usedOpenableLists.size() > 1 && openable.getOpenableList() != null && openable.getOpenableList().isBundle()) {
+                        if (!usedSwfIdsInBundles.containsKey(openable.getOpenableList())) {
+                            usedSwfIdsInBundles.put(openable.getOpenableList(), new HashMap<>());
+                        }
+                        File parentDir = new File(selFile + File.separator + openable.getOpenableList().name);
+                        parentDir.mkdirs();
+                        selFile2 = selFile + File.separator + openable.getOpenableList().name + File.separator + Helper.getNextId(fileNameNoExt, usedSwfIdsInBundles.get(openable.getOpenableList())) + ".xml";
+                    } else {
+                        selFile2 = selFile + File.separator + Helper.getNextId(fileNameNoExt, usedSwfsIds) + ".xml";
+                    }
+                } else {
+                    selFile2 = selFile;
+                }
+
                 try {
-                    File outFile = new File(selFile + File.separator + Helper.makeFileName("swf.xml"));
-                    new SwfXmlExporter().exportXml(swf, outFile);
-                    Main.stopWork();
+                    new RetryTask(() -> {
+                        File outFile = new File(selFile2);
+                        new SwfXmlExporter().exportXml(openable, outFile);
+                    }, handler).run();
+
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
+                    break;
+                } catch (InterruptedException ex) {
+                    break;
                 }
             }
         }
+        Main.stopWork();
     }
 
     public void importSwfXml(List<TreeItem> items) {
