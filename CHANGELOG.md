@@ -73,6 +73,8 @@ All notable changes to this project will be documented in this file.
 - [#1646] Scrolling in Error log frame inside log texts
 - JLayer stripping last byte of MP3 data
 - [#2469] Converting shape type did not convert gradient colors transparency
+- [#2470] Transform - paste matrix, edit current matrix not working
+- Do not allow to switch PlaceObjects in transform mode
 
 ## [23.0.1] - 2025-05-16
 ### Fixed
@@ -3876,6 +3878,7 @@ Major version of SWF to XML export changed to 2.
 [#2405]: https://www.free-decompiler.com/flash/issues/2405
 [#1646]: https://www.free-decompiler.com/flash/issues/1646
 [#2469]: https://www.free-decompiler.com/flash/issues/2469
+[#2470]: https://www.free-decompiler.com/flash/issues/2470
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448

@@ -220,6 +220,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Matrix transform;
     private AffineTransform transformUpdated;
+    
+    private Matrix originalMatrix = new Matrix();
 
     private final double LQ_FACTOR = 2;
 
@@ -710,7 +712,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Matrix getNewMatrix() {
+        if (transform == null) {
+            return new Matrix();
+        }
         return transform;
+    }
+    
+    public Matrix getOriginalMatrix() {
+        return originalMatrix;
     }
 
     public synchronized void selectDepth(int depth) {
@@ -1563,7 +1572,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     freeTransformDepths(newSelectedDepths);
                                     firePlaceObjectSelected();
                                 }
-                            } else if ((altDown && !selectionMode) || selectionMode) {
+                            } else if ((altDown && !selectionMode && !doFreeTransform) || selectionMode) {
                                 selectDepths(newSelectedDepths);
                                 firePlaceObjectSelected();
                             }
@@ -4365,7 +4374,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Timer setTimelinedTimer = null;
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler, Matrix originalMatrix) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -4432,6 +4441,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
+            this.originalMatrix = originalMatrix;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
             this.parentDepths.clear();
@@ -4664,6 +4674,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         pointEditPanel.setVisible(false);
         iconPanel.setImg(image);
         drawReady = true;
+        originalMatrix = new Matrix();
 
         horizontalScrollBar.setVisible(false);
         verticalScrollBar.setVisible(false);
@@ -5476,7 +5487,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     newCursor = guideXCursor;
                                 } else if (mode == MODE_GUIDE_Y) {
                                     newCursor = guideYCursor;
-                                } else if (iconPanel.isAltDown() && !selectionMode) {
+                                } else if (iconPanel.isAltDown() && !selectionMode && !doFreeTransform) {
                                     if (depthStateUnderCursor == null) {
                                         newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {
@@ -5948,8 +5959,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         redraw();
         fireBoundsChange(getTransformBounds(), registrationPoint, position);
     }
-
-    public void applyTransformMatrix(Matrix matrix) {
+        
+    public void applyTransformMatrix(Matrix matrix) {        
+        applyTransformMatrixInternal(matrix);
+        redraw();
+        fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
+        fireTransformChanged();
+    }
+    
+    private void applyTransformMatrixInternal(Matrix matrix) {
         Matrix parentMatrix = getParentMatrix();
         transform = transform.preConcatenate(matrix);
         transform = parentMatrix.concatenate(transform).concatenate(parentMatrix.inverse());
@@ -5957,10 +5975,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Point2D newRegistrationPoint = new Point2D.Double();
         matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
         registrationPoint = newRegistrationPoint;
-
-        redraw();
-        fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
-        fireTransformChanged();
+    }
+    
+    public void setFullTransformMatrix(Matrix matrix) {
+        Matrix deltaMatrix = getOriginalMatrix().inverse().concatenate(getNewMatrix().inverse()).concatenate(matrix);
+        applyTransformMatrixInternal(deltaMatrix);
+        Matrix errorCorrectionMatrix = matrix.inverse().concatenate(getNewMatrix().concatenate(getOriginalMatrix()));
+        applyTransformMatrix(errorCorrectionMatrix.inverse());
     }
 
     private Point2D toTransformPoint(Point2D point) {
@@ -6111,5 +6132,5 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
             return timelined;
         }
-    }
+    }   
 }

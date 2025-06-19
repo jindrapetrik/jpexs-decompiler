@@ -425,7 +425,7 @@ public class TransformPanel extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (matrixEditCurrentCheckBox.isSelected()) {
-                    Matrix matrix = imagePanel.getNewMatrix();
+                    Matrix matrix = imagePanel.getOriginalMatrix().concatenate(imagePanel.getNewMatrix());
                     matrixATextField.setText(formatDouble(matrix.scaleX));
                     matrixBTextField.setText(formatDouble(matrix.rotateSkew0));
                     matrixCTextField.setText(formatDouble(matrix.rotateSkew1));
@@ -491,7 +491,7 @@ public class TransformPanel extends JPanel {
             }
         }
         if (matrixEditCurrentCheckBox.isSelected()) {
-            Matrix matrix = imagePanel.getNewMatrix();
+            Matrix matrix = imagePanel.getOriginalMatrix().concatenate(imagePanel.getNewMatrix());
             matrixATextField.setText(formatDouble(matrix.scaleX));
             matrixBTextField.setText(formatDouble(matrix.rotateSkew0));
             matrixCTextField.setText(formatDouble(matrix.rotateSkew1));
@@ -527,7 +527,7 @@ public class TransformPanel extends JPanel {
     }
 
     private void copyClipboardActionPerformed(ActionEvent e) {
-        Matrix matrix = imagePanel.getNewMatrix();
+        Matrix matrix = imagePanel.getOriginalMatrix().concatenate(imagePanel.getNewMatrix());
         String copyString = "MATRIX[" + matrix.scaleX + "," + matrix.rotateSkew0 + "," + matrix.rotateSkew1 + "," + matrix.scaleY + "," + matrix.translateX + "," + matrix.translateY + "]";
         StringSelection stringSelection = new StringSelection(copyString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -552,8 +552,7 @@ public class TransformPanel extends JPanel {
                         matrix.translateX = Double.parseDouble(matcher.group("translateX"));
                         matrix.translateY = Double.parseDouble(matcher.group("translateY"));
 
-                        matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
-                        imagePanel.applyTransformMatrix(matrix);
+                        imagePanel.setFullTransformMatrix(matrix);
                     }
                 }
             }
@@ -688,9 +687,10 @@ public class TransformPanel extends JPanel {
             matrix.translateX = parseDouble(matrixETextField.getText());
             matrix.translateY = parseDouble(matrixFTextField.getText());
             if (matrixEditCurrentCheckBox.isSelected()) {
-                matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
+                imagePanel.setFullTransformMatrix(matrix);
+            } else {
+                imagePanel.applyTransformMatrix(matrix);
             }
-            imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
             //ignored
         }
