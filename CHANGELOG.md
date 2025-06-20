@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file.
 - [#2467] Show ImportAssets name/characterId in the title when there is only single one item
 - [#2468] Option for `-dumpas2` CLI command to use export names (`-exportNames` option)
 - AS3 - code completion (properties and methods)
+- [#2470] Transformation - Copy individual transforms to clipboard,
+  load/apply from clipboard buttons
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
@@ -3869,6 +3871,7 @@ Major version of SWF to XML export changed to 2.
 [#1625]: https://www.free-decompiler.com/flash/issues/1625
 [#2467]: https://www.free-decompiler.com/flash/issues/2467
 [#2468]: https://www.free-decompiler.com/flash/issues/2468
+[#2470]: https://www.free-decompiler.com/flash/issues/2470
 [#2456]: https://www.free-decompiler.com/flash/issues/2456
 [#2459]: https://www.free-decompiler.com/flash/issues/2459
 [#2460]: https://www.free-decompiler.com/flash/issues/2460
@@ -3878,7 +3881,6 @@ Major version of SWF to XML export changed to 2.
 [#2405]: https://www.free-decompiler.com/flash/issues/2405
 [#1646]: https://www.free-decompiler.com/flash/issues/1646
 [#2469]: https://www.free-decompiler.com/flash/issues/2469
-[#2470]: https://www.free-decompiler.com/flash/issues/2470
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448

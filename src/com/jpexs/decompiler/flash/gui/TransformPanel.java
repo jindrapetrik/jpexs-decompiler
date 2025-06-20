@@ -108,10 +108,16 @@ public class TransformPanel extends JPanel {
     private JTextField matrixFTextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JCheckBox matrixEditCurrentCheckBox = new JCheckBox(AppStrings.translate("transform.matrix.editCurrent"));
 
-    private JButton pasteClipboardButton;
+    private JButton loadClipboardButton;
+    private JButton applyClipboardButton;
 
     private static final String doublePatternString = "[-+]?([0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?|[0-9]+)";
-    private static final Pattern matrixPattern = Pattern.compile("^MATRIX\\[(?<scaleX>" + doublePatternString + "),(?<rotateSkew0>" + doublePatternString + "),(?<rotateSkew1>" + doublePatternString + "),(?<scaleY>" + doublePatternString + "),(?<translateX>" + doublePatternString + "),(?<translateY>" + doublePatternString + ")\\]$");
+    private static final String unitPatternString = "PX|TWIP|PERCENT|TURN|DEG|RAD|GRAD";
+    private static final Pattern matrixPattern = Pattern.compile("^MATRIX\\[(?<scaleX>" + doublePatternString + "),(?<rotateSkew0>" + doublePatternString + "),(?<rotateSkew1>" + doublePatternString + "),(?<scaleY>" + doublePatternString + "),(?<translateX>" + doublePatternString + "),(?<translateY>" + doublePatternString + ")(,combine:(?<combine>true|false))?\\]$");
+    private static final Pattern movePattern = Pattern.compile("^MOVE\\[x:(?<x>" + doublePatternString + "),y:(?<y>" + doublePatternString + "),unit:(?<unit>" + unitPatternString + "),relative:(?<relative>true|false)\\]$");
+    private static final Pattern rotatePattern = Pattern.compile("^ROTATE\\[angle:(?<angle>" + doublePatternString + "),unit:(?<unit>" + unitPatternString + "),clockwise:(?<clockwise>true|false)\\]$");
+    private static final Pattern scalePattern = Pattern.compile("^SCALE\\[width:(?<width>" + doublePatternString + "),height:(?<height>" + doublePatternString + "),unit:(?<unit>" + unitPatternString + ")\\]");
+    private static final Pattern skewPattern = Pattern.compile("^SKEW\\[x:(?<x>" + doublePatternString + "),y:(?<y>" + doublePatternString + "),unit:(?<unit>" + unitPatternString + ")\\]$");
 
     private ImagePanel imagePanel;
 
@@ -237,7 +243,7 @@ public class TransformPanel extends JPanel {
         addRow(movePanel, 0, new JLabel(AppStrings.translate("transform.move.horizontal")), moveHorizontalTextField, moveUnitComboBox);
         addRow(movePanel, 1, new JLabel(AppStrings.translate("transform.move.vertical")), moveVerticalTextField);
         addJoinedRow(movePanel, 2, moveRelativeCheckBox, 3);
-        addJoinedRow(movePanel, 3, makeClearApplyPanel(this::applyMoveActionPerformed, this::clearMoveActionPerformed), 3);
+        addJoinedRow(movePanel, 3, makeClearApplyPanel(this::applyMoveActionPerformed, this::clearMoveActionPerformed, this::copyMoveActionPerformed), 3);
         finishRow(movePanel, 4);
         add(makeCard("move", "transformmove16", movePanel));
 
@@ -264,7 +270,7 @@ public class TransformPanel extends JPanel {
         addRow(scalePanel, 0, new JLabel(AppStrings.translate("transform.scale.width")), scaleWidthTextField, scaleUnitComboBox);
         addRow(scalePanel, 1, new JLabel(AppStrings.translate("transform.scale.height")), scaleHeightTextField);
         addJoinedRow(scalePanel, 2, scaleProportionallyCheckBox, 3);
-        addJoinedRow(scalePanel, 3, makeClearApplyPanel(this::applyScaleActionPerformed, this::clearScaleActionPerformed), 3);
+        addJoinedRow(scalePanel, 3, makeClearApplyPanel(this::applyScaleActionPerformed, this::clearScaleActionPerformed, this::copyScaleActionPerformed), 3);
         finishRow(scalePanel, 4);
         add(makeCard("scale", "transformscale16", scalePanel));
         scaleUnitComboBox.addItem(Unit.PERCENT);
@@ -351,7 +357,7 @@ public class TransformPanel extends JPanel {
         clockGroup.add(rotateAntiClockwiseToggleButton);
         JPanel rotatePanel = new JPanel(new GridBagLayout());
         addRow(rotatePanel, 0, new JLabel(AppStrings.translate("transform.rotate.angle")), rotateTextField, rotateUnitComboBox, rotateAntiClockwiseToggleButton, rotateClockwiseToggleButton);
-        addJoinedRow(rotatePanel, 1, makeClearApplyPanel(this::applyRotateActionPerformed, this::clearRotateActionPerformed), 5);
+        addJoinedRow(rotatePanel, 1, makeClearApplyPanel(this::applyRotateActionPerformed, this::clearRotateActionPerformed, this::copyRotateActionPerformed), 5);
         finishRow(rotatePanel, 2);
         add(makeCard("rotate", "transformrotate16", rotatePanel));
 
@@ -380,7 +386,7 @@ public class TransformPanel extends JPanel {
         JPanel skewPanel = new JPanel(new GridBagLayout());
         addRow(skewPanel, 0, new JLabel(AppStrings.translate("transform.skew.horizontal")), skewHorizontalTextField, skewUnitComboBox);
         addRow(skewPanel, 1, new JLabel(AppStrings.translate("transform.skew.vertical")), skewVerticalTextField);
-        addJoinedRow(skewPanel, 2, makeClearApplyPanel(this::applySkewActionPerformed, this::clearSkewActionPerformed), 3);
+        addJoinedRow(skewPanel, 2, makeClearApplyPanel(this::applySkewActionPerformed, this::clearSkewActionPerformed, this::copySkewActionPerformed), 3);
         finishRow(skewPanel, 3);
 
         add(makeCard("skew", "transformskew16", skewPanel));
@@ -417,7 +423,7 @@ public class TransformPanel extends JPanel {
                 new JLabel(AppStrings.translate("transform.matrix.d")), matrixDTextField,
                 new JLabel(AppStrings.translate("transform.matrix.f")), matrixFTextField);
         addJoinedRow(matrixPanel, 2, matrixEditCurrentCheckBox, 6);
-        addJoinedRow(matrixPanel, 3, makeClearApplyPanel(this::applyMatrixActionPerformed, this::clearMatrixActionPerformed), 6);
+        addJoinedRow(matrixPanel, 3, makeClearApplyPanel(this::applyMatrixActionPerformed, this::clearMatrixActionPerformed, this::copyMatrixActionPerformed), 6);
         finishRow(matrixPanel, 4);
         add(makeCard("matrix", "transformmatrix16", matrixPanel));
 
@@ -443,23 +449,25 @@ public class TransformPanel extends JPanel {
             }
         });
 
-        JPanel clipboardPanel = new JPanel(new FlowLayout());
+        JPanel clipboardPanel = new JPanel();
+        clipboardPanel.setLayout(new BoxLayout(clipboardPanel, BoxLayout.Y_AXIS));
         JButton copyClipboardButton = new JButton(AppStrings.translate("transform.clipboard.copy"), View.getIcon("copy16"));
         copyClipboardButton.addActionListener(this::copyClipboardActionPerformed);
-        pasteClipboardButton = new JButton(AppStrings.translate("transform.clipboard.paste"), View.getIcon("paste16"));
-        pasteClipboardButton.addActionListener(this::pasteClipboardActionPerformed);
+        copyClipboardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadClipboardButton = new JButton(AppStrings.translate("transform.clipboard.paste.load"), View.getIcon("paste16"));
+        loadClipboardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadClipboardButton.addActionListener(this::loadClipboardActionPerformed);
+        applyClipboardButton = new JButton(AppStrings.translate("transform.clipboard.paste.apply"), View.getIcon("paste16"));
+        applyClipboardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        applyClipboardButton.addActionListener(this::applyClipboardActionPerformed);
         clipboardPanel.add(copyClipboardButton);
-        clipboardPanel.add(pasteClipboardButton);
+        clipboardPanel.add(loadClipboardButton);
+        clipboardPanel.add(applyClipboardButton);
         Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(this::clipBoardflavorsChanged);
 
         add(makeCard("clipboard", "clipboard16", clipboardPanel));
 
         add(Box.createVerticalGlue());
-        /*JPanel finalPanel = new JPanel();
-        //finalPanel.setPreferredSize(new Dimension(1, Integer.MAX_VALUE));
-        finalPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        finalPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        add(finalPanel);*/
     }
 
     public void load() {
@@ -509,32 +517,47 @@ public class TransformPanel extends JPanel {
             if (hasTransferableText) {
                 String result = (String) contents.getTransferData(DataFlavor.stringFlavor);
                 if (result != null) {
-                    Matcher matcher = matrixPattern.matcher(result);
-                    if (matcher.matches()) {
-                        pasteClipboardButton.setEnabled(true);
-                    } else {
-                        pasteClipboardButton.setEnabled(false);
+
+                    List<Pattern> patterns = Arrays.asList(matrixPattern, movePattern, rotatePattern, scalePattern, skewPattern);
+
+                    for (Pattern pattern : patterns) {
+                        Matcher matcher = pattern.matcher(result);
+                        if (matcher.matches()) {
+                            loadClipboardButton.setEnabled(true);
+                            applyClipboardButton.setEnabled(true);
+                            return;
+                        }
                     }
-                } else {
-                    pasteClipboardButton.setEnabled(false);
                 }
-            } else {
-                pasteClipboardButton.setEnabled(false);
             }
         } catch (Exception ex) {
-            pasteClipboardButton.setEnabled(false);
+            //ignore
         }
+        loadClipboardButton.setEnabled(false);
+        applyClipboardButton.setEnabled(false);
     }
 
     private void copyClipboardActionPerformed(ActionEvent e) {
         Matrix matrix = imagePanel.getOriginalMatrix().concatenate(imagePanel.getNewMatrix());
         String copyString = "MATRIX[" + matrix.scaleX + "," + matrix.rotateSkew0 + "," + matrix.rotateSkew1 + "," + matrix.scaleY + "," + matrix.translateX + "," + matrix.translateY + "]";
-        StringSelection stringSelection = new StringSelection(copyString);
+        copyStringToClipboard(copyString);
+    }
+
+    private void copyStringToClipboard(String s) {
+        StringSelection stringSelection = new StringSelection(s);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
     }
 
-    private void pasteClipboardActionPerformed(ActionEvent e) {
+    private void loadClipboardActionPerformed(ActionEvent e) {
+        pasteClipboard(false);
+    }
+
+    private void applyClipboardActionPerformed(ActionEvent e) {
+        pasteClipboard(true);
+    }
+
+    private void pasteClipboard(boolean apply) {
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             Transferable contents = clipboard.getContents(null);
@@ -552,7 +575,87 @@ public class TransformPanel extends JPanel {
                         matrix.translateX = Double.parseDouble(matcher.group("translateX"));
                         matrix.translateY = Double.parseDouble(matcher.group("translateY"));
 
-                        imagePanel.setFullTransformMatrix(matrix);
+                        matrixATextField.setText(formatDouble(matrix.scaleX));
+                        matrixBTextField.setText(formatDouble(matrix.rotateSkew0));
+                        matrixCTextField.setText(formatDouble(matrix.rotateSkew1));
+                        matrixDTextField.setText(formatDouble(matrix.scaleY));
+                        matrixETextField.setText(formatDouble(matrix.translateX));
+                        matrixFTextField.setText(formatDouble(matrix.translateY));
+
+                        String combineStr = matcher.group("combine");
+                        boolean combine = false;
+                        if ("true".equals(combineStr)) {
+                            combine = true;
+                        }
+
+                        matrixEditCurrentCheckBox.setSelected(!combine);
+
+                        if (apply) {
+                            if (combine) {
+                                imagePanel.applyTransformMatrix(matrix);
+                            } else {
+                                imagePanel.setFullTransformMatrix(matrix);
+                            }
+                        }
+                        return;
+                    }
+                    matcher = movePattern.matcher(result);
+                    if (matcher.matches()) {
+                        double x = Double.parseDouble(matcher.group("x"));
+                        double y = Double.parseDouble(matcher.group("y"));
+                        Unit unit = Unit.valueOf(matcher.group("unit"));
+                        boolean relative = Boolean.parseBoolean(matcher.group("relative"));
+
+                        moveUnitComboBox.setSelectedItem(unit);
+                        moveHorizontalTextField.setText(formatDouble(x));
+                        moveVerticalTextField.setText(formatDouble(y));
+                        moveRelativeCheckBox.setSelected(relative);
+
+                        if (apply) {
+                            applyMoveActionPerformed(null);
+                        }
+                        return;
+                    }
+                    matcher = rotatePattern.matcher(result);
+                    if (matcher.matches()) {
+                        double angle = Double.parseDouble(matcher.group("angle"));
+                        Unit unit = Unit.valueOf(matcher.group("unit"));
+                        boolean clockwise = Boolean.parseBoolean(matcher.group("clockwise"));
+
+                        rotateUnitComboBox.setSelectedItem(unit);
+                        rotateTextField.setText(formatDouble(angle));
+                        rotateClockwiseToggleButton.setSelected(clockwise);
+                        rotateAntiClockwiseToggleButton.setSelected(!clockwise);
+                        if (apply) {
+                            applyRotateActionPerformed(null);
+                        }
+                        return;
+                    }
+                    matcher = scalePattern.matcher(result);
+                    if (matcher.matches()) {
+                        double width = Double.parseDouble(matcher.group("width"));
+                        double height = Double.parseDouble(matcher.group("width"));
+                        Unit unit = Unit.valueOf(matcher.group("unit"));
+                        scaleUnitComboBox.setSelectedItem(unit);
+                        scaleWidthTextField.setText(formatDouble(width));
+                        scaleHeightTextField.setText(formatDouble(height));
+                        if (apply) {
+                            applyScaleActionPerformed(null);
+                        }
+                        return;
+                    }
+                    matcher = skewPattern.matcher(result);
+                    if (matcher.matches()) {
+                        double x = Double.parseDouble(matcher.group("x"));
+                        double y = Double.parseDouble(matcher.group("y"));
+                        Unit unit = Unit.valueOf(matcher.group("unit"));
+                        skewUnitComboBox.setSelectedItem(unit);
+                        skewHorizontalTextField.setText(formatDouble(x));
+                        skewVerticalTextField.setText(formatDouble(y));
+
+                        if (apply) {
+                            applySkewActionPerformed(null);
+                        }
                     }
                 }
             }
@@ -578,6 +681,18 @@ public class TransformPanel extends JPanel {
             }
             matrix.translate(moveHorizontal, moveVertical);
             imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
+            //ignored
+        }
+    }
+
+    private void copyMoveActionPerformed(ActionEvent e) {
+        try {
+            double moveHorizontal = parseDouble(moveHorizontalTextField.getText());
+            double moveVertical = parseDouble(moveVerticalTextField.getText());
+            Unit unit = (Unit) moveUnitComboBox.getSelectedItem();
+            boolean moveRelative = moveRelativeCheckBox.isSelected();
+            copyStringToClipboard("MOVE[x:" + moveHorizontal + ",y:" + moveVertical + ",unit:" + unit.name() + ",relative:" + (moveRelative ? "true" : "false") + "]");
         } catch (NumberFormatException nfe) {
             //ignored
         }
@@ -615,6 +730,17 @@ public class TransformPanel extends JPanel {
         }
     }
 
+    private void copyScaleActionPerformed(ActionEvent e) {
+        try {
+            double scaleWidth = parseDouble(scaleWidthTextField.getText());
+            double scaleHeight = parseDouble(scaleHeightTextField.getText());
+            Unit scaleUnit = (Unit) scaleUnitComboBox.getSelectedItem();
+            copyStringToClipboard("SCALE[width:" + scaleWidth + ",height:" + scaleHeight + ",unit:" + scaleUnit.name() + "]");
+        } catch (NumberFormatException nfe) {
+            //ignored
+        }
+    }
+
     private void clearRotateActionPerformed(ActionEvent e) {
         rotateTextField.setText(formatDouble(0));
         rotateUnitComboBox.setSelectedItem(Unit.TURN);
@@ -627,6 +753,17 @@ public class TransformPanel extends JPanel {
             double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ? -1.0 : 1.0) * convertUnit(rotate, (Unit) rotateUnitComboBox.getSelectedItem(), Unit.RAD);
             Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registrationPoint.getX(), registrationPoint.getY()));
             imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
+            //ignored
+        }
+    }
+
+    private void copyRotateActionPerformed(ActionEvent e) {
+        try {
+            double angle = parseDouble(rotateTextField.getText());
+            Unit unit = (Unit) rotateUnitComboBox.getSelectedItem();
+            boolean clockwise = rotateClockwiseToggleButton.isSelected();
+            copyStringToClipboard("ROTATE[angle:" + angle + ",unit:" + unit.name() + ",clockwise:" + (clockwise ? "true" : "false") + "]");
         } catch (NumberFormatException nfe) {
             //ignored
         }
@@ -667,6 +804,17 @@ public class TransformPanel extends JPanel {
         }
     }
 
+    private void copySkewActionPerformed(ActionEvent e) {
+        try {
+            double skewHorizontal = parseDouble(skewHorizontalTextField.getText());
+            double skewVertical = parseDouble(skewVerticalTextField.getText());
+            Unit unit = (Unit) skewUnitComboBox.getSelectedItem();
+            copyStringToClipboard("SKEW[x:" + skewHorizontal + ",y:" + skewVertical + ",unit:" + unit.name() + "]");
+        } catch (NumberFormatException nfe) {
+            //ignored
+        }
+    }
+
     private void clearMatrixActionPerformed(ActionEvent e) {
         matrixATextField.setText(formatDouble(1));
         matrixBTextField.setText(formatDouble(0));
@@ -694,6 +842,21 @@ public class TransformPanel extends JPanel {
         } catch (NumberFormatException nfe) {
             //ignored
         }
+    }
+
+    private void copyMatrixActionPerformed(ActionEvent e) {
+        Matrix matrix = new Matrix();
+        matrix.scaleX = parseDouble(matrixATextField.getText());
+        matrix.rotateSkew0 = parseDouble(matrixBTextField.getText());
+        matrix.rotateSkew1 = parseDouble(matrixCTextField.getText());
+        matrix.scaleY = parseDouble(matrixDTextField.getText());
+        matrix.translateX = parseDouble(matrixETextField.getText());
+        matrix.translateY = parseDouble(matrixFTextField.getText());
+
+        boolean combine = !matrixEditCurrentCheckBox.isSelected();
+
+        String copyString = "MATRIX[" + matrix.scaleX + "," + matrix.rotateSkew0 + "," + matrix.rotateSkew1 + "," + matrix.scaleY + "," + matrix.translateX + "," + matrix.translateY + ",combine:" + (combine ? "true" : "false") + "]";
+        copyStringToClipboard(copyString);
     }
 
     private void applyRotate(double degree) {
@@ -845,14 +1008,18 @@ public class TransformPanel extends JPanel {
         Configuration.guiTransformLastExpandedCards.set(String.join(",", openedCards));
     }
 
-    private JPanel makeClearApplyPanel(ActionListener onApply, ActionListener onClear) {
+    private JPanel makeClearApplyPanel(ActionListener onApply, ActionListener onClear, ActionListener onCopy) {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton clearButton = new JButton(AppStrings.translate("transform.clear"));
         clearButton.addActionListener(onClear);
         JButton applyButton = new JButton(AppStrings.translate("transform.apply"), View.getIcon("apply16"));
         applyButton.addActionListener(onApply);
+        JButton copyButton = new JButton(View.getIcon("copy16"));
+        copyButton.setToolTipText(AppStrings.translate("transform.copy"));
+        copyButton.addActionListener(onCopy);
         buttonsPanel.add(clearButton);
         buttonsPanel.add(applyButton);
+        buttonsPanel.add(copyButton);
         return buttonsPanel;
     }
 
