@@ -82,13 +82,18 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.FlatteningPathIterator;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -211,6 +216,20 @@ public class Timeline {
      * Mode of drawing only sprites.
      */
     public static final int DRAW_MODE_SPRITES = 2;
+
+    /**
+     * Decimal format for clip path
+     */
+    private static final DecimalFormat svgPathDecimalFormat;
+
+    static {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        svgPathDecimalFormat = new DecimalFormat("0.##", symbols); // max 3 desetinná místa, žádné zbytečné nuly
+    }
+
+    private static String formatDoubleSvg(double value) {
+        return svgPathDecimalFormat.format(value);
+    }
 
     /**
      * Ensures that the timeline is initialized.
@@ -1438,6 +1457,7 @@ public class Timeline {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
                     clips.remove(c);
+                    c--;
                     clipChanged = true;
                 }
             }
@@ -1666,7 +1686,7 @@ public class Timeline {
 
         Frame frameObj = getFrame(frame);
         List<SvgClip> clips = new ArrayList<>();
-
+        
         int maxDepth = getMaxDepth();
         int clipCount = 0;
         Element clipGroup = null;
@@ -1675,6 +1695,7 @@ public class Timeline {
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
                     clips.remove(c);
+                    c--;
                     clipChanged = true;
                 }
             }
@@ -1686,9 +1707,63 @@ public class Timeline {
                 }
 
                 if (!clips.isEmpty()) {
-                    String clip = clips.get(clips.size() - 1).shape; // todo: merge clip areas
+                    String clipName = exporter.getUniqueId("clipPath");
+                    exporter.createClipPath(null, clipName);
+                    Area a = null;
+                    for (SvgClip c : clips) {
+                        if (a == null) {
+                            a = new Area(c.shape);
+                        } else {
+                            a.intersect(new Area(c.shape));
+                        }
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    PathIterator pathIterator = new FlatteningPathIterator(a.getPathIterator(AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0)), 0.01);
+                    float[] coords = new float[6];
+
+                    while (!pathIterator.isDone()) {
+                        int type = pathIterator.currentSegment(coords);
+                        switch (type) {
+                            case PathIterator.SEG_MOVETO:
+                                sb.append("M ")
+                                        .append(formatDoubleSvg(coords[0])).append(" ")
+                                        .append(formatDoubleSvg(coords[1])).append(" ");
+                                break;
+                            case PathIterator.SEG_LINETO:
+                                sb.append("L ")
+                                        .append(formatDoubleSvg(coords[0])).append(" ")
+                                        .append(formatDoubleSvg(coords[1])).append(" ");
+                                break;
+                            case PathIterator.SEG_QUADTO:
+                                sb.append("Q ")
+                                        .append(formatDoubleSvg(coords[0])).append(" ")
+                                        .append(formatDoubleSvg(coords[1])).append(" ")
+                                        .append(formatDoubleSvg(coords[2])).append(" ")
+                                        .append(formatDoubleSvg(coords[3])).append(" ");
+                                break;
+                            case PathIterator.SEG_CUBICTO:
+                                sb.append("C ")
+                                        .append(formatDoubleSvg(coords[0])).append(" ")
+                                        .append(formatDoubleSvg(coords[1])).append(" ")
+                                        .append(formatDoubleSvg(coords[2])).append(" ")
+                                        .append(formatDoubleSvg(coords[3])).append(" ")
+                                        .append(formatDoubleSvg(coords[4])).append(" ")
+                                        .append(formatDoubleSvg(coords[5])).append(" ");
+                                break;
+                            case PathIterator.SEG_CLOSE:
+                                sb.append("Z ");
+                                break;
+                        }
+                        pathIterator.next();
+                    }
+
+                    Element path = exporter.createElement("path");
+                    path.setAttribute("d", sb.toString().trim());
+                    exporter.addToGroup(path);
+                    exporter.endGroup();
                     clipGroup = exporter.createSubGroup(null, null);
-                    clipGroup.setAttribute("clip-path", "url(#" + clip + ")");
+                    clipGroup.setAttribute("clip-path", "url(#" + clipName + ")");
                 }
 
                 clipCount = clips.size();
@@ -1729,13 +1804,9 @@ public class Timeline {
                 // TODO: if (layer.filters != null)
                 // TODO: if (layer.blendMode > 1)                                               
                 if (layer.clipDepth > -1) {
-                    String clipName = exporter.getUniqueId("clipPath");
-                    Matrix mat = new Matrix(layer.matrix);
-                    exporter.createClipPath(mat, clipName);
-                    SvgClip clip = new SvgClip(clipName, layer.clipDepth);
+                    Shape shape = drawable.getOutline(false, 0, 0, layer.ratio, new RenderContext(), layerMatrix, false, null, 1);;
+                    SvgClip clip = new SvgClip(layer.clipDepth, shape);
                     clips.add(clip);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, transformation, strokeTransformation);
-                    exporter.endGroup();
                 } else {
                     boolean createNew = false;
 

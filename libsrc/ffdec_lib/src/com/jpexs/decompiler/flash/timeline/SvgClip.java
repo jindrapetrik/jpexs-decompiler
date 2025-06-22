@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import java.awt.Shape;
+
 /**
  * SVG clipping region
  *
@@ -24,23 +26,23 @@ package com.jpexs.decompiler.flash.timeline;
 public class SvgClip {
 
     /**
-     * Shape.
-     */
-    public String shape;
-
-    /**
      * Depth.
      */
     public int depth;
+    
+    /**
+     * Shape
+     */
+    public Shape shape;
 
     /**
      * Constructs SvgClip.
      *
-     * @param shape Shape
      * @param depth Depth
+     * @param shape Shape
      */
-    public SvgClip(String shape, int depth) {
-        this.shape = shape;
+    public SvgClip(int depth, Shape shape) {
         this.depth = depth;
+        this.shape = shape;
     }
 }
