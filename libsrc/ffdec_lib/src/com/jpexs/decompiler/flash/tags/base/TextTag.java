@@ -858,7 +858,8 @@ public abstract class TextTag extends DrawableTag {
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
-        for (TEXTRECORD rec : textRecords) {
+        for (int r = 0; r < textRecords.size(); r++) {
+            TEXTRECORD rec = textRecords.get(r);
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
                     textColor = rec.textColorA.toInt();
@@ -892,16 +893,11 @@ public abstract class TextTag extends DrawableTag {
             if (exporter.useTextTag) {
                 StringBuilder text = new StringBuilder();
                 int totalAdvance = 0;
-                for (int i = 0; i < rec.glyphEntries.size(); i++) {
-                    GLYPHENTRY entry  = rec.glyphEntries.get(i);
+                for (GLYPHENTRY entry : rec.glyphEntries) {
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
                         text.append(ch);
-                        if (i == rec.glyphEntries.size() - 1 && entry.glyphAdvance == 0) {
-                            totalAdvance += font.getGlyphAdvance(entry.glyphIndex) * rat;
-                        } else {
-                            totalAdvance += entry.glyphAdvance;
-                        }
+                        totalAdvance += entry.glyphAdvance;
                     }
                 }
 
