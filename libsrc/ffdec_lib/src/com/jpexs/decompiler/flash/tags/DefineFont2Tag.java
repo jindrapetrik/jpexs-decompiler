@@ -481,15 +481,14 @@ public class DefineFont2Tag extends FontTag {
             code = 0;
         }
 
-        int pos = -1;
-        boolean exists = false;
-        for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) >= code) {
-                if (codeTable.get(i) == code) {
-                    exists = true;
+        int pos = codeTable.indexOf(code);
+        boolean exists = pos != -1;
+        if (!exists) {
+            for (int i = 0; i < codeTable.size(); i++) {
+                if (codeTable.get(i) > code) {
+                    pos = i;
+                    break;
                 }
-                pos = i;
-                break;
             }
         }
         if (pos == -1) {
@@ -551,18 +550,7 @@ public class DefineFont2Tag extends FontTag {
     @Override
     public synchronized boolean removeCharacter(char character) {
         int code = (int) character;
-        int pos = -1;
-        for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) >= code) {
-                if (codeTable.get(i) == code) {
-                    pos = i;
-                    break;
-                }
-
-                return false;
-            }
-        }
-
+        int pos = codeTable.indexOf(code);
         if (pos == -1) {
             return false;
         }

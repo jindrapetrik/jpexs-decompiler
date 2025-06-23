@@ -80,6 +80,7 @@ All notable changes to this project will be documented in this file.
 - [#2471] Clipping - multiple clips handling, in display and also SVG export
 - [#2471] SVG Export - exporting with font-face - text tags with multiple texts,
   fix invalid family names, incorrect text size
+- Replacing existing characters in a font which has character codes unsorted
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

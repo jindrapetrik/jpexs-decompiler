@@ -305,20 +305,20 @@ public class DefineFontTag extends FontTag {
         boolean exists = false;
         if (fontInfoTag != null) {
             List<Integer> codeTable = fontInfoTag.getCodeTable();
-            for (int i = 0; i < codeTable.size(); i++) {
-                if (codeTable.get(i) >= code) {
-                    if (codeTable.get(i) == code) {
-                        exists = true;
+                        
+            pos = codeTable.indexOf(code);
+            exists = pos != -1;
+            if (!exists) {
+                for (int i = 0; i < codeTable.size(); i++) {
+                    if (codeTable.get(i) > code) {
+                        pos = i;
+                        break;
                     }
-
-                    pos = i;
-                    break;
                 }
             }
-
             if (pos == -1) {
                 pos = codeTable.size();
-            }
+            }            
         } else {
             pos = 0;
         }
@@ -372,17 +372,8 @@ public class DefineFontTag extends FontTag {
         int code = (int) character;
         int pos = -1;
         List<Integer> codeTable = fontInfoTag.getCodeTable();
-        for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) >= code) {
-                if (codeTable.get(i) == code) {
-                    pos = i;
-                    break;
-                }
-
-                return false;
-            }
-        }
-
+        pos = codeTable.indexOf(code);
+        
         if (pos == -1) {
             return false;
         }
