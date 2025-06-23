@@ -832,6 +832,13 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    private static String makeValidStyleFontFamily(String family) {
+        family = family.replace("+", "_");
+        family = family.replace("\uFFFD", "_");
+        //this may be incomplete list of incompatibilities
+        return family;
+    }
+    
     /**
      * Converts static text to SVG.
      * @param swf SWF
@@ -897,10 +904,12 @@ public abstract class TextTag extends DrawableTag {
                 if (hasOffset) {
                     exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
                 }
+                
+                String fontFamily = makeValidStyleFontFamily(font.getFontNameIntag());
 
                 Element textElement = exporter.createElement("text");
                 textElement.setAttribute("font-size", Double.toString(rat * 1024));
-                textElement.setAttribute("font-family", font.getFontNameIntag());
+                textElement.setAttribute("font-family", fontFamily);
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setTextContent(text.toString());
@@ -913,7 +922,7 @@ public abstract class TextTag extends DrawableTag {
 
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.WOFF;
-                exporter.addStyle(font.getFontNameIntag(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
+                exporter.addStyle(fontFamily, new FontExporter().exportFont(font, fontExportMode), fontExportMode);
 
                 if (hasOffset) {
                     exporter.endGroup();
