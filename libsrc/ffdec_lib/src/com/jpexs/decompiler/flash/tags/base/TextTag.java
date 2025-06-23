@@ -893,9 +893,9 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
 
-                boolean hasOffset = offsetX != 0 || offsetY != 0;
+                boolean hasOffset = x != 0 || y != 0;
                 if (hasOffset) {
-                    exporter.createSubGroup(Matrix.getTranslateInstance(offsetX, offsetY), null);
+                    exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
                 }
 
                 Element textElement = exporter.createElement("text");
@@ -917,6 +917,10 @@ public abstract class TextTag extends DrawableTag {
 
                 if (hasOffset) {
                     exporter.endGroup();
+                }
+
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    x += entry.glyphAdvance;
                 }
             } else {
                 Matrix mat0 = transformation.clone();
