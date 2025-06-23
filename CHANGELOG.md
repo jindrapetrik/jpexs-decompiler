@@ -78,8 +78,8 @@ All notable changes to this project will be documented in this file.
 - [#2470] Transform - paste matrix, edit current matrix not working
 - Do not allow to switch PlaceObjects in transform mode
 - [#2471] Clipping - multiple clips handling, in display and also SVG export
-- [#2471] SVG Export - exporting with font-face - text tags with multiple texts
-- [#2471] SVG Export - exporting with font-face - fix invalid family names
+- [#2471] SVG Export - exporting with font-face - text tags with multiple texts,
+  fix invalid family names, incorrect text size
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

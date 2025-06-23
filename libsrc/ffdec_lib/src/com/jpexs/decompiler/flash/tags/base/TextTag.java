@@ -854,7 +854,7 @@ public abstract class TextTag extends DrawableTag {
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom, Matrix transformation) {
         int textColor = 0;
         FontTag font = null;
-        int textHeight = 12;
+        double textHeight = 12;
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
@@ -892,11 +892,16 @@ public abstract class TextTag extends DrawableTag {
             if (exporter.useTextTag) {
                 StringBuilder text = new StringBuilder();
                 int totalAdvance = 0;
-                for (GLYPHENTRY entry : rec.glyphEntries) {
+                for (int i = 0; i < rec.glyphEntries.size(); i++) {
+                    GLYPHENTRY entry  = rec.glyphEntries.get(i);
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
                         text.append(ch);
-                        totalAdvance += entry.glyphAdvance;
+                        if (i == rec.glyphEntries.size() - 1 && entry.glyphAdvance == 0) {
+                            totalAdvance += font.getGlyphAdvance(entry.glyphIndex) * rat;
+                        } else {
+                            totalAdvance += entry.glyphAdvance;
+                        }
                     }
                 }
 
@@ -908,7 +913,7 @@ public abstract class TextTag extends DrawableTag {
                 String fontFamily = makeValidStyleFontFamily(font.getFontNameIntag());
 
                 Element textElement = exporter.createElement("text");
-                textElement.setAttribute("font-size", Double.toString(rat * 1024));
+                textElement.setAttribute("font-size", Double.toString(textHeight / SWF.unitDivisor));
                 textElement.setAttribute("font-family", fontFamily);
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
