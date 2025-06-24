@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - code completion (properties and methods)
 - [#2470] Transformation - Copy individual transforms to clipboard,
   load/apply from clipboard buttons
+- Option to turn off code completion on dot(.) key
 
 ### Changed
 - AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node

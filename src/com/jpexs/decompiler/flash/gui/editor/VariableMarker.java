@@ -706,7 +706,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                     tim.cancel();
                     tim = null;
                 }
-                if (e.getKeyChar() == '.') {
+                if (e.getKeyChar() == '.' && com.jpexs.decompiler.flash.configuration.Configuration.showCodeCompletionOnDot.get()) {
                     if (!editor.isEditable()) {
                         return;
                     }

@@ -1145,6 +1145,10 @@ public final class Configuration {
     @ConfigurationName("warning.linkTypes")
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningLinkTypes = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> showCodeCompletionOnDot = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
