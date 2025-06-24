@@ -752,7 +752,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     } else {
                         fname = new Path(s.value.toString());
                     }
-                    if (fname.equals(classNameStr)) { //constructor
+                    if (fname.toString().equals(classNameStr)) { //constructor
                         if (isStatic) {
                             errors.add(new SimpleParseException("Constructor cannot be static", lexer.yyline(), s.position));
                         }
