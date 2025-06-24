@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import java.awt.BorderLayout;
@@ -39,6 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -60,6 +62,8 @@ public class LinkDialog extends JDialog {
     private SWF swf;
 
     private boolean overLinkButton = false;
+    
+    private JLabel noOtherFilesLabel = new JLabel(AppStrings.translate("abc.link.dialog.noOtherFilesOpened"));
 
     private List<ActionListener> saveListeners = new ArrayList<>();
 
@@ -106,6 +110,9 @@ public class LinkDialog extends JDialog {
                 dispose();
             }
         });
+        
+        noOtherFilesLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
         JPanel customLibraryPanel = new JPanel(new BorderLayout());
         linkList = new JList<>();
         linkList.setCellRenderer(new CustomLibraryListCellRenderer());
@@ -121,6 +128,7 @@ public class LinkDialog extends JDialog {
             }
         });
         customLibraryPanel.add(linkList, BorderLayout.CENTER);
+        customLibraryPanel.add(noOtherFilesLabel, BorderLayout.NORTH);
 
         customLibraryPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
@@ -140,6 +148,7 @@ public class LinkDialog extends JDialog {
         }
 
         populateSWFs(swf, selectedSWFs);
+        noOtherFilesLabel.setVisible(selectedSWFs.isEmpty());
     }
 
     public void show(SWF swf) {
