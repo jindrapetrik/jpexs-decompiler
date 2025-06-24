@@ -170,7 +170,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     ret = true;
                     break;
                 case PARENT_OPEN:
-                    lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);                    
+                    lastVarName = call(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
                     ret = true;
                     break;
                 case DESCENDANTS:
@@ -459,7 +459,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             lastVarName = lastVarName.add(Path.PATH_PARENTHESIS);
             variables.add(new Separator(lastVarName, s.position));
         }
-        
+
         return lastVarName;
     }
 
@@ -544,7 +544,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             subvariables.add(new Variable(true, paramNames.get(paramNames.size() - 1), paramPositions.get(paramNames.size() - 1), null, new Path("Array"), null));
         }
         Reference<Boolean> needsActivation2 = new Reference<>(false);
-        
+
         if (!isInterface && !isNative) {
             s = lex();
             expected(errors, s, lexer.yyline(), SymbolType.CURLY_OPEN);
@@ -559,7 +559,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
         int scopeEndPos = s.position;
 
         if (isMethod) {
-            
+
             MethodScope ms = new MethodScope(scopePos, scopeEndPos, subvariables, isStatic);
             variables.add(ms);
         } else {
@@ -1454,6 +1454,12 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     loops.push(floop);
                     if (loopLabel != null) {
                         loopLabels.put(floop, loopLabel);
+                    }
+                    s = lex();
+                    if (s.type == SymbolType.IN) {
+                        expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, false, variables, false, abc);
+                    } else {
+                        lexer.pushback(s);
                     }
                     if (!forin) {
                         s = lex();
