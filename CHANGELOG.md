@@ -83,6 +83,7 @@ All notable changes to this project will be documented in this file.
   fix invalid family names, incorrect text size
 - Replacing existing characters in a font which has character codes unsorted
 - [#2475] SVG Import - ignoring gradients caused by missing offset attribute of stop element
+- Not saving library type (airglobal/playerglobal) when switching SWFs
 
 ## [23.0.1] - 2025-05-16
 ### Fixed

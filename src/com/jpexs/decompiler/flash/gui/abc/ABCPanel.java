@@ -265,12 +265,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return;
         }
 
+        this.abc = abc;        
         if (Main.isSwfAir(abc.getOpenable())) {
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_AIR);
         } else {
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
         }
-        this.abc = abc;
         decompiledTextArea.setParser(new ActionScript3SimpleParser(abc));
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
