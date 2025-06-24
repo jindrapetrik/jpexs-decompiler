@@ -1886,7 +1886,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         break;
                     case "goto":
                         expectedType(errors, SymbolGroup.IDENTIFIER);
-                        errors.add(new SimpleParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline(), s.position));
+                        //errors.add(new SimpleParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline(), s.position));
+                        ret = true;
                         break;
                     case "multiname":
                         errors.add(new SimpleParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline(), s.position));
