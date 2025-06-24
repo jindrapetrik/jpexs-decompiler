@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -116,7 +116,17 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
      * Inner functions
      */
     private List<FunctionActionItem> innerFunctions;
+    
+    /**
+     * Parameter positions in the codde
+     */
+    public List<Integer> paramPositions;
 
+    /**
+     * Parameter registers
+     */
+    private List<Integer> paramRegisters;
+    
     /**
      * Register - this
      */
@@ -146,6 +156,10 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
      * Register - global
      */
     public static final int REGISTER_GLOBAL = 6;
+    
+    
+    
+    
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -185,8 +199,9 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
      * @param variables Variables
      * @param innerFunctions Inner functions
      * @param hasEval Has eval
+     * @param paramPositions Parameter positions
      */
-    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions, boolean hasEval) {
+    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions, boolean hasEval, List<Integer> paramPositions, List<Integer> paramRegisters) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
@@ -197,6 +212,8 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         this.variables = variables;
         this.innerFunctions = innerFunctions;
         this.hasEval = hasEval;
+        this.paramPositions = paramPositions;
+        this.paramRegisters = paramRegisters;
     }
 
     @Override
@@ -267,7 +284,11 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
             String pname = paramNames.get(p);
             if (pname == null || pname.isEmpty()) {
-                pname = new RegisterNumber(regStart + p).translate();
+                if (paramRegisters != null) {
+                    pname = new RegisterNumber(paramRegisters.get(p)).translate();
+                } else {
+                    pname = new RegisterNumber(regStart + p).translate();
+                }                
             }
             HighlightData d = getSrcData();
             d.localName = pname;
@@ -336,6 +357,10 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         return true;
     }
 
+    public List<VariableActionItem> getVariables() {
+        return variables;
+    }        
+
     private Set<String> getDefinedVariableNames(List<VariableActionItem> variables) {
         Set<String> ret = new HashSet<>();
         for (VariableActionItem v : variables) {
@@ -359,6 +384,10 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             getDeeplyUsedVariableNames(topLevelDefinedVariableNames, innerFun, deeplyUsedVariableNames);
         }
     }
+
+    public List<FunctionActionItem> getInnerFunctions() {
+        return innerFunctions;
+    }        
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

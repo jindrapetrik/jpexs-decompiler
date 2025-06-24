@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.configuration.TomlConfigurationStorage;
 import com.jpexs.decompiler.flash.docs.As12PCodeDocs;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -110,6 +111,7 @@ import com.jpexs.decompiler.flash.gui.SearchInMemory;
 import com.jpexs.decompiler.flash.gui.SearchInMemoryListener;
 import com.jpexs.decompiler.flash.gui.SwfInMemory;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -189,7 +191,6 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.process.Process;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
-import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.Font;
@@ -282,7 +283,7 @@ public class CommandLineArgumentParser {
             if (ConfigurationItem.isInternal(field)) {
                 continue;
             }
-            
+
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             Object value = item.get();
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -562,6 +563,9 @@ public class CommandLineArgumentParser {
                         return null;
                     }
                     break;
+                case "-configfile":
+                    parseConfigFile(args);
+                    break;
                 case "-onerror":
                     handler = parseOnError(args);
                     break;
@@ -779,6 +783,9 @@ public class CommandLineArgumentParser {
             printHeader();
             printConfigurationSettings();
             System.exit(0);
+        } else if (nextParam.equals("-storeconfigfile")) {
+            parseStoreConfigFile(args);
+            System.exit(0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             parseHelp(args);
             System.exit(0);
@@ -859,7 +866,8 @@ public class CommandLineArgumentParser {
                 cp = new String[]{cp[0], "1"};
             }
 
-            Field field = fields.get(cp[0].toLowerCase(Locale.ENGLISH));
+            String nameLowerCase = cp[0].toLowerCase(Locale.ENGLISH);
+            Field field = fields.get(nameLowerCase);
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             String stringValue = cp[1];
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -903,6 +911,9 @@ public class CommandLineArgumentParser {
                 ConfigurationItem uncheckedItem = (ConfigurationItem) item;
                 uncheckedItem.set(enumValue);
             }
+            if ("locale".equals(nameLowerCase)) {
+                Main.initLang();
+            }
         }
     }
 
@@ -931,6 +942,46 @@ public class CommandLineArgumentParser {
         }
 
         setConfigurations(args.pop());
+    }
+
+    private static void parseStoreConfigFile(Stack<String> args) {
+        boolean comments = false;
+        boolean all = false;
+        String configFile;
+        while (true) {
+            if (args.isEmpty()) {
+                System.err.println("Configuration file expected");
+                badArguments("configfile");
+            }
+            configFile = args.pop();
+            if (configFile.equals("-comments")) {
+                comments = true;
+            } else if (configFile.equals("-all")) {
+                all = true;
+            } else {
+                if (!args.isEmpty()) {
+                    badArguments("configfile");
+                }
+                break;
+            }
+        }
+        TomlConfigurationStorage storage = new TomlConfigurationStorage();
+        storage.saveToFile(configFile, comments, !all);
+        System.out.println("Configuration saved to \"" + configFile + "\"");
+    }
+
+    private static void parseConfigFile(Stack<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("Configuration file expected");
+            badArguments("configfile");
+        }
+        String configFile = args.pop();
+        if (!new File(configFile).exists()) {
+            System.err.println("Configuration file \"" + configFile + "\" does not exist!");
+            badArguments("configfile");
+        }
+        Configuration.loadFromFile(configFile);
+        System.out.println("Configuration loaded from the file \"" + configFile + "\"");
     }
 
     private static void parseSwf2Exe(Stack<String> args, String charset) {
@@ -2207,7 +2258,7 @@ public class CommandLineArgumentParser {
                         }
                     }
                     FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom, transparentBackground);
-                    frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, fes, evl);
+                    frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, 1, fes, evl);
                 }
 
                 if (exportAll || exportFormats.contains("sprite")) {
@@ -2215,7 +2266,7 @@ public class CommandLineArgumentParser {
                     SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom);
                     for (Tag t : extags) {
                         if (t instanceof DefineSpriteTag) {
-                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, ((DefineSpriteTag) t).getCharacterId(), null, ses, evl);
+                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, ((DefineSpriteTag) t).getCharacterId(), null, 1, ses, evl);
                         }
                     }
                 }
@@ -2949,7 +3000,7 @@ public class CommandLineArgumentParser {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
                 while (true) {
-                    String objectToReplace = args.pop();
+                    String objectToReplace = args.pop();                    
 
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
@@ -3050,10 +3101,26 @@ public class CommandLineArgumentParser {
                             }).importText(textTag, new String(data, Utf8Helper.charset));
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
+                            Integer startFrame = null;
+                            if (!args.isEmpty()) {
+                                if (args.peek().toLowerCase(Locale.ENGLISH).equals("-startframe")) {
+                                    args.pop();
+                                    if (args.isEmpty()) {
+                                        System.err.println("Frame number must be specified");
+                                        badArguments("replace");
+                                    }
+                                    try {
+                                        startFrame = Integer.parseInt(args.pop());
+                                    } catch (NumberFormatException nfe) {
+                                        System.err.println("Frame number should be integer");
+                                        badArguments("replace");
+                                    }
+                                }
+                            }
                             boolean ok = false;
                             SoundImporter soundImporter = new SoundImporter();
                             try {
-                                ok = soundImporter.importSound(st, new ByteArrayInputStream(data), soundFormat);
+                                ok = soundImporter.importSound(st, new ByteArrayInputStream(data), soundFormat, startFrame);
                             } catch (UnsupportedSamplingRateException usre) {
                                 List<String> supportedRatesStr = new ArrayList<>();
                                 for (int i : usre.getSupportedRates()) {
@@ -4318,11 +4385,21 @@ public class CommandLineArgumentParser {
         if (args.isEmpty()) {
             badArguments("dumpas2");
         }
+        boolean useExportNames = false;
+        String exportNamesParam = args.pop();
+        if (exportNamesParam.toLowerCase(Locale.ENGLISH).equals("-exportnames")) {
+            useExportNames = true;
+        } else {
+            args.push(exportNamesParam);
+        }
+        if (args.isEmpty()) {
+            badArguments("dumpas2");
+        }
         File file = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
-                Map<String, ASMSource> asms = swf.getASMs(false);
+                Map<String, ASMSource> asms = swf.getASMs(useExportNames);
                 for (String as2 : asms.keySet()) {
                     System.out.println(as2);
                 }

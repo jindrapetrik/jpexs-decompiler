@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -133,8 +134,10 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
                 writer.append("= ");
                 return compoundValue.toString(writer, localData);
             }
-            writer.append(" = ");
-            value.toString(writer, localData);
+            if (value != null && !(value instanceof DirectValueActionItem && (((DirectValueActionItem) value).value == Undefined.INSTANCE))) {
+                writer.append(" = ");
+                value.toString(writer, localData);
+            }
         }
         return writer;
     }

@@ -1,32 +1,35 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +210,17 @@ public class FullMultinameAVM2Item extends AVM2Item {
                 if ("*".equals(simpleName)) {
                     writer.append("*");
                 } else {
-                    writer.append(constants.getMultiname(multinameIndex).getNameWithCustomNamespace(localData.abc, fullyQualifiedNames, false, true));
+                    Reference<DottedChain> customNsRef = new Reference<>(null);
+                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+                    DottedChain customNs = customNsRef.getVal();
+                    if (customNs != null) {
+                        String nsname = customNs.getLast();
+                        String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+                        writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
+                        writer.appendNoHilight("::");
+                    }
+        
+                    writer.append(localName);
                 }
             } else {
                 writer.append("§§multiname(").append(multinameIndex).append(")");

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.BlendMode;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * SVG exporter.
@@ -78,7 +81,7 @@ public class SVGExporter {
 
     protected int lastClipId;
 
-    public Map<Tag, String> exportedTags = new HashMap<>();
+    public Map<ExportKey, String> exportedTags = new HashMap<>();
 
     public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
@@ -88,11 +91,63 @@ public class SVGExporter {
 
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
+    private double zoom;
+
+    public static class ExportKey {
+
+        private final Tag tag;
+        public final ColorTransform colorTransform;
+        public final int ratio;
+        public final boolean clipped;
+
+        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio, boolean clipped) {
+            this.tag = tag;
+            this.colorTransform = colorTransform;
+            this.ratio = ratio;
+            this.clipped = clipped;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 79 * hash + Objects.hashCode(this.tag);
+            hash = 79 * hash + Objects.hashCode(this.colorTransform);
+            hash = 79 * hash + this.ratio;
+            hash = 79 * hash + (this.clipped ? 1 : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ExportKey other = (ExportKey) obj;
+            if (this.ratio != other.ratio) {
+                return false;
+            }
+            if (this.clipped != other.clipped) {
+                return false;
+            }
+            if (!Objects.equals(this.tag, other.tag)) {
+                return false;
+            }
+            return Objects.equals(this.colorTransform, other.colorTransform);
+        }
+    }
+
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {
         this(bounds, zoom, objectType, null);
     }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType, Color backgroundColor) {
+        this.zoom = zoom;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -134,6 +189,10 @@ public class SVGExporter {
         gradients = new ArrayList<>();
     }
 
+    public double getZoom() {
+        return zoom;
+    }
+
     private Element getDefs() {
         if (_svgDefs == null) {
             _svgDefs = _svg.createElement("defs");
@@ -151,10 +210,28 @@ public class SVGExporter {
         }
         return _svgStyle;
     }
+    
+    public final boolean hasSmallStrokes() {
+        NodeList nodes = _svgGs.peek().getElementsByTagName("path");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            if ("true".equals(e.getAttribute("ffdec:has-small-stroke"))) {
+                return true;
+            }
+        }
+        nodes = _svgGs.peek().getElementsByTagName("use");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            if ("true".equals(e.getAttribute("ffdec:has-small-stroke"))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public final void createDefGroup(ExportRectangle bounds, String id) {
         createDefGroup(bounds, id, 1);
-    }
+    }   
 
     public final void createDefGroup(ExportRectangle bounds, String id, double zoom) {
         Element g = _svg.createElement("g");
@@ -494,7 +571,7 @@ public class SVGExporter {
         if (characterName != null && !characterName.isEmpty()) {
             image.setAttribute("ffdec:characterName", characterName);
         }
-
+        
         setBlendMode(image, blendMode);
 
         handleFilters(image, filters);

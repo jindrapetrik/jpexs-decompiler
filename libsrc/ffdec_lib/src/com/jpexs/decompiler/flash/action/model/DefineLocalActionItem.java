@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -104,7 +105,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         } else {
             stripQuotes(name, localData, writer);
         }
-        if (value == null) {
+        if (value == null || ((value instanceof DirectValueActionItem) && ((DirectValueActionItem) value).value == Undefined.INSTANCE)) {
             return writer;
         }
         writer.append(" = ");
@@ -126,7 +127,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        if (value == null) {
+        if (value == null || (value instanceof DirectValueActionItem && ((DirectValueActionItem) value).value == Undefined.INSTANCE)) {
             return toSourceMerge(localData, generator, name, new ActionDefineLocal2());
         } else {
             return toSourceMerge(localData, generator, name, value, new ActionDefineLocal());

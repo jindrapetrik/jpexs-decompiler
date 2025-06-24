@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -28,6 +28,15 @@ import java.awt.image.RescaleOp;
  */
 public class ColorTransform implements Cloneable {
 
+    private int redAdd;
+    private int greenAdd;
+    private int blueAdd;
+    private int alphaAdd;
+    private int redMulti;
+    private int greenMulti;
+    private int blueMulti;
+    private int alphaMulti;
+
     /**
      * Constructor.
      */
@@ -37,6 +46,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Converts this color transform to RescaleOp.
+     *
      * @return RescaleOp
      */
     public RescaleOp toRescaleOp() {
@@ -46,6 +56,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to the given image.
+     *
      * @param src Source image
      * @return Transformed image
      */
@@ -55,6 +66,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to the given color.
+     *
      * @param color Color
      * @return Transformed color
      */
@@ -64,6 +76,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to the given color.
+     *
      * @param color Color
      * @return Transformed color
      */
@@ -76,6 +89,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to the given color.
+     *
      * @param color Color
      * @return Transformed color
      */
@@ -88,6 +102,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to the given color.
+     *
      * @param color Color
      * @return Transformed color
      */
@@ -100,6 +115,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Applies this color transform to gradient records.
+     *
      * @param gradRecords Gradient records
      * @return Transformed gradient records
      */
@@ -118,6 +134,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets red addition.
+     *
      * @return Red addition
      */
     public int getRedAdd() {
@@ -126,6 +143,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets green addition.
+     *
      * @return Green addition
      */
     public int getGreenAdd() {
@@ -134,6 +152,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets blue addition.
+     *
      * @return Blue addition
      */
     public int getBlueAdd() {
@@ -142,6 +161,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets alpha addition.
+     *
      * @return Alpha addition
      */
     public int getAlphaAdd() {
@@ -150,6 +170,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets red multiplier.
+     *
      * @return Red multiplier
      */
     public int getRedMulti() {
@@ -158,6 +179,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets green multiplier.
+     *
      * @return Green multiplier
      */
     public int getGreenMulti() {
@@ -166,6 +188,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets blue multiplier.
+     *
      * @return Blue multiplier
      */
     public int getBlueMulti() {
@@ -174,6 +197,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Gets alpha multiplier.
+     *
      * @return Alpha multiplier
      */
     public int getAlphaMulti() {
@@ -182,6 +206,7 @@ public class ColorTransform implements Cloneable {
 
     /**
      * Merges this color transform with another one.
+     *
      * @param c Another color transform
      * @return Merged color transform
      */
@@ -245,4 +270,55 @@ public class ColorTransform implements Cloneable {
             throw new RuntimeException();
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.getRedAdd();
+        hash = 97 * hash + this.getGreenAdd();
+        hash = 97 * hash + this.getBlueAdd();
+        hash = 97 * hash + this.getAlphaAdd();
+        hash = 97 * hash + this.getRedMulti();
+        hash = 97 * hash + this.getGreenMulti();
+        hash = 97 * hash + this.getBlueMulti();
+        hash = 97 * hash + this.getAlphaMulti();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ColorTransform)) {
+            return false;
+        }
+        final ColorTransform other = (ColorTransform) obj;
+        if (this.getRedAdd() != other.getRedAdd()) {
+            return false;
+        }
+        if (this.getGreenAdd() != other.getGreenAdd()) {
+            return false;
+        }
+        if (this.getBlueAdd() != other.getBlueAdd()) {
+            return false;
+        }
+        if (this.getAlphaAdd() != other.getAlphaAdd()) {
+            return false;
+        }
+        if (this.getRedMulti() != other.getRedMulti()) {
+            return false;
+        }
+        if (this.getGreenMulti() != other.getGreenMulti()) {
+            return false;
+        }
+        if (this.getBlueMulti() != other.getBlueMulti()) {
+            return false;
+        }
+        return this.getAlphaMulti() == other.getAlphaMulti();
+    }
+
 }

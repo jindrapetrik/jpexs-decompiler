@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -821,9 +821,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             List<Object> code2 = new ArrayList<>();
 
-            int dpos = 0;
             code2.add(new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
-            dpos++;
             Set<Integer> regs = bodyToRegToName.containsKey(bodyIndex) ? bodyToRegToName.get(bodyIndex).keySet() : new TreeSet<>();
             for (int r : regs) {
                 String name = bodyToRegToName.get(bodyIndex).get(r);
@@ -864,12 +862,12 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (addedLines.contains(line)) {
                     continue;
                 }
-                if (!origPosToNewPos.containsKey(i + dpos)) {
+                if (!origPosToNewPos.containsKey(i)) {
                     continue;
                 }
                 addedLines.add(line);
                 logger.log(Level.FINE, "Script {0}: Insert debugline({1}) at pos {2} to body {3}", new Object[]{path, line, i, bodyIndex});
-                code2.add(origPosToNewPos.get(i + dpos), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
+                code2.add(origPosToNewPos.get(i), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
             long adr = 0;
             Map<Long, Long> mapOffsets = new HashMap<>();

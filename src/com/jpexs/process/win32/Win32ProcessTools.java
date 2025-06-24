@@ -1,42 +1,42 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.process.win32;
 
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.BITMAP;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Gdi32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.ICONINFO;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.MEMORY_BASIC_INFORMATION;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.PROCESSENTRY32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Psapi;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHFILEINFO;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.User32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinBase;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Advapi32;
-import com.sun.jna.platform.win32.BITMAP;
-import com.sun.jna.platform.win32.BaseTSD;
-import com.sun.jna.platform.win32.Gdi32;
-import com.sun.jna.platform.win32.ICONINFO;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.MEMORY_BASIC_INFORMATION;
-import com.sun.jna.platform.win32.PROCESSENTRY32;
-import com.sun.jna.platform.win32.Psapi;
-import com.sun.jna.platform.win32.SHFILEINFO;
-import com.sun.jna.platform.win32.Shell32;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinBase;
-import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.platform.win32.WinNT;
-import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;

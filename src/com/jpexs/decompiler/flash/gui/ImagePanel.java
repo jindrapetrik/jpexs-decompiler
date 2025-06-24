@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -325,7 +325,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int hilightEdgeColorStep = 10;
     private int hilightEdgeColor = 0;
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##");
 
     private JScrollBar horizontalScrollBar;
     private JScrollBar verticalScrollBar;
@@ -389,7 +389,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
-    
+
     private static int getSnapGuidesDistance() {
         return Configuration.guidesSnapAccuracy.get().getDistance();
     }
@@ -710,7 +710,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Matrix getNewMatrix() {
+        if (transform == null) {
+            return new Matrix();
+        }
         return transform;
+    }
+
+    public Matrix getOriginalMatrix() {
+        if (selectedDepths.size() == 1 && timelined != null) {
+            int depth = selectedDepths.get(0);
+            Frame fr = timelined.getTimeline().getFrame(frame);
+            if (fr != null && fr.layers.containsKey(depth)) {
+                return new Matrix(fr.layers.get(depth).matrix);
+            }
+        }
+        return new Matrix();
     }
 
     public synchronized void selectDepth(int depth) {
@@ -724,12 +738,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized void selectDepths(List<Integer> depths) {
 
         depths = new ArrayList<>(depths);
-        
-        
+
         if (timelined == null) {
             depths = new ArrayList<>();
         } else {
-            Frame fr = timelined.getTimeline().getFrame(frame);            
+            Frame fr = timelined.getTimeline().getFrame(frame);
 
             for (int i = 0; i < depths.size(); i++) {
                 int depth = depths.get(i);
@@ -1564,7 +1577,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     freeTransformDepths(newSelectedDepths);
                                     firePlaceObjectSelected();
                                 }
-                            } else if ((altDown && !selectionMode) || selectionMode) {
+                            } else if ((altDown && !selectionMode && !doFreeTransform) || selectionMode) {
                                 selectDepths(newSelectedDepths);
                                 firePlaceObjectSelected();
                             }
@@ -1655,6 +1668,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (depthStateUnderCursor.matrix != null) {
                                 matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
                             }
+                            matrix = matrix.concatenate(getParentMatrix());
                             Matrix scaleMatrix = Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor);
 
                             matrix = matrix.preConcatenate(scaleMatrix);
@@ -1956,13 +1970,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Double snapOffsetY = null;
 
                         double zoomDouble = getRealZoom();
+                        Matrix parentMatrix = getParentMatrix();
 
                         if (Configuration.snapAlign.get() && timelined != null && points == null && transform != null) {
                             Frame fr = timelined.getTimeline().getFrame(frame);
                             if (fr != null) {
                                 Timeline timeline = timelined.getTimeline();
-
-                                Matrix parentMatrix = getParentMatrix();
 
                                 Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
                                 double ex = mouseTransPoint.getX();
@@ -2143,6 +2156,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                                 if (ds.matrix != null) {
                                                     dsMatrix = new Matrix(ds.matrix);
                                                 }
+                                                dsMatrix = dsMatrix.concatenate(parentMatrix);
 
                                                 Rectangle2D bounds = dsMatrix.transform(new Rectangle2D.Double(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin));
                                                 bounds = new Rectangle2D.Double(
@@ -2304,6 +2318,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     if (depthStateUnderCursor.matrix != null) {
                                         matrix = matrix.preConcatenate(new Matrix(depthStateUnderCursor.matrix));
                                     }
+                                    matrix = matrix.concatenate(parentMatrix);
 
                                     Matrix scaleMatrix = Matrix.getScaleInstance(zoomDouble / SWF.unitDivisor);
 
@@ -3454,6 +3469,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             BoundedTag bounded = (BoundedTag) timelined;
             RECT rect = bounded.getRect();
+            if (rect == null) {
+                return;
+            }
             int width = rect.getWidth();
             double scale = 1.0;
             /*if (width > swf.displayRect.getWidth()) {
@@ -3829,7 +3847,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 if (!selectedDepths.isEmpty() && transform != null) {
-                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    Rectangle2D transformBounds = transformUpdated == null ? getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
                     g2.setColor(getForeground());
 
                     Rectangle2D imgBounds = toImageRect(transformBounds);
@@ -3909,9 +3927,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     g2.setColor(Configuration.guidesColor.get());
                     g2.drawLine(0, guideDragY, GUIDE_THICKNESS, guideDragY);
                 }
-                
+
                 if (!selectedDepths.isEmpty() && transform != null) {
-                    Rectangle2D transformBounds = transformUpdated == null ?  getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
+                    Rectangle2D transformBounds = transformUpdated == null ? getTransformBounds() : getTransformBounds(new Matrix(transformUpdated));
                     g2.setColor(getForeground());
 
                     Rectangle2D imgBounds = toImageRect(transformBounds);
@@ -4140,6 +4158,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         RECT timRect = timelined.getRect();
+
+        if (timRect == null) {
+            return;
+        }
 
         /*
         int h_value = horizontalScrollBar.getValue();
@@ -4813,6 +4835,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Matrix parentMatrix = new Matrix();
             for (int i = 0; i < parentTimelineds.size(); i++) {
                 DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
+                if (parentDepthState == null) {
+                    continue;
+                }
 
                 parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             }
@@ -4851,7 +4876,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         for (int i = 0; i < selectedDepths.size(); i++) {
             if (newMatrix != null) {
-                DepthState ds = timeline.getFrame(frame).layers.get(selectedDepths.get(i));
+                Frame fr = timeline.getFrame(frame);
+                if (fr == null) {
+                    continue;
+                }
+                DepthState ds = fr.layers.get(selectedDepths.get(i));
                 if (ds != null) {
                     ds.temporaryMatrix = newMatrix.concatenate(new Matrix(ds.matrix)).toMATRIX();
                 }
@@ -5182,7 +5211,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         MouseEvent lastMouseEvent;
         int frame;
         int time;
-        Point cursorPosition;
+        Point2D cursorPosition;
         int mouseButton;
         List<Integer> selectedDepths;
         Zoom zoom;
@@ -5206,8 +5235,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             cursorPosition = this.cursorPosition;
             if (cursorPosition != null) {
                 Point2D p2d = toTransformPoint(cursorPosition);
-                //p2d = getParentMatrix().inverse().transform(p2d);
-                cursorPosition = new Point((int) Math.round(p2d.getX() / SWF.unitDivisor), (int) Math.round(p2d.getY() / SWF.unitDivisor));
+                //p2d = getParentMatrix().inverse().transform(p2d);                
+                cursorPosition = new Point2D.Double(p2d.getX() / SWF.unitDivisor, p2d.getY() / SWF.unitDivisor);
             }
 
             mouseButton = this.mouseButton;
@@ -5228,7 +5257,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (cursorPosition != null) { // && (!doFreeTransform || transformSelectionMode)) {
             DisplayPoint touchPoint = new DisplayPoint(cursorPosition);
             if (touchPointOffset != null) {
-                touchPoint = new DisplayPoint(cursorPosition.x + touchPointOffset.x, cursorPosition.y + touchPointOffset.y);
+                touchPoint = new DisplayPoint((int) Math.round(cursorPosition.getX() + touchPointOffset.x), (int) Math.round(cursorPosition.getY() + touchPointOffset.y));
             }
 
             renderContext.cursorPosition = new Point((int) (touchPoint.x * SWF.unitDivisor), (int) (touchPoint.y * SWF.unitDivisor));
@@ -5377,7 +5406,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             StringBuilder ret = new StringBuilder();
 
             if (cursorPosition != null && autoPlayed) {
-                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("]");
+                ret.append(" [").append(formatDouble(cursorPosition.getX())).append(";").append(formatDouble(cursorPosition.getY())).append("]");
                 if (showObjectsUnderCursor) {
                     ret.append(" : ");
                 }
@@ -5461,7 +5490,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     newCursor = guideXCursor;
                                 } else if (mode == MODE_GUIDE_Y) {
                                     newCursor = guideYCursor;
-                                } else if (iconPanel.isAltDown() && !selectionMode) {
+                                } else if (iconPanel.isAltDown() && !selectionMode && !doFreeTransform) {
                                     if (depthStateUnderCursor == null) {
                                         newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {
@@ -5935,12 +5964,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void applyTransformMatrix(Matrix matrix) {
+        applyTransformMatrixInternal(matrix);
+        redraw();
+        fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
+        fireTransformChanged();
+    }
+
+    private void applyTransformMatrixInternal(Matrix matrix) {
         Matrix parentMatrix = getParentMatrix();
-        transform = transform.preConcatenate(matrix);
-        transform = parentMatrix.concatenate(transform).concatenate(parentMatrix.inverse());
+        transform = parentMatrix.concatenate(matrix).concatenate(transform).concatenate(parentMatrix.inverse());
 
         Point2D newRegistrationPoint = new Point2D.Double();
         matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
+        registrationPoint = newRegistrationPoint;
+    }
+
+    public void setFullTransformMatrix(Matrix matrix) {
+        Matrix relativeMatrix = matrix.concatenate(getOriginalMatrix().inverse()).concatenate(transform.inverse());
+        Matrix parentMatrix = getParentMatrix();
+        transform = parentMatrix.concatenate(matrix).concatenate(getOriginalMatrix().inverse()).concatenate(parentMatrix.inverse());
+
+        Point2D newRegistrationPoint = new Point2D.Double();
+        relativeMatrix.toTransform().transform(registrationPoint, newRegistrationPoint);
         registrationPoint = newRegistrationPoint;
 
         redraw();
@@ -6070,7 +6115,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         if (totalBounds == null) {
             return new Rectangle2D.Double(0, 0, 1, 1);
-        }        
+        }
         return totalBounds;
     }
 

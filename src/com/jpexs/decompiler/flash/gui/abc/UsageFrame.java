@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.multinames.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
@@ -36,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -142,10 +145,20 @@ public class UsageFrame extends AppDialog implements MouseListener {
                     } else {
                         decompiledTextArea.gotoClassHeader();
                     }
+                    Timer tim = new Timer();
+                    tim.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(true);
+                        }
+                    }, 500);                    
                 }
             };
 
-            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == newAbc) {
+            Main.getMainFrame().getPanel().setLoadingScrollPosEnabled(false);
+            if (decompiledTextArea.getScriptIndex() == icu.getScriptIndex() 
+                    && (decompiledTextArea.getClassIndex() == icu.getClassIndex() || icu.getClassIndex() == -1) 
+                    && abcPanel.abc == newAbc) {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);
@@ -157,7 +170,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 } else {
                     scriptName = "";
                 }
-                abcPanel.hilightScript(abcPanel.getOpenable(), scriptName);
+                abcPanel.hilightScript(icu.getAbc().getOpenable(), scriptName);
             }
         }
     }

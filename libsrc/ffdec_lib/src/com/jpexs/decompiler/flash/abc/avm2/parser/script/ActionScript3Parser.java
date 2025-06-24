@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -40,7 +40,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
-import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
@@ -149,7 +148,7 @@ import macromedia.asc.util.Decimal128;
  * @author JPEXS
  */
 public class ActionScript3Parser {
-    
+
     private static final GraphTargetDialect DIALECT = AVM2GraphTargetDialect.INSTANCE;
 
     private long uniqLast = 0;
@@ -266,12 +265,12 @@ public class ActionScript3Parser {
                 s = lex();
             } while (s.type == SymbolType.COMMA);
             if (s.type == SymbolType.USHIFT_RIGHT) {
-                s = new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_THAN);
+                s = new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.GREATER_THAN);
                 lexer.pushback(s);
                 lexer.pushback(s);
             }
             if (s.type == SymbolType.SHIFT_RIGHT) {
-                s = new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_THAN);
+                s = new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.GREATER_THAN);
                 lexer.pushback(s);
             }
             expected(s, lexer.yyline(), SymbolType.GREATER_THAN);
@@ -442,8 +441,8 @@ public class ActionScript3Parser {
         if (s.type == SymbolType.BRACKET_OPEN) {
             lexer.pushback(s);
             if (attrBracket) {
-                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
-                lexer.pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DOT, "."));
+                lexer.pushback(new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
+                lexer.pushback(new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.DOT, "."));
             }
             ret = member(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables, abc);
         } else {
@@ -919,7 +918,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs);
+                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), true, generatedNs);
                     traits.add(ns);
                     break;
                 case CONST:
@@ -961,7 +960,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline(), false);
+                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline(), false, false);
                     } else {
                         tar = new SlotAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline());
                     }
@@ -1101,9 +1100,10 @@ public class ActionScript3Parser {
             boolean isDynamic = false;
             boolean isPublic = false;
             boolean isNative = false;
+            boolean isInternal = false;
             NamespaceItem ns = packageInternalNs;
             List<ParsedSymbol> preSymbols = new ArrayList<>();
-            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC)) {
+            while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC, SymbolType.INTERNAL, SymbolType.NATIVE)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -1111,13 +1111,24 @@ public class ActionScript3Parser {
                     isFinal = true;
                     preSymbols.add(s);
                 }
+                if (s.type == SymbolType.INTERNAL) {
+                    if (!inPackage) {
+                        throw new AVM2ParseException("internal only allowed inside package", lexer.yyline());
+                    }
+                    if (isPublic || isInternal) {
+                        throw new AVM2ParseException("Only one of public/internal keyword allowed", lexer.yyline());
+                    }
+                    isInternal = true;
+                    ns = packageInternalNs;
+                    preSymbols.add(s);
+                }
                 if (s.type == SymbolType.PUBLIC) {
                     if (!inPackage) {
                         throw new AVM2ParseException("public only allowed inside package", lexer.yyline());
 
                     }
-                    if (isPublic) {
-                        throw new AVM2ParseException("Only one public keyword allowed", lexer.yyline());
+                    if (isPublic || isInternal) {
+                        throw new AVM2ParseException("Only one of public/internal keyword allowed", lexer.yyline());
                     }
                     isPublic = true;
                     ns = publicNs;
@@ -1263,7 +1274,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline(), false);
+                        tar = new ConstAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline(), false, false);
                     } else {
                         tar = new SlotAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline());
                     }
@@ -1297,7 +1308,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
 
-                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs));
+                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), true, generatedNs));
                     break;
                 default:
                     lexer.pushback(s);
@@ -2129,17 +2140,18 @@ public class ActionScript3Parser {
      */
     private void xmlToLowerThanFix(ParsedSymbol symb) {
         if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {
-            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as LOWER_THAN
             String pb = symb.value.toString().substring(1);
             symb.type = SymbolType.LOWER_THAN;
             symb.group = SymbolGroup.OPERATOR;
             symb.value = "<";
+            int pos = 1;
             if (pb.charAt(0) == '=') {
                 symb.type = SymbolType.LOWER_EQUAL;
                 symb.value = "<=";
                 pb = pb.substring(1);
+                pos++;
             }
-            lexer.yypushbackstr(pb); //parse again as LOWER_THAN
+            lexer.yypushbackstr(pb, ActionScriptLexer.YYINITIAL, pos); //parse again as LOWER_THAN
         }
     }
 
@@ -2149,12 +2161,14 @@ public class ActionScript3Parser {
             symb.type = SymbolType.DIVIDE;
             symb.group = SymbolGroup.OPERATOR;
             symb.value = "/";
+            int pos = 1;
             if (pb.charAt(0) == '=') {
                 symb.type = SymbolType.ASSIGN_DIVIDE;
                 symb.value = "/=";
                 pb = pb.substring(1);
+                pos++;
             }
-            lexer.yypushbackstr(pb); //parse again as DIVIDE
+            lexer.yypushbackstr(pb, ActionScriptLexer.YYINITIAL, pos); //parse again as DIVIDE
 
         }
     }
@@ -2199,8 +2213,9 @@ public class ActionScript3Parser {
 
             rhs = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables, abc);
             if (rhs == null) {
-                lexer.pushback(op);
-                break;
+                throw new AVM2ParseException("Missing operand", lexer.yyline());
+                //lexer.pushback(op);
+                //break;
             }
 
             lookahead = peekExprToken();
@@ -2575,10 +2590,10 @@ public class ActionScript3Parser {
                 ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables, abc);
                 allowMemberOrCall = true;
                 break;
-            case NAN:
+            /*case NAN:
                 ret = new NanAVM2Item(null, null);
 
-                break;
+                break;*/
             case INFINITY:
                 ret = new DoubleValueAVM2Item(null, null, Double.POSITIVE_INFINITY);
 
@@ -2608,8 +2623,8 @@ public class ActionScript3Parser {
             case FLOAT4:
                 if (!abc.hasFloat4Support()) {
                     //parse again as method call
-                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()));
-                    lexer.pushback(new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
+                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()), ActionScriptLexer.YYINITIAL, "float4".length());
+                    lexer.pushback(new ParsedSymbol(-1, SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
                     ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);
                 } else {
                     ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);
@@ -2652,8 +2667,8 @@ public class ActionScript3Parser {
             case NEW:
                 s = lex();
                 if (s.type == SymbolType.XML_STARTTAG_BEGIN) {
-                    lexer.yypushbackstr(s.value.toString().substring(1), ActionScriptLexer.YYINITIAL);
-                    s = new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_THAN);
+                    lexer.yypushbackstr(s.value.toString().substring(1), ActionScriptLexer.YYINITIAL, 1);
+                    s = new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.LOWER_THAN);
                 }
                 if (s.type == SymbolType.FUNCTION) {
                     s = lexer.lex();

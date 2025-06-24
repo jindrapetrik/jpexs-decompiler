@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -207,13 +207,7 @@ public class BitmapExporter extends ShapeExporterBase {
         com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
         thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
         thicknessScaleX = Math.abs(p11.x - p00.x);
-        thicknessScaleY = Math.abs(p11.y - p00.y);
-
-        /*Matrix transPre = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        p00 = transPre.transform(0, 0);
-        p11 = transPre.transform(1, 1);
-        realZoom = p00.distanceTo(p11) / Math.sqrt(2);
-        System.out.println("realZoom=" + realZoom);*/
+        thicknessScaleY = Math.abs(p11.y - p00.y);      
     }
 
     /**

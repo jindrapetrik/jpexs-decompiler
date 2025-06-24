@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -103,10 +103,11 @@ public class ActionDefineFunctionPushRegisterCleanerTest extends ActionScript2Te
                 + "function testReturns()\r\n"
                 + "{\r\n"
                 + "var _loc2_ = 10;\r\n"
+                + "var _loc1_;\r\n"
                 + "if(_loc2_ > 2)\r\n"
                 + "{\r\n"
                 + "_loc2_ = _loc2_ + 1;\r\n"
-                + "var _loc1_ = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
                 + "while(_loc1_ < 100)\r\n"
                 + "{\r\n"
                 + "if(_loc2_ + _loc1_ == 27)\r\n"

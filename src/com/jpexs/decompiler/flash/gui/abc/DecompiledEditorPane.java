@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,11 +38,13 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
+import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -60,8 +62,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -101,8 +101,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
-    }   
-    
+    }
+
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
     }
@@ -286,16 +286,18 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return getMultinameAtPos(getCaretPosition(), abcUsed);
     }
 
-    public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type) {
+    public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type, Reference<LinkType> linkTypeRef) {
         Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
         Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
 
         if (h == null) {
+            linkTypeRef.setVal(LinkType.NO_LINK);
             return -1;
         }
 
         List<Highlighting> tms = Highlighting.searchAllPos(highlightedText.getMethodHighlights(), pos);
         if (tms.isEmpty()) {
+            linkTypeRef.setVal(LinkType.NO_LINK);
             return -1;
         }
         for (Highlighting tm : tms) {
@@ -303,6 +305,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             List<Highlighting> tm_tms = Highlighting.searchAllIndexes(highlightedText.getMethodHighlights(), tm.getProperties().index);
             //is it already declaration?
             if (h.getProperties().declaration || (sh != null && sh.getProperties().declaration)) {
+                linkTypeRef.setVal(LinkType.NO_LINK);            
                 return -1; //no jump
             }
 
@@ -312,6 +315,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
                 type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
+                linkTypeRef.setVal(LinkType.LINK_THIS_SCRIPT);
                 return ch.startPos;
             }
 
@@ -322,6 +326,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             search.localName = hData.localName;
             search.specialValue = hData.specialValue;
             if (search.isEmpty()) {
+                linkTypeRef.setVal(LinkType.NO_LINK);
                 return -1;
             }
             search.declaration = true;
@@ -333,89 +338,96 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
                 if (rh != null) {
                     type.setVal(rh.getProperties().declaredType);
+                    linkTypeRef.setVal(LinkType.LINK_OTHER_SCRIPT);
                     return rh.startPos;
                 }
             }
         }
 
+        linkTypeRef.setVal(LinkType.NO_LINK);            
         return -1;
-    }
-
-    public boolean getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed) {
+    } 
+    
+    public LinkType getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed, boolean currentSwfOnly, Reference<Integer> scriptIndexRef) {
 
         int m = getMultinameAtPos(pos, true, abcUsed);
 
         if (indexing == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
         /*int m = getMultinameAtPos(pos, true, abcUsed);
         if (m <= 0) {
             return false;
         }*/
         SyntaxDocument sd = (SyntaxDocument) getDocument();
-        Token t = sd.getTokenAt(pos + 1);
-        Token lastToken = t;
+        Token t = VariableMarker.getIdentifierTokenAt(sd, pos); //sd.getTokenAt(pos + 1);
+        Token lastToken = t;        
         Token prev;
         String propName = t.getString(sd);
         if (!(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX)) {
-            return false;
+            return LinkType.NO_LINK;
         }
         prev = sd.getPrevToken(t);
         if (prev == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
         if (!".".equals(prev.getString(sd))) {
-            return false;
+            return LinkType.NO_LINK;
         }
         Highlighting sh = Highlighting.search(highlightedText.getSpecialHighlights(), new HighlightData(), prev.start, prev.start);
         if (sh == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
 
         HighlightData data = sh.getProperties();
 
         String parentType = data.propertyType;
         if (parentType.equals("*")) {
-            return false;
+            return LinkType.NO_LINK;
         }
-        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), data.isStatic, !data.isStatic, true);
+        Reference<Boolean> foundStatic = new Reference<>(null);
+        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), true, !data.isStatic, true, foundStatic);
         if (propertyTraitIndex == null) {
-            return false;
+            return LinkType.NO_LINK;
         }
-
+        scriptIndexRef.setVal(propertyTraitIndex.scriptIndex);
+        
         List<ABCContainerTag> abcs = getABC().getSwf().getAbcList();
         int index = 0;
-        boolean found = false;
+        boolean isCurrentSwf = false;
         for (ABCContainerTag cnt : abcs) {
             if (cnt.getABC() == propertyTraitIndex.abc) {
                 abcIndex.setVal(index);
-                found = true;
+                isCurrentSwf = true;
                 break;
             }
             index++;
         }
-        if (!found) {
-            return false;
+
+        if (currentSwfOnly) {
+            if (!isCurrentSwf) {
+                return LinkType.NO_LINK;
+            }
         }
 
         abcUsed.setVal(propertyTraitIndex.abc);
 
         index = propertyTraitIndex.abc.findClassByName(propertyTraitIndex.objType.toString());
         if (index == -1) {
-            return false;
+            return LinkType.NO_LINK;
         }
         classIndex.setVal(index);
 
-        classTrait.setVal(data.isStatic);
+        classTrait.setVal(foundStatic.getVal());
 
         Traits ts;
-        if (data.isStatic) {
+        if (foundStatic.getVal()) {
             ts = propertyTraitIndex.abc.class_info.get(index).static_traits;
         } else {
             ts = propertyTraitIndex.abc.instance_info.get(index).instance_traits;
         }
-
-        found = false;
+        
+        boolean found = false;
         for (int i = 0; i < ts.traits.size(); i++) {
             if (ts.traits.get(i) == propertyTraitIndex.trait) {
                 traitIndex.setVal(i);
@@ -424,12 +436,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
         }
         if (!found) {
-            return false;
+            return LinkType.NO_LINK;
         }
 
         multinameIndex.setVal(propertyTraitIndex.trait.name_index);
 
-        return true;
+        return isCurrentSwf ? LinkType.LINK_OTHER_SCRIPT : LinkType.LINK_OTHER_FILE;
         /*
         if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX) {
             return false;
@@ -622,6 +634,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     @Override
     public void caretUpdate(final CaretEvent e) {
+        if (!isEnabled()) {
+            return;
+        }
         ABC abc = getABC();
         if (abc == null) {
             return;
@@ -882,18 +897,17 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public void setScript(ScriptPack scriptLeaf, boolean force) {
         View.checkAccess();
-        
+
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
             setSourceWorker = null;
         }
-        
+
         synchronized (this) {
             scriptLoaded = false;
         }
-        
 
-        if (!force && this.script == scriptLeaf) {                            
+        if (!force && this.script == scriptLeaf) {
             synchronized (this) {
                 scriptLoaded = true;
             }
@@ -1004,8 +1018,6 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 abcPanel.brokenHintPanel.setVisible(false);
             }
             setText(hilightedCode);
-            
-            
 
             if (highlightedText.getClassHighlights().size() > 0) {
                 try {
@@ -1018,7 +1030,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
         }
 
-        scriptLoaded = true;                
+        scriptLoaded = true;
 
         fireScript();
     }
@@ -1039,13 +1051,21 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     public int getClassIndex() {
         return classIndex;
     }
+    
+    public int getScriptIndex() {
+        ScriptPack pack = getScriptLeaf();
+        if (pack == null) {
+            return -1;
+        }
+        return pack.scriptIndex;
+    }
 
     private ABC getABC() {
         return script == null ? null : script.abc;
     }
 
     @Override
-    public synchronized void setText(String t) {
+    public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
     }
@@ -1079,9 +1099,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
         setCaretPosition(position);
     }
-    
+
     @Override
-    public synchronized void setCaretPosition(int position) {
+    public void setCaretPosition(int position) {
         super.setCaretPosition(position);
-    }        
+    }
 }

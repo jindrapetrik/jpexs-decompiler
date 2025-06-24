@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -558,10 +558,14 @@ public abstract class TextTag extends DrawableTag {
      * @param colorTransform Color transform
      * @param zoom Zoom
      */
-    public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
+    public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom);
+        
+        Matrix mat = transformation.clone();
+        mat = mat.concatenate(new Matrix(textMatrix));        
+        //??FIXME
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, 1, zoom, mat);
         shapeExporter.export();
         exporter.endGroup();
     }
@@ -828,6 +832,13 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    private static String makeValidStyleFontFamily(String family) {
+        family = family.replace("+", "_");
+        family = family.replace("\uFFFD", "_");
+        //this may be incomplete list of incompatibilities
+        return family;
+    }
+    
     /**
      * Converts static text to SVG.
      * @param swf SWF
@@ -838,15 +849,17 @@ public abstract class TextTag extends DrawableTag {
      * @param textMatrix Text matrix
      * @param colorTransform Color transform
      * @param zoom Zoom
+     * @param transformation Transformation
      */
-    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
+    public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom, Matrix transformation) {
         int textColor = 0;
         FontTag font = null;
-        int textHeight = 12;
+        double textHeight = 12;
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = new ArrayList<>();
-        for (TEXTRECORD rec : textRecords) {
+        for (int r = 0; r < textRecords.size(); r++) {
+            TEXTRECORD rec = textRecords.get(r);
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
                     textColor = rec.textColorA.toInt();
@@ -888,14 +901,16 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
 
-                boolean hasOffset = offsetX != 0 || offsetY != 0;
+                boolean hasOffset = x != 0 || y != 0;
                 if (hasOffset) {
-                    exporter.createSubGroup(Matrix.getTranslateInstance(offsetX, offsetY), null);
+                    exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
                 }
+                
+                String fontFamily = makeValidStyleFontFamily(font.getFontNameIntag());
 
                 Element textElement = exporter.createElement("text");
-                textElement.setAttribute("font-size", Double.toString(rat * 1024));
-                textElement.setAttribute("font-family", font.getFontNameIntag());
+                textElement.setAttribute("font-size", Double.toString(textHeight / SWF.unitDivisor));
+                textElement.setAttribute("font-family", fontFamily);
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setTextContent(text.toString());
@@ -908,14 +923,29 @@ public abstract class TextTag extends DrawableTag {
 
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.WOFF;
-                exporter.addStyle(font.getFontNameIntag(), new FontExporter().exportFont(font, fontExportMode), fontExportMode);
+                exporter.addStyle(fontFamily, new FontExporter().exportFont(font, fontExportMode), fontExportMode);
 
                 if (hasOffset) {
                     exporter.endGroup();
                 }
+
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    x += entry.glyphAdvance;
+                }
             } else {
+                Matrix mat0 = transformation.clone();
+                mat0 = mat0.concatenate(new Matrix(textMatrix));
+                Matrix matScale = Matrix.getScaleInstance(rat);
+
+                
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
+                    
+                    
+                    matScale.translateX = x;
+                    matScale.translateY = y;
+                    
+                    Matrix matX = mat0.concatenate(matScale);
                     if (entry.glyphIndex != -1) {
                         // shapeNum: 1
                         SHAPE shape = glyphs.get(entry.glyphIndex);
@@ -936,7 +966,7 @@ public abstract class TextTag extends DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, zoom, zoom, matX);
                             shapeExporter.export();
                             if (!exporter.endGroup()) {
                                 charId = "";

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2SimpleParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
@@ -57,7 +58,7 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.editor.VariableMarker;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -86,6 +87,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +97,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -109,10 +111,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
 import javax.swing.tree.TreePath;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -193,8 +195,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private CancellableWorker setSourceWorker;
 
     private List<Runnable> scriptListeners = new ArrayList<>();
-
+    
     private boolean scriptLoaded = true;
+    
+    private JPanel pcodePanel;
 
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
@@ -539,9 +543,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 @Override
                 protected Void doInBackground() throws Exception {
 
+                    if (isCancelled()) {
+                        return null;
+                    }
                     ActionList innerActions = actions;
                     if (disassemblingNeeded) {
                         View.execInEventDispatch(() -> {
+                            if (isCancelled()) {
+                                return;
+                            }
                             editor.setShowMarkers(false);
                             setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                             if (decompileNeeded) {
@@ -550,12 +560,18 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                             }
                         });
 
+                        if (isCancelled()) {
+                            return null;
+                        }
                         DisassemblyListener listener = getDisassemblyListener();
                         asm.addDisassemblyListener(listener);
                         innerActions = asm.getActions();
                         asm.removeDisassemblyListener(listener);
                     }
 
+                    if (isCancelled()) {
+                        return null;
+                    }
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);
@@ -625,6 +641,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         editor.setShowMarkers(true);
         decompiledEditor.setShowMarkers(Configuration.decompile.get());
+        decompiledEditor.setParser(new ActionScript2SimpleParser(asm.getSwf()));
         lastASM = asm;
         lastCode = actions;
         lastDecompiled = decompiledText;
@@ -696,7 +713,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.setEditable(false);
         decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
-        decompiledEditor.setLinkHandler(new LinkHandler() {
+        /*decompiledEditor.setLinkHandler(new LinkHandler() {
             @Override
             public boolean isLink(Token token) {
                 int pos = token.start;
@@ -725,7 +742,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             public Highlighter.HighlightPainter linkPainter() {
                 return decompiledEditor.linkPainter();
             }
-        });
+        });*/
 
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
@@ -864,12 +881,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
         panCode.add(topButtonsPan, BorderLayout.NORTH);
 
-        JPanel panB = new JPanel();
-        panB.setLayout(new BorderLayout());
+        pcodePanel = new JPanel();
+        pcodePanel.setLayout(new BorderLayout());
         asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        panB.add(asmLabel, BorderLayout.NORTH);
-        panB.add(panCode, BorderLayout.CENTER);
+        pcodePanel.add(asmLabel, BorderLayout.NORTH);
+        pcodePanel.add(panCode, BorderLayout.CENTER);
 
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
@@ -892,7 +909,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         //buttonsPan.add(saveHexButton);
         //buttonsPan.add(loadHexButton);
-        panB.add(buttonsPan, BorderLayout.SOUTH);
+        pcodePanel.add(buttonsPan, BorderLayout.SOUTH);
 
         saveButton.addActionListener(this::saveActionButtonActionPerformed);
         editButton.addActionListener(this::editActionButtonActionPerformed);
@@ -931,8 +948,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
 
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
-        panelWithHint.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
-
+        
+        JPanel panelDecompiled = new JPanel(new BorderLayout(0, 0));
+        panelDecompiled.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
+        panelWithHint.add(panelDecompiled, BorderLayout.CENTER);
+        
         brokenHintPanel.setVisible(false);
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -1007,7 +1027,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         setLayout(new BorderLayout());
 
         if (Configuration.displayAs12PCodePanel.get()) {
-            add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+            add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, pcodePanel, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         } else {
             splitPane = null;
             add(panA, BorderLayout.CENTER);
@@ -1016,6 +1036,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.setFont(Configuration.getSourceFont());
         decompiledEditor.setFont(Configuration.getSourceFont());
         decompiledEditor.changeContentType("text/actionscript");
+        DefaultSyntaxKit kit = (DefaultSyntaxKit) decompiledEditor.getEditorKit();
+        kit.installComponent(decompiledEditor, VariableMarker.class.getName());
 
         editor.addCaretListener(new CaretListener() {
             @Override
@@ -1171,6 +1193,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             saveButton.setEnabled(false);
             editButton.setVisible(!val);
             cancelButton.setVisible(val);
+            
+            editDecompiledButton.setEnabled(!val);
         }
 
         editor.getCaret().setVisible(true);
@@ -1186,9 +1210,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         View.checkAccess();
 
         if (src != null) {
-            if (val) {
-                setDecompiledText(src.getScriptName(), src.getExportedScriptName(), lastDecompiled.text);
-            } else {
+            if (!val) {
                 setDecompiledText(src.getScriptName(), src.getExportedScriptName(), lastDecompiled.text);
             }
         }
@@ -1206,6 +1228,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             saveDecompiledButton.setEnabled(false);
             editDecompiledButton.setVisible(!val);
             cancelDecompiledButton.setVisible(val);
+            pcodePanel.setVisible(!val);
         }
         decompiledEditor.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
@@ -1392,13 +1415,26 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         Runnable onScriptComplete = new Runnable() {
             @Override
             public void run() {
-                decompiledEditor.setCaretPosition(0);
+                Timer tim = new Timer();
+                tim.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                decompiledEditor.setSelectionStart(0);
+                                decompiledEditor.setSelectionEnd(0);
+                                decompiledEditor.setCaretPosition(0);
+                                if (result.isPcode()) {
+                                    searchPanel.showQuickFindDialog(editor);
+                                } else {
+                                    searchPanel.showQuickFindDialog(decompiledEditor);
+                                }
+                            }
+                        });
+                    }
+                }, 100);
 
-                if (result.isPcode()) {
-                    searchPanel.showQuickFindDialog(editor);
-                } else {
-                    searchPanel.showQuickFindDialog(decompiledEditor);
-                }
                 removeScriptListener(this);
             }
         };
@@ -1406,10 +1442,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         addScriptListener(onScriptComplete);
 
         AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getFullModel();
+        mainPanel.getCurrentTree().getSelectionModel().clearSelection();
         TreePath tp = ttm.getTreePath(result.getSrc());
         mainPanel.getCurrentTree().setSelectionPath(tp);
         mainPanel.getCurrentTree().scrollPathToVisible(tp);
-
     }
 
     @Override

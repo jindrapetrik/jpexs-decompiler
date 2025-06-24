@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -462,6 +462,68 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             }
         }
     }
+
+    @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUB(1, 0); //No clip actions
+        sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
+        sos.writeUB(1, placeFlagHasName ? 1 : 0);
+        sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
+        sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
+        sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
+        sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
+        sos.writeUB(1, placeFlagMove ? 1 : 0);
+        sos.writeUB(1, reserved ? 1 : 0);
+        sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
+        sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
+        sos.writeUB(1, placeFlagHasImage ? 1 : 0);
+        sos.writeUB(1, placeFlagHasClassName ? 1 : 0);
+        sos.writeUB(1, placeFlagHasCacheAsBitmap ? 1 : 0);
+        sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
+        sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
+        sos.writeUI16(depth);
+
+        if (placeFlagHasClassName) {
+            sos.writeString(className);
+        }
+        if (placeFlagHasCharacter) {
+            sos.writeUI16(characterId);
+        }
+        if (placeFlagHasMatrix) {
+            sos.writeMatrix(matrix);
+        }
+        if (placeFlagHasColorTransform) {
+            sos.writeCXFORMWITHALPHA(colorTransform);
+        }
+        if (placeFlagHasRatio) {
+            sos.writeUI16(ratio);
+        }
+        if (placeFlagHasName) {
+            sos.writeString(name);
+        }
+        if (placeFlagHasClipDepth) {
+            sos.writeUI16(clipDepth);
+        }
+        if (placeFlagHasFilterList) {
+            sos.writeFILTERLIST(surfaceFilterList);
+        }
+        if (placeFlagHasBlendMode) {
+            sos.writeUI8(blendMode);
+        }
+        if (placeFlagHasCacheAsBitmap) {
+            if (!bitmapCacheBug) {
+                sos.writeUI8(bitmapCache);
+            }
+        }
+        if (placeFlagHasVisible) {
+            sos.writeUI8(visible);
+        }
+        if (placeFlagOpaqueBackground) {
+            sos.writeRGBA(backgroundColor);
+        }        
+    }
+    
+    
 
     @Override
     public int getPlaceObjectNum() {

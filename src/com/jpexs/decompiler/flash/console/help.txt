@@ -46,8 +46,10 @@ alias /?
 -dumpSWF <infile>
     Dump list of SWF tags to console.
 
--dumpAS2 <infile>
+-dumpAS2 [-exportNames] <infile>
     Dump list of AS1/2 scripts to console.
+    Use -exportNames option to print names in export format
+    (used in -replace command etc.)
 
 -dumpAS3 <infile>
     Dump list of AS3 scripts to console.
@@ -98,18 +100,21 @@ alias /?
     Convert FlashPaper SWF file <infile> to PDF <outfile>.
     Use -zoom parameter to specify image quality.
 
--replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> \
-         [nofill] ([<format1>][<methodBodyIndex1>]) \
-         [(<characterId2>|<scriptName2>) <importDataFile2> \
-         [nofill] ([<format2>][<methodBodyIndex2>])]...
+-replace <infile> <outfile> \
+       (<characterId1>|<scriptName1>) <importDataFile1> \
+       [nofill] [-startFrame <startFrame>] ([<format1>][<methodBodyIndex1>]) \
+       [(<characterId2>|<scriptName2>) <importDataFile2> \
+       [nofill] [-startFrame <startFrame>] ([<format2>][<methodBodyIndex2>])]...
     Replace data.
     Replaces the data of the specified BinaryData, Image, Shape, Text,
     Sound tag or Script.
     nofill parameter can be specified only for shape replace.
+    <startFrame> parameter sets sound range start frame (for sound streams)
     <format> parameter can be specified for Image and Shape tags.
     valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4.
     <methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code.
     Use -1 as characterId to replace main timeline SoundStreamHead.
+
 -replace <infile> <outfile> <argsfile>
     Replace data using argsfile.     
     Same as -replace command, but the rest of arguments is read as lines from
@@ -295,6 +300,11 @@ alias /?
     List all available configuration keys and current values.
     These keys can be used in -config pre-option.
 
+-storeConfigFile [-comments] [-all] <file>
+    Stores current configuration to a file <file>.
+    With -comments argument it adds titles and descriptions.
+    With -all argument it exports all configs, not even modified.
+
 -translator
     Runs the Translator app for FFDec localization
 
@@ -393,6 +403,11 @@ Pre-options:
     If no other parameters passed, configuration is saved.
     Otherwise it is used only once.
     DO NOT PUT space between comma (,) and next value.
+
+-configFile <file>
+    Applies to: *
+    Use configuration from a file <file>. TOML file format is expected.
+    When it has .bin extension, legacy storage is used.
 
 -onerror (abort|retry <N>|ignore)
     Applies to: -export, -importScript

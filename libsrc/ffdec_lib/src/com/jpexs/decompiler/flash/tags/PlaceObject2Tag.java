@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -258,6 +258,39 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
             sos.writeCLIPACTIONS(clipActions);
         }
     }
+
+    @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUB(1, 0); //no clip actions
+        sos.writeUB(1, placeFlagHasClipDepth ? 1 : 0);
+        sos.writeUB(1, placeFlagHasName ? 1 : 0);
+        sos.writeUB(1, placeFlagHasRatio ? 1 : 0);
+        sos.writeUB(1, placeFlagHasColorTransform ? 1 : 0);
+        sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
+        sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
+        sos.writeUB(1, placeFlagMove ? 1 : 0);
+        sos.writeUI16(depth);
+        if (placeFlagHasCharacter) {
+            sos.writeUI16(characterId);
+        }
+        if (placeFlagHasMatrix) {
+            sos.writeMatrix(matrix);
+        }
+        if (placeFlagHasColorTransform) {
+            sos.writeCXFORMWITHALPHA(colorTransform);
+        }
+        if (placeFlagHasRatio) {
+            sos.writeUI16(ratio);
+        }
+        if (placeFlagHasName) {
+            sos.writeString(name);
+        }
+        if (placeFlagHasClipDepth) {
+            sos.writeUI16(clipDepth);
+        }
+    }
+    
+    
 
     @Override
     public int getPlaceObjectNum() {

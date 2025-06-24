@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2024 JPEXS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2024-2025 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.easygui.properties.panels;
 
@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -1093,13 +1094,20 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             for (int i = 0; i < fdepths.size(); i++) {
                 PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
                 PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
-
-                int index = timelined.indexOfTag(placeObjectBefore);
-                timelined.removeTag(index);
-                timelined.addTag(index, placeObjectAfter);
-                timelined.setModified(true);
+                
+                if (!(timelined instanceof ButtonTag)) {
+                    int index = timelined.indexOfTag(placeObjectBefore);
+                    timelined.removeTag(index);
+                    timelined.addTag(index, placeObjectAfter);
+                    timelined.setModified(true);
+                }
                 DepthState depthStateBefore = depthStatesBefore.get(i);
                 doPlaceOperation(placeObjectAfter, depthStateBefore);
+                
+                if (timelined instanceof ButtonTag) {
+                    ButtonTag button = (ButtonTag) timelined;
+                    button.setRecordFromPlaceObject(fframe, placeObjectAfter);
+                }
             }
 
             timelined.resetTimeline();
@@ -1113,9 +1121,14 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             for (int i = 0; i < placeObjectsAfter.size(); i++) {
                 PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
                 PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
-                int index = timelined.indexOfTag(placeObjectAfter);
-                timelined.removeTag(index);
-                timelined.addTag(index, placeObjectBefore);
+                if (timelined instanceof ButtonTag) {
+                    ButtonTag button = (ButtonTag) timelined;
+                    button.setRecordFromPlaceObject(fframe, placeObjectBefore);                    
+                } else {
+                    int index = timelined.indexOfTag(placeObjectAfter);
+                    timelined.removeTag(index);
+                    timelined.addTag(index, placeObjectBefore);
+                }
             }
             if (!timelinedModifiedBefore) {
                 timelined.setModified(false);

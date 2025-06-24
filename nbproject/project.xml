@@ -306,24 +306,20 @@
                     <ide-action name="profile"/>
                     <ide-action name="debug"/>
                     <action>
-                        <label>New version - nightly build</label>
-                        <target>new-version-nightlybuild</target>
-                    </action>
-                    <action>
                         <label>Create Installer</label>
                         <target>installer</target>
                     </action>
                     <action>
-                        <label>Create EXE</label>
-                        <target>exe</target>
-                    </action>
-                    <action>
-                        <label>Pack locales</label>
-                        <target>locales</target>
-                    </action>
-                    <action>
                         <label>Create ZIP</label>
                         <target>archive</target>
+                    </action>
+                    <action>
+                        <label>Release new version on GitHub</label>
+                        <target>github-newversion</target>
+                    </action>
+                    <action>
+                        <label>Check style</label>
+                        <target>checkstyle</target>
                     </action>
                 </context-menu>
             </view>

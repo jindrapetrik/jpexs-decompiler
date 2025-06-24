@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,10 +30,17 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -45,12 +52,15 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * @author JPEXS
@@ -74,6 +84,10 @@ public class ErrorLogFrame extends AppFrame {
     private static final int MAX_LOG_ITEM_COUNT = 100;
 
     private final AtomicInteger logItemCount = new AtomicInteger();
+
+    private List<String> logHistory = new ArrayList<>();
+
+    private JButton saveToFileButton;
 
     public Handler getHandler() {
         return handler;
@@ -138,7 +152,60 @@ public class ErrorLogFrame extends AppFrame {
                 clearLog();
             }
         });
+        saveToFileButton = new JButton(translate("saveToFile"));
+        saveToFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = View.getFileChooserWithIcon("save");
+                fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+
+                FileFilter txtFilter = new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".txt"))
+                                || (f.isDirectory());
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return translate("filter.txt");
+                    }
+                };
+                fc.addChoosableFileFilter(txtFilter);
+                fc.setAcceptAllFileFilterUsed(true);
+                if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+                File file = Helper.fixDialogFile(fc.getSelectedFile());
+                try (Writer w = new FileWriter(file); PrintWriter pw = new PrintWriter(w);) {
+                    List<String> logHistoryCopy = new ArrayList<>(logHistory);
+                    boolean first = true;
+                    for (String entry : logHistoryCopy) {
+                        if (!first) {
+                            pw.println("-------------------------");
+                        }
+                        pw.println(entry);
+                        first = false;
+                    }
+                } catch (IOException ex) {
+                    ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("error.cannotSave").replace("%error%", ex.getLocalizedMessage()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         buttonsPanel.add(clearButton);
+
+        /*
+        JButton makeErrorButton = new JButton("Do error");
+        makeErrorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Logger.getLogger(ErrorLogFrame.class.getName()).log(Level.SEVERE, "Test message", new Exception());
+            }            
+        });
+        buttonsPanel.add(makeErrorButton);
+         */
+        saveToFileButton.setEnabled(false);
+        buttonsPanel.add(saveToFileButton);
 
         expandIcon = View.getIcon("expand16");
         collapseIcon = View.getIcon("collapse16");
@@ -167,6 +234,8 @@ public class ErrorLogFrame extends AppFrame {
     }
 
     public void clearLog() {
+        saveToFileButton.setEnabled(false);
+        logHistory.clear();
         logViewInner.removeAll();
         logItemCount.set(0);
         Main.clearLogFile();
@@ -239,6 +308,7 @@ public class ErrorLogFrame extends AppFrame {
                 }
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 final String dateStr = format.format(new Date());
+                final String logEntry = dateStr + " " + level.toString() + " " + msg + "\r\n" + detail;
 
                 JToggleButton copyButton = new JToggleButton(View.getIcon("copy16"));
                 copyButton.setFocusPainted(false);
@@ -252,10 +322,11 @@ public class ErrorLogFrame extends AppFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                        StringSelection stringSelection = new StringSelection(dateStr + " " + level.toString() + " " + msg + "\r\n" + detail);
+                        StringSelection stringSelection = new StringSelection(logEntry);
                         clipboard.setContents(stringSelection, null);
                     }
                 });
+                logHistory.add(logEntry);
 
                 final JToggleButton expandButton = new JToggleButton(collapseIcon);
                 expandButton.setFocusPainted(false);
@@ -266,12 +337,13 @@ public class ErrorLogFrame extends AppFrame {
                 expandButton.setMargin(new Insets(2, 2, 2, 2));
                 expandButton.setToolTipText(translate("details"));
 
-                final JScrollPane scrollPane;
+                final JPanel detailPanel;
                 if (detailComponent != null) {
-                    scrollPane = new FasterScrollPane(detailComponent);
-                    scrollPane.setAlignmentX(0f);
+                    detailPanel = new JPanel(new BorderLayout());
+                    detailPanel.add(detailComponent, BorderLayout.CENTER);
+                    detailPanel.setAlignmentX(0f);
                 } else {
-                    scrollPane = null;
+                    detailPanel = null;
                 }
 
                 if (detailComponent != null) {
@@ -279,7 +351,7 @@ public class ErrorLogFrame extends AppFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             expandButton.setIcon(expandButton.isSelected() ? expandIcon : collapseIcon);
-                            scrollPane.setVisible(expandButton.isSelected());
+                            detailPanel.setVisible(expandButton.isSelected());
                             revalidate();
                             repaint();
                         }
@@ -309,13 +381,14 @@ public class ErrorLogFrame extends AppFrame {
                 header.add(copyButton);
                 pan.add(header);
                 if (detailComponent != null) {
-                    pan.add(scrollPane);
-                    scrollPane.setVisible(false);
+                    pan.add(detailPanel);
+                    detailPanel.setVisible(false);
                 }
                 pan.setAlignmentX(0f);
                 if (logViewInner != null) { //may be disposed or what? #1904
                     logViewInner.add(pan);
                 }
+                saveToFileButton.setEnabled(true);
                 revalidate();
                 repaint();
             });

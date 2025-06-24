@@ -1,31 +1,31 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.console;
 
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Win32Exception;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.SHELLEXECUTEINFO;
-import com.sun.jna.platform.win32.Shell32;
-import com.sun.jna.platform.win32.Win32Exception;
-import com.sun.jna.platform.win32.WinReg;
-import com.sun.jna.platform.win32.WinUser;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,9 +107,9 @@ public class ContextMenuTools {
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
                 registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
-                registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);                               
+                registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
             }
-            
+
             for (String ext : extensions) {
 
                 // 1) Add to context menu of SWF
@@ -124,9 +124,8 @@ public class ContextMenuTools {
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
                     }
-                                        
+
                     //Open with per extension
-                    
                     exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
                     if ((!exists) && add) { //add
                         Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
@@ -134,7 +133,7 @@ public class ContextMenuTools {
                     if (exists && (!add)) { //remove
                         registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "." + ext + "\\OpenWithList\\" + exeName);
                     }
-                    
+
                     if (add) {
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, clsName, verb);
                     }
@@ -175,8 +174,8 @@ public class ContextMenuTools {
                     }
                     if (add) {
                         Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "", verbName);
-                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");                    
-                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "MUIVerb", "@" + appDir + exeName + ",-" + muiVerbCode);                                       
+                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command", "", "\"" + appDir + exeName + "\" \"%1\"");
+                        Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb, "MUIVerb", "@" + appDir + exeName + ",-" + muiVerbCode);
                     }
                     if (exists && (!add)) { //remove        
                         registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\." + ext + "\\Shell\\" + verb + "\\Command");

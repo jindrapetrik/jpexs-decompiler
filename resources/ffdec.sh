@@ -10,6 +10,8 @@
 # If the app then terminates with OutOfMemory you can experiment with lower value.
 # FFDEC_STACK_SIZE=32m
 
+# Uncomment following when you want to disable checks for hardware acceleration compatibility.
+# export J2D_D3D_NO_HWCHECK=true
 
 # Hide VLC error output
 export VLC_VERBOSE=-1

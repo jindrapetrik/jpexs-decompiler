@@ -32,6 +32,8 @@ These include:
 * Miter clip - modified openjdk8 Stroker - `miterclip.jar` - Support for miter clip join style in shapes
 * FlexSDK Decimal128 class - `decimal.jar` - Working with decimal type in AS3
 * FLA Compound Document Tools - `flacomdoc.jar` - Exporting FLA to CS4 or lower
+* TomlJ - `tomlj-1.1.1.jar` - Storing configuration
+* ANTLR - `antlr-runtime-4.11.1.jar` - Storing configuration
 
 ## Basic library usage
 ```java
@@ -140,6 +142,8 @@ And also links to these libraries:
 * [Java Native Access - JNA] (Registry association, Process memory reading) - LGPL
 * [Open Imaging GIF Decoder] (GIF file importing) - Apache License 2.0
 * [FLA Compound Document Tools] (Exporting to FLA CS4 and below) - LGPLv2.1
+* [TomlJ] (Storing configuration) - Apache License 2.0
+* [ANTLR] (Storing configuration) - BSD 3-Clause
 
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
@@ -160,3 +164,5 @@ And also links to these libraries:
 [openjdk8 Stroker]: https://github.com/JetBrains/jdk8u_jdk
 [Apache Flex SDK]: https://github.com/apache/flex-sdk
 [FLA Compound Document Tools]: https://github.com/jindrapetrik/flacomdoc
+[TomlJ]: https://github.com/tomlj/tomlj
+[ANTLR]: https://www.antlr.org/

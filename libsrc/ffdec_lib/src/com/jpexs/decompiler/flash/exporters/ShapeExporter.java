@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -102,22 +102,24 @@ public class ShapeExporter {
 
                 final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + settings.getFileExtension()));
                 new RetryTask(() -> {
+                    Matrix m = Matrix.getScaleInstance(settings.zoom);
+                    RECT rect = st.getRect();
+                    m.translate(-rect.Xmin, -rect.Ymin);
                     switch (settings.mode) {
                         case SVG:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                ExportRectangle rect = new ExportRectangle(st.getRect());
-                                rect.xMax *= settings.zoom;
-                                rect.yMax *= settings.zoom;
-                                rect.xMin *= settings.zoom;
-                                rect.yMin *= settings.zoom;
-                                SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
-                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                ExportRectangle rect2 = new ExportRectangle(st.getRect());
+                                rect2.xMax *= settings.zoom;
+                                rect2.yMax *= settings.zoom;
+                                rect2.xMin *= settings.zoom;
+                                rect2.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
+                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
                         case PNG:
                         case BMP:
-                            RECT rect = st.getRect();
                             int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
@@ -129,9 +131,7 @@ public class ShapeExporter {
                                     g.setColor(backColor.toColor());
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
-                            }
-                            Matrix m = Matrix.getScaleInstance(settings.zoom);
-                            m.translate(-rect.Xmin, -rect.Ymin);
+                            }                            
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);

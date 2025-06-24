@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2023-2024 JPEXS
- *
+ *  Copyright (C) 2023-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -252,12 +252,18 @@ public class ScrollPosStorage {
                     return;
                 }
                 actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getCaretPosition();
+                if (mainPanel.getABCPanel().decompiledTextArea.getSelectionStart() > 0) {
+                    actionScriptCaret = mainPanel.getABCPanel().decompiledTextArea.getSelectionStart();
+                }
                 
                 actionScriptScrollHorizontal = mainPanel.getABCPanel().decompiledScrollPane.getHorizontalScrollBar().getValue();
                 actionScriptScrollVertical = mainPanel.getABCPanel().decompiledScrollPane.getVerticalScrollBar().getValue();
                 pcodeScrollHorizontal = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getHorizontalScrollBar().getValue();
                 pcodeScrollVertical = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceScrollPane().getVerticalScrollBar().getValue();
                 pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getCaretPosition();
+                if (mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getSelectionStart() > 0) {
+                    pcodeCaret = mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().getSelectionStart();
+                }
             }
                                     
         } else if (asmItem instanceof ASMSource) {       
@@ -272,9 +278,15 @@ public class ScrollPosStorage {
                 actionScriptScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getHorizontalScrollBar().getValue();
                 actionScriptScrollVertical = ((JScrollPane) mainPanel.getActionPanel().decompiledEditor.getParent().getParent()).getVerticalScrollBar().getValue();
                 actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getCaretPosition();
+                if (mainPanel.getActionPanel().decompiledEditor.getSelectionStart() > 0) {
+                    actionScriptCaret = mainPanel.getActionPanel().decompiledEditor.getSelectionStart();
+                }
                 pcodeScrollHorizontal = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getHorizontalScrollBar().getValue();
                 pcodeScrollVertical = ((JScrollPane) mainPanel.getActionPanel().editor.getParent().getParent()).getVerticalScrollBar().getValue();
                 pcodeCaret = mainPanel.getActionPanel().editor.getCaretPosition();
+                if (mainPanel.getActionPanel().editor.getSelectionStart() > 0) {
+                    pcodeCaret = mainPanel.getActionPanel().editor.getSelectionStart();
+                }
             }            
         }
         int folderPreviewScrollVertical = 0;

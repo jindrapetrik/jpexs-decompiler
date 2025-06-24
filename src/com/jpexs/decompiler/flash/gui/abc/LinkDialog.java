@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2023-2024 JPEXS
- *
+ *  Copyright (C) 2023-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import java.awt.BorderLayout;
@@ -39,6 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -60,6 +62,8 @@ public class LinkDialog extends JDialog {
     private SWF swf;
 
     private boolean overLinkButton = false;
+    
+    private JLabel noOtherFilesLabel = new JLabel(AppStrings.translate("abc.link.dialog.noOtherFilesOpened"));
 
     private List<ActionListener> saveListeners = new ArrayList<>();
 
@@ -106,6 +110,9 @@ public class LinkDialog extends JDialog {
                 dispose();
             }
         });
+        
+        noOtherFilesLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
         JPanel customLibraryPanel = new JPanel(new BorderLayout());
         linkList = new JList<>();
         linkList.setCellRenderer(new CustomLibraryListCellRenderer());
@@ -121,6 +128,7 @@ public class LinkDialog extends JDialog {
             }
         });
         customLibraryPanel.add(linkList, BorderLayout.CENTER);
+        customLibraryPanel.add(noOtherFilesLabel, BorderLayout.NORTH);
 
         customLibraryPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
@@ -140,6 +148,7 @@ public class LinkDialog extends JDialog {
         }
 
         populateSWFs(swf, selectedSWFs);
+        noOtherFilesLabel.setVisible(selectedSWFs.isEmpty());
     }
 
     public void show(SWF swf) {

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
@@ -51,12 +53,14 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     /**
      * Has blend mode?
+     *
      * @since SWF 8
      */
     public boolean buttonHasBlendMode;
 
     /**
      * Has filter list?
+     *
      * @since SWF 8
      */
     public boolean buttonHasFilterList;
@@ -145,12 +149,31 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     /**
      * Constructor.
+     *
      * @param swf SWF
      * @param tag Button tag
      */
     public BUTTONRECORD(SWF swf, ButtonTag tag) {
         this.swf = swf;
         this.tag = tag;
+    }
+
+    public BUTTONRECORD(BUTTONRECORD source) {
+        this.buttonHasBlendMode = source.buttonHasBlendMode;
+        this.buttonHasFilterList = source.buttonHasFilterList;
+        this.buttonStateHitTest = source.buttonStateHitTest;
+        this.buttonStateDown = source.buttonStateDown;
+        this.buttonStateOver = source.buttonStateOver;
+        this.buttonStateUp = source.buttonStateUp;
+        this.characterId = source.characterId;
+        this.placeDepth = source.placeDepth;
+        this.placeMatrix = new MATRIX(source.placeMatrix);
+        this.colorTransform = source.colorTransform == null ? null : new CXFORMWITHALPHA(source.colorTransform);
+        this.filterList = Helper.deepCopy(source.filterList);
+        this.blendMode = source.blendMode;
+        this.swf = source.swf;
+        this.tag = source.tag;
+        this.modified = source.modified;
     }
 
     /**
@@ -178,6 +201,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     /**
      * Sets the modified flag.
+     *
      * @param value Modified flag
      */
     public void setModified(boolean value) {
@@ -211,7 +235,68 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     }
 
     /**
+     * Enables/disables specific frame
+     *
+     * @param frame Frame
+     * @param value Value
+     */
+    public void setFrame(int frame, boolean value) {
+        switch (frame) {
+            case ButtonTag.FRAME_UP:
+                buttonStateUp = value;
+                break;
+            case ButtonTag.FRAME_OVER:
+                buttonStateOver = value;
+                break;
+            case ButtonTag.FRAME_DOWN:
+                buttonStateDown = value;
+                break;
+            case ButtonTag.FRAME_HITTEST:
+                buttonStateHitTest = value;
+                break;
+        }
+    }
+
+    /**
+     * Has frame
+     *
+     * @param frame Frame
+     * @return True if has
+     */
+    public boolean hasFrame(int frame) {
+        switch (frame) {
+            case ButtonTag.FRAME_UP:
+                return buttonStateUp;
+            case ButtonTag.FRAME_OVER:
+                return buttonStateOver;
+            case ButtonTag.FRAME_DOWN:
+                return buttonStateDown;
+            case ButtonTag.FRAME_HITTEST:
+                return buttonStateHitTest;
+        }
+        return false;
+    }
+
+    /**
+     * Imports placeObject to this BUTTONRECORD
+     *
+     * @param placeObject Place tag
+     */
+    public void fromPlaceObject(PlaceObjectTypeTag placeObject) {
+        placeDepth = placeObject.getDepth();
+        characterId = placeObject.getCharacterId();
+        ColorTransform importedColorTrans = placeObject.getColorTransform();
+        colorTransform = importedColorTrans == null ? new CXFORMWITHALPHA() : new CXFORMWITHALPHA(placeObject.getColorTransform());
+        placeMatrix = placeObject.getMatrix();
+        blendMode = placeObject.getBlendMode();
+        buttonHasBlendMode = blendMode > 0;
+        filterList = placeObject.getFilters();
+        buttonHasFilterList = filterList != null && !filterList.isEmpty();
+    }
+
+    /**
      * Converts this BUTTONRECORD to a place tag.
+     *
      * @return Place tag
      */
     public PlaceObject3Tag toPlaceObject() {
@@ -246,5 +331,21 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
             placeTag.placeFlagHasFilterList = true;
         }
         return placeTag;
+    }
+
+    public boolean isEmpty() {
+        if (buttonStateUp) {
+            return false;
+        }
+        if (buttonStateOver) {
+            return false;
+        }
+        if (buttonStateDown) {
+            return false;
+        }
+        if (buttonStateHitTest) {
+            return false;
+        }
+        return true;
     }
 }

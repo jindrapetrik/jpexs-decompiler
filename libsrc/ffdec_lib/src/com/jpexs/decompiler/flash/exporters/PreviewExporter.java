@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
@@ -58,6 +60,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -252,6 +255,10 @@ public class PreviewExporter {
     public SWFHeader exportSwf(OutputStream os, TreeItem treeItem, Color backgroundColor, int fontPageNum, boolean showControls) throws IOException, ActionParseException {
         SWF swf = (SWF) treeItem.getOpenable();
 
+        if (treeItem instanceof TagScript) {
+            treeItem = ((TagScript) treeItem).getTag();
+        }
+
         int frameCount = 1;
         float frameRate = swf.frameRate;
         HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
@@ -335,7 +342,15 @@ public class PreviewExporter {
 
             FileAttributesTag fa = swf.getFileAttributes();
             if (fa != null) {
-                fa.writeTag(sos2);
+                FileAttributesTag fa2;
+                try {
+                    fa2 = (FileAttributesTag) fa.cloneTag();
+                    fa2.actionScript3 = false;
+                    fa2.setModified(true);
+                    fa2.writeTag(sos2);
+                } catch (InterruptedException ex) {
+                    //ignored
+                }                
             }
 
             SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
@@ -347,18 +362,21 @@ public class PreviewExporter {
                 setBgColorTag.writeTag(sos2);
             }
 
+            Set<Integer> doneCharacters = new LinkedHashSet<>();
             if (treeItem instanceof Frame) {
                 Frame fn = (Frame) treeItem;
                 Timelined parent = fn.timeline.timelined;
 
-                Set<Integer> doneCharacters = new LinkedHashSet<>();
                 for (Tag t : parent.getTags()) {
                     if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
                         continue;
                     }
 
-                    if (t instanceof DoActionTag || t instanceof DoInitActionTag) {
-                        // todo: Maybe DoABC tags should be removed, too
+                    if (t instanceof DoActionTag
+                            || t instanceof DoInitActionTag
+                            || t instanceof ABCContainerTag
+                            || t instanceof SymbolClassTag
+                            || t instanceof ExportAssetsTag) {
                         continue;
                     }
 
@@ -366,8 +384,7 @@ public class PreviewExporter {
                     t.getNeededCharactersDeep(needed);
                     for (int n : needed) {
                         if (!doneCharacters.contains(n)) {
-                            writeTag(swf.getCharacter(n), sos2);
-                            doneCharacters.add(n);
+                            writeTag(swf.getCharacter(n), sos2, doneCharacters);
                         }
                     }
 
@@ -377,8 +394,7 @@ public class PreviewExporter {
                     if (t instanceof CharacterTag) {
                         int characterId = ((CharacterTag) t).getCharacterId();
                         if (characterId != -1) {
-                            doneCharacters.add(characterId);
-                            writeTag(t, sos2);
+                            writeTag(t, sos2, doneCharacters);
                         }
                     }
                 }
@@ -427,11 +443,11 @@ public class PreviewExporter {
                             }
                         }
 
-                        writeTag(characterTag, sos2);
+                        writeTag(characterTag, sos2, doneCharacters);
                     }
                 }
 
-                writeTag((Tag) treeItem, sos2);
+                writeTag((Tag) treeItem, sos2, doneCharacters);
 
                 MATRIX mat = new MATRIX();
                 mat.hasRotate = false;
@@ -570,25 +586,6 @@ public class PreviewExporter {
 
                     doa = new DoActionTag(swf, null);
                     actions = ASMParser.parse(0, false,
-                            "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\"\n"
-                            + "Push \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                            + "NewObject\n"
-                            + "SetMember\n"
-                            + "Push \"my_define_sound\" 1 \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\"\n"
-                            + "GetMember\n"
-                            + "Push \"attachSound\"\n"
-                            + "CallMethod\n"
-                            + "Pop\n"
-                            + "Stop", swf.version, false, swf.getCharset());
-                    doa.setActions(actions);
-                    doa.writeTag(sos2);
-                    new ShowFrameTag(swf).writeTag(sos2);
-
-                    actions = ASMParser.parse(0, false,
                             "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"start\"\n"
                             + "StopSounds\n"
                             + "Push \"_root\"\n"
@@ -613,59 +610,6 @@ public class PreviewExporter {
                             + "Stop", swf.version, false, swf.getCharset());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
-                    new ShowFrameTag(swf).writeTag(sos2);
-
-                    actions = ASMParser.parse(0, false,
-                            "ConstantPool \"_root\" \"my_sound\" \"Sound\" \"my_define_sound\" \"attachSound\" \"onSoundComplete\" \"start\" \"execParam\"\n"
-                            + "StopSounds\n"
-                            + "Push \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\" 0.0 \"Sound\"\n"
-                            + "NewObject\n"
-                            + "SetMember\n"
-                            + "Push \"my_define_sound\" 1 \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\"\n"
-                            + "GetMember\n"
-                            + "Push \"attachSound\"\n"
-                            + "CallMethod\n"
-                            + "Pop\n"
-                            + "Push \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\"\n"
-                            + "GetMember\n"
-                            + "Push \"onSoundComplete\"\n"
-                            + "DefineFunction2 \"\" 0 2 false true true false true false true false false  {\n"
-                            + "Push 0.0 register1 \"my_sound\"\n"
-                            + "GetMember\n"
-                            + "Push \"start\"\n"
-                            + "CallMethod\n"
-                            + "Pop\n"
-                            + "}\n"
-                            + "SetMember\n"
-                            + "Push \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"execParam\"\n"
-                            + "GetMember\n"
-                            + "Push 1 \"_root\"\n"
-                            + "GetVariable\n"
-                            + "Push \"my_sound\"\n"
-                            + "GetMember\n"
-                            + "Push \"start\"\n"
-                            + "CallMethod\n"
-                            + "Pop\n"
-                            + "Stop", swf.version, false, swf.getCharset());
-                    doa.setActions(actions);
-                    doa.writeTag(sos2);
-                    new ShowFrameTag(swf).writeTag(sos2);
-
-                    actions = ASMParser.parse(0, false,
-                            "StopSounds\n"
-                            + "Stop", swf.version, false, swf.getCharset());
-                    doa.setActions(actions);
-                    doa.writeTag(sos2);
-                    new ShowFrameTag(swf).writeTag(sos2);
-
                     new ShowFrameTag(swf).writeTag(sos2);
                 } else if (treeItem instanceof DefineVideoStreamTag) {
                     List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
@@ -705,8 +649,10 @@ public class PreviewExporter {
                             MATRIX m2 = new Matrix(m).preConcatenate(new Matrix(mat)).toMATRIX();
                             pt.writeTagWithMatrix(sos2, m2);
                             lastTag = t;
+                        } else if (t instanceof DoActionTag) {
+                            //ignore
                         } else {
-                            t.writeTag(sos2);
+                            t.writeTagNoScripts(sos2);
                             lastTag = t;
                         }
                     }
@@ -746,8 +692,16 @@ public class PreviewExporter {
         return t;
     }
 
-    private static void writeTag(Tag t, SWFOutputStream sos) throws IOException {
+    private static void writeTag(Tag t, SWFOutputStream sos, Set<Integer> doneCharacters) throws IOException {
         t = classicTag(t);
+
+        if (t instanceof CharacterIdTag) {
+            int chId = ((CharacterIdTag) t).getCharacterId();
+            if (doneCharacters.contains(chId)) {
+                return;
+            }
+            doneCharacters.add(chId);
+        }
 
         t.writeTag(sos);
         if (t instanceof CharacterIdTag) {
@@ -755,7 +709,16 @@ public class PreviewExporter {
             if (chIdTags != null) {
                 for (CharacterIdTag chIdTag : chIdTags) {
                     if (!(chIdTag instanceof PlaceObjectTypeTag || chIdTag instanceof RemoveTag)) {
-                        ((Tag) chIdTag).writeTag(sos);
+
+                        Set<Integer> needed = new LinkedHashSet<>();
+                        ((Tag) chIdTag).getNeededCharactersDeep(needed);
+                        for (int n : needed) {
+                            if (!doneCharacters.contains(n)) {
+                                writeTag(((Tag) chIdTag).getSwf().getCharacter(n), sos, doneCharacters);
+                            }
+                        }
+
+                        ((Tag) chIdTag).writeTagNoScripts(sos);
                     }
                 }
             }

@@ -1,6 +1,90 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- "Starting Flash content debugger" in status bar when debugging starts
+- Simple editor - edit parameters of items inside buttons
+- Simple editor - add/remove frames in buttons, button timeline header
+- Configuration is now stored in easily readable/editable textual format (TOML)
+  (saved also to older binary format, but loading is preffered from
+   the new TOML file, when exists)
+- `-configFile` and `-storeConfigFile` commandline parameters for loading/storing configuration file
+- Option to .bat and .sh file to enable J2D_D3D_NO_HWCHECK
+- [#2404] Quick find in text/script editors - show number of occurences
+- [#1418] Option to make main window Always on top
+- [#289] Support for Aero Snap on Windows
+- [#2412] Show coordinates on stage mouse move for up to 2 decimal places
+- "Show detail" context menu item for items in folder preview
+- [#1682] AS2 - Adding class by context menu on packages
+- Simple editor - detection of english color name (based on CSS names)
+- [#2050] AS1/2/3 - highlight variable definition and all its instances on cursor place
+  (also in edit mode)
+- AS1/2/3 - underline errors in the code (also in edit mode) 
+- AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar
+- AS1/2 direct editation - hide P-code panel when editing
+- Disable AS1/2/3 direct editation when editing P-code
+- AS3 - navigation to definition in other SWF file and also player/airglobal
+- [#2463] Export subsprites animation context menu on frames
+- Open in the Flash Player context menu on graphic/sound tags and frames
+- [#2236], [#2451] Replacing sound stream block ranges
+- Importing sound stream block ranges
+- Commandline replacing sound stream block ranges
+- [#1625] Error log frame - Save all to file button
+- [#2467] Show ImportAssets name/characterId in the title when there is only single one item
+- [#2468] Option for `-dumpas2` CLI command to use export names (`-exportNames` option)
+- AS3 - code completion (properties and methods)
+- [#2470] Transformation - Copy individual transforms to clipboard,
+  load/apply from clipboard buttons
+- Option to turn off code completion on dot(.) key
+
+### Changed
+- AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node
+  so there is no longer need to expand frame nodes (useful for fast switching scripts)
+- AS1/2 - Scripts from default package (not these inside `__Packages`) are now
+  exported/imported to/from main scripts folder instead of localized `<default package>` before.
+  (Only happened when package flattening was on)
+  This may break backwards compatibility. For importing scripts from older
+  versions of FFDec, you should move the scripts from `<default package>`
+  to main scripts folder.
+- SWF to XML export in GUI dialog selects a XML file instead of directory
+  (and directory when multiple SWFs are selected)
+
+### Fixed
+- [#2456] FLA export - NullPointer exception while exporting to CS4 or lower via commandline
+- Touch point, snap align and snap to objects incorrect position when editing nested layers
+- Resize export dialogs labels to match localized strings
+- AS1/2 debugger - deletion of SWD file after debugging
+- Proper freeing memory after SWF close
+- AS1/2 improper selection of search result
+- [#2459] AS1/2 StoreRegister improper declaration position
+- AS2 Class names not showing in Folder list view
+- AS1/2 - Incorrect DefineFunction2 parameter names when parameter name is empty
+- [#2460] SVG export - incorrect caching colorTransform and ratio for the same tag
+- [#2461] SVG export - incorrect clipping / missing shapes
+- AS1/2 direct editation - Position in the code should stay same after clicking Edit button
+- AS3 direct editation - Allow internal keyword on script traits (e.g. classes)
+- AS3 direct editation - NaN can be used as identifier
+- Pin header for AS2 script in the Resources view should show Class name in 
+  the title instead of tag full description
+- AS1/2/3 for decompilation with multiple variables
+- AS3 native functions outside class allowed
+- AS3 difference between namespace keyword and const of type Namespace
+- [#2462] AS3 debugger - incorrect line info injected
+- [#2464] SVG export - minimum stroke width of 1 px
+- [#2405] Incorrect saving tags after Cloning / Copy-pasting
+- [#1646] Scrolling in Error log frame inside log texts
+- JLayer stripping last byte of MP3 data
+- [#2469] Converting shape type did not convert gradient colors transparency
+- [#2470] Transform - paste matrix, edit current matrix not working
+- Do not allow to switch PlaceObjects in transform mode
+- [#2471] Clipping - multiple clips handling, in display and also SVG export
+- [#2471] SVG Export - exporting with font-face - text tags with multiple texts,
+  fix invalid family names, incorrect text size
+- Replacing existing characters in a font which has character codes unsorted
+- [#2475] SVG Import - ignoring gradients caused by missing offset attribute of stop element
+- Not saving library type (airglobal/playerglobal) when switching SWFs
+
 ## [23.0.1] - 2025-05-16
 ### Fixed
 - Nullpointer exception during SWF opening when Simple editor is active
@@ -3612,6 +3696,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...dev
 [23.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.0...version23.0.1
 [23.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.2...version23.0.0
 [22.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.1...version22.0.2
@@ -3781,6 +3866,30 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2404]: https://www.free-decompiler.com/flash/issues/2404
+[#1418]: https://www.free-decompiler.com/flash/issues/1418
+[#289]: https://www.free-decompiler.com/flash/issues/289
+[#2412]: https://www.free-decompiler.com/flash/issues/2412
+[#1682]: https://www.free-decompiler.com/flash/issues/1682
+[#2050]: https://www.free-decompiler.com/flash/issues/2050
+[#2463]: https://www.free-decompiler.com/flash/issues/2463
+[#2236]: https://www.free-decompiler.com/flash/issues/2236
+[#2451]: https://www.free-decompiler.com/flash/issues/2451
+[#1625]: https://www.free-decompiler.com/flash/issues/1625
+[#2467]: https://www.free-decompiler.com/flash/issues/2467
+[#2468]: https://www.free-decompiler.com/flash/issues/2468
+[#2470]: https://www.free-decompiler.com/flash/issues/2470
+[#2456]: https://www.free-decompiler.com/flash/issues/2456
+[#2459]: https://www.free-decompiler.com/flash/issues/2459
+[#2460]: https://www.free-decompiler.com/flash/issues/2460
+[#2461]: https://www.free-decompiler.com/flash/issues/2461
+[#2462]: https://www.free-decompiler.com/flash/issues/2462
+[#2464]: https://www.free-decompiler.com/flash/issues/2464
+[#2405]: https://www.free-decompiler.com/flash/issues/2405
+[#1646]: https://www.free-decompiler.com/flash/issues/1646
+[#2469]: https://www.free-decompiler.com/flash/issues/2469
+[#2471]: https://www.free-decompiler.com/flash/issues/2471
+[#2475]: https://www.free-decompiler.com/flash/issues/2475
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448
@@ -4041,7 +4150,6 @@ Major version of SWF to XML export changed to 2.
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355
-[#1682]: https://www.free-decompiler.com/flash/issues/1682
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986

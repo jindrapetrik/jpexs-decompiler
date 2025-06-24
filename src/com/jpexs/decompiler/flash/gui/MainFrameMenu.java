@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.easygui.EasyPanel;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
@@ -1292,6 +1291,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/file/start");
 
         addMenuItem("/file/view", translate("menu.view"), null, null, 0, null, false, null, false);
+        if (!supportsAppMenu()) {
+            addToggleMenuItem("/file/view/alwaysOnTop", translate("menu.file.view.alwaysOnTop"), null, null, this::alwaysOnTopActionPerformed, 0, null);
+        }
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
@@ -1554,6 +1556,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 setMenuChecked("/file/view/easy", true);
                 break;
         }
+    }
+    
+    private void alwaysOnTopActionPerformed(ActionEvent evt) {
+        mainFrame.getWindow().setAlwaysOnTop(!mainFrame.getWindow().isAlwaysOnTop());
+        setMenuChecked("/file/view/alwaysOnTop", mainFrame.getWindow().isAlwaysOnTop());
     }
 
     private void viewResourcesActionPerformed(ActionEvent evt) {

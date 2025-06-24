@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -305,20 +305,20 @@ public class DefineFontTag extends FontTag {
         boolean exists = false;
         if (fontInfoTag != null) {
             List<Integer> codeTable = fontInfoTag.getCodeTable();
-            for (int i = 0; i < codeTable.size(); i++) {
-                if (codeTable.get(i) >= code) {
-                    if (codeTable.get(i) == code) {
-                        exists = true;
+                        
+            pos = codeTable.indexOf(code);
+            exists = pos != -1;
+            if (!exists) {
+                for (int i = 0; i < codeTable.size(); i++) {
+                    if (codeTable.get(i) > code) {
+                        pos = i;
+                        break;
                     }
-
-                    pos = i;
-                    break;
                 }
             }
-
             if (pos == -1) {
                 pos = codeTable.size();
-            }
+            }            
         } else {
             pos = 0;
         }
@@ -372,17 +372,8 @@ public class DefineFontTag extends FontTag {
         int code = (int) character;
         int pos = -1;
         List<Integer> codeTable = fontInfoTag.getCodeTable();
-        for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) >= code) {
-                if (codeTable.get(i) == code) {
-                    pos = i;
-                    break;
-                }
-
-                return false;
-            }
-        }
-
+        pos = codeTable.indexOf(code);
+        
         if (pos == -1) {
             return false;
         }

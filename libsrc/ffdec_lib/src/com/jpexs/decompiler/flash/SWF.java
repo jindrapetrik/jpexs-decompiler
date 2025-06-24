@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -351,8 +351,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Map of characterId to CharacterTag including imported tags. The
-     * CharacterTags.getCharacterId() does not necessarily be the characterId
-     * in the map since there can be imported CharacterTags from other SWFs.
+     * CharacterTags.getCharacterId() does not necessarily be the characterId in
+     * the map since there can be imported CharacterTags from other SWFs.
      */
     @Internal
     private volatile Map<Integer, CharacterTag> charactersWithImported;
@@ -797,7 +797,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getPlayerSWC() != null) {
                 SWC swc = new SWC(Configuration.getPlayerSWC());
                 //set allowRenameIdentifiers parameter to FALSE otherwise there will be an infinite loop
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, "__playerglobal", null, true, false, true, null, "WINDOWS-1252", false);
                 playerGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
@@ -805,12 +805,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (Configuration.getAirSWC() != null) {
                 SWC swc = new SWC(Configuration.getAirSWC());
                 //set allowRenameIdentifiers to FALSE
-                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, "WINDOWS-1252", false);
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, "__airglobal", null, true, false, true, null, "WINDOWS-1252", false);
                 airGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
     }
-
+        
     /**
      * Gets SWF charset. SWF version 5 or lower were non-unicode. SWF object has
      * assigned charset.
@@ -3219,6 +3219,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Map<String, ASMSource> asmsToExport = new LinkedHashMap<>();
         for (TreeItem treeItem : getFirstLevelASMNodes(null)) {
+            if (treeItem instanceof AS2Package) {
+                AS2Package pkg = (AS2Package) treeItem;
+                if (pkg.isDefaultPackage()) {
+                    getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport,
+                            "",
+                            ""
+                    );
+                    continue;
+                }
+            }
             getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport,
                     File.separator + getASMPath(true, treeItem),
                     File.separator + getASMPath(false, treeItem)
@@ -3276,18 +3286,22 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         } else if (treeItem instanceof FrameScript) {
             FrameScript frameScript = (FrameScript) treeItem;
-            Frame parentFrame = frameScript.getFrame();
-            for (TreeItem subItem : parentFrame.actionContainers) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
-                        pathExportFilenames + File.separator + getASMPath(true, subItem),
-                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
-                );
-            }
-            for (TreeItem subItem : parentFrame.actions) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
-                        pathExportFilenames + File.separator + getASMPath(true, subItem),
-                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
-                );
+            if (frameScript.getSingleDoActionTag() != null && !exportFileNames) {
+                asmsToExport.put(pathNoExportFilenames, frameScript.getSingleDoActionTag());
+            } else {
+                Frame parentFrame = frameScript.getFrame();
+                for (TreeItem subItem : parentFrame.actionContainers) {
+                    getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                            pathExportFilenames + File.separator + getASMPath(true, subItem),
+                            pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    );
+                }
+                for (TreeItem subItem : parentFrame.actions) {
+                    getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                            pathExportFilenames + File.separator + getASMPath(true, subItem),
+                            pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    );
+                }
             }
         } else if (treeItem instanceof AS2Package) {
             AS2Package as2Package = (AS2Package) treeItem;
@@ -5112,7 +5126,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         setModified(true);
         tags.remove(tag);
         updateCharacters();
-        readOnlyTags = null;        
+        readOnlyTags = null;
     }
 
     /**
@@ -6213,12 +6227,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
-        if (uninitializedAs2ClassTraits == null) {            
+        if (uninitializedAs2ClassTraits == null) {
             calculateAs2UninitializedClassTraits();
         }
         return uninitializedAs2ClassTraits;
     }
-    
+
     public boolean needsCalculatingAS2UninitializeClassTraits(ASMSource src) {
         if (!isAS3()) {
             if (src instanceof DoInitActionTag) {
@@ -6238,5 +6252,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public SWF getSwf() {
         return this;
+    }
+
+    /**
+     * Checks whether SWF was freed
+     *
+     * @return True if destroyed
+     */
+    public boolean isDestroyed() {
+        return destroyed;
     }
 }

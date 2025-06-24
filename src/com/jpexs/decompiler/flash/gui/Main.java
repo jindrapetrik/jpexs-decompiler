@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,12 +49,14 @@ import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.soleditor.CookiesChangedListener;
 import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeModel;
-import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -82,9 +84,6 @@ import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinReg;
 import java.awt.Component;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -132,6 +131,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -146,12 +146,12 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -451,13 +451,13 @@ public class Main {
 
     private static interface SwfPreparation {
 
-        public SWF prepare(SWF swf, String swfHash) throws InterruptedException;
+        public SWF prepare(SWF swf, String swfHash, List<File> tempFiles) throws InterruptedException;
     }
 
     private static class SwfRunPrepare implements SwfPreparation {
 
         @Override
-        public SWF prepare(SWF swf, String swfHash) throws InterruptedException {
+        public SWF prepare(SWF swf, String swfHash, List<File> tempFiles) throws InterruptedException {
             if (Configuration.autoOpenLoadedSWFs.get()) {
                 if (!DebuggerTools.hasDebugger(swf)) {
                     DebuggerTools.switchDebugger(swf);
@@ -477,7 +477,7 @@ public class Main {
         }
 
         @Override
-        public SWF prepare(SWF instrSWF, String swfHash) throws InterruptedException {
+        public SWF prepare(SWF instrSWF, String swfHash, List<File> tempFiles) throws InterruptedException {
             EventListener prepEventListener = new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -497,6 +497,7 @@ public class Main {
             instrSWF.addEventListener(prepEventListener);
             try {
                 File fTempFile = new File(instrSWF.getFile());
+                startWork(AppStrings.translate("work.injecting_debuginfo"), swfPrepareWorker, true);
                 instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
                 try (FileOutputStream fos = new FileOutputStream(fTempFile)) {
                     instrSWF.saveTo(fos);
@@ -534,11 +535,13 @@ public class Main {
                                 }
                             }
                         });
+                        startWork(AppStrings.translate("work.generating_swd"), swfPrepareWorker, true);
                         if (doPCode) {
                             instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         } else {
                             instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         }
+                        tempFiles.add(swdFile);
                     }
                 }
             } catch (IOException ex) {
@@ -583,7 +586,9 @@ public class Main {
                 }
             }
             if (prep != null) {
-                instrSWF = prep.prepare(instrSWF, swfHash);
+                List<File> prepTempFiles = new ArrayList<>();
+                instrSWF = prep.prepare(instrSWF, swfHash, prepTempFiles);
+                tempFiles.addAll(prepTempFiles);
             }
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
@@ -602,12 +607,12 @@ public class Main {
         }
     }
 
-    public static void runAsync(File swfFile) {
+    public static boolean runAsync(File swfFile) {
         String playerLocation = Configuration.playerLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             advancedSettings("paths");
-            return;
+            return false;
         }
         try {
             final Process process = Runtime.getRuntime().exec(new String[]{playerLocation, swfFile.getAbsolutePath()});
@@ -619,8 +624,10 @@ public class Main {
                     }
                 }
             });
+            return true;
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 
@@ -827,6 +834,7 @@ public class Main {
                         runningPreparation = new SwfDebugPrepare(doPCode);
                     }
                     Main.stopWork();
+                    Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
                     Main.startDebugger();
                     runPlayer(AppStrings.translate("work.debugging.wait"), playerLocation, fTempFile.getAbsolutePath(), flashVars);
                 }
@@ -1001,10 +1009,18 @@ public class Main {
     }
 
     public static void startWork(String name, CancellableWorker worker) {
-        startWork(name, -1, worker);
+        startWork(name, -1, worker, false);
+    }
+
+    public static void startWork(String name, CancellableWorker worker, boolean force) {
+        startWork(name, -1, worker, force);
     }
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
+        startWork(name, percent, worker, false);
+    }
+
+    public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean force) {
         working = true;
         long nowTime = System.currentTimeMillis();
         if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {
@@ -1033,6 +1049,7 @@ public class Main {
 
     public static void stopWork() {
         working = false;
+        lastTimeStartWork = 0;
         View.execInEventDispatchLater(() -> {
             if (mainFrame != null) {
                 mainFrame.getPanel().setWorkStatus("", null);
@@ -1655,34 +1672,37 @@ public class Main {
         private final OpenableOpened executeAfterOpen;
 
         private final int[] reloadIndices;
+        
+        private final boolean loadSession;
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo) {
-            this(sourceInfo, -1);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, boolean loadSession) {
+            this(sourceInfo, -1, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, int reloadIndex) {
-            this(sourceInfo, null, reloadIndex);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, int reloadIndex, boolean loadSession) {
+            this(sourceInfo, null, reloadIndex, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
-            this(sourceInfo, executeAfterOpen, -1);
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, boolean loadSession) {
+            this(sourceInfo, executeAfterOpen, -1, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex, boolean loadSession) {
             this.sourceInfos = new OpenableSourceInfo[]{sourceInfo};
             this.executeAfterOpen = executeAfterOpen;
             this.reloadIndices = new int[]{reloadIndex};
+            this.loadSession = loadSession;
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos) {
-            this(sourceInfos, null, null);
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, boolean loadSession) {
+            this(sourceInfos, null, null, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen) {
-            this(sourceInfos, executeAfterOpen, null);
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, boolean loadSession) {
+            this(sourceInfos, executeAfterOpen, null, loadSession);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices, boolean loadSession) {
             this.sourceInfos = sourceInfos;
             this.executeAfterOpen = executeAfterOpen;
             int[] indices = new int[sourceInfos.length];
@@ -1690,6 +1710,7 @@ public class Main {
                 indices[i] = -1;
             }
             this.reloadIndices = reloadIndices == null ? indices : reloadIndices;
+            this.loadSession = loadSession;
         }
 
         @Override
@@ -1820,28 +1841,30 @@ public class Main {
                         }
                     }
 
-                    if (isInited()) {
-                        if (resourcesPathStr == null) {
-                            TagTreeModel model = mainFrame.getPanel().tagTree.getFullModel();
-                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
-                            if (tp != null) {
-                                mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                    if (loadSession) {
+                        if (isInited()) {
+                            if (resourcesPathStr == null) {
+                                TagTreeModel model = mainFrame.getPanel().tagTree.getFullModel();
+                                TreePath tp = model == null ? null : model.getTreePath(fopenable);
+                                if (tp != null) {
+                                    mainFrame.getPanel().tagTree.setSelectionPath(tp);
+                                }
+                            } else {
+                                mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                            }
+                            if (tagListPathStr == null) {
+                                TagListTreeModel model = mainFrame.getPanel().tagListTree.getFullModel();
+                                TreePath tp = model == null ? null : model.getTreePath(fopenable);
+                                if (tp != null) {
+                                    mainFrame.getPanel().tagListTree.setSelectionPath(tp);
+                                }
+                            } else {
+                                mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
                             }
                         } else {
-                            mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                            mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
+                            mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                         }
-                        if (tagListPathStr == null) {
-                            TagListTreeModel model = mainFrame.getPanel().tagListTree.getFullModel();
-                            TreePath tp = model == null ? null : model.getTreePath(fopenable);
-                            if (tp != null) {
-                                mainFrame.getPanel().tagListTree.setSelectionPath(tp);
-                            }
-                        } else {
-                            mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
-                        }
-                    } else {
-                        mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
-                        mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
                     if (fswf != null) {
@@ -1969,10 +1992,10 @@ public class Main {
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
         View.checkAccess();
 
-        return openFile(swfFile, fileTitle, null);
+        return openFile(swfFile, fileTitle, null, true);
     }
 
-    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
+    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen, boolean loadSession) {
         View.checkAccess();
 
         try {
@@ -1983,7 +2006,15 @@ public class Main {
             }
             swfFile = file.getCanonicalPath();
             OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, swfFile, fileTitle);
-            OpenFileResult openResult = openFile(sourceInfo);
+            OpenFileResult openResult = openFile(sourceInfo, new OpenableOpened() {
+                @Override
+                public void opened(Openable openable) {
+                    if (executeAfterOpen != null) {
+                        executeAfterOpen.run();
+                    }
+                }
+            }, loadSession  
+            );
             return openResult;
         } catch (IOException ex) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
@@ -1993,35 +2024,46 @@ public class Main {
 
     public static OpenFileResult openFile(OpenableSourceInfo sourceInfo) {
         View.checkAccess();
-
-        return openFile(new OpenableSourceInfo[]{sourceInfo});
+        return openFile(sourceInfo, true);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen);
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, loadSession);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, loadSession);
     }
 
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex, boolean loadSession) {
+        View.checkAccess();
+
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex}, loadSession);
+    }
+    
     public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos) {
         View.checkAccess();
 
-        return openFile(newSourceInfos, null);
+        return openFile(newSourceInfos, true);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, boolean loadSession) {
         View.checkAccess();
 
-        return openFile(newSourceInfos, executeAfterOpen, null);
+        return openFile(newSourceInfos, null, loadSession);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, boolean loadSession) {
+        View.checkAccess();
+
+        return openFile(newSourceInfos, executeAfterOpen, null, loadSession);
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices, boolean loadSession) {
         View.checkAccess();
 
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
@@ -2083,7 +2125,7 @@ public class Main {
             }
         }
 
-        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices);
+        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices, loadSession);
         wrk.execute();
         if (reloadIndices == null) {
             sourceInfos.addAll(Arrays.asList(newSourceInfos));
@@ -2118,7 +2160,7 @@ public class Main {
             }
         }
 
-        openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
+        openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo), true);
     }
 
     public static void reloadFile(File file) {
@@ -2128,7 +2170,7 @@ public class Main {
                 continue;
             }
             if (file.equals(new File(info.getFile()))) {
-                openFile(info, null, i);
+                openFile(info, null, i, true);
             }
         }
     }
@@ -2576,7 +2618,7 @@ public class Main {
         initUiLang();
 
         initLookAndFeel();
-
+                
         View.execInEventDispatch(() -> {
             ErrorLogFrame.createNewInstance();
 
@@ -2737,7 +2779,7 @@ public class Main {
                         @Override
                         public void run() {
                             OpenableSourceInfo osi = new OpenableSourceInfo(new ReReadableInputStream(new ByteArrayInputStream(inputData)), null, titleWithHash);
-                            openFile(osi, afterLoad);
+                            openFile(osi, afterLoad, true);
                         }
                     });
                 }
@@ -3053,6 +3095,21 @@ public class Main {
         AppStrings.updateLanguage();
 
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
+        
+        ResourceBundle advancedSettingsBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
+        Set<String> confirationNames = Configuration.getConfigurationFields(false, true).keySet();
+        Map<String, String> titles = new LinkedHashMap<>();
+        Map<String, String> descriptions = new LinkedHashMap<>();
+        for (String name : confirationNames) {
+            if (advancedSettingsBundle.containsKey("config.name." + name)) {
+                titles.put(name, advancedSettingsBundle.getString("config.name." + name));
+            }
+            if (advancedSettingsBundle.containsKey("config.description." + name)) {
+                descriptions.put(name, advancedSettingsBundle.getString("config.description." + name));            
+            }
+        }
+        Configuration.setConfigurationDescriptions(descriptions);
+        Configuration.setConfigurationTitles(titles);
     }
 
     /**
@@ -3223,7 +3280,7 @@ public class Main {
                         setSessionLoaded(true);
                         mainFrame.getPanel().reload(true);
                         mainFrame.getPanel().updateUiWithCurrentOpenable();
-                    });
+                    }, true);
                 }
             }
         }
@@ -3406,6 +3463,7 @@ public class Main {
             }
             String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
             if (currentTagName.equals(latestTagName) || stableTagName.equals(latestTagName)) {
+                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
                 //no new version
                 return false;
             }

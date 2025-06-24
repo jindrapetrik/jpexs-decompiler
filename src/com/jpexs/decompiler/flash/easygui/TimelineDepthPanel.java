@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,10 +48,14 @@ public class TimelineDepthPanel extends JPanel {
         maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
         String maxDepthStr = Integer.toString(maxDepth);
         setFont(getFont().deriveFont(FONT_SIZE));
+        int yofs = TimelineBodyPanel.FRAME_HEIGHT - (scrollOffset % TimelineBodyPanel.FRAME_HEIGHT);
+        int height = yofs + maxDepth * TimelineBodyPanel.FRAME_HEIGHT + 1;
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
-        Dimension dim = new Dimension(maxDepthW + 2 * PADDING, Integer.MAX_VALUE);
+        Dimension dim = new Dimension(maxDepthW + 2 * PADDING, height);
         setSize(dim);
         setPreferredSize(dim);
+        setMinimumSize(new Dimension(maxDepthW + 2 * PADDING, 0));
+        revalidate();
     }
 
     public void scroll(int offset) {

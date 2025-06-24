@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2022-2024 JPEXS
- *
+ *  Copyright (C) 2022-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -109,11 +111,7 @@ public class FolderListPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
-                    if (selectedIndex > -1) {
-                        TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);
-                        TreePath subPath = parentPath.pathByAddingChild(selectedItem);
-                        mainPanel.getCurrentTree().setSelectionPath(subPath);
-                    }
+                    goToSelection();
                 }
             }
 
@@ -157,13 +155,21 @@ public class FolderListPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted(), true);
                     mainPanel.getContextPopupMenu().show(FolderListPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
         });
         setFocusable(true);
+    }
+
+    public void goToSelection() {
+        if (selectedIndex > -1) {
+            TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);
+            TreePath subPath = parentPath.pathByAddingChild(selectedItem);
+            mainPanel.getCurrentTree().setSelectionPath(subPath);
+        }
     }
 
     public synchronized void setItems(TreePath parentPath, List<TreeItem> items) {
@@ -180,6 +186,7 @@ public class FolderListPanel extends JPanel {
         items = new ArrayList<>();
         selectedItems.clear();
         selectedIndex = -1;
+        parentPath = null;
     }
 
     @Override
@@ -236,18 +243,32 @@ public class FolderListPanel extends JPanel {
                     TreeItem treeItem = items.get(index);
 
                     TreeNodeType type = AbstractTagTree.getTreeNodeType(treeItem);
+                    if ((treeItem instanceof FrameScript) && ((FrameScript) treeItem).getSingleDoActionTag() != null) {
+                        type = TreeNodeType.AS_FRAME;
+                    }
+                    
                     Icon icon = ICONS.get(type);
                     icon.paintIcon(l, g, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconHeight() / 2);
-                    String s;
-                    if (treeItem instanceof Tag) {
-                        Tag t = (Tag) treeItem;
-                        String uniqueId = t.getUniqueId();
-                        s = ((Tag) treeItem).getTagName();
-                        if (uniqueId != null) {
-                            s = s + " (" + uniqueId + ")";
+                    String s = null;
+                    if (treeItem instanceof DoInitActionTag) {
+                        DoInitActionTag tag = (DoInitActionTag) treeItem;
+                        String expName = tag.getSwf().getExportName(tag.getCharacterId());
+                        if (expName != null && !expName.isEmpty()) {
+                            String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
+                            s = pathParts[pathParts.length - 1];
                         }
-                    } else {
-                        s = treeItem.toString();
+                    }
+                    if (s == null) {
+                        if (treeItem instanceof Tag) {
+                            Tag t = (Tag) treeItem;
+                            String uniqueId = t.getUniqueId();
+                            s = ((Tag) treeItem).getTagName();
+                            if (uniqueId != null) {
+                                s = s + " (" + uniqueId + ")";
+                            }
+                        } else {
+                            s = treeItem.toString();
+                        }
                     }
 
                     int itemIndex = mainPanel.getCurrentTree().getFullModel().getItemIndex(treeItem);

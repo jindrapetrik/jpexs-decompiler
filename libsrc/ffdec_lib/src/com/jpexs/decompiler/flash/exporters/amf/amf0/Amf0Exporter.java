@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -41,6 +41,19 @@ import java.util.Map;
  */
 public class Amf0Exporter {
 
+    /**
+     * Constructor.
+     */
+    public Amf0Exporter() {
+    }   
+    
+    /**
+     * Converts AMF map to string.
+     * @param map Map
+     * @param level Level
+     * @param newLine Newline char
+     * @return String result
+     */
     public static String amfMapToString(
             Map<String, Object> map,
             int level,
@@ -81,6 +94,16 @@ public class Amf0Exporter {
         return sb.toString();
     }
 
+    /**
+     * Converts AMF to string
+     * @param value Value
+     * @param level Level
+     * @param newLine New line
+     * @param processedObjects Processed objects
+     * @param referenceCount Reference count
+     * @param objectAlias Object alias
+     * @return String result
+     */
     public static String amfToString(
             Object value,
             int level,

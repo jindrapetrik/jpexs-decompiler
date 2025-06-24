@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -70,6 +70,11 @@ public class ConstAVM2Item extends AVM2Item {
      * Package
      */
     public NamespaceItem pkg;
+    
+    /**
+     * Is namespace?
+     */    
+    public boolean ns;
 
     /**
      * Generated namespace
@@ -96,9 +101,10 @@ public class ConstAVM2Item extends AVM2Item {
      * @param type Type
      * @param value Value
      * @param line Line
+     * @param ns Is namespace?
      * @param generatedNs Generated namespace
      */
-    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line, boolean generatedNs) {
+    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line, boolean ns, boolean generatedNs) {
 
         super(null, null, NOPRECEDENCE, value);
         this.metadata = metadata;
@@ -108,6 +114,7 @@ public class ConstAVM2Item extends AVM2Item {
         this.var = var;
         this.type = type;
         this.customNamespace = customNamespace;
+        this.ns = ns;
         this.generatedNs = generatedNs;
     }
 
@@ -134,12 +141,12 @@ public class ConstAVM2Item extends AVM2Item {
         }
         
         AVM2SourceGenerator agen = (AVM2SourceGenerator) generator;
-        int ns = agen.genNs(localData.importedClasses, pkg.name, pkg, localData.openedNamespaces, localData, line);
-        if (type.toString().equals("Namespace")) {
+        if (this.ns) {
             return new ArrayList<>();
         }
                 
-
+        int ns = agen.genNs(localData.importedClasses, pkg.name, pkg, localData.openedNamespaces, localData, line);
+        
         List<GraphSourceItem> ret = new ArrayList<>();
         if (value != null) {
             GraphTargetItem value2 = AVM2SourceGenerator.handleAndOrCoerce(value, type);            

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -105,9 +105,7 @@ public class FolderPreviewPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
-                    if (selectedIndex > -1) {
-                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
-                    }
+                    goToSelection();
                 }
             }
 
@@ -151,13 +149,19 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted(), true);
                     mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
         });
         setFocusable(true);
+    }
+    
+    public void goToSelection() {
+        if (selectedIndex > -1) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
+        }
     }
 
     public synchronized void setItems(List<TreeItem> items) {
@@ -171,7 +175,7 @@ public class FolderPreviewPanel extends JPanel {
         repaint();
         ((JScrollPane) getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
-
+            
     public void clear() {
         items = new ArrayList<>();
         executor.shutdownNow();

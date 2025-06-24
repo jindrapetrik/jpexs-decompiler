@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -37,13 +37,20 @@ public class ParsedSymbol {
      * Type
      */
     public SymbolType type;
+    
+    /**
+     * Position in source text
+     */
+    public int position;
 
     /**
      * Constructor.
+     * @param position Position
      * @param group Group
      * @param type Type
      */
-    public ParsedSymbol(SymbolGroup group, SymbolType type) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = null;
@@ -51,11 +58,13 @@ public class ParsedSymbol {
 
     /**
      * Constructor.
+     * @param position Position
      * @param group Group
      * @param type Type
      * @param value Value
      */
-    public ParsedSymbol(SymbolGroup group, SymbolType type, Object value) {
+    public ParsedSymbol(int position, SymbolGroup group, SymbolType type, Object value) {
+        this.position = position;
         this.group = group;
         this.type = type;
         this.value = value;

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -191,6 +191,14 @@ public class GRADIENT implements Serializable {
             result.interpolationMode = 0;
             if (gradientRecords.length > 8) {
                 result.gradientRecords = Arrays.copyOfRange(result.gradientRecords, 0, 8);
+            }
+        }
+        
+        for (GRADRECORD rec : result.gradientRecords) {
+            if (shapeNum < 3) {
+                rec.color = new RGB(rec.color);
+            } else {
+                rec.color = new RGBA(rec.color);
             }
         }
         return result;

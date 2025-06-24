@@ -15,6 +15,8 @@ package jsyntaxpane.actions;
 
 import java.awt.Component;
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -46,6 +48,10 @@ public class DocumentSearchData {
 	private boolean wrap = true;
 	private ReplaceDialog replaceDlg;
 	private QuickFindDialog quickFindDlg;
+        /**
+         * JPEXS
+         */
+        private Map<JTextComponent, Integer> currentOccurenceMap = new WeakHashMap<>();
 
 	/**
 	 * This prevent creating a new instance.  You must call the getFromEditor
@@ -54,6 +60,8 @@ public class DocumentSearchData {
 	 */
 	private DocumentSearchData() {
 	}
+
+                      
 
 	public Pattern getPattern() {
 		return pattern;
@@ -176,20 +184,57 @@ public class DocumentSearchData {
 		// go throw all matches, and stop when we reach current pos
 		int start = -1;
 		int end = -1;
+                int occurenceNumber = 0; //JPEXS
 		while (matcher.find()) {
 			if (matcher.end() >= dot) {
 				break;
 			}
+                        occurenceNumber++;
 			start = matcher.start();
 			end = matcher.end();
 		}
 		if (end > 0) {
 			target.select(start, end);
+                        currentOccurenceMap.put(target, occurenceNumber);
 			return true;
 		} else {
-			return false;
+                        return false;
 		}
 	}
+        
+        /**
+         * Gets search occurences. (JPEXS)
+         *
+         * @param target
+         * @return Number of occurences
+         */
+        public int getOccurencesCount(JTextComponent target) {
+                if (getPattern() == null) {
+			return 0;
+		}
+                SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(target);
+		if (sDoc == null) {
+			return 0;
+		}
+                Matcher matcher = sDoc.getMatcher(getPattern());
+                int count = 0;
+                while (matcher.find()) {
+                        count++;
+                }
+                return count;
+        }
+        
+        /**
+         * Gets current occurence number. (JPEXS)
+         * @param target
+         * @return Current occurence number.
+         */
+        public int getCurrentOccurence(JTextComponent target) {
+                if (!currentOccurenceMap.containsKey(target)) {
+                    return 0;
+                }
+                return currentOccurenceMap.get(target);
+        }  
 
 	/**
 	 * Perform a FindNext operation on the given text component.  Position
@@ -214,22 +259,37 @@ public class DocumentSearchData {
 		if (start >= sDoc.getLength()) {
 			start = sDoc.getLength();
 		}
-		Matcher matcher = sDoc.getMatcher(getPattern(), start);
-		if (matcher != null && matcher.find()) {
-			// since we used an offset in the matcher, the matcher location
-			// MUST be offset by that location
-			target.select(matcher.start() + start, matcher.end() + start);
+		Matcher matcher = sDoc.getMatcher(getPattern());
+                
+                //JPEXS
+                int occurenceNumber = 0;
+                boolean found = false;
+                if (matcher != null) {
+                    while(matcher.find()) {                            
+                            occurenceNumber++;
+                            if (matcher.start() >= start) {
+                                    found = true;
+                                    break;
+                            }
+                    }
+                }
+                
+		if (found) { //JPEXS
+			target.select(matcher.start(), matcher.end()); //JPEXS
+                        currentOccurenceMap.put(target, occurenceNumber);
 			return true;
 		} else {
 			if (isWrap()) {
 				matcher = sDoc.getMatcher(getPattern());
 				if (matcher != null && matcher.find()) {
 					target.select(matcher.start(), matcher.end());
+                                        currentOccurenceMap.put(target, 1);
 					return true;
 				} else {
+                                        currentOccurenceMap.put(target, 0);
 					return false;
 				}
-			} else {
+			} else {                                
 				return false;
 			}
 		}

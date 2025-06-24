@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2024 JPEXS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2024-2025 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui.player;
 
@@ -79,7 +79,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         rulerButton.addActionListener(this::rulerActionPerformed);
         rulerButton.setToolTipText(AppStrings.translate("button.ruler.hint"));
         rulerButton.setSelected(Configuration.showRuler.get());
-
+        
         Configuration.showRuler.addListener(new ConfigurationItemChangeListener<Boolean>() {
             @Override
             public void configurationItemChanged(Boolean newValue) {
@@ -114,7 +114,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         guidesOptionsButton.setToolTipText(AppStrings.translate("button.guides_options"));
 
         snapOptionsButton = new SnapOptionsButton();
-        
+
         PopupButton gridButton = new PopupButton(View.getIcon("grid16")) {
             @Override
             protected JPopupMenu getPopupMenu() {
@@ -123,15 +123,15 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
                 showGridCheckBoxMenuItem.addActionListener(ZoomPanel.this::showGridCheckBoxMenuItemActionPerformed);
                 showGridCheckBoxMenuItem.setSelected(Configuration.showGrid.get());
                 menu.add(showGridCheckBoxMenuItem);
-                
+
                 JMenuItem editGridMenuItem = new JMenuItem(AppStrings.translate("grid_options.edit"));
                 editGridMenuItem.addActionListener(ZoomPanel.this::editGridMenuItemActionPerformed);
                 menu.add(editGridMenuItem);
-                
+
                 return menu;
-            }            
+            }
         };
-        gridButton.setToolTipText(AppStrings.translate("button.grid_options"));       
+        gridButton.setToolTipText(AppStrings.translate("button.grid_options"));
 
         
         percentLabel.setToolTipText(AppStrings.translate("zoom.hint"));
@@ -152,11 +152,11 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
                     } catch (NumberFormatException nfe) {
                         //ignore
                     }
-                    
+
                 }
-            }            
+            }
         });
-        
+
         setLayout(new FlowLayout());
         add(percentLabel);
         add(zoomInButton);
@@ -170,12 +170,12 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
 
         display.addEventListener(this);
     }
-    
+
     
     private void editGridMenuItemActionPerformed(ActionEvent evt) {
         new GridDialog(Main.getDefaultDialogsOwner()).setVisible(true);
     }
-    
+
     private void showGridCheckBoxMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
         Configuration.showGrid.set(source.isSelected());
@@ -194,7 +194,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
     private void guidesEditActionPerformed(ActionEvent evt) {
         new GuidesDialog(Main.getDefaultDialogsOwner(), display).setVisible(true);
     }
-    
+
     private void guidesClearActionPerformed(ActionEvent evt) {
         display.clearGuides();
     }
@@ -295,7 +295,7 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
                 zoomToFit = zoom.fit;
                 realZoom = zoom.value;
                 updateZoomDisplay();
-            }
+            }                                    
         });
     }
 

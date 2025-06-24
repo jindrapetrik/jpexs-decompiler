@@ -9,6 +9,9 @@ rem Uncomment following when you encounter StackOverFlowErrors.
 rem If the app then terminates with OutOfMemory you can experiment with lower value.
 rem set FFDEC_STACK_SIZE=32m
 
+rem Uncomment following when you want to disable checks for hardware acceleration compatibility.
+rem set J2D_D3D_NO_HWCHECK=true
+
 rem Hide VLC error output
 set VLC_VERBOSE=-1
 

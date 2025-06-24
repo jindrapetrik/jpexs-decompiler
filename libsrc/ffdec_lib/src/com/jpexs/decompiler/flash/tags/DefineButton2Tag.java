@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -142,6 +142,21 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeUB(7, reserved);
+        sos.writeUB(1, trackAsMenu ? 1 : 0);
+
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset())) {
+            sos2.writeBUTTONRECORDList(characters, true);
+        }
+        byte[] brdata = baos2.toByteArray();
+        sos.writeUI16(0);
+        sos.write(brdata);        
+    }        
+
+    @Override
     public int getCharacterId() {
         return buttonId;
     }
@@ -200,6 +215,9 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
+        if (swf == null) {
+            return null;
+        }
         Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
         RECT ret = cache == null ? null : cache.get(this);
         if (ret != null) {
@@ -267,21 +285,36 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             layer.filters = r.filterList;
             layer.matrix = r.placeMatrix;
             layer.characterId = r.characterId;
+            layer.depth = r.placeDepth;            
+            
             if (r.placeDepth > maxDepth) {
                 maxDepth = r.placeDepth;
             }
 
             if (r.buttonStateUp) {
                 frameUp.layers.put(r.placeDepth, new DepthState(layer, frameUp, frameUp, false));
+                frameUp.layers.get(r.placeDepth).key = true;
             }
-            if (r.buttonStateDown) {
-                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, frameDown, false));
-            }
+            
             if (r.buttonStateOver) {
                 frameOver.layers.put(r.placeDepth, new DepthState(layer, frameOver, frameOver, false));
+                if (!r.buttonStateUp) {
+                    frameOver.layers.get(r.placeDepth).key = true;
+                }
             }
+            
+            if (r.buttonStateDown) {
+                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, frameDown, false));
+                if (!r.buttonStateOver) {
+                    frameDown.layers.get(r.placeDepth).key = true;
+                }
+            }
+            
             if (r.buttonStateHitTest) {
                 frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, frameHit, false));
+                if (!r.buttonStateDown) {
+                    frameHit.layers.get(r.placeDepth).key = true;
+                }
             }
         }
 
@@ -313,7 +346,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public void setFrameCount(int frameCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        
     }
 
     @Override

@@ -44,6 +44,8 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
 
     private boolean enableWhiteSpace = false;
 
+    private int yyStartOffset = 0;
+
     private final Pattern float4Pattern = Pattern.compile("float4.*\\([\r\n \t\f]*(?<f1>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f2>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f3>[^\r\n \t\f]+)[\r\n \t\f]*,[\r\n \t\f]*(?<f4>[^\r\n \t\f]+)[\r\n \t\f]*\\)", Pattern.MULTILINE);
 
     public ActionScriptLexer(String sourceCode){
@@ -51,10 +53,11 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
         this.sourceCode = sourceCode;
     }
 
-    public void yypushbackstr(String s, int state)
+    public void yypushbackstr(String s, int state, int skipNumChars)
     {
         int numLines = count(s, "\n");
         int newYyline = yyline - numLines;
+        yyStartOffset = yyStartOffset + skipNumChars + yychar;
         sourceCode = s + sourceCode.substring(yychar + yylength());
         yyreset(new StringReader(sourceCode));
         yybegin(state);
@@ -72,17 +75,14 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
         yybegin(state);
     }
 
-    public void yypushbackstr(String s)
-    {
-        yypushbackstr(s, YYINITIAL);
-    }
-
     StringBuilder string = new StringBuilder();
 
     private static String xmlTagName = "";
 
+    private int startPos = -1;
+
     public int yychar() {
-        return yychar;
+        return yyStartOffset + yychar;
     }
 
     private Stack<ParsedSymbol> pushedBack = new Stack<>();
@@ -249,144 +249,147 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 <YYINITIAL> {
 
   /* keywords */
-  "break"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.BREAK, yytext()); }
-  "case"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CASE, yytext()); }
-  "continue"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CONTINUE, yytext()); }
-  "default"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DEFAULT, yytext()); }
-  "do"                           { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DO, yytext()); }
-  "while"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WHILE, yytext()); }
-  "else"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.ELSE, yytext()); }
-  "for"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FOR, yytext()); }
-  "each"                         { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.EACH, yytext()); }
-  "in"                           { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IN, yytext()); }
-  "if"                           { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IF, yytext()); }
-  "return"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.RETURN, yytext()); }
-  "super"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SUPER, yytext()); }
-  "switch"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SWITCH, yytext()); }
-  "throw"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THROW, yytext()); }
-  "try"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.TRY, yytext()); }
-  "catch"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CATCH, yytext()); }
-  "finally"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FINALLY, yytext()); }
-  "while"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WHILE, yytext()); }
-  "with"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WITH, yytext()); }
-  "dynamic"                      { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.DYNAMIC, yytext()); }
-  "internal"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.INTERNAL, yytext()); }
-  "override"                     { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.OVERRIDE, yytext()); }
-  "private"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PRIVATE, yytext()); }
-  "protected"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PROTECTED, yytext()); }
-  "public"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PUBLIC, yytext()); }
-  "static"                       { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.STATIC, yytext()); }
-  "class"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CLASS, yytext()); }
-  "const"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CONST, yytext()); }
-  "extends"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.EXTENDS, yytext()); }
-  "function"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FUNCTION, yytext()); }
-  "get"                          { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.GET, yytext()); }
-  "implements"                   { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IMPLEMENTS, yytext()); }
-  "interface"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.INTERFACE, yytext()); }
-  "namespace"                    { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, yytext()); }
-  "package"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PACKAGE, yytext()); }
-  "set"                          { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.SET, yytext()); }
-  "var"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.VAR, yytext()); }
-  "import"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IMPORT, yytext()); }
-  "use"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.USE, yytext()); }
-  "false"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FALSE, yytext()); }
-  "null"                         { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NULL, yytext()); }
-  "this"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THIS, yytext()); }
-  "true"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.TRUE, yytext()); }
-  "undefined"                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
-  "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
-  "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
-  "final"                        { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext()); }
-  "native"                       { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.NATIVE, yytext()); }
+  "break"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.BREAK, yytext()); }
+  "case"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.CASE, yytext()); }
+  "continue"                     { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.CONTINUE, yytext()); }
+  "default"                      { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.DEFAULT, yytext()); }
+  "do"                           { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.DO, yytext()); }
+  "while"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.WHILE, yytext()); }
+  "else"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.ELSE, yytext()); }
+  "for"                          { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.FOR, yytext()); }
+  "each"                         { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.EACH, yytext()); }
+  "in"                           { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.IN, yytext()); }
+  "if"                           { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.IF, yytext()); }
+  "return"                       { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.RETURN, yytext()); }
+  "super"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.SUPER, yytext()); }
+  "switch"                       { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.SWITCH, yytext()); }
+  "throw"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.THROW, yytext()); }
+  "try"                          { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.TRY, yytext()); }
+  "catch"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.CATCH, yytext()); }
+  "finally"                      { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.FINALLY, yytext()); }
+  "while"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.WHILE, yytext()); }
+  "with"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.WITH, yytext()); }
+  "dynamic"                      { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.DYNAMIC, yytext()); }
+  "internal"                     { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.INTERNAL, yytext()); }
+  "override"                     { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.OVERRIDE, yytext()); }
+  "private"                      { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.PRIVATE, yytext()); }
+  "protected"                    { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.PROTECTED, yytext()); }
+  "public"                       { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.PUBLIC, yytext()); }
+  "static"                       { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.STATIC, yytext()); }
+  "class"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.CLASS, yytext()); }
+  "const"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.CONST, yytext()); }
+  "extends"                      { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.EXTENDS, yytext()); }
+  "function"                     { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.FUNCTION, yytext()); }
+  "get"                          { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.GET, yytext()); }
+  "implements"                   { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.IMPLEMENTS, yytext()); }
+  "interface"                    { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.INTERFACE, yytext()); }
+  "namespace"                    { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, yytext()); }
+  "package"                      { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.PACKAGE, yytext()); }
+  "set"                          { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.SET, yytext()); }
+  "var"                          { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.VAR, yytext()); }
+  "import"                       { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.IMPORT, yytext()); }
+  "use"                          { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.USE, yytext()); }
+  "false"                        { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.FALSE, yytext()); }
+  "null"                         { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.NULL, yytext()); }
+  "this"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.THIS, yytext()); }
+  "true"                         { return new ParsedSymbol(yychar(), SymbolGroup.KEYWORD, SymbolType.TRUE, yytext()); }
+  "undefined"                    { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
+  "Infinity"                     { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
+  /* "NaN"                          { return new ParsedSymbol(yychar(), SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); } */
+  "final"                        { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext()); }
+  "native"                       { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.NATIVE, yytext()); }
 
 
   {VerbatimString}               { 
                                     String verbatimString = yytext();
                                     verbatimString = verbatimString.substring(2, verbatimString.length() - 1);
-                                    return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, verbatimString); }
+                                    return new ParsedSymbol(yychar(), SymbolGroup.STRING, SymbolType.STRING, verbatimString); }
 
   /* operators */
 
-  "("                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.PARENT_OPEN, yytext());  }
-  ")"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.PARENT_CLOSE, yytext());  }
-  "{"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.CURLY_OPEN, yytext());  }
-  "}"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.CURLY_CLOSE, yytext());  }
-  "["                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.BRACKET_OPEN, yytext());  }
-  "]"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.BRACKET_CLOSE, yytext());  }
-  ";"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SEMICOLON, yytext());  }
-  ","                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.COMMA, yytext());  }
-  "..."                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.REST, yytext());  }
-  "."                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DOT, yytext());  }
-  "="                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN, yytext());  }
-  ">"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_THAN, yytext());  }
-  "<"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_THAN, yytext());  }
-  "!"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT, yytext());  }
-  "~"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NEGATE, yytext());  }
-  "?."                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NULL_DOT, yytext());  }
-  "??"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NULL_COALESCE, yytext());  }
-  "?"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.TERNAR, yytext());  }
-  ":"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.COLON, yytext());  }
-  "==="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_EQUALS, yytext());  }
-  "=="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.EQUALS, yytext());  }
-  "<="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_EQUAL, yytext());  }
-  ">="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_EQUAL, yytext());  }
-  "!=="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_NOT_EQUAL, yytext());  }
-  "!="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT_EQUAL, yytext());  }
-  "&&="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_AND, yytext());  }
-  "&&"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AND, yytext());  }
-  "||="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_OR, yytext());  }
-  "||"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.OR, yytext());  }
-  "++"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.INCREMENT, yytext());  }
-  "--"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DECREMENT, yytext());  }
-  "+"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.PLUS, yytext());  }
-  "-"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.MINUS, yytext());  }
-  "*"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.MULTIPLY, yytext());  }
-  "/"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DIVIDE, yytext());  }
-  "&"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.BITAND, yytext());  }
-  "|"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.BITOR, yytext());  }
-  "^"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.XOR, yytext());  }
-  "%"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.MODULO, yytext());  }
-  "<<"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_LEFT, yytext());  }
-  ">>"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_RIGHT, yytext());  }
-  ">>>"                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.USHIFT_RIGHT, yytext());  }
-  "+="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_PLUS, yytext());  }
-  "-="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MINUS, yytext());  }
-  "*="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MULTIPLY, yytext());  }
-  "/="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_DIVIDE, yytext());  }
-  "&="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITAND, yytext());  }
-  "|="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITOR, yytext());  }
-  "^="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_XOR, yytext());  }
-  "%="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MODULO, yytext());  }
-  "<<="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_LEFT, yytext());  }
-  ">>="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_RIGHT, yytext());  }
-  ">>>="                         { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_USHIFT_RIGHT, yytext());  }
-  "as"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AS, yytext());  }
-  "delete"                       { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DELETE, yytext());  }
-  "instanceof"                   { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.INSTANCEOF, yytext());  }
-  "is"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.IS, yytext());  }
-  "::"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NAMESPACE_OP, yytext());  }
-  "new"                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NEW, yytext());  }
-  "typeof"                       { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.TYPEOF, yytext());  }
-  "void"                         { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.VOID, yytext());  }
-  "@"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, yytext());  }
-  ".("                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.FILTER, yytext()); }
-  ".."                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DESCENDANTS, yytext()); }
+  "("                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.PARENT_OPEN, yytext());  }
+  ")"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.PARENT_CLOSE, yytext());  }
+  "{"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.CURLY_OPEN, yytext());  }
+  "}"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.CURLY_CLOSE, yytext());  }
+  "["                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.BRACKET_OPEN, yytext());  }
+  "]"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.BRACKET_CLOSE, yytext());  }
+  ";"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.SEMICOLON, yytext());  }
+  ","                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.COMMA, yytext());  }
+  "..."                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.REST, yytext());  }
+  "."                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.DOT, yytext());  }
+  "="                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN, yytext());  }
+  ">"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.GREATER_THAN, yytext());  }
+  "<"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.LOWER_THAN, yytext());  }
+  "!"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NOT, yytext());  }
+  "~"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NEGATE, yytext());  }
+  "?."                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NULL_DOT, yytext());  }
+  "??"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NULL_COALESCE, yytext());  }
+  "?"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.TERNAR, yytext());  }
+  ":"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.COLON, yytext());  }
+  "==="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.STRICT_EQUALS, yytext());  }
+  "=="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.EQUALS, yytext());  }
+  "<="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.LOWER_EQUAL, yytext());  }
+  ">="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.GREATER_EQUAL, yytext());  }
+  "!=="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.STRICT_NOT_EQUAL, yytext());  }
+  "!="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NOT_EQUAL, yytext());  }
+  "&&="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_AND, yytext());  }
+  "&&"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.AND, yytext());  }
+  "||="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_OR, yytext());  }
+  "||"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.OR, yytext());  }
+  "++"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.INCREMENT, yytext());  }
+  "--"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.DECREMENT, yytext());  }
+  "+"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.PLUS, yytext());  }
+  "-"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.MINUS, yytext());  }
+  "*"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.MULTIPLY, yytext());  }
+  "/"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.DIVIDE, yytext());  }
+  "&"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.BITAND, yytext());  }
+  "|"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.BITOR, yytext());  }
+  "^"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.XOR, yytext());  }
+  "%"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.MODULO, yytext());  }
+  "<<"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.SHIFT_LEFT, yytext());  }
+  ">>"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.SHIFT_RIGHT, yytext());  }
+  ">>>"                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.USHIFT_RIGHT, yytext());  }
+  "+="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_PLUS, yytext());  }
+  "-="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_MINUS, yytext());  }
+  "*="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_MULTIPLY, yytext());  }
+  "/="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_DIVIDE, yytext());  }
+  "&="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITAND, yytext());  }
+  "|="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITOR, yytext());  }
+  "^="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_XOR, yytext());  }
+  "%="                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_MODULO, yytext());  }
+  "<<="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_LEFT, yytext());  }
+  ">>="                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_RIGHT, yytext());  }
+  ">>>="                         { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ASSIGN_USHIFT_RIGHT, yytext());  }
+  "as"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.AS, yytext());  }
+  "delete"                       { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.DELETE, yytext());  }
+  "instanceof"                   { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.INSTANCEOF, yytext());  }
+  "is"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.IS, yytext());  }
+  "::"                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NAMESPACE_OP, yytext());  }
+  "new"                          { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.NEW, yytext());  }
+  "typeof"                       { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.TYPEOF, yytext());  }
+  "void"                         { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.VOID, yytext());  }
+  "@"                            { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, yytext());  }
+  ".("                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.FILTER, yytext()); }
+  ".."                           { return new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.DESCENDANTS, yytext()); }
 
   /* string literal */
   \"                             {
+                                    startPos = yychar();
                                     string.setLength(0);
                                     yybegin(STRING);
                                  }
   {Preprocessor}                 {
-                                    return new ParsedSymbol(SymbolGroup.PREPROCESSOR, SymbolType.PREPROCESSOR, yytext().substring(2));
+                                    return new ParsedSymbol(yychar(), SymbolGroup.PREPROCESSOR, SymbolType.PREPROCESSOR, yytext().substring(2));
                                  }
   "\u00A7"                       {
+                                    startPos = yychar();
                                     string.setLength(0);
                                     yybegin(OIDENTIFIER);
                                  }
 
   /* character literal */
   \'                             {
+                                    startPos = yychar();
                                     string.setLength(0);
                                     yybegin(CHARLITERAL);
                                  }
@@ -399,50 +402,50 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                         ival = ival.substring(0, ival.length() - 1);
                                     }
                                     try{
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(ival)); 
+                                        return new ParsedSymbol(yychar(), SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(ival)); 
                                     } catch(NumberFormatException nfe){
                                         //its too long for an Integer var
-                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(ival)); 
+                                        return new ParsedSymbol(yychar(), SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(ival)); 
                                     }
                                  }
 
   {HexIntegerLiteral}            {                                    
                                     try {
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext().substring(2), 16));
+                                        return new ParsedSymbol(yychar(), SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext().substring(2), 16));
                                     } catch (NumberFormatException nfe) {
                                         //its too long for an Integer var
-                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext().substring(2), 16).doubleValue()); 
+                                        return new ParsedSymbol(yychar(), SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext().substring(2), 16).doubleValue()); 
                                     }
                                  }
   {OctIntegerLiteral}            { 
                                    try {
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext(), 8));
+                                        return new ParsedSymbol(yychar(), SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext(), 8));
                                    } catch (NumberFormatException nfe) {
                                         //its too long for an Integer var
-                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext(), 8).doubleValue()); 
+                                        return new ParsedSymbol(yychar(), SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext(), 8).doubleValue()); 
                                    }
                                  }  
   {DoubleLiteral}                { 
                                     String dval = yytext();
                                     if (dval.endsWith("m")) {
                                         dval = dval.substring(0, dval.length() - 1);
-                                        return new ParsedSymbol(SymbolGroup.DECIMAL, SymbolType.DECIMAL, new Decimal128(dval));
+                                        return new ParsedSymbol(yychar(), SymbolGroup.DECIMAL, SymbolType.DECIMAL, new Decimal128(dval));
                                     }
                                     if (dval.endsWith("f")) {
                                         dval = dval.substring(0, dval.length() - 1);
-                                        return new ParsedSymbol(SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(dval));
+                                        return new ParsedSymbol(yychar(), SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(dval));
                                     }
                                     if (dval.endsWith("d")) {
                                         dval = dval.substring(0, dval.length() - 1);
                                     }
-                                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(dval));
+                                    return new ParsedSymbol(yychar(), SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(dval));
                                  }
 {FloatLiteral}                   { 
                                     String fval = yytext();
                                     if (fval.endsWith("f")) {
                                         fval = fval.substring(0, fval.length() - 1);
                                     }
-                                    return new ParsedSymbol(SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(fval));
+                                    return new ParsedSymbol(yychar(), SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(fval));
                                  }
 
 {Float4Literal}                  {
@@ -456,22 +459,23 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                         }
                                         fvalues[i] = Float.parseFloat(fval);
                                     }
-                                    return new ParsedSymbol(SymbolGroup.FLOAT4, SymbolType.FLOAT4, new Float4(fvalues));
+                                    return new ParsedSymbol(yychar(), SymbolGroup.FLOAT4, SymbolType.FLOAT4, new Float4(fvalues));
                                  }
   /* comments */
   {Comment}                      { yyline += count(yytext(),"\n"); }
 
   {LineTerminator}               {
                                     yyline++;
-                                    if (enableWhiteSpace) { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); }
+                                    if (enableWhiteSpace) { return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); }
                                  }
   /* whitespace */
-  {WhiteSpace}                   { if (enableWhiteSpace) { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); } }
-  {TypeNameSpec}                 { return new ParsedSymbol(SymbolGroup.TYPENAME, SymbolType.TYPENAME, yytext()); }
+  {WhiteSpace}                   { if (enableWhiteSpace) { return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); } }
+  {TypeNameSpec}                 { return new ParsedSymbol(yychar(), SymbolGroup.TYPENAME, SymbolType.TYPENAME, yytext()); }
   {XmlOpenTagStart}              {
+                                    startPos = yychar();
                                     yybegin(XMLOPENTAG);
                                     string.setLength(0);
-                                    return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext());
+                                    return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext());
                                  }
   {XmlCommentStart}              {
                                        string.setLength(0); string.append(yytext() ); yybegin(XMLCOMMENTALONE);
@@ -479,20 +483,20 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {XmlCDataStart}                {
                                        string.setLength(0); string.append(yytext() ); yybegin(XMLCDATAALONE);
                                  }
-  "<{"                           {  return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
+  "<{"                           {  return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
   /* identifiers */
-  {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
+  {Identifier}                   { return new ParsedSymbol(yychar(), SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
   /* regexp */
-  {RegExp}                       { return new ParsedSymbol(SymbolGroup.REGEXP, SymbolType.REGEXP, yytext()); }
-  {NamespaceSuffix}              { return new ParsedSymbol(SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1))); }   
+  {RegExp}                       { return new ParsedSymbol(yychar(), SymbolGroup.REGEXP, SymbolType.REGEXP, yytext()); }
+  {NamespaceSuffix}              { return new ParsedSymbol(yychar(), SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1))); }   
 }
 
 <XMLCLOSETAGFINISH> {
     ">"                            { 
                                     yybegin(XML);
-                                    pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_THAN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.OPERATOR, SymbolType.GREATER_THAN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
@@ -505,36 +509,36 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 <XMLOPENTAG> {   
    {XmlAttribute}                 {
                                     yybegin(XMLOPENTAGATTRIB);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    "{"                            {
                                     yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRNAMEVAR_BEGIN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRNAMEVAR_BEGIN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    {XmlOpenTagEnd}                {
                                     yybegin(XML);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_END, yytext()));
+                                    pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_STARTTAG_END, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    {XmlOpenTagClose}              {
                                     yybegin(XML);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTFINISHTAG_END, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_STARTFINISHTAG_END, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
@@ -548,15 +552,15 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 <XMLOPENTAGATTRIB> {
     \"{XmlDQuoteStringChar}*\"      {
                                         yybegin(XMLOPENTAG);
-                                        return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
+                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
                                     }
     \'{XmlSQuoteStringChar}*\'      {
                                         yybegin(XMLOPENTAG);
-                                        return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE_SINGLEQUOTED, yytext());
+                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE_SINGLEQUOTED, yytext());
                                     }
     "{"                             {
                                       yybegin(YYINITIAL);
-                                      return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRVALVAR_BEGIN, yytext());
+                                      return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRVALVAR_BEGIN, yytext());
                                     }
 }
 
@@ -567,7 +571,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     string.append(yytext());
                                     String tos = string.toString();
                                     string.setLength(0);
-                                    return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR, tos);
+                                    return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_INSTR, tos);
                                   }
    {LineTerminator}               { string.append(yytext());  yyline++;}
    [^]                            { string.append(yytext()); }
@@ -579,7 +583,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(XML);
                                      String ret = string.toString();
                                      string.setLength(0);
-                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_CDATA, ret);
+                                     return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_CDATA, ret);
                                   }
  {LineTerminator}                 { string.append(yytext());  yyline++;}
     [^]                           { string.append(yytext()); }
@@ -591,7 +595,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(YYINITIAL);
                                      String ret = string.toString();
                                      string.setLength(0);
-                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_CDATA, ret);
+                                     return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_CDATA, ret);
                                   }
  {LineTerminator}                 { string.append(yytext());  yyline++;}
     [^]                           { string.append(yytext()); }
@@ -603,7 +607,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(XML);
                                      String ret = string.toString();
                                      string.setLength(0);
-                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
+                                     return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
                                   }
    {LineTerminator}               { string.append(yytext()); yyline++;}
    [^]                            { string.append(yytext());}
@@ -615,7 +619,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(YYINITIAL);
                                      String ret = string.toString();
                                      string.setLength(0);
-                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
+                                     return new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
                                   }
    {LineTerminator}               { string.append(yytext()); yyline++;}
    [^]                            { string.append(yytext());}
@@ -624,7 +628,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 <XML> {
    {XmlCDataStart}                {
                                     String ret = string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
-                                    if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
+                                    if (!ret.isEmpty()) return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }
    {XmlInstrStart}                {
                                     yybegin(XMLINSTR);
@@ -632,27 +636,27 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                        String tos = string.toString(); 
                                        string.setLength(0);
                                        string.append(yytext());
-                                       return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, tos);                                       
+                                       return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_TEXT, tos);                                       
                                     }
                                     string.append(yytext());
                                   }   
    {XmlCommentStart}                        {
                                      String ret = string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
-                                     if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
+                                     if (!ret.isEmpty()) return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }
    {XmlOpenTagStart}              {
                                     yybegin(XMLOPENTAG);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    {XmlCloseTag}                  {
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_FINISHTAG, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_FINISHTAG, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
@@ -660,27 +664,27 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   
    "<{"                           {
                                     yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    "</{"                          {
                                     yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_FINISHVARTAG_BEGIN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_FINISHVARTAG_BEGIN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
                                   }
    "{"                            {
                                     yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_VAR_BEGIN, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_VAR_BEGIN, yytext()));
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
                                     }
                                     return lex();
@@ -694,7 +698,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(YYINITIAL);
                                      repeatNum = 1;
                                      // length also includes the trailing quote
-                                     return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, string.toString());
+                                     return new ParsedSymbol(startPos, SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, string.toString());
                                  }
 
   {OIdentifierCharacter}         { for(int r=0;r<repeatNum;r++) string.append(yytext()); repeatNum = 1;}
@@ -725,7 +729,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      // length also includes the trailing quote
                                      String tos = string.toString();
                                      string.setLength(0);
-                                     return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, tos);
+                                     return new ParsedSymbol(startPos, SymbolGroup.STRING, SymbolType.STRING, tos);
                                  }
 
   {StringCharacter}+             { string.append(yytext()); }
@@ -754,7 +758,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   \'                             {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
-                                     return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, string.toString());
+                                     return new ParsedSymbol(startPos, SymbolGroup.STRING, SymbolType.STRING, string.toString());
                                  }
 
   {SingleCharacter}+             { string.append(yytext()); }
@@ -781,4 +785,4 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
 /* error fallback */
 [^]                              {  }
-<<EOF>>                          { return new ParsedSymbol(SymbolGroup.EOF, SymbolType.EOF, null); }
+<<EOF>>                          { return new ParsedSymbol(yychar(), SymbolGroup.EOF, SymbolType.EOF, null); }

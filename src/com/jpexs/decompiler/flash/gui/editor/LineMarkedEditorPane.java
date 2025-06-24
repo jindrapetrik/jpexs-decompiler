@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2024 JPEXS
- *
+ *  Copyright (C) 2010-2025 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -18,24 +18,23 @@ package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
+import com.jpexs.decompiler.flash.simpleparser.LinkType;
+import com.jpexs.decompiler.flash.simpleparser.Path;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParser;
+import com.jpexs.decompiler.flash.simpleparser.Variable;
 import com.jpexs.helpers.Reference;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.KeyEventPostProcessor;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
@@ -48,7 +47,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.Segment;
@@ -73,12 +71,54 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     private boolean error = false;
 
-    private Token lastUnderlined = null;
-
-    private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
-
     private LinkHandler linkHandler = this;
+    
+    
+    private SimpleParser parser;   
 
+    @Override
+    public LinkType getClassLinkType(Path className) {
+        return LinkType.NO_LINK;
+    }
+
+    @Override
+    public boolean traitExists(Path className, String traitName) {
+        return false;
+    }
+
+    @Override
+    public void handleClassLink(Path className) {
+    }
+
+    @Override
+    public void handleTraitLink(Path className, String traitName) {
+    }
+
+    @Override
+    public Path getTraitType(Path className, String traitName) {
+        return new Path("*");
+    }
+
+    @Override
+    public Path getTraitSubType(Path className, String traitName, int level) {
+        return null;
+    }
+
+    @Override
+    public Path getTraitCallType(Path className, String traitName) {
+        return null;
+    }
+
+    @Override
+    public Path getTraitCallSubType(Path className, String traitName, int level) {
+        return null;
+    }
+
+    @Override
+    public List<Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
+        return new ArrayList<>();
+    }
+    
     public static class LineMarker implements Comparable<LineMarker> {
 
         private final Color bgColor;
@@ -145,6 +185,15 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 
+    public SimpleParser getParser() {
+        return parser;
+    }
+    
+    public void setParser(SimpleParser parser) {
+        this.parser = parser;
+    }
+   
+    
     private Map<Integer, SortedSet<LineMarker>> lineMarkers = Collections.synchronizedMap(new HashMap<Integer, SortedSet<LineMarker>>());
 
     public void setLineMarkers(Map<Integer, SortedSet<LineMarker>> colorMarkers) {
@@ -324,29 +373,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 }
 
             }
-        });
-        final LinkAdapter la = new LinkAdapter();
-        addMouseMotionListener(la);
-        addMouseListener(la);
-
-        //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addKeyEventPostProcessor(new KeyEventPostProcessor() {
-                    @Override
-                    public boolean postProcessKeyEvent(KeyEvent e) {
-                        if (e.getID() == KeyEvent.KEY_PRESSED) {
-                            la.keyPressed(e);
-                        }
-                        if (e.getID() == KeyEvent.KEY_RELEASED) {
-                            la.keyReleased(e);
-                        }
-                        if (e.getID() == KeyEvent.KEY_TYPED) {
-                            la.keyTyped(e);
-                        }
-                        return false;
-                    }
-                });
-
+        });                
     }
 
     public Token tokenAtPos(Point lastPos) {
@@ -380,88 +407,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             return t;
         }
         return null;
-    }
-
-    private class LinkAdapter extends MouseAdapter implements KeyListener {
-
-        private Point lastPos = new Point(0, 0);
-
-        private boolean ctrlDown = false;
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                ctrlDown = true;
-                update();
-            }
-        }
-
-        @Override
-        public void keyTyped(KeyEvent e) {
-
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                ctrlDown = false;
-                update();
-            }
-        }
-
-        private void update() {
-            if (ctrlDown) {
-                Token t = tokenAtPos(lastPos);
-
-                if (t != lastUnderlined) {
-                    if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
-                        MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
-
-                        if (t != null && linkHandler.isLink(t)) {
-                            lastUnderlined = t;
-                            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-                        } else {
-                            lastUnderlined = null;
-                        }
-                    } else {
-                        lastUnderlined = null;
-                    }
-                }
-
-                if (lastUnderlined != null) {
-                    MyMarkers.markToken(LineMarkedEditorPane.this, lastUnderlined, underLinePainter);
-                } else {
-                    setCursor(Cursor.getDefaultCursor());
-                }
-                repaint();
-            } else {
-                lastUnderlined = null;
-                MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
-                setCursor(Cursor.getDefaultCursor());
-                repaint();
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (ctrlDown) {
-                Token t = tokenAtPos(lastPos);
-                if (t != null && linkHandler.isLink(t)) {
-                    linkHandler.handleLink(t);
-                }
-            }
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-
-            ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
-            lastPos = e.getPoint();
-            update();
-
-        }
-    }
+    }    
+   
 
     public void setLinkHandler(LinkHandler linkHandler) {
         if (linkHandler == null) {
@@ -472,21 +419,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     public LinkHandler getLinkHandler() {
         return linkHandler;
-    }
-
-    @Override
-    public HighlightPainter linkPainter() {
-        return underLinePainter;
-    }
-
-    @Override
-    public boolean isLink(Token token) {
-        return false;
-    }
-
-    @Override
-    public void handleLink(Token token) {
-
     }
 
     @Override
@@ -570,78 +502,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 
-    public static class UnderLinePainter extends DefaultHighlighter.DefaultHighlightPainter {
-
-        public UnderLinePainter(Color color) {
-            super(color);
-        }
-
-        @Override
-        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
-            try {
-                // --- determine locations ---
-                TextUI mapper = c.getUI();
-
-                Color col = getColor();
-                if (col == null) {
-                    col = Color.black;
-                }
-                g.setColor(col);
-                for (int i = offs0; i < offs1; i++) {
-
-                    Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i, Position.Bias.Forward);
-                    Rectangle2D r1 = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i + 1, Position.Bias.Forward);
-                    if (r1.getY() == r.getY()) {
-                        g.drawLine((int) r.getX(), (int) (r.getY() + r.getHeight() - 3), (int) r1.getX(), (int) (r.getY() + r.getHeight() - 3));
-                    }
-                }
-
-            } catch (BadLocationException e) {
-                // can't render
-            }
-        }
-
-        @Override
-        public Shape paintLayer(Graphics g, int offs0, int offs1,
-                Shape bounds, JTextComponent c, View view) {
-
-            g.setColor(c.getSelectionColor());
-
-            Rectangle r;
-
-            if (offs0 == view.getStartOffset()
-                    && offs1 == view.getEndOffset()) {
-                // Contained in view, can just use bounds.
-                if (bounds instanceof Rectangle) {
-                    r = (Rectangle) bounds;
-                } else {
-                    r = bounds.getBounds();
-                }
-            } else {
-                // Should only render part of View.
-                try {
-                    // --- determine locations ---
-                    Shape shape = view.modelToView(offs0, Position.Bias.Forward,
-                            offs1, Position.Bias.Backward,
-                            bounds);
-                    r = (shape instanceof Rectangle)
-                            ? (Rectangle) shape : shape.getBounds();
-                } catch (BadLocationException e) {
-                    // can't render
-                    r = null;
-                }
-            }
-
-            if (r != null) {
-                r.width = Math.max(r.width, 1);
-
-                paint(g, offs0, offs1, r, c);
-
-            }
-
-            return r;
-        }
-    }
+    
 
     private int cut(double val) {
         int ival = (int) Math.round(val);
@@ -722,5 +583,5 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 fgp.paint(g, lineStart.getVal(), lineEnd.getVal(), null, this);
             }
         }
-    }
+    }   
 }
