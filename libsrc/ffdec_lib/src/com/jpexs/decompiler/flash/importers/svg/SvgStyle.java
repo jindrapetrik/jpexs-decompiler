@@ -557,8 +557,10 @@ class SvgStyle {
                 Element stopEl = (Element) node;
                 SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl, cachedBitmaps);
 
-                String offsetStr = stopEl.getAttribute("offset");
-                double offset = importer.parseNumberOrPercent(offsetStr);
+                double offset = 0;
+                if (stopEl.hasAttribute("offset")) {
+                    offset = importer.parseNumberOrPercent(stopEl.getAttribute("offset"));
+                }
                 Color color = newStyle.getStopColor();
                 if (color == null) {
                     color = Color.BLACK;
