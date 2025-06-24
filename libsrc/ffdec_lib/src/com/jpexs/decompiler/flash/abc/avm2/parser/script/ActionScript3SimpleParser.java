@@ -1890,7 +1890,9 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         ret = true;
                         break;
                     case "multiname":
-                        errors.add(new SimpleParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline(), s.position));
+                        expectedType(errors, SymbolType.INTEGER);
+                        //errors.add(new SimpleParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline(), s.position));
+                        ret = true;
                         break;
                     default:
                         errors.add(new SimpleParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline(), s.position));
