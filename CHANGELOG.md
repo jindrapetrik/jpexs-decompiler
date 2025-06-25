@@ -1,8 +1,6 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
 ## [24.0.0] - 2025-06-24
 ### Added
 - "Starting Flash content debugger" in status bar when debugging starts
