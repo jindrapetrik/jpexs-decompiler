@@ -116,6 +116,8 @@ public class MetainfoUpdater {
         li = li.replaceAll("\\[(#[0-9]+)\\]", "$1");
         li = li.replaceAll("\\[(PR[0-9]+)\\]", "$1");
         li = li.replace("&", "&amp;");
+        li = li.replace("<", "&lt;");
+        li = li.replace(">", "&gt;");
         return li;
     }
 }
