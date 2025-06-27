@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import jsyntaxpane.actions.*;
 import javax.swing.JEditorPane;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
@@ -67,6 +68,12 @@ public class PairsMarker implements CaretListener, SyntaxComponent, PropertyChan
     @Override
     public void config(Configuration config) {
         Color markerColor = config.getColor(PROPERTY_COLOR, new Color(0xeeee33));
+        
+        Color editorBackground = UIManager.getColor("EditorPane.background");
+        int light = (editorBackground.getRed() + editorBackground.getGreen() + editorBackground.getBlue()) / 3;
+        if (light < 128) {
+            markerColor = new Color(0x553322);
+        }
         this.marker = new Markers.SimpleMarker(markerColor);
     }
 

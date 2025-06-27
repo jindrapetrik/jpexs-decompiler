@@ -18,6 +18,7 @@ import jsyntaxpane.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Segment;
@@ -33,6 +34,8 @@ public abstract class DefaultJFlexLexer implements Lexer {
     protected int tokenStart;
     protected int tokenLength;
     protected int offset;
+    
+    protected Stack<Token> pushedBack = new Stack<>();
 
     /**
      * Helper method to create and return a new Token from of TokenType
@@ -100,7 +103,7 @@ public abstract class DefaultJFlexLexer implements Lexer {
             CharArrayReader reader = new CharArrayReader(segment.array, segment.offset, segment.count);
             yyreset(reader);
             this.offset = ofst;
-            for (Token t = yylex(); t != null; t = yylex()) {
+            for (Token t = lex(); t != null; t = lex()) {
                 tokens.add(t);
             }
         } catch (IOException ex) {
@@ -115,6 +118,29 @@ public abstract class DefaultJFlexLexer implements Lexer {
      */
     public abstract void yyreset(Reader reader);
 
+    
+    /**
+     * JPEXS:
+     * Pushes back token.
+     * @param token 
+     */    
+    public void pushBack(Token token) {
+        pushedBack.push(token);
+    }
+    
+    /**
+     * JPEXS:
+     * Calls yylex, allows pushback
+     * @return
+     * @throws java.io.IOException 
+     */
+    public Token lex() throws java.io.IOException {
+        if (!pushedBack.isEmpty()) {
+            return pushedBack.pop();
+        }
+        return yylex();
+    }
+    
     /**
      * This is called to return the next Token from the Input Reader
      * @return next token, or null if no more tokens.
