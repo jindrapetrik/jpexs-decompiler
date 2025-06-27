@@ -79,6 +79,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -476,6 +477,14 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     public void config(Configuration config) {
         Color markerColor = config.getColor(PROPERTY_COLOR, DEFAULT_COLOR);
         Color errorColor = config.getColor(PROPERTY_ERRORCOLOR, DEFAULT_ERRORCOLOR);
+        
+        
+        Color editorBackground = UIManager.getColor("EditorPane.background");
+        int light = (editorBackground.getRed() + editorBackground.getGreen() + editorBackground.getBlue()) / 3;
+        if (light < 128) {
+            markerColor = new Color(0x443322);
+        }
+        
         this.marker = new OccurencesMarker(markerColor);
         this.errorMarker = new WavyUnderLinePainter(errorColor); //Markers.SimpleMarker(errorColor);
         String types = config.getString(

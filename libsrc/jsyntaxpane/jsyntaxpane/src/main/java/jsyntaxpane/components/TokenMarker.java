@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import jsyntaxpane.SyntaxDocument;
@@ -101,6 +102,11 @@ public class TokenMarker implements SyntaxComponent, CaretListener, PropertyChan
     public void config(Configuration config) {
         Color markerColor = config.getColor(
                 PROPERTY_COLOR, DEFAULT_COLOR);
+        Color editorBackground = UIManager.getColor("EditorPane.background");
+        int light = (editorBackground.getRed() + editorBackground.getGreen() + editorBackground.getBlue()) / 3;
+        if (light < 128) {
+            markerColor = new Color(0x553322);
+        }
         this.marker = new Markers.SimpleMarker(markerColor);
         String types = config.getString(
                 PROPERTY_TOKENTYPES, DEFAULT_TOKENTYPES);

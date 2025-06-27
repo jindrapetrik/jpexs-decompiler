@@ -83,7 +83,7 @@ StringCharacter = [^\r\n\"\\]
 Register= register{NumberLiteral}
 Constant= constant{NumberLiteral}
 
-%state STRING,PARAMETERS
+%state STRING,IDENT,PARAMETERS
 
 %%
 
@@ -94,6 +94,7 @@ Constant= constant{NumberLiteral}
   {WhiteSpace}                   {  }
 
   {Label}                        {
+                                    pushBack(token(TokenType.OPERATOR,yychar+yylength()-1,1));
                                     return token(TokenType.IDENTIFIER,yychar,yylength()-1);
                                 }
 
@@ -112,6 +113,9 @@ Constant= constant{NumberLiteral}
                                     tokenStart = yychar;
                                     tokenLength = 1;
                                  }
+
+  /* operator*/  
+  ","                            { return token(TokenType.OPERATOR);}
 
   /* numeric literals */
 

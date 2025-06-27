@@ -103,7 +103,10 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                 }
 
 
-  {Label}                        {return token(TokenType.IDENTIFIER,yychar,yylength()-1); }
+  {Label}                        {
+                                    pushBack(token(TokenType.OPERATOR,yychar+yylength()-1,1));
+                                    return token(TokenType.IDENTIFIER,yychar,yylength()-1); 
+                                 }
 
    
 
