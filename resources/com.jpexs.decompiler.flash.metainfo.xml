@@ -65,6 +65,14 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="24.0.1" date="2025-06-27">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2476 Dark interface skins identifiers highlighter visibility</li>
+				</ul>
+			</description>
+		</release>
 		<release version="24.0.0" date="2025-06-24">
 			<description>
 				<p>Added</p>
