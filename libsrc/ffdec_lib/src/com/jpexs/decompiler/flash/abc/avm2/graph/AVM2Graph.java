@@ -1391,6 +1391,7 @@ public class AVM2Graph extends Graph {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
                 stopPart2.add(exAfterPart);
+                stopPartKind2.add(StopPartKind.OTHER);
                 if (defaultPart != null) {
                     stopPart2.add(defaultPart);
                     stopPartKind2.add(StopPartKind.OTHER);

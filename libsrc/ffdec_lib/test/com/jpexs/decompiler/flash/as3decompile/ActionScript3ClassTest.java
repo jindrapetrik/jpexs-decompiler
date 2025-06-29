@@ -726,7 +726,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testHaxeStaticVars() {
         /*
         Static vars in Haxe are initialized in script initializer (normal flash uses class initializer)
-        */
+         */
         decompileScriptPack("haxe", "tests_classes.TestStaticVars", "package tests_classes\n"
                 + "{\n"
                 + "   public class TestStaticVars\n"

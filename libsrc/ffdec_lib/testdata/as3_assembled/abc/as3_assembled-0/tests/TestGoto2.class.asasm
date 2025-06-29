@@ -1,0 +1,121 @@
+class
+ refid "tests:TestGoto2"
+ instance QName(PackageNamespace("tests"), "TestGoto2")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestGoto2")
+  iinit
+   refid "tests:TestGoto2/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestGoto2/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+      debug 1, "v", 0, 13
+            pushbyte 5
+            coerce_a
+            setlocal1
+            getlocal1
+            pushbyte 1
+            ifngt ofs003e
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "a"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            getlocal1
+            pushbyte 2
+            ifngt ofs0031
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "goto"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            jump ofs0074
+   ofs0031:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "b"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            jump ofs0047
+   ofs003e:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "c"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+   ofs0047:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "d"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            getlocal1
+            pushbyte 3
+            ifngt ofs008c
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "e"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            getlex Multiname("b",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushbyte 5
+            ifngt ofs007e
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "f"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+   ofs0074:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "g"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+   ofs007e:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "h"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            jump ofs0096
+   ofs008c:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "i"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+   ofs0096:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")])
+            pushstring "end"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestGoto2"),ProtectedNamespace("tests:TestGoto2"),StaticProtectedNs("tests:TestGoto2"),PrivateNamespace("TestGoto2.as$32")]), 1
+            returnvoid
+      
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestGoto2/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

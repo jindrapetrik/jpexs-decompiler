@@ -39,6 +39,7 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        writer.append("return;");
         return writer;
     }
 
@@ -49,7 +50,7 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
 
     @Override
     public boolean isEmpty() {
-        return true;
+        return false;
     }
 
     @Override

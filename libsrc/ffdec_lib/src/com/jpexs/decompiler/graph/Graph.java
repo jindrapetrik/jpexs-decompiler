@@ -989,6 +989,7 @@ public class Graph {
 
         processIfGotos2(new ArrayList<>(), gotos, ret, ret);
         processIfGotos(gotos, ret, ret);
+        processScriptEnd(ret);
 
         Map<String, Integer> usages = new HashMap<>();
         Map<String, GotoItem> lastUsage = new HashMap<>();
@@ -1673,6 +1674,26 @@ public class Graph {
         }
     }
 
+    private void processScriptEnd(List<GraphTargetItem> ret) {
+        if (!ret.isEmpty()) {
+            if (ret.get(ret.size() - 1) instanceof ScriptEndItem) {
+                ret.remove(ret.size() - 1);
+                processScriptEnd(ret);
+                return;
+            }
+            if (ret.get(ret.size() - 1) instanceof Block) {
+                Block blk = (Block) ret.get(ret.size() - 1);
+                if (blk instanceof SwitchItem) {
+                    return;
+                }
+                                
+                for (List<GraphTargetItem> sub : blk.getSubs()) {
+                    processScriptEnd(sub);                    
+                }
+            }
+        }
+    }
+    
     /**
      * Processes ifs.
      *
@@ -2879,9 +2900,9 @@ public class Graph {
 
             if (stopPart.contains(part)) {
 
-                /*boolean hasBlockClosesAfter = false;
+                boolean isRealStopPart = false;
                 //this weird stuff handles some goto problems:
-                loopi:
+                /*loopi:
                 for (int i = 0; i < stopPartKind.size(); i++) {
                     if (stopPart.get(i) == part) {
                         for (int j = i + 1; j < stopPartKind.size(); j++) {
@@ -2893,17 +2914,31 @@ public class Graph {
                             }
                         }
                     }
+                }*/
+                
+                //isRealStopPart = stopPart.get(stopPart.size() - 1) == part;
+                for (int i = stopPartKind.size() - 1; i >= 0; i--) {
+                    if (stopPartKind.get(i) == StopPartKind.OTHER && stopPart.get(i) == part) {
+                        isRealStopPart = true;
+                        break;
+                    }
+                    if (stopPartKind.get(i) == StopPartKind.BLOCK_CLOSE) {
+                        if (stopPart.get(i) == part) {
+                            isRealStopPart = true;
+                        }
+                        break;
+                    }
                 }
 
-                if (!hasBlockClosesAfter) {*/
-                if (currentLoop != null) {
-                    currentLoop.phase = 0;
+                if (isRealStopPart) {
+                    if (currentLoop != null) {
+                        currentLoop.phase = 0;
+                    }
+                    if (debugPrintGraph) {
+                        System.err.println("Stopped on part " + part);
+                    }
+                    return ret;
                 }
-                if (debugPrintGraph) {
-                    System.err.println("Stopped on part " + part);
-                }
-                return ret;
-                //}
             }
 
             if (code.size() <= part.start) {
@@ -2927,6 +2962,7 @@ public class Graph {
                         if (firstCodePos == -1) {
                             firstCodePos = firstCode.size();
                         }
+                        ((GraphPartMarkedArrayList<GraphTargetItem>) firstCode).clearCurrentParts();
                         ((GraphPartMarkedArrayList<GraphTargetItem>) firstCode).startPart(part);
                     }
 
@@ -3308,7 +3344,8 @@ public class Graph {
                         List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
 
                         if ((!isEmpty) && (next != null)) {
-                            if (!stopPart2.contains(next)) { //?? might be a break or something
+                            //if (!stopPart2.contains(next)) 
+                            { //?? might be a break or something
                                 stopPart2.add(next);
                                 stopPartKind2.add(StopPartKind.BLOCK_CLOSE);
                             }
