@@ -3344,11 +3344,8 @@ public class Graph {
                         List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
 
                         if ((!isEmpty) && (next != null)) {
-                            //if (!stopPart2.contains(next)) 
-                            { //?? might be a break or something
-                                stopPart2.add(next);
-                                stopPartKind2.add(StopPartKind.BLOCK_CLOSE);
-                            }
+                            stopPart2.add(next);
+                            stopPartKind2.add(StopPartKind.BLOCK_CLOSE);                            
                         }
 
                         List<GraphTargetItem> onTrue = new ArrayList<>();
