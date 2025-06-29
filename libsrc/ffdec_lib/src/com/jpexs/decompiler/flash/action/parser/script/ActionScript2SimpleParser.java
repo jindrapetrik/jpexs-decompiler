@@ -1249,8 +1249,8 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 arrCnt++;
                 expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
-                if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
-                    expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
+                if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
+                    break;
                 }
             }
         } else {

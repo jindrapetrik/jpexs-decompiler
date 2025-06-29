@@ -998,6 +998,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         errors.clear();
         removeErrorMarkers();
         highlightsPanel.repaint();
+        boolean doClear = false;
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 
@@ -1051,7 +1052,23 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 Path type = newExternalTypes.get(i);
                 newSimpleExternalClassNameToFullClassName.put(type.getLast(), type);
             }
-            definitionPosToReferences = newDefinitionPosToReferences;
+            
+            definitionPosToReferences.clear();            
+            referenceToDefinition.clear();
+            externalTypes.clear();
+            referenceToExternalTypeIndex.clear();
+            externalTypeIndexToReference.clear();
+            simpleExternalClassNameToFullClassName.clear();
+            referenceToExternalTraitKey.clear();
+            externalTraitKeyToReference.clear();
+            separatorPosToType.clear();
+            localTypeTraits.clear();
+            definitionToType.clear();
+            definitionToCallType.clear();
+            separatorIsStatic.clear();
+            variableSuggestions.clear();
+            
+            definitionPosToReferences = newDefinitionPosToReferences;            
             referenceToDefinition = newReferenceToDefinition;
             externalTypes = newExternalTypes;
             referenceToExternalTypeIndex = newReferenceToExternalTypeIndex;
@@ -1071,12 +1088,31 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         } catch (BadLocationException | IOException | InterruptedException ex) {
             definitionPosToReferences.clear();
             referenceToDefinition.clear();
-            //ex.printStackTrace();
+            doClear = true;
         } catch (SimpleParseException ex) {
-            definitionPosToReferences.clear();
-            referenceToDefinition.clear();
+            doClear = true;
             errors.put((int) ex.position, ex.getMessage());
         }
+        
+        if (doClear) {
+            definitionPosToReferences.clear();
+            referenceToDefinition.clear();
+            definitionPosToReferences.clear();            
+            referenceToDefinition.clear();
+            externalTypes.clear();
+            referenceToExternalTypeIndex.clear();
+            externalTypeIndexToReference.clear();
+            simpleExternalClassNameToFullClassName.clear();
+            referenceToExternalTraitKey.clear();
+            externalTraitKeyToReference.clear();
+            separatorPosToType.clear();
+            localTypeTraits.clear();
+            definitionToType.clear();
+            definitionToCallType.clear();
+            separatorIsStatic.clear();
+            variableSuggestions.clear();
+        }
+        
         Timer tim = errorsTimer;
         if (tim != null) {
             tim.cancel();

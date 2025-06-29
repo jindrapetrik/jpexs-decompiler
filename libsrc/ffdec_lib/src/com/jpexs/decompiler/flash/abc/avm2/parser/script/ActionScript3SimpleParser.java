@@ -1650,8 +1650,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 arrCnt++;
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                 s = lex();
-                if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
-                    expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
+                if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
+                    break;
                 }
             }
         } else {

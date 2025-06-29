@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
+- AS1/2/3 highligter - brackets parsing error causing memory leak / crash
 
 ## [24.0.1] - 2025-06-27
 ### Fixed
