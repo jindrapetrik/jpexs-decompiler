@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -98,10 +99,14 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             ret.put("chid", "" + chid);
         }
         if (exportName != null) {
-            ret.put("exp", Helper.escapePCodeString(exportName));
+            ret.put("exp", DottedChain.parseNoSuffix(exportName).toPrintableString(false));
         }
         if (!classNames.isEmpty()) {
-            ret.put("cls", Helper.joinEscapePCodeString(", ", classNames));
+            List<String> escapedList = new ArrayList<>();
+            for (String className : classNames) {
+                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(true));
+            }
+            ret.put("cls", String.join(", ", escapedList));
         }
         return ret;
     }

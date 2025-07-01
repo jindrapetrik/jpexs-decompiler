@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -137,7 +138,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
         Map<String, String> ret = super.getNameProperties();
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
-            ret.put("im", "" + names.get(0));
+            ret.put("im", "" + DottedChain.parseNoSuffix(names.get(0)).toPrintableString(false));
         }
         return ret;
     }

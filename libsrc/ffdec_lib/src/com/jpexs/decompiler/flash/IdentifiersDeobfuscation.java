@@ -622,6 +622,63 @@ public class IdentifiersDeobfuscation {
         return writer;
     }
 
+    
+    /**
+     * Unescapes deobfuscated identifier
+     * @param s String
+     * @return Unescaped string
+     */
+    public static String unescapeOIdentifier(String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+        if (s.length() < 2) {
+            return s;
+        }
+        if (!(s.startsWith("\u00A7") && s.endsWith("\u00A7"))) {
+            return s;
+        }
+        for (int i = 1; i < s.length() - 1; i++) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                if (i + 1 < s.length() - 1) {
+                    i++;
+                    c = s.charAt(i);
+                    if (c == 'n') {
+                        ret.append("\n");
+                    } else if (c == 'r') {
+                        ret.append("\r");
+                    } else if (c == 't') {
+                        ret.append("\t");
+                    } else if (c == 'b') {
+                        ret.append("\b");
+                    } else if (c == 'f') {
+                        ret.append("\f");
+                    } else if (c == '\\') {
+                        ret.append("\\");
+                    } else if (c == '\u00A7') {
+                        ret.append("\u00A7");                        
+                    } else if (c == 'x' && i + 2 < s.length() - 1) {                        
+                        ret.append((char) Integer.parseInt(s.substring(i + 1, i + 3), 16));
+                        i += 2;
+                    } else if (c == '{') {
+                        int endPos = s.indexOf("}", i);
+                        if (endPos != -1) {
+                            int numRepeat = Integer.parseInt(s.substring(i + 1, endPos));
+                            i = endPos + 1;
+                            c = s.charAt(i);
+                            for (int j = 0; j < numRepeat; j++) {
+                                ret.append(c);
+                            }
+                        }
+                    }
+                }
+            } else {
+                ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
+    
     /**
      * Escapes obfuscated identifier.
      *

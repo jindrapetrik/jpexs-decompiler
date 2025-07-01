@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.Component;
@@ -84,7 +86,12 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void reset() {
         try {
-            setText((String) ReflectionTools.getValue(obj, field, index));
+            String newValue = (String) ReflectionTools.getValue(obj, field, index);
+            DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
+            if (di != null) {
+                newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(di.as3());
+            }
+            setText(newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -95,10 +102,15 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         try {
             String oldValue = (String) ReflectionTools.getValue(obj, field, index);
             String newValue = getText();
+            DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
+            if (di != null) {
+                newValue = DottedChain.parsePrintable(newValue).toRawString();
+            }
+            
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
-            ReflectionTools.setValue(obj, field, index, getText());
+            ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }

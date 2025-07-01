@@ -149,7 +149,31 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             return ret;
         }
     }
+    
+    /**
+     * Parses a dotted chain from a deobfuscated string.
+     *
+     * @param name Name
+     * @return Dotted chain
+     */
+    public static final DottedChain parsePrintable(String name) {
+        if (name == null) {
+            return DottedChain.EMPTY;
+        } else if (name.isEmpty()) {
+            return DottedChain.TOPLEVEL;
+        } else {
+            String[] parts = name.split("\\.");
+            List<PathPart> newParts = new ArrayList<>();
+            for (String part : parts) {
+                newParts.add(new PathPart(IdentifiersDeobfuscation.unescapeOIdentifier(part), false, ""));
+            }
 
+            DottedChain ret = new DottedChain();
+            ret.parts = newParts;
+            return ret;
+        }
+    }
+       
     /**
      * Constructs a new dotted chain.
      *

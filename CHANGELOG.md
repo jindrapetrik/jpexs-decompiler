@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2477] Option to disable AS2 detection of uninitialized class fields
 - AS2 detection of uninitialized class fields is cancellable and shows progress
+- AS2 - show deobfuscated class/package names in the class tree
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

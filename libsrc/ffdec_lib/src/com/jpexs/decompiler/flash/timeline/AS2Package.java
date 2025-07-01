@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +189,10 @@ public class AS2Package implements TreeItem {
 
     @Override
     public String toString() {
-        return name;
+        if (defaultPackage) {
+            return name;
+        }
+        return DottedChain.parseNoSuffix(name).toPrintableString(false);
     }
 
     /**

@@ -3360,7 +3360,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         while (it instanceof AS2Package) {
             pkg = (AS2Package) it;
             if (!pkg.isDefaultPackage()) {
-                pkgParts.add(0, pkg.getName());
+                pkgParts.add(0, DottedChain.parseNoSuffix(pkg.getName()).toPrintableString(false));
             }
             it = model.getParent(it);
         }
@@ -3376,7 +3376,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (addScriptDialog.showDialog() != JOptionPane.OK_OPTION) {
             return;
         }
-        createClass(addScriptDialog.getClassName(), swf);
+        createAs2Class(addScriptDialog.getClassName(), swf);
     }
 
     private void addAs3ClassActionPerformed(ActionEvent evt) {
@@ -3887,7 +3887,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         addSpriteInitScript(sprite.getSwf(), sprite);
     }
 
-    private void createClass(String className, SWF swf) {
+    private void createAs2Class(String className, SWF swf) {
+        
+        className = DottedChain.parsePrintable(className).toRawString();
+        
         ReadOnlyTagList tags = swf.getTags();
         List<Integer> exportedIds = new ArrayList<>();
         for (int i = 0; i < tags.size(); i++) {
@@ -4043,7 +4046,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                         addInstanceEventScript(swf, tim, placeType, frame);
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_CLASS) {
-                        createClass(addScriptDialog.getClassName(), swf);
+                        createAs2Class(addScriptDialog.getClassName(), swf);
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_INIT) {
                         DefineSpriteTag sprite = addScriptDialog.getSprite();
                         addSpriteInitScript(swf, sprite);

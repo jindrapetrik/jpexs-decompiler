@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -255,7 +256,7 @@ public class FolderListPanel extends JPanel {
                         String expName = tag.getSwf().getExportName(tag.getCharacterId());
                         if (expName != null && !expName.isEmpty()) {
                             String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-                            s = pathParts[pathParts.length - 1];
+                            s = IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
                         }
                     }
                     if (s == null) {

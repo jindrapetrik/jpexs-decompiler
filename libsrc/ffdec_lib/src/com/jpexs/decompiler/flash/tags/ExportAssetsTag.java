@@ -21,10 +21,12 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
 
     @SWFArray(value = "name", countField = "count")
     @Table(value = "assets", itemName = "asset")
+    @DottedIdentifier
     public List<String> names;
 
     /**
@@ -161,7 +164,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         Map<String, String> ret = super.getNameProperties();
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
-            ret.put("ex", "" + names.get(0));
+            ret.put("ex", "" + DottedChain.parseNoSuffix(names.get(0)).toPrintableString(false));
         }
         return ret;
     }
