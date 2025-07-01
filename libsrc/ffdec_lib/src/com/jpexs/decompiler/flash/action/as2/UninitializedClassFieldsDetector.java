@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.as2;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
@@ -33,7 +34,9 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.ProgressListener;
 import java.util.ArrayList;
@@ -59,9 +62,16 @@ public class UninitializedClassFieldsDetector {
         progressListeners.remove(listener);
     }
     
-    private void fireProgress(String status) {
+    private void fireProgress(ASMSource asm, String asmPath) {
+        if (asm instanceof DoInitActionTag) {
+            DoInitActionTag doi = (DoInitActionTag) asm;
+            String exportName = doi.getSwf().getExportName(doi.spriteId);
+            if (exportName != null) {
+                asmPath = DottedChain.parseNoSuffix(exportName).toPrintableString(false);
+            }
+        }
         for (ProgressListener listener : progressListeners) {
-            listener.status(status);
+            listener.status(asmPath);
         }
     }
     
@@ -211,83 +221,158 @@ public class UninitializedClassFieldsDetector {
         }
         final Map<String, Map<String, Trait>> result = new LinkedHashMap<>();
         Map<String, ASMSource> asms = swf.getASMs(false);
+        
+        CancellableWorker worker = CancellableWorker.getCurrent();
+        
+        /*Map<String, List<GraphTargetItem>> trees = new HashMap<>();
+        asms.entrySet().parallelStream()
+            .forEach(item -> {
+                CancellableWorker.assignThreadToWorker(Thread.currentThread(), worker);
+                if (worker.isCancelled()) {
+                    return;
+                }
+                fireProgress(item.getValue(), item.getKey());
+                try {
+                    trees.put(item.getKey(), item.getValue().getActionsToTree());
+                } catch (Throwable t) {
+                    trees.put(item.getKey(), new ArrayList<>());
+                    //ignore
+                }
+            });        */
 
-        List<ASMSource> classesAsms = new ArrayList<>();
-
+        
         final Map<String, Map<String, Trait>> classTraits = new LinkedHashMap<>(ActionScript2Classes.getClassToTraits());
         final Map<String, List<String>> classInheritance = new HashMap<>(ActionScript2Classes.getClassInheritance());
 
-        //get all assigned traits and inheritance tree
-        for (String key : asms.keySet()) {
-            if (CancellableWorker.isInterrupted()) {
-                throw new InterruptedException();
-            }      
-            ASMSource asm = asms.get(key);
-            if (asm instanceof DoInitActionTag) {
-                DoInitActionTag doi = (DoInitActionTag) asm;
-                String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
-                if (exportName != null && exportName.startsWith("__Packages.")) {
-                    fireProgress(key);
-                    List<GraphTargetItem> tree = asm.getActionsToTree();
-                    for (GraphTargetItem item : tree) {
-                        if (item instanceof InterfaceActionItem) {
-                            InterfaceActionItem iai = (InterfaceActionItem) item;
-                            String className = String.join(".", getMembersPath(iai.name));
-                            classInheritance.put(className, new ArrayList<>());
-                            if (iai.superInterfaces != null) {
-                                for (GraphTargetItem imp : iai.superInterfaces) {
-                                    String imtName = String.join(".", getMembersPath(imp));
-                                    classInheritance.get(className).add(imtName);
-                                }
-                            }
-                        }
-                        if (item instanceof ClassActionItem) {
-                            ClassActionItem cai = (ClassActionItem) item;
-                            final String className = String.join(".", getMembersPath(cai.className));
-                            classInheritance.put(className, new ArrayList<>());
-                            if (!classTraits.containsKey(className)) {
-                                classTraits.put(className, new LinkedHashMap<>());
-                            }
-                            for (int i = 0; i < cai.traits.size(); i++) {
-                                MyEntry<GraphTargetItem, GraphTargetItem> en = cai.traits.get(i);
-                                if (!(en.getKey() instanceof DirectValueActionItem)) {
-                                    continue;
-                                }
-                                DirectValueActionItem dv = (DirectValueActionItem) en.getKey();
-                                String name = dv.getAsString();
-                                GraphTargetItem value = en.getValue();
-                                boolean isStatic = cai.traitsStatic.get(i);
-                                if (value instanceof FunctionActionItem) {
-                                    if (name.startsWith("__get__") || name.startsWith("__set__")) {
-                                        String vname = name.substring(7);
-                                        Variable v = new Variable(isStatic, vname, vname, className);
-                                        classTraits.get(className).put(vname, v);
+        
+        Map<String, List<GraphTargetItem>> cachedTrees = new HashMap<>();
+        
+        asms.entrySet().parallelStream()
+                .filter(item -> item.getValue() instanceof DoInitActionTag)
+                .forEach(entry -> {                        
+                                    CancellableWorker.assignThreadToWorker(Thread.currentThread(), worker);
+                                    if (worker.isCancelled()) {
+                                        return;
                                     }
-                                    Method m = new Method(isStatic, name, "Unknown" /*FIXME?*/, className);
-                                    classTraits.get(className).put(name, m);
-                                } else {
-                                    Variable v = new Variable(isStatic, name, name, className);
-                                    classTraits.get(className).put(name, v);
-                                }
-                            }
-                            if (cai.extendsOp != null) {
-                                String parentClassName = String.join(".", getMembersPath(cai.extendsOp));
-                                classInheritance.get(className).add(parentClassName);
-                            } else {
-                                classInheritance.get(className).add("Object");
-                            }
-                            if (cai.implementsOp != null) {
-                                for (GraphTargetItem imp : cai.implementsOp) {
-                                    String imtName = String.join(".", getMembersPath(imp));
-                                    classInheritance.get(className).add(imtName);
-                                }
-                            }
-                        }
-                    }                    
-                    classesAsms.add(doi);
-                }
-            }
-        }
+                                    fireProgress(entry.getValue(), entry.getKey()); 
+                                    
+                                    String key = entry.getKey();
+                                    ASMSource asm = asms.get(key);
+                                    if (asm instanceof DoInitActionTag) {
+                                        DoInitActionTag doi = (DoInitActionTag) asm;
+                                        String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
+                                        if (exportName != null && exportName.startsWith("__Packages.")) {
+                                            //fireProgress(doi, key);
+                                            List<GraphTargetItem> tree = new ArrayList<>();
+                                            try {
+                                                tree = asm.getActionsToTree();
+                                            } catch (Throwable t) {
+                                                //ignore
+                                            }
+                                            cachedTrees.put(key, tree);
+                                            //get all assigned traits and inheritance tree                
+                                            for (GraphTargetItem item : tree) {
+                                                if (item instanceof InterfaceActionItem) {
+                                                    InterfaceActionItem iai = (InterfaceActionItem) item;
+                                                    String className = String.join(".", getMembersPath(iai.name));
+                                                    classInheritance.put(className, new ArrayList<>());
+                                                    if (iai.superInterfaces != null) {
+                                                        for (GraphTargetItem imp : iai.superInterfaces) {
+                                                            String imtName = String.join(".", getMembersPath(imp));
+                                                            classInheritance.get(className).add(imtName);
+                                                        }
+                                                    }
+                                                }
+                                                if (item instanceof ClassActionItem) {
+                                                    ClassActionItem cai = (ClassActionItem) item;
+                                                    final String className = String.join(".", getMembersPath(cai.className));
+                                                    classInheritance.put(className, new ArrayList<>());
+                                                    if (!classTraits.containsKey(className)) {
+                                                        classTraits.put(className, new LinkedHashMap<>());
+                                                    }
+                                                    for (int i = 0; i < cai.traits.size(); i++) {
+                                                        MyEntry<GraphTargetItem, GraphTargetItem> en = cai.traits.get(i);
+                                                        if (!(en.getKey() instanceof DirectValueActionItem)) {
+                                                            continue;
+                                                        }
+                                                        DirectValueActionItem dv = (DirectValueActionItem) en.getKey();
+                                                        String name = dv.getAsString();
+                                                        GraphTargetItem value = en.getValue();
+                                                        boolean isStatic = cai.traitsStatic.get(i);
+                                                        if (value instanceof FunctionActionItem) {
+                                                            if (name.startsWith("__get__") || name.startsWith("__set__")) {
+                                                                String vname = name.substring(7);
+                                                                Variable v = new Variable(isStatic, vname, vname, className);
+                                                                classTraits.get(className).put(vname, v);
+                                                            }
+                                                            Method m = new Method(isStatic, name, "Unknown" /*FIXME?*/, className);
+                                                            classTraits.get(className).put(name, m);
+                                                        } else {
+                                                            Variable v = new Variable(isStatic, name, name, className);
+                                                            classTraits.get(className).put(name, v);
+                                                        }
+                                                    }
+                                                    if (cai.extendsOp != null) {
+                                                        String parentClassName = String.join(".", getMembersPath(cai.extendsOp));
+                                                        classInheritance.get(className).add(parentClassName);
+                                                    } else {
+                                                        classInheritance.get(className).add("Object");
+                                                    }
+                                                    if (cai.implementsOp != null) {
+                                                        for (GraphTargetItem imp : cai.implementsOp) {
+                                                            String imtName = String.join(".", getMembersPath(imp));
+                                                            classInheritance.get(className).add(imtName);
+                                                        }
+                                                    }
+                                                }
+                                            }          
+
+                                            //Detect this.x assigns
+                                            for (GraphTargetItem item : tree) {
+                                                if (item instanceof ClassActionItem) {
+                                                    ClassActionItem cai = (ClassActionItem) item;
+                                                    final String className = String.join(".", getMembersPath(cai.className));
+                                                    for (int i = 0; i < cai.traits.size(); i++) {
+                                                        MyEntry<GraphTargetItem, GraphTargetItem> en = cai.traits.get(i);
+                                                        if (!(en.getKey() instanceof DirectValueActionItem)) {
+                                                            continue;
+                                                        }
+                                                        GraphTargetItem value = en.getValue();
+                                                        if (value instanceof GraphTargetItem) {
+                                                            AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+                                                                @Override
+                                                                public boolean visit(GraphTargetItem item) {
+                                                                    List<String> path = getFullPath(item);
+                                                                    if (path != null) {
+                                                                        List<String> parent = new ArrayList<>(path);
+                                                                        parent.remove(parent.size() - 1);
+                                                                        if (parent.size() == 1) {
+                                                                            if (parent.get(0).equals("this")) {
+                                                                                String name = path.get(path.size() - 1);
+                                                                                if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
+                                                                                    Variable v = new Variable(false, name, null, className);
+                                                                                    if (!result.containsKey(className)) {
+                                                                                        result.put(className, new LinkedHashMap<>());
+                                                                                    }
+                                                                                    result.get(className).put(name, v);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    return true;
+                                                                }
+                                                            };
+                                                            visitor.visit(value);
+                                                            value.visitRecursively(visitor);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+            
+            
+        });
 
         //Complete inheritance tree
         for (String className : classInheritance.keySet()) {
@@ -301,73 +386,28 @@ public class UninitializedClassFieldsDetector {
                     }
                 }
             }
-        }
-
-        //Detect this.x assigns
-        for (String key : asms.keySet()) {
-            if (CancellableWorker.isInterrupted()) {
-                throw new InterruptedException();
-            }
-            ASMSource asm = asms.get(key);
-            if (asm instanceof DoInitActionTag) {
-                DoInitActionTag doi = (DoInitActionTag) asm;
-                String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
-                if (exportName != null && exportName.startsWith("__Packages.")) {
-                    fireProgress(key);                    
-                    List<GraphTargetItem> tree = asm.getActionsToTree();
-                    for (GraphTargetItem item : tree) {
-                        if (item instanceof ClassActionItem) {
-                            ClassActionItem cai = (ClassActionItem) item;
-                            final String className = String.join(".", getMembersPath(cai.className));
-                            for (int i = 0; i < cai.traits.size(); i++) {
-                                MyEntry<GraphTargetItem, GraphTargetItem> en = cai.traits.get(i);
-                                if (!(en.getKey() instanceof DirectValueActionItem)) {
-                                    continue;
-                                }
-                                GraphTargetItem value = en.getValue();
-                                if (value instanceof GraphTargetItem) {
-                                    AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
-                                        @Override
-                                        public boolean visit(GraphTargetItem item) {
-                                            List<String> path = getFullPath(item);
-                                            if (path != null) {
-                                                List<String> parent = new ArrayList<>(path);
-                                                parent.remove(parent.size() - 1);
-                                                if (parent.size() == 1) {
-                                                    if (parent.get(0).equals("this")) {
-                                                        String name = path.get(path.size() - 1);
-                                                        if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
-                                                            Variable v = new Variable(false, name, null, className);
-                                                            if (!result.containsKey(className)) {
-                                                                result.put(className, new LinkedHashMap<>());
-                                                            }
-                                                            result.get(className).put(name, v);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            return true;
-                                        }
-                                    };
-                                    visitor.visit(value);
-                                    value.visitRecursively(visitor);
-                                }
-                            }
-                        }
-                    }
-                    classesAsms.add(doi);
-                }
-            }
-        }
+        }       
 
         //getting static classname.x assigns
-        for (String key : asms.keySet()) {
-            if (CancellableWorker.isInterrupted()) {
-                throw new InterruptedException();
+        asms.entrySet().parallelStream().forEach(entry -> {
+            CancellableWorker.assignThreadToWorker(Thread.currentThread(), worker);
+            if (worker.isCancelled()) {
+                return;
             }
+            fireProgress(entry.getValue(), entry.getKey()); 
+            String key = entry.getKey();
             ASMSource asm = asms.get(key);
-            fireProgress(key);                    
-            List<GraphTargetItem> tree = asm.getActionsToTree();
+            //fireProgress(asm, key);                    
+            List<GraphTargetItem> tree = new ArrayList<>();
+            if (cachedTrees.containsKey(key)) {
+                tree = cachedTrees.get(key);
+            } else {
+                try {
+                    tree = asm.getActionsToTree();
+                } catch(Throwable t) {
+                    //ignore
+                }                 
+            }
             for (GraphTargetItem item : tree) {
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                     @Override
@@ -402,7 +442,7 @@ public class UninitializedClassFieldsDetector {
                 visitor.visit(item);
                 item.visitRecursively(visitor);
             }
-        }
+        });
         
         
         //Removed cached version of classes - allow reparsing using detected uninitialized fields

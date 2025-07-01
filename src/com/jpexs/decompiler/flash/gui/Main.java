@@ -1528,6 +1528,9 @@ public class Main {
                         if (event.equals("importing_as")) {
                             startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);
                         }
+                        if (event.equals("unitializedClassFields")) {
+                            continueWork(AppStrings.translate("work.decompiling") + "..." + (String) data);
+                        }
                     }
                 });
             }
