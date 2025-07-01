@@ -117,7 +117,7 @@ public class RegisterNumber implements Serializable {
      * @return Translated name
      */
     public String translate() {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null || name.isEmpty()) {
             return String.format(Configuration.registerNameFormat.get(), number);
         }
         return name;
