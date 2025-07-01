@@ -66,9 +66,13 @@ import java.util.List;
             this.offset = ofst;
             prevToken = null;
             Token t = yylex();
-            prevToken = t;
+            if (t.type != TokenType.COMMENT) {
+                prevToken = t;            
+            }
             for (; t != null; t = yylex()) {
-                prevToken = t;
+                if (t.type != TokenType.COMMENT) {            
+                    prevToken = t;
+                }
                 tokens.add(t);
             }
         } catch (IOException ex) {
@@ -211,6 +215,9 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
   "new"                          { prevNew = true; return token(TokenType.KEYWORD); }
 
+  /* comments */
+  {Comment}                      { return token(TokenType.COMMENT); }
+
   {RegExp}                       { 
                                     prevNew = false; 
                                     if (prevToken == null || (prevToken.type == TokenType.OPERATOR && prevToken.pairValue >= 0)) {
@@ -324,12 +331,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
   {DoubleLiteral}                |
   {DoubleLiteral}[dD]            { prevNew = false; return token(TokenType.NUMBER); }
-
-  // JavaDoc comments need a state so that we can highlight the @ controls
-
-  /* comments */
-  {Comment}                      { prevNew = false; return token(TokenType.COMMENT); }
-
+  
   /* whitespace */
   {WhiteSpace}                   { }
   {XMLBeginOneTag}               { 

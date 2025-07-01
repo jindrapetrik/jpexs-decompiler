@@ -576,6 +576,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Uninitialized AS2 class traits. Class name to trait name to trait.
      */
     private volatile Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
+    
+    /**
+     * Detecting uninitilized class fields
+     */
+    @Internal
+    private boolean detectingUninitializedClassFields = false;       
+    
+    @Internal
+    private UninitializedClassFieldsDetector uninitializedClassFieldsDetector = new UninitializedClassFieldsDetector();
 
     /**
      * ExporterInfo tag.
@@ -664,6 +673,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     private final Object charactersLock = new Object();
 
+    public UninitializedClassFieldsDetector getUninitializedClassFieldsDetector() {
+        return uninitializedClassFieldsDetector;
+    }   
+    
     /**
      * Sets main GFX exporterinfo tag
      *
@@ -6208,24 +6221,40 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws java.lang.InterruptedException On interruption
      */
     public void calculateAs2UninitializedClassTraits() throws InterruptedException {
+        setDetectingUninitialized(true);
         uninitializedAs2ClassTraits = new HashMap<>();
-        UninitializedClassFieldsDetector detector = new UninitializedClassFieldsDetector();
         try {
-            uninitializedAs2ClassTraits = detector.calculateAs2UninitializedClassTraits(this);
-        } catch (Throwable t) {
+            uninitializedAs2ClassTraits = getUninitializedClassFieldsDetector().calculateAs2UninitializedClassTraits(this);
+        } catch (Throwable t) {           
             uninitializedAs2ClassTraits = null;
             throw t;
+        } finally {
+            setDetectingUninitialized(false);
         }
     }
-
+    
+    private synchronized void setDetectingUninitialized(boolean val) {
+        this.detectingUninitializedClassFields = val;
+    }
+    
+    private synchronized boolean isDetectingUninitialized() {
+        return detectingUninitializedClassFields;
+    }
+    
     /**
      * Gets uninitialized class traits in AS2.
      *
      * @return Map of class name to map of trait name to trait
      */
-    public synchronized Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() throws InterruptedException {
+    public Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() throws InterruptedException {
+        if (Configuration.skipDetectionOfUnitializedClassFields.get()) {
+            return new LinkedHashMap<>();
+        }
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
+        }        
+        if (isDetectingUninitialized()) {
+            return new LinkedHashMap<>();
         }
         if (uninitializedAs2ClassTraits == null) {
             calculateAs2UninitializedClassTraits();

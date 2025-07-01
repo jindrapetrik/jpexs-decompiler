@@ -66,6 +66,8 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
     private CancellableWorker parentWorker;
 
     private boolean canceled = false;
+    
+    private boolean userCancelled = false;
 
     private List<Runnable> cancelListeners = new ArrayList<>();
 
@@ -188,6 +190,15 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         THREAD_POOL.execute(this);
     }
 
+    public final boolean userCancel(boolean mayIterruptIfRunning) {
+        userCancelled = true;
+        return cancel(mayIterruptIfRunning);       
+    }
+
+    public boolean isUserCancelled() {
+        return userCancelled;
+    }        
+    
     @Override
     public final boolean cancel(boolean mayInterruptIfRunning) {
         canceled = true;

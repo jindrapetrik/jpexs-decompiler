@@ -3379,6 +3379,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         updateClassesList();
         reload(true);
     }
+    
+    public void skipDetectionOfUnitializedClassFieldsChanged() {
+        clearAllScriptCache();
+        updateClassesList();
+        reload(true);
+    }
 
     public void renameColliding(final Openable openable) {
         View.checkAccess();

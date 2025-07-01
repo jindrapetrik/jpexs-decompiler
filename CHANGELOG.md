@@ -2,9 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#2477] Option to disable AS2 detection of uninitialized class fields
+- AS2 detection of uninitialized class fields is cancellable and shows progress
+
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
 - AS1/2/3 highligter - brackets parsing error causing memory leak / crash
+- Comments color highlighting
+
+ ### Changed
+- Icon of "Deobfuscation options" menu from pile of pills to medkit
 
 ## [24.0.1] - 2025-06-27
 ### Fixed
@@ -3877,6 +3885,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404

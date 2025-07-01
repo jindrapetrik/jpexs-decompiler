@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.action.as2.UninitializedClassFieldsDetector;
 import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
@@ -73,6 +74,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -577,17 +579,38 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                             decompiledEditor.setShowMarkers(false);
                             if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
                                 setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; ...", "text/flasm");
-                                setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "...");
+                                setDecompiledText("-", "-", 
+                                        "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "..." 
+                                        + (Configuration.skipDetectionOfUnitializedClassFields.get() ? "" : "\r\n" + "// " + AppStrings.translate("work.decompiling.allScripts.ucf.canBeSkipped"))
+                                );
                             } else {
                                 setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
                             }
                         });
 
-                        HighlightedText htext = SWF.getCached(asm, innerActions);
-                        ActionList finalActions = innerActions;
-                        View.execInEventDispatch(() -> {
-                            setSourceCompleted(asm, htext, finalActions);
-                        });
+                        CancellableWorker that = this;
+                        //if (withUninitializedClassFields)
+                        ProgressListener progressListener = new ProgressListener() {
+                            @Override
+                            public void progress(int p) {
+                            }
+
+                            @Override
+                            public void status(String status) {
+                                Main.startWork(AppStrings.translate("work.decompiling") + " " + status + "  ...", that);
+                            }                            
+                        };
+                        UninitializedClassFieldsDetector det = asm.getSwf().getUninitializedClassFieldsDetector();
+                        det.addProgressListener(progressListener);
+                        try {
+                            HighlightedText htext = SWF.getCached(asm, innerActions);                        
+                            ActionList finalActions = innerActions;
+                            View.execInEventDispatch(() -> {
+                                setSourceCompleted(asm, htext, finalActions);
+                            });
+                        } finally {
+                            det.removeProgressListener(progressListener);
+                        }
                     } else {
                         ActionList finalActions = innerActions;
                         View.execInEventDispatch(() -> {
@@ -611,7 +634,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         } catch (CancellationException ex) {
                             editor.setShowMarkers(false);
                             setEditorText("-", "-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
-                            setDecompiledText("-", "-", "// " + AppStrings.translate("work.canceled"));
+                            setDecompiledText("-", "-", "// " + AppStrings.translate("work.canceled"));                                                        
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, "Error", ex);
                             decompiledEditor.setShowMarkers(false);
@@ -968,7 +991,14 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         });
 
-        PopupButton deobfuscateOptionsButton = new PopupButton(View.getIcon("deobfuscateoptions16")) {
+        Configuration.skipDetectionOfUnitializedClassFields.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                mainPanel.skipDetectionOfUnitializedClassFieldsChanged();
+            }            
+        });
+        
+        PopupButton deobfuscateOptionsButton = new PopupButton(View.getIcon("medkit16")) {
             @Override
             protected JPopupMenu getPopupMenu() {
                 JPopupMenu popupMenu = new JPopupMenu();
@@ -978,9 +1008,13 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 JCheckBox removeObfuscatedDeclarationsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(ActionPanel.this::removeObfuscatedDeclarationsMenuItemActionPerformed);
-
+                JCheckBox skipUninitializedClassFieldsDetectionMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.skip_uninitialized_class_fields_detection"));
+                skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUnitializedClassFields.get());
+                skipUninitializedClassFieldsDetectionMenuItem.addActionListener(ActionPanel.this::skipUninitializedClassFieldsDetectionMenuItemActionPerformed);
+                
                 popupMenu.add(simplifyExpressionsMenuItem);
                 popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+                popupMenu.add(skipUninitializedClassFieldsDetectionMenuItem);
 
                 return popupMenu;
             }
@@ -1123,6 +1157,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         JCheckBox checkBox = (JCheckBox) evt.getSource();
         Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(checkBox.isSelected());
         mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void skipUninitializedClassFieldsDetectionMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBox checkBox = (JCheckBox) evt.getSource();
+        Configuration.skipDetectionOfUnitializedClassFields.set(checkBox.isSelected());
+        mainPanel.skipDetectionOfUnitializedClassFieldsChanged();
     }
 
     private void breakPointListButtonActionPerformed(ActionEvent evt) {

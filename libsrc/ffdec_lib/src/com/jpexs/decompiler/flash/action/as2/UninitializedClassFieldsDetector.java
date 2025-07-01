@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.ProgressListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,6 +49,22 @@ import java.util.Map;
  */
 public class UninitializedClassFieldsDetector {
 
+    private List<ProgressListener> progressListeners = new ArrayList<>();
+    
+    public void addProgressListener(ProgressListener listener) {
+        progressListeners.add(listener);
+    }
+    
+    public void removeProgressListener(ProgressListener listener) {
+        progressListeners.remove(listener);
+    }
+    
+    private void fireProgress(String status) {
+        for (ProgressListener listener : progressListeners) {
+            listener.status(status);
+        }
+    }
+    
     /**
      * Gets path of variable and its getMembers: a.b.c.d => [a,b,c,d].
      *
@@ -210,6 +227,7 @@ public class UninitializedClassFieldsDetector {
                 DoInitActionTag doi = (DoInitActionTag) asm;
                 String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
                 if (exportName != null && exportName.startsWith("__Packages.")) {
+                    fireProgress(key);
                     List<GraphTargetItem> tree = asm.getActionsToTree();
                     for (GraphTargetItem item : tree) {
                         if (item instanceof InterfaceActionItem) {
@@ -265,7 +283,7 @@ public class UninitializedClassFieldsDetector {
                                 }
                             }
                         }
-                    }
+                    }                    
                     classesAsms.add(doi);
                 }
             }
@@ -295,6 +313,7 @@ public class UninitializedClassFieldsDetector {
                 DoInitActionTag doi = (DoInitActionTag) asm;
                 String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
                 if (exportName != null && exportName.startsWith("__Packages.")) {
+                    fireProgress(key);                    
                     List<GraphTargetItem> tree = asm.getActionsToTree();
                     for (GraphTargetItem item : tree) {
                         if (item instanceof ClassActionItem) {
@@ -347,6 +366,7 @@ public class UninitializedClassFieldsDetector {
                 throw new InterruptedException();
             }
             ASMSource asm = asms.get(key);
+            fireProgress(key);                    
             List<GraphTargetItem> tree = asm.getActionsToTree();
             for (GraphTargetItem item : tree) {
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
@@ -381,6 +401,22 @@ public class UninitializedClassFieldsDetector {
                 };
                 visitor.visit(item);
                 item.visitRecursively(visitor);
+            }
+        }
+        
+        
+        //Removed cached version of classes - allow reparsing using detected uninitialized fields
+        for (String key : asms.keySet()) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }      
+            ASMSource asm = asms.get(key);
+            if (asm instanceof DoInitActionTag) {
+                DoInitActionTag doi = (DoInitActionTag) asm;
+                String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
+                if (exportName != null && exportName.startsWith("__Packages.")) {
+                    SWF.uncache(doi);
+                }
             }
         }
 

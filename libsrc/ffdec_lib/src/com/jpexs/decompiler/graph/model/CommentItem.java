@@ -52,7 +52,18 @@ public class CommentItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append("/* ");
+        int commentLinesCount = 0;
+        for (int i = 0; i < commentLines.length; i++) {
+            if (commentLines[i] == null) {
+                continue;
+            }
+            commentLinesCount++;
+        }
+        if (commentLinesCount == 1) {
+            writer.append("// ");
+        } else {
+            writer.append("/* ");
+        }
         for (int i = 0; i < commentLines.length; i++) {
             if (commentLines[i] == null) {
                 continue;
@@ -62,7 +73,10 @@ public class CommentItem extends GraphTargetItem {
                 writer.newLine();
             }
         }
-        return writer.append(" */");
+        if (commentLinesCount > 1) {
+            writer.append(" */");
+        }
+        return writer;
     }
 
     /**

@@ -81,7 +81,7 @@ public class MainFrameStatusPanel extends JPanel {
         cancelButton.addActionListener((ActionEvent e) -> {
             CancellableWorker w = currentWorker;
             if (w != null) {           
-                w.cancel(true);
+                w.userCancel(true);
             }
         });                               
         statusLeftPanel.add(loadingPanel);
