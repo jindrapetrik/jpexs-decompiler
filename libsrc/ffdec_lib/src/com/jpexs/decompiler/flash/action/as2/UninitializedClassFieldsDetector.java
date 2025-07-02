@@ -223,13 +223,13 @@ public class UninitializedClassFieldsDetector {
     public Map<String, Map<String, Trait>> calculateAs2UninitializedClassTraits(SWF swf) throws InterruptedException {
         if (swf.isAS3()) {
             return new HashMap<>();
-        }        
+        }
         final Map<String, Map<String, Trait>> resultInstance = Collections.synchronizedMap(new LinkedHashMap<>());
         final Map<String, Map<String, Trait>> resultStatic = Collections.synchronizedMap(new LinkedHashMap<>());
         Map<String, ASMSource> asms = swf.getASMs(false);
 
         CancellableWorker worker = CancellableWorker.getCurrent();
-       
+
         final Map<String, Map<String, Trait>> classTraits = Collections.synchronizedMap(new LinkedHashMap<>(ActionScript2Classes.getClassToTraits()));
         final Map<String, List<String>> classInheritance = Collections.synchronizedMap(new HashMap<>(ActionScript2Classes.getClassInheritance()));
 
@@ -240,7 +240,7 @@ public class UninitializedClassFieldsDetector {
         Runnable cancelListener = new Runnable() {
             @Override
             public void run() {
-                for (Thread t : subThreads) {                    
+                for (Thread t : subThreads) {
                     t.interrupt();
                 }
             }
@@ -268,8 +268,8 @@ public class UninitializedClassFieldsDetector {
                             if (exportName != null && exportName.startsWith("__Packages.")) {
                                 //fireProgress(doi, key);
                                 List<GraphTargetItem> tree = new ArrayList<>();
-                                try {                             
-                                    tree = asm.getActionsToTree();                                    
+                                try {
+                                    tree = asm.getActionsToTree();
                                 } catch (Throwable t) {
                                     //ignore
                                 }
@@ -437,10 +437,9 @@ public class UninitializedClassFieldsDetector {
                                     String className = String.join(".", parent);
                                     if (classInheritance.containsKey(className)) {
                                         //it's a class
-                                        if (!containsTrait(classTraits, classInheritance, className, name) 
+                                        if (!containsTrait(classTraits, classInheritance, className, name)
                                                 && (!resultInstance.containsKey(className) || !resultInstance.get(className).containsKey(name))
-                                                && (!resultStatic.containsKey(className) || !resultStatic.get(className).containsKey(name))
-                                                ) {
+                                                && (!resultStatic.containsKey(className) || !resultStatic.get(className).containsKey(name))) {
                                             if (!resultStatic.containsKey(className)) {
                                                 resultStatic.put(className, new TreeMap<>(new NaturalOrderComparator()));
                                             }
@@ -461,14 +460,14 @@ public class UninitializedClassFieldsDetector {
             if (worker != null && worker.isCancelled()) {
                 throw new InterruptedException();
             }
-            
+
 
             /*for (String cls:result.keySet()) {
                 System.err.println("class "+cls);
                 for(String name:result.get(cls).keySet()) {
                     System.err.println("- " +result.get(cls).get(name));
                 }
-            }*/            
+            }*/
             Map<String, Map<String, Trait>> result = new LinkedHashMap<>();
             for (String className : resultInstance.keySet()) {
                 for (String traitName : resultInstance.get(className).keySet()) {
@@ -497,7 +496,7 @@ public class UninitializedClassFieldsDetector {
                     if (exportName != null && exportName.startsWith("__Packages.")) {
                         SWF.uncache(doi);
                     }
-                }                
+                }
             }
             if (worker != null) {
                 worker.removeCancelListener(cancelListener);
