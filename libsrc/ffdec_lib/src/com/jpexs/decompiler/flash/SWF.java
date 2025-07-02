@@ -585,6 +585,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     
     @Internal
     private UninitializedClassFieldsDetector uninitializedClassFieldsDetector = new UninitializedClassFieldsDetector();
+    
+    @Internal
+    private final Object uninitializedClassFieldsLock = new Object();
 
     /**
      * ExporterInfo tag.
@@ -3349,15 +3352,28 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (treeItem instanceof AS2Package) {
             AS2Package pkg = (AS2Package) treeItem;
             if (pkg.isFlat()) {
-                String[] parts = pkg.getName().split("\\.");
-                for (int i = 0; i < parts.length; i++) {
-                    parts[i] = Helper.makeFileName(parts[i]);
+                if (exportFileName) {
+                    String[] parts = pkg.getName().split("\\.");
+                    for (int i = 0; i < parts.length; i++) {
+                        parts[i] = Helper.makeFileName(parts[i]);
+                    }
+                    return String.join(File.separator, parts);
                 }
-                return String.join(File.separator, parts);
+                return DottedChain.parseNoSuffix(pkg.getName()).toPrintableString(false);
             }
         }
 
         if (!exportFileName) {
+            
+            if (treeItem instanceof DoInitActionTag) {
+                DoInitActionTag tag = (DoInitActionTag) treeItem;
+                String expName = tag.getSwf().getExportName(tag.getCharacterId());
+                if (expName != null && !expName.isEmpty()) {
+                    String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
+                    return IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
+                }
+            }
+            
             return treeItem.toString();
         }
 
@@ -6221,15 +6237,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws java.lang.InterruptedException On interruption
      */
     public void calculateAs2UninitializedClassTraits() throws InterruptedException {
+        waitForUninitializedClassDetector();
         setDetectingUninitialized(true);
         uninitializedAs2ClassTraits = new HashMap<>();
         try {
             uninitializedAs2ClassTraits = getUninitializedClassFieldsDetector().calculateAs2UninitializedClassTraits(this);
         } catch (Throwable t) {           
+            //System.err.println("Calculating AS2 uninitialized fields cancelled");
             uninitializedAs2ClassTraits = null;
             throw t;
         } finally {
             setDetectingUninitialized(false);
+            synchronized (uninitializedClassFieldsLock) {
+                uninitializedClassFieldsLock.notifyAll();
+            }            
         }
     }
     
@@ -6237,7 +6258,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         this.detectingUninitializedClassFields = val;
     }
     
-    private synchronized boolean isDetectingUninitialized() {
+    public synchronized boolean isDetectingUninitialized() {
         return detectingUninitializedClassFields;
     }
     
@@ -6290,5 +6311,18 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public boolean isDestroyed() {
         return destroyed;
+    }
+    
+    public void waitForUninitializedClassDetector() {
+        if (!isDetectingUninitialized()) {
+            return;
+        }
+        try {
+            synchronized (uninitializedClassFieldsLock) {
+                uninitializedClassFieldsLock.wait();
+            }            
+        } catch (InterruptedException ex) {
+            //ignore
+        }
     }
 }

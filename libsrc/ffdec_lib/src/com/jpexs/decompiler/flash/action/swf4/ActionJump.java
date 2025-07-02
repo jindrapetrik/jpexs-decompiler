@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -168,8 +169,8 @@ public class ActionJump extends Action {
         int ofs = code.adr2pos(targetAddress);
         if (ofs == -1) {
             int length = getBytesLength();
-            ofs = code.adr2pos(getAddress() + length);
-            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs{0} from ofs{1}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress())});
+            ofs = code.adr2pos(getAddress() + length);           
+            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs{0} from ofs{1} in {2}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress()), ((ActionGraphSource) code).getPath()});
         }
         ret.add(ofs);
         return ret;

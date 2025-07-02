@@ -261,7 +261,7 @@ public class ActionGraphSource extends GraphSource {
                 return size();
             }
             if (ret == -1) {
-                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "{0} - address loc{1} not found", new Object[]{path, Helper.formatAddress(adr)});
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "address loc{1} not found in {0}", new Object[]{path, Helper.formatAddress(adr)});
             }
         }
         return ret;
@@ -307,4 +307,7 @@ public class ActionGraphSource extends GraphSource {
         return variables;
     }
 
+    public String getPath() {
+        return path;
+    }   
 }

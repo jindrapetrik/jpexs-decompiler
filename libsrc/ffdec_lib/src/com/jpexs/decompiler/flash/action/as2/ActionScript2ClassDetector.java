@@ -635,7 +635,7 @@ public class ActionScript2ClassDetector {
                             String getterNameStr = getAsString(((GetMemberActionItem) propertyGetter).memberName, "getter memberName");
                             if (!(getterNameStr.equals("__get__" + propertyNameStr))) {
                                 //throw new AssertException("getter does not match property name");
-                                Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": getter " + IdentifiersDeobfuscation.printIdentifier(false, getterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
+                                //Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": getter " + IdentifiersDeobfuscation.printIdentifier(false, getterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
                                 continue;
                             }
 
@@ -669,7 +669,7 @@ public class ActionScript2ClassDetector {
                             }
                             String setterNameStr = getAsString(((GetMemberActionItem) propertySetter).memberName, "setter memberNAme");
                             if (!(setterNameStr.equals("__set__" + propertyNameStr))) {
-                                Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": setter " + IdentifiersDeobfuscation.printIdentifier(false, setterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
+                                //Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": setter " + IdentifiersDeobfuscation.printIdentifier(false, setterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
                                 continue;
                                 //throw new AssertException("setter does not match property name");
                             }
@@ -845,7 +845,7 @@ public class ActionScript2ClassDetector {
             // goto next line and check next classes
             return true;
         } catch (AssertException ex) {
-            logger.log(Level.WARNING, "{0}: Cannot detect class - {1}", new Object[]{scriptPath, ex.getCondition()});
+            logger.log(Level.WARNING, "Cannot detect class - {0} in {1}", new Object[]{ex.getCondition(), scriptPath});
         }
         return false;
     }

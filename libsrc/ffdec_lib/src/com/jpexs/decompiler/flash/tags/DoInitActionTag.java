@@ -297,7 +297,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(swf.getUninitializedAs2ClassTraits(), true, false, getActions(), swf.version, 0, "", swf.getCharset());
+            return Action.actionsToTree(swf.getUninitializedAs2ClassTraits(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

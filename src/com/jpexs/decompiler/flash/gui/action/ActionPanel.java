@@ -527,7 +527,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         if (!decompile) {
             decompiledText = new HighlightedText(Helper.getDecompilationSkippedComment());
         } else {
-            decompiledText = SWF.getFromCache(asm);
+            if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src) && src.getSwf().isDetectingUninitialized()) {
+                decompiledText = null;
+            } else {
+                decompiledText = SWF.getFromCache(asm);
+            }
         }
 
         HighlightedText fdecompiledText = decompiledText;
@@ -589,7 +593,6 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         });
 
                         CancellableWorker that = this;
-                        //if (withUninitializedClassFields)
                         ProgressListener progressListener = new ProgressListener() {
                             @Override
                             public void progress(int p) {
@@ -602,6 +605,13 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         };
                         UninitializedClassFieldsDetector det = asm.getSwf().getUninitializedClassFieldsDetector();
                         det.addProgressListener(progressListener);
+                        
+                        if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
+                            src.getSwf().waitForUninitializedClassDetector();                                                        
+                        }
+                        if (isCancelled()) {
+                            return null;
+                        }
                         try {
                             HighlightedText htext = SWF.getCached(asm, innerActions);                        
                             ActionList finalActions = innerActions;
