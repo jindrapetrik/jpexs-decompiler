@@ -31,10 +31,12 @@ package com.jpexs.decompiler.flash.tags.text;
 
 %{
 
-    boolean finish = false;
-    boolean parameter = false;
+    private boolean finish = false;
+    private boolean parameter = false;
 
-    StringBuilder string = null;
+    private StringBuilder string = null;
+
+    private int repeatNum = 1;
     
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -55,13 +57,16 @@ package com.jpexs.decompiler.flash.tags.text;
 %}
 
 Parameter = [a-z_][a-z0-9_]*
-Value = [^ \r\n\]\"]+
+Value = [^ \r\n\]\"\u00A7]+
 Divider = [ \r\n]+
 HexDigit          = [0-9a-fA-F]
 StringCharacter = [^\r\n\"\\]
+OIdentifierCharacter = [^\r\n\u00A7\\]
+DecIntegerLiteral = (0 | [1-9][0-9]*) [ui]?
+LineTerminator = \r|\n|\r\n
 
 
-%state PARAMETER,VALUE,STRING
+%state PARAMETER,VALUE,OIDENTIFIER,STRING
 
 %%
 
@@ -96,7 +101,7 @@ StringCharacter = [^\r\n\"\\]
 }
 
 <PARAMETER> {
-    {Divider}                          {}
+    {Divider}                    {}
     {Parameter}                  {
                                     yybegin(VALUE);
                                     return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
@@ -115,6 +120,10 @@ StringCharacter = [^\r\n\"\\]
                                     yybegin(STRING);
                                  }
 
+    "\u00A7"                     {
+                                    string = new StringBuilder();
+                                    yybegin(OIDENTIFIER);
+                                 }
     {Parameter}                  {
                                     return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
                                  }
@@ -125,6 +134,38 @@ StringCharacter = [^\r\n\"\\]
                                     yybegin(YYINITIAL);
                                     parameter = false;
                                  }
+}
+
+<OIDENTIFIER> {
+    "\u00A7"                         {
+                                     yybegin(VALUE);
+                                     repeatNum = 1;
+                                     // length also includes the trailing quote
+                                     String ret = string.toString();
+                                     string = null;
+                                     return new ParsedSymbol(SymbolType.PARAMETER_VALUE, ret);
+                                 }
+
+  {OIdentifierCharacter}         { for(int r=0;r<repeatNum;r++) string.append(yytext()); repeatNum = 1;}
+
+  /* escape sequences */
+  "\\b"                          { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;}
+  "\\t"                          { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;}
+  "\\n"                          { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;}
+  "\\f"                          { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;}
+  "\\\u00A7"                     { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;}
+  "\\r"                          { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;}
+  "\\\\"                         { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;}
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1;}
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1;}
+  \\\{{DecIntegerLiteral}\}      { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1)); }
+
+  /* escape sequences */
+
+  \\.                            { throw new TextParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);  }
+  {LineTerminator}               { yybegin(VALUE);  yyline++;}
 }
 
 <STRING> {

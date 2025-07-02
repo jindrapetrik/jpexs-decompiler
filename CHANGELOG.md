@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - AS2 detection of uninitialized class fields is cancellable, faster (parallel)
   and shows its progress
 - AS2 - show deobfuscated class/package names in the class tree
+- Allow obfuscated DefineEditText variable identifiers
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -55,10 +56,12 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -175,6 +178,7 @@ public class DefineEditTextTag extends TextTag {
     @Conditional("hasLayout")
     public int leading;
 
+    @DottedIdentifier
     public String variableName;
 
     @Conditional("hasText")
@@ -656,7 +660,7 @@ public class DefineEditTextTag extends TextTag {
             writer.append("leading ").append(leading).newLine();
         }
         if (!variableName.isEmpty()) {
-            writer.append("variablename ").append(variableName).newLine();
+            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(false)).newLine();
         }
         writer.append("]");
         if (hasText) {
