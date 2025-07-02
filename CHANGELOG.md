@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2/3 highligter - brackets parsing error causing memory leak / crash
 - Comments color highlighting
 - AS1/2 Obfuscated registers names not resolving because of trimming
+- Escaping HTML in raw tag editor
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

@@ -913,10 +913,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 } else if (val instanceof ByteArrayRange) {
                     valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
                 } else {
-                    valStr += " = " + colorAdd + val.toString() + enumAdd;
+                    valStr += " = " + colorAdd + escapeHtml(val.toString()) + enumAdd;
                 }
             }
             return getNameType(fieldIndex) + valStr;
+        }
+        
+        private String escapeHtml(String val) {
+            return val.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
         }
 
         public String getType(int fieldIndex) {
