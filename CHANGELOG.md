@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
+- Error log window shows last 100 log entries (instead of first 100)
 
 ## [24.0.1] - 2025-06-27
 ### Fixed
