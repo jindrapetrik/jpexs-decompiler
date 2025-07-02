@@ -86,15 +86,15 @@ public class ActionScript2UninitializedFieldsTest extends ActionScript2TestBase 
 
     @Test
     public void testUninitializedFields() {
-        compareSrc("MyClass", "   var v;\n"
-                + "   var v2;\n"
-                + "   var f;\n"
+        compareSrc("MyClass", "   var _v3;\n"
                 + "   var c;\n"
                 + "   var d;\n"
-                + "   var _v3;\n"
-                + "   static var sv2;\n"
+                + "   var f;\n"
+                + "   var v;\n"
+                + "   var v2;\n"
                 + "   static var _sv3;\n"
                 + "   static var sv;\n"
+                + "   static var sv2;\n"
                 + "   var init_v = 2;\n"
                 + "   static var sinit_v = 3;\n"
                 + "   function MyClass()\n"

@@ -46,6 +46,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import natorder.NaturalOrderComparator;
 
 /**
  * Uninitialized class fields detector for ActionScript 2.
@@ -217,11 +219,13 @@ public class UninitializedClassFieldsDetector {
      * @return Map of class name to map of trait name to trait
      * @throws java.lang.InterruptedException On interruption
      */
+    @SuppressWarnings("unchecked")
     public Map<String, Map<String, Trait>> calculateAs2UninitializedClassTraits(SWF swf) throws InterruptedException {
         if (swf.isAS3()) {
             return new HashMap<>();
         }        
-        final Map<String, Map<String, Trait>> result = Collections.synchronizedMap(new LinkedHashMap<>());
+        final Map<String, Map<String, Trait>> resultInstance = Collections.synchronizedMap(new LinkedHashMap<>());
+        final Map<String, Map<String, Trait>> resultStatic = Collections.synchronizedMap(new LinkedHashMap<>());
         Map<String, ASMSource> asms = swf.getASMs(false);
 
         CancellableWorker worker = CancellableWorker.getCurrent();
@@ -349,12 +353,12 @@ public class UninitializedClassFieldsDetector {
                                                             if (parent.size() == 1) {
                                                                 if (parent.get(0).equals("this")) {
                                                                     String name = path.get(path.size() - 1);
-                                                                    if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
+                                                                    if (!containsTrait(classTraits, classInheritance, className, name) && (!resultInstance.containsKey(className) || !resultInstance.get(className).containsKey(name))) {
                                                                         Variable v = new Variable(false, name, null, className);
-                                                                        if (!result.containsKey(className)) {
-                                                                            result.put(className, new LinkedHashMap<>());
+                                                                        if (!resultInstance.containsKey(className)) {
+                                                                            resultInstance.put(className, new TreeMap<>(new NaturalOrderComparator()));
                                                                         }
-                                                                        result.get(className).put(name, v);
+                                                                        resultInstance.get(className).put(name, v);
                                                                     }
                                                                 }
                                                             }
@@ -433,12 +437,15 @@ public class UninitializedClassFieldsDetector {
                                     String className = String.join(".", parent);
                                     if (classInheritance.containsKey(className)) {
                                         //it's a class
-                                        if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
-                                            if (!result.containsKey(className)) {
-                                                result.put(className, new LinkedHashMap<>());
+                                        if (!containsTrait(classTraits, classInheritance, className, name) 
+                                                && (!resultInstance.containsKey(className) || !resultInstance.get(className).containsKey(name))
+                                                && (!resultStatic.containsKey(className) || !resultStatic.get(className).containsKey(name))
+                                                ) {
+                                            if (!resultStatic.containsKey(className)) {
+                                                resultStatic.put(className, new TreeMap<>(new NaturalOrderComparator()));
                                             }
                                             Variable v = new Variable(true, name, null, className);
-                                            result.get(className).put(name, v);
+                                            resultStatic.get(className).put(name, v);
                                         }
                                     }
                                 }
@@ -462,6 +469,23 @@ public class UninitializedClassFieldsDetector {
                     System.err.println("- " +result.get(cls).get(name));
                 }
             }*/            
+            Map<String, Map<String, Trait>> result = new LinkedHashMap<>();
+            for (String className : resultInstance.keySet()) {
+                for (String traitName : resultInstance.get(className).keySet()) {
+                    if (!result.containsKey(className)) {
+                        result.put(className, new LinkedHashMap<>());
+                    }
+                    result.get(className).put(traitName, resultInstance.get(className).get(traitName));
+                }
+            }
+            for (String className : resultStatic.keySet()) {
+                for (String traitName : resultStatic.get(className).keySet()) {
+                    if (!result.containsKey(className)) {
+                        result.put(className, new LinkedHashMap<>());
+                    }
+                    result.get(className).put(traitName, resultStatic.get(className).get(traitName));
+                }
+            }
             return result;
         } finally {
             //Removed cached version of classes - allow reparsing using detected uninitialized fields
