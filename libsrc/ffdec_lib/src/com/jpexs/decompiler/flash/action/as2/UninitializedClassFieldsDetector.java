@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.ProgressListener;
 import java.util.ArrayList;
@@ -243,13 +242,15 @@ public class UninitializedClassFieldsDetector {
             }
         };
 
-        worker.addCancelListener(cancelListener);
+        if (worker != null) {
+            worker.addCancelListener(cancelListener);
+        }
 
         try {
             asms.entrySet().parallelStream()
                     .filter(item -> item.getValue() instanceof DoInitActionTag)
                     .forEach(entry -> {
-                        if (worker.isCancelled()) {
+                        if (worker != null && worker.isCancelled()) {
                             return;
                         }
                         subThreads.add(Thread.currentThread());
@@ -372,7 +373,7 @@ public class UninitializedClassFieldsDetector {
 
                     });
 
-            if (worker.isCancelled()) {
+            if (worker != null && worker.isCancelled()) {
                 throw new InterruptedException();
             }
 
@@ -390,13 +391,13 @@ public class UninitializedClassFieldsDetector {
                 }
             }
 
-            if (worker.isCancelled()) {
+            if (worker != null && worker.isCancelled()) {
                 throw new InterruptedException();
             }
 
             //getting static classname.x assigns
             asms.entrySet().parallelStream().forEach(entry -> {
-                if (worker.isCancelled()) {
+                if (worker != null && worker.isCancelled()) {
                     return;
                 }
                 subThreads.add(Thread.currentThread());
@@ -450,7 +451,7 @@ public class UninitializedClassFieldsDetector {
                 }
             });
 
-            if (worker.isCancelled()) {
+            if (worker != null && worker.isCancelled()) {
                 throw new InterruptedException();
             }
             
@@ -460,10 +461,7 @@ public class UninitializedClassFieldsDetector {
                 for(String name:result.get(cls).keySet()) {
                     System.err.println("- " +result.get(cls).get(name));
                 }
-            }*/
-            if (worker.isCancelled()) {
-                throw new InterruptedException();
-            }
+            }*/            
             return result;
         } finally {
             //Removed cached version of classes - allow reparsing using detected uninitialized fields
@@ -477,7 +475,9 @@ public class UninitializedClassFieldsDetector {
                     }
                 }                
             }
-            worker.removeCancelListener(cancelListener);
+            if (worker != null) {
+                worker.removeCancelListener(cancelListener);
+            }
         }
     }
 }
