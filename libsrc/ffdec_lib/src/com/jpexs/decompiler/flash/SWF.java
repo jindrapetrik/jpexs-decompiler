@@ -6286,9 +6286,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public boolean needsCalculatingAS2UninitializeClassTraits(ASMSource src) {
         if (!isAS3()) {
             if (src instanceof DoInitActionTag) {
-                if (uninitializedAs2ClassTraits == null) {
-                    return true;
-                }
+                DoInitActionTag doi = (DoInitActionTag) src;
+                String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
+                if (exportName != null && exportName.startsWith("__Packages.")) {
+                    if (uninitializedAs2ClassTraits == null) {
+                        return true;
+                    }
+                }                
             }
         }
         return false;

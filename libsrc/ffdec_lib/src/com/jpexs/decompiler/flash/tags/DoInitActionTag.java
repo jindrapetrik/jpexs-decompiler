@@ -39,6 +39,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,7 +159,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset());
+        return Action.actionsToSource(requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), this, actions, getScriptName(), writer, getCharset());
     }
 
     @Override
@@ -167,7 +168,11 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
+        return Action.actionsToSource(requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
+    }
+    
+    private boolean requiresUninitielizedClassTraitsDetection() {
+        return swf.needsCalculatingAS2UninitializeClassTraits(this);
     }
 
     @Override
@@ -297,7 +302,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(swf.getUninitializedAs2ClassTraits(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
+            return Action.actionsToTree(requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }
