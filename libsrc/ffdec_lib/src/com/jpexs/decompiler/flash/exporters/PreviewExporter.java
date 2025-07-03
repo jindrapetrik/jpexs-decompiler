@@ -703,7 +703,7 @@ public class PreviewExporter {
             doneCharacters.add(chId);
         }
 
-        t.writeTag(sos);
+        t.writeTagNoScripts(sos);
         if (t instanceof CharacterIdTag) {
             List<CharacterIdTag> chIdTags = t.getSwf().getCharacterIdTags(((CharacterIdTag) t).getCharacterId());
             if (chIdTags != null) {

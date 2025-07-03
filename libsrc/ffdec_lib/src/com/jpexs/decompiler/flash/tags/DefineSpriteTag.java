@@ -149,6 +149,26 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
             sos.writeUI16(0);
         }
     }
+    
+    @Override
+    public void getDataNoScript(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(spriteId);
+        sos.writeUI16(frameCount);
+        ReadOnlyTagList tags = getTags();
+        for (Tag t : tags) {
+            if (t instanceof DoActionTag
+                    || t instanceof DoInitActionTag
+                    || t instanceof ABCContainerTag
+                    || t instanceof SymbolClassTag
+                    || t instanceof ExportAssetsTag) {
+                continue;
+            }
+            t.writeTagNoScripts(sos);
+        }
+        if (hasEndTag) {
+            sos.writeUI16(0);
+        }
+    }
 
     @Override
     public Timeline getTimeline() {
@@ -510,5 +530,5 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public void setFrameCount(int frameCount) {
         this.frameCount = frameCount;
-    }
+    }        
 }
