@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Obfuscated registers names not resolving because of trimming
 - Escaping HTML in raw tag editor
 - Flash player preview not stripping scripts from DefineSprites
+- Not clearing selected depth after timelined change
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

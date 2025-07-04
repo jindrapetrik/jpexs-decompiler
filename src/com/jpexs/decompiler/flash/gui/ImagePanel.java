@@ -4494,6 +4494,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             depthStateUnderCursor = null;
             hilightedEdge = null;
             hilightedPoints = null;
+            selectedDepths = new ArrayList<>();
+            selectedPoints = new ArrayList<>();                    
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
