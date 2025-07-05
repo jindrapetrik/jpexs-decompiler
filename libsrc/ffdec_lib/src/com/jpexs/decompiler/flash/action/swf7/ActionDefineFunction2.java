@@ -344,7 +344,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
                 + ", " + preloadArgumentsFlag
                 + ", " + suppressThisFlag
                 + ", " + preloadThisFlag
-                + ", " + preloadGlobalFlag).trim() + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
+                + ", " + preloadGlobalFlag).trim() + paramStr + " {";
     }
 
     @Override

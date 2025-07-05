@@ -680,9 +680,6 @@ public abstract class Action implements GraphSourceItem {
                 long addr = ((Action) cnt).getAddress() + cnt.getHeaderSize();
                 for (Long size : sizes) {
                     addr += size;
-                    if (size == 0) {
-                        continue;
-                    }
                     if (!containers.containsKey(addr)) {
                         containers.put(addr, new ArrayList<>());
                     }
@@ -691,14 +688,14 @@ public abstract class Action implements GraphSourceItem {
             }
 
             if (containers.containsKey(offset)) {
-                for (int i = 0; i < containers.get(offset).size(); i++) {
+                for (int i = containers.get(offset).size() - 1; i >= 0; i--) {
+                    GraphSourceItemContainer cnt = containers.get(offset).get(i);
+                    int cntPos = containersPos.get(cnt);
                     if (lastPush) {
                         writer.newLine();
                         lastPush = false;
-                    }
-                    writer.appendNoHilight("}").newLine();
-                    GraphSourceItemContainer cnt = containers.get(offset).get(i);
-                    int cntPos = containersPos.get(cnt);
+                    }                    
+                    writer.appendNoHilight("}").newLine();                                      
                     writer.appendNoHilight(cnt.getASMSourceBetween(cntPos));
                     cntPos++;
                     containersPos.put(cnt, cntPos);

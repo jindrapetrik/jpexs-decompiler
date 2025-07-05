@@ -187,7 +187,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             paramStr.append("\"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\" ");
         }
 
-        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\", " + paramNames.size() + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
+        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\", " + paramNames.size() + paramStr + " {";
     }
 
     @Override

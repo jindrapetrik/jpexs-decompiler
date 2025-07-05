@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - show deobfuscated class/package names in the class tree
 - Allow obfuscated DefineEditText variable identifiers
 - Selectable text (DefineEditTexts with noselect=0)
+- AS1/2 P-code curly braces pair highlighting
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -18,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Escaping HTML in raw tag editor
 - Flash player preview not stripping scripts from DefineSprites
 - Not clearing selected depth after timelined change
+- [#2480] AS1/2 P-code decompilation of try..catch with empty catch body at the end of function
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3896,6 +3898,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
+[#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
