@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
 - Error log window shows last 100 log entries (instead of first 100)
+- AS1/2 P-code double Push values have suffix ".0" to properly distinguish them
+- AS1/2 P-code float Push values have suffix "f" to properly distinguish them
 
 ## [24.0.1] - 2025-06-27
 ### Fixed

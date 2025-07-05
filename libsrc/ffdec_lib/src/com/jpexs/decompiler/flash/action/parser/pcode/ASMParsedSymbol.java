@@ -127,6 +127,11 @@ public class ASMParsedSymbol {
      * Type: Comma
      */
     public static final int TYPE_COMMA = 18;
+    
+    /**
+     * Type: Double
+     */
+    public static final int TYPE_DOUBLE = 19;
 
     /**
      * Constructor.

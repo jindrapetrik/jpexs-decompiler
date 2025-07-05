@@ -179,9 +179,12 @@ public class ActionPush extends Action {
                         o = (double) l;
                     }
                 }
-                if (o instanceof Double || o instanceof Float) {
+                if (o instanceof Float) {
+                    sos.writeUI8(1);
+                    sos.writeFLOAT((Float) o);
+                } else if (o instanceof Double) {
                     sos.writeUI8(6);
-                    sos.writeDOUBLE(((Number) o).doubleValue());
+                    sos.writeDOUBLE((Double) o);
                 } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
                     sos.writeUI8(7);
                     sos.writeSI32(((Number) o).longValue());
@@ -231,7 +234,9 @@ public class ActionPush extends Action {
                         o = (double) l;
                     }
                 }
-                if (o instanceof Double || o instanceof Float) {
+                if (o instanceof Float) {
+                    res += 5;
+                } else if (o instanceof Double) {
                     res += 9;
                 } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
                     res += 5;
@@ -330,6 +335,7 @@ public class ActionPush extends Action {
                     }
                     break;
                 case ASMParsedSymbol.TYPE_FLOAT:
+                case ASMParsedSymbol.TYPE_DOUBLE:
                 case ASMParsedSymbol.TYPE_NULL:
                 case ASMParsedSymbol.TYPE_UNDEFINED:
                 case ASMParsedSymbol.TYPE_REGISTER:
@@ -438,7 +444,14 @@ public class ActionPush extends Action {
         } else if (value instanceof RegisterNumber) {
             ret = ((RegisterNumber) value).toStringNoName();
         } else if ((value instanceof Float) || (value instanceof Double)) {
-            ret = EcmaScript.toString(value);
+            String fdString = EcmaScript.toString(value);
+            if (value instanceof Double && fdString.matches("^[0-9]+$")) {
+                fdString += ".0";
+            }
+            if (value instanceof Float) {
+                fdString += "f";
+            }
+            ret = fdString;            
         } else {
             ret = value.toString();
         }
