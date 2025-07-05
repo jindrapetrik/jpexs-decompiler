@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 /**
@@ -48,6 +49,42 @@ public class RenderContext {
      * Mouse over button.
      */
     public ButtonTag mouseOverButton;
+    
+    /**
+     * Mouse over text.
+     */
+    public TextTag mouseOverText;
+    
+    /**
+     * Selection text tag
+     */
+    public TextTag selectionText;
+    
+    /**
+     * Text selection start
+     */
+    public int selectionStart = 0;
+    
+    /**
+     * Text selection end
+     */
+    public int selectionEnd = 0;
+    
+    /**
+     * Position of glyph in the text under cursor
+     */
+    public int glyphPosUnderCursor = -1;
+    
+    /**
+     * Bouding rect of the glyph under cursor
+     */
+    public Rectangle2D glyphUnderCursorRect = null;
+    
+    /**
+     * Glyph under cursor X position
+     */
+    public double glyphUnderCursorXPosition = 0;
+    
 
     /**
      * Border image.
@@ -60,9 +97,14 @@ public class RenderContext {
     public Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache;
 
     /**
-     * Enable handling buttons
+     * Enable handling buttons.
      */
     public boolean enableButtons = true;
+    
+    /**
+     * Enable handling texts.
+     */
+    public boolean enableTexts = true;
     
     /**
      * Clear display object cache.

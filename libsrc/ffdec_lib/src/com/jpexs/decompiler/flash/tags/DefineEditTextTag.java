@@ -1040,20 +1040,20 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
+        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
-        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
+        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0);
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
+        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor, 0, 0);
     }
 
-    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
@@ -1074,7 +1074,7 @@ public class DefineEditTextTag extends TextTag {
             List<TEXTRECORD> allTextRecords = getTextRecords(swf);
             switch (renderMode) {
                 case BITMAP:
-                    staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+                    staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform, selectionStart, selectionEnd);
                     break;
                 case HTML5_CANVAS:
                     staticTextToHtmlCanvas(zoom, swf, allTextRecords, 2, htmlCanvasBuilder, getBounds(), getTextMatrix(), colorTransform);

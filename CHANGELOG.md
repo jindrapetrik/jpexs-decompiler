@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
   and shows its progress
 - AS2 - show deobfuscated class/package names in the class tree
 - Allow obfuscated DefineEditText variable identifiers
+- Selectable text (DefineEditTexts with noselect=0)
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

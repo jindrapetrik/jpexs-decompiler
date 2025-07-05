@@ -63,6 +63,8 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextAttribute;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -297,6 +299,78 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Gets rectangle positions of glyph entries of the TEXTRECORDs.
+     * @param list Text record list
+     * @param swf SWF
+     * @return List of RECTs
+     */
+    public static List<RECT> getGlyphEntriesPositions(List<TEXTRECORD> list, SWF swf) {
+        
+        List<RECT> ret = new ArrayList<>();
+        int x = 0;
+        int y = 0;
+        FontTag font = null;
+        double ascent = 0;
+        double descent = 0;
+        double leading = 0;
+        int textHeight = 12;
+
+        FontMetrics fontMetrics;
+        BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = bi.getGraphics();
+        Font aFont;
+        
+        for (int r = 0; r < list.size(); r++) {
+            TEXTRECORD rec = list.get(r);
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+            
+            if (rec.styleFlagsHasFont) {
+                FontTag font2 = rec.getFont(swf);
+                if (font2 != null) {
+                    font = font2;
+                }
+                textHeight = rec.textHeight;
+                if (font == null) {
+                    Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id={0} was not found.", rec.fontId);
+                    continue;
+                }
+
+                if (!font.hasLayout()) {
+                    String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
+                    aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
+
+                    Map<TextAttribute, Integer> attr = new HashMap<>();
+
+                    attr.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+                    attr.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
+                    aFont = aFont.deriveFont(attr);
+
+                    fontMetrics = graphics.getFontMetrics(aFont);
+                    LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
+                    ascent = lm.getAscent() * SWF.unitDivisor;
+                    descent = lm.getDescent() * SWF.unitDivisor;
+                    leading = lm.getLeading() * SWF.unitDivisor;
+                } else {
+                    ascent = ((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
+                    descent = ((double) font.getDescent() * textHeight / 1024.0 / font.getDivider());
+                    leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider());
+                }
+            }
+            
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                ret.add(new RECT(x, x + entry.glyphAdvance, (int) Math.round(y - ascent), (int) Math.round(y + descent + leading)));
+                x += entry.glyphAdvance;
+            }
+        }
+        return ret;
+    }
+    
     /**
      * Gets text records attributes.
      * @param list Text records
@@ -579,8 +653,10 @@ public abstract class TextTag extends DrawableTag {
      * @param textMatrix Text matrix
      * @param transformation Transformation
      * @param colorTransform Color transform
+     * @param selectionStart Selection start
+     * @param selectionEnd Selection end
      */
-    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int selectionStart, int selectionEnd) {
         if (image.getGraphics() instanceof GraphicsTextDrawable) {
             //custom drawing
             ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
@@ -591,6 +667,13 @@ public abstract class TextTag extends DrawableTag {
         int textHeight = 12;
         int x = 0;
         int y = 0;
+        int pos = 0;
+        double ascent = 0;
+        double descent = 0;
+        double leading = 0;
+        FontMetrics fontMetrics;
+        BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = bi.getGraphics();
         List<SHAPE> glyphs = null;
         Matrix mat0 = transformation.clone();
         mat0 = mat0.concatenate(new Matrix(textMatrix));
@@ -613,6 +696,28 @@ public abstract class TextTag extends DrawableTag {
                 }
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
+                
+                
+                if (!font.hasLayout()) {
+                    String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
+                    Font aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
+
+                    Map<TextAttribute, Integer> attr = new HashMap<>();
+
+                    attr.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+                    attr.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
+                    aFont = aFont.deriveFont(attr);
+
+                    fontMetrics = graphics.getFontMetrics(aFont);
+                    LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
+                    ascent = lm.getAscent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                    descent = lm.getDescent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                    leading = lm.getLeading() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                } else {
+                    ascent =  font.getAscent(); //((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
+                    descent = font.getDescent(); //(double) font.getDescent() * textHeight / 1024.0 / font.getDivider());
+                    leading = font.getLeading(); //(double) font.getLeading()* textHeight / 1024.0 / font.getDivider());
+                }
             }
             if (rec.styleFlagsHasXOffset) {
                 x = rec.xOffset;
@@ -651,8 +756,24 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
 
+                
+                if (pos >= selectionStart && pos < selectionEnd) {
+                    Graphics2D g = (Graphics2D) image.getGraphics();
+                    
+                    RGB borderColor = new RGBA(Color.black);
+                    RGB fillColor = new RGBA(Color.black);
+                    RECT bounds = new RECT(0, (int) Math.round(entry.glyphAdvance * 1024 * font.getDivider() / textHeight),
+                            (int) Math.round(-ascent), (int) Math.round((descent + leading))
+                    );
+                    //bounds = shape.getBounds(1);
+                    //bounds.Ymin = (int) Math.round(-ascent);
+                    //bounds.Ymax = (int) Math.round(descent + leading);
+                    Matrix mat2 = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform);
+                }
+                
                 if (shape != null) {
-                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
@@ -661,6 +782,8 @@ public abstract class TextTag extends DrawableTag {
                         TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
                     }
                 }
+                
+                pos++;
 
                 x += entry.glyphAdvance;
             }
