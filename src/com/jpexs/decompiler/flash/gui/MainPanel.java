@@ -46,7 +46,10 @@ import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.easygui.DoableOperation;
 import com.jpexs.decompiler.flash.easygui.EasyPanel;
+import com.jpexs.decompiler.flash.easygui.EasyStrings;
+import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.Font4Exporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
@@ -5024,7 +5027,42 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         };
     }
 
-    public boolean saveText(TextTag textTag, String formattedText, String[] texts, LineMarkedEditorPane editor) {
+    public boolean saveText(TextTag textTag, String formattedText, String[] texts, LineMarkedEditorPane editor, UndoManager undoManager) {        
+        if (undoManager != null) {            
+            String prevText = textTag.getFormattedText(false).text;
+            if (saveTextInternal(textTag, formattedText, texts, editor)) {                            
+                undoManager.doOperation(new DoableOperation() {
+
+                    boolean first = true;
+
+                    @Override
+                    public void doOperation() {
+                        if (first) {
+                            first = false;
+                            return;
+                        }
+                        saveTextInternal(textTag, formattedText, texts, editor);
+                    }
+
+                    @Override
+                    public void undoOperation() {
+                        saveTextInternal(textTag, prevText, texts, editor);                        
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return EasyStrings.translate("action.change").replace("%item%", EasyStrings.translate("action.change.text"));
+                    }
+                }, textTag.getSwf());
+                return true;
+            }
+            return false;
+        }
+        return saveTextInternal(textTag, formattedText, texts, editor);        
+    }
+
+    private boolean saveTextInternal(TextTag textTag, String formattedText, String[] texts, LineMarkedEditorPane editor) {        
+        
         try {
             if (textTag.setFormattedText(getMissingCharacterHandler(), formattedText, texts)) {
                 return true;

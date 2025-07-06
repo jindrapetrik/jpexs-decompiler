@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Allow obfuscated DefineEditText variable identifiers
 - Selectable text (DefineEditTexts with noselect=0), copy to clipboard, select all
 - AS1/2 P-code curly braces pair highlighting
+- [#2478] Simple editor - editing texts (not WYSIWYG, textual as in classic editor)
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -3899,6 +3900,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
+[#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2476]: https://www.free-decompiler.com/flash/issues/2476

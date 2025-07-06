@@ -104,11 +104,18 @@ public class EasySwfPanel extends JPanel {
 
     private static final String PROPERTIES_DOCUMENT = "Document";
     private static final String PROPERTIES_INSTANCE = "Instance";
+    private static final String PROPERTIES_TEXT = "Text";
     private DocumentPropertiesPanel documentPropertiesPanel;
     private InstancePropertiesPanel instancePropertiesPanel;
+    private InstancePropertiesPanel textInstancePropertiesPanel;
     private final MainPanel mainPanel;
 
+    /**
+     *
+     * @param mainPanel
+     */
     public EasySwfPanel(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
         stagePanel = new ImagePanel();
@@ -476,9 +483,11 @@ public class EasySwfPanel extends JPanel {
         documentPropertiesPanel = new DocumentPropertiesPanel(undoManager);
         propertiesPanel.setLayout(new CardLayout());
 
-        instancePropertiesPanel = new InstancePropertiesPanel(this, undoManager);
+        instancePropertiesPanel = new InstancePropertiesPanel(this, undoManager, false);
+        textInstancePropertiesPanel = new InstancePropertiesPanel(this, undoManager, true);
         propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
         propertiesPanel.add(instancePropertiesPanel, PROPERTIES_INSTANCE);
+        propertiesPanel.add(textInstancePropertiesPanel, PROPERTIES_TEXT);
 
         rightTabbedPane.addTab(EasyStrings.translate("properties"), propertiesPanel);
 
@@ -553,15 +562,28 @@ public class EasySwfPanel extends JPanel {
                 }
             }
         });
-        this.mainPanel = mainPanel;
     }
 
+    public MainPanel getMainPanel() {
+        return mainPanel;
+    }   
+    
     private void updatePropertiesPanel() {
         CardLayout cl = (CardLayout) propertiesPanel.getLayout();
         List<PlaceObjectTypeTag> places = getSelectedPlaceTags();
         if (places == null || places.isEmpty()) {
             cl.show(propertiesPanel, PROPERTIES_DOCUMENT);
             return;
+        }
+        if (places.size() == 1) {
+            int chid = places.get(0).getCharacterId();
+            if (chid > -1) {
+                if (places.get(0).getSwf().getCharacter(chid) instanceof TextTag) {
+                    textInstancePropertiesPanel.update();
+                    cl.show(propertiesPanel, PROPERTIES_TEXT);
+                    return;
+                }
+            }
         }
         instancePropertiesPanel.update();
         cl.show(propertiesPanel, PROPERTIES_INSTANCE);
@@ -592,6 +614,7 @@ public class EasySwfPanel extends JPanel {
             timelineLabel.setText("");
             documentPropertiesPanel.setSwf(null);
             instancePropertiesPanel.update();
+            textInstancePropertiesPanel.update();
         } else {
             SWF swf = timelined.getSwf();
             documentPropertiesPanel.setSwf(swf);
@@ -617,6 +640,7 @@ public class EasySwfPanel extends JPanel {
                 closeTimelineButton.setVisible(true);
             }
             instancePropertiesPanel.update();
+            textInstancePropertiesPanel.update();
         }
         updateUndos();
     }
@@ -645,7 +669,8 @@ public class EasySwfPanel extends JPanel {
         if (stagePanel.getTimelined() == null) {
             return;
         }
-        Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();
+        updatePropertiesPanel();
+        Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();        
     }
 
     public void dispose() {

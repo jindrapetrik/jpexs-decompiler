@@ -29,12 +29,16 @@ import com.jpexs.decompiler.flash.easygui.properties.PropertyChangeDoableOperati
 import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInterface;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
+import com.jpexs.decompiler.flash.gui.TextPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -79,6 +83,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -123,6 +128,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private final JComboBox<String> backgroundComboBox = new JComboBox<>();
     private final JPanel backgroundColorPanel = new JPanel();
     private final JLabel backgroundColorLabel = new JLabel();
+    
+    private final TextPanel textPanel;
 
     private final FiltersTreeTable filtersTable;
 
@@ -132,7 +139,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
 
     
     
-    public InstancePropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
+    public InstancePropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager, boolean withText) {
         super("instance");
         setLayout(new BorderLayout());
 
@@ -245,7 +252,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         colorEffectPanel.add(new JPanel(), gbc);
-
+        
         JPanel displayPanel = new JPanel();
         gridBag = new GridBagLayout();
         displayPanel.setLayout(gridBag);
@@ -371,7 +378,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         displayPanel.add(new JPanel(), gbc);
 
+        textPanel = new TextPanel(swfPanel.getMainPanel(), undoManager);        
         JPanel filtersPanel = new JPanel(new BorderLayout());
+        filtersPanel.setPreferredSize(new Dimension(400, 200));
         filtersTable = new FiltersTreeTable();
         
         JPanel filtersToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));               
@@ -562,7 +571,10 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         addCard(propertiesPanel, "positionSize", null, positionSizePanel, gbc, false);
         addCard(propertiesPanel, "colorEffect", null, colorEffectPanel, gbc, false);
         addCard(propertiesPanel, "display", null, displayPanel, gbc, false);
-        addCard(propertiesPanel, "filters", null, filtersPanel, gbc, true);
+        addCard(propertiesPanel, "filters", null, filtersPanel, gbc, !withText);
+        if (withText) {
+            addCard(propertiesPanel, "text", null, textPanel, gbc, true);
+        }
 
         setCardOpened("positionSize", true);
 
@@ -865,7 +877,10 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         });
 
-        add(propertiesPanel, BorderLayout.CENTER);
+        JScrollPane sp1 = new FasterScrollPane(propertiesPanel);
+        sp1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        add(sp1, BorderLayout.CENTER);
 
         swfPanel.getStagePanel().addBoundsChangeListener(new BoundsChangeListener() {
             @Override
@@ -925,7 +940,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         Set<List<FILTER>> filters = new HashSet<>();
         Set<Integer> ratio = new HashSet<>();
         
-
+        TextTag text = null;
+        
         for (DepthState ds : dss) {
             if (ds == null) {
                 continue;
@@ -960,8 +976,16 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             backgroundColor.add(ds.backGroundColor);
             filters.add(ds.filters);
             ratio.add(ds.ratio == -1 ? 0 : ds.ratio);
+            CharacterTag ch = ds.getCharacter();
+            if (ch instanceof TextTag) {
+                text = (TextTag) ch;
+            }
         }
 
+        if (dss.size() > 1) {
+            text = null;
+        }
+        
         if (visible.size() == 0) {
             return;
         }
@@ -1055,6 +1079,10 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             filtersTable.setFilters(new ArrayList<>());
         } else {
             filtersTable.setFilters(null);
+        }
+        
+        if (text != null) {
+            textPanel.setText(text);
         }
         updating = false;
         revalidate();

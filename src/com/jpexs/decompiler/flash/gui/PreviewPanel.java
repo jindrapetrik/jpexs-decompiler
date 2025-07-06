@@ -386,7 +386,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void createParametersPanel() {
         displayWithPreview = new JPanel(new CardLayout());
 
-        textPanel = new TextPanel(mainPanel);
+        textPanel = new TextPanel(mainPanel, null);
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
 
         fontPanel = new FontPanel(mainPanel);
