@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -54,6 +55,7 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
@@ -87,6 +89,8 @@ import java.awt.Stroke;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.Transparency;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -127,7 +131,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -415,6 +421,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean editTexts = false;
 
     private Timer textCursorBlinkTimer;
+    
+    private void setTextSelection(int value) {
+        int selStart = getSelectionStartInt();
+        int delta = value - selStart;
+        changeTextSelection(delta);
+    }
     
     private void changeTextSelection(int delta) {
         TextTag text = textSelectionText;
@@ -1646,6 +1658,78 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
+                    if (SwingUtilities.isRightMouseButton(e) && !selectionMode && !doFreeTransform) {
+                        TextTag text = mouseOverText;
+                        if (text != null) {
+                            if (text instanceof DefineEditTextTag) {
+                                DefineEditTextTag dtext = (DefineEditTextTag) text;
+                                List<TEXTRECORD> recs = dtext.getTextRecords(dtext.getSwf());
+                                FontTag font = null;
+                                int pos = 0;
+                                int selStart = getSelectionStartInt();
+                                int selEnd = getSelectionEndInt();
+                                StringBuilder sb = new StringBuilder();
+                                int y = 0;
+                                for (TEXTRECORD r : recs) {
+                                    if (r.styleFlagsHasFont) {
+                                        font = r.getFont(dtext.getSwf());                                        
+                                    }
+                                    if (r.styleFlagsHasYOffset) {
+                                        int oldY = y;
+                                        y = r.yOffset;
+                                        if (text == textSelectionText && pos >= selStart && pos < selEnd) {
+                                            if (y > oldY && sb.length() > 0) {
+                                                sb.append("\n");
+                                            }
+                                        }
+                                    }
+                                    if (font == null) {
+                                        continue;
+                                    }
+                                    for (GLYPHENTRY g : r.glyphEntries) {
+                                        if (text == textSelectionText && pos >= selStart && pos < selEnd) {
+                                            sb.append(font.glyphToChar(g.glyphIndex));
+                                        }
+                                        pos++;
+                                    }
+                                }
+                                String textToCopy = sb.toString();
+                                int fullLength = pos;
+                                
+                                JPopupMenu pm = new JPopupMenu();
+                                JMenuItem copyMenuItem = new JMenuItem(AppStrings.translate("text.copy"), View.getIcon("copy16"));
+                                copyMenuItem.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        StringSelection stringSelection = new StringSelection(textToCopy);
+                                        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                        clipboard.setContents(stringSelection, null);
+                                    }                                    
+                                });
+                                JMenuItem selectAllMenuItem = new JMenuItem(AppStrings.translate("text.selectAll"), View.getIcon("selectall16"));
+                                selectAllMenuItem.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        textSelectionText = text;
+                                        textSelectionStartPrecise = 0.0;
+                                        textSelectionEndPrecise = (double) fullLength;
+                                        textSelectionStartGlyphRect = new Rectangle2D.Double(); //??
+                                        textSelectionStartGlyphXPosition = 0.0; //??                                
+                                
+                                        repaint();
+                                    }                                    
+                                });
+                                
+                                if (!textToCopy.isEmpty()) {
+                                    pm.add(copyMenuItem);                                    
+                                }
+                                pm.add(selectAllMenuItem);
+                                pm.show(iconPanel, e.getX(), e.getY());
+                                
+                            }
+                        }
+                    }
+                    
                     if (e.getClickCount() == 2) {
                         if (Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
                             Point mousePoint = e.getPoint();
@@ -4217,7 +4301,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (text == null || (!allowSelectAllTextTypes && (!(text instanceof DefineEditTextTag) || ((DefineEditTextTag) text).noSelect))) {
                         text = null;
                     }
-                    if (text != null && !doFreeTransform) {
+                    if (text != null && !doFreeTransform && !selectionMode) {
                         Rectangle2D glyphRect = iconPanel.glyphUnderCursorRect;
                         if (iconPanel.glyphPosUnderCursor > -1 && glyphRect != null) {
                             if (mouseButton == 1) {
@@ -4721,6 +4805,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             hilightedPoints = null;
             selectedDepths = new ArrayList<>();
             selectedPoints = new ArrayList<>();
+            textSelectionEndPrecise = null;
+            textSelectionStartPrecise = null;
+            textSelectionStartGlyphRect = null;
+            textSelectionStartGlyphXPosition = null;
+            textSelectionText = null;
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
@@ -5455,6 +5544,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         return selStartInt;
     }
+    
+    private int getSelectionEndInt() {
+        Double selStart = textSelectionStartPrecise;
+        Double selEnd = textSelectionEndPrecise;
+
+        if (selStart == null) {
+            return -1;
+        }
+
+        if (selStart != null && selEnd != null) {
+            if (selStart > selEnd) {
+                double tmp = selStart;
+                selStart = selEnd;
+                selEnd = tmp;
+            }
+        }
+        int selEndInt = (int) Math.floor(selEnd);
+        double endFract = selEnd - selEndInt;
+        if (endFract > 0.7) {
+            selEndInt++;
+        }
+        return selEndInt;
+    }
 
     private void drawFrame(Timer thisTimer, boolean display) {
         Timelined timelined;
@@ -5779,7 +5891,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 } else if (handCursor) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-                                } else if (selectingText || (iconPanel.mouseOverText != null && (allowSelectAllTextTypes || (iconPanel.mouseOverText instanceof DefineEditTextTag && !((DefineEditTextTag) iconPanel.mouseOverText).noSelect)))) {
+                                } else if (!selectionMode && !doFreeTransform && (selectingText || (iconPanel.mouseOverText != null && (allowSelectAllTextTypes || (iconPanel.mouseOverText instanceof DefineEditTextTag && !((DefineEditTextTag) iconPanel.mouseOverText).noSelect))))) {
                                     newCursor = textCursor;
                                 } else if (zoomAvailable && iconPanel.hasAllowMove()) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);

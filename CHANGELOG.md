@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
   and shows its progress
 - AS2 - show deobfuscated class/package names in the class tree
 - Allow obfuscated DefineEditText variable identifiers
-- Selectable text (DefineEditTexts with noselect=0)
+- Selectable text (DefineEditTexts with noselect=0), copy to clipboard, select all
 - AS1/2 P-code curly braces pair highlighting
 
 ### Fixed
