@@ -1776,19 +1776,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
 
                         DepthState ds = depthStateUnderCursor;
-                        if (ds != null) {
-                            CharacterTag cht = ds.getCharacter();
-                            if (cht instanceof Timelined) {
-                                synchronized (lock) {
-                                    parentTimelineds.add(timelined);
-                                    parentDepths.add(ds.depth);
-                                    parentFrames.add(ds.frame.frame);
-                                    timelined = (Timelined) cht;
-                                    selectedDepths.clear();
-                                    frame = 0;
-                                }
-                                fireMediaDisplayStateChanged();
-                            }
+                        if (ds != null) {                            
+                            openDepth(frame, ds.depth);
+                            //gotoFrame(1);
                         }
 
                         return;
@@ -4757,7 +4747,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
-            this.parentDepths.clear();
+            this.parentDepths.clear();            
             centerImage();
             this.swf = swf;
             zoomAvailable = allowZoom;
@@ -4814,6 +4804,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             iconPanel.calcRect();
+            
+            if (selectionMode) {                
+                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
+                int chid = -1;
+                if (timelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) timelined).getCharacterId();
+                }
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "" + chid);
+                
+                
+                loadOpenedDepths();                                
+            }
+            
+            
 
             clearGuidesInternal();
             setNoGuidesCharacter();
@@ -6258,11 +6262,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (frame < 1) {
             frame = 1;
         }
-
+               
         this.autoPlayed = true;
         this.frame = frame - 1;
         this.prevFrame = -1;
+        
+        if (selectionMode) {
+            SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "" + frame);
+        }
+        
         stopInternal();
+        
+        
         redraw();
         fireMediaDisplayStateChanged();
     }
@@ -6542,6 +6554,92 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 return parentTimelineds.get(0);
             }
             return timelined;
+        }
+    }
+    
+    public void loadOpenedDepths() {
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
+        if (conf != null) {
+            int chid = -1;
+            if (!parentTimelineds.isEmpty()) {
+                Timelined firstTimelined = parentTimelineds.get(0);
+                if (firstTimelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) firstTimelined).getCharacterId();
+                }
+            } else {
+                if (timelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) timelined).getCharacterId();
+                }
+            }
+            int lastChid = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "-1"));
+            if (lastChid != chid) {
+                return;
+            }            
+            List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
+            List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
+            while (parentFrames.size() < parentDepths.size()) {
+                parentFrames.add("0");
+            }
+            
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
+            
+            int frame = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "1"));
+            
+            for (int i = 0; i < parentDepths.size(); i++) {                
+                openDepth(Integer.parseInt(parentFrames.get(i)), Integer.parseInt(parentDepths.get(i)));
+            }
+
+            gotoFrame(frame);            
+        } else {
+            gotoFrame(1);
+        }
+    }
+    
+    public void openDepth(int frame, int depth) {
+        Timelined tim = timelined;
+        if (tim == null) {
+            return;
+        }
+        if (tim.getTimeline().getFrame(frame) == null) {
+            return;
+        }
+        DepthState ds = tim.getTimeline().getFrame(frame).layers.get(depth);
+        if (ds != null) {                            
+            CharacterTag cht = ds.getCharacter();
+            if (cht instanceof Timelined) {
+                int newFrame = 0;
+                synchronized (lock) {
+                    parentTimelineds.add(timelined);
+                    parentDepths.add(ds.depth);
+                    parentFrames.add(ds.frame.frame);
+                    timelined = (Timelined) cht;
+                    selectedDepths.clear();
+                    
+                    int time = ds.time;
+                    newFrame = time % timelined.getFrameCount();
+                    if (timelined instanceof ButtonTag) {
+                        newFrame = ButtonTag.FRAME_UP;
+                    }
+                    frame = newFrame;
+
+                    SWF swf = parentTimelineds.get(0).getSwf();
+                    SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
+                    if (parentTimelineds.size() == 1) {
+                        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "" + (ds.frame.frame + 1));
+                    }
+                    
+                    List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
+                    parentDepths.add("" + ds.depth);
+                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, parentDepths);
+                    
+                    List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
+                    parentFrames.add("" + ds.frame.frame);
+                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);                
+                }
+                gotoFrame(newFrame + 1);
+                fireMediaDisplayStateChanged();
+            }
         }
     }
 }

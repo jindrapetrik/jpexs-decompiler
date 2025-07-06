@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Selectable text (DefineEditTexts with noselect=0), copy to clipboard, select all
 - AS1/2 P-code curly braces pair highlighting
 - [#2478] Simple editor - editing texts (not WYSIWYG, textual as in classic editor)
+- [#2478] Simple editor - remembering last frame / timeline
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

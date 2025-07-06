@@ -494,11 +494,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public void depthSelect(int depth) {
-        frameSelect(getFirstFrame(), Arrays.asList(depth));
+        frameSelect(getFirstFrame(), Arrays.asList(depth), true);
     }
 
     public void depthsSelect(List<Integer> depths) {
-        frameSelect(getFirstFrame(), depths);
+        frameSelect(getFirstFrame(), depths, true);
     }
 
     public int getFirstFrame() {
@@ -515,7 +515,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return cursor.iterator().next().y;
     }
 
-    public void rectSelect(int frame, int depth, int endFrame, int endDepth) {
+    private void rectSelect(int frame, int depth, int endFrame, int endDepth) {
         int x1 = Math.min(frame, endFrame);
         int x2 = Math.max(frame, endFrame);
         int y1 = Math.min(depth, endDepth);
@@ -550,11 +550,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         fireFrameSelected(frame, depths);
     }
 
-    public void frameSelect(int frame, int depth) {
-        frameSelect(frame, Arrays.asList(depth));
+    public void frameSelect(int frame, int depth, boolean notify) {
+        frameSelect(frame, Arrays.asList(depth), notify);
     }
 
-    public void frameSelect(int frame, List<Integer> depths) {
+    public void frameSelect(int frame, List<Integer> depths, boolean notify) {
         /*if (cursor != null && cursor.width == 1 && cursor.height == 1 && (cursor.contains(frame, depth) || (depth == -1 && cursor.contains(frame, cursor.y)))) {
             return;
         }
@@ -582,7 +582,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         this.depth = depths.isEmpty() ? 0 : depths.get(0);
         this.endFrame = frame;
          */
-        fireFrameSelected(frame, depths);
+        if (notify) {
+            fireFrameSelected(frame, depths);
+        }
     }
 
     private void fireFrameSelected(int frame, List<Integer> depths) {
@@ -626,7 +628,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             fireFrameSelected(frame, newDepths);
         } else {
             if (!(cursor != null && cursor.contains(p) && SwingUtilities.isRightMouseButton(e))) {
-                frameSelect(p.x, Arrays.asList(p.y));
+                frameSelect(p.x, Arrays.asList(p.y), true);
             }
         }
         requestFocusInWindow();
@@ -838,7 +840,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 timelined.resetTimeline();
 
                 Point firstCursor = orderedCursor.iterator().next();
-                frameSelect(firstCursor.x, firstCursor.y);
+                frameSelect(firstCursor.x, firstCursor.y, true);
                 timeline = timelined.getTimeline();
 
                 refresh();
@@ -1275,22 +1277,22 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         switch (e.getKeyCode()) {
             case 37: //left
                 if (firstCursorItem.x > 0) {
-                    frameSelect(firstCursorItem.x - 1, firstCursorItem.y);
+                    frameSelect(firstCursorItem.x - 1, firstCursorItem.y, true);
                 }
                 break;
             case 39: //right
                 if (firstCursorItem.x < timeline.getFrameCount() - 1) {
-                    frameSelect(firstCursorItem.x + 1, firstCursorItem.y);
+                    frameSelect(firstCursorItem.x + 1, firstCursorItem.y, true);
                 }
                 break;
             case 38: //up
                 if (firstCursorItem.y > 0) {
-                    frameSelect(firstCursorItem.x, firstCursorItem.y - 1);
+                    frameSelect(firstCursorItem.x, firstCursorItem.y - 1, true);
                 }
                 break;
             case 40: //down
                 if (firstCursorItem.y < timeline.getMaxDepth()) {
-                    frameSelect(firstCursorItem.x, firstCursorItem.y + 1);
+                    frameSelect(firstCursorItem.x, firstCursorItem.y + 1, true);
                 }
                 break;
         }

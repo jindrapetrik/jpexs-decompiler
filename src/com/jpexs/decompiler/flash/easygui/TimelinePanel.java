@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -124,7 +127,7 @@ public class TimelinePanel extends JPanel {
 
             @Override
             public void frameSelected(int frame, List<Integer> depths) {
-                ftimeline.frameSelect(frame, depths);
+                ftimeline.frameSelect(frame, depths, true);
             }
         });
     }
@@ -158,11 +161,13 @@ public class TimelinePanel extends JPanel {
     }
 
     public void setFrame(int frame, int depth) {
-        timelineBodyPanel.frameSelect(frame, depth);
+        timePanel.frameSelect(frame);
+        timelineBodyPanel.frameSelect(frame, depth, false);
     }
 
     public void setFrame(int frame, List<Integer> depths) {
-        timelineBodyPanel.frameSelect(frame, depths);
+        timePanel.frameSelect(frame);
+        timelineBodyPanel.frameSelect(frame, depths, false);
     }
 
     public void refresh() {
@@ -187,7 +192,20 @@ public class TimelinePanel extends JPanel {
             timelineBodyPanel.setTimeline(timelined.getTimeline());
             depthPanel.setTimeline(timelined.getTimeline());
             timePanel.setTimeline(timelined.getTimeline());
-            timelineBodyPanel.frameSelect(0, 0);
+            
+            SWF swf = timelined.getSwf();
+            SwfSpecificCustomConfiguration conf = swf == null ? null : Configuration.getSwfSpecificCustomConfiguration(swf);
+            
+            int frame = conf == null ? 0 : Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "1")) - 1;
+            
+            timePanel.frameSelect(frame);
+            timelineBodyPanel.frameSelect(frame, 0, false);
         }
     }
+
+    public TimelineBodyPanel getTimelineBodyPanel() {
+        return timelineBodyPanel;
+    }
+    
+    
 }

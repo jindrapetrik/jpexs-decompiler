@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.easygui.properties.panels.DocumentPropertiesPanel;
 import com.jpexs.decompiler.flash.easygui.properties.panels.InstancePropertiesPanel;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -134,7 +136,8 @@ public class EasySwfPanel extends JPanel {
                             setTimelined(stagePanel.getTimelined(), false);
                         }
                     });
-
+                } else {
+                    timelinePanel.setFrame(stagePanel.getFrame(), stagePanel.getSelectedDepths());
                 }
             }
 
@@ -427,7 +430,15 @@ public class EasySwfPanel extends JPanel {
         closeTimelineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTimelined(timelined.getSwf());
+                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
+                
+                String firstParentFrame = conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "1");
+                
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, firstParentFrame);
+
+                setTimelined(timelined.getSwf());                
             }
         });
 
@@ -458,7 +469,7 @@ public class EasySwfPanel extends JPanel {
                 }
 
                 transformPanel.setVisible(!depths.isEmpty());
-                updatePropertiesPanel();
+                updatePropertiesPanel();                
             }
         });
 
@@ -593,6 +604,23 @@ public class EasySwfPanel extends JPanel {
         return rightTabbedPane.getSelectedIndex() == 2;
     }
 
+    public void setSwf(SWF swf) {
+        Timelined tim = swf;
+        if (swf != null) {
+            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
+            if (conf != null) {
+                int timId = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "-1"));
+                if (timId > -1) {
+                    CharacterTag ct = swf.getCharacter(timId);
+                    if (ct != null && ct instanceof Timelined) {
+                        tim = (Timelined) ct;
+                    }
+                }
+            }
+        }
+        setTimelined(tim);
+    }
+    
     public void setTimelined(Timelined timelined) {
         setTimelined(timelined, true);
     }
@@ -616,21 +644,10 @@ public class EasySwfPanel extends JPanel {
             instancePropertiesPanel.update();
             textInstancePropertiesPanel.update();
         } else {
-            SWF swf = timelined.getSwf();
+            SWF swf = timelined.getSwf();            
             documentPropertiesPanel.setSwf(swf);
             libraryTreeTable.setSwf(swf);
             libraryPreviewPanel.clearAll();
-            if (updateStage) {
-                stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);
-                if (timelined instanceof CharacterTag) {
-                    stagePanel.setGuidesCharacter(swf, ((CharacterTag) timelined).getCharacterId());
-                } else {
-                    stagePanel.setGuidesCharacter(swf, -1);
-                }
-                stagePanel.pause();
-                stagePanel.gotoFrame(0);
-            }
-            timelinePanel.setTimelined(timelined);
             if (timelined instanceof SWF) {
                 timelineLabel.setText(EasyStrings.translate("timeline.main"));
                 closeTimelineButton.setVisible(false);
@@ -639,6 +656,23 @@ public class EasySwfPanel extends JPanel {
                 timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
                 closeTimelineButton.setVisible(true);
             }
+            timelinePanel.setTimelined(timelined); //tohle se volá blbě rekurzivně!!!
+            
+            if (updateStage) {
+                stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);
+                if (timelined instanceof CharacterTag) {
+                    stagePanel.setGuidesCharacter(swf, ((CharacterTag) timelined).getCharacterId());
+                } else {
+                    stagePanel.setGuidesCharacter(swf, -1);
+                }
+                stagePanel.pause();
+                //stagePanel.gotoFrame(0);
+            }
+            
+            if (updateStage) {                
+                //timelinePanel.getTimelineBodyPanel().frameSelect(0, 0);
+            }
+            
             instancePropertiesPanel.update();
             textInstancePropertiesPanel.update();
         }

@@ -32,4 +32,9 @@ public class CustomConfigurationKeys {
     public static final String KEY_BREAKPOINTS = "breakpoints";
     public static final String KEY_PATH_RESOLVING = "pathResolving";
     public static final String KEY_GUIDES = "guides";
+    public static final String KEY_EASY_LAST_SELECTED_TIMELINE = "easy.lastSelected.timeline";
+    public static final String KEY_EASY_LAST_SELECTED_FRAME = "easy.lastSelected.frame";
+    public static final String KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME = "easy.lastSelected.firstParentFrame";
+    public static final String KEY_EASY_LAST_SELECTED_PARENT_DEPTHS = "easy.lastSelected.parentDepths";
+    public static final String KEY_EASY_LAST_SELECTED_PARENT_FRAMES = "easy.lastSelected.parentFrames";    
 }
