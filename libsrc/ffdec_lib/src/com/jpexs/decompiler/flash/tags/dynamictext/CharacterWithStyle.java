@@ -32,4 +32,9 @@ public class CharacterWithStyle {
      * Style
      */
     public TextStyle style;
+    
+    /**
+     * Position in HTML source
+     */
+    public int htmlSourcePosition = -1;
 }

@@ -60,15 +60,16 @@ public class Word {
      * Adds glyph.
      * @param character Character
      * @param glyphEntry Glyph entry
+     * @param htmlSourcePosition Position in HTML source
      */
-    public void addGlyph(char character, GLYPHENTRY glyphEntry) {
+    public void addGlyph(char character, GLYPHENTRY glyphEntry, int htmlSourcePosition) {
 
         if (record == null) {
             record = new SameStyleTextRecord();
             record.style = model.style;
             records.add(record);
         }
-        record.glyphEntries.add(new GlyphCharacter(character, glyphEntry));
+        record.glyphEntries.add(new GlyphCharacter(character, glyphEntry, htmlSourcePosition));
     }
 
     /**

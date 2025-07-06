@@ -93,6 +93,19 @@ public abstract class TextTag extends DrawableTag {
     }
 
     /**
+     * Inserts character at the given position.
+     * @param glyphPos Glyph position
+     * @param character Character
+     */
+    public abstract void insertCharacterGlyph(int glyphPos, char character);
+    
+    /**
+     * Removes character glyph at the given position
+     * @param glyphPos Glyph position
+     */
+    public abstract void removeCharacterGlyph(int glyphPos);
+    
+    /**
      * Gets text matrix.
      * @return Text matrix
      */

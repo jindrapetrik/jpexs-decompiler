@@ -14,27 +14,29 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags.dynamictext;
-
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.types.TEXTRECORD;
-import java.util.List;
+package com.jpexs.decompiler.flash.tags.text.xml;
 
 /**
- * Text record with font class.
+ *
  * @author JPEXS
  */
-public class AdvancedTextRecord extends TEXTRECORD {
-    public String fontClass = null;      
-    
-    public List<Integer> htmlSourcePositions = null;
-    
-    @Override
-    public FontTag getFont(SWF swf) {
-        if (fontClass != null) {
-            return swf.getFontByClass(fontClass);
-        }
-        return super.getFont(swf);
-    }        
+public enum XmlSymbolType {
+    ENTITY,
+    ENTITY_NUMERIC,
+    INSTR_OPEN,
+    TAG_OPEN,
+    TAG_OPEN_END,
+    TAG_CLOSE,
+    COMMENT_OPEN,
+    COMMENT,
+    COMMENT_CLOSE,
+    CDATA_OPEN,
+    CDATA,
+    CDATA_CLOSE,
+    CHARACTER,
+    ATTRIBUTE,
+    ATTRIBUTE_VALUE,
+    INSTR_CLOSE,
+    WHITESPACE,
+    EOF
 }

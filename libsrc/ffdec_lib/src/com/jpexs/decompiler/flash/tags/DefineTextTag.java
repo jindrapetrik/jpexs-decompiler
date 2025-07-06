@@ -75,7 +75,7 @@ public class DefineTextTag extends StaticTextTag {
     public DefineTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
-    }
+    }           
 
     @Override
     public int getTextNum() {

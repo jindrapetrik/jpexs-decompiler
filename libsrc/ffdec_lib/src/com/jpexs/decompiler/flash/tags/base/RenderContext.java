@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
@@ -56,9 +57,19 @@ public class RenderContext {
     public TextTag mouseOverText;
     
     /**
+     * Absolute matrix of mouse over text position
+     */
+    public Matrix mouseOverTextAbsMatrix;
+    
+    /**
      * Selection text tag
      */
     public TextTag selectionText;
+    
+    /**
+     * Selection text abs matrix
+     */
+    public Matrix selectionAbsMatrix;
     
     /**
      * Text selection start

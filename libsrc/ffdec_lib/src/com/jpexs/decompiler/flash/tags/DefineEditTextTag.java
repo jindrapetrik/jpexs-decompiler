@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -43,10 +42,13 @@ import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.Word;
 import com.jpexs.decompiler.flash.tags.enums.TextRenderMode;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
-import com.jpexs.decompiler.flash.tags.text.SymbolType;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
+import com.jpexs.decompiler.flash.tags.text.xml.XmlException;
+import com.jpexs.decompiler.flash.tags.text.xml.XmlLexer;
+import com.jpexs.decompiler.flash.tags.text.xml.XmlParsedSymbol;
+import com.jpexs.decompiler.flash.tags.text.xml.XmlSymbolType;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
@@ -64,28 +66,22 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * DefineEditText tag - defines an editable text field.
@@ -215,6 +211,154 @@ public class DefineEditTextTag extends TextTag {
     public DefineEditTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public void removeCharacterGlyph(int glyphPos) {
+        List<TEXTRECORD> recs = getTextRecords(getSwf());
+        int pos = 0;
+        for (TEXTRECORD r : recs) {
+            if (r instanceof AdvancedTextRecord) {
+                AdvancedTextRecord atr = (AdvancedTextRecord) r;
+                for (int htmlSourcePos : atr.htmlSourcePositions) {
+                    if (pos == glyphPos) {
+                        char character = initialText.charAt(htmlSourcePos);
+                        if (character == '&') {
+                            int semiPos = initialText.indexOf(";", htmlSourcePos);
+                            if (semiPos != -1) {
+                                initialText = initialText.substring(0, htmlSourcePos) + initialText.substring(semiPos + 1);
+                                return;
+                            }
+                        }
+                        initialText = initialText.substring(0, htmlSourcePos) + initialText.substring(htmlSourcePos + 1);
+                        packHtml();
+                        setModified(true);
+                        return;
+                    }
+                    pos++;
+                }
+            }
+        }
+    }
+
+    private void packHtml() {
+        try {
+            XmlLexer lexer = new XmlLexer(new StringReader(initialText));
+            XmlParsedSymbol s = lexer.yylex();
+            String tagName = null;
+            StringBuilder result = new StringBuilder();
+            StringBuilder cached = new StringBuilder();
+            boolean hasCharacter = false;
+            while (s.type != XmlSymbolType.EOF) {
+                if (s.type == XmlSymbolType.TAG_OPEN) {
+                    if (tagName != null) {
+                        result.append(cached.toString());
+                    }
+                    tagName = (String) s.value;
+                    cached = new StringBuilder();
+                    cached.append(s.rawText);
+                    hasCharacter = false;
+                } else if (s.type == XmlSymbolType.TAG_CLOSE) {
+                    if (tagName != null) {
+                        if ("font".equals(tagName) && !hasCharacter) {
+                            //ignore
+                        } else {
+                            cached.append(s.rawText);
+                            result.append(cached.toString());
+                        }
+                    } else {
+                        result.append(s.rawText);
+                    }
+                    tagName = null;
+                } else if (s.type == XmlSymbolType.ATTRIBUTE
+                        || s.type == XmlSymbolType.ATTRIBUTE_VALUE
+                        || s.type == XmlSymbolType.TAG_OPEN_END) {
+                    if (tagName != null) {
+                        cached.append(s.rawText);
+                    } else {
+                        result.append(s.rawText);
+                    }
+                } else if (s.type == XmlSymbolType.CHARACTER) {
+                    hasCharacter = true;
+                    if (tagName != null) {
+                        cached.append(s.rawText);
+                    } else {
+                        result.append(s.rawText);
+                    }
+                } else {
+                    if (tagName != null) {
+                        cached.append(s.rawText);
+                    } else {
+                        result.append(s.rawText);
+                    }
+                }
+                s = lexer.yylex();
+            }
+            initialText = result.toString();
+        } catch (IOException | XmlException ex) {
+            //ignore
+        }
+    }
+
+    @Override
+    public void insertCharacterGlyph(int glyphPos, char character) {
+        List<TEXTRECORD> recs = getTextRecords(getSwf());
+        int pos = 0;
+        String str = "" + character;
+        switch (character) {
+            case '&':
+                str = "&amp;";
+                break;
+            case '<':
+                str = "&lt;";
+                break;
+            case '>':
+                str = "&gt;";
+                break;
+            case '\u00A0':
+                str = "&nbsp;";
+                break;
+        }
+        /*
+            case '"':
+                str = "&quot";
+                break;
+            case '\'':
+                str = "&apos;";
+                break;
+        */
+    
+        int lastHtmlSourcePos = -1;
+        for (TEXTRECORD r : recs) {
+            if (r instanceof AdvancedTextRecord) {
+                AdvancedTextRecord atr = (AdvancedTextRecord) r;
+                for (int htmlSourcePos : atr.htmlSourcePositions) {
+                    if (pos == glyphPos) {
+                        initialText = initialText.substring(0, htmlSourcePos) + str + initialText.substring(htmlSourcePos);
+                        setModified(true);
+                        return;
+                    }
+                    lastHtmlSourcePos = htmlSourcePos;
+                    pos++;
+                }
+            }
+        }
+
+        if (lastHtmlSourcePos == -1) {
+            initialText = str + initialText;
+            return;
+        }
+
+        int newHtmlSourcePos = lastHtmlSourcePos + 1;
+        char prevCharacter = initialText.charAt(lastHtmlSourcePos);
+        if (character == '&') {
+            int semiPos = initialText.indexOf(";", lastHtmlSourcePos);
+            if (semiPos != -1) {
+                newHtmlSourcePos = semiPos + 1;
+            }
+        }
+
+        initialText = initialText.substring(0, newHtmlSourcePos) + str + initialText.substring(newHtmlSourcePos);
     }
 
     @Override
@@ -402,107 +546,24 @@ public class DefineEditTextTag extends TextTag {
         style.leftMargin = leftMargin;
         final List<CharacterWithStyle> ret = new ArrayList<>();
         if (html) {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser;
+            //SAXParserFactory factory = SAXParserFactory.newInstance();
+            //SAXParser saxParser;
             final Stack<TextStyle> styles = new Stack<>();
             styles.add(style);
-            try {
+            /*try {
                 saxParser = factory.newSAXParser();
                 DefaultHandler handler = new DefaultHandler() {
+                    
+                    private Locator locator;
+
                     @Override
-                    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                        TextStyle style = styles.peek();
-                        switch (qName) {
-                            case "p":
-                                // todo: parse the following attribute:
-                                // align
-                                break;
-                            case "a":
-                                // todo: handle link - href, target attributes
-                                break;
-                            case "b":
-                                style = style.clone();
-                                style.bold = true;
-                                styles.add(style);
-                                break;
-                            case "i":
-                                style = style.clone();
-                                style.italic = true;
-                                styles.add(style);
-                                break;
-                            case "u":
-                                style = style.clone();
-                                style.underlined = true;
-                                styles.add(style);
-                                break;
-                            case "font":
-                                style = style.clone();
-                                String color = unescape(attributes.getValue("color"));
-                                if (color != null) {
-                                    if (color.startsWith("#")) {
-                                        try {
-                                            if (color.length() == 7) { //#rrggbb
-                                                style.textColor = new RGBA(Color.decode(color));
-                                            } else if (color.length() == 9) { //#aarrggbb                                            
-                                                style.textColor = RGBA.fromHexARGB(color);
-                                                style.textColor.alpha = 255; //no alpha is allowed
-                                            }
-                                        } catch (NumberFormatException ex) {
-                                            //do not change textColor
-                                        }
-                                        
-                                    }
-                                }
-                                String size = unescape(attributes.getValue("size"));
-                                if (size != null && size.length() > 0) {                                    
-                                    try {
-                                        char firstChar = size.charAt(0);
-                                        if (firstChar != '+' && firstChar != '-') {
-                                            int fontSize = Integer.parseInt(size);
-                                            style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
-                                        } else {
-                                            int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
-                                            if (firstChar == '+') {
-                                                style.fontHeight = style.fontHeight + fontSizeDelta;
-                                            } else {
-                                                style.fontHeight = style.fontHeight - fontSizeDelta;
-                                            }
-                                        }
-                                        style.fontLeading = leading;
-                                    } catch (NumberFormatException nfe) {
-                                        //do not change fontHeight or leading
-                                    }
-                                }
-                                String face = unescape(attributes.getValue("face"));
-
-                                if (face != null && face.length() > 0) {
-                                    style.fontFace = face;
-                                }
-
-                                String letterspacing = unescape(attributes.getValue("letterSpacing"));
-                                if (letterspacing != null && letterspacing.length() > 0) {
-                                    try {
-                                        style.letterSpacing = Double.parseDouble(letterspacing);
-                                    } catch (NumberFormatException nfe) {
-                                        //do not change letterSpacing
-                                    }                                    
-                                }
-
-                                String kerning = unescape(attributes.getValue("kerning"));
-                                if (kerning != null && kerning.length() > 0) {
-                                    style.kerning = kerning.equals("1");
-                                }
-
-                                styles.add(style);
-                                break;
-                            case "br":
-                            case "sbr": // what's this?
-                                CharacterWithStyle cs = new CharacterWithStyle();
-                                cs.character = '\n';
-                                cs.style = style;
-                                ret.add(cs);
-                                break;
-                        }
+                    public void setDocumentLocator(Locator locator) {
+                        this.locator = locator;
+                    }
+    
+                    @Override
+                    public void startElement(String uri, String localName, String qName, Map<String, String> attributes) throws SAXException {
+                        
                     }
 
                     @Override
@@ -555,33 +616,209 @@ public class DefineEditTextTag extends TextTag {
                         addCharacters(ret, txt, style);
                     }
                 };
+            */
 
-                str = str.replace("&nbsp;", "/{entity-nbsp}");
-                str = str.replace("&lt;", "/{entity-lt}");
-                str = str.replace("&gt;", "/{entity-gt}");
-                str = str.replace("&quot;", "/{entity-quot}");
-                str = str.replace("&amp;", "/{entity-amp}");
-                str = str.replace("&apos;", "/{entity-apos}");
-                str = str.replace("&", "&amp;");
+            XmlLexer lexer = new XmlLexer(new StringReader(str));
+            try {
+                XmlParsedSymbol s = lexer.yylex();
+                boolean inOpenTag = false;
+                String attributeName = null;
+                String tagName = null;
+                Map<String, String> attributes = new LinkedHashMap<>();
+                loops:
+                while (s.type != XmlSymbolType.EOF) {
+                    switch (s.type) {
+                        case TAG_OPEN:
+                            inOpenTag = true;
+                            attributeName = null;
+                            tagName = (String) s.value;
+                            attributes.clear();
+                            break;
+                        case ATTRIBUTE:
+                            attributeName = (String) s.value;
+                            break;
+                        case ATTRIBUTE_VALUE:
+                            if (attributeName == null) {
+                                //Error
+                                break loops;
+                            }
+                            attributes.put(attributeName, unescape((String) s.value));
+                            break;
+                        case TAG_OPEN_END:
+                            style = styles.peek();
+                            switch (tagName) {
+                                case "p":
+                                    // todo: parse the following attribute:
+                                    // align
+                                    break;
+                                case "a":
+                                    // todo: handle link - href, target attributes
+                                    break;
+                                case "b":
+                                    style = style.clone();
+                                    style.bold = true;
+                                    styles.add(style);
+                                    break;
+                                case "i":
+                                    style = style.clone();
+                                    style.italic = true;
+                                    styles.add(style);
+                                    break;
+                                case "u":
+                                    style = style.clone();
+                                    style.underlined = true;
+                                    styles.add(style);
+                                    break;
+                                case "font":
+                                    style = style.clone();
+                                    String color = attributes.get("color");
+                                    if (color != null) {
+                                        if (color.startsWith("#")) {
+                                            try {
+                                                if (color.length() == 7) { //#rrggbb
+                                                    style.textColor = new RGBA(Color.decode(color));
+                                                } else if (color.length() == 9) { //#aarrggbb                                            
+                                                    style.textColor = RGBA.fromHexARGB(color);
+                                                    style.textColor.alpha = 255; //no alpha is allowed
+                                                }
+                                            } catch (NumberFormatException ex) {
+                                                //do not change textColor
+                                            }
 
-                str = "<!DOCTYPE html [\n"
-                        + "]><root>" + str + "</root>";
+                                        }
+                                    }
+                                    String size = attributes.get("size");
+                                    if (size != null && size.length() > 0) {
+                                        try {
+                                            char firstChar = size.charAt(0);
+                                            if (firstChar != '+' && firstChar != '-') {
+                                                int fontSize = Integer.parseInt(size);
+                                                style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
+                                            } else {
+                                                int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
+                                                if (firstChar == '+') {
+                                                    style.fontHeight = style.fontHeight + fontSizeDelta;
+                                                } else {
+                                                    style.fontHeight = style.fontHeight - fontSizeDelta;
+                                                }
+                                            }
+                                            style.fontLeading = leading;
+                                        } catch (NumberFormatException nfe) {
+                                            //do not change fontHeight or leading
+                                        }
+                                    }
+                                    String face = attributes.get("face");
+
+                                    if (face != null && face.length() > 0) {
+                                        style.fontFace = face;
+                                    }
+
+                                    String letterspacing = attributes.get("letterSpacing");
+                                    if (letterspacing != null && letterspacing.length() > 0) {
+                                        try {
+                                            style.letterSpacing = Double.parseDouble(letterspacing);
+                                        } catch (NumberFormatException nfe) {
+                                            //do not change letterSpacing
+                                        }
+                                    }
+
+                                    String kerning = attributes.get("kerning");
+                                    if (kerning != null && kerning.length() > 0) {
+                                        style.kerning = kerning.equals("1");
+                                    }
+
+                                    styles.add(style);
+                                    break;
+                                case "br":
+                                case "sbr": // what's this?
+                                    CharacterWithStyle cs = new CharacterWithStyle();
+                                    cs.character = '\n';
+                                    cs.style = style;
+                                    ret.add(cs);
+                                    break;
+                            }
+                            tagName = null;
+                            break;
+                        case TAG_CLOSE:
+                            tagName = (String) s.value;
+                            switch (tagName) {
+                                case "b":
+                                case "i":
+                                case "u":
+                                case "font":
+                                    styles.pop();
+                                    break;
+                                case "p":
+                                    style = styles.peek();
+                                    CharacterWithStyle cs = new CharacterWithStyle();
+                                    cs.character = '\n';
+                                    cs.style = style;
+                                    ret.add(cs);
+                                    break;
+                            }
+                            tagName = null;
+                            break;
+
+                        case ENTITY:
+                        case CHARACTER:
+                            String txt = (String) s.value;
+                            if (s.type == XmlSymbolType.ENTITY) {
+                                txt = unescape("&" + txt + ";");
+                            }
+                            style = styles.peek();
+                            if (style.fontFace != null && useOutlines) {
+                                CharacterTag ct = swf.getCharacterByExportName(style.fontFace);
+                                if (ct != null && (ct instanceof FontTag)) {
+                                    style.font = (FontTag) ct;
+                                } else {
+                                    style.font = swf.getFontByNameInTag(style.fontFace, style.bold, style.italic);
+                                }
+                                if (style.font == null) {
+                                    style.fontFace = null;
+                                }
+                            }
+                            addCharacters(ret, txt, style, s.position);
+                            break;
+                    }
+                    s = lexer.yylex();
+                }
+            } catch (IOException ex) {
+                //Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (XmlException ex) {
+                //Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+                //ex.printStackTrace();
+            }
+            /*
+            str = str.replace("&nbsp;", "/{entity-nbsp}");
+            str = str.replace("&lt;", "/{entity-lt}");
+            str = str.replace("&gt;", "/{entity-gt}");
+            str = str.replace("&quot;", "/{entity-quot}");
+            str = str.replace("&amp;", "/{entity-amp}");
+            str = str.replace("&apos;", "/{entity-apos}");
+            str = str.replace("&", "&amp;");
+
+            str = "<!DOCTYPE html [\n"
+                + "]><root>" + str + "</root>";
                 saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
             } catch (ParserConfigurationException | SAXException | IOException ex) {
                 Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, "Error parsing text " + getCharacterId(), ex);
             }
+            */
         } else {
-            addCharacters(ret, str, style);
+            addCharacters(ret, str, style, 0);
         }
         return ret;
     }
 
-    private void addCharacters(List<CharacterWithStyle> list, String str, TextStyle style) {
+    private void addCharacters(List<CharacterWithStyle> list, String str, TextStyle style, int position) {
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             CharacterWithStyle cs = new CharacterWithStyle();
             cs.character = ch;
             cs.style = style;
+            if (position > -1) {
+                cs.htmlSourcePosition = position + i;
+            }
             list.add(cs);
         }
     }
@@ -705,7 +942,7 @@ public class DefineEditTextTag extends TextTag {
                 switch (s.type) {
                     case PARAMETER_IDENTIFIER:
                         String paramName = (String) s.value;
-                        s = lexer.yylex();                        
+                        s = lexer.yylex();
                         String paramValue = (String) s.value;
                         switch (paramName) {
                             case "xmin":
@@ -1137,7 +1374,7 @@ public class DefineEditTextTag extends TextTag {
                         ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider();
                     }
                 }
-                textModel.addGlyph(c, ge);
+                textModel.addGlyph(c, ge, cs.htmlSourcePosition);
                 if (Character.isWhitespace(c)) {
                     lastWasWhiteSpace = true;
                 }
@@ -1330,8 +1567,10 @@ public class DefineEditTextTag extends TextTag {
                     tr2.yOffset = yOffset;
                 }
                 tr2.glyphEntries = new ArrayList<>(tr.glyphEntries.size());
+                tr2.htmlSourcePositions = new ArrayList<>(tr.glyphEntries.size());
                 for (GlyphCharacter ge : tr.glyphEntries) {
                     tr2.glyphEntries.add(ge.glyphEntry);
+                    tr2.htmlSourcePositions.add(ge.htmlSourcePosition);
                 }
                 allTextRecords.add(tr2);
             }
@@ -1352,5 +1591,18 @@ public class DefineEditTextTag extends TextTag {
     @Override
     public boolean isSingleFrame() {
         return true;
+    }
+
+    private String unescape(String txt) {
+        if (txt == null) {
+            return null;
+        }
+        txt = txt.replace("&nbsp;", "\u00A0");
+        txt = txt.replace("&lt;", "<");
+        txt = txt.replace("&gt;", ">");
+        txt = txt.replace("&quot;", "\"");
+        txt = txt.replace("&amp;", "&");
+        txt = txt.replace("&apos;", "'");
+        return txt;
     }
 }

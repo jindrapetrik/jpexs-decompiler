@@ -1231,28 +1231,30 @@ public class Timeline {
             }
             
             if (drawable instanceof TextTag) {
-                if (renderContext.cursorPosition != null && renderContext.enableTexts) {
+                TextTag textTag = (TextTag) drawable;                    
+                Matrix textMatrix = new Matrix(textTag.getTextMatrix());
+                if (drawable == renderContext.selectionText) {
+                    renderContext.selectionAbsMatrix = absMat.concatenate(textMatrix);
+                }
+                if (renderContext.enableTexts) {
                     int dx = (int) (viewRect.xMin * unzoom);
                     int dy = (int) (viewRect.yMin * unzoom);
-                    Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
+                    Point cursorPositionInView = renderContext.cursorPosition == null ? new Point(0, 0) : new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
                     Shape textShape = ((TextTag) drawable).getOutline(true, 0, 0, 0, renderContext, absMat, true, viewRect, unzoom);
                     
-                    TextTag textTag = (TextTag) drawable;
+                    
                             
                     if (textShape.contains(cursorPositionInView)) {
                         renderContext.mouseOverText = textTag;                        
+                        renderContext.mouseOverTextAbsMatrix = absMat;
                     }
+                    
                     if (textShape.contains(cursorPositionInView) || (drawable == renderContext.selectionText && renderContext.mouseButton == 1)) {  
                         Rectangle textBounds = textShape.getBounds();
                         List<TEXTRECORD> textRecords = new ArrayList<>();
-                        Matrix textMatrix = new Matrix();
                         if (textTag instanceof StaticTextTag) {
-                            textRecords = ((StaticTextTag) textTag).textRecords;
-                            MATRIX tm = ((StaticTextTag) textTag).textMatrix;
-                            if (tm != null) {
-                                textMatrix = new Matrix(tm);
-                            }
+                            textRecords = ((StaticTextTag) textTag).textRecords;                        
                         }
                         if (textTag instanceof DefineEditTextTag) {
                             textRecords = ((DefineEditTextTag) textTag).getTextRecords(textTag.getSwf());
@@ -1264,6 +1266,8 @@ public class Timeline {
                         int closestPos = -1;
                         double closestDistance = Double.MAX_VALUE;
                         Point cursorPosNoTrans = absMat.concatenate(textMatrix).inverse().transform(cursorPositionInView);                            
+                                                
+                        pos = 0;
                         for (RECT gp : glyphPositions) {
                             /*Rectangle2D r = new Rectangle2D.Double(
                                     textBounds.x + gp.Xmin * unzoom, 
@@ -1301,6 +1305,12 @@ public class Timeline {
                                 break;
                             }
                             
+                            /*if (drawable == renderContext.selectionText && pos == renderContext.selectionStart) {
+                                closestPos = pos;
+                                closestDistance = 0;
+                                break;
+                            }*/
+                            
                             if (cursorPosNoTrans.y >= r.getY() && cursorPosNoTrans.y <= r.getMaxY()) {
                                 double tx = Math.max(r.getMinX() - cursorPosNoTrans.getX(), 0);
                                 tx = Math.max(tx, cursorPosNoTrans.getX() - r.getMaxX());
@@ -1331,12 +1341,12 @@ public class Timeline {
                             pos++;
                         }
                         
-                        if (closestPos == -1) {
+                        if (closestPos == -1 && renderContext.mouseButton == 1) {
                             if (!glyphPositions.isEmpty()) {
                                 RECT gp = glyphPositions.get(0);
                                 Rectangle2D r = new Rectangle2D.Double(
-                                    gp.Xmin * unzoom, 
-                                    gp.Ymin * unzoom,
+                                    gp.Xmin, 
+                                    gp.Ymin,
                                     gp.Xmax - gp.Xmin,
                                     gp.Ymax - gp.Ymin
                                 );
@@ -1346,8 +1356,8 @@ public class Timeline {
                                 
                                 gp = glyphPositions.get(glyphPositions.size() - 1);
                                 r = new Rectangle2D.Double(
-                                    gp.Xmin * unzoom, 
-                                    gp.Ymin * unzoom,
+                                    gp.Xmin, 
+                                    gp.Ymin,
                                     gp.Xmax - gp.Xmin,
                                     gp.Ymax - gp.Ymin
                                 );
@@ -1360,8 +1370,8 @@ public class Timeline {
                         if (closestPos > -1) {
                             RECT gp = glyphPositions.get(closestPos);
                             Rectangle2D r = new Rectangle2D.Double(
-                                        gp.Xmin * unzoom, 
-                                        gp.Ymin * unzoom,
+                                        gp.Xmin, 
+                                        gp.Ymin,
                                         gp.Xmax - gp.Xmin,
                                         gp.Ymax - gp.Ymin
                                 );

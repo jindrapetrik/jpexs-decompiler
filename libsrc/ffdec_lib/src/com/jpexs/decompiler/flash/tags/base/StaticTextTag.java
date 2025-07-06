@@ -125,6 +125,14 @@ public abstract class StaticTextTag extends TextTag {
         }
     }
 
+    @Override
+    public void insertCharacterGlyph(int glyphPos, char character) {
+    }
+
+    @Override
+    public void removeCharacterGlyph(int glyphPos) {
+    }    
+    
     /**
      * Gets data bytes
      *

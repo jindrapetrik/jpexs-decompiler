@@ -60,14 +60,15 @@ public class Paragraph {
      * Add glyph.
      * @param character Character
      * @param glyphEntry Glyph entry
+     * @param htmlSourcePosition Position in HTML source
      */
-    public void addGlyph(char character, GLYPHENTRY glyphEntry) {
+    public void addGlyph(char character, GLYPHENTRY glyphEntry, int htmlSourcePosition) {
 
         if (word == null) {
             word = new Word(model);
             words.add(word);
         }
-        word.addGlyph(character, glyphEntry);
+        word.addGlyph(character, glyphEntry, htmlSourcePosition);
     }
 
     /**

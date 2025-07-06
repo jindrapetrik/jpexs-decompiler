@@ -58,14 +58,15 @@ public class DynamicTextModel {
      * Add glyph.
      * @param character Character
      * @param glyphEntry Glyph entry
+     * @param htmlSourcePosition Position in HTML source
      */
-    public void addGlyph(char character, GLYPHENTRY glyphEntry) {
+    public void addGlyph(char character, GLYPHENTRY glyphEntry, int htmlSourcePosition) {
 
         if (paragraph == null) {
             paragraph = new Paragraph(this);
             paragraphs.add(paragraph);
         }
-        paragraph.addGlyph(character, glyphEntry);
+        paragraph.addGlyph(character, glyphEntry, htmlSourcePosition);
     }
 
     /**

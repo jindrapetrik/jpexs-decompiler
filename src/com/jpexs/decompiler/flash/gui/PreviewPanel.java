@@ -590,6 +590,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
 
+        imagePanel.addTextChangedListener(new Runnable() {
+            @Override
+            public void run() {
+                textPanel.refresh();
+            }            
+        });
+        
         imagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

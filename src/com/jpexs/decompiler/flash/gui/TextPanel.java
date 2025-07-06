@@ -167,9 +167,11 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     public SearchPanel<TextTag> getSearchPanel() {
         return textSearchPanel;
     }
-
-    public void setText(TextTag textTag) {
-        this.textTag = textTag;
+    
+    public void refresh() {
+        if (this.textTag == null) {
+            return;
+        }
         String formattedText;
         try {
             formattedText = textTag.getFormattedText(false).text;
@@ -178,6 +180,11 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         }
 
         textValue.setText(formattedText);
+    }
+
+    public void setText(TextTag textTag) {
+        this.textTag = textTag;
+        refresh();
         textValue.setCaretPosition(0);
         setModified(false);
         setEditText(false);
