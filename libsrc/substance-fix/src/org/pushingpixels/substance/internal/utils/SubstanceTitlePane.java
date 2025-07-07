@@ -302,6 +302,7 @@ public class SubstanceTitlePane extends JComponent {
 		 */
 		@Override
 		public synchronized void paint(Graphics g) {
+                        super.paint(g); //JPEXS: call parent to properly draw background
 			Graphics2D graphics = (Graphics2D) g.create();
 
 			SubstanceColorScheme scheme = SubstanceCoreUtilities.getSkin(this)
@@ -314,15 +315,15 @@ public class SubstanceTitlePane extends JComponent {
 
 			graphics.drawRect(0, 0, w - 1, h - 1);
 
-			graphics.setColor(scheme.getExtraLightColor());
+			graphics.setColor(scheme.getExtraLightColor().brighter()); //JPEXS: added brighter
 			graphics.fillRect(1, 1, w - 2, h - 2);
 
 			while (this.graphValues.size() > (w - 2))
 				this.graphValues.removeFirst();
 
 			int xOff = w - this.graphValues.size() - 1;
-			graphics.setColor(scheme.getMidColor());
-			int count = 0;
+                        graphics.setColor(scheme.getMidColor());
+                        int count = 0;
 			for (double value : this.graphValues) {
 				int valueH = (int) (value * (h - 2));
 				graphics.drawLine(xOff + count, h - 1 - valueH, xOff + count,
@@ -765,7 +766,7 @@ public class SubstanceTitlePane extends JComponent {
 			this.heapStatusPanel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					System.gc();
+                                        System.gc();
 				}
 			});
 
