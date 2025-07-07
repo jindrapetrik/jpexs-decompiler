@@ -1154,6 +1154,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> skipDetectionOfUnitializedClassFields = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> showHeapStatusWidget = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

@@ -155,6 +155,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**

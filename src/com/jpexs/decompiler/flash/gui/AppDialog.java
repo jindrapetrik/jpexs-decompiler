@@ -21,6 +21,8 @@ import java.awt.Window;
 import java.util.ResourceBundle;
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
+import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
  * @author JPEXS
@@ -50,6 +52,7 @@ public abstract class AppDialog extends JDialog {
         if (Configuration.useRibbonInterface.get()) {
             getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
         }
+        SubstanceLookAndFeel.setWidgetVisible(this.rootPane, false, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
     }
 
     public ResourceBundle getResourceBundle() {

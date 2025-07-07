@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 P-code curly braces pair highlighting
 - [#2478] Simple editor - editing texts (not WYSIWYG, textual as in classic editor)
 - [#2478] Simple editor - remembering last frame / timeline
+- Optional heap memory status widget in the titlebar
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

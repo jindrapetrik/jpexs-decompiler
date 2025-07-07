@@ -55,8 +55,11 @@ import javax.swing.JFrame;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
+import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.flamingo.ribbon.ui.SubstanceRibbonRootPaneUI;
 import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
+import org.pushingpixels.substance.internal.utils.SubstanceTitlePane;
 
 /**
  * @author JPEXS
@@ -69,7 +72,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
     public MainFrameRibbon() {
         super();
-
+                
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         JRibbon ribbon = getRibbon();
@@ -182,7 +185,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                 }
             }
         });
-
+                
         View.centerScreenMain(this);
 
         enableAeroSnap();
@@ -276,11 +279,14 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                         private void updateRect() {
                             int appButtonSize = (int) Math.round(trans.getScaleX() * Integer.getInteger("peacock.appButtonSize", 24));
+                            SubstanceTitlePane.HeapStatusPanel h = new SubstanceTitlePane.HeapStatusPanel();
+                            int heapWidth = Configuration.showHeapStatusWidget.get() ? 5 + h.getPreferredWidth() : 0;
                             int titleIconsWidth
                                     = 3 + SubstanceSizeUtils.getTitlePaneIconSize() //close                                    
                                     + 10 + SubstanceSizeUtils.getTitlePaneIconSize() //maximize / restore
                                     + 2 + SubstanceSizeUtils.getTitlePaneIconSize() //minimize
                                     + 2 + SubstanceSizeUtils.getTitlePaneIconSize() //always on top
+                                    + heapWidth
                                     ;
 
                             dragRect = new Rectangle(

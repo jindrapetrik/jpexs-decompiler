@@ -115,6 +115,8 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
  * @author JPEXS
  */
 public class View {
+    
+    private static boolean heapWidgetInited = false;
 
     public static Color getDefaultBackgroundColor() {
         if (Configuration.useRibbonInterface.get() && SubstanceLookAndFeel.getCurrentSkin() != null) {
@@ -175,6 +177,7 @@ public class View {
         }
 
         try {
+            //UIManager.put(SubstanceLookAndFeel.WINDOW_HEAP_STATUS_VISIBLE, Boolean.TRUE);
             LookAndFeel oldLookAndFeel = UIManager.getLookAndFeel();
             if (!(oldLookAndFeel instanceof SubstanceOfficeBlue2007LookAndFeel)) {
                 UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
@@ -194,6 +197,12 @@ public class View {
             }
 
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999); //This works for not changing labels color and not changing Dialogs title
+            
+            if (Configuration.showHeapStatusWidget.get() && !heapWidgetInited) {
+                SubstanceLookAndFeel.setWidgetVisible(null, true, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
+            }
+            heapWidgetInited = true;
+            
             if (View.isOceanic()) {
                 UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                 UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));

@@ -208,7 +208,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textValue.setCaretPosition(0);
         setModified(false);
         setEditText(false);
-        boolean readOnly = ((Tag) textTag).isReadOnly();
+        boolean readOnly = textTag == null ? true : ((Tag) textTag).isReadOnly();
         if (readOnly) {
             textValue.setEditable(false);
         }
