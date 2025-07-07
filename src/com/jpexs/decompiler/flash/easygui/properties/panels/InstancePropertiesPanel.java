@@ -1081,9 +1081,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             filtersTable.setFilters(null);
         }
         
-        if (text != null) {
-            textPanel.setText(text);
-        }
+        textPanel.setText(text);
         updating = false;
         revalidate();
     }
