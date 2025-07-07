@@ -51,8 +51,8 @@ public abstract class AppDialog extends JDialog {
         View.installEscapeCloseOperation(this);
         if (Configuration.useRibbonInterface.get()) {
             getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+            SubstanceLookAndFeel.setWidgetVisible(this.rootPane, false, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
         }
-        SubstanceLookAndFeel.setWidgetVisible(this.rootPane, false, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
     }
 
     public ResourceBundle getResourceBundle() {

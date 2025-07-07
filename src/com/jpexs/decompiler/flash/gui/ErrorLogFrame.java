@@ -57,10 +57,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileFilter;
+import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
  * @author JPEXS
@@ -231,6 +234,10 @@ public class ErrorLogFrame extends AppFrame {
             }
         };
         handler.setLevel(Level.WARNING);
+        
+        if (Configuration.useRibbonInterface.get()) {
+            SubstanceLookAndFeel.setWidgetVisible(this.rootPane, false, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
+        }
     }
 
     public void clearLog() {
