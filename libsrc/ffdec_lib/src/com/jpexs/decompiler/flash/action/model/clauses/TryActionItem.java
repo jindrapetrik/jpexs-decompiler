@@ -42,6 +42,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -186,6 +187,40 @@ public class TryActionItem extends ActionItem implements Block {
                 }
                 if (ti instanceof Block) {
                     ret.addAll(((Block) ti).getContinues());
+                }
+            }
+        }
+        return ret;
+    }
+   
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        for (GraphTargetItem ti : tryCommands) {
+            if (ti instanceof ContinueItem) {
+                ret.add((BreakItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getBreaks());
+            }
+        }
+        if (finallyCommands != null) {
+            for (GraphTargetItem ti : finallyCommands) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        for (List<GraphTargetItem> commands : catchCommands) {
+            for (GraphTargetItem ti : commands) {
+                if (ti instanceof ContinueItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
                 }
             }
         }

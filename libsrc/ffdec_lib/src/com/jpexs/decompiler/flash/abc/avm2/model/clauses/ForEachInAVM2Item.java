@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.LoopItem;
@@ -164,6 +165,20 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
             }
             if (ti instanceof Block) {
                 ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        return ret;
+    }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof BreakItem) {
+                ret.add((BreakItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getBreaks());
             }
         }
         return ret;

@@ -1016,12 +1016,91 @@ public class Graph {
         }
         expandGotos(ret);
         processIfs(ret);
+        processSwitches2(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         return ret;
     }
 
+    
+    /**
+     * This is needed to avoid loop identifiers in AS1/2. AS3 supports them, but AS1/2 not.
+     * 
+     * loop1: switch(a) {  //has loop identifier
+     *    case 1:
+     *      trace("1");
+     *      break;
+     *    case 2: //last case
+     *      trace("2");
+     *      switch(b) { //last command is switch
+     *         case 3:
+     *         case 4:
+     *            trace("4");
+     *            break loop1; //breaks parent loop
+     *         case 5:
+     *            trace("5");
+     *            break loop1;
+     *         case 6:
+     *            trace("6");
+     *      }
+     * }
+     * 
+     * ==> 
+     * 
+     * switch(a) {
+     *    case 1:
+     *      trace("1");
+     *      break;
+     *    case 2:
+     *      trace("2");
+     *      switch(b) {
+     *         case 3:
+     *         case 4:
+     *            trace("4");
+     *            break;
+     *         case 5:
+     *            trace("5");
+     *            break;
+     *         case 6:
+     *            trace("6");
+     *      }
+     * }
+     * @param list Items
+     */
+    protected void processSwitches2(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                Block bl = (Block) item;
+                for (List<GraphTargetItem> subList : bl.getSubs()) {
+                    processSwitches2(subList);
+                }
+            }
+            if (item instanceof SwitchItem) {
+                SwitchItem sw = (SwitchItem) item;
+                if (sw.caseCommands.isEmpty()) {
+                    continue;
+                }
+                List<GraphTargetItem> lastCase = sw.caseCommands.get(sw.caseCommands.size() - 1);
+                if (lastCase.isEmpty()) {
+                    continue;
+                }
+                if (!(lastCase.get(lastCase.size() - 1) instanceof SwitchItem)) {
+                    continue; 
+                }
+                SwitchItem swInner = (SwitchItem) lastCase.get(lastCase.size() - 1);
+                                
+                List<BreakItem> breaks = swInner.getBreaks();
+                for (BreakItem br : breaks) {
+                    if (br.loopId == sw.loop.id) {
+                        br.loopId = swInner.loop.id;
+                    }
+                }
+            }            
+        }
+    }
+    
     /**
      * Prepares second pass data. Can return null when no second pass will
      * happen. Override this method to prepare second pass data.
@@ -1051,7 +1130,7 @@ public class Graph {
     protected final void processSwitches(List<GraphTargetItem> list) {
         processSwitches(list, -1);
     }
-
+    
     /*
     
     while(something){

@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#2480] AS1/2 P-code decompilation of try..catch with empty catch body at the end of function
 - [#2477] AS1/2 deobfuscation - and/or operators, jumps before function start, 
   jumps to function end, jumps in for..in return/break
+- [#2477] AS1/2 Switch in last statement of switch break labels
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

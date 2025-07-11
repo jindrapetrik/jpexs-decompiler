@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -271,6 +272,12 @@ public class ClassActionItem extends ActionItem implements Block {
     @Override
     public List<ContinueItem> getContinues() {
         List<ContinueItem> ret = new ArrayList<>();
+        return ret;
+    }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
         return ret;
     }
 

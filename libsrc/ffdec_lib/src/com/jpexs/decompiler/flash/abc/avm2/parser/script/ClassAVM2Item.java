@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -186,6 +187,13 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         List<ContinueItem> ret = new ArrayList<>();
         return ret;
     }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        return ret;
+    }
+    
 
     @Override
     public boolean needsSemicolon() {

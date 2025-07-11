@@ -187,6 +187,23 @@ public class SwitchItem extends LoopItem implements Block {
         }
         return ret;
     }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+
+        for (List<GraphTargetItem> onecase : caseCommands) {
+            for (GraphTargetItem ti : onecase) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        return ret;
+    }
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
