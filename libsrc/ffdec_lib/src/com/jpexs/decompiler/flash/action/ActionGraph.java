@@ -105,6 +105,11 @@ public class ActionGraph extends Graph {
      * Inside function
      */
     private boolean insideFunction;
+    
+    /**
+     * Needs uninitialized class fields detection
+     */
+    private final boolean needsUninitializedClassFieldsDetection;
 
     /**
      * Uninitialized class traits - maps class name to map of trait name to
@@ -115,6 +120,7 @@ public class ActionGraph extends Graph {
     /**
      * Constructs ActionGraph
      *
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection 
      * @param uninitializedClassTraits Uninitialized class traits
      * @param path Path
      * @param insideDoInitAction Inside DoInitAction
@@ -127,12 +133,18 @@ public class ActionGraph extends Graph {
      * @param charset Charset
      * @param startIp Start IP
      */
-    public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset, int startIp) {
+    public ActionGraph(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset, int startIp) {
         super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset, startIp), new ArrayList<>(), startIp);
+        this.needsUninitializedClassFieldsDetection = needsUninitializedClassFieldsDetection;
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
     }
+
+    public boolean doesNeedUninitializedClassFieldsDetection() {
+        return needsUninitializedClassFieldsDetection;
+    }
+        
           
     /**
      * Get uninitialized class traits
@@ -181,7 +193,7 @@ public class ActionGraph extends Graph {
                     ActionList al = outs.get(i);
                     int startIp = startIps.get(i);
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph(uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
+                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
                     );
                 }
             }
@@ -212,6 +224,7 @@ public class ActionGraph extends Graph {
     /**
      * Translates via Graph - decompiles.
      *
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection 
      * @param uninitializedClassTraits Uninitialized class traits
      * @param secondPassData Second pass data
      * @param insideDoInitAction Inside DoInitAction
@@ -227,8 +240,8 @@ public class ActionGraph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {        
-        ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
+    public static List<GraphTargetItem> translateViaGraph(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {        
+        ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -625,7 +638,7 @@ public class ActionGraph extends Graph {
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
-            if (Configuration.skipDetectionOfUnitializedClassFields.get()) {
+            if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUnitializedClassFields.get()) {
                 ret.add(0, new CommentItem(AppResources.translate("decompilationWarning.as2.noUninitializedClassFieldsDetection")));
             }
         }

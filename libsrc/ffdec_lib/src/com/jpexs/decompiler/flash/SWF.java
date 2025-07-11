@@ -4149,7 +4149,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 int staticOperation = 0;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(new HashMap<>() /*??*/, true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
+                    dec = Action.actionsToTree(false, new HashMap<>() /*??*/, true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
                 } catch (EmptyStackException ex) {
                     continue;
                 }

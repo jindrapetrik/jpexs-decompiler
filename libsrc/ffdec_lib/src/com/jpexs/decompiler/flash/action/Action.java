@@ -982,7 +982,7 @@ public abstract class Action implements GraphSourceItem {
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = 0;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem> tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+                    List<GraphTargetItem> tree = actionsToTree(asm.getSwf().needsCalculatingAS2UninitializeClassTraits(asm), uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     for (ActionTreeOperation treeOperation : treeOperations) {
                         treeOperation.run(tree);
@@ -1036,6 +1036,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Converts list of actions to List of treeItems
      *
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
      * @param insideFunction Inside function?
@@ -1047,13 +1048,14 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        return actionsToTree(uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+    public static List<GraphTargetItem> actionsToTree(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        return actionsToTree(needsUninitializedClassFieldsDetection, uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
     }
 
     /**
      * Converts list of actions to List of treeItems.
      *
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
      * @param insideFunction Inside function?
@@ -1068,17 +1070,17 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+    public static List<GraphTargetItem> actionsToTree(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            return ActionGraph.translateViaGraph(uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            return ActionGraph.translateViaGraph(uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
         }
     }
 
@@ -1290,10 +1292,10 @@ public abstract class Action implements GraphSourceItem {
                         }
                         int startIp = adr2ip(actions, endAddr);
                         try {                            
-                            out = ActionGraph.translateViaGraph(graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
                         } catch (SecondPassException spe) {
                             variables2 = prepareVariables(cnt, variables);
-                            out = ActionGraph.translateViaGraph(graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
                         }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
