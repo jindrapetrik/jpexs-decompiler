@@ -581,11 +581,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);
-                            if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
+                            if (!Configuration.skipDetectionOfUnitializedClassFields.get() && src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
                                 setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; ...", "text/flasm");
                                 setDecompiledText("-", "-", 
-                                        "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "..." 
-                                        + (Configuration.skipDetectionOfUnitializedClassFields.get() ? "" : "\r\n" + "// " + AppStrings.translate("work.decompiling.allScripts.ucf.canBeSkipped"))
+                                        "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "..." + "\r\n"
+                                        + "// " + AppStrings.translate("work.decompiling.allScripts.ucf.canBeSkipped")
                                 );
                             } else {
                                 setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
