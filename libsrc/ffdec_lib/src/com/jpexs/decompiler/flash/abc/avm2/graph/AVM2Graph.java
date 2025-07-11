@@ -222,7 +222,7 @@ public class AVM2Graph extends Graph {
      * @param localRegAssignmentIps Local register assignment IPs
      */
     public AVM2Graph(int swfVersion, AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ScopeStack localScopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssignmentIps) {
-        super(AVM2GraphTargetDialect.INSTANCE, new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssignmentIps), getExceptionEntries(body));
+        super(AVM2GraphTargetDialect.INSTANCE, new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssignmentIps), getExceptionEntries(body), 0);
         this.avm2code = code;
         this.abc = abc;
         this.body = body;
@@ -1818,6 +1818,7 @@ public class AVM2Graph extends Graph {
 
                 Reference<GraphPart> nextRef = new Reference<>(null);
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
+                makeAllCommands(output, stack);
                 SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
                 ret = new ArrayList<>();
                 ret.addAll(output);

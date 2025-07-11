@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionOr;
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
@@ -84,6 +85,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -146,7 +148,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             actions.removeUnreachableActions();
             actions.removeZeroJumps();
             getTimeCount = 0;
-
+                                    
             // GetTime, If => Jump, assume GetTime > 0
             FastActionListIterator iterator = actions.iterator();
             while (iterator.hasNext()) {
@@ -162,10 +164,30 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     ActionJump jump = new ActionJump(0, actions.getCharset());
                     ActionItem jumpItem = new ActionItem(jump);
                     jumpItem.setJumpTarget(a2Item.getJumpTarget());
+                    
+                    /* This simple approach does not work                    
+                    
                     iterator.remove(); // GetTime
                     iterator.next();
                     iterator.remove(); // If
                     iterator.add(jumpItem); // replace If with Jump
+                    */
+                    
+                    //Must remove + add in this particular order,
+                    //otherwise if will map the jumpsTo after the new jumpItem.
+                    
+                    iterator.next(); //to If
+                    iterator.add(jumpItem);  // Add Jump after If
+                    
+                    //Now go back and remove GetTime, If...
+                    iterator.prev(); //to If
+                    iterator.prev(); //to GetTime
+
+                    iterator.remove(); //GetTime
+                    iterator.next();                    
+                    iterator.remove(); //If
+                    iterator.next();                    
+                    
                     changed = true;
                     ret = true;
                     getTimeCount--;
@@ -184,12 +206,36 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                         ActionJump jump = new ActionJump(0, actions.getCharset());
                         ActionItem jumpItem = new ActionItem(jump);
                         jumpItem.setJumpTarget(a2Item.getJumpTarget());
+                        /* This simple approach does not work
                         iterator.remove(); // GetTime
                         iterator.next();
                         iterator.remove(); // Increment
                         iterator.next();
                         iterator.remove(); // If
                         iterator.add(jumpItem); // replace If with Jump
+                        */                                                
+                        
+                        
+                        //Must remove + add in this particular order,
+                        //otherwise if will map the jumpsTo after the new jumpItem.
+                        
+                        iterator.next(); //to Increment
+                        iterator.next(); //to If
+                        iterator.add(jumpItem); // Add Jump after If
+                        
+                        //Now go back and remove GetTime, Increment, If...
+                        iterator.prev(); //to If
+                        iterator.prev(); //to Increment
+                        iterator.prev(); //to GetTime
+                        
+                        iterator.remove(); //GetTime
+                        iterator.next(); 
+                        iterator.remove(); //Increment
+                        iterator.next();
+                        iterator.remove(); //If
+                        
+                        iterator.next();
+                                                
                         changed = true;
                         ret = true;
                     }
@@ -208,7 +254,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         boolean ret = false;
         actions.removeUnreachableActions();
         actions.removeZeroJumps();
-
+                
         ActionConstantPool cPool = getConstantPool(actions);
         LocalDataArea localData = new LocalDataArea(new Stage(null), true);
         localData.stack = new FixItemCounterStack();
@@ -481,7 +527,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         if (item.action.isExit()) {
             return;
         }
-
+        
         FixItemCounterStack stack = (FixItemCounterStack) localData.stack;
         int instructionsProcessed = 0;
         int skippedInstructions = 0;
@@ -560,7 +606,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
             if (!(action instanceof ActionPush
                     || action instanceof ActionPushDuplicate
-                    //|| action instanceof ActionPop
+                    || action instanceof ActionPop
                     || action instanceof ActionAsciiToChar
                     || action instanceof ActionCharToAscii
                     || action instanceof ActionDecrement
@@ -660,7 +706,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 }
             }
 
-            if (isEnd || (stack.allItemsFixed() && (action instanceof ActionIf || (jumpFound && action instanceof ActionJump) || action instanceof ActionSetVariable))) {
+            if (isEnd || (stack.allItemsFixed() && (action instanceof ActionPop || action instanceof ActionIf || (jumpFound && action instanceof ActionJump) || action instanceof ActionSetVariable))) {
                 result.item = item;
                 result.instructionsProcessed = instructionsProcessed;
                 result.minSkippedInstructions = skippedInstructions;
@@ -676,7 +722,11 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
                 if (isEnd) {
                     break;
-                }
+                }                
+            }
+            
+            if (jumpedHere && item.prev.isContainerLastAction()) {
+                break;
             }
 
             if (action instanceof ActionReturn) {

@@ -54,6 +54,7 @@ import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -101,6 +102,11 @@ public class Graph {
      * Exceptions in the graph
      */
     private final List<GraphException> exceptions;
+    
+    /**
+     * Graph startIp
+     */
+    protected int startIp = 0;
 
     /**
      * Debug flag to print all parts
@@ -122,7 +128,7 @@ public class Graph {
      * Debug flag to not process Ifs
      */
     protected boolean debugDoNotProcess = false;
-
+        
     /**
      * Logger
      */
@@ -152,11 +158,13 @@ public class Graph {
      * @param dialect Dialect
      * @param code Graph source
      * @param exceptions Exceptions in the graph
+     * @param startIp Start ip
      */
-    public Graph(GraphTargetDialect dialect, GraphSource code, List<GraphException> exceptions) {
+    public Graph(GraphTargetDialect dialect, GraphSource code, List<GraphException> exceptions, int startIp) {
         this.dialect = dialect;
         this.code = code;
         this.exceptions = exceptions;
+        this.startIp = startIp;
     }
 
     /**
@@ -2950,7 +2958,7 @@ public class Graph {
 
             if (vCanHandleVisited) {
                 if (visited.contains(part)) {
-                    String labelName = "addr" + part.start;
+                    String labelName = "addr" + Helper.formatAddress(code.pos2adr(part.start, true)); //was: part.start;
                     List<GraphTargetItem> firstCode = partCodes.get(part);
                     int firstCodePos = partCodePos.get(part);
                     if (firstCodePos > firstCode.size()) {
@@ -3298,6 +3306,7 @@ public class Graph {
                     }
                     Reference<GraphPart> nextRef = new Reference<>(null);
                     Reference<GraphTargetItem> tiRef = new Reference<>(null);
+                    makeAllCommands(currentRet, stack);
                     SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path,
                             caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
                     GraphPart next = nextRef.getVal();
@@ -3767,7 +3776,7 @@ public class Graph {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];
-        ret.add(makeGraph(null, new GraphPath(), code, 0, 0, allBlocks, refs, visited));
+        ret.add(makeGraph(null, new GraphPath(), code, startIp, 0, allBlocks, refs, visited));
         for (int pos : alternateEntries) {
             GraphPart e1 = new GraphPart(-1, -1);
             e1.path = new GraphPath("e");
@@ -3811,9 +3820,9 @@ public class Graph {
         if (parent != null) {
             ret.refs.add(parent);
             parent.nextParts.add(ret);
-        }
+        }        
         while (ip < code.size()) {
-            ip = checkIp(ip);
+            ip = checkIp(ip);         
             if (ip >= code.size()) {
                 break;
             }
@@ -3870,8 +3879,10 @@ public class Graph {
             } else if (ins.isJump()) {
                 part.end = ip;
                 allBlocks.add(part);
-                ip = ins.getBranches(code).get(0);
+                ip = ins.getBranches(code).get(0);      
+                ip = checkIp(ip);
                 makeGraph(part, path, code, ip, lastIp, allBlocks, refs, visited);
+                lastIp = -1;
                 break;
             } else if (ins.isBranch()) {
                 part.end = ip;
@@ -3879,7 +3890,7 @@ public class Graph {
                 allBlocks.add(part);
                 List<Integer> branches = ins.getBranches(code);
                 for (int i = 0; i < branches.size(); i++) {
-                    makeGraph(part, path.sub(i, ip), code, branches.get(i), ip, allBlocks, refs, visited);
+                    makeGraph(part, path.sub(i, ip), code, checkIp(branches.get(i)), ip, allBlocks, refs, visited);
                 }
                 break;
             }
@@ -4083,6 +4094,7 @@ public class Graph {
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
             List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
+                
         boolean hasDefault = false;
         /*
                 case 4:

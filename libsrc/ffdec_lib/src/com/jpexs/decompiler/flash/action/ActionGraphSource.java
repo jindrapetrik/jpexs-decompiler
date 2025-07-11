@@ -107,8 +107,9 @@ public class ActionGraphSource extends GraphSource {
      * @param functions Functions
      * @param charset Charset
      */
-    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, String charset) {
-        this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions, charset);
+    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, String charset, int startIp) {
+        this.startIp = startIp;
+        this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions, charset);        
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;

@@ -35,6 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.testng.Assert;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
@@ -293,6 +296,38 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail();
         }
     }
+    
+    @Test
+    public void testRemoveGetTimeWithJumpTo() {
+        String actionsString = "ConstantPool \"a\"\n"
+                + "Jump loc3\n"
+                + "loc4:Push 1\n"
+                + "Trace\n"
+                + "Jump loc5\n"
+                + "loc3:GetTime\n"
+                + "If loc1\n"
+                + "Push \"FAIL\"\n"
+                + "Trace\n"
+                + "loc1:Push \"OK\"\n"
+                + "Trace\n"
+                + "loc2:Jump loc4\n"
+                + "loc5:";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
+            String actualResult = writer.toString();
+
+            assertTrue(!actualResult.contains("FAIL"));
+            assertTrue(actualResult.contains("OK"));
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
 
     @Test
     public void testRemoveGetTimeAndIncrement() {
@@ -317,6 +352,147 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
 
             assertTrue(!actualResult.contains("FAIL"));
             assertTrue(actualResult.contains("OK"));
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+    
+    @Test
+    public void testRemoveGetTimeAndIncrementWithJumpTo() {
+        String actionsString = "ConstantPool \"a\"\n"
+                + "Jump loc3\n"
+                + "loc4: Push 1\n"
+                + "Trace\n"
+                + "Jump loc5\n"
+                + "loc3:GetTime\n"
+                + "Increment\n"
+                + "If loc1\n"
+                + "Push \"FAIL\"\n"
+                + "Trace\n"
+                + "loc1:Push \"OK\"\n"
+                + "Trace\n"
+                + "loc2:Jump loc4\n"
+                + "loc5:\n";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
+            String actualResult = writer.toString();
+
+            assertTrue(!actualResult.contains("FAIL"));
+            assertTrue(actualResult.contains("OK"));
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+    
+    @Test
+    public void testJumpAfterFunctionEnd() {
+        String actionsString = "ConstantPool \"a\", \"b\", \"c\", \"d\"\n"
+                + "Jump loc0026\n"
+                + "loc0012:Push \"once\"\n"
+                + "Trace\n"
+                + "Jump loc0058\n"
+                + "loc0021:Jump loc0053\n"
+                + "loc0026:DefineFunction \"f\", 0 {\n"
+                + "Push \"a\"\n"
+                + "Trace\n"
+                + "Push register1\n"
+                + "Push 2\n"
+                + "Equals\n"
+                + "If loc004d\n"
+                + "Jump loc0021\n"
+                + "loc004d:Push \"b\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "loc0053:Jump loc0012\n"
+                + "loc0058:Push \"c\"\n"
+                + "Trace";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
+            String actualResult = writer.toString();
+
+            Pattern patOnce = Pattern.compile("\"once\"");
+            Matcher m = patOnce.matcher(actualResult);
+            int count = 0;
+            while(m.find()) {
+                count++;
+            }            
+            
+            Assert.assertEquals(count, 1, "The string \"once\" should only appear once.");            
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+    
+    @Test
+    public void testRemoveForInReturnsWithJumpsEnd() {
+        String actionsString = "Jump locA\n"
+                + "locC: Not\n"
+                + "Jump locD\n"
+                + "locB: Equals2\n"
+                + "Jump locC\n"
+                + "locA: Push null\n"
+                + "Jump locB\n"
+                + "locD: If locA\n"
+                + "Push 1\n"
+                + "Trace\n";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
+            String actualResult = writer.toString().trim();
+
+            Assert.assertEquals(actualResult, "trace(1);");
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+    
+    @Test
+    public void testRemoveAndOr() {
+        String actionsString = "Push 1\n"
+                + "Push 2\n"
+                + "Equals\n"
+                + "PushDuplicate\n"
+                + "If locA\n"
+                + "Pop\n"
+                + "Push 3\n"
+                + "Push 4\n"
+                + "Equals\n"
+                + "locA:If locB\n"
+                + "Push \"One\"\n"
+                + "Trace\n"
+                + "Jump locC\n"
+                + "locB: Push \"Two\"\n"
+                + "Trace\n"
+                + "locC:Push \"End\"\n"
+                + "Trace\n";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
+            String actualResult = writer.toString().trim().replace("\r\n", "\n");
+
+            Assert.assertEquals(actualResult, "trace(\"One\");\ntrace(\"End\");");
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }

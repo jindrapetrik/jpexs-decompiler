@@ -136,13 +136,13 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
 
         try {
-            body = ActionGraph.translateViaGraph(uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
+            body = ActionGraph.translateViaGraph(uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            body = ActionGraph.translateViaGraph(uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
+            body = ActionGraph.translateViaGraph(uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
         }
         output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
     }

@@ -46,6 +46,7 @@ public class ActionDefineFunctionPushRegisterCleanerTest extends ActionScript2Te
         Configuration.simplifyExpressions.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
+        Configuration.skipDetectionOfUnitializedClassFields.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2_definefunc_regs/as2_definefunc_regs.swf")), false);
     }
 

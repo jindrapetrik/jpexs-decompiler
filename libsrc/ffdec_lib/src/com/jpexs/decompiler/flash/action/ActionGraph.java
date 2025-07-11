@@ -125,9 +125,10 @@ public class ActionGraph extends Graph {
      * @param functions Functions
      * @param version Version
      * @param charset Charset
+     * @param startIp Start IP
      */
-    public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
-        super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
+    public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset, int startIp) {
+        super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset, startIp), new ArrayList<>(), startIp);
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
@@ -164,18 +165,23 @@ public class ActionGraph extends Graph {
                 String functionName = (action instanceof ActionDefineFunction) ? ((ActionDefineFunction) action).functionName : ((ActionDefineFunction2) action).functionName;
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 List<ActionList> outs = new ArrayList<>();
+                List<Integer> startIps = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
                         continue;
                     }
-                    outs.add(new ActionList(alist.subList(Action.adr2ip(alist, endAddr), Action.adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
+                    int startIp = Action.adr2ip(alist, endAddr);
+                    startIps.add(startIp);
+                    outs.add(new ActionList(alist.subList(0, Action.adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
                     endAddr += size;
                 }
 
-                for (ActionList al : outs) {
+                for (int i = 0; i < outs.size(); i++) {
+                    ActionList al = outs.get(i);
+                    int startIp = startIps.get(i);
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph(uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset())
+                            new ActionGraph(uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
                     );
                 }
             }
@@ -221,8 +227,8 @@ public class ActionGraph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {        
-        ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
+    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {        
+        ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -280,7 +286,7 @@ public class ActionGraph extends Graph {
     
     @Override
     protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
-
+                               
         if (level == 0) {
             List<GraphTargetItem> removed = new ArrayList<>();
             for (int i = list.size() - 1; i >= 0; i--) {
@@ -295,7 +301,7 @@ public class ActionGraph extends Graph {
             }
             list.addAll(0, removed);
         }                
-
+             
         int targetStart;
         int targetEnd;
         GraphTargetItem targetStartItem = null;
@@ -867,6 +873,7 @@ public class ActionGraph extends Graph {
 
                 Reference<GraphPart> nextRef = new Reference<>(null);
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
+                makeAllCommands(output, stack);
                 SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
                 ret = new ArrayList<>();
                 ret.addAll(output);
@@ -882,7 +889,19 @@ public class ActionGraph extends Graph {
         }
         return ret;
     }
-
+    
+    private int ipAfterJumps(int nip) {
+        while (nip < code.size() && code.get(nip) instanceof ActionJump) {
+            ActionJump j = (ActionJump) code.get(nip);
+            int nip2 = code.adr2pos(j.getTargetAddress());
+            if (nip2 == nip) {
+                break;
+            }
+            nip = nip2;            
+        }
+        return nip;
+    }
+            
     /**
      * Checks IP and allows to modify it.
      *
@@ -891,22 +910,67 @@ public class ActionGraph extends Graph {
      */
     @Override
     protected int checkIp(int ip) {
-        int oldIp = ip;
+        
+        if (ip >= code.size()) {
+            return ip;
+        }
+        
+        int oldIp = ip;        
+        
         //return/break in for..in
+        /*
+        We need to skip following:
+        
+        locA:Push null
+        Equals/Equals2
+        Not
+        If locA
+        ...
+        
+        Beware: There can be obfuscation jumps anywhere on the path!
+        */
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
+            int nip = ip;
+            if (nip + 1 < code.size()) {
+                nip++;
+                nip = ipAfterJumps(nip);
+                if (nip < code.size() && ((code.get(nip) instanceof ActionEquals) || (code.get(nip) instanceof ActionEquals2))) {
+                    nip++;
+                    nip = ipAfterJumps(nip);
+                    if (nip < code.size() && code.get(nip) instanceof ActionNot) {
+                        nip++;
+                        nip = ipAfterJumps(nip);
+                        if (nip < code.size() && code.get(nip) instanceof ActionIf) {
+                            ActionIf aif = (ActionIf) code.get(nip);
+                            
+                            int jip = code.adr2pos(aif.getTargetAddress());
+                            jip = ipAfterJumps(jip);
+                            if (jip == ip) {
+                                nip++;
+                                ip = nip;
+                            }
+                        }
+                    }
+                }                                    
+            }
+            
+            //The simple approach is not working, there may be jumps inside
+            /*
             if (ip + 3 <= code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {
                         if (code.get(ip + 3) instanceof ActionIf) {
                             ActionIf aif = (ActionIf) code.get(ip + 3);
-                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 /*IF numbytes*/ + aif.getJumpOffset()) == ip) {
+                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 //IF numbytes
+                            + aif.getJumpOffset()) == ip) {
                                 ip += 4;
                             }
                         }
                     }
                 }
             }
+            */
         }
         if (oldIp != ip) {
             if (ip == code.size()) { //no next checkIp call since its after code size
