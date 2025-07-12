@@ -226,7 +226,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:int = 5;\r\n"
-                + "loop3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -240,7 +239,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "}\r\n"
                 + "if(b == 15)\r\n"
                 + "{\r\n"
-                + "break loop3;\r\n"
+                + "break;\r\n"
                 + "}\r\n"
                 + "b += 1;\r\n"
                 + "}\r\n"
@@ -1980,7 +1979,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
                 + "}\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"B\");\r\n",
                  false);

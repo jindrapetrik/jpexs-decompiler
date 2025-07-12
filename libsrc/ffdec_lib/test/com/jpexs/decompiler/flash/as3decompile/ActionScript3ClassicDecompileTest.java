@@ -227,7 +227,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:* = 5;\r\n"
-                + "loop3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -241,7 +240,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "if(b == 15)\r\n"
                 + "{\r\n"
-                + "break loop3;\r\n"
+                + "break;\r\n"
                 + "}\r\n"
                 + "b += 1;\r\n"
                 + "}\r\n"
@@ -912,7 +911,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case \"c\":\r\n"
                 + "trace(\"val c\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"final\");\r\n"
                 + "}\r\n",
@@ -1965,7 +1963,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "if(a)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"B\");\r\n",

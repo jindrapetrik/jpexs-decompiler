@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
@@ -639,8 +640,15 @@ public abstract class Action implements GraphSourceItem {
                     writer.appendNoHilight(" ");
                 }
 
-                byte[] bytes = a.getBytes(version);
-                writer.appendNoHilight(Helper.bytesToHexString(bytes));
+                
+                byte[] bytes;
+                try {
+                    bytes = a.getBytes(version);
+                    writer.appendNoHilight(Helper.bytesToHexString(bytes));
+                } catch (ValueTooLargeException tooLarge) {
+                    bytes = new byte[0];
+                    writer.appendNoHilight("!TOO LARGE!");
+                }
 
                 if (Configuration.showOriginalBytesInPcodeHex.get()) {
                     if (fileData != null && fileOffset != -1 && fileData.length > fileOffset + bytes.length - 1) {
@@ -1074,7 +1082,7 @@ public abstract class Action implements GraphSourceItem {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, fixActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
@@ -1082,6 +1090,20 @@ public abstract class Action implements GraphSourceItem {
             functions.putAll(functionsBackup);
             return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
         }
+    }
+    
+    private static List<Action> fixActionsClassHeader(List<Action> actions, boolean needsUninitializedClassFieldsDetection, String charset, String path) {
+        ActionList alist = new ActionList(actions, charset);
+        if (needsUninitializedClassFieldsDetection) {
+            try {
+                new ActionIncorrectClassHeaderRemover().actionListParsed(alist, null);
+            } catch (InterruptedException ex) {
+                //ignored
+            } catch (Throwable ex) {
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Removing incorrect class header failed: " + path, ex);
+            }  
+        }
+        return alist;
     }
 
     /**

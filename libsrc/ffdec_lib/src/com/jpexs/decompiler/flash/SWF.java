@@ -4751,7 +4751,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
 
                 int version = swf == null ? SWF.DEFAULT_VERSION : swf.version;
-                ActionList list = ActionListReader.readActionListTimeout(listeners, rri, version, prevLength, prevLength + actionBytes.getLength(), src.toString()/*FIXME?*/, deobfuscationMode);
+                ActionList list = ActionListReader.readActionListTimeout(src, listeners, rri, version, prevLength, prevLength + actionBytes.getLength(), src.toString()/*FIXME?*/, deobfuscationMode);
                 list.fileData = actionBytes.getArray();
                 list.deobfuscationMode = deobfuscationMode;
                 if (swf != null) {
@@ -6289,9 +6289,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 DoInitActionTag doi = (DoInitActionTag) src;
                 String exportName = doi.getSwf().getCharacter(doi.getCharacterId()).getExportName();
                 if (exportName != null && exportName.startsWith("__Packages.")) {
-                    if (uninitializedAs2ClassTraits == null) {
-                        return true;
-                    }
+                    return true;                    
                 }                
             }
         }

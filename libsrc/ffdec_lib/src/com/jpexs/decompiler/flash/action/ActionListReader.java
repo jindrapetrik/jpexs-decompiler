@@ -28,10 +28,14 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -70,6 +75,7 @@ public class ActionListReader {
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
+     * @param asm ASM source
      * @param listeners List of listeners
      * @param sis SWF input stream
      * @param version SWF version
@@ -82,13 +88,13 @@ public class ActionListReader {
      * @throws InterruptedException On interrupt
      * @throws TimeoutException On timeout
      */
-    public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
+    public static ActionList readActionListTimeout(ASMSource asm, final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
         try {
             ActionList actions = CancellableWorker.call("script.readActionList", new Callable<ActionList>() {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {
-                    return readActionList(listeners, sis, version, ip, endIp, path, deobfuscationMode);
+                    return readActionList(asm, listeners, sis, version, ip, endIp, path, deobfuscationMode);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
 
@@ -110,6 +116,7 @@ public class ActionListReader {
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
+     * @param asm ASM source
      * @param listeners List of listeners
      * @param sis SWF input stream
      * @param version SWF version
@@ -121,7 +128,7 @@ public class ActionListReader {
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
      */
-    public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
+    public static ActionList readActionList(ASMSource asm, List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         // actionMap and nextOffsets should contain exactly the same keys
         Map<Long, Action> actionMap = new TreeMap<>();
@@ -180,15 +187,14 @@ public class ActionListReader {
             System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
             p++;
         }*/
-        //TODO: This cleaner needs to be executed only before actual decompilation, not when disassembly only
         try {
-            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, sis.getSwf());
+            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, null);
         } catch (ThreadDeath | InterruptedException ex) {
-            throw ex;
+            //ignored
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
-        }
-
+            Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
+        }          
+        
         return actions;
     }
 

@@ -116,7 +116,7 @@ public class ActionGraph extends Graph {
      * trait
      */
     private Map<String, Map<String, Trait>> uninitializedClassTraits;
-
+    
     /**
      * Constructs ActionGraph
      *

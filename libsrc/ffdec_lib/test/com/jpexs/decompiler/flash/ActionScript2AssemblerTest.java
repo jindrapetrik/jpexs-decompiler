@@ -75,7 +75,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
+                Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -126,7 +126,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             writer.finishHilights();
             String actualResult = writer.toString();
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
@@ -173,6 +173,52 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "trace(\"Hello\");\n"
                 + "}\n"
                 + "}");
+    }
+
+    @Test
+    public void testJumpAfterFunctionFix() {
+        String res = decompilePcode("ConstantPool \"F\", \"A\", \"f\", \"B\", \"C\"\n"
+                + "DefineFunction \"f\", 0 {\n"
+                + "Push \"F\"\n"
+                + "Trace\n"
+                + "Push 1, 1\n"
+                + "Equals2\n"
+                + "If loc005b\n"
+                + "Push \"G\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "Push \"A\"\n"
+                + "Trace\n"
+                + "Push 0\n"
+                + "Push \"f\"\n"
+                + "CallFunction\n"
+                + "Pop\n"
+                + "Push \"B\"\n"
+                + "Trace\n"
+                + "Push 1\n"
+                + "loc005b:Push 2\n"
+                + "Equals2\n"
+                + "If loc006e\n"
+                + "Push \"C\"\n"
+                + "Trace\n"
+                + "loc006e:Stop");
+        res = cleanPCode(res);
+        assertEquals(res, "function f()\n"
+                + "{\n"
+                + "trace(\"F\");\n"
+                + "if(1 != 1)\n"
+                + "{\n"
+                + "trace(\"G\");\n"
+                + "}\n"
+                + "}\n"
+                + "trace(\"A\");\n"
+                + "f();\n"
+                + "trace(\"B\");\n"
+                + "if(1 != 2)\n"
+                + "{\n"
+                + "trace(\"C\");\n"
+                + "}\n"
+                + "stop();");
     }
 
     @Test

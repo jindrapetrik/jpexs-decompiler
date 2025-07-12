@@ -77,6 +77,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionToString;
 import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
@@ -119,20 +120,80 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         boolean useVariables = false;
         while (changed) {
             while (changed) {
-                changed = removeGetTimes(fastActions);
-                changed |= removeObfuscationIfs(fastActions, fakeFunctions, useVariables);
-                actions.setActions(fastActions.toActionList());
-                changed |= ActionListReader.fixConstantPools(null, actions);
-                if (!changed && !useVariables) {
-                    useVariables = true;
-                    changed = true;
+                while (changed) {
+                    changed = removeGetTimes(fastActions);
+                    changed |= removeObfuscationIfs(fastActions, fakeFunctions, useVariables);
+                    actions.setActions(fastActions.toActionList());
+                    changed |= ActionListReader.fixConstantPools(null, actions);
+                    if (!changed && !useVariables) {
+                        useVariables = true;
+                        changed = true;
+                    }
+                }
+                if (Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get()) {
+                    changed = removeObfuscatedUnusedVariables(fastActions);
+                    actions.setActions(fastActions.toActionList());
                 }
             }
-            if (Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get()) {
-                changed = removeObfuscatedUnusedVariables(fastActions);
-                actions.setActions(fastActions.toActionList());
+            changed = updateJumpsAfterFunction(fastActions);
+            if (changed) {
+                useVariables = false;
             }
         }
+    }
+
+    private static boolean updateJumpsAfterFunction(FastActionList list) {
+        Stack<ActionItem> functionEnds = new Stack<>();
+        boolean changed = false;
+        FastActionListIterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            ActionItem ai = iterator.next();
+            Action a = ai.action;
+            ActionItem currentFunctionEnd = null;
+
+            while (!functionEnds.isEmpty()) {
+                currentFunctionEnd = functionEnds.peek();
+
+                if (a.getAddress() >= currentFunctionEnd.action.getAddress()) {
+                    functionEnds.pop();
+                    currentFunctionEnd = null;
+                } else {
+                    break;
+                }
+            }
+            if (a instanceof ActionDefineFunction) {
+                //ActionDefineFunction f = (ActionDefineFunction) a;
+                functionEnds.push(ai.getContainerLastActions().get(0).next);
+            }
+            if (a instanceof ActionDefineFunction2) {
+                //ActionDefineFunction2 f = (ActionDefineFunction2) a;               
+                functionEnds.push(ai.getContainerLastActions().get(0).next);
+            }
+            ai.getContainerLastActions();
+            if (currentFunctionEnd != null) {
+                if (a instanceof ActionJump) {
+                    ActionJump jump = (ActionJump) a;
+                    long targetAddress = jump.getTargetAddress();
+                    if (targetAddress > currentFunctionEnd.action.getAddress()) {
+                        //System.err.println("Jump after function at " + Helper.formatAddress(a.getFileOffset()));                        
+                        //jump.setJumpOffset((int) (currentMaxAddress - (jump.getAddress() + jump.getBytesLength())));
+                        ai.setJumpTarget(currentFunctionEnd);
+                        changed = true;
+                    }
+                }
+                if (a instanceof ActionIf) {
+                    ActionIf aIf = (ActionIf) a;
+                    long targetAddress = aIf.getTargetAddress();
+                    if (targetAddress > currentFunctionEnd.action.getAddress()) {
+                        //System.err.println("Jump after function at " + Helper.formatAddress(a.getFileOffset()));
+                        //aIf.setJumpOffset((int) (currentMaxAddress - (aIf.getAddress() + aIf.getBytesLength())));
+                        ai.setJumpTarget(currentFunctionEnd);
+                        changed = true;
+                    }
+                }
+            }
+        }
+        return changed;
     }
 
     private boolean removeGetTimes(FastActionList actions) throws InterruptedException {
@@ -148,7 +209,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             actions.removeUnreachableActions();
             actions.removeZeroJumps();
             getTimeCount = 0;
-                                    
+
             // GetTime, If => Jump, assume GetTime > 0
             FastActionListIterator iterator = actions.iterator();
             while (iterator.hasNext()) {
@@ -164,30 +225,28 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     ActionJump jump = new ActionJump(0, actions.getCharset());
                     ActionItem jumpItem = new ActionItem(jump);
                     jumpItem.setJumpTarget(a2Item.getJumpTarget());
-                    
+
                     /* This simple approach does not work                    
                     
                     iterator.remove(); // GetTime
                     iterator.next();
                     iterator.remove(); // If
                     iterator.add(jumpItem); // replace If with Jump
-                    */
-                    
+                     */
                     //Must remove + add in this particular order,
                     //otherwise if will map the jumpsTo after the new jumpItem.
-                    
                     iterator.next(); //to If
                     iterator.add(jumpItem);  // Add Jump after If
-                    
+
                     //Now go back and remove GetTime, If...
                     iterator.prev(); //to If
                     iterator.prev(); //to GetTime
 
                     iterator.remove(); //GetTime
-                    iterator.next();                    
+                    iterator.next();
                     iterator.remove(); //If
-                    iterator.next();                    
-                    
+                    iterator.next();
+
                     changed = true;
                     ret = true;
                     getTimeCount--;
@@ -213,29 +272,27 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                         iterator.next();
                         iterator.remove(); // If
                         iterator.add(jumpItem); // replace If with Jump
-                        */                                                
-                        
-                        
+                         */
+
                         //Must remove + add in this particular order,
                         //otherwise if will map the jumpsTo after the new jumpItem.
-                        
                         iterator.next(); //to Increment
                         iterator.next(); //to If
                         iterator.add(jumpItem); // Add Jump after If
-                        
+
                         //Now go back and remove GetTime, Increment, If...
                         iterator.prev(); //to If
                         iterator.prev(); //to Increment
                         iterator.prev(); //to GetTime
-                        
+
                         iterator.remove(); //GetTime
-                        iterator.next(); 
+                        iterator.next();
                         iterator.remove(); //Increment
                         iterator.next();
                         iterator.remove(); //If
-                        
+
                         iterator.next();
-                                                
+
                         changed = true;
                         ret = true;
                     }
@@ -254,7 +311,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         boolean ret = false;
         actions.removeUnreachableActions();
         actions.removeZeroJumps();
-                
+
         ActionConstantPool cPool = getConstantPool(actions);
         LocalDataArea localData = new LocalDataArea(new Stage(null), true);
         localData.stack = new FixItemCounterStack();
@@ -505,6 +562,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
     /**
      * Check if the name is fake.
+     *
      * @param name Name
      * @return True if the name is fake
      */
@@ -514,6 +572,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
     /**
      * Execute actions.
+     *
      * @param item Action item
      * @param localData Local data
      * @param constantPool Constant pool
@@ -527,7 +586,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         if (item.action.isExit()) {
             return;
         }
-        
+
         FixItemCounterStack stack = (FixItemCounterStack) localData.stack;
         int instructionsProcessed = 0;
         int skippedInstructions = 0;
@@ -722,9 +781,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
                 if (isEnd) {
                     break;
-                }                
+                }
             }
-            
+
             if (jumpedHere && item.prev.isContainerLastAction()) {
                 break;
             }
