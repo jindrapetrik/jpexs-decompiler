@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2478] Simple editor - editing texts (not WYSIWYG, textual as in classic editor)
 - [#2478] Simple editor - remembering last frame / timeline
 - Optional heap memory status widget in the titlebar
+- [#2485] Show variable name in the text tree node label
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -3910,6 +3911,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
+[#2485]: https://www.free-decompiler.com/flash/issues/2485
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338

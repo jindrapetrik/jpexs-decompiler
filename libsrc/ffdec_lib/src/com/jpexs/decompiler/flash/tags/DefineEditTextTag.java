@@ -1605,4 +1605,13 @@ public class DefineEditTextTag extends TextTag {
         txt = txt.replace("&apos;", "'");
         return txt;
     }
+    
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        if (variableName != null && !variableName.isEmpty()) {
+            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(false));
+        }
+        return ret;
+    }
 }
