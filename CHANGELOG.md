@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - [#2477] AS1/2 Switch in last statement of switch break labels
 - [#2338] AS2 Reading large classes with incorrect if jumps on the beginning
 - [#2338] AS1/2/3 Obfuscated code - jump to jump handling
+- [#1277] AS1/2 Propagate break/continue to avoid loop/switch labels
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3910,6 +3911,8 @@ Major version of SWF to XML export changed to 2.
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
+[#2338]: https://www.free-decompiler.com/flash/issues/2338
+[#1277]: https://www.free-decompiler.com/flash/issues/1277
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
@@ -4004,7 +4007,6 @@ Major version of SWF to XML export changed to 2.
 [#2330]: https://www.free-decompiler.com/flash/issues/2330
 [#2335]: https://www.free-decompiler.com/flash/issues/2335
 [#2334]: https://www.free-decompiler.com/flash/issues/2334
-[#2338]: https://www.free-decompiler.com/flash/issues/2338
 [#2337]: https://www.free-decompiler.com/flash/issues/2337
 [#2339]: https://www.free-decompiler.com/flash/issues/2339
 [#943]: https://www.free-decompiler.com/flash/issues/943

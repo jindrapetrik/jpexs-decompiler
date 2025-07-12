@@ -1016,7 +1016,7 @@ public class Graph {
         }
         expandGotos(ret);
         processIfs(ret);
-        processSwitchesAndLoops2(ret);
+        propagateBreaks(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
@@ -1024,34 +1024,63 @@ public class Graph {
     }
 
     /**
-     * This is needed to avoid loop identifiers in AS1/2. AS3 supports them, but
+     * This is needed to avoid loop/switch identifiers in AS1/2. AS3 supports them, but
      * AS1/2 not.
      *
-     * loop1: switch(a) { //has loop identifier case 1: trace("1"); break; case
-     * 2: //last case trace("2"); switch(b) { //last command is switch case 3:
-     * case 4: trace("4"); break loop1; //breaks parent loop case 5: trace("5");
-     * break loop1; case 6: trace("6"); } }
+     * <pre>
+     * loop1: switch(a) { //has loop identifier
+     *          case 1:
+     *              trace("1");
+     *              break;
+     *          case 2: //last case
+     *              trace("2");
+     *              switch(b) { //last command is switch case 3:
+     *                  case 4:
+     *                      trace("4");
+     *                      break loop1; //breaks parent loop
+     *                  case 5:
+     *                      trace("5");
+     *                      break loop1;
+     *                  case 6:
+     *                      trace("6");
+     *              }
+     *          }
      *
      * ==>
      *
-     * switch(a) { case 1: trace("1"); break; case 2: trace("2"); switch(b) {
-     * case 3: case 4: trace("4"); break; case 5: trace("5"); break; case 6:
-     * trace("6"); } }
+     * switch(a) {
+     *      case 1:
+     *          trace("1");
+     *          break;
+     *      case 2:
+     *          trace("2");
+     *          switch(b) {
+     *              case 3:
+     *              case 4:
+     *                  trace("4");
+     *                  break;
+     *              case 5:
+     *                  trace("5");
+     *                  break;
+     *              case 6:
+     *                  trace("6");
+     *          }
+     * }
      *
-     * It also does similar thing to loops and continues.
+     * </pre> It also does similar thing to loops and continues.
      *
      *
      *
      *
      * @param list Items
      */
-    protected void processSwitchesAndLoops2(List<GraphTargetItem> list) {
+    protected void propagateBreaks(List<GraphTargetItem> list) {
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if (item instanceof Block) {
                 Block bl = (Block) item;
                 for (List<GraphTargetItem> subList : bl.getSubs()) {
-                    processSwitchesAndLoops2(subList);
+                    propagateBreaks(subList);
                 }
             }
             if (item instanceof SwitchItem) {
@@ -1065,17 +1094,23 @@ public class Graph {
                 }
 
                 //Replace breaks in lastCommands loops
-                for (List<GraphTargetItem> com : sw.caseCommands) {
+                for (int h = 0; h < sw.caseCommands.size(); h++) {
+                    List<GraphTargetItem> com = sw.caseCommands.get(h);
                     List<GraphTargetItem> com2 = com;
                     if (com.isEmpty()) {
                         continue;
                     }
+                    boolean isLastCase = h == sw.caseCommands.size() - 1;
                     int last = com.size() - 1;
-                    if (!((com.get(last) instanceof BreakItem) && (((BreakItem) com.get(last)).loopId == sw.loop.id))) {
+                    boolean hasBreak = ((com.get(last) instanceof BreakItem) && (((BreakItem) com.get(last)).loopId == sw.loop.id));
+                    
+                    if (!isLastCase && !hasBreak) {
                         continue;
                     }
                     com2 = new ArrayList<>(com);
-                    com2.remove(com2.size() - 1);
+                    if (hasBreak) {
+                        com2.remove(com2.size() - 1);
+                    }
 
                     List<List<GraphTargetItem>> todos = new ArrayList<>();
                     todos.add(com2);
@@ -1087,7 +1122,22 @@ public class Graph {
                         }
                         GraphTargetItem lastCommand = currentList.get(currentList.size() - 1);
                         if (lastCommand instanceof LoopItem) {
-                            if (!(lastCommand instanceof SwitchItem)) {
+                            if (lastCommand instanceof SwitchItem) {
+                                SwitchItem innerSwitch = (SwitchItem) lastCommand;
+                                List<List<GraphTargetItem>> subs = innerSwitch.getSubs();
+                                for (int k = 0; k < subs.size(); k++) {
+                                    List<GraphTargetItem> caseCommands = subs.get(k);
+                                    if (caseCommands.isEmpty()) {
+                                        continue;
+                                    }
+                                    lastCommand = caseCommands.get(caseCommands.size() - 1);
+                                    if ((lastCommand instanceof BreakItem) || (lastCommand instanceof ContinueItem) || (lastCommand instanceof ExitItem)) {
+                                        changeBreakToBreak(caseCommands, sw.loop.id, innerSwitch.loop.id);                                    
+                                    } else if (k == subs.size() - 1) {
+                                        changeBreakToBreak(caseCommands, sw.loop.id, innerSwitch.loop.id);                                    
+                                    }                                
+                                }                                
+                            } else {
                                 LoopItem innerLoop = (LoopItem) lastCommand;
                                 changeBreakToBreak(innerLoop.getBaseBodyCommands(), sw.loop.id, innerLoop.loop.id);
                                 //Detect While
@@ -1105,7 +1155,7 @@ public class Graph {
                                                         body.remove(0);
                                                         WhileItem wh = new WhileItem(dialect, innerLoop.getSrc(), innerLoop.getLineStartItem(), innerLoop.loop, expr, body);
                                                         if (currentList == com2) {
-                                                            com.set(com.size() - 2, wh);
+                                                            com.set(com.size() - 1 - (hasBreak ? 1 : 0), wh);
                                                         } else {
                                                             currentList.set(currentList.size() - 1, wh);
                                                         }
@@ -1150,11 +1200,10 @@ public class Graph {
                         Block blk = (Block) lastCommand;
                         List<List<GraphTargetItem>> newTodos = new ArrayList<>(blk.getSubs());
                         if (!newTodos.isEmpty() && lastCommand instanceof SwitchItem) {
-                            List<List<GraphTargetItem>> newTodos2 = new ArrayList<>();
-                            newTodos2.add(newTodos.get(newTodos.size() - 1));
-                            newTodos = newTodos2;
+                            //empty
+                        } else {
+                            todos.addAll(newTodos);
                         }
-                        todos.addAll(newTodos);
                     }
                 }
                 //-----------------------
