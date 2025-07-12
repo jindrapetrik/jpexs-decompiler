@@ -35,11 +35,13 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -963,6 +965,17 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
 
             String typeStr = type.getSimpleName();
+            
+            if ("RGB".equals(typeStr)) {
+                try {
+                    Object val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
+                    if (val instanceof RGBA) {
+                        typeStr = "RGBA";
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    //ignore
+                }
+            }
 
             boolean bracketsDetected = false;
             if (swfType != null) {
@@ -1598,6 +1611,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //Hack to set CLIPACTIONRECORD parent
                 if ((obj instanceof CLIPACTIONS) && (v instanceof CLIPACTIONRECORD)) {
                     ((CLIPACTIONRECORD) v).setParentClipActions((CLIPACTIONS) obj);
+                }
+                
+                //Hack to set GRADRECORD to RGB or RGBA based on shape num
+                if (v instanceof GRADRECORD) {
+                    GRADRECORD grad = (GRADRECORD) v;
+                    if (editedTag instanceof ShapeTag) {
+                        ShapeTag shape = (ShapeTag) editedTag;
+                        if (shape.getShapeNum() >= 3) {
+                            grad.color = new RGBA(Color.black);
+                        } else {
+                            grad.color = new RGB(Color.black);
+                        }
+                    } else {
+                        grad.color = new RGBA(Color.black);
+                    }
                 }
 
                 if (obj instanceof HasSwfAndTag) {
