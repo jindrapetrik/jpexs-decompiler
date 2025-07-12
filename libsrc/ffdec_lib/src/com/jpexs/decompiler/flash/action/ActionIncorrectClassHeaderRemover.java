@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionListIterator;
+import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -69,6 +70,7 @@ public class ActionIncorrectClassHeaderRemover extends SWFDecompilerAdapter {
                     || (a instanceof ActionPop)
                     || (a instanceof ActionConstantPool)
                     || (a instanceof ActionDefineLocal) // obfuscated variable assignments
+                    || (a instanceof ActionStrictMode) // seen in obfuscated code
                 ) {
                 a.translate(ld, stack, output, ip, "");
             } else if (a instanceof ActionJump) {
