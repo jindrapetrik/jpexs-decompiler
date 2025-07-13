@@ -88,6 +88,7 @@ package
         TestInnerFunctionScope;
         TestInnerIf;
         TestInnerTry;
+        TestLoopInLoop;
         TestLogicalComputing;
         TestManualConvert;
         TestMetadata;

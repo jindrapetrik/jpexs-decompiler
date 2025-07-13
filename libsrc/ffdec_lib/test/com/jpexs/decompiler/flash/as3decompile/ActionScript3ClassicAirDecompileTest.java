@@ -1501,6 +1501,44 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testLoopInLoop() {
+        decompileMethod("classic_air", "testLoopInLoop", "var i:* = undefined;\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "var c:Boolean = true;\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "for(i = 0; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "if(!a)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"H\");\r\n"
+                + "}\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"L\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "while(!a);\r\n",
+                 false);
+    }
+
+    @Test
     public void testManualConvert() {
         decompileMethod("classic_air", "testManualConvert", "trace(\"String(this).length\");\r\n"
                 + "trace(String(this).length);\r\n",

@@ -111,19 +111,19 @@ public class Graph {
     /**
      * Debug flag to print all parts
      */
-    private boolean debugPrintAllParts = false;
+    private final boolean debugPrintAllParts = false;
     /**
      * Debug flag to print loop list
      */
-    private boolean debugPrintLoopList = false;
+    private final boolean debugPrintLoopList = false;
     /**
      * Debug flag to print getLoops
      */
-    private boolean debugGetLoops = false;
+    private final boolean debugGetLoops = false;
     /**
      * Debug flag to print decompilation progress (printGraph method)
      */
-    private boolean debugPrintGraph = false;
+    private final boolean debugPrintGraph = false;
     /**
      * Debug flag to not process Ifs
      */
@@ -1600,7 +1600,14 @@ public class Graph {
         for (Loop el : loops) {
             el.backEdges.clear();
             Set<GraphPart> uniqueRefs = new HashSet<>(el.loopContinue.refs);
-            for (GraphPart r : uniqueRefs) {
+            loopr: for (GraphPart r : uniqueRefs) {
+                for (Loop el2 : loops) {
+                    if (el2.phase == 1) {
+                        if (el2.loopContinue == r) {
+                            continue loopr;
+                        }
+                    }
+                }
                 if (el.loopContinue.leadsTo(localData, this, code, r, loops, throwStates, true)) {
                     el.backEdges.add(r);
                 }
@@ -3208,7 +3215,7 @@ public class Graph {
                         if (stopPart.get(i) == part) {
                             isRealStopPart = true;
                         }
-                        break;
+                        break;                                                
                     }
                 }
 
