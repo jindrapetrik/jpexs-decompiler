@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -95,9 +96,22 @@ public class AS2Generator {
                 doa = null;
             }
         }
-        try (FileOutputStream fos = new FileOutputStream("as2_teststub.java")) {
+        
+        String testFile = "test/com/jpexs/decompiler/flash/ActionScript2Test.java";
+        String txt = Helper.readTextFile(testFile);
+        
+        String startString = "//--FRAMES-START--";
+        String endString = "//--FRAMES-END--";
+        
+        String before = txt.substring(0, txt.indexOf(startString) + startString.length());
+        String after = txt.substring(txt.indexOf(endString));
+        
+        String result = before + "\r\n" + s.toString() + "\r\n    " + after;
+        Helper.writeFile(testFile, result.getBytes("UTF-8"));
+        
+        /*try (FileOutputStream fos = new FileOutputStream("as2_teststub.java")) {
             fos.write(Utf8Helper.getBytes(s.toString()));
-        }
+        }*/
         System.exit(0);
     }
 }
