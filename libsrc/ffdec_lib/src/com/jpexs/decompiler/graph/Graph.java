@@ -549,17 +549,24 @@ public class Graph {
         }
 
         List<GraphPart> loopContinues = new ArrayList<>();
+        List<GraphPart> loopBreaks = new ArrayList<>();
         for (Loop l : loops) {
             if (l.phase == 1) {
                 loopContinues.add(l.loopContinue);
                 if (l.loopPreContinue != null) {
                     loopContinues.add(l.loopPreContinue);
                 }
-            }
+                if (l.loopBreak != null) {
+                    loopBreaks.add(l.loopBreak);
+                }
+            }            
         }
 
         for (GraphPart p : parts) {
             if (loopContinues.contains(p)) {
+                break;
+            }
+            if (loopBreaks.contains(p)) {
                 break;
             }
             boolean common = true;
@@ -594,6 +601,9 @@ public class Graph {
             }
             if (common) {
                 if (loopContinues.contains(p)) {
+                    return null;
+                }
+                if (loopBreaks.contains(p)) {
                     return null;
                 }
                 return p;

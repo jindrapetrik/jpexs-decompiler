@@ -136,6 +136,7 @@ package
         TestWhileAnd;
         TestWhileBreak;
         TestWhileBreak2;
+        TestWhileBreak3;
         TestWhileContinue;
         TestWhileDoWhile;
         TestWhileSwitch;

@@ -2316,6 +2316,37 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testWhileBreak3() {
+        decompileMethod("classic", "testWhileBreak3", "var i:int = Math.floor(Math.random() * 11);\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "if(i < 100)\r\n"
+                + "{\r\n"
+                + "if(i < 0)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "if(i < 4)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "if(i == 4)\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "return i;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return i;\r\n",
+                 false);
+    }
+
+    @Test
     public void testWhileContinue() {
         decompileMethod("classic", "testWhileContinue", "var a:* = 5;\r\n"
                 + "while(true)\r\n"
