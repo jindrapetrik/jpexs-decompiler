@@ -86,6 +86,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
         return null;
     }
 
+    //--FRAMES-START--
     @Test
     public void frame23_Test() {
         compareSrc(23, "stop();\r\n"
@@ -2542,4 +2543,24 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"end\");\r\n"
         );
     }
+
+    @Test
+    public void frame94_functionSwitchTest() {
+        compareSrc(94, "function reset()\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "trace(\"functionSwitchTest\");\r\n"
+                + "stop();\r\n"
+                + "switch(test)\r\n"
+                + "{\r\n"
+                + "case 1:\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "case 3:\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+        );
+    }
+    //--FRAMES-END--
 }

@@ -72,6 +72,7 @@ import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -181,6 +182,7 @@ public class ActionGraph extends Graph {
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
+                        startIps.add(0);
                         continue;
                     }
                     int startIp = Action.adr2ip(alist, endAddr);
@@ -1012,6 +1014,19 @@ public class ActionGraph extends Graph {
         }
         return spd;
     }
+    
+    private GraphTargetItem getFirstListItem(List<GraphTargetItem> list) {
+        int i = 0;
+        while(i < list.size()) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof LabelItem) {
+                i++;
+                continue;
+            }
+            return item;
+        }
+        return null;        
+    }
 
     /**
      * Checks second pass switches.
@@ -1057,9 +1072,9 @@ public class ActionGraph extends Graph {
                             IfItem ii2 = ii;
                             IfItem lastOkayIi = ii;
                             while (true) {
-                                if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
-                                        || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
-                                    ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
+                                if ((isNeq && (getFirstListItem(ii2.onTrue) instanceof IfItem))
+                                        || (!isNeq && (getFirstListItem(ii2.onFalse) instanceof IfItem))) {
+                                    ii2 = (IfItem) (isNeq ? getFirstListItem(ii2.onTrue) : getFirstListItem(ii2.onFalse));
                                     if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
                                         isNeq = (ii2.expression instanceof StrictNeqActionItem);
                                         sneq = ((BinaryOpItem) ii2.expression);

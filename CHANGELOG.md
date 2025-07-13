@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - [#1277] AS1/2 Propagate break/continue to avoid loop/switch labels
 - [#2483] Editing shape gradient records - RGB vs RGBA
 - [#2486] AS Loop in loop producing gotos in some cases
+- [#2486] AS1/2 Switch after function, problem with labels
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
