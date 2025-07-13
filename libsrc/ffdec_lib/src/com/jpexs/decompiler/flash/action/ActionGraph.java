@@ -1017,7 +1017,7 @@ public class ActionGraph extends Graph {
     
     private GraphTargetItem getFirstListItem(List<GraphTargetItem> list) {
         int i = 0;
-        while(i < list.size()) {
+        while (i < list.size()) {
             GraphTargetItem item = list.get(i);
             if (item instanceof LabelItem) {
                 i++;
