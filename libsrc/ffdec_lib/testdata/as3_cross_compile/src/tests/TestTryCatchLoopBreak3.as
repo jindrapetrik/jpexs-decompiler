@@ -15,7 +15,7 @@ package tests
 			a = 0;			
 			trace("before loop");			
 			while (true) { 
-				
+				trace("a");
 				try
 				{
 					trace("in try"); 

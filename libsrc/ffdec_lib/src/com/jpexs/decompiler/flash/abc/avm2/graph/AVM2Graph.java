@@ -1220,13 +1220,26 @@ public class AVM2Graph extends Graph {
                 }
             }
 
+            //try in while
+            if (afterPart == part) {
+                afterPart = null;
+            }
+
             GraphPart exAfterPart = afterPart;
 
             if (finallyException == null) {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                stopPart2.add(afterPart);
                 List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
-                stopPartKind2.add(StopPartKind.OTHER);
+                if (afterPart != null) {
+                    stopPart2.add(afterPart);
+                    stopPartKind2.add(StopPartKind.OTHER);
+                }
+
+                for (Loop el : loops) {
+                    if (el.loopContinue == part && el.phase == 1) {
+                        el.phase = 4; //Special case: try inside loop. 4 is immediately switched back to 1 inside printGraph
+                    }
+                }
                 tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
             }
 
@@ -2654,23 +2667,22 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        
         AVM2FinalProcessLocalData adata = (AVM2FinalProcessLocalData) localData;
         //if(false)
         if (!adata.bottomSetLocals.isEmpty()) {
             boolean modified = false;
             for (int i = 0; i < list.size(); i++) {
-                
+
                 if (list.get(i) instanceof LoopItem) {
                     continue;
                 }
                 if (list.get(i) instanceof WithEndAVM2Item) {
                     continue;
                 }
-                
+
                 List<SetLocalAVM2Item> foundSetLoc = new ArrayList<>();
                 List<SetLocalAVM2Item> ignoredItems = new ArrayList<>();
-                
+
                 //We need to ignore everything on the right side of && and ||,                
                 list.get(i).visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                     @Override
@@ -2690,16 +2702,14 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 });
-                
+
                 list.get(i).visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                     @Override
                     public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
-                        
+
                         if (item instanceof SetLocalAVM2Item) {
-                            if (
-                                    adata.bottomSetLocals.contains((SetLocalAVM2Item) item)
-                                    && !ignoredItems.contains((SetLocalAVM2Item) item)
-                                ) {
+                            if (adata.bottomSetLocals.contains((SetLocalAVM2Item) item)
+                                    && !ignoredItems.contains((SetLocalAVM2Item) item)) {
                                 int s = parentStack.size() - 1;
                                 if (parentStack.get(s) instanceof CoerceAVM2Item) {
                                     s--;
@@ -2710,21 +2720,21 @@ public class AVM2Graph extends Graph {
                                     GraphTargetItem parent = parentStack.get(s);
                                     boolean move = true;
                                     if (parent instanceof SetTypeAVM2Item) {
-                                        SetTypeAVM2Item setType = (SetTypeAVM2Item) parent;                                                                                
-                                        
+                                        SetTypeAVM2Item setType = (SetTypeAVM2Item) parent;
+
                                         if (setType.getValue().getNotCoerced() == item) { //chained assignment                                            
                                             //if (!((parent instanceof SetLocalAVM2Item)
                                             //        && ((SetLocalAVM2Item)parent).regIndex == ((SetLocalAVM2Item) item).regIndex)) { //no chain for the same localreg
-                                            move = false;                                                                                       
-                                        }                                        
+                                            move = false;
+                                        }
                                     }
-                                    if (move) { 
+                                    if (move) {
                                         foundSetLoc.add(0, (SetLocalAVM2Item) item);
                                     }
-                                }                                
+                                }
                             }
                         }
-                    }                
+                    }
                 });
                 for (SetLocalAVM2Item setLoc : foundSetLoc) {
                     list.add(i, setLoc.clone());
@@ -2740,7 +2750,7 @@ public class AVM2Graph extends Graph {
                     GraphTargetItem lastExpr = list.remove(list.size() - 1);
                     List<GraphTargetItem> onTrue = new ArrayList<>();
                     BreakItem bi = new BreakItem(dialect, null, null, wi.loop.id);
-                    onTrue.add(bi);                    
+                    onTrue.add(bi);
                     IfItem ifi = new IfItem(dialect, null, null, lastExpr.invert(null), onTrue, new ArrayList<>());
                     list.add(ifi);
                     wi.commands.addAll(0, list);
@@ -2748,9 +2758,9 @@ public class AVM2Graph extends Graph {
                     list.add(new TrueItem(dialect, null, null));
                 }
             }
-            
+
         }
-        
+
         /*
         convert this situation:
         
@@ -2766,7 +2776,7 @@ public class AVM2Graph extends Graph {
         It's TestSwapAssignment assembled test case.
         
          */
-        /*for (int i = 0; i < list.size(); i++) {
+ /*for (int i = 0; i < list.size(); i++) {
 
             GraphTargetItem item = list.get(i);
             Map<Integer, List<SetLocalAVM2Item>> setRegisters = new HashMap<>();
@@ -2880,7 +2890,7 @@ public class AVM2Graph extends Graph {
             });
             i = newI.getVal();
         }
-        */
+         */
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
     }
@@ -2888,7 +2898,7 @@ public class AVM2Graph extends Graph {
     @Override
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
         FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).bottomSetLocals);
-        finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;        
+        finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;
         return finalProcess;
     }
 
@@ -3191,11 +3201,11 @@ public class AVM2Graph extends Graph {
     protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         return new SecondPassData();
     }
-    
+
     @Override
     protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
         GraphTargetItem result = stack.pop();
-        
+
         /*
         Fixes this case:
         
@@ -3212,8 +3222,7 @@ public class AVM2Graph extends Graph {
         dup
         setlocal x
         
-        */
-        
+         */
         if (stack.getMark("firstSetLocal") != null) {
             SetLocalAVM2Item setLocal = (SetLocalAVM2Item) stack.getMark("firstSetLocal");
             if (setLocal.directlyCausedByDup) {
@@ -3221,7 +3230,7 @@ public class AVM2Graph extends Graph {
                 setLocal.hideValue = true;
             }
         }
-        
+
         return result;
     }
 
@@ -3230,7 +3239,7 @@ public class AVM2Graph extends Graph {
         if (localData.swfVersion < 50) {
             return ternar;
         }
-        
+
         if (ternar.expression instanceof EqAVM2Item) {
             EqAVM2Item eq = (EqAVM2Item) ternar.expression;
             if (eq.rightSide instanceof NullAVM2Item) {
@@ -3243,7 +3252,7 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        
+
         if (ternar.expression instanceof NeqAVM2Item) {
             NeqAVM2Item neq = (NeqAVM2Item) ternar.expression;
             if (neq.rightSide instanceof NullAVM2Item) {
@@ -3252,7 +3261,41 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        
+
         return ternar;
-    }       
+    }
+
+    @Override
+    protected int checkIp(int ip) {
+        if (true) {
+            //return ip;
+        }
+        /*
+        Ignore label instructions
+        
+        <pre>
+        locA:
+            label
+        locB:
+            pushbyte 1
+        
+        =>
+        
+        locAB: 
+            pushbyte 1
+        </pre>
+         */
+        while (ip < code.size()) {
+            GraphSourceItem ins = code.get(ip);
+            if (!(ins instanceof AVM2Instruction)) {
+                break;
+            }
+            AVM2Instruction ains = (AVM2Instruction) ins;
+            if (!(ains.definition instanceof LabelIns)) {
+                break;
+            }
+            ip++;
+        }
+        return ip;
+    }
 }

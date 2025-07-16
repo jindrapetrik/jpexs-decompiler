@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - [#2486] AS Loop in loop producing gotos in some cases
 - [#2486] AS1/2 Switch after function, problem with labels
 - [#2486] AS ifs with direct breaks (in obfuscated code)
+- [#2486] AS3 skipping label instruction
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

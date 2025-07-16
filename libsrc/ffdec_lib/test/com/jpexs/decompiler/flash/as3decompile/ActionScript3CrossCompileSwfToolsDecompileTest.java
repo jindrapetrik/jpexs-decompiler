@@ -345,6 +345,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"before loop\");\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
+                + "trace(\"a\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"

@@ -1,0 +1,165 @@
+class
+ refid "tests:TestLabel"
+ instance QName(PackageNamespace("tests"), "TestLabel")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestLabel")
+  iinit
+   refid "tests:TestLabel/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    param QName(PackageNamespace(""),"String")      
+    refid "tests:TestLabel/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+            pushscope
+            getlocal1
+            pushbyte 0
+            pushbyte 1
+            callproperty QName(Namespace("http://adobe.com/AS3/2006/builtin"),"substr"), 2
+            coerce_s
+            setlocal2
+            pushfalse
+            setlocal3
+            pushbyte 0
+            convert_u
+            setlocal 4
+            jump ofs00aa
+   ofs0017:
+            label
+            jump ofs0025
+   ofs001c:
+            label
+            getlocal2
+            pushstring "L"
+            ifne ofs0025
+   ofs0024:
+            label
+   ofs0025:
+            returnvoid
+            pushtrue
+            iftrue ofs002b
+   ofs002b:
+            label
+            getlocal0
+            getlocal1
+            callpropvoid QName(PrivateNamespace(""),"_-9m"), 1
+            jump ofs0035
+   ofs0035:
+            label
+            jump ofs0017
+            getlocal0
+            getproperty QName(PackageNamespace(""),"_-J0")
+            getlocal1
+            callpropvoid QName(Namespace("http://adobe.com/AS3/2006/builtin"),"push"), 1
+            jump ofs0045
+   ofs0045:
+            label
+            getlocal 4
+            increment
+            convert_u
+            setlocal 4
+            jump ofs0050
+   ofs0050:
+            label
+            jump ofs0035
+            label
+            getlocal1
+            getlocal0
+            getproperty QName(PackageNamespace(""),"_-J0")
+            getlocal 4
+            getproperty MultinameL([PrivateNamespace("","1"),PackageNamespace(""),PrivateNamespace("","2"),PackageInternalNs(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("flash.display"),PackageNamespace("flash.events"),PackageNamespace("flash.system"),PackageNamespace("flash.text"),PackageNamespace("_-Pz"),PackageNamespace("com.newgrounds"),PackageNamespace("Playtomic"),PackageNamespace("flash.net"),PackageNamespace("flash.xml"),PackageNamespace("_-P2"),ProtectedNamespace("Main"),StaticProtectedNs("Main"),StaticProtectedNs("flash.display:MovieClip"),StaticProtectedNs("flash.display:Sprite"),StaticProtectedNs("flash.display:DisplayObjectContainer"),StaticProtectedNs("flash.display:InteractiveObject"),StaticProtectedNs("flash.display:DisplayObject"),StaticProtectedNs("flash.events:EventDispatcher"),StaticProtectedNs("Object")])
+            ifne ofs0062
+   ofs0062:
+            pushtrue
+            setlocal3
+            jump ofs0068
+   ofs0068:
+            label
+            jump ofs0024
+   ofs006d:
+            label
+            getlocal2
+            pushstring "A"
+            ifne ofs001c
+            pushbyte 0
+            convert_u
+            setlocal 4
+            jump ofs0050
+   ofs007e:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            getlocal1
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0068
+   ofs0089:
+            label
+            getlocal3
+            pushfalse
+            ifne ofs0068
+            jump ofs007e
+            label
+            getlocal 4
+            increment
+            convert_u
+            setlocal 4
+            jump ofs009f
+   ofs009f:
+            label
+            jump ofs0089
+            pushtrue
+            setlocal3
+            jump ofs00aa
+   ofs00aa:
+            getlocal2
+            pushstring "E"
+            ifne ofs006d
+            pushbyte 0
+            convert_u
+            setlocal 4
+            jump ofs009f
+            returnvoid
+      end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestLabel/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

@@ -781,7 +781,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case 4:\r\n"
                 + "trace(\"4\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "if(c)\r\n"
                 + "{\r\n"
