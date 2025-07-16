@@ -2775,8 +2775,8 @@ public class AVM2Graph extends Graph {
         
         It's TestSwapAssignment assembled test case.
         
-         */
- /*for (int i = 0; i < list.size(); i++) {
+        
+        for (int i = 0; i < list.size(); i++) {
 
             GraphTargetItem item = list.get(i);
             Map<Integer, List<SetLocalAVM2Item>> setRegisters = new HashMap<>();
@@ -2890,7 +2890,7 @@ public class AVM2Graph extends Graph {
             });
             i = newI.getVal();
         }
-         */
+        */
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
     }
