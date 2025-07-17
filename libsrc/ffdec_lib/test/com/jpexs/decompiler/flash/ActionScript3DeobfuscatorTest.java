@@ -17,32 +17,49 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGroupParts;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.Float4;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+import macromedia.asc.util.Decimal128;
 import org.testng.Assert;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -65,8 +82,97 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         Configuration.padAs3PCodeInstructionName.set(false);
         Configuration.useOldStyleGetSetLocalsAs3PCode.set(false);
         Configuration.labelOnSeparateLineAs3PCode.set(true);
+        Configuration.decompilationTimeoutSingleMethod.set(5);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
+
+    private void decompilePCode(String pCode, String expected) throws Exception {
+        pCode = "code\r\n"
+                + "getlocal0\r\n"
+                + "pushscope\r\n"
+                + pCode
+                + "returnvoid\r\n";
+        final ABC abc = new ABC(new ABCContainerTag() {
+            @Override
+            public ABC getABC() {
+                return null;
+            }
+
+            @Override
+            public SWF getSwf() {
+                return swf;
+            }
+
+            @Override
+            public int compareTo(ABCContainerTag o) {
+                return 0;
+            }
+
+            @Override
+            public void setABC(ABC abc) {
+            }
+        });
+        MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
+        AVM2Code code = ASM3Parser.parse(abc, new StringReader(pCode), null, new MissingSymbolHandler() {
+            //no longer ask for adding new constants
+            @Override
+            public boolean missingString(String value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingInt(long value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingUInt(long value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingDouble(double value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingDecimal(Decimal128 value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingFloat(float value) {
+                return true;
+            }
+
+            @Override
+            public boolean missingFloat4(Float4 value) {
+                return true;
+            }
+        }, b, new MethodInfo());
+        b.setCode(code);
+        abc.addMethodBody(b);
+        abc.addMethodInfo(new MethodInfo(new int[]{0}, 0, 0, 0, new ValueKind[0], new int[0]));
+
+        ClassInfo ci = new ClassInfo();
+        InstanceInfo ii = new InstanceInfo();
+        ii.name_index = abc.constants.addMultiname(
+                Multiname.createQName(
+                        false,
+                        abc.constants.getStringId("Test", true),
+                        abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)
+                ));
+        abc.addClass(ci, ii, 0);
+        ScriptInfo si = new ScriptInfo(new Traits());
+        abc.script_info.add(si);
+
+        code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
+        code.removeLabelsAndDebugLine(b);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        String actual = b.toSource(10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>());       
+        actual = actual.replace("\r\n", "\n");
+        assertEquals(actual, expected);
+    }      
 
     private String recompilePCode(String str, SWFDecompilerAdapter deobfuscator) throws IOException, AVM2ParseException, InterruptedException {
         str = "code\r\n"
@@ -316,6 +422,158 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "returnvoid\r\n");
     }
 
+    @Test
+    public void testIgnoreLabels() throws Exception {
+        decompilePCode("getlocal1\n"
+                + "            setlocal2\n"
+                + "            pushfalse\n"
+                + "            setlocal3\n"
+                + "            pushbyte 0\n"
+                + "            convert_u\n"
+                + "            setlocal 4\n"
+                + "            jump ofs00a4\n"
+                + "   ofs000f:\n"
+                + "            label\n"
+                + "            jump ofs001d\n"
+                + "   ofs0014:\n"
+                + "            label\n"
+                + "            getlocal2\n"
+                + "            pushstring \"C\"\n"
+                + "            ifne ofs001d\n"
+                + "   ofs001c:\n"
+                + "            label\n" //this label critical to be removed
+                + "   ofs001d:\n"
+                + "            returnvoid\n"
+                + "            pushtrue\n"
+                + "            iftrue ofs0023\n"
+                + "   ofs0023:\n"
+                + "            label\n"
+                + "            getlocal0\n"
+                + "            getlocal1\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump ofs002d\n"
+                + "   ofs002d:\n"
+                + "            label\n"
+                + "            jump ofs000f\n"
+                + "            getlocal0\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal1\n"
+                + "            callpropvoid QName(Namespace(\"http://adobe.com/AS3/2006/builtin\"),\"push\"), 1\n"
+                + "            jump ofs003d\n"
+                + "   ofs003d:\n"
+                + "            label\n"
+                + "            getlocal 4\n"
+                + "            increment\n"
+                + "            convert_u\n"
+                + "            setlocal 4\n"
+                + "            jump ofs0048\n"
+                + "   ofs0048:\n"
+                + "            label\n"
+                + "            jump ofs002d\n"
+                + "            label\n"
+                + "            getlocal1\n"
+                + "            getlocal0\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"xxx\")\n"
+                + "            getlocal 4\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"xxx\")\n"
+                + "            ifne ofs005c\n"
+                + "   ofs005c:\n"
+                + "            pushtrue\n"
+                + "            setlocal3\n"
+                + "            jump ofs0062\n"
+                + "   ofs0062:\n"
+                + "            label\n"
+                + "            jump ofs001c\n"
+                + "   ofs0067:\n"
+                + "            label\n"
+                + "            getlocal2\n"
+                + "            pushstring \"B\"\n"
+                + "            ifne ofs0014\n"
+                + "            pushbyte 0\n"
+                + "            convert_u\n"
+                + "            setlocal 4\n"
+                + "            jump ofs0048\n"
+                + "   ofs0078:\n"
+                + "            label\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal1\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump ofs0062\n"
+                + "   ofs0083:\n"
+                + "            label\n"
+                + "            getlocal3\n"
+                + "            pushfalse\n"
+                + "            ifne ofs0062\n"
+                + "            jump ofs0078\n"
+                + "            label\n"
+                + "            getlocal 4\n"
+                + "            increment\n"
+                + "            convert_u\n"
+                + "            setlocal 4\n"
+                + "            jump ofs0099\n"
+                + "   ofs0099:\n"
+                + "            label\n"
+                + "            jump ofs0083\n"
+                + "            pushtrue\n"
+                + "            setlocal3\n"
+                + "            jump ofs00a4\n"
+                + "   ofs00a4:\n"
+                + "            getlocal2\n"
+                + "            pushstring \"A\"\n"
+                + "            ifne ofs0067\n"
+                + "            pushbyte 0\n"
+                + "            convert_u\n"
+                + "            setlocal 4\n"
+                + "            jump ofs0099\n", "         var _loc2_:* = param1;\n"
+                + "         var _loc4_:uint = 0;\n"
+                + "         if(_loc2_ == \"A\")\n"
+                + "         {\n"
+                + "            _loc4_ = 0;\n"
+                + "            trace(param1);\n"
+                + "         }\n"
+                + "         else if(_loc2_ == \"B\")\n"
+                + "         {\n"
+                + "            _loc4_ = 0;\n"
+                + "         }\n"
+                + "         else if(_loc2_ == \"C\")\n"
+                + "         {\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testWhileTrue() throws Exception {
+        decompilePCode(
+"            getlex QName(PackageNamespace(\"\"),\"Math\")\n" +
+"            getlex QName(PackageNamespace(\"\"),\"Math\")\n" +
+"            debugline 8\n" +
+"            callproperty QName(PackageNamespace(\"\"),\"random\"), 0\n" +
+"            pushbyte 6\n" +
+"            multiply\n" +
+"            callproperty QName(PackageNamespace(\"\"),\"floor\"), 1\n" +
+"            convert_i\n" +
+"            setlocal1\n" +
+"            getlocal1\n" +
+"            debugline 10\n" +
+"            pushbyte 4\n" +
+"            ifngt ofs0034\n" +
+"            jump ofs0030\n" +
+"   ofs002d:\n" +
+"            label\n" +
+"            debugline 11\n" +
+"   ofs0030:\n" +
+"            jump ofs002d\n" +
+"   ofs0034:\n" +
+"            ", "         param1 = Math.floor(Math.random() * 6);\n" +
+"         if(param1 <= 4)\n" +
+"         {\n" +
+"            return;\n" +
+"         }\n" +
+"         while(true)\n" +
+"         {\n" +
+"         }\n");
+        
+    }
+    
     // TODO: JPEXS @Test
     public void testNotRemoveParams() throws Exception {
         String res = recompile("function tst(p1,p2){"

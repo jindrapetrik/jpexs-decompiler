@@ -3652,12 +3652,38 @@ public class AVM2Code implements Cloneable {
                     cnt++;
                 }
             }
+            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {                
+                ins.setIgnored(true, 0);
+                if (minChangedIp == -1 || minChangedIp > i) {
+                    minChangedIp = i;
+                }
+                cnt++;
+            }
         }
 
         removeIgnored(body);
 
         minChangedIpRef.setVal(minChangedIp);
 
+        return cnt;
+    }
+    
+    /**
+     * Removes label and debugline instructions
+     * @param body Method body
+     * @return Number of removed instructions
+     * @throws InterruptedException 
+     */
+    public int removeLabelsAndDebugLine(MethodBody body) throws InterruptedException {        
+        int cnt = 0;
+        for (int i = code.size() - 1; i >= 0; i--) {
+            AVM2Instruction ins = code.get(i);            
+            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {                
+                ins.setIgnored(true, 0);
+                cnt++;
+            }
+        }
+        removeIgnored(body);       
         return cnt;
     }
 

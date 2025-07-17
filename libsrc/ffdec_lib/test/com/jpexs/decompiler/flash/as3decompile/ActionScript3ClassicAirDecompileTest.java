@@ -425,8 +425,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testDefaultNotLastGrouped", "var k:int = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
-                + "case \"six\":\r\n"
                 + "default:\r\n"
+                + "case \"six\":\r\n"
                 + "trace(\"def and 6\");\r\n"
                 + "case \"five\":\r\n"
                 + "trace(\"def and 6 and 5\");\r\n"
@@ -2419,6 +2419,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"E\");\r\n"
                 + "}\r\n"
                 + "i++;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testWhileTrue() {
+        decompileMethod("classic_air", "testWhileTrue", "var a:int = Math.floor(Math.random() * 6);\r\n"
+                + "if(a <= 4)\r\n"
+                + "{\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
                 + "}\r\n",
                  false);
     }

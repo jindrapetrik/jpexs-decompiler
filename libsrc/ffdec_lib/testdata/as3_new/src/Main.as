@@ -140,6 +140,7 @@ package
         TestWhileContinue;
         TestWhileDoWhile;
         TestWhileSwitch;
+        TestWhileTrue;
         TestWhileTry;
         TestWhileTry2;        
         TestXml;

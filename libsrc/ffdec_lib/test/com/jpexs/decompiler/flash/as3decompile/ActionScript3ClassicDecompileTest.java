@@ -2417,6 +2417,18 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testWhileTrue() {
+        decompileMethod("classic", "testWhileTrue", "var a:int = Math.floor(Math.random() * 6);\r\n"
+                + "if(a > 4)\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testWhileTry() {
         decompileMethod("classic", "testWhileTry", "while(true)\r\n"
                 + "{\r\n"

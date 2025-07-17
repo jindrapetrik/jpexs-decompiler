@@ -3263,39 +3263,5 @@ public class AVM2Graph extends Graph {
         }
 
         return ternar;
-    }
-
-    @Override
-    protected int checkIp(int ip) {
-        if (true) {
-            //return ip;
-        }
-        /*
-        Ignore label instructions
-        
-        <pre>
-        locA:
-            label
-        locB:
-            pushbyte 1
-        
-        =>
-        
-        locAB: 
-            pushbyte 1
-        </pre>
-         */
-        while (ip < code.size()) {
-            GraphSourceItem ins = code.get(ip);
-            if (!(ins instanceof AVM2Instruction)) {
-                break;
-            }
-            AVM2Instruction ains = (AVM2Instruction) ins;
-            if (!(ains.definition instanceof LabelIns)) {
-                break;
-            }
-            ip++;
-        }
-        return ip;
-    }
+    }   
 }

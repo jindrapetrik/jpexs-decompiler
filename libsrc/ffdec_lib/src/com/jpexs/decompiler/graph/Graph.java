@@ -4125,6 +4125,9 @@ public class Graph {
                 }
 
                 GraphPart nextPart = part.nextParts.get(0);
+                if (nextPart == part) {
+                    continue;
+                }
 
                 for (GraphPart r : part.refs) {
                     while (true) {

@@ -631,6 +631,7 @@ public final class MethodBody implements Cloneable {
         if (deobfuscate) {
             try {
                 code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
+                code.removeLabelsAndDebugLine(body);
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {
