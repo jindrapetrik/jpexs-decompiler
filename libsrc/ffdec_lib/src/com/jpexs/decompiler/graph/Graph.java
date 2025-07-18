@@ -3241,8 +3241,9 @@ public class Graph {
                     }
                 }*/
 
-                //isRealStopPart = stopPart.get(stopPart.size() - 1) == part;
-                for (int i = stopPartKind.size() - 1; i >= 0; i--) {
+                
+                //This weird stuff also tries to handle some goto problems
+                for (int i = stopPartKind.size() - 1; i >= 0; i--) {                    
                     if (stopPartKind.get(i) == StopPartKind.OTHER && stopPart.get(i) == part) {
                         isRealStopPart = true;
                         break;
@@ -3250,11 +3251,13 @@ public class Graph {
                     if (stopPartKind.get(i) == StopPartKind.BLOCK_CLOSE) {
                         if (stopPart.get(i) == part) {
                             isRealStopPart = true;
+                        } else if (stopPart.get(i).start >= code.size()) { //end of as1/2 function
+                            continue;
                         }
                         break;
                     }
                 }
-
+                                               
                 if (isRealStopPart) {
                     if (currentLoop != null) {
                         currentLoop.phase = 0;
