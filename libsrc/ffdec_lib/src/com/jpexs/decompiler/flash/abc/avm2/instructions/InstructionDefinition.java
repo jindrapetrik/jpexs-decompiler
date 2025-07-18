@@ -506,9 +506,9 @@ public abstract class InstructionDefinition implements Serializable {
         Traits traits = null;
         if (obj instanceof NewActivationAVM2Item) {
             traits = localData.methodBody.traits;
-        } else if (obj instanceof ThisAVM2Item) {
+        } else if (obj instanceof ThisAVM2Item && localData.classIndex > -1) {            
             traits = localData.abc.instance_info.get(localData.classIndex).instance_traits;
-        } else if (obj instanceof ClassAVM2Item) {
+        } else if (obj instanceof ClassAVM2Item && localData.classIndex > -1) {
             traits = localData.abc.class_info.get(localData.classIndex).static_traits;
         } else if (obj instanceof GlobalAVM2Item) {
             traits = localData.abc.script_info.get(localData.scriptIndex).traits;

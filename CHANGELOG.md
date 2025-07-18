@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - [#2486] AS ifs with direct breaks (in obfuscated code)
 - [#2486] AS3 skipping label instruction
 - Highlighter nullpointer
+- AS3 search slot name Index out of bounds
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
