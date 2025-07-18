@@ -52,6 +52,9 @@ public class Markers {
      */
     public static void removeMarkers(JTextComponent component, SimpleMarker marker) {
         Highlighter hilite = component.getHighlighter();
+        if (hilite == null) {
+            return;
+        }
         Highlighter.Highlight[] hilites = hilite.getHighlights();
 
         for (int i = 0; i < hilites.length; i++) {
