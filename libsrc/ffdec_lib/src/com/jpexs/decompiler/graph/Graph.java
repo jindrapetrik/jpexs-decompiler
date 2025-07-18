@@ -3251,8 +3251,6 @@ public class Graph {
                     if (stopPartKind.get(i) == StopPartKind.BLOCK_CLOSE) {
                         if (stopPart.get(i) == part) {
                             isRealStopPart = true;
-                        } else if (stopPart.get(i).start >= code.size()) { //end of as1/2 function
-                            continue;
                         }
                         break;
                     }
@@ -3672,9 +3670,16 @@ public class Graph {
                         List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                         List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
 
-                        if ((!isEmpty) && (next != null)) {
+                        if (!isEmpty && next != null) {
+                            //handle end of as1/2 script or function
+                            if (next.start >= code.size()) {
+                                next = null;
+                            }
+                        }
+                        
+                        if ((!isEmpty) && (next != null)) {                                                                               
                             stopPart2.add(next);
-                            stopPartKind2.add(StopPartKind.BLOCK_CLOSE);
+                            stopPartKind2.add(StopPartKind.BLOCK_CLOSE);                            
                         }
 
                         List<GraphTargetItem> onTrue = new ArrayList<>();
