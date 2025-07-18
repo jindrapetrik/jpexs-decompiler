@@ -4764,7 +4764,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             } catch (CancellationException ex) {
                 throw ex;
             } catch (Exception ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, "Reading action list error in " + src.getSwf().getShortPathTitle() + ":" + src.getScriptName(), ex);
                 return new ActionList(src.getSwf().getCharset());
             }
         }
