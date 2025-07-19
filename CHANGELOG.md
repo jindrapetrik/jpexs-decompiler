@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - [#2486] AS3 skipping label instruction
 - Highlighter nullpointer
 - AS3 search slot name Index out of bounds
+- AS text search - not being able to cancel search over multiple swf files
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

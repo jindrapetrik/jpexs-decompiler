@@ -757,8 +757,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         try {
             SWF.initPlayer();
-        } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "IOException during SWF.initplayer", ex);
+        } catch (InterruptedException ex) {
+            return new AbcIndexing();
         }
         abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
         for (Tag tag : tags) {
@@ -784,7 +786,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param swfs List of SWFs to set as dependencies
      */
-    public void setAbcIndexDependencies(List<SWF> swfs) {
+    public void setAbcIndexDependencies(List<SWF> swfs) throws InterruptedException {
         abcIndex = null;
         getAbcIndex();
         for (SWF swf : swfs) {
@@ -3998,7 +4000,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param renameType Rename type
      * @return Number of changes
      */
-    public int deobfuscateAS3Identifiers(RenameType renameType) {
+    public int deobfuscateAS3Identifiers(RenameType renameType) throws InterruptedException {
         AbcIndexing ai = getAbcIndex();
         Map<Tag, Map<Integer, String>> stringUsageTypesMap = new HashMap<>();
         Map<Tag, Set<Integer>> stringUsagesMap = new HashMap<>();

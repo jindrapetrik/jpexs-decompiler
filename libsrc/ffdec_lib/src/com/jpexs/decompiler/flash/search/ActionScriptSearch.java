@@ -128,7 +128,10 @@ public class ActionScriptSearch {
                         } catch (CancellationException ex) {
                             throw new InterruptedException();
                         } catch (ExecutionException ex) {
-                            Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, null, ex);
+                            if (ex.getCause() instanceof InterruptedException) {
+                                throw (InterruptedException) ex.getCause();
+                            }
+                            Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, "Execution exception during search", ex);                            
                         }
                     }
                 }
@@ -266,7 +269,10 @@ public class ActionScriptSearch {
                     } catch (CancellationException ex) {
                         throw new InterruptedException();
                     } catch (ExecutionException ex) {
-                        Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, null, ex);
+                        if (ex.getCause() instanceof InterruptedException) {
+                            throw (InterruptedException) ex.getCause();
+                        }
+                        Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, "Execution exception during search", ex);
                     }
                 }
             } catch (InterruptedException ex) {
