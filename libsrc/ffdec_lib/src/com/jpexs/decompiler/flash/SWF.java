@@ -786,9 +786,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param swfs List of SWFs to set as dependencies
      */
-    public void setAbcIndexDependencies(List<SWF> swfs) throws InterruptedException {
+    public void setAbcIndexDependencies(List<SWF> swfs) {
         abcIndex = null;
         getAbcIndex();
+        if (abcIndex == null) {
+            return;
+        }
         for (SWF swf : swfs) {
             for (Tag tag : swf.tags) {
                 if (tag instanceof ABCContainerTag) {
