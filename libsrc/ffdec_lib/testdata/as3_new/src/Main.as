@@ -118,6 +118,7 @@ package
         TestStringConcat;
         TestStrings;        
         TestSwitch;
+        TestSwitchBig;
         TestSwitchContinue;
         TestSwitchComma;
         TestSwitchDefault;

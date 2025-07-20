@@ -424,8 +424,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
         decompileMethod("classic", "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
-                + "case \"six\":\r\n"
                 + "default:\r\n"
+                + "case \"six\":\r\n"
                 + "trace(\"def and 6\");\r\n"
                 + "case \"five\":\r\n"
                 + "trace(\"def and 6 and 5\");\r\n"
@@ -1921,6 +1921,35 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "case 89:\r\n"
                 + "trace(\"eightynine\");\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testSwitchBig() {
+        decompileMethod("classic", "testSwitchBig", "var k:* = 10;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "case \"C\":\r\n"
+                + "trace(\"BC\");\r\n"
+                + "break;\r\n"
+                + "case \"D\":\r\n"
+                + "default:\r\n"
+                + "case \"E\":\r\n"
+                + "trace(\"D-default-E\");\r\n"
+                + "break;\r\n"
+                + "case \"F\":\r\n"
+                + "trace(\"F no break\");\r\n"
+                + "case \"G\":\r\n"
+                + "trace(\"G\");\r\n"
+                + "break;\r\n"
+                + "case \"H\":\r\n"
+                + "trace(\"H last\");\r\n"
+                + "}\r\n"
+                + "trace(\"after switch\");\r\n",
                  false);
     }
 

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
+import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
@@ -1383,7 +1384,7 @@ public class Graph {
      * @param list List of GraphTargetItems
      * @param lastLoopId Last loop id
      */
-    protected final void processSwitches(List<GraphTargetItem> list, long lastLoopId) {
+    protected void processSwitches(List<GraphTargetItem> list, long lastLoopId) {
         loopi:
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
@@ -2311,6 +2312,25 @@ public class Graph {
         translatePart(localData, part, stack, staticOperation, null);
         return stack.pop();
     }
+    
+    /**
+     * Translates part and get its stack with output
+     *
+     * @param localData Local data
+     * @param part Part
+     * @param stack Translate stack
+     * @param staticOperation Unused
+     * @return Top of the stack
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
+     */
+    //@SuppressWarnings("unchecked")
+    protected final GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, List<GraphTargetItem> output) throws InterruptedException, GraphPartChangeException {
+        stack = (TranslateStack) stack.clone();
+        output.clear();
+        output.addAll(translatePart(localData, part, stack, staticOperation, null));
+        return stack.pop();
+    }
 
     /**
      * Translates part.
@@ -3194,6 +3214,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding break");
                     }
+                    makeAllCommands(ret, stack);
                     ret.add(new BreakItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
@@ -3204,6 +3225,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding precontinue");
                     }
+                    makeAllCommands(ret, stack);                    
                     ret.add(new ContinueItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
@@ -3214,6 +3236,7 @@ public class Graph {
                     if (debugPrintGraph) {
                         System.err.println("Adding continue");
                     }
+                    makeAllCommands(ret, stack);                    
                     ret.add(new ContinueItem(dialect, null, localData.lineStartInstruction, el.id));
                     return ret;
                 }
@@ -3267,8 +3290,10 @@ public class Graph {
                 }
             }
 
-            if (code.size() <= part.start) {
-                ret.add(new ScriptEndItem(dialect));
+            if (code.size() <= part.start) {                
+                if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
+                    ret.add(new ScriptEndItem(dialect));
+                }
                 return ret;
             }
 
@@ -3428,7 +3453,9 @@ public class Graph {
                     }
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
-                    output.add(new ScriptEndItem(dialect));
+                    if (!(!output.isEmpty() && output.get(output.size() - 1) instanceof ExitItem)) {
+                        output.add(new ScriptEndItem(dialect));
+                    }
                 }
             }
 
@@ -4651,7 +4678,8 @@ public class Graph {
                 stopPart2x.add(breakPart);
                 stopPartKind2x.add(StopPartKind.OTHER);
             }
-            currentCaseCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
+            TranslateStack subStack = (TranslateStack) stack.clone();
+            currentCaseCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, subStack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
             if (willHaveBreak) {
                 if (!currentCaseCommands.isEmpty()) {
                     GraphTargetItem last = currentCaseCommands.get(currentCaseCommands.size() - 1);
@@ -4660,8 +4688,7 @@ public class Graph {
                     }
                 }
             }
-            caseCommands.add(currentCaseCommands);
-            makeAllCommands(currentCaseCommands, stack);
+            caseCommands.add(currentCaseCommands);            
         }
 
         /*

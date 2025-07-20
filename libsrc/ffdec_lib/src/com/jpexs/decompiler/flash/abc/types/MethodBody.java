@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCodeException;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorPushFalseIfFalse;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -641,6 +642,11 @@ public final class MethodBody implements Cloneable {
                 code = body.getCode();
                 code.fixJumps(path, body);
                 return body;
+            }
+        } else {
+            //This needs to be done otherwise some switch testcases fail. (Flex)
+            try (Statistics s = new Statistics("AVM2DeobfuscatorPushFalseIfFalse")) {
+                new AVM2DeobfuscatorPushFalseIfFalse().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, method_info, body);
             }
         }
 
