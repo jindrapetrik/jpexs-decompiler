@@ -596,6 +596,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         boolean skippedInstructionsUnknown = false;
         boolean jumpedHere = true;
         boolean jumpFound = false;
+        boolean pushDuplicateBefore = false;
         while (true) {
             if (item.isExcluded()) {
                 break;
@@ -665,7 +666,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
             if (!(action instanceof ActionPush
                     || action instanceof ActionPushDuplicate
-                    || action instanceof ActionPop
+                    || (action instanceof ActionPop && pushDuplicateBefore)
                     || action instanceof ActionAsciiToChar
                     || action instanceof ActionCharToAscii
                     || action instanceof ActionDecrement
@@ -726,6 +727,12 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 if (!ok) {
                     break;
                 }
+            }
+            
+            if (action instanceof ActionPushDuplicate) {
+                pushDuplicateBefore = true;
+            } else if (!(action instanceof ActionIf) && !(action instanceof ActionJump) && !(action instanceof ActionNot)) {
+                pushDuplicateBefore = false;
             }
 
             boolean isEnd = action instanceof ActionEnd;

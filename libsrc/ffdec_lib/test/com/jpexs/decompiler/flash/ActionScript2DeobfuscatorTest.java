@@ -71,6 +71,17 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         return writer.toString();
     }
 
+    private String decompilePCode(String str) throws Exception {
+        List<Action> actions = ASMParser.parse(0, true, str, swf.version, false, swf.getCharset());
+
+        DoActionTag doa = getFirstActionTag();
+        doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+        writer.finishHilights();
+        return writer.toString().trim().replace("\r\n", "\n");
+    }
+
     @DataProvider(name = "provideBasicTrueExpressions")
     public Object[][] provideBasicTrueExpressions() {
         return new Object[][]{
@@ -297,7 +308,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail();
         }
     }
-    
+
     @Test
     public void testRemoveGetTimeWithJumpTo() {
         String actionsString = "ConstantPool \"a\"\n"
@@ -357,7 +368,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail();
         }
     }
-    
+
     @Test
     public void testRemoveGetTimeAndIncrementWithJumpTo() {
         String actionsString = "ConstantPool \"a\"\n"
@@ -390,7 +401,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail();
         }
     }
-    
+
     @Test
     public void testJumpAfterFunctionEnd() {
         String actionsString = "ConstantPool \"a\", \"b\", \"c\", \"d\"\n"
@@ -426,16 +437,16 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             Pattern patOnce = Pattern.compile("\"once\"");
             Matcher m = patOnce.matcher(actualResult);
             int count = 0;
-            while(m.find()) {
+            while (m.find()) {
                 count++;
-            }            
-            
-            Assert.assertEquals(count, 1, "The string \"once\" should only appear once.");            
+            }
+
+            Assert.assertEquals(count, 1, "The string \"once\" should only appear once.");
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }
     }
-    
+
     @Test
     public void testRemoveForInReturnsWithJumpsEnd() {
         String actionsString = "Jump locA\n"
@@ -463,39 +474,49 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail();
         }
     }
-    
+
     @Test
-    public void testRemoveAndOr() {
-        String actionsString = "Push 1\n"
+    public void testRemoveAnd() throws Exception {
+        String pcode = "ConstantPool \"v\"\n"
+                + "Push \"v\"\n"
+                + "Push 1\n"
                 + "Push 2\n"
-                + "Equals\n"
+                + "Less2\n"
                 + "PushDuplicate\n"
-                + "If locA\n"
+                + "Not\n"
+                + "If loc0036\n"
                 + "Pop\n"
-                + "Push 3\n"
-                + "Push 4\n"
-                + "Equals\n"
-                + "locA:If locB\n"
-                + "Push \"One\"\n"
-                + "Trace\n"
-                + "Jump locC\n"
-                + "locB: Push \"Two\"\n"
-                + "Trace\n"
-                + "locC:Push \"End\"\n"
-                + "Trace\n";
-        try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+                + "Push 2\n"
+                + "Push 8\n"
+                + "Less2\n"
+                + "loc0036:DefineLocal\n";
+        String actualResult = decompilePCode(pcode);
+        Assert.assertEquals(actualResult, "var v = true;");
+    }
 
-            DoActionTag doa = getFirstActionTag();
-            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
-            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
-            writer.finishHilights();
-            String actualResult = writer.toString().trim().replace("\r\n", "\n");
+    @Test
+    public void testRemoveOr() throws Exception {
+        String pcode = "ConstantPool \"v\"\n"
+                + "Push \"v\"\n"
+                + "Push 1\n"
+                + "Push 2\n"
+                + "Less2\n"
+                + "PushDuplicate\n"
+                + "If loc0035\n"
+                + "Pop\n"
+                + "Push 2\n"
+                + "Push 8\n"
+                + "Less2\n"
+                + "loc0035:DefineLocal\n";
+        String actualResult = decompilePCode(pcode);
+        Assert.assertEquals(actualResult, "var v = true;");
+    }
 
-            Assert.assertEquals(actualResult, "trace(\"One\");\ntrace(\"End\");");
-        } catch (IOException | ActionParseException | InterruptedException ex) {
-            fail();
-        }
+    @Test
+    public void testPopMustStayIntact() throws Exception {
+        String expected = "test < 100 ? (test > -100 ? 0 : f()) : g();";
+        String actual = recompile(expected);
+        actual = actual.trim();
+        Assert.assertEquals(actual, expected);
     }
 }
