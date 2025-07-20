@@ -39,6 +39,8 @@ All notable changes to this project will be documented in this file.
 - AS3 search slot name Index out of bounds
 - AS text search - not being able to cancel search over multiple swf files
 - [#2486] AS3 switches detection in some cases
+- AS1/2 Hide icons panel when editing
+- AS1/2 both pcode and AS editable at the same time
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

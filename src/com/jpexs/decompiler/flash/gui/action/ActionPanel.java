@@ -202,6 +202,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     
     private JPanel pcodePanel;
 
+    private JPanel iconsPanel;
+    
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
     }
@@ -988,7 +990,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         
         brokenHintPanel.setVisible(false);
 
-        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JToggleButton deobfuscateButton = new JToggleButton(View.getIcon("deobfuscate16"));
         deobfuscateButton.setMargin(new Insets(5, 5, 5, 5));
         deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
@@ -1200,6 +1202,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         mainPanel.setEditingStatus();
         saveButton.setEnabled(value);
         cancelButton.setEnabled(value);
+        topButtonsPan.setVisible(false);
+        decompiledEditor.setEditable(false);
     }
 
     private boolean isDecompiledModified() {
@@ -1215,6 +1219,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         mainPanel.setEditingStatus();
         saveDecompiledButton.setEnabled(value);
         cancelDecompiledButton.setEnabled(value);
+        iconsPanel.setVisible(false);
+        editor.setEditable(false);
     }
 
     public void setEditMode(boolean val) {
@@ -1232,11 +1238,13 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         if (Configuration.editorMode.get()) {
             editor.setEditable(true);
+            decompiledEditor.setEditable(true);
             editButton.setVisible(false);
             saveButton.setVisible(true);
             saveButton.setEnabled(false);
             cancelButton.setVisible(true);
             cancelButton.setEnabled(false);
+            topButtonsPan.setVisible(true);
         } else {
             editor.setEditable(val);
             saveButton.setVisible(val);
@@ -1245,6 +1253,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             cancelButton.setVisible(val);
             
             editDecompiledButton.setEnabled(!val);
+            topButtonsPan.setVisible(!val);
         }
 
         editor.getCaret().setVisible(true);
@@ -1266,12 +1275,14 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
 
         if (Configuration.editorMode.get()) {
+            editor.setEditable(true);
             decompiledEditor.setEditable(true);
             editDecompiledButton.setVisible(false);
             saveDecompiledButton.setVisible(true);
             saveDecompiledButton.setEnabled(false);
             cancelDecompiledButton.setVisible(true);
             cancelDecompiledButton.setEnabled(false);
+            iconsPanel.setVisible(true);            
         } else {
             decompiledEditor.setEditable(val);
             saveDecompiledButton.setVisible(val);
@@ -1279,6 +1290,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             editDecompiledButton.setVisible(!val);
             cancelDecompiledButton.setVisible(val);
             pcodePanel.setVisible(!val);
+            iconsPanel.setVisible(!val);
         }
         decompiledEditor.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
