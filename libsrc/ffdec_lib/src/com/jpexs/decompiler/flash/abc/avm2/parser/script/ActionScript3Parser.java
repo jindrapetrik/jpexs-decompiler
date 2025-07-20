@@ -2713,18 +2713,22 @@ public class ActionScript3Parser {
                 ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);
                 allowMemberOrCall = true;
 
-                //var = memberOrCall(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
-                //ret = var;
                 break;
             default:
-                GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);
-                if (excmd != null) {
-                    //?
-                    ret = excmd;
-                    allowMemberOrCall = true; //?
-                    break;
+                if (s.isType(SymbolGroup.IDENTIFIER)) {
+                    lexer.pushback(s);
+                    ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);
+                    allowMemberOrCall = true;
+                } else {
+                    GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);
+                    if (excmd != null) {
+                        //?
+                        ret = excmd;
+                        allowMemberOrCall = true; //?
+                        break;
+                    }
+                    lexer.pushback(s);
                 }
-                lexer.pushback(s);
         }
         if (allowMemberOrCall && ret != null) {
             ret = memberOrCall(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables, abc);

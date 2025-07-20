@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -2123,6 +2122,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 break;
             default:
                 lexer.pushback(s);
+                if (s.isType(SymbolGroup.IDENTIFIER)) {
+                    lastVarName = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                    ret = true;
+                    allowMemberOrCall = true;                
+                }                                
         }
         if (allowMemberOrCall && ret) {
             memberOrCall(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);

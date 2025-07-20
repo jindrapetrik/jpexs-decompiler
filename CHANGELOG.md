@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - [#2486] AS3 switches detection in some cases
 - AS1/2 Hide icons panel when editing
 - AS1/2 both pcode and AS editable at the same time
+- AS3 direct editation - Allow some special words (like `override`) as identifiers
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
