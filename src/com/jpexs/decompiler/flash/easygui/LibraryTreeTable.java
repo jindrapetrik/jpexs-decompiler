@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Helper;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
 import java.awt.Color;
@@ -38,6 +40,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
@@ -384,12 +389,17 @@ public class LibraryTreeTable extends JTreeTable {
                 case 1:
                     if (o instanceof CharacterTag) {
                         CharacterTag ct = (CharacterTag) o;
-                        if (!ct.getClassNames().isEmpty()) {
-                            return String.join(", ", ct.getClassNames());
+                        String exportName = ct.getExportName();
+                        if (exportName != null) {
+                            return Helper.escapeExportname(exportName, false);
                         }
-                        String en = ct.getExportName();
-                        if (en != null) {
-                            return en;
+                        Set<String> classNames = ct.getClassNames();
+                        if (!classNames.isEmpty()) {
+                            List<String> escapedList = new ArrayList<>();
+                            for (String className : classNames) {
+                                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(true));
+                            }
+                            return String.join(", ", escapedList);
                         }
                     }
                     return "";

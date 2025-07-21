@@ -911,14 +911,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
                 if (val instanceof String && di != null) {
                     if (di.exportName()) {
-                        valStr += " = " + Helper.escapeExportname(val.toString(), true);
+                        valStr += " = " + escapeHtml(Helper.escapeExportname(val.toString(), true));
                     } else {
-                        valStr += " = " + DottedChain.parseNoSuffix(val.toString()).toPrintableString(di.as3());
+                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(di.as3()));
                     }
                 } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {
                     valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
+                } else if (val instanceof String) {
+                    valStr += " = \"" + escapeHtml(Helper.escapePCodeString(val.toString())) + "\"";
                 } else {
                     valStr += " = " + colorAdd + escapeHtml(val.toString()) + enumAdd;
                 }

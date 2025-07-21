@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -161,7 +162,7 @@ public class Frame implements TreeItem, Exportable {
         List<String> labels = new ArrayList<>();
         for (Tag t : innerTags) {
             if (t instanceof FrameLabelTag) {
-                labels.add(((FrameLabelTag) t).name);
+                labels.add("\"" + Helper.escapePCodeString(((FrameLabelTag) t).name) + "\"");
             }
         }
         if (!labels.isEmpty()) {

@@ -49,7 +49,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2 P-code double Push values have suffix ".0" to properly distinguish them
 - AS1/2 P-code float Push values have suffix "f" to properly distinguish them
 - AS1/2: Export names are deobfuscated only when start with `__Packages.`,
-  if not, then classical escaping is performed (with quotes)
+  if not, then classical escaping is performed
+- Quotes in tree node parameter values that need them
 
 ## [24.0.1] - 2025-06-27
 ### Fixed
