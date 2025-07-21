@@ -1031,9 +1031,26 @@ public class Graph {
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
+        //fixSwitchEnds(ret);
         return ret;
     }
 
+    /*
+    private void fixSwitchEnds(List<GraphTargetItem> items) {
+        for (GraphTargetItem item : items) {
+            if (item instanceof SwitchItem) {
+                fixSwitchEnd((SwitchItem) item);
+            }
+            if (item instanceof Block) {
+                Block blk = (Block) item;
+                for (List<GraphTargetItem> sub : blk.getSubs()) {
+                    fixSwitchEnds(sub);
+                }
+            }
+        }
+    }
+    */
+    
     /**
      * This is needed to avoid loop/switch identifiers in AS1/2. AS3 supports
      * them, but AS1/2 not.
@@ -1148,6 +1165,7 @@ public class Graph {
                                         changeBreakToBreak(caseCommands, sw.loop.id, innerSwitch.loop.id);
                                     }
                                 }
+                                fixSwitchEnd(innerSwitch);
                             } else {
                                 LoopItem innerLoop = (LoopItem) lastCommand;
                                 changeBreakToBreak(innerLoop.getBaseBodyCommands(), sw.loop.id, innerLoop.loop.id);
@@ -1219,7 +1237,7 @@ public class Graph {
                 }
                 //-----------------------
 
-                if (!(lastCase.get(lastCase.size() - 1) instanceof SwitchItem)) {
+                if (lastCase.isEmpty() || !(lastCase.get(lastCase.size() - 1) instanceof SwitchItem)) {
                     continue;
                 }
                 SwitchItem swInner = (SwitchItem) lastCase.get(lastCase.size() - 1);
@@ -1260,6 +1278,30 @@ public class Graph {
                                 }
                                 todos.addAll(newTodos);
                             }
+                        }
+                    }
+                    if (li instanceof ForItem) {
+                        ForItem fi = (ForItem) li;
+                        List<ContinueItem> continues = fi.getContinues();
+                        boolean hasContinue = false;
+                        for (ContinueItem ci : continues) {
+                            if (ci.loopId == fi.loop.id) {
+                                hasContinue = true;
+                                break;
+                            }
+                        }
+                        
+                        //No continue, change for back to while
+                        if (!hasContinue) {
+                            List<GraphTargetItem> expr = new ArrayList<>();
+                            expr.add(fi.expression);
+                            WhileItem wh = new WhileItem(dialect, fi.getSrc(), fi.getLineStartItem(), fi.loop, expr, fi.commands);
+                            wh.commands.addAll(fi.finalCommands);
+                            list.set(i, wh);
+                            for (int j = 0; j < fi.firstCommands.size(); j++) {
+                                list.add(i, fi.firstCommands.get(j));
+                                i++;
+                            }                            
                         }
                     }
                 }
@@ -3629,6 +3671,7 @@ public class Graph {
                     List<GraphPart> caseBodyParts = new ArrayList<>();
                     for (int i = 1; i < getNextParts(localData, part).size(); i++) {
                         if (!hasExpr) {
+                            //This if probably should be removed, but it fails some tests...
                             if (getNextParts(localData, part).get(i) == defaultPart) {
                                 pos++;
                                 continue;
@@ -4739,7 +4782,7 @@ public class Graph {
         return ret;
     }
 
-    private void fixSwitchEnd(SwitchItem sw) {
+    protected void fixSwitchEnd(SwitchItem sw) {
 
         List<GraphTargetItem> caseValuesMap = sw.caseValues;
         List<Integer> valuesMapping = sw.valuesMapping;
@@ -4781,36 +4824,51 @@ public class Graph {
             }
         }
 
-        //If the lastone is default empty and alone, remove it
+        //If the lastone is default empty and alone, remove it                       
         if (!caseCommands.isEmpty()) {
             List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
             if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
                 BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
-                lastc.remove(lastc.size() - 1);
+                if (bi.loopId == loopId) {
+                    lastc.remove(lastc.size() - 1);
+                }
             }
             if (lastc.isEmpty()) {
                 int cnt2 = 0;
-                if (caseValuesMap.get(caseValuesMap.size() - 1) instanceof DefaultItem) {
+                int defaultIndex = -1;
+                for (int i = 0; i < valuesMapping.size(); i++) {
+                    if (valuesMapping.get(i) == caseCommands.size() - 1) {
+                        if (caseValuesMap.get(i) instanceof DefaultItem) {
+                            defaultIndex = i;
+                            break;
+                        }
+                    }
+                }
+                if (defaultIndex > -1) {
                     for (int i = valuesMapping.size() - 1; i >= 0; i--) {
                         if (valuesMapping.get(i) == caseCommands.size() - 1) {
                             cnt2++;
                         }
                     }
 
-                    caseValuesMap.remove(caseValuesMap.size() - 1);
-                    valuesMapping.remove(valuesMapping.size() - 1);
+                    caseValuesMap.remove(defaultIndex);
+                    valuesMapping.remove(defaultIndex);
                     if (cnt2 == 1) {
                         caseCommands.remove(caseCommands.size() - 1);
                     }
                 }
             }
         }
+        
+        
         //remove last break from last section                
         if (!caseCommands.isEmpty()) {
             List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
             if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
                 BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
-                lastc.remove(lastc.size() - 1);
+                if (bi.loopId == loopId) {
+                    lastc.remove(lastc.size() - 1);
+                }
             }
         }
     }

@@ -128,7 +128,7 @@ public class SwitchItem extends LoopItem implements Block {
         for (int i = 0; i < caseCommands.size(); i++) {
 
             //if last is default and is empty, ignore it
-            if (i == caseCommands.size() - 1) {
+            /*if (i == caseCommands.size() - 1) {
                 if (caseCommands.get(i).isEmpty()) {
                     boolean hasDefault = false;
                     boolean hasNonDefault = false;
@@ -145,7 +145,7 @@ public class SwitchItem extends LoopItem implements Block {
                         continue;
                     }
                 }
-            }
+            }*/
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
                     if (!(caseValues.get(k) instanceof DefaultItem)) {
@@ -228,5 +228,23 @@ public class SwitchItem extends LoopItem implements Block {
     @Override
     public List<GraphTargetItem> getBaseBodyCommands() {
         return null;
+    }
+    
+    public void removeValue(int index) {
+        int m = valuesMapping.get(index);
+        caseValues.remove(index);
+        valuesMapping.remove(index);
+        boolean otherFound = false;
+        for (int i = 0; i < valuesMapping.size(); i++) {
+            if (valuesMapping.get(i) == m) {
+                return;
+            }
+        }
+        caseCommands.remove(m);
+        for (int i = 0; i < valuesMapping.size(); i++) {
+            if (valuesMapping.get(i) > m) {
+                valuesMapping.set(i, valuesMapping.get(i) - 1);
+            }
+        }
     }
 }

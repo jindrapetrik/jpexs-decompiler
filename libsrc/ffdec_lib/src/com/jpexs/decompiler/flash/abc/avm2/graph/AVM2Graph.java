@@ -2522,7 +2522,7 @@ public class AVM2Graph extends Graph {
         if (debugDoNotProcess) {
             return;
         }
-
+       
         loopi:
         for (int i = 1 /*not first*/; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
@@ -2611,9 +2611,9 @@ public class AVM2Graph extends Graph {
                             continue loopi;
                         }
                         int cv = ((IntegerValueTypeItem) thisSwitch.caseValues.get(k)).intValue();
-                        if (!expressionsMap.containsKey(cv)) {
+                        /*if (!expressionsMap.containsKey(cv)) {
                             continue loopi;
-                        }
+                        }*/
                         thisExpressions.add(cv);
                     }
 
@@ -2621,9 +2621,6 @@ public class AVM2Graph extends Graph {
 
                     for (int key : expressionsMap.keySet()) {
                         if (!thisExpressions.contains(key)) {
-                            if (defaultIndex == -1 && defaultInt != key) {
-                                continue loopi;
-                            }
                             noCaseExpressions.add(key);
                         }
                     }
@@ -2633,8 +2630,32 @@ public class AVM2Graph extends Graph {
                             return o1 - o2;
                         }
                     });
+                    
+                    /*if (!noCaseExpressions.isEmpty() && defaultIndex == -1) {
+                        thisSwitch.caseValues.add(new DefaultItem(dialect));
+                        thisSwitch.valuesMapping.add(thisSwitch.caseCommands.size());
+                        if (!thisSwitch.caseCommands.isEmpty()) {
+                            List<GraphTargetItem> lastCommands = thisSwitch.caseCommands.get(thisSwitch.caseCommands.size() - 1);
+                            if (
+                                    lastCommands.isEmpty()
+                                    || !(
+                                        (lastCommands.get(lastCommands.size() - 1) instanceof ExitItem)
+                                        || (lastCommands.get(lastCommands.size() - 1) instanceof ContinueItem)
+                                        || (lastCommands.get(lastCommands.size() - 1) instanceof BreakItem)
+                                    )
+                                    ) {
+                                lastCommands.add(new BreakItem(dialect, null, null, thisSwitch.loop.id));
+                            }
+                        }
+                        thisSwitch.caseCommands.add(new ArrayList<>());                        
+                    }*/
 
                     for (int k = 0; k < thisSwitch.caseValues.size(); k++) {
+                        /*if (thisSwitch.caseValues.get(k) instanceof DefaultItem) {
+                            thisSwitch.removeValue(k);
+                            k--;
+                            continue;
+                        }*/
                         if (thisSwitch.caseValues.get(k) instanceof DefaultItem) {
                             int m = thisSwitch.valuesMapping.get(k);
                             thisSwitch.caseValues.remove(k);
@@ -2665,12 +2686,19 @@ public class AVM2Graph extends Graph {
                             continue;
                         }
                         int cv = ((IntegerValueTypeItem) thisSwitch.caseValues.get(k)).intValue();
+                        
+                        if (!expressionsMap.containsKey(cv)) {
+                            thisSwitch.removeValue(k);
+                            k--;
+                            continue;
+                        }                        
                         thisSwitch.caseValues.set(k, expressionsMap.get(cv));
                     }
 
                     thisSwitch.switchedObject = prevSwitch.switchedObject;
                     list.remove(i - 1);
                     i--;
+                    fixSwitchEnd(thisSwitch);
                 }
             }
         }

@@ -2021,6 +2021,23 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testSwitchDefaultEndMultiple() {
+        decompileMethod("classic", "testSwitchDefaultEndMultiple", "var a:* = \"X\";\r\n"
+                + "switch(a)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "trace(\"B\");\r\n"
+                + "break;\r\n"
+                + "case \"C\":\r\n"
+                + "case \"D\":\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitchIf() {
         decompileMethod("classic", "testSwitchIf", "var code:String = \"4\";\r\n"
                 + "var a:Boolean = true;\r\n"

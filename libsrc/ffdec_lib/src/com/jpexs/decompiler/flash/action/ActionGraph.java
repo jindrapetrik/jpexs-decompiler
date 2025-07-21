@@ -890,6 +890,7 @@ public class ActionGraph extends Graph {
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
                 makeAllCommands(output, stack);
                 SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
+                fixSwitchEnd(sw);
                 ret = new ArrayList<>();
                 ret.addAll(output);
                 ret.add(sw);

@@ -122,6 +122,7 @@ package
         TestSwitchContinue;
         TestSwitchComma;
         TestSwitchDefault;
+        TestSwitchDefaultEndMultiple;
         TestSwitchIf;
         TestTernarOperator;
         TestTernarOperator2;

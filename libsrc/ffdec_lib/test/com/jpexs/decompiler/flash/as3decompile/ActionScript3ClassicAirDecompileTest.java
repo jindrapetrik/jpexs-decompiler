@@ -2034,6 +2034,23 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testSwitchDefaultEndMultiple() {
+        decompileMethod("classic_air", "testSwitchDefaultEndMultiple", "var a:String = \"X\";\r\n"
+                + "switch(a)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "trace(\"B\");\r\n"
+                + "break;\r\n"
+                + "case \"C\":\r\n"
+                + "case \"D\":\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitchIf() {
         decompileMethod("classic_air", "testSwitchIf", "var code:String = \"4\";\r\n"
                 + "var a:Boolean = true;\r\n"
