@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.util.Map;
 
 /**
@@ -48,7 +50,7 @@ public abstract class RemoveTag extends Tag implements DepthTag {
             ret.put("chid", "" + getCharacterId());
         }
         if (exportName != null) {
-            ret.put("exp", exportName);
+            ret.put("exp", Helper.escapeExportname(exportName, true));
         }
         ret.put("dpt", "" + getDepth());
 

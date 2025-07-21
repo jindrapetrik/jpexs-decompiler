@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -238,6 +239,31 @@ public class Helper {
     }
 
     /**
+     * Escapes export name
+     * @param s Input string
+     * @param quote Add quotes when not starts __Packages.
+     * @return Escaped string
+     */
+    public static String escapeExportname(String s, boolean quote) {
+        if (s.startsWith("__Packages.")) {
+            return DottedChain.parseNoSuffix(s).toPrintableString(false);
+        }
+        return (quote ? "\"" : "") + escapePCodeString(s) + (quote ? "\"" : "");
+    }
+    
+    /**
+     * Unescape export name
+     * @param s Input string
+     * @return Unescaped string
+     */
+    public static String unescapeExportname(String s) {
+        if (s.startsWith("__Packages.")) {
+            return DottedChain.parsePrintable(s).toRawString();
+        }
+        return unescapePCodeString(s);
+    }
+    
+    /**
      * Escapes string by adding backslashes
      *
      * @param s String to escape
@@ -285,6 +311,58 @@ public class Helper {
         return ret.toString();
     }
 
+    /**
+     * Unescapes PCode String
+     * @param s Input string
+     * @return Unescaped string
+     */    
+    public static String unescapePCodeString(String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                if (i + 1 < s.length() - 1) {
+                    i++;
+                    c = s.charAt(i);
+                    if (c == 'n') {
+                        ret.append("\n");
+                    } else if (c == 'r') {
+                        ret.append("\r");
+                    } else if (c == 't') {
+                        ret.append("\t");
+                    } else if (c == 'b') {
+                        ret.append("\b");
+                    } else if (c == 'f') {
+                        ret.append("\f");
+                    } else if (c == '\\') {
+                        ret.append("\\");
+                    } else if (c == '"') {
+                        ret.append("\"");
+                    } else if (c == '\'') {
+                        ret.append("'");
+                    } else if (c == 'x' && i + 2 < s.length() - 1) {                        
+                        ret.append((char) Integer.parseInt(s.substring(i + 1, i + 3), 16));
+                        i += 2;
+                    } else if (c == '{') {
+                        int endPos = s.indexOf("}", i);
+                        if (endPos != -1) {
+                            int numRepeat = Integer.parseInt(s.substring(i + 1, endPos));
+                            i = endPos + 1;
+                            c = s.charAt(i);
+                            for (int j = 0; j < numRepeat; j++) {
+                                ret.append(c);
+                            }
+                        }
+                    }
+                }
+            } else {
+                ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
+    
     /**
      * Escapes string by adding backslashes - limits to english characters -
      * other are unicode escaped.

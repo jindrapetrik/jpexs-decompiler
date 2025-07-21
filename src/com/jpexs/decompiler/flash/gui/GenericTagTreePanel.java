@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -909,7 +910,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                 DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
                 if (val instanceof String && di != null) {
-                    valStr += " = " + DottedChain.parseNoSuffix(val.toString()).toPrintableString(di.as3());
+                    if (di.exportName()) {
+                        valStr += " = " + Helper.escapeExportname(val.toString(), true);
+                    } else {
+                        valStr += " = " + DottedChain.parseNoSuffix(val.toString()).toPrintableString(di.as3());
+                    }
                 } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {

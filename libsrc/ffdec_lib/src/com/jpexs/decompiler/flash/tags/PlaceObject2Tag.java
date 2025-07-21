@@ -131,7 +131,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * If PlaceFlagHasName, Name of character
      */
     @Conditional("placeFlagHasName")
-    @DottedIdentifier    
+    @DottedIdentifier   
     public String name;
 
     /**

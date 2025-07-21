@@ -99,7 +99,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             ret.put("chid", "" + chid);
         }
         if (exportName != null) {
-            ret.put("exp", DottedChain.parseNoSuffix(exportName).toPrintableString(false));
+            ret.put("exp", Helper.escapeExportname(exportName, true));
         }
         if (!classNames.isEmpty()) {
             List<String> escapedList = new ArrayList<>();

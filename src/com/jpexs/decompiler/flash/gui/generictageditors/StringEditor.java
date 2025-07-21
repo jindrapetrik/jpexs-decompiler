@@ -89,7 +89,11 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             String newValue = (String) ReflectionTools.getValue(obj, field, index);
             DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
             if (di != null) {
-                newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(di.as3());
+                if (di.exportName()) {
+                    newValue = Helper.escapeExportname(newValue, false);
+                } else {
+                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(di.as3());
+                }
             }
             setText(newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -104,7 +108,11 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             String newValue = getText();
             DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
             if (di != null) {
-                newValue = DottedChain.parsePrintable(newValue).toRawString();
+                if (di.exportName()) {
+                    newValue = Helper.unescapeExportname(newValue);
+                } else {
+                    newValue = DottedChain.parsePrintable(newValue).toRawString();
+                }
             }
             
             if (Objects.equals(oldValue, newValue)) {

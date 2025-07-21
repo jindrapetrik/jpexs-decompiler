@@ -162,7 +162,12 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         Map<String, String> ret = super.getNameProperties();
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
-            ret.put("im", "" + DottedChain.parseNoSuffix(names.get(0)).toPrintableString(false));
+            String importName = names.get(0);
+            if (importName.startsWith("__Packages.")) {
+                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(false));
+            } else {
+                ret.put("imp", "\"" + Helper.escapePCodeString(importName) +  "\"");
+            }
         }
         return ret;
     }

@@ -245,17 +245,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Override
     public Map<String, String> getNameProperties() {
-        String expName = swf == null ? "" : swf.getExportName(spriteId);
+        String exportName = swf == null ? "" : swf.getExportName(spriteId);
 
         Map<String, String> ret = super.getNameProperties();
         ret.put("sid", "" + spriteId);
 
-        if (expName == null || expName.isEmpty()) {
+        if (exportName == null || exportName.isEmpty()) {
             return ret;
         }
-        //String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-        //ret.put("exp", pathParts[pathParts.length - 1]);   
-        ret.put("exp", expName);
+        ret.put("exp", Helper.escapeExportname(exportName, true));
         return ret;
     }
 

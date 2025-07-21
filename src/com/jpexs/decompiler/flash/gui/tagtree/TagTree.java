@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
@@ -350,7 +351,11 @@ public class TagTree extends AbstractTagTree {
             String expName = tag.getSwf().getExportName(tag.getCharacterId());
             if (expName != null && !expName.isEmpty()) {
                 String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-                return IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
+                if (expName.startsWith("__Packages.")) {
+                    return IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
+                } else {
+                    return Helper.escapeExportname(expName, false);
+                }                
             }
         }
         if (value != null) {

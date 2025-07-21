@@ -30,4 +30,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface DottedIdentifier {
     boolean as3() default false;
+    boolean exportName() default false;
 }
