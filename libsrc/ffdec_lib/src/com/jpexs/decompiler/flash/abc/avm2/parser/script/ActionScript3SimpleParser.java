@@ -1876,6 +1876,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     case "dup":
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                         ret = true;
+                        allowMemberOrCall = true;                        
                         break;
                     case "push":
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);

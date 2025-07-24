@@ -1803,6 +1803,7 @@ public class ActionScript2Parser {
                     //Both ASs
                     case "dup":
                         ret = new DuplicateItem(DIALECT, null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
+                        allowMemberOrCall = true;                        
                         break;
                     case "push":
                         ret = new PushItem(expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));

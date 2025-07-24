@@ -1333,6 +1333,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     case "dup":
                         expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
+                        allowMemberOrCall = true;                        
                         break;
                     case "push":
                         expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
