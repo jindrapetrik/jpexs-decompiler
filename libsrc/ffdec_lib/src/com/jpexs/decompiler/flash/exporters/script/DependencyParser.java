@@ -21,10 +21,13 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -196,6 +199,7 @@ public class DependencyParser {
                 }
             }
             boolean wasNewClass = false;
+            AVM2Instruction prevIns = null;
             for (int i = 0; i < body.getCode().code.size(); i++) {
                 AVM2Instruction ins = body.getCode().code.get(i);
                 
@@ -245,6 +249,26 @@ public class DependencyParser {
                         }
                     }
                 }
+                if (ins.definition instanceof ConstructPropIns) {
+                    Multiname m = abc.constants.getMultiname(ins.operands[0]);
+                    if (m != null) {
+                        if (m.kind == Multiname.MULTINAMEL) {
+                            Dependency dep = new Dependency(DottedChain.parseNoSuffix("flash.utils.getDefinitionByName"), DependencyType.NAMESPACE);
+                            dependencies.add(dep);
+                        }
+                    }
+                }
+                
+                //TODO: what if there's jump between getproperty and construct?
+                if (ins.definition instanceof ConstructIns && prevIns != null && prevIns.definition instanceof GetPropertyIns) {
+                    Multiname m = abc.constants.getMultiname(prevIns.operands[0]);
+                    if (m != null) {
+                        if (m.kind == Multiname.MULTINAMEL) {
+                            Dependency dep = new Dependency(DottedChain.parseNoSuffix("flash.utils.getDefinitionByName"), DependencyType.NAMESPACE);
+                            dependencies.add(dep);
+                        }
+                    }
+                }
                 if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
                     if (ins.operands[0] > 0) { //first is global
                         DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true);
@@ -282,6 +306,7 @@ public class DependencyParser {
                         numberContextRef.setVal(ins.operands[k]);
                     }
                 }
+                prevIns = ins;
             }
         }
     }

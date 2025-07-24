@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
@@ -108,7 +109,7 @@ public class ConstructPropIns extends InstructionDefinition {
 
         if (obj instanceof FindPropertyAVM2Item) {
             multiname.property = false;  //can be type
-        }
+        }               
         stack.push(new ConstructPropAVM2Item(ins, localData.lineStartInstruction, obj, multiname, args, type.getVal(), isStatic.getVal()));
     }
 

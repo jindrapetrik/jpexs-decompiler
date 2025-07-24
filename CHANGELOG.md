@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - [#2493] Incorrect placement of §§push instructions
 - AS3 direct editation/highlighter §§pop in class traits
 - AS direct editation/highlighter §§pop and §§dup can have getmember or call
+- [#1295], [#116] AS3 dynamic construction via MultinameL
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3937,6 +3938,8 @@ Major version of SWF to XML export changed to 2.
 [#2483]: https://www.free-decompiler.com/flash/issues/2483
 [#2486]: https://www.free-decompiler.com/flash/issues/2486
 [#2493]: https://www.free-decompiler.com/flash/issues/2493
+[#1295]: https://www.free-decompiler.com/flash/issues/1295
+[#116]: https://www.free-decompiler.com/flash/issues/116
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
@@ -4178,7 +4181,6 @@ Major version of SWF to XML export changed to 2.
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
-[#116]: https://www.free-decompiler.com/flash/issues/116
 [#2097]: https://www.free-decompiler.com/flash/issues/2097
 [#2098]: https://www.free-decompiler.com/flash/issues/2098
 [#2093]: https://www.free-decompiler.com/flash/issues/2093

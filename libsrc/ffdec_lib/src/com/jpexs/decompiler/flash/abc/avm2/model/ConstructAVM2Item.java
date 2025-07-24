@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Helper;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,12 +78,45 @@ public class ConstructAVM2Item extends AVM2Item {
                 || (object instanceof CallStaticAVM2Item)
                 || (object instanceof CallSuperAVM2Item);
 
-        if (object.getPrecedence() > getPrecedence() || objectIsCall) {
-            writer.append("(");
+        boolean isGetDefinition = false;
+        if (object instanceof GetPropertyAVM2Item) {
+            GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) object;
+            if (getProperty.propertyName instanceof FullMultinameAVM2Item) {
+                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProperty.propertyName;
+                if (fm.multinameIndex > 0) {
+                    Multiname m = localData.abc.constants.getMultiname(fm.multinameIndex);
+                    if (m.kind == Multiname.MULTINAMEL) {
+                        if (m.getNamespaceSet(localData.abc.constants).namespaces.length == 1) {
+                            isGetDefinition = true;
+                            writer.append("(");
+                            if (localData.fullyQualifiedNames.contains(DottedChain.parseNoSuffix("flash.utils.getDefinitionByName"))) {
+                                writer.append("flash.utils.getDefinitionByName");
+                            } else {
+                                writer.append("getDefinitionByName");
+                            }
+                            writer.append("(");
+                            String nname = m.getSingleNamespace(localData.abc.constants).getName(localData.abc.constants).toRawString();
+                            if (!nname.isEmpty()) {
+                                writer.append("\"");
+                                writer.append(Helper.escapeActionScriptString(nname));                        
+                                writer.append("\"+\".\"+");                    
+                            }
+                            fm.name.appendTo(writer, localData);
+                            writer.append("))");
+                        }
+                    }
+                }
+            }
         }
-        object.toString(writer, localData);
-        if (object.getPrecedence() > getPrecedence() || objectIsCall) {
-            writer.append(")");
+        
+        if (!isGetDefinition) {
+            if (object.getPrecedence() > getPrecedence() || objectIsCall) {
+                writer.append("(");
+            }
+            object.toString(writer, localData);
+            if (object.getPrecedence() > getPrecedence() || objectIsCall) {
+                writer.append(")");
+            }
         }
         writer.spaceBeforeCallParenthesis(args.size());
         if (object instanceof InitVectorAVM2Item) {

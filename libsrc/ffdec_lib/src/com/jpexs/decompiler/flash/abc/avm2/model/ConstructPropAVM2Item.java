@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Helper;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,7 +89,36 @@ public class ConstructPropAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        formatProperty(writer, object, propertyName, localData, isStatic, false);        
+        boolean isGetDefinition = false;
+        if (propertyName instanceof FullMultinameAVM2Item) {
+            FullMultinameAVM2Item fm = (FullMultinameAVM2Item) propertyName;
+            if (fm.multinameIndex > 0) {
+                Multiname m = localData.abc.constants.getMultiname(fm.multinameIndex);
+                if (m.kind == Multiname.MULTINAMEL) {
+                    if (m.getNamespaceSet(localData.abc.constants).namespaces.length == 1) {
+                        isGetDefinition = true;
+                        writer.append("(");
+                        if (localData.fullyQualifiedNames.contains(DottedChain.parseNoSuffix("flash.utils.getDefinitionByName"))) {
+                            writer.append("flash.utils.getDefinitionByName");
+                        } else {
+                            writer.append("getDefinitionByName");
+                        }
+                        writer.append("(");
+                        String nname = m.getSingleNamespace(localData.abc.constants).getName(localData.abc.constants).toRawString();
+                        if (!nname.isEmpty()) {
+                            writer.append("\"");
+                            writer.append(Helper.escapeActionScriptString(nname));                        
+                            writer.append("\"+\".\"+");                    
+                        }
+                        fm.name.appendTo(writer, localData);
+                        writer.append("))");
+                    }
+                }
+            }
+        }
+        if (!isGetDefinition) {
+            formatProperty(writer, object, propertyName, localData, isStatic, false);        
+        }
         writer.spaceBeforeCallParenthesis(args.size());
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {

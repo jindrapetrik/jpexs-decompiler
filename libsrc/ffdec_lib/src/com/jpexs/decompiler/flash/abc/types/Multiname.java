@@ -989,7 +989,7 @@ public class Multiname {
      * @return True if this MULTINAME kind with only one namespace
      */
     public boolean isMULTINAMEwithOneNs(AVM2ConstantPool pool) {
-        return kind == MULTINAME && pool.getNamespaceSet(namespace_set_index).namespaces.length == 1;
+        return (kind == MULTINAME || kind == MULTINAMEL || kind == MULTINAMELA) && pool.getNamespaceSet(namespace_set_index).namespaces.length == 1;
     }
 
     /**
