@@ -98,6 +98,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartChangeException;
+import com.jpexs.decompiler.graph.GraphPartMarkedArrayList;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -340,11 +341,11 @@ public class AVM2Graph extends Graph {
             //localData2.scopeStack = new ScopeStack();
             localData2.localScopeStack = new ScopeStack();
 
-            List<GraphTargetItem> targetOutput;
+            List<GraphTargetItem> targetOutput = new GraphPartMarkedArrayList<>();
             try {
-                targetOutput = translatePart(localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
+                translatePart(targetOutput, localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
             } catch (GraphPartChangeException ex1) { //should not happen
-                targetOutput = new ArrayList<>();
+                targetOutput.clear();
             }
 
             int switchedReg = -1;
@@ -1173,9 +1174,9 @@ public class AVM2Graph extends Graph {
             if (finallyIndex > -1) {
                 parsedExceptionIds.add(finallyIndex);
             }
-            List<GraphTargetItem> tryCommands = new ArrayList<>();
-            List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
-            List<GraphTargetItem> finallyCommands = new ArrayList<>();
+            List<GraphTargetItem> tryCommands = new GraphPartMarkedArrayList<>();
+            List<List<GraphTargetItem>> catchCommands = new GraphPartMarkedArrayList<>();
+            List<GraphTargetItem> finallyCommands = new GraphPartMarkedArrayList<>();
 
             GraphPart afterPart = null;
 
@@ -1255,7 +1256,7 @@ public class AVM2Graph extends Graph {
             boolean inlinedFinally = false;
             boolean finallyAsUnnamedException = false;
 
-            List<GraphTargetItem> finallyTargetItems = new ArrayList<>();
+            List<GraphTargetItem> finallyTargetItems = new GraphPartMarkedArrayList<>();
 
             GraphPart defaultPart = null;
             GraphPart finallyPart = null;
@@ -1289,12 +1290,12 @@ public class AVM2Graph extends Graph {
                 AVM2LocalData localData2 = new AVM2LocalData(localData);
                 //localData2.scopeStack = new ScopeStack();
                 localData2.localScopeStack = new ScopeStack();
-
+                
                 try {
                     //We are assuming Finally target has only 1 part
-                    finallyTargetItems = translatePart(localData2, finallyTryTargetPart, st2, staticOperation, path);
+                    translatePart(finallyTargetItems, localData2, finallyTryTargetPart, st2, staticOperation, path);
                 } catch (GraphPartChangeException ex) { //should not happen
-                    finallyTargetItems = new ArrayList<>();
+                    finallyTargetItems.clear();
                 }
                 //boolean targetHasThrow = false;
                 if (!finallyTargetItems.isEmpty() && (finallyTargetItems.get(finallyTargetItems.size() - 1) instanceof ThrowAVM2Item)) {
@@ -1385,9 +1386,10 @@ public class AVM2Graph extends Graph {
                 }
                 if (switchPart != null) {
                     try {
-                        finallyCommands.addAll(translatePart(localData, switchPart, stack, staticOperation, path));
+                        translatePart(finallyCommands, localData, switchPart, stack, staticOperation, path);
                     } catch (GraphPartChangeException ex) {
                         //should not happen
+                        finallyCommands.clear();
                     }
                     stack.pop(); //value switched by lookupswitch                   
                 }
@@ -2249,12 +2251,20 @@ public class AVM2Graph extends Graph {
                                     }
                                 }
 
+                                int firstPushPos = -1;
+                                
                                 for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
                                     if (output.get(i) instanceof PushItem) {
-                                        PushItem pu = (PushItem) output.remove(i);
-                                        stack.push(pu.value);
+                                        firstPushPos = i;
                                     } else {
                                         break;
+                                    }
+                                }                              
+                                if (firstPushPos > -1) {
+                                    int max = output.size() - 2;
+                                    for (int i = firstPushPos; i <= max; i++) {
+                                        PushItem pu = (PushItem) output.remove(firstPushPos);
+                                        stack.push(pu.value);
                                     }
                                 }
                                 if (usages.isEmpty()) {

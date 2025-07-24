@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 both pcode and AS editable at the same time
 - AS3 direct editation - Allow some special words (like `override`) as identifiers
 - [#2486] AS1/2 if jump to function end as return
+- [#2493] Incorrect placement of §§push instructions
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3933,6 +3934,7 @@ Major version of SWF to XML export changed to 2.
 [#1277]: https://www.free-decompiler.com/flash/issues/1277
 [#2483]: https://www.free-decompiler.com/flash/issues/2483
 [#2486]: https://www.free-decompiler.com/flash/issues/2486
+[#2493]: https://www.free-decompiler.com/flash/issues/2493
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418

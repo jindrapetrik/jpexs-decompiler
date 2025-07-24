@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -39,9 +40,25 @@ public class TranslateStack extends Stack<GraphTargetItem> {
      * Path
      */
     private final String path;
+    
+    private List<GraphTargetItem> connectedOutput = null;
+    
+    private int prevOutputSize = 0;
 
     private Map<String, GraphTargetItem> marks = new HashMap<>();
 
+    public void setConnectedOutput(int prevOutputSize, List<GraphTargetItem> connectedOutput) {
+        this.prevOutputSize = prevOutputSize;
+        this.connectedOutput = connectedOutput;
+    }   
+    
+    @Override
+    public GraphTargetItem push(GraphTargetItem item) {
+        if (connectedOutput != null && item != null) {
+            item.outputPos = prevOutputSize + connectedOutput.size();
+        }
+        return super.push(item);
+    }
     
     /**
      * Sets mark.

@@ -62,6 +62,7 @@ public abstract class GraphSource implements Serializable {
     /**
      * Translates the part of the graph source
      *
+     * @param output Output
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -70,11 +71,10 @@ public abstract class GraphSource implements Serializable {
      * @param end End position
      * @param staticOperation Unused
      * @param path Path
-     * @return List of graph target items
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
-    public abstract List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
+    public abstract void translatePart(List<GraphTargetItem> output, Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
 
     /**
      * Gets the important addresses

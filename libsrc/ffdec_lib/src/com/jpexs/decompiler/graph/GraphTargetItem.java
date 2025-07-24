@@ -128,7 +128,12 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * Dialect
      */
     public GraphTargetDialect dialect;
-
+    
+    /**
+     * Position in output - current list of GraphTargetItems
+     */    
+    public int outputPos = -1;
+    
     /**
      * Gets the line start item
      *

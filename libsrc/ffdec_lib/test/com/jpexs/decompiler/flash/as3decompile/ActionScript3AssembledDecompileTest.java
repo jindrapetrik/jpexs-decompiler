@@ -314,6 +314,24 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testPushPlacement() {
+        decompileMethod("assembled", "testPushPlacement", "var a:int = 1;\r\n"
+                + "var b:* = 2;\r\n"
+                + "§§push(a);\r\n"
+                + "a += 1;\r\n"
+                + "if(b >= 2)\r\n"
+                + "{\r\n"
+                + "b = §§pop() + 7;\r\n"
+                + "trace(b);\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "§§pop();\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
                 + "§§push(obfuscated[\"xxx\"] = new [\"ByteArray\"]());\r\n"
@@ -440,33 +458,33 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "case 1:\r\n"
                 + "case 6:\r\n"
                 + "trace(\"1-6\");\r\n"
-                + "addr0120:\r\n"
+                + "addr0121:\r\n"
                 + "trace(\"F\");\r\n"
                 + "break;\r\n"
                 + "case 5:\r\n"
                 + "trace(\"5\");\r\n"
-                + "addr0119:\r\n"
+                + "addr011a:\r\n"
                 + "trace(\"E\");\r\n"
-                + "§§goto(addr0120);\r\n"
+                + "§§goto(addr0121);\r\n"
                 + "case 7:\r\n"
                 + "trace(\"7\");\r\n"
-                + "addr0112:\r\n"
+                + "addr0113:\r\n"
                 + "trace(\"D\");\r\n"
-                + "§§goto(addr0119);\r\n"
+                + "§§goto(addr011a);\r\n"
                 + "case 2:\r\n"
                 + "trace(\"2\");\r\n"
-                + "addr010b:\r\n"
+                + "addr010c:\r\n"
                 + "trace(\"C\");\r\n"
-                + "§§goto(addr0112);\r\n"
+                + "§§goto(addr0113);\r\n"
                 + "case 8:\r\n"
                 + "trace(\"8\");\r\n"
-                + "addr0104:\r\n"
+                + "addr0105:\r\n"
                 + "trace(\"B\");\r\n"
-                + "§§goto(addr010b);\r\n"
+                + "§§goto(addr010c);\r\n"
                 + "default:\r\n"
                 + "trace(\"def\");\r\n"
                 + "trace(\"A\");\r\n"
-                + "§§goto(addr0104);\r\n"
+                + "§§goto(addr0105);\r\n"
                 + "}\r\n"
                 + "trace(\"G\");\r\n"
                 + "return null;\r\n",

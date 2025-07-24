@@ -27,7 +27,6 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
-import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
@@ -2354,7 +2353,7 @@ public class Graph {
     //@SuppressWarnings("unchecked")
     protected final GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation) throws InterruptedException, GraphPartChangeException {
         stack = (TranslateStack) stack.clone();
-        translatePart(localData, part, stack, staticOperation, null);
+        translatePart(new ArrayList<>(), localData, part, stack, staticOperation, null);
         return stack.pop();
     }
     
@@ -2373,13 +2372,14 @@ public class Graph {
     protected final GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, List<GraphTargetItem> output) throws InterruptedException, GraphPartChangeException {
         stack = (TranslateStack) stack.clone();
         output.clear();
-        output.addAll(translatePart(localData, part, stack, staticOperation, null));
+        translatePart(output, localData, part, stack, staticOperation, null);
         return stack.pop();
     }
 
     /**
      * Translates part.
      *
+     * @param output Output
      * @param localData Local data
      * @param part Part
      * @param stack Translate stack
@@ -2389,9 +2389,8 @@ public class Graph {
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
-    protected final List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
+    protected final void translatePart(List<GraphTargetItem> output, BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         List<GraphPart> sub = part.getSubParts();
-        List<GraphTargetItem> ret = new ArrayList<>();
         int end;
         for (GraphPart p : sub) {
             if (p.end == -1) {
@@ -2404,9 +2403,8 @@ public class Graph {
             }
             end = p.end;
             int start = p.start;
-            ret.addAll(code.translatePart(this, part, localData, stack, start, end, staticOperation, path));
+            code.translatePart(output, this, part, localData, stack, start, end, staticOperation, path);
         }
-        return ret;
     }
 
     /**
@@ -3469,6 +3467,7 @@ public class Graph {
             if (currentRet instanceof GraphPartMarkedArrayList) {
                 ((GraphPartMarkedArrayList) currentRet).startPart(part);
             }
+            stack.setConnectedOutput(0, currentRet);
             if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
                 parseNext = false;
             } else {
@@ -3477,9 +3476,10 @@ public class Graph {
                 do {
                     exHappened = false;
                     try {
-                        output.addAll(code.translatePart(this, part, localData, stack, ipStart, part.end, staticOperation, path));
+                        stack.setConnectedOutput(currentRet.size(), output);
+                        code.translatePart(output, this, part, localData, stack, ipStart, part.end, staticOperation, path);
                     } catch (GraphPartChangeException ex) { //Special case for ifFrameLoaded when it's over multiple parts
-                        output.addAll(ex.getOutput());
+                        //output.addAll(ex.getOutput());
                         for (GraphPart p : allParts) {
                             if (p.containsIP(ex.getIp())) {
                                 if (ex.getIp() == p.start) {
@@ -4542,7 +4542,12 @@ public class Graph {
                     //ASC2 leaves some function calls unpopped on stack before returning from a method
                     commands.add(clen, p);
                 } else {
-                    commands.add(clen, new PushItem(p));
+                    int pos = 0;
+                    if (p.outputPos < commands.size()) {
+                        commands.add(p.outputPos, new PushItem(p));
+                    } else {
+                        commands.add(clen + pos, new PushItem(p));
+                    }
                 }
             }
         }

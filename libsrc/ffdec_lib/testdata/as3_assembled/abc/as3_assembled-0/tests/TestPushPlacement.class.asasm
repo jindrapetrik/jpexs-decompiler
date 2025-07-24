@@ -1,0 +1,87 @@
+class
+ refid "tests:TestPushPlacement"
+ instance QName(PackageNamespace("tests"), "TestPushPlacement")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestPushPlacement")
+  iinit
+   refid "tests:TestPushPlacement/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestPushPlacement/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+            getlocal0
+            pushscope
+            debug 1, "a", 0, 13
+            debug 1, "b", 1, 14
+            pushbyte 1
+            convert_i
+            setlocal1
+            pushbyte 2
+            coerce_a
+            setlocal2
+            getlocal1
+            getlocal1
+            pushbyte 1
+            add
+            convert_i
+            setlocal1
+            getlocal2
+            pushbyte 2
+            ifnge ofs0031
+            pushbyte 7
+            add
+            coerce_a
+            setlocal2
+            findpropstrict QName(PackageNamespace(""),"trace")
+            getlocal2
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0032
+   ofs0031:
+            pop
+   ofs0032:
+            returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestPushPlacement/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

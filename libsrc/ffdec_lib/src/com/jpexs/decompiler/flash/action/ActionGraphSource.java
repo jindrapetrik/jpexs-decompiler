@@ -197,6 +197,7 @@ public class ActionGraphSource extends GraphSource {
     /**
      * Translates the part of the graph source
      *
+     * @param output Output
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -210,12 +211,11 @@ public class ActionGraphSource extends GraphSource {
      * @throws GraphPartChangeException On graph part change
      */
     @Override
-    public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
+    public void translatePart(List<GraphTargetItem> output, Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree((ActionGraph) graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
+        Action.actionsPartToTree(output, (ActionGraph) graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
-        return r;
     }
 
     /**

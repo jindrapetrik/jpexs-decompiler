@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestPushPlacement/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestPushPlacement", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestPushPlacement"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestPushPlacement"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestPushPlacement")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestPushPlacement")
+  #include "TestPushPlacement.class.asasm"
+ end ; trait
+end ; script
