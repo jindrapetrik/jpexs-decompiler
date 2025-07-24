@@ -44,6 +44,8 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - Allow some special words (like `override`) as identifiers
 - [#2486] AS1/2 if jump to function end as return
 - [#2493] Incorrect placement of §§push instructions
+- AS3 direct editation/highlighter §§pop in class traits
+- AS direct editation/highlighter §§pop can have getmember or call
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

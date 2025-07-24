@@ -1809,6 +1809,7 @@ public class ActionScript2Parser {
                         break;
                     case "pop":
                         ret = new PopItem(DIALECT, null, null);
+                        allowMemberOrCall = true;
                         break;
                     case "strict":
                         s = lexer.lex();

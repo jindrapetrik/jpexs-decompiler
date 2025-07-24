@@ -626,7 +626,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             parseMetadata(errors);
 
             ParsedSymbol s = lex();
-            while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
+            loops: while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         errors.add(new SimpleParseException("Only one final keyword allowed", lexer.yyline(), s.position));
@@ -712,6 +712,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
                         } else {
                             lexer.pushback(s);
+                            break loops;
                         }
                         break;
                 }
@@ -1882,6 +1883,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         break;
                     case "pop":
                         ret = true;
+                        allowMemberOrCall = true;
                         break;
                     case "goto":
                         expectedType(errors, SymbolGroup.IDENTIFIER);
