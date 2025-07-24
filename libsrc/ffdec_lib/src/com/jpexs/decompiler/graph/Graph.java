@@ -486,6 +486,9 @@ public class Graph {
                 if (next == null) {
                     continue;
                 }
+                if (next.start >= code.size()) {
+                    continue;
+                }
 
                 for (Loop l : loops) {
                     if ((l.phase == 1) || (l.reachableMark == 1)) {
@@ -3320,7 +3323,7 @@ public class Graph {
                         break;
                     }
                 }
-                                               
+                
                 if (isRealStopPart) {
                     if (currentLoop != null) {
                         currentLoop.phase = 0;
@@ -3734,18 +3737,23 @@ public class Graph {
                         if (isEmpty) {
                             next = nps.get(0);
                         }
-                        boolean hasOntrue = nps.get(1) != next;
+                        boolean hasOnTrue = nps.get(1) != next;
                         boolean hasOnFalse = nps.get(0) != next;
-
-                        List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                        List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
-
-                        if (!isEmpty && next != null) {
-                            //handle end of as1/2 script or function
-                            if (next.start >= code.size()) {
-                                next = null;
-                            }
+                        
+                        if (nps.get(1).start >= code.size()) {
+                            next = null;
+                            hasOnTrue = true;
+                            hasOnFalse = true;
+                        } else if (nps.get(0).start >= code.size()) {
+                            next = null;
+                            hasOnTrue = true;
+                            hasOnFalse = true;
                         }
+
+                        
+                        
+                        List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
+                        List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);                       
                         
                         if ((!isEmpty) && (next != null)) {                                                                               
                             stopPart2.add(next);
@@ -3753,7 +3761,7 @@ public class Graph {
                         }
 
                         List<GraphTargetItem> onTrue = new ArrayList<>();
-                        if (!isEmpty && hasOntrue) {
+                        if (!isEmpty && hasOnTrue) {
                             onTrue = printGraph(foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                         }
                         List<GraphTargetItem> onFalse = new ArrayList<>();

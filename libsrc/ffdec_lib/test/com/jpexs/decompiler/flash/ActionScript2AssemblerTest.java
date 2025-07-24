@@ -452,4 +452,48 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "}\n"
                 + "trace(\"end\");");
     }
+
+    @Test
+    public void testReturnAsJumpAfterFunction() {
+        String res = decompilePcode("DefineFunction \"test\", 0 {\n"
+                + "Push register1\n"
+                + "Push \"A\"\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc002d\n"
+                + "Push \"in A\"\n"
+                + "Trace\n"
+                + "Jump loc0053\n"
+                + "loc002d:Push register1\n"
+                + "Push \"B\"\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc004e\n"
+                + "Push \"in B\"\n"
+                + "Trace\n"
+                + "Jump loc0053\n"
+                + "loc004e:Jump loc005f\n"
+                + "loc0053:Jump loc0058\n"
+                + "loc0058:Push \"C\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "loc005f:\n");
+        res = cleanPCode(res);
+        assertEquals(res, "function test()\n"
+                + "{\n"
+                + "if(_loc1_ == \"A\")\n"
+                + "{\n"
+                + "trace(\"in A\");\n"
+                + "}\n"
+                + "else if(_loc1_ == \"B\")\n"
+                + "{\n"
+                + "trace(\"in B\");\n"
+                + "}\n"
+                + "else\n"
+                + "{\n"
+                + "return;\n"
+                + "}\n"
+                + "trace(\"C\");\n"
+                + "}");
+    }
 }
