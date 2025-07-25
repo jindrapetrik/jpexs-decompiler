@@ -3066,6 +3066,7 @@ public class ABC implements Openable {
      * Clears all caches.
      */
     public void clearAllCaches() {
+        deobfuscation = null;
         resetMethodIndexing();
         getSwf().clearAbcListCache();
         getSwf().clearScriptCache();
