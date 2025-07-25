@@ -206,7 +206,6 @@ public class ActionGraphSource extends GraphSource {
      * @param end End position
      * @param staticOperation Unused
      * @param path Path
-     * @return List of graph target items
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
