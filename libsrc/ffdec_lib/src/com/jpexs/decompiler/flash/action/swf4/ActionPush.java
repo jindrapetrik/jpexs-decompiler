@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Set;
 
 /**
  * Push action - Pushes values onto the stack.
@@ -376,6 +377,7 @@ public class ActionPush extends Action {
 
     /**
      * Converts the parameters to string - use replacements when available.
+     *
      * @param container Container
      * @param knownAddresses Known addresses
      * @param exportMode Export mode
@@ -395,6 +397,7 @@ public class ActionPush extends Action {
 
     /**
      * To string without quotes.
+     *
      * @param i Index
      * @return String
      */
@@ -431,6 +434,7 @@ public class ActionPush extends Action {
 
     /**
      * Converts the parameter to string.
+     *
      * @param i Index
      * @return String
      */
@@ -451,7 +455,7 @@ public class ActionPush extends Action {
             if (value instanceof Float) {
                 fdString += "f";
             }
-            ret = fdString;            
+            ret = fdString;
         } else {
             ret = value.toString();
         }
@@ -468,6 +472,7 @@ public class ActionPush extends Action {
 
     /**
      * To string.
+     *
      * @param writer Writer
      * @return Writer
      */
@@ -500,7 +505,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
             GraphTargetItem toPush = null;
@@ -547,7 +552,7 @@ public class ActionPush extends Action {
             }
             toPush.setPos(pos);
             stack.push(toPush);
-            pos++;            
+            pos++;
         }
     }
 

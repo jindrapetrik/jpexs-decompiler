@@ -50,6 +50,8 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -61,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,6 +76,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import natorder.NaturalOrderComparator;
 
 /**
  * Script pack class. A script pack is a collection of traits that are in the
@@ -207,7 +211,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc, abc.constants, null, false, true);
+                scriptName = name.getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
             }
         }
         return scriptName;
@@ -247,6 +251,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     /**
      * Converts the script pack.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits
@@ -255,7 +260,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param parallel Parallel
      * @throws InterruptedException On interrupt
      */
-    public void convert(AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void convert(Set<String> usedDeobfuscations, AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
         int swfVersion = -1;
         if (getOpenable() instanceof SWF) {
@@ -274,7 +279,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.mark();
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(sinit_bodyIndex));
-            abc.bodies.get(sinit_bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>(), initClasses);
+            abc.bodies.get(sinit_bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>(), initClasses, usedDeobfuscations);
             scriptInitializerIsEmpty = !writer.getMark();
 
         }
@@ -286,9 +291,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.convertPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
+                trait.convertPackaged(usedDeobfuscations, swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
             } else {
-                trait.convert(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
+                trait.convert(usedDeobfuscations, swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
             }
         }
     }
@@ -296,6 +301,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     /**
      * Append script to writer.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits
@@ -306,7 +312,8 @@ public class ScriptPack extends AS3ClassTreeItem {
      * class
      * @throws InterruptedException On interrupt
      */
-    private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel, boolean exportAllClasses) throws InterruptedException {
+    @SuppressWarnings("unchecked")
+    private void appendTo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel, boolean exportAllClasses) throws InterruptedException {
         
         int swfVersion = -1;
         if (getOpenable() instanceof SWF) {
@@ -325,7 +332,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     continue;
                 }
 
-                String fullName = t.getName(abc).getNameWithNamespace(abc, abc.constants, false).toPrintableString(abc.getSwf(), true);
+                String fullName = t.getName(abc).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
                 writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
@@ -355,7 +362,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.newLine();
             }
             writer.startTrait(traitIndicesList.get(t));
-            trait.toStringPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, fullyQualifiedNames, parallel, false);
+            trait.toStringPackaged(usedDeobfuscations, swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, fullyQualifiedNames, parallel, false);
 
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
@@ -374,7 +381,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (isSimple) {
             ignorePackage = getPathPackage();
         }
-        Trait.writeImports(traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+        Trait.writeImports(usedDeobfuscations, traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
         first = true;
 
         for (int t = 0; t < traitList.size(); t++) {
@@ -386,7 +393,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.newLine();
             }
             writer.startTrait(traitIndicesList.get(t));
-            trait.toString(swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+            trait.toString(usedDeobfuscations, swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
 
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
@@ -417,9 +424,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.toStringPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toStringPackaged(usedDeobfuscations, swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             } else {
-                trait.toString(swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toString(usedDeobfuscations, swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
             writer.endTrait();
             first = false;
@@ -436,7 +443,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (!first) {
                         writer.newLine();
                     }
-                    abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
                 } else {
                     writer.append("");
                 }
@@ -458,6 +465,22 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
         }
+        if (!usedDeobfuscations.isEmpty()) {
+            writer.newLine();
+            List<String> commentLines = new ArrayList<>();
+            commentLines.add("@deobfuscated");            
+            Map<String, String> fullMap = abc.getSwf().getAs3ObfuscatedIdentifiers();
+            int i = 0;
+            for (String obfuscated : usedDeobfuscations) {
+                String deobfuscated = fullMap.get(obfuscated);
+                commentLines.add(deobfuscated + " = \"" + Helper.escapeActionScriptString(obfuscated) + "\"");
+                i++;
+            }
+            commentLines.sort(new NaturalOrderComparator());
+            commentLines.add("");
+            String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
+            new CommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+        }
     }
 
     /**
@@ -475,12 +498,13 @@ public class ScriptPack extends AS3ClassTreeItem {
      */
     public void toSource(AbcIndexing abcIndex, GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts, boolean exportAllClasses) throws InterruptedException {
         writer.suspendMeasure();
+        Set<String> usedDeobfuscations = Collections.synchronizedSet(new LinkedHashSet<>());
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {
             CancellableWorker.call("script.scriptPack.toSource", new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    convert(abcIndex, new NulWriter(), traits, convertData, exportMode, parallel);
+                    convert(usedDeobfuscations, abcIndex, new NulWriter(), traits, convertData, exportMode, parallel);
                     return null;
                 }
             }, timeout, TimeUnit.SECONDS);
@@ -511,7 +535,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         writer.continueMeasure();
 
-        appendTo(abcIndex, writer, traits, convertData, exportMode, parallel, exportAllClasses);
+        appendTo(usedDeobfuscations, abcIndex, writer, traits, convertData, exportMode, parallel, exportAllClasses);
     }
 
     /**

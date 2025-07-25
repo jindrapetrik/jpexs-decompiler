@@ -37,7 +37,9 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * AVM2 item base class.
@@ -197,11 +199,12 @@ public abstract class AVM2Item extends GraphTargetItem {
      * @param swf SWF
      * @param localRegNames Local register names
      * @param reg Register
+     * @param usedDeobfuscations Used deobfuscations
      * @return Local register name
      */
-    public static String localRegName(SWF swf, HashMap<Integer, String> localRegNames, int reg) {
+    public static String localRegName(SWF swf, HashMap<Integer, String> localRegNames, int reg, Set<String> usedDeobfuscations) {
         if (localRegNames.containsKey(reg)) {
-            return IdentifiersDeobfuscation.printIdentifier(swf, true, localRegNames.get(reg));
+            return IdentifiersDeobfuscation.printIdentifier(swf, usedDeobfuscations, true, localRegNames.get(reg));
         } else {
             if (reg == 0) {
                 return "this";

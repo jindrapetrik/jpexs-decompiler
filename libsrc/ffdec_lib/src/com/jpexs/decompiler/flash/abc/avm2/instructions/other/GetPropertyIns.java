@@ -152,7 +152,7 @@ public class GetPropertyIns extends InstructionDefinition {
             Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
         type.setVal(TypeItem.UNKNOWN);
         callType.setVal(TypeItem.UNKNOWN);
-        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc, localData.abc.constants, new ArrayList<>(), true, true);
+        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true);
         if (obj instanceof FindPropertyAVM2Item) {
             FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) obj;
             if (fprop.propertyName.equals(multiname)) {
@@ -162,10 +162,10 @@ public class GetPropertyIns extends InstructionDefinition {
                         if (t instanceof TraitSlotConst) {
                             TraitSlotConst tsc = (TraitSlotConst) t;
                             if (Objects.equals(
-                                    tsc.getName(localData.abc).getName(localData.abc, localData.abc.constants, new ArrayList<>(), true, true),
+                                    tsc.getName(localData.abc).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true),
                                     multinameStr
                             )) {
-                                GraphTargetItem ty = AbcIndexing.multinameToType(tsc.type_index, localData.abc, localData.abc.constants);
+                                GraphTargetItem ty = AbcIndexing.multinameToType(localData.usedDeobfuscations, tsc.type_index, localData.abc, localData.abc.constants);
                                 type.setVal(ty);
                                 callType.setVal(ty);
                                 return;
@@ -176,13 +176,13 @@ public class GetPropertyIns extends InstructionDefinition {
 
                 if (type.getVal().equals(TypeItem.UNKNOWN)) {
                     if (localData.abcIndex != null) {
-                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc, localData.abc.constants, true).toRawString();
+                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.abc.constants, true).toRawString();
                         if (currentClassName != null) {
                             Reference<Boolean> foundStatic = new Reference<>(null);                
                             localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType, foundStatic);
                         }
                         if (type.getVal().equals(TypeItem.UNKNOWN)) {
-                            GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc, localData.abc.constants);
+                            GraphTargetItem ti = AbcIndexing.multinameToType(localData.usedDeobfuscations, multiname.multinameIndex, localData.abc, localData.abc.constants);
                             if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                                 type.setVal(ti);
                                 callType.setVal(ti); //coercion  i = int(xx);

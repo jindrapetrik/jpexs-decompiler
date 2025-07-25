@@ -40,6 +40,7 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -300,7 +301,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(requiresUninitielizedClassTraitsDetection(), requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(),requiresUninitielizedClassTraitsDetection(), requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

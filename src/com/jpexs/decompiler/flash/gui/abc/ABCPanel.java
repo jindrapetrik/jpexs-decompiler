@@ -121,6 +121,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -936,9 +937,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.addScriptListener(setTrait);
             String scriptName;
             if (classIndex > -1) {
-                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(newAbc, newAbc.constants, true).toPrintableString(newAbc.getSwf(), true);
+                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(new LinkedHashSet<>(), newAbc, newAbc.constants, true).toPrintableString(new LinkedHashSet<>(), newAbc.getSwf(), true);
             } else if (scriptIndex > -1) {
-                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc).toPrintableString(newAbc.getSwf(), true);
+                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc, new LinkedHashSet<>()).toPrintableString(new LinkedHashSet<>(), newAbc.getSwf(), true);
             } else {
                 scriptName = "";
             }
@@ -1011,7 +1012,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     swfRef.setVal(ci.abc.getSwf());
                 }
 
-                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(ci.abc.getSwf(), true);
+                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(new LinkedHashSet<>(), ci.abc.getSwf(), true);
                 
                 if (swfRef.getVal() == abc.getSwf()) {                    
                     hilightScript(getOpenable(), scriptNamePrintable);
@@ -1147,7 +1148,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             public List<com.jpexs.decompiler.flash.simpleparser.Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
                 List<AbcIndexing.PropertyDef> propertyDefList = new ArrayList<>();
                 List<Boolean> isStaticList = new ArrayList<>();
-                abc.getSwf().getAbcIndex().getClassTraits(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
+                abc.getSwf().getAbcIndex().getClassTraits(new LinkedHashSet<>(), new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
                 List<com.jpexs.decompiler.flash.simpleparser.Variable> ret = new ArrayList<>();
                 for (int i = 0; i < propertyDefList.size(); i++) {
                     AbcIndexing.PropertyDef def = propertyDefList.get(i);
@@ -1166,7 +1167,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         if (tmgs.kindType == Trait.TRAIT_SETTER) {
                             int[] paramTypes = ti.abc.method_info.get(tmgs.method_info).param_types;
                             if (paramTypes.length == 1) {
-                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(ti.abc, ti.abc.constants, false).getStringParts());
+                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(new LinkedHashSet<>(), ti.abc, ti.abc.constants, false).getStringParts());
                                 callType = null;
                             } else {
                                 continue;

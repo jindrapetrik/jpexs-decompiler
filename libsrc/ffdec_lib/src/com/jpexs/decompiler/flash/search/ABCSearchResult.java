@@ -30,6 +30,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -240,10 +241,10 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         boolean isStatic = traitId < staticTraitCount;
 
         if (isStatic) {
-            return abc.class_info.get(classIndex).static_traits.traits.get(traitId).getName(abc).getName(abc, abc.constants, null, false, true);
+            return abc.class_info.get(classIndex).static_traits.traits.get(traitId).getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
         } else {
             int index = traitId - staticTraitCount;
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc, abc.constants, null, false, true);
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
         }
     }
 

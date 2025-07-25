@@ -20,6 +20,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -48,6 +49,11 @@ public abstract class BaseLocalData {
      * SWF version
      */
     public int swfVersion = -1;
+    
+    /**
+     * Used deobfuscations
+     */
+    public Set<String> usedDeobfuscations = new LinkedHashSet<>();
 
     /**
      * Constructor.

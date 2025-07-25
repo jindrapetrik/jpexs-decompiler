@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
@@ -65,7 +66,7 @@ public class ActionScript3OptionalParametersTest extends ActionScript3DecompileT
         assertTrue(methodInfo > -1);
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<>());
+        abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<>(), new LinkedHashSet<>());
         writer.finishHilights();
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";

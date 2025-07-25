@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import javax.swing.JTextArea;
 
@@ -95,7 +96,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
                 if (di.exportName()) {
                     newValue = Helper.escapeExportname(swf, newValue, false);
                 } else {
-                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(swf, di.as3());
+                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(new LinkedHashSet<>(), swf, di.as3());
                 }
             }
             setText(newValue);

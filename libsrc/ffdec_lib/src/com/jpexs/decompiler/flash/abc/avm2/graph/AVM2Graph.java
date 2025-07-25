@@ -743,6 +743,7 @@ public class AVM2Graph extends Graph {
     /**
      * Translates via Graph - decompiles.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param secondPassData Second pass data
      * @param callStack Call stack
@@ -765,7 +766,7 @@ public class AVM2Graph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(int swfVersion, SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, int swfVersion, SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         ScopeStack localScopeStack = new ScopeStack();
         AVM2Graph g = new AVM2Graph(swfVersion, abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localScopeStack, localRegNames, fullyQualifiedNames, localRegAssignmentIps);
 
@@ -788,6 +789,7 @@ public class AVM2Graph extends Graph {
         localData.ip = 0;
         localData.code = code;
         localData.swfVersion = swfVersion;
+        localData.usedDeobfuscations = usedDeobfuscations;
         g.init(localData);
         Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : g.heads) {
@@ -2190,7 +2192,7 @@ public class AVM2Graph extends Graph {
                                                 }
                                                 if (construct.object instanceof GetLexAVM2Item) {
                                                     GetLexAVM2Item glt = (GetLexAVM2Item) construct.object;
-                                                    isXMLList = glt.propertyName.getName(aLocalData.abc, aLocalData.getConstants(), aLocalData.fullyQualifiedNames, true, true).equals("XMLList");
+                                                    isXMLList = glt.propertyName.getName(new LinkedHashSet<>(), aLocalData.abc, aLocalData.getConstants(), aLocalData.fullyQualifiedNames, true, true).equals("XMLList");
                                                 }
 
                                                 if (isXMLList) {
@@ -2733,7 +2735,7 @@ public class AVM2Graph extends Graph {
                             if (sp.value instanceof LocalRegAVM2Item) {
                                 LocalRegAVM2Item lr = (LocalRegAVM2Item) sp.value;
                                 AVM2FinalProcessLocalData aLocalData = (AVM2FinalProcessLocalData) localData;
-                                if (Objects.equals(propName.resolvedMultinameName, AVM2Item.localRegName(abc.getSwf(), aLocalData.localRegNames, lr.regIndex))) {
+                                if (Objects.equals(propName.resolvedMultinameName, AVM2Item.localRegName(abc.getSwf(), aLocalData.localRegNames, lr.regIndex, new LinkedHashSet<>()))) {
                                     list.remove(i);
                                     i--;
                                     continue loopi;
@@ -2746,7 +2748,7 @@ public class AVM2Graph extends Graph {
                 if (list.get(i) instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(i);
                     if (sslot.slotObject instanceof NewActivationAVM2Item) {
-                        String slotName = sslot.slotName.getName(abc, abc.constants, new ArrayList<>(), true, true);
+                        String slotName = sslot.slotName.getName(new LinkedHashSet<>()/*???*/, abc, abc.constants, new ArrayList<>(), true, true);
                         if (sslot.value.getNotCoercedNoDup() instanceof LocalRegAVM2Item) {
                             LocalRegAVM2Item locReg = (LocalRegAVM2Item) sslot.value.getNotCoercedNoDup();
                             if (localRegNames.containsValue(slotName)) {

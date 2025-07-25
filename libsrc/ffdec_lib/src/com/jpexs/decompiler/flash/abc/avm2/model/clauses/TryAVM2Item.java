@@ -142,7 +142,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
             writer.append("catch(");
-            String localName = catchExceptions.get(e).getVarName(localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames);
+            String localName = catchExceptions.get(e).getVarName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames);
             if (localName.isEmpty()) {
                 localName = finCatchName;
             }
@@ -153,10 +153,10 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
             int eti = catchExceptions.get(e).type_index;
 
-            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.abc, localData.constantsAvm2, true);
+            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, true);
             writer.hilightSpecial(localName, HighlightSpecialType.TRY_NAME, e, data);
             writer.append(":");
-            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);
+            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);
             writer.append(")");
             List<GraphTargetItem> commands = catchCommands.get(e);
             appendBlock(null, writer, localData, commands);

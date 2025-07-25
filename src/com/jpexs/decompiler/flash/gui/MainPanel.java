@@ -2010,7 +2010,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!oldName.equals(newName)) {
 
                 if (oldName.equals(abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().className)) {
-                    scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().packageStr.add(newName, "").toPrintableString(swf, true);
+                    scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().packageStr.add(newName, "").toPrintableString(new LinkedHashSet<>(), swf, true);
                 }
 
                 final String fScriptName = scriptName;
@@ -2849,7 +2849,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         String documentClass = swf.getDocumentClass();
         if (documentClass != null && currentView != VIEW_DUMP) {
-            String documentClassPrintable = DottedChain.parseNoSuffix(documentClass).toPrintableString(swf, true);
+            String documentClassPrintable = DottedChain.parseNoSuffix(documentClass).toPrintableString(new LinkedHashSet<>(), swf, true);
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
                 ABCPanel abcPanel = getABCPanel();

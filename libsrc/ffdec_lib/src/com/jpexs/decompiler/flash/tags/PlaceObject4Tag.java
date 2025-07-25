@@ -45,6 +45,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -711,7 +712,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (placeFlagHasName) {
-            ret.put("nm", DottedChain.parseNoSuffix(name).toPrintableString(getSwf(), false));
+            ret.put("nm", DottedChain.parseNoSuffix(name).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
         }
         return ret;
     }

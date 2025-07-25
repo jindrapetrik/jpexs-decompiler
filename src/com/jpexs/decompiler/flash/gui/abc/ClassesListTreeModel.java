@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.event.TreeModelEvent;
@@ -156,7 +157,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         }
 
         if (flat) {
-            String fullName = packageStr.toPrintableString(abc.getSwf(), true);
+            String fullName = packageStr.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
             boolean defaultPackage = false;
             if (fullName.length() == 0) {
                 fullName = AppResources.translate("package.default");

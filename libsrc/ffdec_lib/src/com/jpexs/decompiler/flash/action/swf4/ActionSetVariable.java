@@ -48,6 +48,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * SetVariable action - Sets a variable value.
@@ -81,7 +82,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
         String nameStr;
@@ -197,10 +198,10 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public String getVariableName(TranslateStack stack, ConstantPool cpool, SWF swf) {
+    public String getVariableName(Set<String> usedDeobfuscations, TranslateStack stack, ConstantPool cpool, SWF swf) {
         if (stack.size() < 2) {
             return null;
         }
-        return stack.get(stack.size() - 2).toStringNoQuotes(LocalData.create(cpool, swf));
+        return stack.get(stack.size() - 2).toStringNoQuotes(LocalData.create(cpool, swf, usedDeobfuscations));
     }
 }

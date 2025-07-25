@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import macromedia.asc.util.Decimal128;
@@ -168,7 +169,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
         code.removeLabelsAndDebugLine(b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        String actual = b.toSource(10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>());
+        String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>());
         actual = actual.replace("\r\n", "\n");
         assertEquals(actual, expected);
     }

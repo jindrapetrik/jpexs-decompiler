@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +72,7 @@ public class UninitializedClassFieldsDetector {
             DoInitActionTag doi = (DoInitActionTag) asm;
             String exportName = doi.getSwf().getExportName(doi.spriteId);
             if (exportName != null) {
-                asmPath = DottedChain.parseNoSuffix(exportName).toPrintableString(doi.getSwf(), false);
+                asmPath = DottedChain.parseNoSuffix(exportName).toPrintableString(new LinkedHashSet<>(), doi.getSwf(), false);
             }
         }
         for (ProgressListener listener : progressListeners) {

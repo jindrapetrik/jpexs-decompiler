@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * SetTarget2 action - Sets the target for the next action, stack-based.
@@ -40,6 +41,7 @@ public class ActionSetTarget2 extends Action {
 
     /**
      * Constructor.
+     *
      * @param charset Charset
      */
     public ActionSetTarget2(String charset) {
@@ -63,7 +65,7 @@ public class ActionSetTarget2 extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem target = stack.pop();
         output.add(new SetTarget2ActionItem(this, lineStartAction, target));
     }

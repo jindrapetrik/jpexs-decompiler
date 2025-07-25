@@ -87,6 +87,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import static org.testng.Assert.assertEquals;
@@ -559,7 +560,7 @@ public class FlashPlayerTest {
                     task.actions = newActions;
 
                     List<GraphTargetItem> output = new ArrayList<>();
-                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>());
+                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>(), new LinkedHashSet<>());
                     TranslateStack stack = new TranslateStack("");
                     for (Action a : newActions) {
                         a.translate(localData, stack, output, 0, "");

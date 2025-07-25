@@ -83,6 +83,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param offset Offset
      * @param charset Charset
      */
@@ -93,6 +94,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @throws IOException On I/O error
@@ -109,6 +111,7 @@ public class ActionIf extends Action {
 
     /**
      * Gets the target address
+     *
      * @return Address
      */
     public long getTargetAddress() {
@@ -139,6 +142,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -179,7 +183,7 @@ public class ActionIf extends Action {
         long targetAddress = getTargetAddress();
         int jmp = code.adr2pos(targetAddress);
         int after = code.adr2pos(getAddress() + length);
-        if (jmp == -1) {                       
+        if (jmp == -1) {
             Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs{0} from ofs{1} in {2}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress()), ((ActionGraphSource) code).getPath()});
             ret.add(after);
         } else {

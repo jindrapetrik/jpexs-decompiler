@@ -782,7 +782,7 @@ public class ABC implements Openable {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0 && mIndex < constants.getMultinameCount()) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(this, constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(new LinkedHashSet<>(), this, constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.getCode().code.get(ip - 1).operands[0];
@@ -1352,7 +1352,7 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyClassInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(this, constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 MethodBody body = findBody(class_info.get(i).cinit_index);
                 if (body != null) {
                     return body;
@@ -1371,7 +1371,7 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyInstanceInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(this, constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 MethodBody body = findBody(instance_info.get(i).iinit_index);
                 if (body != null) {
                     return body;
@@ -1391,11 +1391,11 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyByClassAndName(String classNameWithSuffix, String methodNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(this, constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodNameWithSuffix.equals(t2.getName(this).getName(this, constants, null, true, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -1407,7 +1407,7 @@ public class ABC implements Openable {
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodNameWithSuffix.equals(t2.getName(this).getName(this, constants, null, true, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -1520,7 +1520,7 @@ public class ABC implements Openable {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
                             String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
-                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(this, constants, true);
+                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
                             map.put(key, val);
                         }
                     }
@@ -1701,7 +1701,7 @@ public class ABC implements Openable {
         for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
             Multiname m = constants.getMultiname(multinameIndex);
             if (m.kind == Multiname.QNAME || m.kind == Multiname.QNAMEA) {
-                String name = m.getName(this, constants, new ArrayList<>(), true, false);
+                String name = m.getName(new LinkedHashSet<>(), this, constants, new ArrayList<>(), true, false);
                 List<Integer> indices = nameToQNameIndices.get(name);
                 if (indices == null) {
                     indices = new ArrayList<>();
@@ -1772,7 +1772,7 @@ public class ABC implements Openable {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(this, constants, null, true, true).equals(methodNameWithSuffix)) {
+                    if (t.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true).equals(methodNameWithSuffix)) {
                         return ((TraitMethodGetterSetter) t).method_info;
                     }
                 }
@@ -1792,7 +1792,7 @@ public class ABC implements Openable {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(this, constants, null, true, true).equals(methodNameWithSuffix)) {
+                    if (t.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true).equals(methodNameWithSuffix)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
                     }
                 }
@@ -1835,7 +1835,7 @@ public class ABC implements Openable {
             if (instance_info.get(c).deleted) {
                 continue;
             }
-            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(this, constants, true);
+            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
             if (nameWithSuffix.equals(s.toRawString())) {
                 return c;
             }

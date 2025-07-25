@@ -58,6 +58,7 @@ import java.util.Base64;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -248,7 +249,7 @@ public class Helper {
      */
     public static String escapeExportname(SWF swf, String s, boolean quote) {
         if (s.startsWith("__Packages.")) {
-            return DottedChain.parseNoSuffix(s).toPrintableString(swf, false);
+            return DottedChain.parseNoSuffix(s).toPrintableString(new LinkedHashSet<>(), swf, false);
         }
         return (quote ? "\"" : "") + escapePCodeString(s) + (quote ? "\"" : "");
     }

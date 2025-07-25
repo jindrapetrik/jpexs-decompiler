@@ -1857,7 +1857,7 @@ public class AVM2Code implements Cloneable {
      * @throws ConvertException On convert error
      * @throws InterruptedException On interrupt
      */
-    public void toSourceOutput(List<GraphTargetItem> output, int swfVersion, Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssignmentIps, LinkedIdentityHashSet<SetLocalAVM2Item> bottomStackSetLocals) throws ConvertException, InterruptedException {
+    public void toSourceOutput(List<GraphTargetItem> output, int swfVersion, Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssignmentIps, LinkedIdentityHashSet<SetLocalAVM2Item> bottomStackSetLocals, Set<String> usedDeobfuscations) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.err.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1976,7 +1976,7 @@ public class AVM2Code implements Cloneable {
             } else
              */
             if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                ins.definition.translate(swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                ins.definition.translate(usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 //ip = end + 1;
                 break;
             } else if (ins.definition instanceof NewFunctionIns) {
@@ -1998,7 +1998,7 @@ public class AVM2Code implements Cloneable {
                                         if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc, abc.constants, fullyQualifiedNames, true, true);
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
                                                     localScopeStack.pop(); // with
                                                     output.remove(output.size() - 1); // with
                                                     ip = ip + plus + 4; // +1 below
@@ -2012,13 +2012,13 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 // What to do when hasDup is false?
-                ins.definition.translate(swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                ins.definition.translate(usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                 nft.functionName = functionName;
                 ip++;
             } else {
                 try {
-                    ins.definition.translate(swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                    ins.definition.translate(usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
 
                     if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
                         bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
@@ -2070,19 +2070,20 @@ public class AVM2Code implements Cloneable {
     /**
      * Gets types of local registers.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return Map from register id to type
      */
-    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         HashMap<Integer, GraphTargetItem> ret = new HashMap<>();
         AVM2Instruction prev = null;
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof SetLocalTypeIns) {
                 if (prev != null) {
                     if (prev.definition instanceof CoerceOrConvertTypeIns) {
-                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(abc, constants, prev));
+                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(usedDeobfuscations,abc, constants, prev));
                     }
                 }
             }
@@ -2239,6 +2240,7 @@ public class AVM2Code implements Cloneable {
     /**
      * Injects declarations of registers/slots/properties etc.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param level Level
      * @param paramNames Parameter names
      * @param items Items
@@ -2251,14 +2253,14 @@ public class AVM2Code implements Cloneable {
      * @param abc ABC
      * @param body Method body
      */
-    private void injectDeclarations(int level, List<String> paramNames, List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, List<String> declaredProperties, List<DeclarationAVM2Item> declaredPropsDec, ABC abc, MethodBody body) {
+    private void injectDeclarations(Set<String> usedDeobfuscations, int level, List<String> paramNames, List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, List<String> declaredProperties, List<DeclarationAVM2Item> declaredPropsDec, ABC abc, MethodBody body) {
         //boolean hasActivation = abc.method_info.get(body.method_info).flagNeed_activation();
         Map<String, TraitSlotConst> traits = new LinkedHashMap<>();
         for (Trait t : body.traits.traits) {
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
                 Multiname tratMultiname = abc.constants.getMultiname(tsc.name_index);
-                String bodyTraitName = tratMultiname.getName(abc, abc.constants, new ArrayList<>(), true, true);
+                String bodyTraitName = tratMultiname.getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true);
                 traits.put(bodyTraitName, tsc);
             }
         }
@@ -2276,7 +2278,7 @@ public class AVM2Code implements Cloneable {
                     if (ss.slotName == null) {
                         break;
                     }
-                    propNameStr = ss.slotName.getName(abc, abc.constants, new ArrayList<>(), true, true);
+                    propNameStr = ss.slotName.getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true);
                     value = ss.value;
                 } else if (item instanceof SetPropertyAVM2Item) {
                     SetPropertyAVM2Item sp = (SetPropertyAVM2Item) item;
@@ -2324,7 +2326,7 @@ public class AVM2Code implements Cloneable {
                         } else {
                             return;
                         }
-                        propertyName = propertyMultiName.getName(abc, abc.constants, new ArrayList<>(), true, true);
+                        propertyName = propertyMultiName.getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true);
 
                         if (traits.containsKey(propertyName)) {
                             Slot sl = new Slot(new NewActivationAVM2Item(null, null), propertyMultiName);
@@ -2349,8 +2351,8 @@ public class AVM2Code implements Cloneable {
                     if (!beginDeclaredSlotsNames.contains(traitName)) {
                         Slot sl = new Slot(new NewActivationAVM2Item(null, null), abc.constants.getMultiname(traits.get(traitName).name_index));
                         TraitSlotConst tsc = (TraitSlotConst) traits.get(traitName);
-                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc, abc.constants);
-                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc, abc.constants, type, TypeItem.UNBOUNDED /*?*/, false), type);
+                        GraphTargetItem type = AbcIndexing.multinameToType(usedDeobfuscations, tsc.type_index, abc, abc.constants);
+                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc, abc.constants, type, TypeItem.UNBOUNDED /*?*/, false, usedDeobfuscations), type);
                         declaredSlotsDec.add(d);
                         declaredSlots.add(sl);
 
@@ -2416,7 +2418,7 @@ public class AVM2Code implements Cloneable {
                                 if (!declaredProperties.contains(propName.resolvedMultinameName)) {
                                     if (traits.containsKey(propName.resolvedMultinameName)) {
                                         TraitSlotConst tsc = traits.get(propName.resolvedMultinameName);
-                                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc, abc.constants);
+                                        GraphTargetItem type = AbcIndexing.multinameToType(usedDeobfuscations, tsc.type_index, abc, abc.constants);
                                         DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
                                         sp.setDeclaration(d);
                                         declaredPropsDec.add(d);
@@ -2446,14 +2448,14 @@ public class AVM2Code implements Cloneable {
                     SetSlotAVM2Item ssti = (SetSlotAVM2Item) subItem;
                     if (ssti.scope instanceof NewActivationAVM2Item) {
                         Slot sl = new Slot(ssti.scope, ssti.slotName);
-                        String slotPropertyName = sl.multiname.getName(abc, abc.constants, new ArrayList<>(), true, false);
+                        String slotPropertyName = sl.multiname.getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, false);
                         if (!paramNames.contains(slotPropertyName)) {
 
                             int index = slotListIndexOf(declaredSlots, slotPropertyName, abc);
                             if (index == -1) {
                                 GraphTargetItem type = TypeItem.UNBOUNDED;
                                 if (traits.containsKey(slotPropertyName)) {
-                                    type = AbcIndexing.multinameToType(traits.get(slotPropertyName).type_index, abc, abc.constants);
+                                    type = AbcIndexing.multinameToType(usedDeobfuscations, traits.get(slotPropertyName).type_index, abc, abc.constants);
                                 }
                                 DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
                                 ssti.setDeclaration(d);
@@ -2482,7 +2484,7 @@ public class AVM2Code implements Cloneable {
             if (currentItem instanceof Block) {
                 Block blk = (Block) currentItem;
                 for (List<GraphTargetItem> sub : blk.getSubs()) {
-                    injectDeclarations(level + 1, paramNames, sub, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
+                    injectDeclarations(usedDeobfuscations, level + 1, paramNames, sub, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
                 }
             }
         }
@@ -2516,6 +2518,7 @@ public class AVM2Code implements Cloneable {
     /**
      * Converts code to source - list of GraphTargetItems.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param callStack Call stack
      * @param abcIndex ABC indexing
@@ -2539,7 +2542,7 @@ public class AVM2Code implements Cloneable {
      * @return List of GraphTargetItems
      * @throws InterruptedException On interrupt
      */
-    public List<GraphTargetItem> toGraphTargetItems(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, List<Integer> initTraitClasses) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(Set<String> usedDeobfuscations, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, List<Integer> initTraitClasses) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -2550,13 +2553,13 @@ public class AVM2Code implements Cloneable {
         }
         HashMap<Integer, GraphTargetItem> localRegTypes = new HashMap<>();
         for (int i = 0; i < abc.method_info.get(methodIndex).param_types.length; i++) {
-            localRegTypes.put(i + 1, AbcIndexing.multinameToType(abc.method_info.get(methodIndex).param_types[i], abc, abc.constants));
+            localRegTypes.put(i + 1, AbcIndexing.multinameToType(usedDeobfuscations, abc.method_info.get(methodIndex).param_types[i], abc, abc.constants));
         }
 
         try {
-            list = AVM2Graph.translateViaGraph(swfVersion, null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
+            list = AVM2Graph.translateViaGraph(usedDeobfuscations, swfVersion, null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
         } catch (SecondPassException spe) {
-            list = AVM2Graph.translateViaGraph(swfVersion, spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
+            list = AVM2Graph.translateViaGraph(usedDeobfuscations, swfVersion, spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
         }
         if (initTraits != null) {
 
@@ -2582,7 +2585,7 @@ public class AVM2Code implements Cloneable {
                                     if (value != null && !convertData.assignedValues.containsKey(tsc)) {
                                         if (value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                            f.functionName = tsc.getName(abc).getName(abc, abc.constants, fullyQualifiedNames, true, true);
+                                            f.functionName = tsc.getName(abc).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
                                         }
                                         AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
@@ -2671,7 +2674,7 @@ public class AVM2Code implements Cloneable {
                                         }
                                         if (value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                            f.functionName = tsc.getName(abc).getName(abc, abc.constants, fullyQualifiedNames, true, true);
+                                            f.functionName = tsc.getName(abc).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
                                         }
                                         AssignedValue av = new AssignedValue(classMultiname == -1 ? ti : null, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
@@ -2889,7 +2892,7 @@ public class AVM2Code implements Cloneable {
             if (param_types[i] == 0) {
                 type = TypeItem.UNBOUNDED;
             } else {
-                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc, abc.constants, true));
+                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true));
             }
             if (d.length > r) {
                 d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null), type), type);
@@ -2914,9 +2917,9 @@ public class AVM2Code implements Cloneable {
         HashMap<Integer, String> registerNames = body.getLocalRegNames(abc);
         List<String> paramNamesList = new ArrayList<>();
         for (int ir = 0; ir < r; ir++) {
-            paramNamesList.add(AVM2Item.localRegName(abc.getSwf(), localRegNames, ir));
+            paramNamesList.add(AVM2Item.localRegName(abc.getSwf(), localRegNames, ir, usedDeobfuscations));
         }
-        injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
+        injectDeclarations(usedDeobfuscations, 0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
 
         return list;
     }

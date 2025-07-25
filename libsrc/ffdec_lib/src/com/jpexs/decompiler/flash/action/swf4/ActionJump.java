@@ -64,6 +64,7 @@ public class ActionJump extends Action {
 
     /**
      * Gets the jump offset
+     *
      * @return Offset
      */
     public int getJumpOffset() {
@@ -72,6 +73,7 @@ public class ActionJump extends Action {
 
     /**
      * Sets the jump offset
+     *
      * @param offset Offset
      */
     public final void setJumpOffset(int offset) {
@@ -80,6 +82,7 @@ public class ActionJump extends Action {
 
     /**
      * Constructor
+     *
      * @param offset Offset
      * @param charset Charset
      */
@@ -90,6 +93,7 @@ public class ActionJump extends Action {
 
     /**
      * Constructor
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @throws IOException On I/O error
@@ -106,6 +110,7 @@ public class ActionJump extends Action {
 
     /**
      * Gets the target address
+     *
      * @return Address
      */
     public long getTargetAddress() {
@@ -136,6 +141,7 @@ public class ActionJump extends Action {
 
     /**
      * Constructor
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -169,7 +175,7 @@ public class ActionJump extends Action {
         int ofs = code.adr2pos(targetAddress);
         if (ofs == -1) {
             int length = getBytesLength();
-            ofs = code.adr2pos(getAddress() + length);           
+            ofs = code.adr2pos(getAddress() + length);
             Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs{0} from ofs{1} in {2}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress()), ((ActionGraphSource) code).getPath()});
         }
         ret.add(ofs);

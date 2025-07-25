@@ -71,13 +71,14 @@ public class ActionLocalData extends BaseLocalData {
      * @param insideDoInitAction Is inside doInitAction
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, Map<String, Map<String, Trait>> uninitializedClassTraits) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
         this.secondPassData = secondPassData;
         regNames = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
         this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
+        this.usedDeobfuscations = usedDeobfuscations;
     }
 
     /**
@@ -88,13 +89,14 @@ public class ActionLocalData extends BaseLocalData {
      * @param regNames Register names
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, Map<String, Map<String, Trait>> uninitializedClassTraits) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
         this.regNames = regNames;
         this.secondPassData = secondPassData;
         variables = new HashMap<>();
         functions = new HashMap<>();
         this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
+        this.usedDeobfuscations = usedDeobfuscations;
     }
 
     /**
@@ -108,7 +110,7 @@ public class ActionLocalData extends BaseLocalData {
      * @param functions Functions
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits) {
+    public ActionLocalData(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
         this.allSwitchParts = switchParts;
         this.regNames = regNames;
         this.variables = variables;
@@ -116,5 +118,6 @@ public class ActionLocalData extends BaseLocalData {
         this.insideDoInitAction = insideDoInitAction;
         this.secondPassData = secondPassData;
         this.uninitializedClassTraits = uninitializedClassTraits;
+        this.usedDeobfuscations = usedDeobfuscations;
     }
 }

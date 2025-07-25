@@ -116,6 +116,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -231,7 +232,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             Multiname m = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants);
             if (m != null) {
                 Namespace ns = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNamespace(ci.abc.constants);
-                String n = m.getName(ci.abc, ci.abc.constants, new ArrayList<>(), true, true /*FIXME!!*/);
+                String n = m.getName(new LinkedHashSet<>(), ci.abc, ci.abc.constants, new ArrayList<>(), true, true /*FIXME!!*/);
                 String nsn = ns == null ? null : ns.getRawName(ci.abc.constants);
                 name_index = constants.getQnameId(
                         n,
@@ -253,7 +254,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (name_index == 0) {
             if (pkg.isEmpty() && localData.currentScript != null /*FIXME!*/) {
                 for (Trait t : localData.currentScript.traits.traits) {
-                    if (t.getName(abc).getName(abc, constants, null, true, true /*FIXME!!*/).equals(name)) {
+                    if (t.getName(abc).getName(new LinkedHashSet<>(), abc, constants, null, true, true /*FIXME!!*/).equals(name)) {
                         name_index = t.name_index;
                         break;
                     }
@@ -718,7 +719,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         List<MethodBody> callStack = new ArrayList<>();
                         callStack.add(pcinit);
                         try {
-                            pcinit.convert(-1 /*FIXME??*/, callStack, null, d, "-", ScriptExportMode.AS, true, mi, -1, ci.index, ci.abc, null, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, new NulWriter(), new ArrayList<>(), ci.abc.class_info.get(ci.index).static_traits, false, new HashSet<>(), new ArrayList<>());
+                            pcinit.convert(-1 /*FIXME??*/, callStack, null, d, "-", ScriptExportMode.AS, true, mi, -1, ci.index, ci.abc, null, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, new NulWriter(), new ArrayList<>(), ci.abc.class_info.get(ci.index).static_traits, false, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             //FIXME! Add skinparts from _skinParts attribute of parent class!!!
                         } catch (InterruptedException ex) {
                             Logger.getLogger(AVM2SourceGenerator.class.getName()).log(Level.SEVERE, "Getting parent skinparts interrupted", ex);
@@ -727,7 +728,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if (t instanceof TraitSlotConst) {
                                 TraitSlotConst tsc = (TraitSlotConst) t;
                                 if (tsc.kindType == Trait.TRAIT_SLOT) {
-                                    if ("_skinParts".equals(tsc.getName(ci.abc).getName(ci.abc, ci.abc.constants, new ArrayList<>(), true, true))) {
+                                    if ("_skinParts".equals(tsc.getName(ci.abc).getName(new LinkedHashSet<>(), ci.abc, ci.abc.constants, new ArrayList<>(), true, true))) {
                                         if (d.assignedValues.containsKey(tsc)) {
                                             if (d.assignedValues.get(tsc).value instanceof NewObjectAVM2Item) {
                                                 NewObjectAVM2Item no = (NewObjectAVM2Item) d.assignedValues.get(tsc).value;
@@ -1812,7 +1813,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     instanceInfo.super_index = abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createQName(false, str("Object"), namespace(Namespace.KIND_PACKAGE, "")), true);
                 }
                 if (instanceInfo.super_index != 0) {
-                    int foundClass = abc.findClassByName(abc.constants.getMultiname(instanceInfo.super_index).getNameWithNamespace(abc, abc.constants, true));
+                    int foundClass = abc.findClassByName(abc.constants.getMultiname(instanceInfo.super_index).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true));
                     if (foundClass > -1) {
                         if (foundClass > minClassIndex) {
                             minClassIndex = foundClass;
@@ -1822,7 +1823,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 instanceInfo.interfaces = new int[((ClassAVM2Item) item).implementsOp.size()];
                 for (int i = 0; i < ((ClassAVM2Item) item).implementsOp.size(); i++) {
                     instanceInfo.interfaces[i] = superIntName(localData, ((ClassAVM2Item) item).implementsOp.get(i));
-                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(abc, abc.constants, true));
+                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true));
                     if (foundIface > -1) {
                         if (foundIface > minClassIndex) {
                             minClassIndex = foundIface;
@@ -1845,7 +1846,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     GraphTargetItem un = ((InterfaceAVM2Item) item).superInterfaces.get(i);
                     instanceInfo.interfaces[i] = superIntName(localData, un);
 
-                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(abc, abc.constants, true));
+                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true));
                     if (foundIface > -1) {
                         if (foundIface > minClassIndex) {
                             minClassIndex = foundIface;
@@ -2342,7 +2343,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (Trait t : scriptInfo.traits.traits) {
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
-                DottedChain className = tc.getName(abc).getNameWithNamespace(abc, abc.constants, true);
+                DottedChain className = tc.getName(abc).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true);
 
                 List<Integer> parents = new ArrayList<>();
                 if (documentClass != null && documentClass.equals(className)) {
@@ -2356,7 +2357,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     sinitcode.add(ins(AVM2Instructions.PushNull));
                 } else {
 
-                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, abc, constants), abc, scriptIndex);
+                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(new LinkedHashSet<>(), abc.instance_info.get(tc.class_info).name_index, abc, constants), abc, scriptIndex);
                     while (ci != null && ci.parent != null) {
                         ci = ci.parent;
                         Multiname origM = ci.abc.constants.getMultiname(ci.abc.instance_info.get(ci.index).name_index);
@@ -2430,7 +2431,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             indices.add(
                     abc.getSelectedAbc().constants.getMultinameId(
                             Multiname.createQName(false,
-                                    abc.getSelectedAbc().constants.getStringId(superName.getName(a, a.constants, null, true, true /*FIXME!!! ???*/), true),
+                                    abc.getSelectedAbc().constants.getStringId(superName.getName(new LinkedHashSet<>(), a, a.constants, null, true, true /*FIXME!!! ???*/), true),
                                     abc.getSelectedAbc().constants.getNamespaceId(superName.getNamespace(a.constants).kind, superName.getNamespace(a.constants).getName(a.constants), 0, true)), true)
             );
         }
@@ -2449,16 +2450,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (tsc.type_index == 0) {
                 return TypeItem.UNBOUNDED;
             }
-            return AbcIndexing.multinameToType(tsc.type_index, abc.getSelectedAbc(), abc.getSelectedAbc().constants);
+            return AbcIndexing.multinameToType(new LinkedHashSet<>(), tsc.type_index, abc.getSelectedAbc(), abc.getSelectedAbc().constants);
         }
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
             if (tmgs.kindType == Trait.TRAIT_GETTER) {
-                return AbcIndexing.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).ret_type, abc.getSelectedAbc(), abc.getSelectedAbc().constants);
+                return AbcIndexing.multinameToType(new LinkedHashSet<>(), abc.getSelectedAbc().method_info.get(tmgs.method_info).ret_type, abc.getSelectedAbc(), abc.getSelectedAbc().constants);
             }
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 if (abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types.length > 0) {
-                    return AbcIndexing.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types[0], abc.getSelectedAbc(), abc.getSelectedAbc().constants);
+                    return AbcIndexing.multinameToType(new LinkedHashSet<>(), abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types[0], abc.getSelectedAbc(), abc.getSelectedAbc().constants);
                 } else {
                     return TypeItem.UNBOUNDED;
                 }
@@ -2557,12 +2558,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param outABCs Out ABCs
      */
     public static void parentNames(AbcIndexing abc, int scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
-        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc(), abc.getSelectedAbc().constants, true /*FIXME!!*/)), abc.getSelectedAbc(), scriptIndex);
+        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(new LinkedHashSet<>(), abc.getSelectedAbc(), abc.getSelectedAbc().constants, true /*FIXME!!*/)), abc.getSelectedAbc(), scriptIndex);
         while (ci != null) {
             int ni = ci.abc.instance_info.get(ci.index).name_index;
             indices.add(ni);
             outABCs.add(ci.abc);
-            names.add(ci.abc.constants.getMultiname(ni).getName(ci.abc, ci.abc.constants, null, true, true/*FIXME!!*/));
+            names.add(ci.abc.constants.getMultiname(ni).getName(new LinkedHashSet<>(), ci.abc, ci.abc.constants, null, true, true/*FIXME!!*/));
             namespaces.add(ci.abc.constants.getMultiname(ni).getNamespace(ci.abc.constants).getName(ci.abc.constants).toRawString());
             ci = ci.parent;
         }

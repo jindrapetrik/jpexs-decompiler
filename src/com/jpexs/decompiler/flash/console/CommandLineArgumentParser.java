@@ -231,6 +231,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -4354,9 +4355,9 @@ public class CommandLineArgumentParser {
         if (dcs != null) {
             if (dcs.contains(".")) {
                 DottedChain dc = DottedChain.parseWithSuffix(dcs);
-                pw.println("documentClass=" + dc.toPrintableString(swf, true));
+                pw.println("documentClass=" + dc.toPrintableString(new LinkedHashSet<>(), swf, true));
             } else {
-                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(swf, true, dcs));
+                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(swf, new LinkedHashSet<>(), true, dcs));
             }
         } else {
             pw.println("documentClass=");

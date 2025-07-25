@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.Set;
 
 /**
  * Coerce or convert type instruction interface.
@@ -31,10 +32,11 @@ public interface CoerceOrConvertTypeIns {
     /**
      * Get target type of coercing or converting.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param constants Constants
      * @param ins Instruction
      * @return Target type
      */
-    public GraphTargetItem getTargetType(ABC abc, AVM2ConstantPool constants, AVM2Instruction ins);
+    public GraphTargetItem getTargetType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, AVM2Instruction ins);
 }

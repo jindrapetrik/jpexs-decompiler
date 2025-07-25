@@ -195,6 +195,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2846,7 +2847,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                 if (constructorBody.convertedItems != null) {
                     for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
                         GraphTargetItem ti = constructorBody.convertedItems.get(j);
@@ -3039,7 +3040,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                 List<String> allFramesAccessibilityTraitNames = new ArrayList<>();
                 List<String> frameTraitNames = new ArrayList<>();
                 if (constructorBody.convertedItems != null) {
@@ -3060,14 +3061,14 @@ public class XFLConverter {
                                         if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
                                             if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                 GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                frameTraitNames.add(lex.propertyName.getName(abc, abc.constants, new ArrayList<>(), false, true));
+                                                frameTraitNames.add(lex.propertyName.getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), false, true));
                                             } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, new ArrayList<>(), false, true));
+                                                        frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), false, true));
                                                     }
                                                 }
                                             }
@@ -3083,7 +3084,7 @@ public class XFLConverter {
                 List<String> frameRangeAccessibilityTraitNames = new ArrayList<>();
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String traitName = t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false);
+                        String traitName = t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false);
                         if ("__setTab_handler".equals(traitName)
                                 || "__setAcc_handler".equals(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
@@ -3093,7 +3094,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             if (traitBody.convertedItems == null) {
                                 continue;
                             }
@@ -3120,7 +3121,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             if (traitBody.convertedItems != null) {
                                 for (int j = 0; j < traitBody.convertedItems.size(); j++) {
                                     GraphTargetItem ti = traitBody.convertedItems.get(j);
@@ -3144,13 +3145,13 @@ public class XFLConverter {
 
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String traitName = t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false);
+                        String traitName = t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false);
                         if (frameAccessibilityTraitNames.contains(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             if (traitBody.convertedItems != null) {
                                 if (!traitBody.convertedItems.isEmpty()) {
                                     if (traitBody.convertedItems.get(0) instanceof IfItem) {
@@ -3252,7 +3253,7 @@ public class XFLConverter {
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             if (traitBody.convertedItems != null) {
                                 if (!traitBody.convertedItems.isEmpty()) {
                                     if (traitBody.convertedItems.get(0) instanceof IfItem) {
@@ -3367,13 +3368,13 @@ public class XFLConverter {
                 }
 
                 for (Trait t : instanceInfo.instance_traits.traits) {
-                    if (allFramesAccessibilityTraitNames.contains(t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false))) {
+                    if (allFramesAccessibilityTraitNames.contains(t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false))) {
                         if (t instanceof TraitMethodGetterSetter) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
                             List<MethodBody> traitCallStack = new ArrayList<>();
                             traitCallStack.add(traitBody);
-                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
                             if (traitBody.convertedItems != null) {
                                 for (int j = 0; j < traitBody.convertedItems.size(); j++) {
                                     GraphTargetItem ti = traitBody.convertedItems.get(j);
@@ -3479,7 +3480,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
 
                 Map<Integer, String> frameToTraitName = new HashMap<>();
 
@@ -3511,14 +3512,14 @@ public class XFLConverter {
                                             int frame = frameItem.intValue();
                                             if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                 GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                frameToTraitName.put(frame, lex.propertyName.getName(abc, abc.constants, new ArrayList<>(), true, false));
+                                                frameToTraitName.put(frame, lex.propertyName.getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false));
                                             } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameToTraitName.put(frame, abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, new ArrayList<>(), true, false));
+                                                        frameToTraitName.put(frame, abc.constants.getMultiname(multinameIndex).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false));
                                                     }
                                                 }
                                             }
@@ -3532,7 +3533,7 @@ public class XFLConverter {
                 Map<String, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
                 for (Trait trait : instanceInfo.instance_traits.traits) {
                     if (trait instanceof TraitMethodGetterSetter) {
-                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index).getName(abc, abc.constants, new ArrayList<>(), true, false), (TraitMethodGetterSetter) trait);
+                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, false), (TraitMethodGetterSetter) trait);
                     }
                 }
 
@@ -3547,7 +3548,7 @@ public class XFLConverter {
                         callStack = new ArrayList<>();
                         callStack.add(frameBody);
 
-                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>());
+                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
 
                         if (frameBody.convertedItems != null) {
                             for (int i = 0; i < frameBody.convertedItems.size(); i++) {
@@ -3569,7 +3570,7 @@ public class XFLConverter {
                         }
 
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
-                        frameBody.toString(swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
+                        frameBody.toString(new LinkedHashSet<>(), swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 
                         String script = scriptBuilder.toString();
                         ret.put(frame, script);

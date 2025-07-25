@@ -37,6 +37,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -258,7 +259,7 @@ public class FolderListPanel extends JPanel {
                         if (expName != null && !expName.isEmpty()) {
                             String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
                             if (expName.startsWith("__Packages.")) {
-                                s = IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), false, pathParts[pathParts.length - 1]);
+                                s = IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), new LinkedHashSet<>(), false, pathParts[pathParts.length - 1]);
                             } else {
                                 s = Helper.escapeExportname(tag.getSwf(), expName, false);
                             } 

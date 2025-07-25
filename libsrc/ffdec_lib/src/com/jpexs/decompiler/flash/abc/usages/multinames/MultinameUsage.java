@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.usages.Usage;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 /**
@@ -86,8 +87,8 @@ public abstract class MultinameUsage implements Usage {
             return false;
         }
         if ((thisM.kind == Multiname.QNAME || thisM.kind == Multiname.QNAMEA) && otherM.kind == thisM.kind) {
-            String thisName = thisM.getName(abc, abc.constants, new ArrayList<>(), true, true);
-            String otherName = otherM.getName(other.abc, other.abc.constants, new ArrayList<>(), true, true);
+            String thisName = thisM.getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, true);
+            String otherName = otherM.getName(new LinkedHashSet<>(), other.abc, other.abc.constants, new ArrayList<>(), true, true);
             Namespace thisNs = thisM.getNamespace(abc.constants);
             Namespace otherNs = otherM.getNamespace(other.abc.constants);
             if (!Objects.equals(thisName, otherName)) {

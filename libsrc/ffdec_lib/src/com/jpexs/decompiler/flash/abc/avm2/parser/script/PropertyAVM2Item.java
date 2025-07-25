@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,11 +218,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     for (MethodBody b : callStack) {
                         for (int i = 0; i < b.traits.traits.size(); i++) {
                             Trait t = b.traits.traits.get(i);
-                            if (t.getName(abc).getName(abc, constants, null, true, true).equals(propertyName)) {
+                            if (t.getName(abc).getName(new LinkedHashSet<>(), abc, constants, null, true, true).equals(propertyName)) {
                                 if (t instanceof TraitSlotConst) {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
                                     objType = new TypeItem(DottedChain.FUNCTION);
-                                    propType = AbcIndexing.multinameToType(tsc.type_index, abc, constants);
+                                    propType = AbcIndexing.multinameToType(new LinkedHashSet<>(), tsc.type_index, abc, constants);
                                     propIndex = tsc.name_index;
                                     if (!localData.traitUsages.containsKey(b)) {
                                         localData.traitUsages.put(b, new ArrayList<>());

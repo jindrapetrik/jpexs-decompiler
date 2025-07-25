@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -897,7 +898,7 @@ public class DefineEditTextTag extends TextTag {
             writer.append("leading ").append(leading).newLine();
         }
         if (!variableName.isEmpty()) {
-            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(getSwf(), false)).newLine();
+            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false)).newLine();
         }
         writer.append("]");
         if (hasText) {
@@ -1610,7 +1611,7 @@ public class DefineEditTextTag extends TextTag {
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (variableName != null && !variableName.isEmpty()) {
-            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(getSwf(), false));
+            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
         }
         return ret;
     }

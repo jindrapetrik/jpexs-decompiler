@@ -25,7 +25,9 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Script info in ABC file.
@@ -108,9 +110,10 @@ public class ScriptInfo {
      * returns null.
      *
      * @param abc ABC file
+     * @param usedDeobfuscations Used deobfuscations
      * @return Simple pack name - Can be null!
      */
-    public DottedChain getSimplePackName(ABC abc) {
+    public DottedChain getSimplePackName(ABC abc, Set<String> usedDeobfuscations) {
         List<Integer> packageTraits = new ArrayList<>();
 
         for (int j = 0; j < traits.traits.size(); j++) {
@@ -128,7 +131,7 @@ public class ScriptInfo {
         if (packageTraits.isEmpty() || packageTraits.size() > 1) {
             return null;
         }
-        return traits.traits.get(packageTraits.get(0)).getName(abc).getNameWithNamespace(abc, abc.constants, true);
+        return traits.traits.get(packageTraits.get(0)).getName(abc).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true);
     }
 
     /**
@@ -180,7 +183,7 @@ public class ScriptInfo {
             if ((nskind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (nskind == Namespace.KIND_PACKAGE)) {
                 DottedChain packageName = name.getSimpleNamespaceName(abc.constants); // assume not null package
-                String objectName = name.getName(abc, abc.constants, null, true, false);
+                String objectName = name.getName(new LinkedHashSet<>() /*???*/, abc, abc.constants, null, true, false);
                 String namespaceSuffix = name.getNamespaceSuffix();
                 List<Integer> traitIndices = new ArrayList<>();
 
@@ -190,7 +193,7 @@ public class ScriptInfo {
                     otherTraits.clear();
                 }
 
-                if (packagePrefix == null || packageName.toPrintableString(abc.getSwf(), true).startsWith(packagePrefix)) {
+                if (packagePrefix == null || packageName.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true).startsWith(packagePrefix)) {
 
                     ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix, abc.getSwf());
                     ScriptPack pack = new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices);
@@ -206,7 +209,7 @@ public class ScriptInfo {
                 Multiname name = t.getName(abc);
 
                 DottedChain packageName = name.getSimpleNamespaceName(abc.constants);
-                String objectName = name.getName(abc, abc.constants, null, true, false);
+                String objectName = name.getName(new LinkedHashSet<>()/*???*/, abc, abc.constants, null, true, false);
                 String namespaceSuffix = name.getNamespaceSuffix();
 
                 List<Integer> traitIndices = new ArrayList<>();

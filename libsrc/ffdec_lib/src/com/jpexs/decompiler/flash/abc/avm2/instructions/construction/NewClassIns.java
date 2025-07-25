@@ -49,11 +49,11 @@ public class NewClassIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.pop().toString(writer, LocalData.create(localData.callStack /*??*/, localData.abcIndex, localData.abc, localData.localRegNames, localData.fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, localData.swfVersion));
+        stack.pop().toString(writer, LocalData.create(localData.callStack /*??*/, localData.abcIndex, localData.abc, localData.localRegNames, localData.fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, localData.swfVersion, localData.usedDeobfuscations));
         writer.finishHilights();
         String baseType = writer.toString();
         ABC abc = localData.abc;
-        stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "§§newclass(" + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.abc, localData.getConstants(), localData.fullyQualifiedNames, false, true) + "," + baseType + ")"));
+        stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "§§newclass(" + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.usedDeobfuscations, localData.abc, localData.getConstants(), localData.fullyQualifiedNames, false, true) + "," + baseType + ")"));
     }
 
     @Override

@@ -142,7 +142,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return IdentifiersDeobfuscation.printIdentifier(localData.swf, false, ((RegisterNumber) value).translate());
+            return IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate());
         }
 
         return value.toString();
@@ -164,7 +164,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, false, ((RegisterNumber) value).translate()));
+            return writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate()));
         }
 
         return writer.append(value.toString());
@@ -197,7 +197,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             srcData.localName = ((RegisterNumber) value).translate();
             srcData.regIndex = ((RegisterNumber) value).number;
             
-            return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(localData.swf, false, ((RegisterNumber) value).translate()), srcData);
+            return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate()), srcData);
         }
         return writer.append(EcmaScript.toString(value));
     }

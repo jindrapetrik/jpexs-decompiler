@@ -173,6 +173,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -2061,7 +2062,7 @@ public class ActionScript2Parser {
     }
 
     private boolean isCastOp(GraphTargetItem item) {
-        LocalData localData = LocalData.create(new ConstantPool(constantPool), this.swf);
+        LocalData localData = LocalData.create(new ConstantPool(constantPool), this.swf, new LinkedHashSet<>());
         List<String> items = new ArrayList<>();
         while (item instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) item;

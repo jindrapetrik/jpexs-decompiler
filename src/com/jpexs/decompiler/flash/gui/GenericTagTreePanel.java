@@ -84,6 +84,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -916,7 +917,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     if (di.exportName()) {
                         valStr += " = " + escapeHtml(Helper.escapeExportname(swf, val.toString(), true));
                     } else {
-                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(swf, di.as3()));
+                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(new LinkedHashSet<>(), swf, di.as3()));
                     }
                 } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";

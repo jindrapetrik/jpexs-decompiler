@@ -38,8 +38,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -127,7 +129,7 @@ public class AS3Generator {
 
                 for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String name = t.getName(abc).getName(abc, abc.constants, null, true, true);
+                        String name = t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
                         String identifier = swfAndIdentifierList[0][1];
@@ -159,8 +161,9 @@ public class AS3Generator {
 
                             List<MethodBody> callStack = new ArrayList<>();
                             callStack.add(b);
-                            b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>(), new ArrayList<>());
-                            b.toString(swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
+                            Set<String> usedDeobfuscations = new LinkedHashSet<>();
+                            b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>(), new ArrayList<>(), usedDeobfuscations);
+                            b.toString(usedDeobfuscations, swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             src.finishHilights();
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {

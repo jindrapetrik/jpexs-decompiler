@@ -104,7 +104,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         if (!classNames.isEmpty()) {
             List<String> escapedList = new ArrayList<>();
             for (String className : classNames) {
-                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(getSwf(), true));
+                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), getSwf(), true));
             }
             ret.put("cls", String.join(", ", escapedList));
         }

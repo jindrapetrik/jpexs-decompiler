@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -192,7 +193,7 @@ public class AS2Package implements TreeItem {
         if (defaultPackage) {
             return name;
         }
-        return DottedChain.parseNoSuffix(name).toPrintableString(swf, false);
+        return DottedChain.parseNoSuffix(name).toPrintableString(new LinkedHashSet<>(), swf, false);
     }
 
     /**

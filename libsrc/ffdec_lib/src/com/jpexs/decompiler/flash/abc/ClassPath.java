@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 /**
@@ -70,7 +71,7 @@ public class ClassPath implements Serializable {
      */
     @Override
     public String toString() {
-        return packageStr.add(className, namespaceSuffix).toPrintableString(swf, true);
+        return packageStr.add(className, namespaceSuffix).toPrintableString(new LinkedHashSet<>() /*???*/, swf, true);
     }
 
     /**

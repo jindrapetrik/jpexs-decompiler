@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ConstantPool action - Sets the current constant pool.
@@ -50,9 +51,9 @@ public class ActionConstantPool extends Action {
      */
     public List<String> constantPool = new ArrayList<>();
 
-
     /**
      * Constructor.
+     *
      * @param constantPool Constant pool
      * @param charset Charset
      */
@@ -63,6 +64,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Constructor.
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @param version SWF version
@@ -79,6 +81,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Constructor.
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -127,6 +130,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Calculates size of string converted to bytes
+     *
      * @param str String
      * @return Size
      */
@@ -136,6 +140,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Calculates the size of the action converted to bytes
+     *
      * @param strings Strings
      * @return Size
      */
@@ -168,6 +173,6 @@ public class ActionConstantPool extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 }

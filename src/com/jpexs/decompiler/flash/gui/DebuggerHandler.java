@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -755,7 +756,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                     pkg = pkg.substring(pkg.indexOf(":") + 1);
                                 }
 
-                                name = swfHash + ":" + DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(Main.getRunningSWF()/*???*/, con.isAS3);
+                                name = swfHash + ":" + DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(new LinkedHashSet<>(), Main.getRunningSWF()/*???*/, con.isAS3);
                             }
                         } else {
                             if (name.contains(":")) {

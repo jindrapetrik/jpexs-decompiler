@@ -87,9 +87,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -977,8 +979,9 @@ public abstract class Action implements GraphSourceItem {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public static GraphTextWriter actionsToSource(Map<String, Map<String, Trait>> uninitializedClassTraits, final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset, List<ActionTreeOperation> treeOperations) throws InterruptedException {
+    public static GraphTextWriter actionsToSource(Map<String, Map<String, Trait>> uninitializedClassTraits, final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset, List<ActionTreeOperation> treeOperations) throws InterruptedException {        
         writer.suspendMeasure();
+        Set<String> usedDeobfuscations = Collections.synchronizedSet(new LinkedHashSet<>());
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
         int timeout = Configuration.decompilationTimeoutSingleMethod.get();
@@ -990,7 +993,7 @@ public abstract class Action implements GraphSourceItem {
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = 0;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem> tree = actionsToTree(asm == null ? false : swf.needsCalculatingAS2UninitializeClassTraits(asm), uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+                    List<GraphTargetItem> tree = actionsToTree(usedDeobfuscations, asm == null ? false : swf.needsCalculatingAS2UninitializeClassTraits(asm), uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     for (ActionTreeOperation treeOperation : treeOperations) {
                         treeOperation.run(tree);
@@ -1037,6 +1040,8 @@ public abstract class Action implements GraphSourceItem {
         if (asm != null) {
             asm.getActionSourceSuffix(writer);
         }
+        
+        //TODO: write the actual used deobfuscations !!!
 
         return writer;
     }
@@ -1044,6 +1049,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Converts list of actions to List of treeItems
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
@@ -1056,13 +1062,14 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> actionsToTree(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        return actionsToTree(needsUninitializedClassFieldsDetection, uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+    public static List<GraphTargetItem> actionsToTree(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        return actionsToTree(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
     }
 
     /**
      * Converts list of actions to List of treeItems.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
@@ -1078,17 +1085,17 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> actionsToTree(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+    public static List<GraphTargetItem> actionsToTree(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, fixActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, fixActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            return ActionGraph.translateViaGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
         }
     }
     
@@ -1109,6 +1116,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Translates this function to stack and output.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param uninitializedClassTraits Uninitialized class traits
      * @param secondPassData Second pass data
      * @param insideDoInitAction Inside DoInitAction?
@@ -1122,7 +1130,7 @@ public abstract class Action implements GraphSourceItem {
      * @param path the value of path
      * @throws InterruptedException On interrupt
      */
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
 
     /**
@@ -1138,7 +1146,7 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         ActionLocalData aLocalData = (ActionLocalData) localData;
-        translate(aLocalData.uninitializedClassTraits, aLocalData.secondPassData, aLocalData.insideDoInitAction, aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
+        translate(localData.usedDeobfuscations, aLocalData.uninitializedClassTraits, aLocalData.secondPassData, aLocalData.insideDoInitAction, aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
     }
 
     /**
@@ -1225,6 +1233,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Converts list of actions to tree.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param output Output
      * @param graph ActionGraph
      * @param switchParts Switch parts
@@ -1245,11 +1254,11 @@ public abstract class Action implements GraphSourceItem {
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
-    public static void actionsPartToTree(List<GraphTargetItem> output, ActionGraph graph, Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> lineStartActionRef, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
+    public static void actionsPartToTree(Set<String> usedDeobfuscations, List<GraphTargetItem> output, ActionGraph graph, Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> lineStartActionRef, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
-        ActionLocalData localData = new ActionLocalData(switchParts, secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits());
+        ActionLocalData localData = new ActionLocalData(switchParts, secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits(), usedDeobfuscations);
         localData.lineStartAction = lineStartActionRef.getVal();
         int ip = start;
         boolean isWhile = false;
@@ -1313,10 +1322,10 @@ public abstract class Action implements GraphSourceItem {
                         }
                         int startIp = adr2ip(actions, endAddr);
                         try {                            
-                            out = ActionGraph.translateViaGraph(graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
                         } catch (SecondPassException spe) {
                             variables2 = prepareVariables(cnt, variables);
-                            out = ActionGraph.translateViaGraph(graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
                         }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);

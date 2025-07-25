@@ -43,8 +43,10 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * AVM2 Deobfuscator removing single get / set registers.
@@ -164,7 +166,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
         localData.localRegTypes = new HashMap<>();
         localData.scriptIndex = scriptIndex;
         localData.ip = 0;
-        localData.code = body.getCode();
+        localData.code = body.getCode();      
         return localData;
     }
 

@@ -34,6 +34,7 @@ import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -1216,7 +1217,7 @@ public class AVM2ConstantPool implements Cloneable {
             writer.println("String[" + i + "]=" + constant_string.get(i));
         }
         for (int i = 1; i < constant_namespace.size(); i++) {
-            writer.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(abc, this));
+            writer.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(new LinkedHashSet<>(), abc, this));
         }
         for (int i = 1; i < constant_namespace_set.size(); i++) {
             writer.println("NamespaceSet[" + i + "]=" + constant_namespace_set.get(i).toString(this));
@@ -1251,7 +1252,7 @@ public class AVM2ConstantPool implements Cloneable {
         if (index == 0) {
             return "null";
         }
-        return constant_namespace.get(index).toString(abc, this);
+        return constant_namespace.get(index).toString(new LinkedHashSet<>(), abc, this);
     }
 
     /**

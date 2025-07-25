@@ -99,6 +99,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -352,7 +353,7 @@ public class TagTree extends AbstractTagTree {
             if (expName != null && !expName.isEmpty()) {
                 String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
                 if (expName.startsWith("__Packages.")) {
-                    return IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), false, pathParts[pathParts.length - 1]);
+                    return IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), new LinkedHashSet<>(), false, pathParts[pathParts.length - 1]);
                 } else {
                     return Helper.escapeExportname(tag.getSwf(), expName, false);
                 }                

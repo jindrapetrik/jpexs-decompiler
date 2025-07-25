@@ -38,6 +38,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -53,7 +54,7 @@ public class ActionIncorrectClassHeaderRemover extends SWFDecompilerAdapter {
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         FastActionList list = new FastActionList(actions);
         int ip = 0;
-        BaseLocalData ld = new ActionLocalData(null, true, new HashMap<>());
+        BaseLocalData ld = new ActionLocalData(null, true, new HashMap<>(), new LinkedHashSet<>());
         TranslateStack stack = new TranslateStack("");
         List<GraphTargetItem> output = new ArrayList<>();
         FastActionListIterator iterator = list.iterator();

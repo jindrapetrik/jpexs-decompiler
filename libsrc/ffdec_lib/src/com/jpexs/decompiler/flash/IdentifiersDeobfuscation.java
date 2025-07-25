@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -539,13 +540,15 @@ public class IdentifiersDeobfuscation {
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax.
      *
+     * @param swf SWF
+     * @param used Set of used obfuscated identifiers in this script - the method will add to it
      * @param as3 Is ActionScript3
      * @param s Identifier
      * @param validExceptions Exceptions which are valid (e.g. some reserved
      * words)
      * @return Printable identifier
      */
-    public static String printIdentifier(SWF swf, boolean as3, String s, String... validExceptions) {
+    public static String printIdentifier(SWF swf, Set<String> used, boolean as3, String s, String... validExceptions) {
         if (s == null || s.isEmpty()) {
             return "";
         }
@@ -553,6 +556,7 @@ public class IdentifiersDeobfuscation {
         if (Configuration.useSafeStr.get() && as3) {
             Map<String, String> map = swf.getAs3ObfuscatedIdentifiers();
             if (map.containsKey(s)) {
+                used.add(s);
                 return map.get(s);
             }
         }

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
+import java.util.LinkedHashSet;
 
 /**
  * ActionScript 3 class TreeItem.
@@ -85,7 +86,7 @@ public abstract class AS3ClassTreeItem implements TreeItem {
             swf = ((ABC) o).getSwf();
         }
         
-        String ret = IdentifiersDeobfuscation.printIdentifier(swf, true, name);
+        String ret = IdentifiersDeobfuscation.printIdentifier(swf, new LinkedHashSet<>(), true, name);
         if (namespaceSuffix != null) {
             ret += namespaceSuffix;
         }

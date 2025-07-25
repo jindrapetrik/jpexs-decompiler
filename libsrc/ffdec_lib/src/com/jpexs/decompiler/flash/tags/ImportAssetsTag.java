@@ -31,6 +31,7 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -142,7 +143,7 @@ public class ImportAssetsTag extends Tag implements ImportTag {
             
             String importName = names.get(0);
             if (importName.startsWith("__Packages.")) {
-                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(getSwf(), false));
+                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
             } else {
                 ret.put("imp", "\"" + Helper.escapePCodeString(importName) +  "\"");
             }

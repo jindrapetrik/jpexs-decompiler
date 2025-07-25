@@ -269,6 +269,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     /**
      * Gets the try size
+     *
      * @return Try size
      */
     public long getTrySize() {
@@ -277,7 +278,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public List<Long> getContainerSizes() {
-        List<Long> ret = new ArrayList<>();        
+        List<Long> ret = new ArrayList<>();
         ret.add(trySize);
         if (catchBlockFlag) {
             ret.add(catchSize);
@@ -306,7 +307,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                 finallySize = size;
             }
         }
-        
+
         if (index > pos) {
             throw new IllegalArgumentException("Valid indexes are 0 to " + pos + ".");
         }
@@ -466,9 +467,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                 catchCommands.add(body);
             }
         }
-        
+
         List<GraphTargetItem> finallyCommands = new ArrayList<>();
-        
+
         if (finallyBlockFlag) {
             p++;
             finallyCommands = contents.get(p);

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -355,7 +356,7 @@ public class AS3Package extends AS3ClassTreeItem {
         if (flat) {
             return packageName;
         }
-        return IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, packageName);
+        return IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), new LinkedHashSet<>(), true, packageName);
     }
 
     /**

@@ -58,6 +58,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     /**
      * Constructor.
+     *
      * @param codeSize Code size
      * @param charset Charset
      */
@@ -86,6 +87,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     /**
      * Constructor.
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @param version Version
@@ -99,6 +101,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     /**
      * Constructor.
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
