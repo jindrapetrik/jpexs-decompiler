@@ -47,6 +47,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation/highlighter §§pop in class traits
 - AS direct editation/highlighter §§pop and §§dup can have getmember or call
 - [#1295], [#116] AS3 dynamic construction via MultinameL
+- ABC cleaner not properly fixing namespace sets
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
