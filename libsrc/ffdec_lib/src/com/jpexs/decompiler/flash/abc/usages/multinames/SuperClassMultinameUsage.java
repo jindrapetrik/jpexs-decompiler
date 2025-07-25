@@ -52,7 +52,7 @@ public class SuperClassMultinameUsage extends MultinameUsage implements InsideCl
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true) + " extends";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc, abc.constants, true) + " extends";
     }
 
     @Override

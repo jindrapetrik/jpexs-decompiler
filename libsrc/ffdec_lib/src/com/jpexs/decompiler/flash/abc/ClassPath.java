@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
 import java.util.Objects;
@@ -41,6 +42,11 @@ public class ClassPath implements Serializable {
      * Namespace suffix
      */
     public final String namespaceSuffix;
+    
+    /**
+     * SWF
+     */
+    private final SWF swf;
 
     /**
      * Constructs a new class path
@@ -48,11 +54,13 @@ public class ClassPath implements Serializable {
      * @param packageStr Package name
      * @param className Class name
      * @param namespaceSuffix Namespace suffix
+     * @param SWF swf
      */
-    public ClassPath(DottedChain packageStr, String className, String namespaceSuffix) {
+    public ClassPath(DottedChain packageStr, String className, String namespaceSuffix, SWF swf) {
         this.packageStr = packageStr == null ? DottedChain.TOPLEVEL : packageStr;
         this.className = className;
         this.namespaceSuffix = namespaceSuffix;
+        this.swf = swf;
     }
 
     /**
@@ -62,7 +70,7 @@ public class ClassPath implements Serializable {
      */
     @Override
     public String toString() {
-        return packageStr.add(className, namespaceSuffix).toPrintableString(true);
+        return packageStr.add(className, namespaceSuffix).toPrintableString(swf, true);
     }
 
     /**

@@ -169,12 +169,12 @@ public class InstanceInfo {
         final String ASSETS_DIR = assetsDir; // "/_assets/";
         if (allowEmbed) {
             if (abc.getSwf() != null) {
-                String className = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
+                String className = getName(abc.constants).getNameWithNamespace(abc, abc.constants, false).toRawString();
                 CharacterTag ct = abc.getSwf().getCharacterByClass(className);
                 if (ct != null) {
                     String fileName = ct.getCharacterExportFileName();
                     if (Configuration.as3ExportNamesUseClassNamesOnly.get()) {
-                        fileName = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
+                        fileName = getName(abc.constants).getNameWithNamespace(abc, abc.constants, false).toRawString();
                     }                    
 
                     String ext = "";
@@ -313,17 +313,17 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(abc.constants, true).toRawString();
+        String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(abc, abc.constants, true).toRawString();
 
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc, abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
         
         if (!isNullable()) {
             writer.appendNoHilight("!");
         }
 
         if (super_index > 0) {
-            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true).toRawString();
-            String parentName = abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false, true);
+            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc, abc.constants, true).toRawString();
+            String parentName = abc.constants.getMultiname(super_index).getName(abc, abc.constants, fullyQualifiedNames, false, true);
             if (!parentName.equals("Object")) {
                 writer.appendNoHilight(" extends ");
                 writer.hilightSpecial(parentName, HighlightSpecialType.TYPE_NAME, typeName);
@@ -339,8 +339,8 @@ public class InstanceInfo {
                 if (i > 0) {
                     writer.append(", ");
                 }
-                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true).toRawString();
-                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TYPE_NAME, typeName);
+                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc, abc.constants, true).toRawString();
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc, abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TYPE_NAME, typeName);
             }
         }
 

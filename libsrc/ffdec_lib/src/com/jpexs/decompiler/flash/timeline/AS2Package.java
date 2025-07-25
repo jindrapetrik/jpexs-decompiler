@@ -192,7 +192,7 @@ public class AS2Package implements TreeItem {
         if (defaultPackage) {
             return name;
         }
-        return DottedChain.parseNoSuffix(name).toPrintableString(false);
+        return DottedChain.parseNoSuffix(name).toPrintableString(swf, false);
     }
 
     /**

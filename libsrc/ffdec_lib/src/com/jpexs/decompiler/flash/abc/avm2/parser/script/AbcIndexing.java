@@ -512,7 +512,7 @@ public final class AbcIndexing {
          */
         @Override
         public String toString() {
-            return abc.constants.getMultiname(abc.instance_info.get(index).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+            return abc.constants.getMultiname(abc.instance_info.get(index).name_index).getNameWithNamespace(abc, abc.constants, true).toPrintableString(abc.getSwf(), true);
         }
 
         /**
@@ -627,7 +627,7 @@ public final class AbcIndexing {
     }
     
     private void getClassIndexTraitNames(List<PropertyDef> ret, List<Boolean> staticRet, ClassIndex ci, boolean getStatic, boolean getInstance, boolean getInheritance, Set<String> used) {
-        GraphTargetItem ciName = multinameToType(ci.abc.instance_info.get(ci.index).name_index, ci.abc.constants);
+        GraphTargetItem ciName = multinameToType(ci.abc.instance_info.get(ci.index).name_index, ci.abc, ci.abc.constants);
                 
         boolean isObject = ciName.equals(new TypeItem("Object"));
         List<String> ignoredObjectTraits = Arrays.asList("_init", "_dontEnumPrototype", "_setPropertyIsEnumerable");
@@ -890,7 +890,7 @@ public final class AbcIndexing {
         AbcIndexing.ClassIndex ci = findClass(prop.parent, prop.abc, null);
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
-            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);
+            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc, ciParent.abc.constants, true);
             TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), prop.getPropNsString()), findStatic, findInstance, findProtected, foundStatic);
             if (pti != null) {
                 return pti;
@@ -920,10 +920,11 @@ public final class AbcIndexing {
     /**
      * Converts multiname to type
      * @param m_index Multiname index
+     * @param abc ABC
      * @param constants AVM2 constant pool
      * @return Type
      */
-    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
+    public static GraphTargetItem multinameToType(int m_index, ABC abc, AVM2ConstantPool constants) {
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
@@ -932,13 +933,13 @@ public final class AbcIndexing {
             return null;
         }
         if (m.kind == Multiname.TYPENAME) {
-            GraphTargetItem obj = multinameToType(m.qname_index, constants);
+            GraphTargetItem obj = multinameToType(m.qname_index, abc, constants);
             if (obj == null) {
                 return null;
             }
             List<GraphTargetItem> params = new ArrayList<>();
             for (int pm : m.params) {
-                GraphTargetItem r = multinameToType(pm, constants);
+                GraphTargetItem r = multinameToType(pm, abc, constants);
                 if (r == null) {
                     return null;
                 }
@@ -950,9 +951,9 @@ public final class AbcIndexing {
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
             if (m.namespace_index != 0 && m.getNamespace(constants).kind == Namespace.KIND_PRIVATE) {
-                return new TypeItem(m.getName(constants, new ArrayList<>(), true, true), "ns:" + m.namespace_index);
+                return new TypeItem(m.getName(abc, constants, new ArrayList<>(), true, true), "ns:" + m.namespace_index);
             }
-            return new TypeItem(m.getNameWithNamespace(constants, true));
+            return new TypeItem(m.getNameWithNamespace(abc, constants, true));
         }
     }
 
@@ -968,12 +969,12 @@ public final class AbcIndexing {
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 return TypeItem.UNBOUNDED;
             }
-            return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
+            return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc, abc.constants);
         }
 
         if (t instanceof TraitFunction) {
             TraitFunction tf = (TraitFunction) t;
-            return multinameToType(abc.method_info.get(tf.method_info).ret_type, abc.constants);
+            return multinameToType(abc.method_info.get(tf.method_info).ret_type, abc, abc.constants);
 
         }
         return TypeItem.UNBOUNDED;
@@ -985,16 +986,16 @@ public final class AbcIndexing {
             if (tsc.type_index == 0) {
                 return TypeItem.UNBOUNDED;
             }
-            return multinameToType(tsc.type_index, abc.constants);
+            return multinameToType(tsc.type_index, abc, abc.constants);
         }
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
             if (tmgs.kindType == Trait.TRAIT_GETTER) {
-                return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
+                return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc, abc.constants);
             }
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 if (abc.method_info.get(tmgs.method_info).param_types.length > 0) {
-                    return multinameToType(abc.method_info.get(tmgs.method_info).param_types[0], abc.constants);
+                    return multinameToType(abc.method_info.get(tmgs.method_info).param_types[0], abc, abc.constants);
                 } else {
                     return TypeItem.UNBOUNDED;
                 }
@@ -1025,13 +1026,13 @@ public final class AbcIndexing {
                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
             }
             if (map != null) {
-                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
-                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants), scriptIndex));
+                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc, abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(name_index, abc, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
+                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc, abc.constants), scriptIndex));
             }
             if (mapNs != null) {
                 Multiname m = abc.constants.getMultiname(t.name_index);
-                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, true/*FIXME ???*/), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m == null ? 0 : m.namespace_index);
-                TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants), scriptIndex);
+                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc, abc.constants, new ArrayList<>() /*?*/, true, true/*FIXME ???*/), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m == null ? 0 : m.namespace_index);
+                TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc, abc.constants), scriptIndex);
                 if (!mapNs.containsKey(ndp)) {
                     mapNs.put(ndp, ti);
                 }
@@ -1136,7 +1137,7 @@ public final class AbcIndexing {
                     Integer classScriptIndex = nsKind == Namespace.KIND_PACKAGE ? null : i;
                     ClassIndex cindex = new ClassIndex(tc.class_info, abc, null, classScriptIndex);
                     addedClasses.add(cindex);
-                    GraphTargetItem cname = multinameToType(ii.name_index, abc.constants);
+                    GraphTargetItem cname = multinameToType(ii.name_index, abc, abc.constants);
                     classes.put(new ClassDef(cname, abc, classScriptIndex), cindex);
 
                     indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties, i);
@@ -1148,7 +1149,7 @@ public final class AbcIndexing {
         for (ClassIndex cindex : addedClasses) {
             int parentClassName = abc.instance_info.get(cindex.index).super_index;
             if (parentClassName > 0) {
-                TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc.constants, true));
+                TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc, abc.constants, true));
                 ClassIndex parentClassIndex = findClass(parentClass, abc, null);
                 if (parentClassIndex == null) {
                     //Parent class can be deleted, do not check. TODO: handle this better
@@ -1210,14 +1211,14 @@ public final class AbcIndexing {
      * @return True if class is instance of another class
      */
     public boolean isInstanceOf(ABC abc, int classIndex, DottedChain searchClassName) {
-        DottedChain clsName = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+        DottedChain clsName = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc, abc.constants, false);
         if (searchClassName.equals(clsName)) {
             return true;
         }
         if (abc.instance_info.get(classIndex).super_index == 0) {
             return false;
         }
-        DottedChain parentClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, false);
+        DottedChain parentClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc, abc.constants, false);
 
         AbcIndexing.ClassIndex ci = findClass(new TypeItem(parentClassName), abc, null);
         if (ci == null) {

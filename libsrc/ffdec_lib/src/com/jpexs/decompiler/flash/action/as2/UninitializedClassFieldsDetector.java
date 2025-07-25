@@ -71,7 +71,7 @@ public class UninitializedClassFieldsDetector {
             DoInitActionTag doi = (DoInitActionTag) asm;
             String exportName = doi.getSwf().getExportName(doi.spriteId);
             if (exportName != null) {
-                asmPath = DottedChain.parseNoSuffix(exportName).toPrintableString(false);
+                asmPath = DottedChain.parseNoSuffix(exportName).toPrintableString(doi.getSwf(), false);
             }
         }
         for (ProgressListener listener : progressListeners) {

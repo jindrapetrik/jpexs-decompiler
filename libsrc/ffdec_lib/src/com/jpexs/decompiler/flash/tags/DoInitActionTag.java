@@ -253,7 +253,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         if (exportName == null || exportName.isEmpty()) {
             return ret;
         }
-        ret.put("exp", Helper.escapeExportname(exportName, true));
+        ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));
         return ret;
     }
 

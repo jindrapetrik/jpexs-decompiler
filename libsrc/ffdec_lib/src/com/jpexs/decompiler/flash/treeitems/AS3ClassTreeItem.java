@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 
 /**
@@ -73,7 +75,17 @@ public abstract class AS3ClassTreeItem implements TreeItem {
      * @return Name with namespace suffix but printable
      */
     public String getPrintableNameWithNamespaceSuffix() {
-        String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
+        
+        Openable o = getOpenable();
+        SWF swf = null;
+        if (o instanceof SWF) {
+            swf = (SWF) o;
+        }
+        if (o instanceof ABC) {
+            swf = ((ABC) o).getSwf();
+        }
+        
+        String ret = IdentifiersDeobfuscation.printIdentifier(swf, true, name);
         if (namespaceSuffix != null) {
             ret += namespaceSuffix;
         }

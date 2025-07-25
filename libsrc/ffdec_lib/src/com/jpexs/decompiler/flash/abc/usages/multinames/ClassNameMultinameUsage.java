@@ -49,7 +49,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " name";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc, abc.constants, true).toPrintableString(abc.getSwf(), true) + " name";
     }
 
     @Override

@@ -434,7 +434,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         for (MethodBody b : callStack) {
             for (int i = 0; i < b.traits.traits.size(); i++) {
                 Trait t = b.traits.traits.get(i);
-                if (t.getName(abcV).getName(constants, null, true, true).equals(variableName)) {
+                if (t.getName(abcV).getName(abcV, constants, null, true, true).equals(variableName)) {
                     if (t instanceof TraitSlotConst) {
                         if (!localData.traitUsages.containsKey(b)) {
                             localData.traitUsages.put(b, new ArrayList<>());

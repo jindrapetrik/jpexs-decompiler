@@ -1158,6 +1158,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showHeapStatusWidget = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> useSafeStr = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

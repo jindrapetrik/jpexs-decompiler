@@ -50,7 +50,7 @@ public abstract class RemoveTag extends Tag implements DepthTag {
             ret.put("chid", "" + getCharacterId());
         }
         if (exportName != null) {
-            ret.put("exp", Helper.escapeExportname(exportName, true));
+            ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));
         }
         ret.put("dpt", "" + getDepth());
 

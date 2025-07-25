@@ -3060,14 +3060,14 @@ public class XFLConverter {
                                         if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
                                             if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                 GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                frameTraitNames.add(lex.propertyName.getName(abc.constants, new ArrayList<>(), false, true));
+                                                frameTraitNames.add(lex.propertyName.getName(abc, abc.constants, new ArrayList<>(), false, true));
                                             } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc.constants, new ArrayList<>(), false, true));
+                                                        frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, new ArrayList<>(), false, true));
                                                     }
                                                 }
                                             }
@@ -3083,7 +3083,7 @@ public class XFLConverter {
                 List<String> frameRangeAccessibilityTraitNames = new ArrayList<>();
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);
+                        String traitName = t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false);
                         if ("__setTab_handler".equals(traitName)
                                 || "__setAcc_handler".equals(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
@@ -3144,7 +3144,7 @@ public class XFLConverter {
 
                 for (Trait t : instanceInfo.instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);
+                        String traitName = t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false);
                         if (frameAccessibilityTraitNames.contains(traitName)) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
@@ -3367,7 +3367,7 @@ public class XFLConverter {
                 }
 
                 for (Trait t : instanceInfo.instance_traits.traits) {
-                    if (allFramesAccessibilityTraitNames.contains(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false))) {
+                    if (allFramesAccessibilityTraitNames.contains(t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false))) {
                         if (t instanceof TraitMethodGetterSetter) {
                             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
                             MethodBody traitBody = abc.findBody(tm.method_info);
@@ -3511,14 +3511,14 @@ public class XFLConverter {
                                             int frame = frameItem.intValue();
                                             if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                 GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                frameToTraitName.put(frame, lex.propertyName.getName(abc.constants, new ArrayList<>(), true, false));
+                                                frameToTraitName.put(frame, lex.propertyName.getName(abc, abc.constants, new ArrayList<>(), true, false));
                                             } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameToTraitName.put(frame, abc.constants.getMultiname(multinameIndex).getName(abc.constants, new ArrayList<>(), true, false));
+                                                        frameToTraitName.put(frame, abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, new ArrayList<>(), true, false));
                                                     }
                                                 }
                                             }
@@ -3532,7 +3532,7 @@ public class XFLConverter {
                 Map<String, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
                 for (Trait trait : instanceInfo.instance_traits.traits) {
                     if (trait instanceof TraitMethodGetterSetter) {
-                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index).getName(abc.constants, new ArrayList<>(), true, false), (TraitMethodGetterSetter) trait);
+                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index).getName(abc, abc.constants, new ArrayList<>(), true, false), (TraitMethodGetterSetter) trait);
                     }
                 }
 

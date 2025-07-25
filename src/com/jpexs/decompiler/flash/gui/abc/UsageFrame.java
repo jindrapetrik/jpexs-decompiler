@@ -78,7 +78,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 if (a == abc) {
                     continue;
                 }
-                List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                List<Integer> mids = a.constants.getMultinameIds(m, a, abc, abc.constants);
                 for (int mid : mids) {
                     usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid, exactMatch));
                 }
@@ -106,7 +106,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
         cont.add(new FasterScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants, true).toPrintableString(true));
+        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc, abc.constants, true).toPrintableString(abc.getSwf(), true));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
@@ -164,9 +164,9 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 decompiledTextArea.addScriptListener(setTrait);
                 String scriptName;
                 if (icu.getClassIndex() > -1) {
-                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toPrintableString(true);
+                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc(), icu.getAbc().constants, true).toPrintableString(icu.getAbc().getSwf(), true);
                 } else if (icu.getScriptIndex() > -1) {
-                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toPrintableString(true);
+                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toPrintableString(icu.getAbc().getSwf(), true);
                 } else {
                     scriptName = "";
                 }

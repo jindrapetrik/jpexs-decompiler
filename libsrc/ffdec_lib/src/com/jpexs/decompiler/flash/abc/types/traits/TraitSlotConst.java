@@ -99,14 +99,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     /**
      * Gets type as string.
      *
+     * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return Type as string
      */
-    public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public String getType(ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false, true);
+            typeStr = constants.getMultiname(type_index).getName(abc, constants, fullyQualifiedNames, false, true);
         }
         return typeStr;
     }
@@ -120,7 +121,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @return Writer
      */
     public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
-        String typeStr = getType(abc.constants, fullyQualifiedNames);
+        String typeStr = getType(abc, abc.constants, fullyQualifiedNames);
         ValueKind val = null;
         if (value_kind != 0) {
             val = new ValueKind(value_index, value_kind);
@@ -137,7 +138,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             typeStr = "";
         }
         writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc, abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
         writer.hilightSpecial(typeStr, HighlightSpecialType.TRAIT_TYPE_NAME);
         return writer;
     }
@@ -356,9 +357,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
              Hide: private static var _skinParts
              (part of [SkinPart] compilations)
              */
-            if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+            if (isStatic && "_skinParts".equals(getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == Trait.TRAIT_SLOT) {
-                    if ("_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+                    if ("_skinParts".equals(getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true))) {
                         if (getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                             return false;
                         }

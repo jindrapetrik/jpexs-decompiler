@@ -166,7 +166,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
             String exportName = names.get(0);
-            ret.put("exp", Helper.escapeExportname(exportName, true));           
+            ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));           
         }
         return ret;
     }

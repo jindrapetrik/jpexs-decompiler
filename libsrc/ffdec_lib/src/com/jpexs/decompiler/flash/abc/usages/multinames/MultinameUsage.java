@@ -86,8 +86,8 @@ public abstract class MultinameUsage implements Usage {
             return false;
         }
         if ((thisM.kind == Multiname.QNAME || thisM.kind == Multiname.QNAMEA) && otherM.kind == thisM.kind) {
-            String thisName = thisM.getName(abc.constants, new ArrayList<>(), true, true);
-            String otherName = otherM.getName(other.abc.constants, new ArrayList<>(), true, true);
+            String thisName = thisM.getName(abc, abc.constants, new ArrayList<>(), true, true);
+            String otherName = otherM.getName(other.abc, other.abc.constants, new ArrayList<>(), true, true);
             Namespace thisNs = thisM.getNamespace(abc.constants);
             Namespace otherNs = otherM.getNamespace(other.abc.constants);
             if (!Objects.equals(thisName, otherName)) {

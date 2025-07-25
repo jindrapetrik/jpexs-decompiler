@@ -53,7 +53,7 @@ public class NewClassIns extends InstructionDefinition {
         writer.finishHilights();
         String baseType = writer.toString();
         ABC abc = localData.abc;
-        stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "§§newclass(" + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.getConstants(), localData.fullyQualifiedNames, false, true) + "," + baseType + ")"));
+        stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "§§newclass(" + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.abc, localData.getConstants(), localData.fullyQualifiedNames, false, true) + "," + baseType + ")"));
     }
 
     @Override

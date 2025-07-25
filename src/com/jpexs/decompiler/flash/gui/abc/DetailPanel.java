@@ -303,7 +303,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                 traitNameLabel.setText("-");
             } else if (abcPanel != null) {
                 Multiname traitName = trait.getName(abc);
-                String traitNameStr = traitName == null ? "" : traitName.getName(abc.constants, null, false, true);
+                String traitNameStr = traitName == null ? "" : traitName.getName(abc, abc.constants, null, false, true);
                 traitNameLabel.setText(traitNameStr);
             }
         });

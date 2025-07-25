@@ -3071,7 +3071,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             DottedChain classDottedChain = new DottedChain(parts);
 
             try {
-                List<Action> regActions = regParser.actionsFromString("Object.registerClass(\"" + Helper.escapePCodeString(identifier) + "\"," + classDottedChain.toPrintableString(false) + ");", swf.getCharset());
+                List<Action> regActions = regParser.actionsFromString("Object.registerClass(\"" + Helper.escapePCodeString(identifier) + "\"," + classDottedChain.toPrintableString(swf, false) + ");", swf.getCharset());
                 regDoInit.setActions(regActions);
             } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
                 //ignore
@@ -3116,7 +3116,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             DottedChain dcParent = new DottedChain(partsParent);
 
             try {
-                List<Action> actions = parser.actionsFromString("class " + classDottedChain.toPrintableString(false) + (classParent.isEmpty() ? "" : " extends " + dcParent.toPrintableString(false)) + "{}", swf.getCharset());
+                List<Action> actions = parser.actionsFromString("class " + classDottedChain.toPrintableString(swf, false) + (classParent.isEmpty() ? "" : " extends " + dcParent.toPrintableString(swf, false)) + "{}", swf.getCharset());
                 classDoInit.setActions(actions);
             } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
                 //ignore
@@ -3259,9 +3259,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
                     DottedChain dc = new DottedChain(pkgParts);
-                    String script = "package " + dc.toPrintableString(true) + " {"
+                    String script = "package " + dc.toPrintableString(swf, true) + " {"
                             + (parentClassName.isEmpty() ? "" : "import " + parentClassName + ";")
-                            + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
+                            + "public class " + IdentifiersDeobfuscation.printIdentifier(swf, true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
                             + " }"
                             + "}";
                     parser.addScript(script, fileName, 0, 0, swf.getDocumentClass(), selectedAbcContainer.getABC());
@@ -3357,16 +3357,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         AbstractTagTreeModel model = mainPanel.getCurrentTree().getFullModel();
         TreeItem it = pkg;
         List<String> pkgParts = new ArrayList<>();
+        SWF swf = (SWF) pkg.getOpenable();
         while (it instanceof AS2Package) {
             pkg = (AS2Package) it;
             if (!pkg.isDefaultPackage()) {
-                pkgParts.add(0, DottedChain.parseNoSuffix(pkg.getName()).toPrintableString(false));
+                pkgParts.add(0, DottedChain.parseNoSuffix(pkg.getName()).toPrintableString(swf, false));
             }
             it = model.getParent(it);
         }
         pkgParts.remove(0);
         String fullPkgName = String.join(".", pkgParts);
-        SWF swf = (SWF) pkg.getOpenable();
         AddScriptDialog addScriptDialog = new AddScriptDialog(Main.getDefaultDialogsOwner(), swf);
         String prefix = fullPkgName;
         if (!prefix.isEmpty()) {
@@ -3489,8 +3489,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                 ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
                 DottedChain dc = new DottedChain(pkgParts);
-                String script = "package " + dc.toPrintableString(true) + " {"
-                        + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + " {"
+                String script = "package " + dc.toPrintableString(doAbc.getSwf(), true) + " {"
+                        + "public class " + IdentifiersDeobfuscation.printIdentifier(swf, true, classSimpleName) + " {"
                         + " }"
                         + "}";
                 parser.addScript(script, fileName, 0, 0, swf.getDocumentClass(), doAbc.getABC());
@@ -3946,7 +3946,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             DottedChain dc = new DottedChain(parts);
 
             try {
-                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}", swf.getCharset());
+                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(swf, false) + "{}", swf.getCharset());
                 doInit.setActions(actions);
             } catch (ActionParseException | IOException | CompilationException
                     | InterruptedException ex) {

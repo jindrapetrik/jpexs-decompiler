@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
@@ -196,10 +197,10 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public String getVariableName(TranslateStack stack, ConstantPool cpool) {
+    public String getVariableName(TranslateStack stack, ConstantPool cpool, SWF swf) {
         if (stack.size() < 2) {
             return null;
         }
-        return stack.get(stack.size() - 2).toStringNoQuotes(LocalData.create(cpool));
+        return stack.get(stack.size() - 2).toStringNoQuotes(LocalData.create(cpool, swf));
     }
 }

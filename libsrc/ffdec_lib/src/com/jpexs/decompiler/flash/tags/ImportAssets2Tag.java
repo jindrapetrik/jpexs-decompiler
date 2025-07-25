@@ -164,7 +164,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
             ret.put("chid", "" + tags.get(0));
             String importName = names.get(0);
             if (importName.startsWith("__Packages.")) {
-                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(false));
+                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(getSwf(), false));
             } else {
                 ret.put("imp", "\"" + Helper.escapePCodeString(importName) +  "\"");
             }

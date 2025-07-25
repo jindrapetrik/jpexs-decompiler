@@ -60,7 +60,7 @@ public class CoerceBIns extends InstructionDefinition implements CoerceOrConvert
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         return new TypeItem(DottedChain.BOOLEAN);
     }
 }

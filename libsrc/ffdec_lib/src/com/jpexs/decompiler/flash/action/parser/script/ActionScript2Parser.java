@@ -253,6 +253,11 @@ public class ActionScript2Parser {
      * Charset
      */
     private String charset;
+    
+    /**
+     * SWF
+     */
+    private SWF swf;
 
     /**
      * Constructor
@@ -2056,7 +2061,7 @@ public class ActionScript2Parser {
     }
 
     private boolean isCastOp(GraphTargetItem item) {
-        LocalData localData = LocalData.create(new ConstantPool(constantPool));
+        LocalData localData = LocalData.create(new ConstantPool(constantPool), this.swf);
         List<String> items = new ArrayList<>();
         while (item instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) item;

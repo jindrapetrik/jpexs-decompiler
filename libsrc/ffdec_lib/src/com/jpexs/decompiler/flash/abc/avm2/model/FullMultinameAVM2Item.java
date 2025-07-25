@@ -156,7 +156,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         if (name != null) {
             cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1));
         } else {
-            cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
+            cname = (abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
@@ -164,7 +164,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {
-                cns = ns.getName(abc.constants).toPrintableString(true);
+                cns = ns.getName(abc.constants).toPrintableString(abc.getSwf(), true);
             }
         }
         return cname.equals(tname) && cns.isEmpty();
@@ -206,7 +206,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             AVM2ConstantPool constants = localData.constantsAvm2;
             List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
-                String simpleName = constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, true, false);
+                String simpleName = constants.getMultiname(multinameIndex).getName(localData.abc, constants, fullyQualifiedNames, true, false);
                 if ("*".equals(simpleName)) {
                     writer.append("*");
                 } else {
@@ -215,7 +215,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     DottedChain customNs = customNsRef.getVal();
                     if (customNs != null) {
                         String nsname = customNs.getLast();
-                        String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+                        String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), true, nsname);                    
                         writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
                         writer.appendNoHilight("::");
                     }

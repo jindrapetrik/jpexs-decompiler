@@ -4354,9 +4354,9 @@ public class CommandLineArgumentParser {
         if (dcs != null) {
             if (dcs.contains(".")) {
                 DottedChain dc = DottedChain.parseWithSuffix(dcs);
-                pw.println("documentClass=" + dc.toPrintableString(true));
+                pw.println("documentClass=" + dc.toPrintableString(swf, true));
             } else {
-                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(true, dcs));
+                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(swf, true, dcs));
             }
         } else {
             pw.println("documentClass=");

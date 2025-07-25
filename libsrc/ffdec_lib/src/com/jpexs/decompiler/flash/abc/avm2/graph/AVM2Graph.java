@@ -2190,7 +2190,7 @@ public class AVM2Graph extends Graph {
                                                 }
                                                 if (construct.object instanceof GetLexAVM2Item) {
                                                     GetLexAVM2Item glt = (GetLexAVM2Item) construct.object;
-                                                    isXMLList = glt.propertyName.getName(aLocalData.getConstants(), aLocalData.fullyQualifiedNames, true, true).equals("XMLList");
+                                                    isXMLList = glt.propertyName.getName(aLocalData.abc, aLocalData.getConstants(), aLocalData.fullyQualifiedNames, true, true).equals("XMLList");
                                                 }
 
                                                 if (isXMLList) {
@@ -2733,7 +2733,7 @@ public class AVM2Graph extends Graph {
                             if (sp.value instanceof LocalRegAVM2Item) {
                                 LocalRegAVM2Item lr = (LocalRegAVM2Item) sp.value;
                                 AVM2FinalProcessLocalData aLocalData = (AVM2FinalProcessLocalData) localData;
-                                if (Objects.equals(propName.resolvedMultinameName, AVM2Item.localRegName(aLocalData.localRegNames, lr.regIndex))) {
+                                if (Objects.equals(propName.resolvedMultinameName, AVM2Item.localRegName(abc.getSwf(), aLocalData.localRegNames, lr.regIndex))) {
                                     list.remove(i);
                                     i--;
                                     continue loopi;
@@ -2746,7 +2746,7 @@ public class AVM2Graph extends Graph {
                 if (list.get(i) instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(i);
                     if (sslot.slotObject instanceof NewActivationAVM2Item) {
-                        String slotName = sslot.slotName.getName(abc.constants, new ArrayList<>(), true, true);
+                        String slotName = sslot.slotName.getName(abc, abc.constants, new ArrayList<>(), true, true);
                         if (sslot.value.getNotCoercedNoDup() instanceof LocalRegAVM2Item) {
                             LocalRegAVM2Item locReg = (LocalRegAVM2Item) sslot.value.getNotCoercedNoDup();
                             if (localRegNames.containsValue(slotName)) {

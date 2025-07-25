@@ -84,7 +84,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), AbcIndexing.multinameToType(multinameIndex, localData.getConstants())));
+        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), AbcIndexing.multinameToType(multinameIndex, localData.abc, localData.getConstants())));
     }
 
     @Override
@@ -98,8 +98,8 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         int multinameIndex = ins.operands[0];
-        return AbcIndexing.multinameToType(multinameIndex, constants);
+        return AbcIndexing.multinameToType(multinameIndex, abc, constants);
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
@@ -44,6 +45,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     private String fieldName;
 
     private boolean multiline;
+    private final SWF swf;
 
     @Override
     public boolean getScrollableTracksViewportWidth() {
@@ -67,7 +69,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         return 0;
     }
 
-    public StringEditor(String fieldName, Object obj, Field field, int index, Class<?> type, boolean multiline) {
+    public StringEditor(String fieldName, Object obj, Field field, int index, Class<?> type, boolean multiline, SWF swf) {
         setLineWrap(true);
         this.obj = obj;
         this.field = field;
@@ -75,13 +77,14 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         this.type = type;
         this.fieldName = fieldName;
         this.multiline = multiline;
+        this.swf = swf;
         if (multiline) {
             Dimension d = new Dimension(500, 200);
             setPreferredSize(d);
             setSize(d);
         }
         reset();
-    }
+           }
 
     @Override
     public void reset() {
@@ -90,9 +93,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
             if (di != null) {
                 if (di.exportName()) {
-                    newValue = Helper.escapeExportname(newValue, false);
+                    newValue = Helper.escapeExportname(swf, newValue, false);
                 } else {
-                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(di.as3());
+                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(swf, di.as3());
                 }
             }
             setText(newValue);

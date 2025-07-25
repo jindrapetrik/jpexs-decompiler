@@ -201,7 +201,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         Reference<Boolean> first = new Reference<>(true);
 
-        String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
+        String instanceInfoName = instanceInfoMultiname.getName(abc, abc.constants, fullyQualifiedNames, false, true);
 
         getMetaData(this, convertData, abc, writer);
 
@@ -210,7 +210,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (convertData.exportEmbedFlaMode) {
             allowEmbed = false;
             if (abc.getSwf() != null) {
-                CharacterTag ct = abc.getSwf().getCharacterByClass(instanceInfoMultiname.getNameWithNamespace(abc.constants, false).toRawString());
+                CharacterTag ct = abc.getSwf().getCharacterByClass(instanceInfoMultiname.getNameWithNamespace(abc, abc.constants, false).toRawString());
                 if (ct == null) {
                     allowEmbed = false;
                 } else {
@@ -318,7 +318,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startMethod(instanceInfo.iinit_index, "iinit");
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
-            writer.appendNoHilight(m.getName(abc.constants, null/*do not want full names here*/, false, true));
+            writer.appendNoHilight(m.getName(abc, abc.constants, null/*do not want full names here*/, false, true));
             writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
             MethodBody body = bodyIndex == -1 ? null : abc.bodies.get(bodyIndex);
@@ -346,7 +346,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         if (convertData.ignoreAccessibility) {
             for (Trait t : instanceInfo.instance_traits.traits) {
-                String traitName = t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false);;
+                String traitName = t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false);;
                 if (traitName.startsWith("__setAcc_")
                         || traitName.startsWith("__setTab_")) {
                     ignoredInstanceTraitNames.add(traitName);
@@ -372,7 +372,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         fullyQualifiedNames = new ArrayList<>();
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false, true);
+        String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc, abc.constants, fullyQualifiedNames, false, true);
         ClassInfo classInfo = abc.class_info.get(class_info);
 
         AbcIndexing index = new AbcIndexing(abc.getSwf());
@@ -382,7 +382,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             int nsIndex = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, sIndex, false);
             if (nsIndex > -1) {
                 Reference<Boolean> foundStatic = new Reference<>(null);                
-                convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants, true)), abc, nsIndex), false, true, false, foundStatic);
+                convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc, abc.constants, true)), abc, nsIndex), false, true, false, foundStatic);
             } else {
                 convertData.thisHasDefaultToPrimitive = true;
             }
@@ -398,7 +398,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             callStack.add(abc.bodies.get(bodyIndex));
 
             if (!abc.instance_info.get(class_info).isInterface()) {
-                AbcIndexing.ClassIndex cls = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(class_info).name_index, abc.constants), abc, scriptIndex);
+                AbcIndexing.ClassIndex cls = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(class_info).name_index, abc, abc.constants), abc, scriptIndex);
                 List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
                 cls = cls.parent;
                 while (cls != null) {
@@ -406,7 +406,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     cls = cls.parent;
                 }
                 for (AbcIndexing.ClassIndex cls2 : clsList) {
-                    newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true)));
+                    newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc, cls2.abc.constants, true)));
                 }
             }
 
@@ -453,14 +453,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                             if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
                                                 if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                     GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                    frameTraitNames.add(lex.propertyName.getName(abc.constants, new ArrayList<>(), false, true));
+                                                    frameTraitNames.add(lex.propertyName.getName(abc, abc.constants, new ArrayList<>(), false, true));
                                                 } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                     GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                     if (getProp.object instanceof ThisAVM2Item) {
                                                         if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                             FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                             int multinameIndex = framePropName.multinameIndex;
-                                                            frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc.constants, new ArrayList<>(), false, true));
+                                                            frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc, abc.constants, new ArrayList<>(), false, true));
                                                         }
                                                     }
                                                 }

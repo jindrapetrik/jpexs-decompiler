@@ -545,9 +545,16 @@ public class IdentifiersDeobfuscation {
      * words)
      * @return Printable identifier
      */
-    public static String printIdentifier(boolean as3, String s, String... validExceptions) {
+    public static String printIdentifier(SWF swf, boolean as3, String s, String... validExceptions) {
         if (s == null || s.isEmpty()) {
             return "";
+        }
+        
+        if (Configuration.useSafeStr.get() && as3) {
+            Map<String, String> map = swf.getAs3ObfuscatedIdentifiers();
+            if (map.containsKey(s)) {
+                return map.get(s);
+            }
         }
 
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better

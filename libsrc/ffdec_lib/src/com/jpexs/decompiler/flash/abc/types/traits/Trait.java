@@ -211,11 +211,11 @@ public abstract class Trait implements Cloneable, Serializable {
             public var attr2;
              */
             if (parent instanceof TraitClass) {
-                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true, true);
+                String thisName = getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true);
                 List<Trait> classTraits = abc.class_info.get(((TraitClass) parent).class_info).static_traits.traits;
                 for (Trait t : classTraits) {
                     if (t.kindType == Trait.TRAIT_SLOT) {
-                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+                        if ("_skinParts".equals(t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true))) {
                             if (t.getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                                 if (convertData.assignedValues.containsKey(t)) {
                                     if (convertData.assignedValues.get(t).value instanceof NewObjectAVM2Item) {
@@ -332,7 +332,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     continue;
                 }
             }
-            traitNamesInThisScript.add(it.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+            traitNamesInThisScript.add(it.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true));
         }
         for (Trait ct : abc.class_info.get(classIndex).static_traits.traits) {
             if (publicProtectedOnly) {
@@ -341,12 +341,12 @@ public abstract class Trait implements Cloneable, Serializable {
                     continue;
                 }
             }
-            traitNamesInThisScript.add(ct.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+            traitNamesInThisScript.add(ct.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true));
         }
         if (abc.instance_info.get(classIndex).super_index == 0) {
             return;
         }
-        DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, true);
+        DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc, abc.constants, true);
         AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(fullClassName), abc, scriptIndex);
         if (ci != null) {
             getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);
@@ -388,7 +388,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (st instanceof TraitClass) {
                 getAllClassTraitNames(traitNamesInThisScript, abcIndex, abc, ((TraitClass) st).class_info, scriptIndex, false);
             } else {
-                traitNamesInThisScript.add(st.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+                traitNamesInThisScript.add(st.getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true));
             }
         }
 
@@ -481,13 +481,13 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight("import ");
 
                 if (imp.size() > 1) {
-                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
+                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(abc.getSwf(), true));
                     writer.appendNoHilight(".");
                 }
                 if ("*".equals(imp.getLast())) {
                     writer.appendNoHilight("*");
                 } else {
-                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
                 }
                 writer.appendNoHilight(";").newLine();
                 hasImport = true;
@@ -545,7 +545,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (METADATA_DEFINITION.equals(name) || METADATA_CTOR_DEFINITION.equals(name)) {
                 continue;
             }
-            writer.append("[").append(IdentifiersDeobfuscation.printIdentifier(true, name));
+            writer.append("[").append(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, name));
             if (!en.getValue().isEmpty()) {
                 writer.append("(");
                 boolean first = true;
@@ -555,7 +555,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                     first = false;
                     if (key != null && !key.isEmpty()) {
-                        writer.append(IdentifiersDeobfuscation.printIdentifier(true, key)).append("=");
+                        writer.append(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, key)).append("=");
                     }
                     writer.append("\"");
                     String val = en.getValue().get(key);
@@ -629,7 +629,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.append(Helper.escapeActionScriptString(m.getSimpleNamespaceName(abc.constants).toRawString()));
                 writer.append("\") ");
             } else if (dc != null && nsname != null) {
-                String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                String identifier = IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, nsname);
                 if (identifier != null && !identifier.isEmpty()) {
                     writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, dc.toRawString()).appendNoHilight(" ");
                 }
@@ -872,7 +872,7 @@ public abstract class Trait implements Cloneable, Serializable {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(abc.getSwf(), true);
             writer.appendNoHilight("package");
             if (!nsname.isEmpty()) {
                 writer.appendNoHilight(" " + nsname); //assume not null name
@@ -881,7 +881,7 @@ public abstract class Trait implements Cloneable, Serializable {
             List<Trait> traits = new ArrayList<>();
             traits.add(this);           
             writeImports(traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);        
-            toString(swfVersion, abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+            toString(swfVersion, abcIndex, name.getNameWithNamespace(abc, abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
         }
@@ -911,7 +911,7 @@ public abstract class Trait implements Cloneable, Serializable {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(abc.getSwf(), true);
             convert(swfVersion, abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
         }
     }
@@ -999,9 +999,9 @@ public abstract class Trait implements Cloneable, Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         DottedChain packageName = ns == null ? DottedChain.EMPTY : ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, null, true, false);
+        String objectName = name.getName(abc, abc.constants, null, true, false);
         String namespaceSuffix = name.getNamespaceSuffix();
-        return new ClassPath(packageName, objectName, namespaceSuffix); //assume not null name
+        return new ClassPath(packageName, objectName, namespaceSuffix, abc.getSwf()); //assume not null name
     }
 
     /**

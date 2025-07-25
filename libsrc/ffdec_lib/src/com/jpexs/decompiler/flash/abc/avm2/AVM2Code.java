@@ -1998,7 +1998,7 @@ public class AVM2Code implements Cloneable {
                                         if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true, true);
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc, abc.constants, fullyQualifiedNames, true, true);
                                                     localScopeStack.pop(); // with
                                                     output.remove(output.size() - 1); // with
                                                     ip = ip + plus + 4; // +1 below
@@ -2070,18 +2070,19 @@ public class AVM2Code implements Cloneable {
     /**
      * Gets types of local registers.
      *
+     * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return Map from register id to type
      */
-    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         HashMap<Integer, GraphTargetItem> ret = new HashMap<>();
         AVM2Instruction prev = null;
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof SetLocalTypeIns) {
                 if (prev != null) {
                     if (prev.definition instanceof CoerceOrConvertTypeIns) {
-                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(constants, prev));
+                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(abc, constants, prev));
                     }
                 }
             }
@@ -2257,7 +2258,7 @@ public class AVM2Code implements Cloneable {
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
                 Multiname tratMultiname = abc.constants.getMultiname(tsc.name_index);
-                String bodyTraitName = tratMultiname.getName(abc.constants, new ArrayList<>(), true, true);
+                String bodyTraitName = tratMultiname.getName(abc, abc.constants, new ArrayList<>(), true, true);
                 traits.put(bodyTraitName, tsc);
             }
         }
@@ -2275,7 +2276,7 @@ public class AVM2Code implements Cloneable {
                     if (ss.slotName == null) {
                         break;
                     }
-                    propNameStr = ss.slotName.getName(abc.constants, new ArrayList<>(), true, true);
+                    propNameStr = ss.slotName.getName(abc, abc.constants, new ArrayList<>(), true, true);
                     value = ss.value;
                 } else if (item instanceof SetPropertyAVM2Item) {
                     SetPropertyAVM2Item sp = (SetPropertyAVM2Item) item;
@@ -2323,7 +2324,7 @@ public class AVM2Code implements Cloneable {
                         } else {
                             return;
                         }
-                        propertyName = propertyMultiName.getName(abc.constants, new ArrayList<>(), true, true);
+                        propertyName = propertyMultiName.getName(abc, abc.constants, new ArrayList<>(), true, true);
 
                         if (traits.containsKey(propertyName)) {
                             Slot sl = new Slot(new NewActivationAVM2Item(null, null), propertyMultiName);
@@ -2348,8 +2349,8 @@ public class AVM2Code implements Cloneable {
                     if (!beginDeclaredSlotsNames.contains(traitName)) {
                         Slot sl = new Slot(new NewActivationAVM2Item(null, null), abc.constants.getMultiname(traits.get(traitName).name_index));
                         TraitSlotConst tsc = (TraitSlotConst) traits.get(traitName);
-                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc.constants);
-                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc.constants, type, TypeItem.UNBOUNDED /*?*/, false), type);
+                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc, abc.constants);
+                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc, abc.constants, type, TypeItem.UNBOUNDED /*?*/, false), type);
                         declaredSlotsDec.add(d);
                         declaredSlots.add(sl);
 
@@ -2415,7 +2416,7 @@ public class AVM2Code implements Cloneable {
                                 if (!declaredProperties.contains(propName.resolvedMultinameName)) {
                                     if (traits.containsKey(propName.resolvedMultinameName)) {
                                         TraitSlotConst tsc = traits.get(propName.resolvedMultinameName);
-                                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc.constants);
+                                        GraphTargetItem type = AbcIndexing.multinameToType(tsc.type_index, abc, abc.constants);
                                         DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
                                         sp.setDeclaration(d);
                                         declaredPropsDec.add(d);
@@ -2445,14 +2446,14 @@ public class AVM2Code implements Cloneable {
                     SetSlotAVM2Item ssti = (SetSlotAVM2Item) subItem;
                     if (ssti.scope instanceof NewActivationAVM2Item) {
                         Slot sl = new Slot(ssti.scope, ssti.slotName);
-                        String slotPropertyName = sl.multiname.getName(abc.constants, new ArrayList<>(), true, false);
+                        String slotPropertyName = sl.multiname.getName(abc, abc.constants, new ArrayList<>(), true, false);
                         if (!paramNames.contains(slotPropertyName)) {
 
                             int index = slotListIndexOf(declaredSlots, slotPropertyName, abc);
                             if (index == -1) {
                                 GraphTargetItem type = TypeItem.UNBOUNDED;
                                 if (traits.containsKey(slotPropertyName)) {
-                                    type = AbcIndexing.multinameToType(traits.get(slotPropertyName).type_index, abc.constants);
+                                    type = AbcIndexing.multinameToType(traits.get(slotPropertyName).type_index, abc, abc.constants);
                                 }
                                 DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
                                 ssti.setDeclaration(d);
@@ -2549,7 +2550,7 @@ public class AVM2Code implements Cloneable {
         }
         HashMap<Integer, GraphTargetItem> localRegTypes = new HashMap<>();
         for (int i = 0; i < abc.method_info.get(methodIndex).param_types.length; i++) {
-            localRegTypes.put(i + 1, AbcIndexing.multinameToType(abc.method_info.get(methodIndex).param_types[i], abc.constants));
+            localRegTypes.put(i + 1, AbcIndexing.multinameToType(abc.method_info.get(methodIndex).param_types[i], abc, abc.constants));
         }
 
         try {
@@ -2581,7 +2582,7 @@ public class AVM2Code implements Cloneable {
                                     if (value != null && !convertData.assignedValues.containsKey(tsc)) {
                                         if (value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                            f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
+                                            f.functionName = tsc.getName(abc).getName(abc, abc.constants, fullyQualifiedNames, true, true);
                                         }
                                         AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
@@ -2670,7 +2671,7 @@ public class AVM2Code implements Cloneable {
                                         }
                                         if (value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                            f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
+                                            f.functionName = tsc.getName(abc).getName(abc, abc.constants, fullyQualifiedNames, true, true);
                                         }
                                         AssignedValue av = new AssignedValue(classMultiname == -1 ? ti : null, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
@@ -2888,7 +2889,7 @@ public class AVM2Code implements Cloneable {
             if (param_types[i] == 0) {
                 type = TypeItem.UNBOUNDED;
             } else {
-                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants, true));
+                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc, abc.constants, true));
             }
             if (d.length > r) {
                 d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null), type), type);
@@ -2913,7 +2914,7 @@ public class AVM2Code implements Cloneable {
         HashMap<Integer, String> registerNames = body.getLocalRegNames(abc);
         List<String> paramNamesList = new ArrayList<>();
         for (int ir = 0; ir < r; ir++) {
-            paramNamesList.add(AVM2Item.localRegName(localRegNames, ir));
+            paramNamesList.add(AVM2Item.localRegName(abc.getSwf(), localRegNames, ir));
         }
         injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
 

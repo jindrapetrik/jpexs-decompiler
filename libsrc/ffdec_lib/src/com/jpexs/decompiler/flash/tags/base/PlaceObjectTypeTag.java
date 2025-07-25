@@ -338,7 +338,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
                 ret.put("chid", "" + charId);
             }
             if (exportName != null) {
-                ret.put("exp", Helper.escapeExportname(exportName, true));
+                ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));
             }
         }
 

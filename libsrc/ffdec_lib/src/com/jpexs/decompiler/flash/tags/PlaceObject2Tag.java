@@ -458,7 +458,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (placeFlagHasName) {
-            ret.put("nm", DottedChain.parseNoSuffix(name).toPrintableString(false));
+            ret.put("nm", DottedChain.parseNoSuffix(name).toPrintableString(getSwf(), false));
         }
         return ret;
     }

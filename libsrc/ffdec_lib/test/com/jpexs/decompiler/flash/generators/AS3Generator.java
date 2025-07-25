@@ -127,7 +127,7 @@ public class AS3Generator {
 
                 for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String name = t.getName(abc).getName(abc.constants, null, true, true);
+                        String name = t.getName(abc).getName(abc, abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
                         String identifier = swfAndIdentifierList[0][1];

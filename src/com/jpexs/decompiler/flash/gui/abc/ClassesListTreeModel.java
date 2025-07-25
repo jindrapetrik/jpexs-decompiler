@@ -156,7 +156,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         }
 
         if (flat) {
-            String fullName = packageStr.toPrintableString(true);
+            String fullName = packageStr.toPrintableString(abc.getSwf(), true);
             boolean defaultPackage = false;
             if (fullName.length() == 0) {
                 fullName = AppResources.translate("package.default");

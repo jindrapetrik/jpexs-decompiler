@@ -333,7 +333,7 @@ public class Traits implements Cloneable, Serializable {
             if (!trait.isVisible(isStatic, abc)) {
                 continue;
             }
-            if (ignoredTraitNames.contains(trait.getName(abc).getName(abc.constants, new ArrayList<>(), false, false))) {
+            if (ignoredTraitNames.contains(trait.getName(abc).getName(abc, abc.constants, new ArrayList<>(), false, false))) {
                 continue;
             }
 

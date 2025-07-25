@@ -100,10 +100,10 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
         if (classIndex != -1) {
             InstanceInfo ii = abc.instance_info.get(classIndex);
             String kind = ii.isInterface() ? "interface" : "class";
-            return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+            return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc, abc.constants, true).toPrintableString(abc.getSwf(), true);
         }
         DottedChain scriptSimpleName = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-        return "script " + (scriptSimpleName == null ? "" + scriptIndex : scriptSimpleName.toPrintableString(true));
+        return "script " + (scriptSimpleName == null ? "" + scriptIndex : scriptSimpleName.toPrintableString(abc.getSwf(), true));
     }
 
     @Override

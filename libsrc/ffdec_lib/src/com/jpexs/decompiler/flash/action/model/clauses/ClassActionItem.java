@@ -250,7 +250,7 @@ public class ClassActionItem extends ActionItem implements Block {
                     item.getValue().toString(writer, localData).newLine();
                 } else {
                     writer.append("var ");
-                    writer.append(IdentifiersDeobfuscation.printIdentifier(false, item.getKey().toStringNoQuotes(localData)));
+                    writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, false, item.getKey().toStringNoQuotes(localData)));
                     if (item.getValue() != null) {
                         writer.append(" = ");
                         item.getValue().toString(writer, localData);

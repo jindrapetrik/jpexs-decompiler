@@ -125,7 +125,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
             writer.appendNoHilight(methodIndex);
             writer.newLine();
         }
-        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, localData.fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc, abc.constants, localData.fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
             List<MethodBody> callStack = new ArrayList<>(localData.callStack);

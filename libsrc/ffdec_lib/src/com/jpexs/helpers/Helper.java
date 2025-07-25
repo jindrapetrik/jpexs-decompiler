@@ -18,6 +18,7 @@ package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -240,13 +241,14 @@ public class Helper {
 
     /**
      * Escapes export name
+     * @param swf SWF
      * @param s Input string
      * @param quote Add quotes when not starts __Packages.
      * @return Escaped string
      */
-    public static String escapeExportname(String s, boolean quote) {
+    public static String escapeExportname(SWF swf, String s, boolean quote) {
         if (s.startsWith("__Packages.")) {
-            return DottedChain.parseNoSuffix(s).toPrintableString(false);
+            return DottedChain.parseNoSuffix(s).toPrintableString(swf, false);
         }
         return (quote ? "\"" : "") + escapePCodeString(s) + (quote ? "\"" : "");
     }

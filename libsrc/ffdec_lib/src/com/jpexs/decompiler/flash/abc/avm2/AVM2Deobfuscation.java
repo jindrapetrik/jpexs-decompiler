@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
  */
 public class AVM2Deobfuscation {
 
+    public static final String SAFE_STR_PREFIX = "_SafeStr_";
+    
     /**
      * Default size of random word.
      */
@@ -97,7 +99,7 @@ public class AVM2Deobfuscation {
      * @param s String
      * @return True if string is valid namespace part
      */
-    private boolean isValidNSPart(String s) {
+    public boolean isValidNSPart(String s) {
         boolean isValid = true;
         if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
@@ -179,6 +181,23 @@ public class AVM2Deobfuscation {
         return ret;
     }
 
+    
+    /**
+     * Checks whether string at given index is valid package name
+     * @param strIndex String index
+     * @return True if valid
+     */
+    public boolean isValidPackageName(int strIndex) {
+        if (strIndex <= 0) {
+            return true;
+        }
+        String s = constants.getString(strIndex);
+        if (builtInNs(s) != null) {
+            return true;
+        }
+        return isValidNSPart(s);
+    }
+    
     /**
      * Deobfuscates package name.
      *
@@ -189,16 +208,9 @@ public class AVM2Deobfuscation {
      * @param renameType Rename type
      * @return Deobfuscated package name
      */
-    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, RenameType renameType) {
-        if (strIndex <= 0) {
-            return strIndex;
-        }
-        String s = constants.getString(strIndex);
-        if (builtInNs(s) != null) {
-            return strIndex;
-        }
-        boolean isValid = isValidNSPart(s);
-        if (!isValid) {
+    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, RenameType renameType) {                        
+        if (!isValidPackageName(strIndex)) {
+            String s = constants.getString(strIndex);
             DottedChain sChain = DottedChain.parseWithSuffix(s);
             DottedChain newName;
             if (namesMap.containsKey(sChain)) {
@@ -228,20 +240,13 @@ public class AVM2Deobfuscation {
     }
 
     /**
-     * Deobfuscates name.
-     *
-     * @param stringUsageTypes String usage types
-     * @param stringUsages String usages
-     * @param namespaceUsages Namespace usages
-     * @param namesMap Names map
+     * Checks whether string at given index is valid name
      * @param strIndex String index
-     * @param firstUppercase First uppercase
-     * @param renameType Rename type
-     * @return Deobfuscated name string index
+     * @return True when valid
      */
-    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
+    public boolean isValidName(int strIndex) {
         if (strIndex <= 0) {
-            return strIndex;
+            return true;
         }
         String s = constants.getString(strIndex);
         boolean isValid = true;
@@ -264,8 +269,24 @@ public class AVM2Deobfuscation {
                 isValid = false;
             }
         }
-
-        if (!isValid) {
+        return isValid;
+    }
+    
+    /**
+     * Deobfuscates name.
+     *
+     * @param stringUsageTypes String usage types
+     * @param stringUsages String usages
+     * @param namespaceUsages Namespace usages
+     * @param namesMap Names map
+     * @param strIndex String index
+     * @param firstUppercase First uppercase
+     * @param renameType Rename type
+     * @return Deobfuscated name string index
+     */
+    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {        
+        if (!isValidName(strIndex)) {
+            String s = constants.getString(strIndex);
             DottedChain newname;
             DottedChain sChain = DottedChain.parseNoSuffix(s);
             if (namesMap.containsKey(sChain)) {

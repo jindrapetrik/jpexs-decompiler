@@ -135,7 +135,7 @@ public class DependencyParser {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, true, true);
+            String name = m.getName(abc, abc.constants, fullyQualifiedNames, true, true);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, m.namespace_index, ignorePackage, name, dependencyType, uses);
@@ -271,7 +271,7 @@ public class DependencyParser {
                 }
                 if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
                     if (ins.operands[0] > 0) { //first is global
-                        DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true);
+                        DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc, abc.constants, true);
                         AbcIndexing.ClassIndex cls = abcIndex.findClass(new TypeItem(type), abc, scriptIndex);
                         List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
                         cls = cls.parent;
@@ -281,7 +281,7 @@ public class DependencyParser {
                         }
                         if (ins.operands[0] < 1 + clsList.size()) {
                             AbcIndexing.ClassIndex cls2 = clsList.get(ins.operands[0] - 1);
-                            DottedChain nimport = cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true);
+                            DottedChain nimport = cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc, cls2.abc.constants, true);
                             Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
                             if (!dependencies.contains(depExp)) {
                                 dependencies.add(depExp);

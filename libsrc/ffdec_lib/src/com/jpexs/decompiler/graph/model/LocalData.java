@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -39,7 +40,12 @@ public class LocalData {
      * Empty local data
      */
     public static LocalData empty = new LocalData();
-
+    
+    /**
+     * SWF
+     */
+    public SWF swf;
+    
     /**
      * Constant pool
      */
@@ -96,9 +102,10 @@ public class LocalData {
      * @param constants Constant pool
      * @return Local data
      */
-    public static LocalData create(ConstantPool constants) {
+    public static LocalData create(ConstantPool constants, SWF swf) {
         LocalData localData = new LocalData();
         localData.constants = constants;
+        localData.swf = swf;
         return localData;
     }
 
@@ -125,6 +132,7 @@ public class LocalData {
         localData.callStack = callStack;
         localData.exportMode = exportMode;                
         localData.swfVersion = swfVersion;
+        localData.swf = abc.getSwf();
         return localData;
     }
 }

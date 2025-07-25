@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
@@ -193,13 +194,14 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     /**
      * Gets local register name.
+     * @param swf SWF
      * @param localRegNames Local register names
      * @param reg Register
      * @return Local register name
      */
-    public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
+    public static String localRegName(SWF swf, HashMap<Integer, String> localRegNames, int reg) {
         if (localRegNames.containsKey(reg)) {
-            return IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(reg));
+            return IdentifiersDeobfuscation.printIdentifier(swf, true, localRegNames.get(reg));
         } else {
             if (reg == 0) {
                 return "this";

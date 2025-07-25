@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -218,7 +219,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
     }
 
     @Override
-    public String getVariableName(TranslateStack stack, ConstantPool cpool) {
+    public String getVariableName(TranslateStack stack, ConstantPool cpool, SWF swf) {
         return "__register" + registerNumber;
     }
 }

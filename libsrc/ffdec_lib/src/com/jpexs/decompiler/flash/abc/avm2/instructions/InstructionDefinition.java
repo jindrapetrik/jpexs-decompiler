@@ -388,7 +388,7 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
 
-        return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.getConstants(), new ArrayList<>(), true, true), name, ns);
+        return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.abc, localData.getConstants(), new ArrayList<>(), true, true), name, ns);
     }
 
     /**

@@ -161,8 +161,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     super.paint(g, c);
                 }
             });
-            setCellRenderer(new MyTreeCellRenderer());
-            setCellEditor(new MyTreeCellEditor(this));
+            setCellRenderer(new MyTreeCellRenderer());            
             setInvokesStopCellEditing(true);
 
         }
@@ -293,9 +292,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private final JTree tree;
 
         private FieldNode fnode;
+        private final SWF swf;
 
-        public MyTreeCellEditor(JTree tree) {
+        public MyTreeCellEditor(JTree tree, SWF swf) {
             this.tree = tree;
+            this.swf = swf;
         }
 
         @Override
@@ -361,7 +362,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
                         editor = new BooleanEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(String.class)) {
-                        editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null);
+                        editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null, swf);
                     } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
                         editor = new ColorEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(byte[].class) || type.equals(ByteArrayRange.class)) {
@@ -794,12 +795,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private MyTreeModel model;
 
         private Object parentObject;
+        private final SWF swf;
 
         public Object getParentObject() {
             return parentObject;
         }
 
-        public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index) {
+        public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index, SWF swf) {
             this.tag = tag;
             this.obj = obj;
             this.fieldSet = fieldSet;
@@ -820,6 +822,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                 }
             }
+            this.swf = swf;
         }
 
         @Override
@@ -911,9 +914,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
                 if (val instanceof String && di != null) {
                     if (di.exportName()) {
-                        valStr += " = " + escapeHtml(Helper.escapeExportname(val.toString(), true));
+                        valStr += " = " + escapeHtml(Helper.escapeExportname(swf, val.toString(), true));
                     } else {
-                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(di.as3()));
+                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(swf, di.as3()));
                     }
                 } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
@@ -1216,15 +1219,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private Object getChild(Object parent, int index, boolean limited) {
             if (parent == mtroot) {
-                return new FieldNode(null, this, mtroot, mtroot, filterFields(mtroot.getSwf(), this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1);
+                return new FieldNode(null, this, mtroot, mtroot, filterFields(mtroot.getSwf(), this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1, mtroot.getSwf());
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
-                return new FieldNode(parent, this, mtroot, fnode.obj, fnode.fieldSet, index);
+                return new FieldNode(parent, this, mtroot, fnode.obj, fnode.fieldSet, index, mtroot.getSwf());
             }
             parent = fnode.getValue(FIELD_INDEX);
-            return new FieldNode(parent, this, mtroot, parent, filterFields(mtroot.getSwf(), this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1);
+            return new FieldNode(parent, this, mtroot, parent, filterFields(mtroot.getSwf(), this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1, mtroot.getSwf());
         }
 
         @Override
@@ -1314,6 +1317,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tree.stopEditing();
         }
         tree.setEditable(edit);
+        if (editedTag != null) {
+            tree.setCellEditor(new MyTreeCellEditor(tree, editedTag.getSwf()));
+        }
         refreshTree();
     }
 

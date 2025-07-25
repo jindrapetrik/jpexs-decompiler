@@ -258,9 +258,9 @@ public class FolderListPanel extends JPanel {
                         if (expName != null && !expName.isEmpty()) {
                             String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
                             if (expName.startsWith("__Packages.")) {
-                                s = IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
+                                s = IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), false, pathParts[pathParts.length - 1]);
                             } else {
-                                s = Helper.escapeExportname(expName, false);
+                                s = Helper.escapeExportname(tag.getSwf(), expName, false);
                             } 
                         }
                     }

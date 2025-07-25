@@ -217,11 +217,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     for (MethodBody b : callStack) {
                         for (int i = 0; i < b.traits.traits.size(); i++) {
                             Trait t = b.traits.traits.get(i);
-                            if (t.getName(abc).getName(constants, null, true, true).equals(propertyName)) {
+                            if (t.getName(abc).getName(abc, constants, null, true, true).equals(propertyName)) {
                                 if (t instanceof TraitSlotConst) {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
                                     objType = new TypeItem(DottedChain.FUNCTION);
-                                    propType = AbcIndexing.multinameToType(tsc.type_index, constants);
+                                    propType = AbcIndexing.multinameToType(tsc.type_index, abc, constants);
                                     propIndex = tsc.name_index;
                                     if (!localData.traitUsages.containsKey(b)) {
                                         localData.traitUsages.put(b, new ArrayList<>());

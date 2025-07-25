@@ -936,9 +936,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.addScriptListener(setTrait);
             String scriptName;
             if (classIndex > -1) {
-                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(newAbc.constants, true).toPrintableString(true);
+                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(newAbc, newAbc.constants, true).toPrintableString(newAbc.getSwf(), true);
             } else if (scriptIndex > -1) {
-                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc).toPrintableString(true);
+                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc).toPrintableString(newAbc.getSwf(), true);
             } else {
                 scriptName = "";
             }
@@ -1011,7 +1011,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     swfRef.setVal(ci.abc.getSwf());
                 }
 
-                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(true);
+                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(ci.abc.getSwf(), true);
                 
                 if (swfRef.getVal() == abc.getSwf()) {                    
                     hilightScript(getOpenable(), scriptNamePrintable);
@@ -1166,7 +1166,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         if (tmgs.kindType == Trait.TRAIT_SETTER) {
                             int[] paramTypes = ti.abc.method_info.get(tmgs.method_info).param_types;
                             if (paramTypes.length == 1) {
-                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(ti.abc.constants, false).getStringParts());
+                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(ti.abc, ti.abc.constants, false).getStringParts());
                                 callType = null;
                             } else {
                                 continue;
@@ -1548,7 +1548,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         continue;
                     }
 
-                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, a, usedAbc, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1601,7 +1601,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     if (a == usedAbc) {
                         continue;
                     }
-                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, a, usedAbc, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }

@@ -967,9 +967,9 @@ public class ABCExplorerDialog extends AppDialog {
         if (found) {
             DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
             if (scriptNameDc == null && scriptTraitIndex > -1) {
-                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc, abc.constants, false);
             }
-            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(abc.getSwf(), true));
             //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
             mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
         }
@@ -1000,7 +1000,7 @@ public class ABCExplorerDialog extends AppDialog {
                 case SCRIPT_INFO:
                     scriptIndex = vwi.getIndex();
                     DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(abc.getSwf(), true));
                     mainPanel.gotoScriptName(abc.getSwf(), scriptName);
                     break;
                 case METHOD_BODY:
@@ -1033,9 +1033,9 @@ public class ABCExplorerDialog extends AppDialog {
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc);
                         if (scriptNameDc2 == null && scriptTraitIndex != -1) {
-                            scriptNameDc2 = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                            scriptNameDc2 = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc, abc.constants, false);
                         }
-                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(true));
+                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(abc.getSwf(), true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName2, classIndex, GraphTextWriter.TRAIT_CLASS_INITIALIZER);
                     }
                     break;
@@ -1086,10 +1086,10 @@ public class ABCExplorerDialog extends AppDialog {
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
                         if (scriptNameDc == null && scriptTraitIndex != -1) {
-                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc, abc.constants, false);
                         }
 
-                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(abc.getSwf(), true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
                     }
 
@@ -1656,7 +1656,7 @@ public class ABCExplorerDialog extends AppDialog {
                     StringBuilderTextWriter miParamStrSbW = new StringBuilderTextWriter(new CodeFormatting(), miStrSb);
                     mi.getParamStr(miParamStrSbW, abc.constants, null, abc, new ArrayList<>());
                     miStrSb.append("): ");
-                    String miReturnType = mi.getReturnTypeRaw(abc.constants, new ArrayList<>());
+                    String miReturnType = mi.getReturnTypeRaw(abc, abc.constants, new ArrayList<>());
                     miStrSb.append(miReturnType);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, mi, miStrSb.toString(), title);
                 case METHOD_BODY:
@@ -1678,7 +1678,7 @@ public class ABCExplorerDialog extends AppDialog {
                     if (ii.name_index >= abc.constants.getMultinameCount() || ii.getName(abc.constants).namespace_index >= abc.constants.getNamespaceCount()) {
                         iiName = "";
                     } else {
-                        iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
+                        iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc, abc.constants, false).toRawString()) + "\"";
                     }
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), title);
                 case CLASS_INFO:

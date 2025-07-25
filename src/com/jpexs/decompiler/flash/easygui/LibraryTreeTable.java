@@ -391,13 +391,13 @@ public class LibraryTreeTable extends JTreeTable {
                         CharacterTag ct = (CharacterTag) o;
                         String exportName = ct.getExportName();
                         if (exportName != null) {
-                            return Helper.escapeExportname(exportName, false);
+                            return Helper.escapeExportname(ct.getSwf(), exportName, false);
                         }
                         Set<String> classNames = ct.getClassNames();
                         if (!classNames.isEmpty()) {
                             List<String> escapedList = new ArrayList<>();
                             for (String className : classNames) {
-                                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(true));
+                                escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(ct.getSwf(), true));
                             }
                             return String.join(", ", escapedList);
                         }

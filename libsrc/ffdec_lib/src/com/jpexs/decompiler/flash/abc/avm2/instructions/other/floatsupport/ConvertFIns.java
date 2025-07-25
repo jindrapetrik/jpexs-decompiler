@@ -77,11 +77,11 @@ public class ConvertFIns extends InstructionDefinition implements CoerceOrConver
     
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.getConstants(), ins)));
+        stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.abc, localData.getConstants(), ins)));
     }
     
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         return new TypeItem("float");
     }
 }

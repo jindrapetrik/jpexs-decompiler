@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.graph.TranslateStack;
 
@@ -31,7 +32,8 @@ public interface StoreTypeAction {
      *
      * @param stack Stack
      * @param cpool Constant pool
+     * @param swf SWF
      * @return Variable name
      */
-    public String getVariableName(TranslateStack stack, ConstantPool cpool);
+    public String getVariableName(TranslateStack stack, ConstantPool cpool, SWF swf);
 }

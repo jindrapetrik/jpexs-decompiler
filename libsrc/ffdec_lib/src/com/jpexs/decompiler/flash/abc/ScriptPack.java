@@ -207,7 +207,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, null, false, true);
+                scriptName = name.getName(abc, abc.constants, null, false, true);
             }
         }
         return scriptName;
@@ -224,7 +224,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         String scriptName = getPathScriptName();
         DottedChain packageName = getPathPackage();
-        File outDir = new File(directory + File.separatorChar + packageName.toFilePath());
+        File outDir = new File(directory + File.separatorChar + packageName.toFilePath(abc.getSwf()));
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + extension;
         return new File(fileName);
     }
@@ -325,7 +325,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     continue;
                 }
 
-                String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
+                String fullName = t.getName(abc).getNameWithNamespace(abc, abc.constants, false).toPrintableString(abc.getSwf(), true);
                 writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
@@ -771,7 +771,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         //String filepath = path.toString().replace('.', '/') + ".as";
         String pkg = path.packageStr.toString();
         String cls = path.className;
-        String filename = new File(directoryPath, path.packageStr.toFilePath()).getPath().replace(";", "{{semicolon}}")
+        String filename = new File(directoryPath, path.packageStr.toFilePath(abc.getSwf())).getPath().replace(";", "{{semicolon}}")
                 + ";"
                 + swfHash + ":"
                 + pkg.replace(".", File.separator).replace(";", "{{semicolon}}")

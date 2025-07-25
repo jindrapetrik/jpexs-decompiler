@@ -565,7 +565,7 @@ public final class MethodBody implements Cloneable {
                     }
                     List<DottedChain> fullyQualifiedNames2 = new ArrayList<>(fullyQualifiedNames);
                     for (Trait t : traits.traits) {
-                        DottedChain tname = DottedChain.parseWithSuffix(t.getName(abc).getName(abc.constants, new ArrayList<>(), false, true));
+                        DottedChain tname = DottedChain.parseWithSuffix(t.getName(abc).getName(abc, abc.constants, new ArrayList<>(), false, true));
                         fullyQualifiedNames2.remove(tname);
                     }
 

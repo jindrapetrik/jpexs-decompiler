@@ -128,7 +128,7 @@ public class LinkReportExporter {
             ns = abc.constants.getNamespace(nss.namespaces[0]);
         }
         String pkgName = ns == null ? "" : ns.getName(abc.constants).toRawString();
-        String clsName = multiName.getName(abc.constants, new ArrayList<>(), true, true);
+        String clsName = multiName.getName(abc, abc.constants, new ArrayList<>(), true, true);
         return pkgName.isEmpty() ? clsName : pkgName + ":" + clsName;
     }
 

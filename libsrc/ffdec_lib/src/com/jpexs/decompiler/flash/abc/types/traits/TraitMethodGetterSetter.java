@@ -127,19 +127,19 @@ public class TraitMethodGetterSetter extends Trait {
         }
 
         writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc, abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
-        abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(method_info).getReturnTypeStr(writer, abc, abc.constants, fullyQualifiedNames);
         return writer;
     }
    
     @Override
     public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         int nsKind = getName(abc).getSimpleNamespaceKind(abc.constants);
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
+        writer.startMethod(method_info, getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false));
+        path = path + "." + getName(abc).getName(abc, abc.constants, fullyQualifiedNames, false, true);
         convertHeader(swfVersion, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
@@ -169,8 +169,8 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(this, convertData, abc, writer);
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
+        writer.startMethod(method_info, getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false));
+        path = path + "." + getName(abc).getName(abc, abc.constants, fullyQualifiedNames, false, true);
         toStringHeader(swfVersion, parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
@@ -188,7 +188,7 @@ public class TraitMethodGetterSetter extends Trait {
                     abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             } else {
-                String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc.constants, fullyQualifiedNames);
+                String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc, abc.constants, fullyQualifiedNames);
                 switch (retTypeRaw) {
                     case "void":
                         break;
@@ -256,10 +256,10 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public boolean isVisible(boolean isStatic, ABC abc) {
         if (Configuration.handleSkinPartsAutomatically.get()) {
-            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+            if ("skinParts".equals(getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == TRAIT_GETTER) {
                     MethodInfo mi = abc.method_info.get(method_info);
-                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants, true).toRawString())) {
+                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc, abc.constants, true).toRawString())) {
                         if (abc.constants.getNamespace(abc.constants.getMultiname(name_index).namespace_index).kind == Namespace.KIND_PROTECTED) {
                             return false;
                         }

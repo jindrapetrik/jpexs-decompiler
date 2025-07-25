@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.Serializable;
@@ -449,12 +450,13 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     /**
      * To string.
      *
+     * @param swf SWF
      * @param as3 Whether to print as AS3
      * @param raw Whether to print raw (without deobfuscation)
      * @param withSuffix Whether to print with suffix
      * @return String
      */
-    protected String toString(boolean as3, boolean raw, boolean withSuffix) {
+    protected String toString(SWF swf, boolean as3, boolean raw, boolean withSuffix) {
         if (parts.isEmpty()) {
             return "";
         }
@@ -469,7 +471,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             }
             String part = parts.get(i).name;
             boolean lastStar = i == parts.size() - 1 && "*".equals(part);
-            ret.append((raw || lastStar) ? part : IdentifiersDeobfuscation.printIdentifier(as3, part));
+            ret.append((raw || lastStar) ? part : IdentifiersDeobfuscation.printIdentifier(swf, as3, part));
             if (withSuffix) {
                 ret.append(parts.get(i).namespaceSuffix);
             }
@@ -481,9 +483,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     /**
      * To file path.
      *
+     * @param swf SWF
      * @return File path
      */
-    public String toFilePath() {
+    public String toFilePath(SWF swf) {
         if (parts.isEmpty()) {
             return "";
         }
@@ -494,7 +497,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
                 ret.append(File.separator);
             }
 
-            ret.append(Helper.makeFileName(IdentifiersDeobfuscation.printIdentifier(true, parts.get(i).name)));
+            ret.append(Helper.makeFileName(IdentifiersDeobfuscation.printIdentifier(swf, true, parts.get(i).name)));
         }
         return ret.toString();
     }
@@ -515,20 +518,22 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     /**
      * To printable string.
      *
+     * @param swf SWF
      * @param as3 Whether to print as AS3
      * @return Printable string
      */
-    public String toPrintableString(boolean as3) {
-        return toString(as3, false, true);
+    public String toPrintableString(SWF swf, boolean as3) {
+        return toString(swf, as3, false, true);
     }
 
     /**
      * To raw string. (without deobfuscation)
      *
+     * @param swf SWF
      * @return Raw string
      */
     public String toRawString() { //Is SUFFIX correctly handled?
-        return toString(false/*ignored*/, true, true);
+        return toString(null, false/*ignored*/, true, true);
     }
 
     /**

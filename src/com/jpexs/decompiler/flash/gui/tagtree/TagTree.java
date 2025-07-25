@@ -352,9 +352,9 @@ public class TagTree extends AbstractTagTree {
             if (expName != null && !expName.isEmpty()) {
                 String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
                 if (expName.startsWith("__Packages.")) {
-                    return IdentifiersDeobfuscation.printIdentifier(false, pathParts[pathParts.length - 1]);
+                    return IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), false, pathParts[pathParts.length - 1]);
                 } else {
-                    return Helper.escapeExportname(expName, false);
+                    return Helper.escapeExportname(tag.getSwf(), expName, false);
                 }                
             }
         }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -179,12 +180,12 @@ public class Namespace {
 
     /**
      * To string.
-     *
+     * @param ABC abc
      * @param constants Constant pool
      * @return String representation
      */
-    public String toString(AVM2ConstantPool constants) {
-        return getName(constants).toPrintableString(true);
+    public String toString(ABC abc, AVM2ConstantPool constants) {
+        return getName(constants).toPrintableString(abc.getSwf(), true);
     }
 
     /**

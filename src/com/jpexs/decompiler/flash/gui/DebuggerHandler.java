@@ -755,7 +755,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                     pkg = pkg.substring(pkg.indexOf(":") + 1);
                                 }
 
-                                name = swfHash + ":" + DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(con.isAS3);
+                                name = swfHash + ":" + DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(Main.getRunningSWF()/*???*/, con.isAS3);
                             }
                         } else {
                             if (name.contains(":")) {

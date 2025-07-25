@@ -84,11 +84,11 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         }
         getModifiers(abc, isStatic, insideInterface, writer, classIndex);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc, abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
-        abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(method_info).getReturnTypeStr(writer, abc, abc.constants, fullyQualifiedNames);
         return writer;
     }
    
@@ -111,7 +111,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(this, convertData, abc, writer);
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
+        writer.startMethod(method_info, getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false));
         toStringHeader(swfVersion, parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
 
         writer.startBlock();
@@ -120,7 +120,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
         }
         writer.endBlock();
 
@@ -133,13 +133,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
+        writer.startMethod(method_info, getName(abc).getName(abc, abc.constants, new ArrayList<>(), true, false));
         convertHeader(swfVersion, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>(), new ArrayList<>());
+            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc, abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>(), new ArrayList<>());
         }
         writer.endMethod();
     }

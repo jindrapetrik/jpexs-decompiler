@@ -897,7 +897,7 @@ public class DefineEditTextTag extends TextTag {
             writer.append("leading ").append(leading).newLine();
         }
         if (!variableName.isEmpty()) {
-            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(false)).newLine();
+            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(getSwf(), false)).newLine();
         }
         writer.append("]");
         if (hasText) {
@@ -1610,7 +1610,7 @@ public class DefineEditTextTag extends TextTag {
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (variableName != null && !variableName.isEmpty()) {
-            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(false));
+            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(getSwf(), false));
         }
         return ret;
     }

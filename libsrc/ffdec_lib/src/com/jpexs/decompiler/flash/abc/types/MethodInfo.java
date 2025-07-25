@@ -344,7 +344,7 @@ public class MethodInfo {
             }
             DottedChain ptype = DottedChain.ALL;
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants, true);
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(abc, constants, true);
             }
 
             HighlightData pdata = new HighlightData();
@@ -353,10 +353,10 @@ public class MethodInfo {
             pdata.regIndex = i + 1;
             if (!localRegNames.isEmpty()) {
                 pdata.localName = localRegNames.get(i + 1); //assuming it is a slot
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 pdata.localName = constants.getString(paramNames[i]);
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else {
                 pdata.localName = "param" + (i + 1);
                 writer.hilightSpecial(pdata.localName, HighlightSpecialType.PARAM_NAME, i, pdata);
@@ -365,7 +365,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", HighlightSpecialType.PARAM, i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(abc, constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
             }
             if (optional != null && flagHas_optional()) {
                 if (i >= param_types.length - optional.length) {
@@ -399,27 +399,27 @@ public class MethodInfo {
         return writer;
     }
 
-    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String rname = "*";
         if (ret_type > 0) {
             Multiname multiname = constants.getMultiname(ret_type);
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
+                rname = multiname.getName(abc, constants, fullyQualifiedNames, false, true);
             }
         }
         return writer.hilightSpecial(rname, HighlightSpecialType.RETURNS);
     }
 
-    public String getReturnTypeRaw(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public String getReturnTypeRaw(ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String rname = "*";
         if (ret_type > 0) {
             Multiname multiname = constants.getMultiname(ret_type);
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
+                rname = multiname.getName(abc, constants, fullyQualifiedNames, false, true);
             }
         }
         return rname;
