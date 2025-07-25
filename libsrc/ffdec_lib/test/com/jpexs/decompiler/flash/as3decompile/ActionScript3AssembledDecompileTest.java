@@ -334,7 +334,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
-                + "§§push(obfuscated[\"xxx\"] = new [\"ByteArray\"]());\r\n"
+                + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+\"ByteArray\"))());\r\n"
                 + "§§push(50);\r\n"
                 + "while(§§dup(§§pop()))\r\n"
                 + "{\r\n"
