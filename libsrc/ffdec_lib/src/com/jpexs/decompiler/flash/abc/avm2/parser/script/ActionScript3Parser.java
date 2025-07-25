@@ -93,6 +93,9 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.asdoc.ActionScriptDocParser;
+import com.jpexs.decompiler.flash.asdoc.AsDocComment;
+import com.jpexs.decompiler.flash.asdoc.AsDocTag;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -134,6 +137,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -486,6 +490,11 @@ public class ActionScript3Parser {
             throw new InterruptedException();
         }
         ParsedSymbol ret = lexer.lex();
+        if (ret.type == SymbolType.IDENTIFIER) {
+            if (replacements.containsKey(ret.value.toString())) {
+                ret.value = replacements.get(ret.value.toString());
+            }
+        }
         if (debugMode) {
             System.out.println(ret);
         }
@@ -1550,10 +1559,10 @@ public class ActionScript3Parser {
         List<GraphTargetItem> xmlParts = xmltag(allOpenedNamespaces, thisType, pkg, new Reference<>(false), openedTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables, abc);
         lexer.setEnableWhiteSpace(true);
         lexer.begin(ActionScriptLexer.YYINITIAL);
-        ParsedSymbol s = lexer.lex();
+        ParsedSymbol s = lex();
         while (s.isType(SymbolType.XML_WHITESPACE)) {
             addS(xmlParts, new StringBuilder(s.value.toString()));
-            s = lexer.lex();
+            s = lex();
         }
         lexer.setEnableWhiteSpace(false);
         lexer.pushback(s);
@@ -1646,7 +1655,7 @@ public class ActionScript3Parser {
                  }
                  break;*/
                 case FUNCTION:
-                    s = lexer.lex();
+                    s = lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
                     ret = (function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc));
@@ -2582,7 +2591,7 @@ public class ActionScript3Parser {
 
                 break;
             case FUNCTION:
-                s = lexer.lex();
+                s = lex();
                 String fname = "";
                 if (s.isType(SymbolGroup.IDENTIFIER)) {
                     fname = s.value.toString();
@@ -2674,7 +2683,7 @@ public class ActionScript3Parser {
                     s = new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.LOWER_THAN);
                 }
                 if (s.type == SymbolType.FUNCTION) {
-                    s = lexer.lex();
+                    s = lex();
                     String ffname = "";
                     if (s.isType(SymbolGroup.IDENTIFIER)) {
                         ffname = s.value.toString();
@@ -2743,6 +2752,8 @@ public class ActionScript3Parser {
     }
 
     private ActionScriptLexer lexer = null;
+    
+    private Map<String, String> replacements = new LinkedHashMap<>();
 
     private List<String> constantPool;
 
@@ -2957,7 +2968,7 @@ public class ActionScript3Parser {
         lexer = new ActionScriptLexer(str);
 
         List<GraphTargetItem> ret = parseScript(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, numberContextRef, abc, sinitNeedsActivation, sinitVariables);
-        if (lexer.lex().type != SymbolType.EOF) {
+        if (lex().type != SymbolType.EOF) {
             throw new AVM2ParseException("Parsing finished before end of the file", lexer.yyline());
         }
         return ret;
@@ -3013,6 +3024,33 @@ public class ActionScript3Parser {
      * @throws InterruptedException On interrupt
      */
     public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+        
+        replacements.clear();
+        ActionScriptDocParser asd = new ActionScriptDocParser();
+        List<AsDocComment> comments = asd.parse(s);
+        for (AsDocComment comment:comments) {
+            for (AsDocTag tag : comment.tags) {
+                if ("identifier".equals(tag.tagName)) {
+                    String tagText = tag.tagText;
+                    if (tagText != null && !tagText.isEmpty()) {
+                        ActionScriptLexer lexer = new ActionScriptLexer(tagText);
+                        ParsedSymbol symb = lexer.yylex();
+                        if (symb.type != SymbolType.IDENTIFIER) {
+                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. Identifier expected.", 0);
+                        }
+                        ParsedSymbol symb2 = lexer.yylex();
+                        if (symb2.type != SymbolType.ASSIGN) {
+                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. Assign expected.", 0);
+                        }
+                        ParsedSymbol symb3 = lexer.yylex();
+                        if (symb3.type != SymbolType.STRING) {
+                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. String expected.", 0);
+                        }
+                        replacements.put(symb.value.toString(), symb3.value.toString());
+                    }
+                }
+            }
+        }
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);
         Reference<Boolean> sinitNeedsActivation = new Reference<>(false);

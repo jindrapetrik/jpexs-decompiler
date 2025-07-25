@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.DocCommentItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -468,18 +469,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (!usedDeobfuscations.isEmpty()) {
             writer.newLine();
             List<String> commentLines = new ArrayList<>();
-            commentLines.add("@deobfuscated");            
             Map<String, String> fullMap = abc.getSwf().getAs3ObfuscatedIdentifiers();
             int i = 0;
             for (String obfuscated : usedDeobfuscations) {
                 String deobfuscated = fullMap.get(obfuscated);
-                commentLines.add(deobfuscated + " = \"" + Helper.escapeActionScriptString(obfuscated) + "\"");
+                commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");
                 i++;
             }
             commentLines.sort(new NaturalOrderComparator());
-            commentLines.add("");
+            commentLines.add(0, "The original code has obfuscated identifiers. List of replacements follows:");
             String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
-            new CommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+            new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
         }
     }
 

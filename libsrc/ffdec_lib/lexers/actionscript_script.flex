@@ -111,11 +111,11 @@ InputCharacter = [^\r\n]
 WhiteSpace = {LineTerminator} | [ \t\f]+
 
 /* comments */
-Comment = {TraditionalComment} | {EndOfLineComment}
+Comment = {TraditionalComment} | {EndOfLineComment} | {AsDocComment}
 
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
-
+AsDocComment = "/**" ~"*/"
 
 
 /* identifiers */
