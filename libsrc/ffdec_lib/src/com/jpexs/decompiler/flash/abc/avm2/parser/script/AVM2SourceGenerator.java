@@ -2415,7 +2415,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param names Names
      * @param namespaces Namespaces
      */
-    public static void parentNamesAddNames(AbcIndexing abc, int scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
+    public static void parentNamesAddNames(AbcIndexing abc, Integer scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
         List<Integer> cindices = new ArrayList<>();
 
         List<ABC> outABCs = new ArrayList<>();
@@ -2557,7 +2557,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param namespaces Namespaces
      * @param outABCs Out ABCs
      */
-    public static void parentNames(AbcIndexing abc, int scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
+    public static void parentNames(AbcIndexing abc, Integer scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
         AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(new LinkedHashSet<>(), abc.getSelectedAbc(), abc.getSelectedAbc().constants, true /*FIXME!!*/)), abc.getSelectedAbc(), scriptIndex);
         while (ci != null) {
             int ni = ci.abc.instance_info.get(ci.index).name_index;

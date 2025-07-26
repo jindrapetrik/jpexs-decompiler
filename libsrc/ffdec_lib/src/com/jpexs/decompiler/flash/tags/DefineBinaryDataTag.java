@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
@@ -42,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.LinkedHashSet;
 
 /**
  * DefineBinaryData tag - Contains binary data.
@@ -286,6 +288,10 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
 
     @Override
     public String getClassExportFileName(String className) {
+        
+        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+            return DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
+        }
         return className;
     }
     

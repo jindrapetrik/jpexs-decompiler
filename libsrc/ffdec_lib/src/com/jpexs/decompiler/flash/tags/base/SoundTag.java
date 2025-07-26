@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
@@ -158,4 +159,10 @@ public interface SoundTag extends TreeItem {
      * @return Initial latency
      */
     public int getInitialLatency();
+    
+    /**
+     * Gets SWF
+     * @return SWF
+     */
+    public SWF getSwf();
 }

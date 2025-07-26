@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -218,5 +219,10 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     @Override
     public int getInitialLatency() {
         return 0;
+    }
+
+    @Override
+    public SWF getSwf() {
+        return head.getSwf();
     }
 }

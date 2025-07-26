@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -43,6 +44,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.imageio.ImageIO;
@@ -153,6 +155,9 @@ public class ImageExporter {
                 Set<String> classNames = imageTag.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
+                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), imageTag.getSwf(), true);
+                        }
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + "." + ImageHelper.getImageFormatString(fileFormat)));
                         File classAlphaPngFile = new File(outdir + File.separator + Helper.makeFileName(className + ".alpha.png"));
                         new RetryTask(() -> {

@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -176,8 +177,12 @@ public class InstanceInfo {
                 if (ct != null) {
                     String fileName = ct.getCharacterExportFileName();
                     if (Configuration.as3ExportNamesUseClassNamesOnly.get()) {
-                        fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
-                    }                    
+                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
+                        } else {
+                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
+                        }
+                    }
 
                     String ext = "";
                     if (ct instanceof DefineBinaryDataTag) {
