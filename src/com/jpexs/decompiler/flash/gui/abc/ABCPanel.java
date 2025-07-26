@@ -1267,8 +1267,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                  */
+                
+                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
+                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
+                deobfuscateIdentifiersMenuItem.addActionListener(ABCPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
+                
+                
                 popupMenu.add(simplifyExpressionsMenuItem);
                 //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+                popupMenu.add(deobfuscateIdentifiersMenuItem);
 
                 return popupMenu;
             }
@@ -2133,6 +2140,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private void simplifyExpressionsMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.simplifyExpressions.set(menuItem.isSelected());
+        mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void autoDeobfuscateIdentifiersMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.autoDeobfuscateIdentifiers.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
 

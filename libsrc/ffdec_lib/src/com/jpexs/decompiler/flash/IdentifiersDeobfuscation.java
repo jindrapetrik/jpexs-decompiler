@@ -552,7 +552,7 @@ public class IdentifiersDeobfuscation {
      */
     public static GraphTextWriter appendObfuscatedIdentifier(SWF swf, Set<String> used, String s, GraphTextWriter writer) {
         Map<String, String> map = new LinkedHashMap<>();
-        if (Configuration.useSafeStr.get() && swf != null) {
+        if (Configuration.autoDeobfuscateIdentifiers.get() && swf != null) {
             map = swf.getObfuscatedIdentifiersMap();
             used.add(s);
             if (map.containsKey(s)) {
@@ -587,7 +587,7 @@ public class IdentifiersDeobfuscation {
         }
         
         Map<String, String> map = new LinkedHashMap<>();
-        if (Configuration.useSafeStr.get()) {
+        if (Configuration.autoDeobfuscateIdentifiers.get()) {
             
             if (swf != null) {
                 map = swf.getObfuscatedIdentifiersMap();
@@ -623,7 +623,7 @@ public class IdentifiersDeobfuscation {
             return s;
         }
 
-        if (Configuration.useSafeStr.get()) {
+        if (Configuration.autoDeobfuscateIdentifiers.get()) {
             String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
             map.put(s, ret);
             used.add(s);

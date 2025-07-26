@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
@@ -99,6 +100,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -1023,10 +1025,14 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 JCheckBox skipUninitializedClassFieldsDetectionMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.skip_uninitialized_class_fields_detection"));
                 skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUnitializedClassFields.get());
                 skipUninitializedClassFieldsDetectionMenuItem.addActionListener(ActionPanel.this::skipUninitializedClassFieldsDetectionMenuItemActionPerformed);
+                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
+                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
+                deobfuscateIdentifiersMenuItem.addActionListener(ActionPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
                 
                 popupMenu.add(simplifyExpressionsMenuItem);
                 popupMenu.add(removeObfuscatedDeclarationsMenuItem);
                 popupMenu.add(skipUninitializedClassFieldsDetectionMenuItem);
+                popupMenu.add(deobfuscateIdentifiersMenuItem);
 
                 return popupMenu;
             }
@@ -1175,6 +1181,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         JCheckBox checkBox = (JCheckBox) evt.getSource();
         Configuration.skipDetectionOfUnitializedClassFields.set(checkBox.isSelected());
         mainPanel.skipDetectionOfUnitializedClassFieldsChanged();
+    }
+    
+    private void autoDeobfuscateIdentifiersMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.autoDeobfuscateIdentifiers.set(menuItem.isSelected());
+        mainPanel.autoDeobfuscateChanged();
     }
 
     private void breakPointListButtonActionPerformed(ActionEvent evt) {
