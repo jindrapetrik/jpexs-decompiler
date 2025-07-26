@@ -37,10 +37,7 @@ public class HexViewTableModel extends AbstractTableModel {
             return 0;
         }
         int byteCount = data.length;
-        int rowCount = byteCount / bytesInRow;
-        if (byteCount % bytesInRow != 0) {
-            rowCount++;
-        }
+        int rowCount = (int) Math.ceil(byteCount / (double) bytesInRow);
         return rowCount;
     }
 
