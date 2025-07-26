@@ -1016,28 +1016,28 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             @Override
             protected JPopupMenu getPopupMenu() {
                 JPopupMenu popupMenu = new JPopupMenu();
+                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
+                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
+                deobfuscateIdentifiersMenuItem.addActionListener(ActionPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
                 JCheckBox simplifyExpressionsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.simplify_expressions"));
                 simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
                 simplifyExpressionsMenuItem.addActionListener(ActionPanel.this::simplifyExpressionsMenuItemActionPerformed);
+                JCheckBoxMenuItem disableDecompilationMenuItem = new JCheckBoxMenuItem(AppStrings.translate("menu.settings.disabledecompilation"));
+                disableDecompilationMenuItem.setSelected(!Configuration.decompile.get());
+                disableDecompilationMenuItem.addActionListener(ActionPanel.this::disableDecompilationMenuItemActionPerformed);
                 JCheckBox removeObfuscatedDeclarationsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(ActionPanel.this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                 JCheckBox skipUninitializedClassFieldsDetectionMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.skip_uninitialized_class_fields_detection"));
                 skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUnitializedClassFields.get());
                 skipUninitializedClassFieldsDetectionMenuItem.addActionListener(ActionPanel.this::skipUninitializedClassFieldsDetectionMenuItemActionPerformed);
-                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
-                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
-                deobfuscateIdentifiersMenuItem.addActionListener(ActionPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
-                JCheckBoxMenuItem disableDecompilationMenuItem = new JCheckBoxMenuItem(AppStrings.translate("menu.settings.disabledecompilation"));
-                disableDecompilationMenuItem.setSelected(!Configuration.decompile.get());
-                disableDecompilationMenuItem.addActionListener(ActionPanel.this::disableDecompilationMenuItemActionPerformed);
                 
+                popupMenu.add(deobfuscateIdentifiersMenuItem);
                 popupMenu.add(simplifyExpressionsMenuItem);
+                popupMenu.add(disableDecompilationMenuItem);
                 popupMenu.add(removeObfuscatedDeclarationsMenuItem);
                 popupMenu.add(skipUninitializedClassFieldsDetectionMenuItem);
-                popupMenu.add(deobfuscateIdentifiersMenuItem);
-                popupMenu.add(disableDecompilationMenuItem);
-
+                
                 return popupMenu;
             }
         };

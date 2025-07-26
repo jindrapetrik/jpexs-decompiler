@@ -1260,6 +1260,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             @Override
             protected JPopupMenu getPopupMenu() {
                 JPopupMenu popupMenu = new JPopupMenu();
+                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
+                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
+                deobfuscateIdentifiersMenuItem.addActionListener(ABCPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
+                
                 JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
                 simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
                 simplifyExpressionsMenuItem.addActionListener(ABCPanel.this::simplifyExpressionsMenuItemActionPerformed);
@@ -1268,19 +1272,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                  */
                 
-                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
-                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
-                deobfuscateIdentifiersMenuItem.addActionListener(ABCPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
                 
                 JCheckBoxMenuItem disableDecompilationMenuItem = new JCheckBoxMenuItem(AppStrings.translate("menu.settings.disabledecompilation"));
                 disableDecompilationMenuItem.setSelected(!Configuration.decompile.get());
                 disableDecompilationMenuItem.addActionListener(ABCPanel.this::disableDecompilationMenuItemActionPerformed);
                 
                 
-                
+                popupMenu.add(deobfuscateIdentifiersMenuItem);                
                 popupMenu.add(simplifyExpressionsMenuItem);
                 //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
-                popupMenu.add(deobfuscateIdentifiersMenuItem);
                 popupMenu.add(disableDecompilationMenuItem);
 
                 return popupMenu;

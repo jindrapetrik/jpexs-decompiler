@@ -58,6 +58,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2: Export names are deobfuscated only when start with `__Packages.`,
   if not, then classical escaping is performed
 - Quotes in tree node parameter values that need them
+- The label of option "automatic deobfuscation" changed to "deobfuscate code"
 
 ## [24.0.1] - 2025-06-27
 ### Fixed
