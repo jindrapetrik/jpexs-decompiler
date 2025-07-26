@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
@@ -173,6 +174,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -259,6 +261,11 @@ public class ActionScript2Parser {
      * SWF
      */
     private SWF swf;
+    
+    /**
+     * Obfuscation identifiers replacements
+     */
+    private Map<String, String> replacements = new LinkedHashMap<>();
 
     /**
      * Constructor
@@ -381,6 +388,11 @@ public class ActionScript2Parser {
             throw new InterruptedException();
         }
         ParsedSymbol ret = lexer.lex();
+        if (ret.type == SymbolType.IDENTIFIER) {
+            if (replacements.containsKey(ret.value.toString())) {
+                ret.value = replacements.get(ret.value.toString());
+            }
+        }
         if (debugMode) {
             System.out.println(ret);
         }
@@ -1129,7 +1141,7 @@ public class ActionScript2Parser {
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
             case FUNCTION:
-                s = lexer.lex();
+                s = lex();
                 expectedIdentifier(s, lexer.yyline());
                 ret = (function(true, s.value.toString(), false, variables, functions, inTellTarget, hasEval));
                 break;
@@ -1799,7 +1811,7 @@ public class ActionScript2Parser {
                     //AS 1/2:
                     //AS2:
                     case "constant":
-                        s = lexer.lex();
+                        s = lex();
                         expected(s, lexer.yyline(), SymbolType.INTEGER);
                         ret = new UnresolvedConstantActionItem((int) (long) (Long) s.value);
                         break;
@@ -1819,7 +1831,7 @@ public class ActionScript2Parser {
                         allowMemberOrCall = true;
                         break;
                     case "strict":
-                        s = lexer.lex();
+                        s = lex();
                         expected(s, lexer.yyline(), SymbolType.INTEGER);
                         ret = new StrictModeActionItem(null, null, (int) (long) (Long) s.value);
                         break;
@@ -2198,6 +2210,13 @@ public class ActionScript2Parser {
      * @throws InterruptedException On interrupt
      */
     public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException, InterruptedException {
+        
+        try {
+            replacements = IdentifiersDeobfuscation.getReplacementsFromDoc(str);
+        } catch (Exception ex) {
+           throw new ActionParseException(ex.getMessage(), -1);
+        }
+        
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
@@ -2208,12 +2227,12 @@ public class ActionScript2Parser {
         BUTTONCONDACTION newButtonCond = new BUTTONCONDACTION();
 
         if (targetSource instanceof BUTTONCONDACTION) {
-            ParsedSymbol symb = lexer.lex();
+            ParsedSymbol symb = lex();
             if (symb.type != SymbolType.IDENTIFIER || !"on".equals(symb.value)) {
                 throw new ActionParseException("on keyword expected but " + symb + " found", lexer.yyline());
             }
             expectedType(SymbolType.PARENT_OPEN);
-            symb = lexer.lex();
+            symb = lex();
             boolean condEmpty = true;
             while (symb.type == SymbolType.IDENTIFIER) {
                 condEmpty = false;
@@ -2240,7 +2259,7 @@ public class ActionScript2Parser {
                         newButtonCond.condOutDownToOverDown = true;
                         break;
                     case "keyPress":
-                        symb = lexer.lex();
+                        symb = lex();
                         expected(symb, lexer.yyline(), SymbolType.STRING);
                         Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
                         if (key == null) {
@@ -2251,12 +2270,12 @@ public class ActionScript2Parser {
                     default:
                         throw new ActionParseException("Unrecognized event type", lexer.yyline());
                 }
-                symb = lexer.lex();
+                symb = lex();
                 if (symb.type == SymbolType.PARENT_CLOSE) {
                     break;
                 }
                 expected(symb, lexer.yyline(), SymbolType.COMMA);
-                symb = lexer.lex();
+                symb = lex();
             }
             expected(symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
             if (condEmpty) {
@@ -2268,13 +2287,13 @@ public class ActionScript2Parser {
         CLIPEVENTFLAGS newClipEventFlags = new CLIPEVENTFLAGS();
         int newClipActionRecordKey = 0;
         if (targetSource instanceof CLIPACTIONRECORD) {
-            ParsedSymbol symb = lexer.lex();
+            ParsedSymbol symb = lex();
             if (symb.type != SymbolType.IDENTIFIER || (!"on".equals(symb.value) && !"onClipEvent".equals(symb.value))) {
                 throw new ActionParseException("on or onClipEvent keyword expected but " + symb + " found", lexer.yyline());
             }
             expectedType(SymbolType.PARENT_OPEN);
             if ("on".equals(symb.value)) {
-                symb = lexer.lex();
+                symb = lex();
                 boolean condEmpty = true;
                 while (symb.type == SymbolType.IDENTIFIER) {
                     condEmpty = false;
@@ -2308,7 +2327,7 @@ public class ActionScript2Parser {
                             break;
 
                         case "keyPress":
-                            symb = lexer.lex();
+                            symb = lex();
                             expected(symb, lexer.yyline(), SymbolType.STRING);
                             Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
                             if (key == null) {
@@ -2320,19 +2339,19 @@ public class ActionScript2Parser {
                         default:
                             throw new ActionParseException("Unrecognized event type", lexer.yyline());
                     }
-                    symb = lexer.lex();
+                    symb = lex();
                     if (symb.type == SymbolType.PARENT_CLOSE) {
                         break;
                     }
                     expected(symb, lexer.yyline(), SymbolType.COMMA);
-                    symb = lexer.lex();
+                    symb = lex();
                 }
                 expected(symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
                 if (condEmpty) {
                     throw new ActionParseException("condition must be non empty", lexer.yyline());
                 }
             } else if ("onClipEvent".equals(symb.value)) {
-                symb = lexer.lex();
+                symb = lex();
                 expected(symb, lexer.yyline(), SymbolType.IDENTIFIER);
 
                 switch ((String) symb.value) {
@@ -2404,7 +2423,7 @@ public class ActionScript2Parser {
             expectedType(SymbolType.CURLY_CLOSE);
         }
 
-        if (lexer.lex().type != SymbolType.EOF) {
+        if (lex().type != SymbolType.EOF) {
             throw new ActionParseException("Parsing finished before end of the file", lexer.yyline());
         }
         if (targetSource instanceof BUTTONCONDACTION) {

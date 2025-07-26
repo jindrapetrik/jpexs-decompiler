@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -466,21 +467,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
         }
-        if (!usedDeobfuscations.isEmpty()) {
-            writer.newLine();
-            List<String> commentLines = new ArrayList<>();
-            Map<String, String> fullMap = abc.getSwf().getAs3ObfuscatedIdentifiers();
-            int i = 0;
-            for (String obfuscated : usedDeobfuscations) {
-                String deobfuscated = fullMap.get(obfuscated);
-                commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");
-                i++;
-            }
-            commentLines.sort(new NaturalOrderComparator());
-            commentLines.add(0, "The original code has obfuscated identifiers. List of replacements follows:");
-            String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
-            new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
-        }
+        IdentifiersDeobfuscation.writeCurrentScriptReplacements(writer, usedDeobfuscations, abc.getSwf());
     }
 
     /**

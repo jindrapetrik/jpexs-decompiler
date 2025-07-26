@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -3023,33 +3024,11 @@ public class ActionScript3Parser {
      * @throws CompilationException On compilation error
      * @throws InterruptedException On interrupt
      */
-    public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
-        
-        replacements.clear();
-        ActionScriptDocParser asd = new ActionScriptDocParser();
-        List<AsDocComment> comments = asd.parse(s);
-        for (AsDocComment comment:comments) {
-            for (AsDocTag tag : comment.tags) {
-                if ("identifier".equals(tag.tagName)) {
-                    String tagText = tag.tagText;
-                    if (tagText != null && !tagText.isEmpty()) {
-                        ActionScriptLexer lexer = new ActionScriptLexer(tagText);
-                        ParsedSymbol symb = lexer.yylex();
-                        if (symb.type != SymbolType.IDENTIFIER) {
-                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. Identifier expected.", 0);
-                        }
-                        ParsedSymbol symb2 = lexer.yylex();
-                        if (symb2.type != SymbolType.ASSIGN) {
-                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. Assign expected.", 0);
-                        }
-                        ParsedSymbol symb3 = lexer.yylex();
-                        if (symb3.type != SymbolType.STRING) {
-                            throw new AVM2ParseException("Invalid @identifier AsDoc tag value. String expected.", 0);
-                        }
-                        replacements.put(symb.value.toString(), symb3.value.toString());
-                    }
-                }
-            }
+    public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {        
+        try {
+            replacements = IdentifiersDeobfuscation.getReplacementsFromDoc(s);
+        } catch (Exception ex) {
+           throw new AVM2ParseException(ex.getMessage(), -1);
         }
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);

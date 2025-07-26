@@ -17,12 +17,22 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptLexer;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ParsedSymbol;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType;
+import com.jpexs.decompiler.flash.asdoc.ActionScriptDocParser;
+import com.jpexs.decompiler.flash.asdoc.AsDocComment;
+import com.jpexs.decompiler.flash.asdoc.AsDocTag;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.model.DocCommentItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -34,6 +44,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
+import natorder.NaturalOrderComparator;
 
 /**
  * Identifiers deobfuscation.
@@ -42,6 +53,11 @@ import java.util.regex.Pattern;
  */
 public class IdentifiersDeobfuscation {
 
+    /**
+     * Prefix to be put instead of obfuscated name. It will by suffixed with a number.
+     */
+    public static final String SAFE_STR_PREFIX = "_SafeStr_";
+    
     /**
      * Random number generator.
      */
@@ -528,11 +544,27 @@ public class IdentifiersDeobfuscation {
     /**
      * Appends obfuscated identifier.
      *
-     * @param s String
+     * @param swf SWF
+     * @param used Used deobfuscations
+     * @param s String     
      * @param writer Writer
      * @return Writer
      */
-    public static GraphTextWriter appendObfuscatedIdentifier(String s, GraphTextWriter writer) {
+    public static GraphTextWriter appendObfuscatedIdentifier(SWF swf, Set<String> used, String s, GraphTextWriter writer) {
+        Map<String, String> map = new LinkedHashMap<>();
+        if (Configuration.useSafeStr.get() && swf != null) {
+            map = swf.getObfuscatedIdentifiersMap();
+            used.add(s);
+            if (map.containsKey(s)) {
+                writer.append(map.get(s));
+            } else {
+                String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
+                map.put(s, ret);                
+                writer.append(ret);
+            }        
+            return writer;
+        }
+        
         writer.append("\u00A7");
         escapeOIdentifier(s, writer);
         return writer.append("\u00A7");
@@ -554,15 +586,22 @@ public class IdentifiersDeobfuscation {
             return "";
         }
         
-        if (Configuration.useSafeStr.get() && as3) {                
+        Map<String, String> map = new LinkedHashMap<>();
+        if (Configuration.useSafeStr.get()) {
             
-            Map<String, String> map = swf == null ? new LinkedHashMap<>() : swf.getAs3ObfuscatedIdentifiers();
+            if (swf != null) {
+                map = swf.getObfuscatedIdentifiersMap();
+            }
+            
             if (map.containsKey(s)) {
                 used.add(s);
                 return map.get(s);
             }
         }
-
+        
+        
+        
+        
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
             return s;
         }
@@ -584,6 +623,13 @@ public class IdentifiersDeobfuscation {
             return s;
         }
 
+        if (Configuration.useSafeStr.get()) {
+            String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
+            map.put(s, ret);
+            used.add(s);
+            return ret;
+        }
+        
         String ret = "\u00A7" + escapeOIdentifier(s) + "\u00A7";
         nameCache.put(s, ret);
         return ret;
@@ -743,5 +789,56 @@ public class IdentifiersDeobfuscation {
     public static void clearCache() {
         as2NameCache.clear();
         as3NameCache.clear();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static GraphTextWriter writeCurrentScriptReplacements(GraphTextWriter writer, Set<String> usedDeobfuscations, SWF swf) {
+        if (!usedDeobfuscations.isEmpty()) {
+            writer.newLine();
+            List<String> commentLines = new ArrayList<>();
+            Map<String, String> fullMap = swf.getObfuscatedIdentifiersMap();
+            int i = 0;
+            for (String obfuscated : usedDeobfuscations) {
+                String deobfuscated = fullMap.get(obfuscated);
+                commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");
+                i++;
+            }
+            commentLines.sort(new NaturalOrderComparator());
+            commentLines.add(0, AppResources.translate("decompilationWarning.obfuscatedIdentifiers"));
+            commentLines.add(1, AppResources.translate("decompilationWarning.replacementsFollow"));
+            String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
+            new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+        }
+        return writer;
+    }
+    
+    public static Map<String, String> getReplacementsFromDoc(String s) throws Exception {
+        ActionScriptDocParser asd = new ActionScriptDocParser();
+        List<AsDocComment> comments = asd.parse(s);
+        Map<String, String> replacements = new LinkedHashMap<>();
+        for (AsDocComment comment:comments) {
+            for (AsDocTag tag : comment.tags) {
+                if ("identifier".equals(tag.tagName)) {
+                    String tagText = tag.tagText;
+                    if (tagText != null && !tagText.isEmpty()) {
+                        ActionScriptLexer lexer = new ActionScriptLexer(tagText);
+                        ParsedSymbol symb = lexer.yylex();
+                        if (symb.type != SymbolType.IDENTIFIER) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. Identifier expected.");
+                        }
+                        ParsedSymbol symb2 = lexer.yylex();
+                        if (symb2.type != SymbolType.ASSIGN) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. Assign expected.");
+                        }
+                        ParsedSymbol symb3 = lexer.yylex();
+                        if (symb3.type != SymbolType.STRING) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. String expected.");
+                        }
+                        replacements.put(symb.value.toString(), symb3.value.toString());
+                    }
+                }
+            }
+        }
+        return replacements;
     }
 }

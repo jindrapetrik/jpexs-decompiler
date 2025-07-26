@@ -248,7 +248,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
 
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, fname, writer);
             } else {
                 writer.append(fname);
                 //calculatedFunctionName.appendToNoQuotes(writer, localData);
@@ -265,7 +265,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
             writer.append(" ");
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, fname, writer);
             } else {
                 writer.append(fname);
             }
@@ -298,7 +298,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             d.declaration = true;
 
             if (!IdentifiersDeobfuscation.isValidName(false, pname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(pname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, pname, writer);
             } else {
                 writer.append(pname);
             }

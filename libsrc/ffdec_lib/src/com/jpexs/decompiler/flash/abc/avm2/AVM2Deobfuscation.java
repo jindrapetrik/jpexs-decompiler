@@ -33,9 +33,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class AVM2Deobfuscation {
-
-    public static final String SAFE_STR_PREFIX = "_SafeStr_";
+public class AVM2Deobfuscation {   
     
     /**
      * Default size of random word.

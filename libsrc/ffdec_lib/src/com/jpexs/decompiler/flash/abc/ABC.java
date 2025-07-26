@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.DeobfuscationListener;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -658,7 +659,7 @@ public class ABC implements Openable {
             return;
         }
         
-        ret.put(s, AVM2Deobfuscation.SAFE_STR_PREFIX + ret.size());
+        ret.put(s, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
     }
     
     private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> ret) {
@@ -680,8 +681,8 @@ public class ABC implements Openable {
         List<String> deobfuscatedList = new ArrayList<>();
         for (String part : parts) {
             if (!deobfuscation.isValidNSPart(part)) {
-                deobfuscatedList.add(AVM2Deobfuscation.SAFE_STR_PREFIX + ret.size());
-                ret.put(part, AVM2Deobfuscation.SAFE_STR_PREFIX + ret.size());                
+                deobfuscatedList.add(IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
+                ret.put(part, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());                
             } else {
                 deobfuscatedList.add(part);
             }

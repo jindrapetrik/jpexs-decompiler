@@ -101,6 +101,11 @@ public class LocalData {
      * SWF version
      */
     public int swfVersion;
+
+    private LocalData() {
+    }
+    
+    
     
     /**
      * Creates a new local data

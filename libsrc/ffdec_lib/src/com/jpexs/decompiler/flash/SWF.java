@@ -672,7 +672,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * AS3 obfuscated identifiers map
      */    
-    private transient Map<String, String> as3ObfuscatedIdentifiersMap = null;
+    private transient Map<String, String> obfuscatedIdentifiersMap = null;
 
     /**
      * Lock for characters synchronization
@@ -4002,21 +4002,23 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets all AS3 obfuscated identifiers in this SWF and their suggested SafeStr replacement
+     * Gets obfuscated identifiers map in this SWF and their suggested SafeStr replacement.
+     * For AS3 it calculates all replacements on first call.
+     * For AS1/2 it adds new items as they are opened in FFDec
      * @return Map source identifier to SafeStr replacement
      */
-    public synchronized Map<String, String> getAs3ObfuscatedIdentifiers() {
-        if (as3ObfuscatedIdentifiersMap != null) {
-            return as3ObfuscatedIdentifiersMap;
+    public synchronized Map<String, String> getObfuscatedIdentifiersMap() {
+        if (obfuscatedIdentifiersMap != null) {
+            return obfuscatedIdentifiersMap;
         }
-        Map<String, String> ret = new LinkedHashMap<>();
+        Map<String, String> ret = Collections.synchronizedMap(new LinkedHashMap<>());
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
                 ABCContainerTag abcTag = (ABCContainerTag) tag;
                 abcTag.getABC().getObfuscatedIdentifiers(ret);
             }
         }
-        return as3ObfuscatedIdentifiersMap = ret;
+        return obfuscatedIdentifiersMap = ret;
     }
     
     /**
@@ -4535,7 +4537,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         asmsCache = null;
         asmsCacheExportFilenames = null;
         synchronized (this) {
-            as3ObfuscatedIdentifiersMap = null;
+            obfuscatedIdentifiersMap = null;
         }
         
         IdentifiersDeobfuscation.clearCache();

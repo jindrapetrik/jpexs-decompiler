@@ -64,7 +64,7 @@ import java.util.List;
             this.offset = ofst;
             prevToken = null;
             Token t = yylex();
-            if (t.type != TokenType.COMMENT) {
+            if (t != null && t.type != TokenType.COMMENT) {
                 prevToken = t;            
             }
             for (; t != null; t = yylex()) {

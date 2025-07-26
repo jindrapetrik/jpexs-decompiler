@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
@@ -1002,7 +1003,7 @@ public abstract class Action implements GraphSourceItem {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
                     }
 
-                    Graph.graphToString(tree, new NulWriter(), new LocalData());
+                    Graph.graphToString(tree, new NulWriter(), LocalData.create(new ConstantPool(), swf, usedDeobfuscations));
                     return tree;
                 }
             }, timeout, TimeUnit.SECONDS);
@@ -1031,7 +1032,7 @@ public abstract class Action implements GraphSourceItem {
             asm.getActionSourcePrefix(writer);
         }
         if (convertException == null) {
-            Graph.graphToString(tree, writer, new LocalData());
+            Graph.graphToString(tree, writer, LocalData.create(new ConstantPool(), swf, usedDeobfuscations));
         } else if (convertException instanceof TimeoutException) {
             Helper.appendTimeoutCommentAs2(writer, timeout, actions.size());
         } else {
@@ -1041,7 +1042,7 @@ public abstract class Action implements GraphSourceItem {
             asm.getActionSourceSuffix(writer);
         }
         
-        //TODO: write the actual used deobfuscations !!!
+        IdentifiersDeobfuscation.writeCurrentScriptReplacements(writer, usedDeobfuscations, swf);
 
         return writer;
     }
