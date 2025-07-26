@@ -917,7 +917,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     if (di.exportName()) {
                         valStr += " = " + escapeHtml(Helper.escapeExportname(swf, val.toString(), true));
                     } else {
-                        valStr += " = " + escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(new LinkedHashSet<>(), swf, di.as3()));
+                        valStr += " = " + escapeHtml("\"" + Helper.escapePCodeString(val.toString()) +"\"");
+                        //escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(new LinkedHashSet<>(), swf, di.as3()));
                     }
                 } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";

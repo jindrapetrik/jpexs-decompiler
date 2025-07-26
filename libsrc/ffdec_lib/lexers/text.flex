@@ -37,7 +37,7 @@ package com.jpexs.decompiler.flash.tags.text;
     private StringBuilder string = null;
 
     private int repeatNum = 1;
-    
+
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -64,7 +64,7 @@ StringCharacter = [^\r\n\"\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 DecIntegerLiteral = (0 | [1-9][0-9]*) [ui]?
 LineTerminator = \r|\n|\r\n
-
+PositiveNumberLiteral = 0 | [1-9][0-9]*
 
 %state PARAMETER,VALUE,OIDENTIFIER,STRING
 
@@ -171,31 +171,34 @@ LineTerminator = \r|\n|\r\n
 <STRING> {
   \"                             {
                                      yybegin(VALUE);
+                                     repeatNum = 1;
                                      // length also includes the trailing quote
                                      String tos = string.toString();
                                      string = null;
                                      return new ParsedSymbol(SymbolType.PARAMETER_VALUE, tos);
                                  }
 
-  {StringCharacter}+             { string.append(yytext()); }
+  {StringCharacter}             { for(int r=0;r<repeatNum;r++) string.append(yytext()); repeatNum = 1; }
 
   /* escape sequences */
-  "\\b"                          { string.append('\b'); }
-  "\\t"                          { string.append('\t'); }
-  "\\n"                          { string.append('\n'); }
-  "\\f"                          { string.append('\f'); }
-  "\\r"                          { string.append('\r'); }
-  "\\\""                         { string.append('\"'); }
-  "\\'"                          { string.append('\''); }
-  "\\\\"                         { string.append('\\'); }
+  "\\b"                          { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;}
+  "\\t"                          { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;}
+  "\\n"                          { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;}
+  "\\f"                          { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;}
+  "\\\u00A7"                     { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;}
+  "\\r"                          { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;}
+  "\\\""                         { for(int r=0;r<repeatNum;r++) string.append('\"'); repeatNum = 1;}
+  "\\'"                          { for(int r=0;r<repeatNum;r++) string.append('\''); repeatNum = 1;}
+  "\\\\"                         { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;}
   \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
-                        				   string.append(val); }
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1; }
   \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
-                        				   string.append(val); }
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1; }
+  \\\{{PositiveNumberLiteral}\}      { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1)); }
 
-  /* escape sequences */
 
-  \\.                            { /* ignore illegal character escape */ } 
+  /* error cases */
+  \\.                            { repeatNum = 1; /* ignore illegal character escape */ }
 }
 
 /* error fallback */

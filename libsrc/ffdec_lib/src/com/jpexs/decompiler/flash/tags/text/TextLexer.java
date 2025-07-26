@@ -73,14 +73,13 @@ public final class TextLexer {
   private static final String ZZ_ACTION_PACKED_0 =
     "\5\0\2\1\1\2\1\3\1\4\1\5\1\6\1\7"+
     "\1\10\1\11\1\12\1\13\1\2\1\14\1\15\1\14"+
-    "\1\16\1\2\1\17\1\20\1\21\1\22\1\23\1\24"+
-    "\1\25\1\26\1\27\1\30\1\31\1\32\1\20\1\33"+
-    "\1\34\1\35\1\36\1\37\1\40\1\41\3\20\1\42"+
-    "\1\43\1\44\1\45\1\46\1\47\1\50\1\51\1\52"+
-    "\2\42\6\0\1\53\1\54\2\0\1\55\1\0";
+    "\1\2\1\16\1\17\1\20\1\21\1\22\1\23\1\24"+
+    "\1\25\1\26\1\27\1\30\1\31\1\17\1\32\1\33"+
+    "\1\34\1\35\1\36\1\37\1\40\3\17\1\41\1\42"+
+    "\1\43\3\41\7\0\1\44\1\45\1\0\1\46";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[69];
+    int [] result = new int[62];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -107,16 +106,15 @@ public final class TextLexer {
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\32\0\64\0\116\0\150\0\202\0\234\0\202"+
     "\0\202\0\266\0\202\0\320\0\352\0\u0104\0\202\0\202"+
-    "\0\202\0\u011e\0\202\0\202\0\u0138\0\u0152\0\u016c\0\202"+
+    "\0\202\0\u011e\0\202\0\202\0\u0138\0\u0152\0\202\0\202"+
     "\0\202\0\202\0\202\0\202\0\202\0\202\0\202\0\202"+
-    "\0\202\0\202\0\202\0\u0186\0\202\0\202\0\202\0\202"+
-    "\0\202\0\202\0\202\0\u01a0\0\u01ba\0\u01d4\0\202\0\202"+
-    "\0\202\0\202\0\202\0\202\0\202\0\202\0\202\0\u0186"+
-    "\0\u01ee\0\u0208\0\u0222\0\u023c\0\u0256\0\u0270\0\u028a\0\202"+
-    "\0\202\0\u01a0\0\u02a4\0\202\0\u0186";
+    "\0\202\0\202\0\u016c\0\202\0\202\0\202\0\202\0\202"+
+    "\0\202\0\202\0\u0186\0\u01a0\0\u01ba\0\202\0\202\0\202"+
+    "\0\u0186\0\u01a0\0\u01d4\0\u01ee\0\u0208\0\u0222\0\u023c\0\u0256"+
+    "\0\u0270\0\u028a\0\202\0\202\0\u0186\0\202";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[69];
+    int [] result = new int[62];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -146,36 +144,34 @@ public final class TextLexer {
     "\1\13\1\14\1\15\1\16\1\15\1\17\1\14\1\20"+
     "\1\15\1\16\1\14\1\15\5\16\1\15\1\16\1\15"+
     "\1\16\2\15\7\21\1\22\1\21\1\23\1\24\2\21"+
-    "\1\25\14\21\7\26\1\27\1\30\1\10\3\26\1\10"+
-    "\14\26\32\0\3\31\1\32\3\31\1\33\1\34\1\0"+
-    "\3\31\1\0\1\35\1\36\1\37\1\40\1\41\1\42"+
-    "\1\43\1\44\1\0\3\31\1\0\2\12\3\0\1\12"+
-    "\4\0\2\12\2\0\5\12\1\0\1\12\1\0\1\12"+
-    "\6\0\1\14\4\0\1\14\3\0\1\14\14\0\3\15"+
-    "\2\0\3\15\3\0\2\15\1\0\15\15\2\16\2\0"+
-    "\1\15\1\16\1\15\3\0\2\16\1\0\1\15\5\16"+
-    "\1\15\1\16\1\15\1\16\2\15\7\31\1\45\1\31"+
-    "\1\0\1\46\2\31\1\0\1\31\1\47\1\50\1\51"+
-    "\1\52\1\53\1\31\1\54\1\0\1\55\1\56\1\31"+
-    "\11\0\1\23\20\0\7\26\3\0\3\26\1\0\14\26"+
-    "\7\57\1\60\1\61\1\0\3\57\1\0\1\57\1\62"+
-    "\1\63\1\64\1\65\1\66\1\67\1\70\1\0\1\71"+
-    "\2\57\2\0\1\72\2\0\2\72\4\0\1\72\3\0"+
-    "\1\72\2\0\1\72\11\0\1\73\2\0\2\73\4\0"+
+    "\1\25\23\21\1\26\1\27\1\10\3\21\1\10\14\21"+
+    "\32\0\3\30\1\31\3\30\1\32\1\33\1\0\3\30"+
+    "\1\0\1\34\1\35\1\36\1\37\1\40\1\41\1\42"+
+    "\1\43\1\0\3\30\1\0\2\12\3\0\1\12\4\0"+
+    "\2\12\2\0\5\12\1\0\1\12\1\0\1\12\6\0"+
+    "\1\14\4\0\1\14\3\0\1\14\14\0\3\15\2\0"+
+    "\3\15\3\0\2\15\1\0\15\15\2\16\2\0\1\15"+
+    "\1\16\1\15\3\0\2\16\1\0\1\15\5\16\1\15"+
+    "\1\16\1\15\1\16\2\15\7\30\1\44\1\30\1\0"+
+    "\1\45\2\30\1\0\1\30\1\46\1\47\1\50\1\51"+
+    "\1\52\1\30\1\53\1\0\1\54\1\55\1\30\11\0"+
+    "\1\23\20\0\7\56\1\44\1\57\1\0\1\45\2\56"+
+    "\1\0\1\56\1\46\1\47\1\50\1\51\1\52\1\60"+
+    "\1\61\1\0\1\62\1\63\1\56\2\0\1\64\2\0"+
+    "\2\64\4\0\1\64\3\0\1\64\2\0\1\64\11\0"+
+    "\1\65\2\0\2\65\4\0\1\65\3\0\1\65\2\0"+
+    "\1\65\11\0\1\66\2\0\2\66\4\0\1\66\3\0"+
+    "\1\66\2\0\1\66\11\0\1\67\10\0\1\70\20\0"+
+    "\1\71\10\0\1\72\20\0\1\73\2\0\2\73\4\0"+
     "\1\73\3\0\1\73\2\0\1\73\11\0\1\74\2\0"+
     "\2\74\4\0\1\74\3\0\1\74\2\0\1\74\11\0"+
-    "\1\75\10\0\1\76\20\0\1\77\2\0\2\77\4\0"+
-    "\1\77\3\0\1\77\2\0\1\77\11\0\1\100\2\0"+
-    "\2\100\4\0\1\100\3\0\1\100\2\0\1\100\11\0"+
-    "\1\101\2\0\2\101\4\0\1\101\3\0\1\101\2\0"+
-    "\1\101\11\0\1\102\2\0\2\102\4\0\1\102\3\0"+
-    "\1\102\2\0\1\102\11\0\1\75\10\0\1\75\1\103"+
-    "\12\0\1\103\1\0\1\104\14\0\1\103\12\0\1\103"+
-    "\1\0\1\104\2\0\1\105\2\0\2\105\4\0\1\105"+
-    "\3\0\1\105\2\0\1\105\40\0\1\104";
+    "\1\75\2\0\2\75\4\0\1\75\3\0\1\75\2\0"+
+    "\1\75\11\0\1\67\10\0\1\67\1\72\12\0\1\72"+
+    "\1\0\1\76\14\0\1\72\12\0\1\72\1\0\1\76"+
+    "\2\0\1\71\10\0\1\71\15\0\1\76\31\0\1\76";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[702];
+    int [] result = new int[676];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -214,11 +210,11 @@ public final class TextLexer {
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\5\0\1\11\1\1\2\11\1\1\1\11\3\1\3\11"+
-    "\1\1\2\11\3\1\14\11\1\1\7\11\3\1\11\11"+
-    "\2\1\6\0\2\11\2\0\1\11\1\0";
+    "\1\1\2\11\2\1\14\11\1\1\7\11\3\1\3\11"+
+    "\3\1\7\0\2\11\1\0\1\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[69];
+    int [] result = new int[62];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -301,7 +297,7 @@ public final class TextLexer {
     private StringBuilder string = null;
 
     private int repeatNum = 1;
-    
+
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -689,11 +685,11 @@ public final class TextLexer {
         case 1: 
           { if (string == null) string = new StringBuilder(); string.append(yytext());
           }
-        case 46: break;
+        case 39: break;
         case 2: 
           { if (!parameter) { if (string == null) string = new StringBuilder(); string.append(yytext()); }
           }
-        case 47: break;
+        case 40: break;
         case 3: 
           { parameter = true;
                                     yybegin(PARAMETER);
@@ -703,47 +699,47 @@ public final class TextLexer {
                                         return new ParsedSymbol(SymbolType.TEXT, ret);
                                     }
           }
-        case 48: break;
+        case 41: break;
         case 4: 
           { yybegin(VALUE);
                                     return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
           }
-        case 49: break;
+        case 42: break;
         case 5: 
           { yybegin(YYINITIAL);
                                     parameter = false;
           }
-        case 50: break;
+        case 43: break;
         case 6: 
           { 
           }
-        case 51: break;
+        case 44: break;
         case 7: 
           { return new ParsedSymbol(SymbolType.PARAMETER_VALUE, yytext());
           }
-        case 52: break;
+        case 45: break;
         case 8: 
           { return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
           }
-        case 53: break;
+        case 46: break;
         case 9: 
           { string = new StringBuilder();
                                     yybegin(STRING);
           }
-        case 54: break;
+        case 47: break;
         case 10: 
           { string = new StringBuilder();
                                     yybegin(OIDENTIFIER);
           }
-        case 55: break;
+        case 48: break;
         case 11: 
           { for(int r=0;r<repeatNum;r++) string.append(yytext()); repeatNum = 1;
           }
-        case 56: break;
+        case 49: break;
         case 12: 
           { yybegin(VALUE);  yyline++;
           }
-        case 57: break;
+        case 50: break;
         case 13: 
           { yybegin(VALUE);
                                      repeatNum = 1;
@@ -752,141 +748,114 @@ public final class TextLexer {
                                      string = null;
                                      return new ParsedSymbol(SymbolType.PARAMETER_VALUE, ret);
           }
-        case 58: break;
+        case 51: break;
         case 14: 
-          { string.append(yytext());
-          }
-        case 59: break;
-        case 15: 
           { yybegin(VALUE);
+                                     repeatNum = 1;
                                      // length also includes the trailing quote
                                      String tos = string.toString();
                                      string = null;
                                      return new ParsedSymbol(SymbolType.PARAMETER_VALUE, tos);
           }
-        case 60: break;
-        case 16: 
+        case 52: break;
+        case 15: 
           { throw new TextParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
           }
-        case 61: break;
-        case 17: 
+        case 53: break;
+        case 16: 
           { if (string == null) string = new StringBuilder(); string.append(']');
           }
-        case 62: break;
-        case 18: 
+        case 54: break;
+        case 17: 
           { if (string == null) string = new StringBuilder(); string.append('\\');
           }
-        case 63: break;
-        case 19: 
+        case 55: break;
+        case 18: 
           { if (string == null) string = new StringBuilder(); string.append('\"');
           }
-        case 64: break;
-        case 20: 
+        case 56: break;
+        case 19: 
           { if (string == null) string = new StringBuilder(); string.append('[');
           }
-        case 65: break;
-        case 21: 
+        case 57: break;
+        case 20: 
           { if (string == null) string = new StringBuilder(); string.append('\b');
           }
-        case 66: break;
-        case 22: 
+        case 58: break;
+        case 21: 
           { if (string == null) string = new StringBuilder(); string.append('\t');
           }
-        case 67: break;
-        case 23: 
+        case 59: break;
+        case 22: 
           { if (string == null) string = new StringBuilder(); string.append('\n');
           }
-        case 68: break;
-        case 24: 
+        case 60: break;
+        case 23: 
           { if (string == null) string = new StringBuilder(); string.append('\f');
           }
-        case 69: break;
-        case 25: 
+        case 61: break;
+        case 24: 
           { if (string == null) string = new StringBuilder(); string.append('\r');
           }
-        case 70: break;
-        case 26: 
+        case 62: break;
+        case 25: 
           { if (string == null) string = new StringBuilder(); string.append('\'');
           }
-        case 71: break;
-        case 27: 
+        case 63: break;
+        case 26: 
           { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;
           }
-        case 72: break;
-        case 28: 
+        case 64: break;
+        case 27: 
           { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;
           }
-        case 73: break;
-        case 29: 
+        case 65: break;
+        case 28: 
           { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;
           }
-        case 74: break;
-        case 30: 
+        case 66: break;
+        case 29: 
           { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;
           }
-        case 75: break;
-        case 31: 
+        case 67: break;
+        case 30: 
           { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;
           }
-        case 76: break;
-        case 32: 
+        case 68: break;
+        case 31: 
           { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;
           }
-        case 77: break;
-        case 33: 
+        case 69: break;
+        case 32: 
           { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;
           }
-        case 78: break;
+        case 70: break;
+        case 33: 
+          { repeatNum = 1; /* ignore illegal character escape */
+          }
+        case 71: break;
         case 34: 
-          { /* ignore illegal character escape */
+          { for(int r=0;r<repeatNum;r++) string.append('\"'); repeatNum = 1;
           }
-        case 79: break;
+        case 72: break;
         case 35: 
-          { string.append('\\');
+          { for(int r=0;r<repeatNum;r++) string.append('\''); repeatNum = 1;
           }
-        case 80: break;
+        case 73: break;
         case 36: 
-          { string.append('\"');
-          }
-        case 81: break;
-        case 37: 
-          { string.append('\b');
-          }
-        case 82: break;
-        case 38: 
-          { string.append('\t');
-          }
-        case 83: break;
-        case 39: 
-          { string.append('\n');
-          }
-        case 84: break;
-        case 40: 
-          { string.append('\f');
-          }
-        case 85: break;
-        case 41: 
-          { string.append('\r');
-          }
-        case 86: break;
-        case 42: 
-          { string.append('\'');
-          }
-        case 87: break;
-        case 43: 
           { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val);
           }
-        case 88: break;
-        case 44: 
+        case 74: break;
+        case 37: 
           { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1;
           }
-        case 89: break;
-        case 45: 
+        case 75: break;
+        case 38: 
           { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1));
           }
-        case 90: break;
+        case 76: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
@@ -894,7 +863,7 @@ public final class TextLexer {
             case YYINITIAL: {
               if (finish) {return null;} else {finish=true; return new ParsedSymbol(SymbolType.TEXT, string == null ? null : string.toString());}
             }
-            case 70: break;
+            case 63: break;
             default:
               {
                 return null;

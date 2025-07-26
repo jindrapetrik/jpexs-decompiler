@@ -65,6 +65,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -898,7 +899,8 @@ public class DefineEditTextTag extends TextTag {
             writer.append("leading ").append(leading).newLine();
         }
         if (!variableName.isEmpty()) {
-            writer.append("variablename ").append(DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false)).newLine();
+            writer.append("variablename ").append("\"").append(Helper.escapePCodeString(variableName)).append("\"").newLine();
+            //.append(DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false)).newLine();
         }
         writer.append("]");
         if (hasText) {
@@ -1611,7 +1613,8 @@ public class DefineEditTextTag extends TextTag {
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (variableName != null && !variableName.isEmpty()) {
-            ret.put("vn", DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
+            ret.put("vn", "\"" + Helper.escapePCodeString(variableName) + "\"");
+            //DottedChain.parseNoSuffix(variableName).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
         }
         return ret;
     }

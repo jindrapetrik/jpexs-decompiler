@@ -96,7 +96,8 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
                 if (di.exportName()) {
                     newValue = Helper.escapeExportname(swf, newValue, false);
                 } else {
-                    newValue = DottedChain.parseNoSuffix(newValue).toPrintableString(new LinkedHashSet<>(), swf, di.as3());
+                    newValue = Helper.escapePCodeString(newValue);
+                    //DottedChain.parseNoSuffix(newValue).toPrintableString(new LinkedHashSet<>(), swf, di.as3());
                 }
             }
             setText(newValue);
@@ -115,7 +116,8 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
                 if (di.exportName()) {
                     newValue = Helper.unescapeExportname(newValue);
                 } else {
-                    newValue = DottedChain.parsePrintable(newValue).toRawString();
+                    newValue = Helper.unescapePCodeString(newValue);
+                    //DottedChain.parsePrintable(newValue).toRawString();
                 }
             }
             

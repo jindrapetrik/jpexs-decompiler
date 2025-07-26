@@ -28,6 +28,7 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -553,8 +554,9 @@ public class IdentifiersDeobfuscation {
             return "";
         }
         
-        if (Configuration.useSafeStr.get() && as3) {
-            Map<String, String> map = swf.getAs3ObfuscatedIdentifiers();
+        if (Configuration.useSafeStr.get() && as3) {                
+            
+            Map<String, String> map = swf == null ? new LinkedHashMap<>() : swf.getAs3ObfuscatedIdentifiers();
             if (map.containsKey(s)) {
                 used.add(s);
                 return map.get(s);
