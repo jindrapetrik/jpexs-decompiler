@@ -16,16 +16,21 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import natorder.NaturalOrderComparator;
 
@@ -46,12 +51,34 @@ public class AS3Package extends AS3ClassTreeItem {
      */
     public String packageName;
 
+    
+    private final String DEFAULT_PACKAGE_NAME = AppResources.translate("package.default");
+    
     /**
      * All subPackages
      */
     @SuppressWarnings("unchecked")
-    private final Map<String, AS3Package> subPackages = new TreeMap<>(new NaturalOrderComparator());
-
+    private final Map<String, AS3Package> subPackages = new TreeMap<>(new Comparator<String>() {
+            NaturalOrderComparator noc = new NaturalOrderComparator();
+            
+            
+            @Override
+            public int compare(String o1, String o2) {
+                if (Objects.equals(o1, o2)) {
+                    return 0;
+                }
+                if (DEFAULT_PACKAGE_NAME.equals(o1)) {
+                    return -1;
+                }
+                if (DEFAULT_PACKAGE_NAME.equals(o2)) {
+                    return 1;
+                }                
+                return noc.compare(o1, o2);
+            }
+        }
+    );
+    
+    
     /**
      * All scripts in this package
      */
@@ -101,6 +128,7 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Constructor.
+     *
      * @param packageName Package name
      * @param openable Openable
      * @param flat Whether the package is flat = in the format "mypkg.sub1.sub2"
@@ -113,7 +141,7 @@ public class AS3Package extends AS3ClassTreeItem {
      * itself, index of scriptInfo
      */
     public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage, ABC abc, boolean partOfCompoundScript, Integer compoundScriptIndex) {
-        super(packageName, "", null);
+        super(packageName, "", null);        
         this.flat = flat;
         this.openable = openable;
         this.packageName = packageName;
@@ -247,9 +275,10 @@ public class AS3Package extends AS3ClassTreeItem {
      *
      * @param script ScriptPack
      */
-    public void addScriptPack(ScriptPack script) {
-        ClassPath cp = script.getClassPath();
-        scripts.put(cp.className + cp.namespaceSuffix, script);
+    public void addScriptPack(ScriptPack script) {        
+        /*ClassPath cp = script.getClassPath();
+        scripts.put(cp.className + cp.namespaceSuffix, script);*/
+        scripts.put(script.getPrintableNameWithNamespaceSuffix(), script);
         sortedScripts = null;
     }
 
@@ -259,7 +288,12 @@ public class AS3Package extends AS3ClassTreeItem {
      * @param subPackage Subpackage
      */
     public void addSubPackage(AS3Package subPackage) {
-        subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
+        if (subPackage.isDefaultPackage()) {
+            subPackages.put(DEFAULT_PACKAGE_NAME, subPackage);
+        } else {
+            subPackages.put(subPackage.getPrintableNameWithNamespaceSuffix(), subPackage);
+        }
+        //subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
         sortedPackages = null;
     }
 
@@ -270,6 +304,12 @@ public class AS3Package extends AS3ClassTreeItem {
      * @return Subpackage
      */
     public AS3Package getSubPackage(String packageName) {
+        /*String printableName;
+        if (packageName.equals(DEFAULT_PACKAGE_NAME)) {
+            printableName = DEFAULT_PACKAGE_NAME;
+        } else {
+            printableName = DottedChain.parseNoSuffix(packageName).toPrintableString(new LinkedHashSet<>(), getSwf(), true);
+        }*/
         return subPackages.get(packageName);
     }
 
@@ -379,5 +419,17 @@ public class AS3Package extends AS3ClassTreeItem {
             }
         }
         return false;
+    }
+
+    @Override
+    protected SWF getSwf() {
+        Openable op = getOpenable();
+        if (op instanceof SWF) {
+            return (SWF) op;
+        }
+        if (op instanceof ABC) {
+            return ((ABC) op).getSwf();
+        }
+        return null;
     }
 }

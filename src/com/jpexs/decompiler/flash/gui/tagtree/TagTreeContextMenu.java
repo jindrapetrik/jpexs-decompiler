@@ -61,7 +61,9 @@ import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -3489,10 +3491,15 @@ public class TagTreeContextMenu extends JPopupMenu {
                 ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
                 DottedChain dc = new DottedChain(pkgParts);
-                String script = "package " + dc.toPrintableString(new LinkedHashSet<>(), doAbc.getSwf(), true) + " {"
-                        + "public class " + IdentifiersDeobfuscation.printIdentifier(swf, new LinkedHashSet<>(), true, classSimpleName) + " {"
+                Set<String> used = new LinkedHashSet<>();
+                String script = "package " + dc.toPrintableString(used, doAbc.getSwf(), true) + " {"
+                        + "public class " + IdentifiersDeobfuscation.printIdentifier(swf, used, true, classSimpleName) + " {"
                         + " }"
                         + "}";
+                StringBuilder sb = new StringBuilder();
+                StringBuilderTextWriter writer = new StringBuilderTextWriter(new CodeFormatting(), sb);
+                IdentifiersDeobfuscation.writeCurrentScriptReplacements(writer, used, swf);
+                script += sb.toString();
                 parser.addScript(script, fileName, 0, 0, swf.getDocumentClass(), doAbc.getABC());
             } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
@@ -3889,7 +3896,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void createAs2Class(String className, SWF swf) {
         
-        className = DottedChain.parsePrintable(className).toRawString();
+        className = DottedChain.parsePrintable(swf, className).toRawString();
         
         ReadOnlyTagList tags = swf.getTags();
         List<Integer> exportedIds = new ArrayList<>();
@@ -3945,8 +3952,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
             DottedChain dc = new DottedChain(parts);
 
-            try {
-                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(new LinkedHashSet<>(), swf, false) + "{}", swf.getCharset());
+            try {                
+                Set<String> used = new LinkedHashSet<>();
+                String sourceCode = "class " + dc.toPrintableString(used, swf, false) + "{}";
+                StringBuilder sb = new StringBuilder();
+                StringBuilderTextWriter writer = new StringBuilderTextWriter(new CodeFormatting(), sb);
+                IdentifiersDeobfuscation.writeCurrentScriptReplacements(writer, used, swf);
+                sourceCode += sb.toString();
+                List<Action> actions = parser.actionsFromString(sourceCode, swf.getCharset());
                 doInit.setActions(actions);
             } catch (ActionParseException | IOException | CompilationException
                     | InterruptedException ex) {

@@ -156,10 +156,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     /**
      * Parses a dotted chain from a deobfuscated string.
      *
+     * @param swf SWF
      * @param name Name
      * @return Dotted chain
      */
-    public static final DottedChain parsePrintable(String name) {
+    public static final DottedChain parsePrintable(SWF swf, String name) {
         if (name == null) {
             return DottedChain.EMPTY;
         } else if (name.isEmpty()) {
@@ -168,7 +169,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             String[] parts = name.split("\\.");
             List<PathPart> newParts = new ArrayList<>();
             for (String part : parts) {
-                newParts.add(new PathPart(IdentifiersDeobfuscation.unescapeOIdentifier(part), false, ""));
+                newParts.add(new PathPart(IdentifiersDeobfuscation.unescapeOIdentifier(swf, part), false, ""));
             }
 
             DottedChain ret = new DottedChain();

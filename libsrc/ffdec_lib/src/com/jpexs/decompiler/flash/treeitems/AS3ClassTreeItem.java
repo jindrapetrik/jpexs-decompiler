@@ -106,4 +106,6 @@ public abstract class AS3ClassTreeItem implements TreeItem {
     public String toString() {
         return getPrintableNameWithNamespaceSuffix();
     }
+    
+    protected abstract SWF getSwf();
 }

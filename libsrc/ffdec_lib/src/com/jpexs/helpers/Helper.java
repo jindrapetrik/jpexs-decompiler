@@ -256,12 +256,13 @@ public class Helper {
     
     /**
      * Unescape export name
+     * @param swf SWF
      * @param s Input string
      * @return Unescaped string
      */
-    public static String unescapeExportname(String s) {
+    public static String unescapeExportname(SWF swf, String s) {
         if (s.startsWith("__Packages.")) {
-            return DottedChain.parsePrintable(s).toRawString();
+            return DottedChain.parsePrintable(swf, s).toRawString();
         }
         return unescapePCodeString(s);
     }

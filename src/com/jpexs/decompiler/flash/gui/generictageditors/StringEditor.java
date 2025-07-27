@@ -114,7 +114,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
             if (di != null) {
                 if (di.exportName()) {
-                    newValue = Helper.unescapeExportname(newValue);
+                    newValue = Helper.unescapeExportname(swf, newValue);
                 } else {
                     newValue = Helper.unescapePCodeString(newValue);
                     //DottedChain.parsePrintable(newValue).toRawString();

@@ -729,11 +729,19 @@ public class IdentifiersDeobfuscation {
     
     /**
      * Unescapes deobfuscated identifier
+     * @param swf SWF
      * @param s String
      * @return Unescaped string
      */
-    public static String unescapeOIdentifier(String s) {
+    public static String unescapeOIdentifier(SWF swf, String s) {
         StringBuilder ret = new StringBuilder(s.length());
+        
+        Map<String, String> map = swf.getObfuscatedIdentifiersMap();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (s.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
         if (s.length() < 2) {
             return s;
         }
@@ -793,7 +801,7 @@ public class IdentifiersDeobfuscation {
     
     @SuppressWarnings("unchecked")
     public static GraphTextWriter writeCurrentScriptReplacements(GraphTextWriter writer, Set<String> usedDeobfuscations, SWF swf) {
-        if (!usedDeobfuscations.isEmpty()) {
+        if (!usedDeobfuscations.isEmpty() && Configuration.autoDeobfuscateIdentifiers.get()) {
             writer.newLine();
             List<String> commentLines = new ArrayList<>();
             Map<String, String> fullMap = swf.getObfuscatedIdentifiersMap();

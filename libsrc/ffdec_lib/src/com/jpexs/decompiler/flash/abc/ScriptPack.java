@@ -624,6 +624,11 @@ public class ScriptPack extends AS3ClassTreeItem {
         abc.script_info.get(scriptIndex).setModified(false);
     }
 
+    @Override
+    protected SWF getSwf() {
+        return abc.getSwf();
+    }
+
     /**
      * Label with address.
      */
