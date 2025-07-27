@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - [#1295], [#116] AS3 dynamic construction via MultinameL
 - ABC cleaner not properly fixing namespace sets
 - The hex view does not display bytes if there are too few of them
+- SymbolClass export/import did not support obfuscated names
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

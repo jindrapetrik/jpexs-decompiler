@@ -72,12 +72,12 @@ public class SymbolClassExporter {
                     if (t instanceof ExportAssetsTag) {
                         ExportAssetsTag eat = (ExportAssetsTag) t;
                         for (int i = 0; i < eat.tags.size(); i++) {
-                            writer.append(eat.tags.get(i) + ";" + eat.names.get(i) + Helper.newLine);
+                            writer.append(eat.tags.get(i) + ";\"" + Helper.escapePCodeString(eat.names.get(i)).replace("\"", "\"\"") + "\"" + Helper.newLine);
                         }
                     } else if (t instanceof SymbolClassTag) {
                         SymbolClassTag sct = (SymbolClassTag) t;
                         for (int i = 0; i < sct.tags.size(); i++) {
-                            writer.append(sct.tags.get(i) + ";" + sct.names.get(i) + Helper.newLine);
+                            writer.append(sct.tags.get(i) + ";\"" + Helper.escapePCodeString(sct.names.get(i)).replace("\"", "\"\"") + "\"" + Helper.newLine);
                         }
                     }
                     if (CancellableWorker.isInterrupted()) {
