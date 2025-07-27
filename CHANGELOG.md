@@ -52,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - ABC cleaner not properly fixing namespace sets
 - The hex view does not display bytes if there are too few of them
 - SymbolClass export/import did not support obfuscated names
+- Configuration TOML file encoding (UTF-8)
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

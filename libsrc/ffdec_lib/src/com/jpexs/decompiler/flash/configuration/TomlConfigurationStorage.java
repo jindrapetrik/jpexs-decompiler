@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
@@ -278,7 +279,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
             modifiedOnly = true;
         }
         try (
-                Writer w = new FileWriter(file); PrintWriter pw = new PrintWriter(w)) {
+                Writer w = new FileWriter(file, Utf8Helper.charset); PrintWriter pw = new PrintWriter(w)) {
             String header = AppResources.translate("configurationFile").replace("%app%", ApplicationInfo.APPLICATION_NAME);
             String splitter = stringOfChar('-', header.length());
             pw.println("# " + splitter);
