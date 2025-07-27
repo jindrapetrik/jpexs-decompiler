@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Optional heap memory status widget in the titlebar
 - [#2485] Show variable name in the text tree node label
 - Deobfuscate identifiers option - non destructible renaming identifiers for display purposes
+- Unknown and errored tags moved to special folders
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

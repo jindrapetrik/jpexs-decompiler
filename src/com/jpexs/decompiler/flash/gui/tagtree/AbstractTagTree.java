@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
@@ -143,10 +144,8 @@ public abstract class AbstractTagTree extends JTree {
     static {
         ICONS = new HashMap<>();
         for (TreeNodeType treeNodeType : TreeNodeType.values()) {
-            if (treeNodeType != TreeNodeType.UNKNOWN) {
-                String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
-                ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
-            }
+            String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
+            ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
         }
     }
 
@@ -484,9 +483,13 @@ public abstract class AbstractTagTree extends JTree {
         }
 
         if (t instanceof TagStub) {
-            return TreeNodeType.ERROR;
+            return TreeNodeType.ERRORED;
         }
 
+        if (t instanceof UnknownTag) {
+            return TreeNodeType.UNKNOWN;
+        }
+        
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
         }

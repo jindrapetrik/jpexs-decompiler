@@ -63,7 +63,7 @@ public enum TreeNodeType {
     REMOVE_OBJECT,
     SCALING_GRID,
     END,
-    ERROR,
+    ERRORED,
     ABC,
     COOKIE
 }

@@ -70,10 +70,10 @@ public class TagStub extends Tag {
         return dataStream;
     }
 
-    @Override
+    /*@Override
     public String toString() {
-        return tagName + " [ID = " + id + "]";
-    }
+        return tagName + " (tid = " + id + ")";
+    }*/
 
     @Override
     public Map<String, String> getNameProperties() {
