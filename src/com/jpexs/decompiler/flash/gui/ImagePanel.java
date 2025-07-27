@@ -4788,7 +4788,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.frozen = frozen;
             this.frozenButtons = frozenButtons;
             this.muted = muted;
-            this.resample = Configuration.previewResampleSound.get();
+            this.resample = false; //Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;

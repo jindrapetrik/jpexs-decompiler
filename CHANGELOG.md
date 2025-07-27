@@ -62,6 +62,9 @@ All notable changes to this project will be documented in this file.
 - Quotes in tree node parameter values that need them
 - The label of option "automatic deobfuscation" changed to "deobfuscate code"
 
+### Removed
+- Resample wav to 44kHz feature from GUI
+
 ## [24.0.1] - 2025-06-27
 ### Fixed
 - [#2476] Dark interface skins identifiers highlighter visibility

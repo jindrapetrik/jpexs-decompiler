@@ -401,12 +401,13 @@ public class ExportDialog extends AppDialog {
         resampleWavCheckBox.setVisible(false);
 
         if (embedCheckBox.isVisible() || visibleOptionClasses.contains(SoundExportMode.class)) {
-            gbc.gridy++;
+            /*gbc.gridy++;
             resampleWavCheckBox.setVisible(true);
             comboPanel.add(resampleWavCheckBox, gbc);
             if (Configuration.lastExportResampleWav.get()) {
                 resampleWavCheckBox.setSelected(true);
-            }
+            }*/
+            resampleWavCheckBox.setSelected(false);
         }
 
         transparentFrameBackgroundCheckBox = new JCheckBox(translate("transparentFrameBackground"));
