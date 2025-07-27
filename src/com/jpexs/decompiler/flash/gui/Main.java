@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ABCOpenException;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
@@ -228,6 +229,8 @@ public class Main {
     private static SWF runningSWF = null;
 
     private static SwfPreparation runningPreparation = null;
+    
+    private static boolean loggingFileLoaded = false;
 
     public static SWF getRunningSWF() {
         return runningSWF;
@@ -3167,10 +3170,11 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         decodeLaunch5jArgs(args);
+        preInitLogging();        
         setSessionLoaded(false);
 
-        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");
-
+        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");       
+        
         clearTemp();
 
         try {
@@ -3293,9 +3297,9 @@ public class Main {
     }
 
     public static String tempFile(String url) throws IOException {
-        File f = new File(Configuration.getFFDecHome() + "saved" + File.separator);
+        File f = new File(AppDirectoryProvider.getFFDecHome() + "saved" + File.separator);
         Path.createDirectorySafe(f);
-        return Configuration.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return AppDirectoryProvider.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
     }
 
     public static void removeTrayIcon() {
@@ -3534,7 +3538,7 @@ public class Main {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
 
         try {
-            fileName = Configuration.getFFDecHome() + "logs" + File.separator;
+            fileName = AppDirectoryProvider.getFFDecHome() + "logs" + File.separator;
             if (Configuration.useDetailedLogging.get()) {
                 fileName += "log-" + sdf.format(new Date()) + ".txt";
             } else {
@@ -3594,16 +3598,23 @@ public class Main {
             System.getProperty("java.version"), System.getProperty("java.vendor"), System.getProperty("os.arch")});
     }
 
-    public static void initLogging(boolean debug) {
-        File loggingFile = new File(Configuration.getFFDecHome() + "/logging.properties");
+    public static void preInitLogging() {
+        File loggingFile = new File(AppDirectoryProvider.getFFDecHome() + "/logging.properties");
         if (loggingFile.exists()) { //use manual configuration file
             final LogManager logManager = LogManager.getLogManager();
             try {
                 logManager.readConfiguration(new FileInputStream(loggingFile));
+                loggingFileLoaded = true;
                 return;
             } catch (IOException ex) {
                 //ignore
             }
+        }
+    }
+    
+    public static void initLogging(boolean debug) {
+        if (loggingFileLoaded) {
+            return;
         }
         try {
             Logger logger = Logger.getLogger("");

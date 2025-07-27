@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.translator;
 
+import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
@@ -899,11 +900,11 @@ public class Translator extends JFrame implements ItemListener {
     }
 
     private String getStorageFile() {
-        return Configuration.getFFDecHome() + "translated.zip";
+        return AppDirectoryProvider.getFFDecHome() + "translated.zip";
     }
 
     private String getWindowFile() {
-        return Configuration.getFFDecHome() + "translated.ini";
+        return AppDirectoryProvider.getFFDecHome() + "translated.ini";
     }
 
     private String escapeUnicode(String s) {
@@ -1137,7 +1138,7 @@ public class Translator extends JFrame implements ItemListener {
     }
 
     private void saveAll() throws FileNotFoundException, IOException {
-        String storageFile = Configuration.getFFDecHome() + "alltranslated.zip";
+        String storageFile = AppDirectoryProvider.getFFDecHome() + "alltranslated.zip";
         save(storageFile, resourceValues);
     }
 

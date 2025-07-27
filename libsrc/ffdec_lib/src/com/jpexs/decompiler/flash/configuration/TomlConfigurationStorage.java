@@ -61,6 +61,8 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
 
     @Override
     public Map<String, Object> loadFromFile(String file) {
+        Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.FINE, "Loading TOML file {0}", file);
+            
         Map<String, Object> result = new LinkedHashMap<>();
         TomlParseResult tomlResult;
         try {
@@ -209,6 +211,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
                 Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during loading TOML configuration", ex);
             }
         }
+        Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.FINE, "TOML file loaded.");
         return result;
     }
 
