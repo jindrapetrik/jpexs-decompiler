@@ -55,7 +55,19 @@ public class IdentifiersDeobfuscation {
      * Prefix to be put instead of obfuscated name. It will by suffixed with a
      * number.
      */
-    public static final String SAFE_STR_PREFIX = "_SafeStr_";
+    public static final String SAFE_STRING_PREFIX = "_SafeStr_";
+    
+    /**
+     * Safe prefix for packages
+     */
+    public static final String SAFE_PACKAGE_PREFIX = "_SafePkg_";
+    
+    /**
+     * Safe prefix for classes
+     */
+    public static final String SAFE_CLASS_PREFIX = "_SafeCls_";
+    
+    
 
     /**
      * Random number generator.
@@ -441,6 +453,13 @@ public class IdentifiersDeobfuscation {
         if (isReservedWord(s, as3)) {
             return false;
         }
+        
+        if (Configuration.autoDeobfuscateIdentifiers.get()
+                && (s.contains(SAFE_STRING_PREFIX)
+                    || s.contains(SAFE_PACKAGE_PREFIX)
+                    || s.contains(SAFE_CLASS_PREFIX))) {
+            return false;
+        }
 
         // simple fast test
         if (VALID_NAME_PATTERN_DOT.matcher(s).matches()) {
@@ -462,6 +481,14 @@ public class IdentifiersDeobfuscation {
      * @return True if string is valid name
      */
     public static boolean isValidName(boolean as3, String s, String... exceptions) {
+        
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.startsWith(SAFE_STRING_PREFIX)
+                    || s.startsWith(SAFE_PACKAGE_PREFIX)
+                    || s.startsWith(SAFE_CLASS_PREFIX))) {
+            return false;
+        }
+        
         for (String e : exceptions) {
             if (e.equals(s)) {
                 return true;
@@ -557,7 +584,7 @@ public class IdentifiersDeobfuscation {
             if (map.containsKey(s)) {
                 writer.append(map.get(s));
             } else {
-                String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
+                String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();
                 map.put(s, ret);
                 writer.append(ret);
             }
@@ -597,6 +624,29 @@ public class IdentifiersDeobfuscation {
                 used.add(s);
                 return map.get(s);
             }
+            
+            if (s.startsWith(SAFE_STRING_PREFIX)
+                    || s.startsWith(SAFE_PACKAGE_PREFIX)
+                    || s.startsWith(SAFE_CLASS_PREFIX)) {
+                String foundKey = null;
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (entry.getValue().equals(s)) {
+                        foundKey = entry.getKey();
+                        break;
+                    }
+                }
+                if (foundKey == null) {
+                    map.put(s, s);
+                    return s;
+                } else {
+                    if (foundKey.equals(s)) {
+                        return s;
+                    }
+                    map.put(foundKey, SAFE_STRING_PREFIX + map.size());                    
+                    map.put(s, s);
+                    return s;
+                }
+            }
         }
 
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
@@ -621,7 +671,7 @@ public class IdentifiersDeobfuscation {
         }
 
         if (Configuration.autoDeobfuscateIdentifiers.get()) {
-            String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
+            String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();
             map.put(s, ret);
             used.add(s);
             return ret;
@@ -799,22 +849,32 @@ public class IdentifiersDeobfuscation {
 
     @SuppressWarnings("unchecked")
     public static GraphTextWriter writeCurrentScriptReplacements(GraphTextWriter writer, Set<String> usedDeobfuscations, SWF swf) {
-        if (!usedDeobfuscations.isEmpty() && Configuration.autoDeobfuscateIdentifiers.get()) {
-            writer.newLine();
-            List<String> commentLines = new ArrayList<>();
-            Map<String, String> fullMap = swf.getObfuscatedIdentifiersMap();
-            int i = 0;
-            for (String obfuscated : usedDeobfuscations) {
-                String deobfuscated = fullMap.get(obfuscated);
-                commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");
-                i++;
-            }
-            commentLines.sort(new NaturalOrderComparator());
-            commentLines.add(0, AppResources.translate("decompilationWarning.obfuscatedIdentifiers"));
-            commentLines.add(1, AppResources.translate("decompilationWarning.replacementsFollow"));
-            String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
-            new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+        if (usedDeobfuscations.isEmpty()) {
+            return writer;
         }
+        if (!Configuration.autoDeobfuscateIdentifiers.get()) {
+            return writer;
+        }
+        
+        writer.newLine();
+        List<String> commentLines = new ArrayList<>();
+        Map<String, String> fullMap = swf.getObfuscatedIdentifiersMap();
+        for (String obfuscated : usedDeobfuscations) {
+            String deobfuscated = fullMap.get(obfuscated);
+            if (obfuscated.equals(deobfuscated)) {
+                continue;
+            }
+            commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");                
+        }
+        if (commentLines.isEmpty()) {
+            return writer;
+        }
+        commentLines.sort(new NaturalOrderComparator());
+        commentLines.add(0, AppResources.translate("decompilationWarning.obfuscatedIdentifiers"));
+        commentLines.add(1, AppResources.translate("decompilationWarning.replacementsFollow"));
+        String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
+        new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+        
         return writer;
     }
 

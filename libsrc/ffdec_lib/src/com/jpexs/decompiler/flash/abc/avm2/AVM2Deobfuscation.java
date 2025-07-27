@@ -17,8 +17,12 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
+import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
+import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_STRING_PREFIX;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -33,8 +37,8 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class AVM2Deobfuscation {   
-    
+public class AVM2Deobfuscation {
+
     /**
      * Default size of random word.
      */
@@ -101,6 +105,13 @@ public class AVM2Deobfuscation {
         boolean isValid = true;
         if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
+        }
+
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.contains(SAFE_STRING_PREFIX)
+                || s.contains(SAFE_PACKAGE_PREFIX)
+                || s.contains(SAFE_CLASS_PREFIX))) {
+            return false;
         }
 
         if (isValid) {
@@ -179,9 +190,9 @@ public class AVM2Deobfuscation {
         return ret;
     }
 
-    
     /**
      * Checks whether string at given index is valid package name
+     *
      * @param strIndex String index
      * @return True if valid
      */
@@ -195,7 +206,7 @@ public class AVM2Deobfuscation {
         }
         return isValidNSPart(s);
     }
-    
+
     /**
      * Deobfuscates package name.
      *
@@ -206,7 +217,7 @@ public class AVM2Deobfuscation {
      * @param renameType Rename type
      * @return Deobfuscated package name
      */
-    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, RenameType renameType) {                        
+    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, RenameType renameType) {
         if (!isValidPackageName(strIndex)) {
             String s = constants.getString(strIndex);
             DottedChain sChain = DottedChain.parseWithSuffix(s);
@@ -239,6 +250,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Checks whether string at given index is valid name
+     *
      * @param strIndex String index
      * @return True when valid
      */
@@ -247,6 +259,14 @@ public class AVM2Deobfuscation {
             return true;
         }
         String s = constants.getString(strIndex);
+
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.startsWith(SAFE_STRING_PREFIX)
+                || s.startsWith(SAFE_PACKAGE_PREFIX)
+                || s.startsWith(SAFE_CLASS_PREFIX))) {
+            return false;
+        }
+
         boolean isValid = true;
         if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
@@ -269,7 +289,7 @@ public class AVM2Deobfuscation {
         }
         return isValid;
     }
-    
+
     /**
      * Deobfuscates name.
      *
@@ -282,7 +302,7 @@ public class AVM2Deobfuscation {
      * @param renameType Rename type
      * @return Deobfuscated name string index
      */
-    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {        
+    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
         if (!isValidName(strIndex)) {
             String s = constants.getString(strIndex);
             DottedChain newname;

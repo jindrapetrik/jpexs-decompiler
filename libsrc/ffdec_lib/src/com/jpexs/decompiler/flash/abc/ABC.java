@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.DeobfuscationListener;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_STRING_PREFIX;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -640,7 +641,7 @@ public class ABC implements Openable {
         }
     }
 
-    private void getObfuscatedIdentifier(int strIndex, Map<String, String> ret) {
+    private void getObfuscatedIdentifier(int strIndex, Map<String, String> map, String prefix) {
         if (strIndex >= constants.getStringCount()) {
             return;
         }
@@ -648,7 +649,7 @@ public class ABC implements Openable {
             return;
         }
         String s = constants.getString(strIndex);
-        if (ret.containsKey(s)) {
+        if (map.containsKey(s)) {
             return;
         }
         AVM2Deobfuscation deobfuscation = getDeobfuscation();
@@ -656,10 +657,39 @@ public class ABC implements Openable {
             return;
         }
 
-        ret.put(s, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
+        if (s.matches("^" + IdentifiersDeobfuscation.SAFE_STRING_PREFIX + "[0-9]+$")
+                    || s.matches("^" + IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + "[0-9]+$")
+                    || s.matches("^" + IdentifiersDeobfuscation.SAFE_CLASS_PREFIX + "[0-9]+$")) {
+            String foundKey = null;
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (entry.getValue().equals(s)) {
+                    foundKey = entry.getKey();
+                    break;
+                }
+            }
+            if (foundKey == null) {
+                map.put(s, s);
+                return;
+            } else {
+                if (foundKey.equals(s)) {
+                    return;
+                }
+                String foundPrefix = SAFE_STRING_PREFIX;
+                if (s.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)) {
+                    foundPrefix = IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
+                } else if (s.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX)) {
+                    foundPrefix = IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
+                }
+                map.put(foundKey, foundPrefix + map.size());                    
+                map.put(s, s);
+                return;
+            }
+        }
+        
+        map.put(s, prefix + map.size());
     }
 
-    private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> ret) {
+    private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> map) {
         if (strIndex >= constants.getStringCount()) {
             return;
         }
@@ -667,7 +697,7 @@ public class ABC implements Openable {
             return;
         }
         String s = constants.getString(strIndex);
-        if (ret.containsKey(s)) {
+        if (map.containsKey(s)) {
             return;
         }
         AVM2Deobfuscation deobfuscation = getDeobfuscation();
@@ -677,30 +707,56 @@ public class ABC implements Openable {
         String[] parts = s.split("\\.", -1);
         List<String> deobfuscatedList = new ArrayList<>();
         for (String part : parts) {
-            if (!deobfuscation.isValidNSPart(part)) {
-                deobfuscatedList.add(IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
-                ret.put(part, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
+            if (!deobfuscation.isValidNSPart(part)) {                                
+                if (part.matches("^" + IdentifiersDeobfuscation.SAFE_STRING_PREFIX + "[0-9]+$")
+                    || part.matches("^" + IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + "[0-9]+$")
+                    || part.matches("^" + IdentifiersDeobfuscation.SAFE_CLASS_PREFIX + "[0-9]+$")) {
+                    String foundKey = null;
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        if (entry.getValue().equals(part)) {
+                            foundKey = entry.getKey();
+                            break;
+                        }
+                    }
+                    if (foundKey == null) {
+                        map.put(part, part);                        
+                    } else {
+                        if (!foundKey.equals(part)) {        
+                            String foundPrefix = SAFE_STRING_PREFIX;
+                            if (part.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)) {
+                                foundPrefix = IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
+                            } else if (part.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX)) {
+                                foundPrefix = IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
+                            }
+                            map.put(foundKey, foundPrefix + map.size());                    
+                            map.put(part, part);
+                        }
+                    }
+                } else {                                                
+                    deobfuscatedList.add(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + map.size());
+                    map.put(part, IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + map.size());
+                }
             } else {
                 deobfuscatedList.add(part);
             }
         }
-        ret.put(s, String.join(".", deobfuscatedList));
+        map.put(s, String.join(".", deobfuscatedList));
     }
 
     public void getObfuscatedIdentifiers(Map<String, String> ret) {
         for (int i = 0; i < instance_info.size(); i++) {
             InstanceInfo insti = instance_info.get(i);
             if (insti.name_index != 0) {
-                getObfuscatedIdentifier(constants.getMultiname(insti.name_index).name_index, ret);
+                getObfuscatedIdentifier(constants.getMultiname(insti.name_index).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX);
                 if (constants.getMultiname(insti.name_index).namespace_index != 0) {
                     getObfuscatedPackageIdentifier(constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index, ret);
                 }
             }
             if (insti.super_index != 0) {
-                getObfuscatedIdentifier(constants.getMultiname(insti.super_index).name_index, ret);
+                getObfuscatedIdentifier(constants.getMultiname(insti.super_index).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX);
             }
             for (int iface : insti.interfaces) {
-                getObfuscatedIdentifier(constants.getMultiname(iface).name_index, ret);
+                getObfuscatedIdentifier(constants.getMultiname(iface).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX );
             }
         }
 
@@ -710,7 +766,7 @@ public class ABC implements Openable {
             if (m.kind == Multiname.MULTINAME && strIndex > 0 && "*".equals(constants.getString(strIndex))) {
                 continue;
             }
-            getObfuscatedIdentifier(constants.getMultiname(i).name_index, ret);
+            getObfuscatedIdentifier(constants.getMultiname(i).name_index, ret, IdentifiersDeobfuscation.SAFE_STRING_PREFIX);
         }
         for (int i = 1; i < constants.getNamespaceCount(); i++) {
             if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { // only packages
