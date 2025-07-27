@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.as2;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;

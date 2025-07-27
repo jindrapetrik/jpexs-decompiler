@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;

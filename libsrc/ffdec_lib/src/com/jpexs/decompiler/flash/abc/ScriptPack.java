@@ -51,9 +51,6 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.model.CommentItem;
-import com.jpexs.decompiler.graph.model.DocCommentItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -78,7 +75,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import natorder.NaturalOrderComparator;
 
 /**
  * Script pack class. A script pack is a collection of traits that are in the

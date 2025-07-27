@@ -30,10 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JScrollPane;
-import javax.swing.text.BadLocationException;
 
 /**
  * Storage for remembering scroll/caret positions of scripts / preview folder.

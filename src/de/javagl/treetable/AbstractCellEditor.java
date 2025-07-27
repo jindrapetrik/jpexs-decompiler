@@ -17,7 +17,6 @@
 package de.javagl.treetable;
 
 import java.util.EventObject;
-
 import javax.swing.CellEditor;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;

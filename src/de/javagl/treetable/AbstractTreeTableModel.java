@@ -16,8 +16,8 @@
  */
 package de.javagl.treetable;
 
-import javax.swing.tree.*;
 import javax.swing.event.*;
+import javax.swing.tree.*;
 
 /**
  * An abstract implementation of the TreeTableModel interface, handling the list

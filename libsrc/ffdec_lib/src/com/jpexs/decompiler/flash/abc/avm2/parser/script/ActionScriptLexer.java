@@ -18,15 +18,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.math.BigInteger;
-import macromedia.asc.util.Decimal128;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import com.jpexs.decompiler.flash.abc.types.Float4;
+import java.util.regex.Pattern;
+import macromedia.asc.util.Decimal128;
 
 
 /**

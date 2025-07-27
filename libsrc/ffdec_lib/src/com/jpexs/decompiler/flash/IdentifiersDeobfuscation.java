@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType;

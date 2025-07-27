@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.Component;
@@ -26,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 import javax.swing.JTextArea;
 

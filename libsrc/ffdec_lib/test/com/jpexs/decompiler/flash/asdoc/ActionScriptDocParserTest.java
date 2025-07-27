@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.asdoc;
 
 import java.util.List;
-import org.testng.annotations.Test;
 import static org.testng.Assert.*;
+import org.testng.annotations.Test;
 
 /**
  *

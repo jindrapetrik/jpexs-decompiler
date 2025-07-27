@@ -43,10 +43,8 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * AVM2 Deobfuscator removing single get / set registers.
