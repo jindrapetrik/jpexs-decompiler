@@ -278,8 +278,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
         if (modifiedOnly == null) {
             modifiedOnly = true;
         }
-        try (
-                Writer w = new FileWriter(file, Utf8Helper.charset); PrintWriter pw = new PrintWriter(w)) {
+        try (PrintWriter pw = new PrintWriter(file, "UTF-8")) {
             String header = AppResources.translate("configurationFile").replace("%app%", ApplicationInfo.APPLICATION_NAME);
             String splitter = stringOfChar('-', header.length());
             pw.println("# " + splitter);
