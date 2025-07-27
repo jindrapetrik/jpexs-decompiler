@@ -104,7 +104,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 
 <STRING> {
   \"                             {
-                                     yybegin(PARAMETER);
+                                     yybegin(VALUE);
                                      // length also includes the trailing quote
                                      return token(TokenType.STRING, tokenStart, tokenLength + 1);
                                  }
