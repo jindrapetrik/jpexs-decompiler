@@ -62,6 +62,10 @@ strong.flags-title {
     background-color: #cccccc;
 }
 
+.instruction.instruction-flag-floatMajor {
+    background-color: #aaaaff;
+}
+
 body {
     font-family: serif;
 }

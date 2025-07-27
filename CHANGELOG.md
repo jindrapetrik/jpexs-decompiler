@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 - [#2485] Show variable name in the text tree node label
 - Deobfuscate identifiers option - non destructible renaming identifiers for display purposes
 - Unknown and errored tags moved to special folders
+- AS3 docs generator - reorganized to distinguish float and float 4 instructions,
+  hilight float instruction blue
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

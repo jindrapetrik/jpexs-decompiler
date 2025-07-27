@@ -42,7 +42,7 @@ public class PushFloat4Ins extends InstructionDefinition {
      * Constructor
      */
     public PushFloat4Ins() {
-        super(0x54, "pushfloat4", new int[]{AVM2Code.DAT_FLOAT4_INDEX}, false, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.FLOAT_MAJOR);
+        super(0x54, "pushfloat4", new int[]{AVM2Code.DAT_FLOAT4_INDEX}, false, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.FLOAT4_SUPPORT);
     }
 
     @Override
