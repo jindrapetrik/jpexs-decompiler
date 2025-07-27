@@ -54,10 +54,11 @@ import natorder.NaturalOrderComparator;
 public class IdentifiersDeobfuscation {
 
     /**
-     * Prefix to be put instead of obfuscated name. It will by suffixed with a number.
+     * Prefix to be put instead of obfuscated name. It will by suffixed with a
+     * number.
      */
     public static final String SAFE_STR_PREFIX = "_SafeStr_";
-    
+
     /**
      * Random number generator.
      */
@@ -546,7 +547,7 @@ public class IdentifiersDeobfuscation {
      *
      * @param swf SWF
      * @param used Used deobfuscations
-     * @param s String     
+     * @param s String
      * @param writer Writer
      * @return Writer
      */
@@ -559,12 +560,12 @@ public class IdentifiersDeobfuscation {
                 writer.append(map.get(s));
             } else {
                 String ret = IdentifiersDeobfuscation.SAFE_STR_PREFIX + map.size();
-                map.put(s, ret);                
+                map.put(s, ret);
                 writer.append(ret);
-            }        
+            }
             return writer;
         }
-        
+
         writer.append("\u00A7");
         escapeOIdentifier(s, writer);
         return writer.append("\u00A7");
@@ -574,7 +575,8 @@ public class IdentifiersDeobfuscation {
      * Ensures identifier is valid and if not, uses paragraph syntax.
      *
      * @param swf SWF
-     * @param used Set of used obfuscated identifiers in this script - the method will add to it
+     * @param used Set of used obfuscated identifiers in this script - the
+     * method will add to it
      * @param as3 Is ActionScript3
      * @param s Identifier
      * @param validExceptions Exceptions which are valid (e.g. some reserved
@@ -585,23 +587,20 @@ public class IdentifiersDeobfuscation {
         if (s == null || s.isEmpty()) {
             return "";
         }
-        
+
         Map<String, String> map = new LinkedHashMap<>();
         if (Configuration.autoDeobfuscateIdentifiers.get()) {
-            
+
             if (swf != null) {
                 map = swf.getObfuscatedIdentifiersMap();
             }
-            
+
             if (map.containsKey(s)) {
                 used.add(s);
                 return map.get(s);
             }
         }
-        
-        
-        
-        
+
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
             return s;
         }
@@ -629,7 +628,7 @@ public class IdentifiersDeobfuscation {
             used.add(s);
             return ret;
         }
-        
+
         String ret = "\u00A7" + escapeOIdentifier(s) + "\u00A7";
         nameCache.put(s, ret);
         return ret;
@@ -679,8 +678,8 @@ public class IdentifiersDeobfuscation {
         }
 
         return writer;
-    }       
-    
+    }
+
     /**
      * Escapes obfuscated identifier.
      *
@@ -726,16 +725,17 @@ public class IdentifiersDeobfuscation {
 
         return ret.toString();
     }
-    
+
     /**
      * Unescapes deobfuscated identifier
+     *
      * @param swf SWF
      * @param s String
      * @return Unescaped string
      */
     public static String unescapeOIdentifier(SWF swf, String s) {
         StringBuilder ret = new StringBuilder(s.length());
-        
+
         Map<String, String> map = swf.getObfuscatedIdentifiersMap();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (s.equals(entry.getValue())) {
@@ -767,8 +767,8 @@ public class IdentifiersDeobfuscation {
                     } else if (c == '\\') {
                         ret.append("\\");
                     } else if (c == '\u00A7') {
-                        ret.append("\u00A7");                        
-                    } else if (c == 'x' && i + 2 < s.length() - 1) {                        
+                        ret.append("\u00A7");
+                    } else if (c == 'x' && i + 2 < s.length() - 1) {
                         ret.append((char) Integer.parseInt(s.substring(i + 1, i + 3), 16));
                         i += 2;
                     } else if (c == '{') {
@@ -798,7 +798,7 @@ public class IdentifiersDeobfuscation {
         as2NameCache.clear();
         as3NameCache.clear();
     }
-    
+
     @SuppressWarnings("unchecked")
     public static GraphTextWriter writeCurrentScriptReplacements(GraphTextWriter writer, Set<String> usedDeobfuscations, SWF swf) {
         if (!usedDeobfuscations.isEmpty() && Configuration.autoDeobfuscateIdentifiers.get()) {
@@ -819,12 +819,12 @@ public class IdentifiersDeobfuscation {
         }
         return writer;
     }
-    
+
     public static Map<String, String> getReplacementsFromDoc(String s) throws Exception {
         ActionScriptDocParser asd = new ActionScriptDocParser();
         List<AsDocComment> comments = asd.parse(s);
         Map<String, String> replacements = new LinkedHashMap<>();
-        for (AsDocComment comment:comments) {
+        for (AsDocComment comment : comments) {
             for (AsDocTag tag : comment.tags) {
                 if ("identifier".equals(tag.tagName)) {
                     String tagText = tag.tagText;

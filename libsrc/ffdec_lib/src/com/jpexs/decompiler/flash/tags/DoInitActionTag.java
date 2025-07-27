@@ -171,7 +171,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
         return Action.actionsToSource(requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
     }
-    
+
     private boolean requiresUninitielizedClassTraitsDetection() {
         return swf.needsCalculatingAS2UninitializeClassTraits(this);
     }
@@ -301,7 +301,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(new LinkedHashSet<>(),requiresUninitielizedClassTraitsDetection(), requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(), requiresUninitielizedClassTraitsDetection(), requiresUninitielizedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

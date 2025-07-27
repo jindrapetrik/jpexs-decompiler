@@ -640,9 +640,6 @@ public class ABC implements Openable {
         }
     }
 
-    
-    
-    
     private void getObfuscatedIdentifier(int strIndex, Map<String, String> ret) {
         if (strIndex >= constants.getStringCount()) {
             return;
@@ -653,15 +650,15 @@ public class ABC implements Openable {
         String s = constants.getString(strIndex);
         if (ret.containsKey(s)) {
             return;
-        }   
-        AVM2Deobfuscation deobfuscation = getDeobfuscation();        
+        }
+        AVM2Deobfuscation deobfuscation = getDeobfuscation();
         if (deobfuscation.isValidName(strIndex)) {
             return;
         }
-        
+
         ret.put(s, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
     }
-    
+
     private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> ret) {
         if (strIndex >= constants.getStringCount()) {
             return;
@@ -672,7 +669,7 @@ public class ABC implements Openable {
         String s = constants.getString(strIndex);
         if (ret.containsKey(s)) {
             return;
-        }        
+        }
         AVM2Deobfuscation deobfuscation = getDeobfuscation();
         if (deobfuscation.isValidPackageName(strIndex)) {
             return;
@@ -682,21 +679,21 @@ public class ABC implements Openable {
         for (String part : parts) {
             if (!deobfuscation.isValidNSPart(part)) {
                 deobfuscatedList.add(IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
-                ret.put(part, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());                
+                ret.put(part, IdentifiersDeobfuscation.SAFE_STR_PREFIX + ret.size());
             } else {
                 deobfuscatedList.add(part);
             }
         }
         ret.put(s, String.join(".", deobfuscatedList));
     }
-    
+
     public void getObfuscatedIdentifiers(Map<String, String> ret) {
         for (int i = 0; i < instance_info.size(); i++) {
             InstanceInfo insti = instance_info.get(i);
             if (insti.name_index != 0) {
                 getObfuscatedIdentifier(constants.getMultiname(insti.name_index).name_index, ret);
                 if (constants.getMultiname(insti.name_index).namespace_index != 0) {
-                    getObfuscatedPackageIdentifier( constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index, ret);
+                    getObfuscatedPackageIdentifier(constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index, ret);
                 }
             }
             if (insti.super_index != 0) {
@@ -706,7 +703,7 @@ public class ABC implements Openable {
                 getObfuscatedIdentifier(constants.getMultiname(iface).name_index, ret);
             }
         }
-        
+
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             Multiname m = constants.getMultiname(i);
             int strIndex = m.name_index;
@@ -720,9 +717,9 @@ public class ABC implements Openable {
                 continue;
             }
             getObfuscatedPackageIdentifier(constants.getNamespace(i).name_index, ret);
-        }               
+        }
     }
-    
+
     /**
      * Deobfuscates identifiers.
      *
@@ -868,9 +865,10 @@ public class ABC implements Openable {
     public boolean hasFloatSupport() {
         return minVersionCheck(47, 16);
     }
-    
+
     /**
      * Checks whether the ABC has float4 support
+     *
      * @return Whether the ABC has float4 support
      */
     public boolean hasFloat4Support() {

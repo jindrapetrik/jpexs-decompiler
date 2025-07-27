@@ -699,7 +699,7 @@ public class Multiname {
             return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
-    
+
     /**
      * Gets the name with custom namespace.
      *
@@ -741,7 +741,7 @@ public class Multiname {
                 DottedChain dc = getNameWithNamespace(usedDeobfuscations, abc, abc.constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(usedDeobfuscations, abc.getSwf(), true);
             }
-            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations,true, name)) + (withSuffix ? getNamespaceSuffix() : "");
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
 
@@ -773,13 +773,13 @@ public class Multiname {
                 NamespaceSet nss = getNamespaceSet(constants);
                 if (nss != null) {
                     if (nss.namespaces.length == 1) {
-                        ns = constants.getNamespace(nss.namespaces[0]);                        
+                        ns = constants.getNamespace(nss.namespaces[0]);
                     }
                 }
-            }            
+            }
             if (ns != null && (ns.kind == Namespace.KIND_PACKAGE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 isPublic = true;
-            } 
+            }
             if (isPublic && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
                 DottedChain dc = getNameWithNamespace(usedDeobfuscations, abc, constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(usedDeobfuscations, abc.getSwf(), true);
@@ -1032,8 +1032,8 @@ public class Multiname {
     }
 
     /**
-     * Checks if this multiname is effectively a QName. Effectively means that it
-     * is a QName or QNameA or MULTINAME with only one namespace.
+     * Checks if this multiname is effectively a QName. Effectively means that
+     * it is a QName or QNameA or MULTINAME with only one namespace.
      *
      * @param thisCpool This constant pool
      * @return True if it's effectively a QName

@@ -162,7 +162,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     super.paint(g, c);
                 }
             });
-            setCellRenderer(new MyTreeCellRenderer());            
+            setCellRenderer(new MyTreeCellRenderer());
             setInvokesStopCellEditing(true);
 
         }
@@ -917,7 +917,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     if (di.exportName()) {
                         valStr += " = " + escapeHtml(Helper.escapeExportname(swf, val.toString(), true));
                     } else {
-                        valStr += " = " + escapeHtml("\"" + Helper.escapePCodeString(val.toString()) +"\"");
+                        valStr += " = " + escapeHtml("\"" + Helper.escapePCodeString(val.toString()) + "\"");
                         //escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(new LinkedHashSet<>(), swf, di.as3()));
                     }
                 } else if (val instanceof byte[]) {
@@ -932,7 +932,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             return getNameType(fieldIndex) + valStr;
         }
-        
+
         private String escapeHtml(String val) {
             return val.replace("&", "&amp;")
                     .replace("<", "&lt;")
@@ -977,7 +977,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
 
             String typeStr = type.getSimpleName();
-            
+
             if ("RGB".equals(typeStr)) {
                 try {
                     Object val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
@@ -1627,7 +1627,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if ((obj instanceof CLIPACTIONS) && (v instanceof CLIPACTIONRECORD)) {
                     ((CLIPACTIONRECORD) v).setParentClipActions((CLIPACTIONS) obj);
                 }
-                
+
                 //Hack to set GRADRECORD to RGB or RGBA based on shape num
                 if (v instanceof GRADRECORD) {
                     GRADRECORD grad = (GRADRECORD) v;

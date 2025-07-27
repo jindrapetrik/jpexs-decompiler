@@ -27,14 +27,15 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class ActionScriptDocParser {
+
     public List<AsDocComment> parse(String str) {
-        List<AsDocComment> comments  = new ArrayList<>();
+        List<AsDocComment> comments = new ArrayList<>();
         ActionScriptDocLexer lexer = new ActionScriptDocLexer(str);
         try {
             ParsedSymbol s = lexer.yylex();
             String startText = null;
             List<AsDocTag> tags = new ArrayList<>();
-            while(s.type != SymbolType.EOF) {
+            while (s.type != SymbolType.EOF) {
                 if (s.type == SymbolType.DOC_BEGIN) {
                     startText = s.text;
                 }
@@ -49,7 +50,7 @@ public class ActionScriptDocParser {
                 s = lexer.yylex();
             }
         } catch (IOException | AsDocParseException ex) {
-            
+            //ignored
         }
         return comments;
     }

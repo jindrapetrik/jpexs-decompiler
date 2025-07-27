@@ -85,7 +85,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             setSize(d);
         }
         reset();
-           }
+    }
 
     @Override
     public void reset() {
@@ -120,7 +120,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
                     //DottedChain.parsePrintable(newValue).toRawString();
                 }
             }
-            
+
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
@@ -177,9 +177,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public Object getObject() {
         return obj;
     }
-    
+
     @Override
     public void setValueNormalizer(ValueNormalizer normalizer) {
-    
-    }  
+
+    }
 }

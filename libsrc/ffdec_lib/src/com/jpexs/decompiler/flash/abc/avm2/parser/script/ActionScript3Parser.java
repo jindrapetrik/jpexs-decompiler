@@ -701,7 +701,8 @@ public class ActionScript3Parser {
             //s = lex();
 
             ParsedSymbol s = lex();
-            loops: while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
+            loops:
+            while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -2753,7 +2754,7 @@ public class ActionScript3Parser {
     }
 
     private ActionScriptLexer lexer = null;
-    
+
     private Map<String, String> replacements = new LinkedHashMap<>();
 
     private List<String> constantPool;
@@ -3024,11 +3025,11 @@ public class ActionScript3Parser {
      * @throws CompilationException On compilation error
      * @throws InterruptedException On interrupt
      */
-    public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {        
+    public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         try {
             replacements = IdentifiersDeobfuscation.getReplacementsFromDoc(s);
         } catch (Exception ex) {
-           throw new AVM2ParseException(ex.getMessage(), -1);
+            throw new AVM2ParseException(ex.getMessage(), -1);
         }
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);

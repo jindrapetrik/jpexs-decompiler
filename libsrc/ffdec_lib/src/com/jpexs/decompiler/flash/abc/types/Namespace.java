@@ -181,9 +181,9 @@ public class Namespace {
 
     /**
      * To string.
-     * 
+     *
      * @param usedDeobfuscations Used deobuscations
-     * @param ABC abc
+     * @param abc ABC
      * @param constants Constant pool
      * @return String representation
      */

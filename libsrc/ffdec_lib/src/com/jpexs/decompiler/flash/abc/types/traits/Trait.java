@@ -422,7 +422,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 imports.add(d.getId());
             }
         }
-        
+
         List<String> importedNames = new ArrayList<>();
 
         importedNames.addAll(Arrays.asList(builtInClasses));
@@ -485,13 +485,13 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight("import ");
 
                 if (imp.size() > 1) {
-                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(usedDeobfuscations,abc.getSwf(), true));
+                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(usedDeobfuscations, abc.getSwf(), true));
                     writer.appendNoHilight(".");
                 }
                 if ("*".equals(imp.getLast())) {
                     writer.appendNoHilight("*");
                 } else {
-                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(),usedDeobfuscations, true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
                 }
                 writer.appendNoHilight(";").newLine();
                 hasImport = true;
@@ -676,7 +676,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                 }
 
-                if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {                                    
+                if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                     String nsPrefix = Namespace.getPrefix(nskind);
                     if (nsPrefix != null && !nsPrefix.isEmpty()) {
                         writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
@@ -888,8 +888,8 @@ public abstract class Trait implements Cloneable, Serializable {
             }
             writer.startBlock();
             List<Trait> traits = new ArrayList<>();
-            traits.add(this);           
-            writeImports(usedDeobfuscations, traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);        
+            traits.add(this);
+            writeImports(usedDeobfuscations, traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
             toString(usedDeobfuscations, swfVersion, abcIndex, name.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
@@ -900,7 +900,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Converts trait including package.
      *
-     * @param usedDeobfuscations  Used deobfuscations
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion
      * @param abcIndex ABC indexing
      * @param parent Parent trait

@@ -52,7 +52,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 
     private boolean flat = true;
-    
+
     private SWF swf;
 
     public List<ScriptPack> getList() {
@@ -293,6 +293,6 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     @Override
     protected SWF getSwf() {
-       return swf;
+        return swf;
     }
 }

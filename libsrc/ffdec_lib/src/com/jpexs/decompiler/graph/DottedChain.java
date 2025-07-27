@@ -534,7 +534,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     /**
      * To raw string. (without deobfuscation)
      *
-     * @param swf SWF
      * @return Raw string
      */
     public String toRawString() { //Is SUFFIX correctly handled?

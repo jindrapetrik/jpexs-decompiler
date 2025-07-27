@@ -2042,7 +2042,7 @@ public class AVM2Code implements Cloneable {
         }
         if (debugMode) {
             System.err.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
-        }       
+        }
     }
 
     /**
@@ -2083,7 +2083,7 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof SetLocalTypeIns) {
                 if (prev != null) {
                     if (prev.definition instanceof CoerceOrConvertTypeIns) {
-                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(usedDeobfuscations,abc, constants, prev));
+                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(usedDeobfuscations, abc, constants, prev));
                     }
                 }
             }
@@ -3648,7 +3648,7 @@ public class AVM2Code implements Cloneable {
                     cnt++;
                 }
             }
-            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {                
+            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {
                 ins.setIgnored(true, 0);
                 if (minChangedIp == -1 || minChangedIp > i) {
                     minChangedIp = i;
@@ -3663,23 +3663,24 @@ public class AVM2Code implements Cloneable {
 
         return cnt;
     }
-    
+
     /**
      * Removes label and debugline instructions
+     *
      * @param body Method body
      * @return Number of removed instructions
-     * @throws InterruptedException 
+     * @throws InterruptedException
      */
-    public int removeLabelsAndDebugLine(MethodBody body) throws InterruptedException {        
+    public int removeLabelsAndDebugLine(MethodBody body) throws InterruptedException {
         int cnt = 0;
         for (int i = code.size() - 1; i >= 0; i--) {
-            AVM2Instruction ins = code.get(i);            
-            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {                
+            AVM2Instruction ins = code.get(i);
+            if ((ins.definition instanceof LabelIns) || (ins.definition instanceof DebugLineIns)) {
                 ins.setIgnored(true, 0);
                 cnt++;
             }
         }
-        removeIgnored(body);       
+        removeIgnored(body);
         return cnt;
     }
 

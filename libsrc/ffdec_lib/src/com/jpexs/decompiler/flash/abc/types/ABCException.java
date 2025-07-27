@@ -71,6 +71,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -80,8 +81,9 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * To string.
+     *
      * @param usedDeobfuscations Used deobfuscations
-     * @param ABC abc
+     * @param abc ABC
      * @param constants AVM2 constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -92,6 +94,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * To string.
+     *
      * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param constants AVM2 constant pool
@@ -109,6 +112,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * Checks if exception is finally.
+     *
      * @return True if exception is finally
      */
     public boolean isFinally() {
@@ -117,6 +121,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * Gets variable name.
+     *
      * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param constants AVM2 constant pool
@@ -132,6 +137,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * Gets type name.
+     *
      * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param constants AVM2 constant pool
@@ -147,6 +153,7 @@ public class ABCException implements Serializable, Cloneable {
 
     /**
      * Clones exception.
+     *
      * @return Cloned exception
      */
     @Override

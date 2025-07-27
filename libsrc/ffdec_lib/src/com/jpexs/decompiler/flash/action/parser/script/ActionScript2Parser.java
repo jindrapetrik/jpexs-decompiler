@@ -256,12 +256,12 @@ public class ActionScript2Parser {
      * Charset
      */
     private String charset;
-    
+
     /**
      * SWF
      */
     private SWF swf;
-    
+
     /**
      * Obfuscation identifiers replacements
      */
@@ -1821,7 +1821,7 @@ public class ActionScript2Parser {
                     //Both ASs
                     case "dup":
                         ret = new DuplicateItem(DIALECT, null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
-                        allowMemberOrCall = true;                        
+                        allowMemberOrCall = true;
                         break;
                     case "push":
                         ret = new PushItem(expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
@@ -2210,13 +2210,13 @@ public class ActionScript2Parser {
      * @throws InterruptedException On interrupt
      */
     public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException, InterruptedException {
-        
+
         try {
             replacements = IdentifiersDeobfuscation.getReplacementsFromDoc(str);
         } catch (Exception ex) {
-           throw new ActionParseException(ex.getMessage(), -1);
+            throw new ActionParseException(ex.getMessage(), -1);
         }
-        
+
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));

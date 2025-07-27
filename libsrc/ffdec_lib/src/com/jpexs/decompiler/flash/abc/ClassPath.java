@@ -43,7 +43,7 @@ public class ClassPath implements Serializable {
      * Namespace suffix
      */
     public final String namespaceSuffix;
-    
+
     /**
      * SWF
      */
@@ -55,7 +55,7 @@ public class ClassPath implements Serializable {
      * @param packageStr Package name
      * @param className Class name
      * @param namespaceSuffix Namespace suffix
-     * @param SWF swf
+     * @param swf SWF
      */
     public ClassPath(DottedChain packageStr, String className, String namespaceSuffix, SWF swf) {
         this.packageStr = packageStr == null ? DottedChain.TOPLEVEL : packageStr;

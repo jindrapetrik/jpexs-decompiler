@@ -220,7 +220,7 @@ public class ButtonAction implements ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(new LinkedHashSet<>(),false, new HashMap<>(), false, false, getActions(), buttonTag.getSwf().version, 0, getScriptName(), buttonTag.getSwf().getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(), false, new HashMap<>(), false, false, getActions(), buttonTag.getSwf().version, 0, getScriptName(), buttonTag.getSwf().getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }
