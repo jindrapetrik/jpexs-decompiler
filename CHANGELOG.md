@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#2478] Simple editor - remembering last frame / timeline
 - Optional heap memory status widget in the titlebar
 - [#2485] Show variable name in the text tree node label
+- Deobfuscate identifiers option - non destructible renaming identifiers for display purposes
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

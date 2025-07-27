@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -52,6 +53,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -123,6 +125,9 @@ public class SoundExporter {
             Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag) st).getClassNames() : new HashSet<>();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
+                    if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), st.getSwf(), true);
+                    }
                     File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
                     new RetryTask(() -> {
                         Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
