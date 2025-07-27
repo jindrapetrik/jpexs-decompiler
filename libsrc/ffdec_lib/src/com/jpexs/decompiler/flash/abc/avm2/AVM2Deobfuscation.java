@@ -17,9 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
-import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
-import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
-import static com.jpexs.decompiler.flash.IdentifiersDeobfuscation.SAFE_STRING_PREFIX;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -108,9 +105,9 @@ public class AVM2Deobfuscation {
         }
 
         if (Configuration.autoDeobfuscateIdentifiers.get() 
-                && (s.contains(SAFE_STRING_PREFIX)
-                || s.contains(SAFE_PACKAGE_PREFIX)
-                || s.contains(SAFE_CLASS_PREFIX))) {
+                && (s.contains(IdentifiersDeobfuscation.SAFE_STRING_PREFIX)
+                || s.contains(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)
+                || s.contains(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX))) {
             return false;
         }
 
@@ -261,9 +258,9 @@ public class AVM2Deobfuscation {
         String s = constants.getString(strIndex);
 
         if (Configuration.autoDeobfuscateIdentifiers.get() 
-                && (s.startsWith(SAFE_STRING_PREFIX)
-                || s.startsWith(SAFE_PACKAGE_PREFIX)
-                || s.startsWith(SAFE_CLASS_PREFIX))) {
+                && (s.startsWith(IdentifiersDeobfuscation.SAFE_STRING_PREFIX)
+                || s.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)
+                || s.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX))) {
             return false;
         }
 
