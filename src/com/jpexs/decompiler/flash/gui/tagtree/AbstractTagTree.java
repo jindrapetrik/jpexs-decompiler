@@ -868,7 +868,8 @@ public abstract class AbstractTagTree extends JTree {
         return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                 RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                 StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID
+                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
+                SetTabIndexTag.ID
         );
     }
 

@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file.
   if not, then classical escaping is performed
 - Quotes in tree node parameter values that need them
 - The label of option "automatic deobfuscation" changed to "deobfuscate code"
+- SetTabIndex tag moved from others to frames folder
 
 ### Removed
 - Resample wav to 44kHz feature from GUI

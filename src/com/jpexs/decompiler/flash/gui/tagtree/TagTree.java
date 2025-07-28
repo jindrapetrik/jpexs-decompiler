@@ -291,7 +291,8 @@ public class TagTree extends AbstractTagTree {
                 ret = Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                         RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                         StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
+                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
+                        SetTabIndexTag.ID);
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(
@@ -304,7 +305,9 @@ public class TagTree extends AbstractTagTree {
                         EnableDebuggerTag.ID, EnableDebugger2Tag.ID, EnableTelemetryTag.ID,
                         ExportAssetsTag.ID, FileAttributesTag.ID, ImportAssetsTag.ID, ImportAssets2Tag.ID,
                         JPEGTablesTag.ID, MetadataTag.ID, ProductInfoTag.ID, ProtectTag.ID, ScriptLimitsTag.ID,
-                        SetBackgroundColorTag.ID, SetTabIndexTag.ID, SymbolClassTag.ID);
+                        SetBackgroundColorTag.ID,
+                        //SetTabIndexTag.ID, 
+                        SymbolClassTag.ID);
                 break;
         }
 
