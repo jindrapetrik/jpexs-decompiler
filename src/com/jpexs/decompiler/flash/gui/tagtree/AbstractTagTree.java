@@ -379,7 +379,7 @@ public abstract class AbstractTagTree extends JTree {
                 || (t instanceof SoundStreamHead2Tag)
                 || (t instanceof DefineExternalSound)
                 || (t instanceof DefineExternalStreamSound)
-                ) {
+            ) {
             return TreeNodeType.SOUND;
         }
         
