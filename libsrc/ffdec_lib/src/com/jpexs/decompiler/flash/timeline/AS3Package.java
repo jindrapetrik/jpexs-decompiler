@@ -394,7 +394,7 @@ public class AS3Package extends AS3ClassTreeItem {
         if (flat) {
             return packageName;
         }
-        return IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), new LinkedHashSet<>(), true, packageName);
+        return IdentifiersDeobfuscation.printIdentifier(getSwf(), new LinkedHashSet<>(), true, packageName);
     }
 
     /**
