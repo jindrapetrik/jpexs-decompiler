@@ -671,7 +671,7 @@ public class IdentifiersDeobfuscation {
         }
 
         if (Configuration.autoDeobfuscateIdentifiers.get()) {
-            String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();
+            String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();            
             map.put(s, ret);
             used.add(s);
             return ret;

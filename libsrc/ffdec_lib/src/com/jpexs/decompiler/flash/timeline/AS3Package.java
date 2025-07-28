@@ -286,12 +286,7 @@ public class AS3Package extends AS3ClassTreeItem {
      * @param subPackage Subpackage
      */
     public void addSubPackage(AS3Package subPackage) {
-        if (subPackage.isDefaultPackage()) {
-            subPackages.put(DEFAULT_PACKAGE_NAME, subPackage);
-        } else {
-            subPackages.put(subPackage.getPrintableNameWithNamespaceSuffix(), subPackage);
-        }
-        //subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
+        subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
         sortedPackages = null;
     }
 
@@ -394,7 +389,8 @@ public class AS3Package extends AS3ClassTreeItem {
         if (flat) {
             return packageName;
         }
-        return IdentifiersDeobfuscation.printIdentifier(getSwf(), new LinkedHashSet<>(), true, packageName);
+        return packageName;
+        //return IdentifiersDeobfuscation.printIdentifier(getSwf(), new LinkedHashSet<>(), true, packageName);
     }
 
     /**
