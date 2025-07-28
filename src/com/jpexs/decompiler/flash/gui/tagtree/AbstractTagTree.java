@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -77,6 +78,7 @@ import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -478,6 +480,22 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.SCALING_GRID;
         }
 
+        if (t instanceof ABCContainerTag) {
+            return TreeNodeType.AS_ABC;
+        }
+        
+        if (t instanceof DefineFontAlignZonesTag) {
+            return TreeNodeType.FONT_ALIGN_ZONES;
+        }
+        
+        if (t instanceof FontInfoTag) {
+            return TreeNodeType.FONT_INFO;
+        }
+        
+        if (t instanceof DefineFontNameTag) {
+            return TreeNodeType.FONT_NAME;
+        }
+        
         if (t instanceof EndTag) {
             return TreeNodeType.END;
         }
@@ -809,6 +827,22 @@ public abstract class AbstractTagTree extends JTree {
                 || (cl == DefineFont4Tag.class)
                 || (cl == DefineCompactedFont.class)) {
             return TreeNodeType.FONT;
+        }
+        
+        if (FontInfoTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.FONT_INFO;
+        }
+        
+        if (cl == DefineFontNameTag.class) {
+            return TreeNodeType.FONT_NAME;
+        }
+        
+        if (cl == DefineFontAlignZonesTag.class) {
+            return TreeNodeType.FONT_ALIGN_ZONES;
+        }
+        
+        if (ABCContainerTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.AS_ABC;
         }
 
         // DefineText, DefineText2, DefineEditTextTag
