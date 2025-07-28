@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Unknown and errored tags moved to special folders
 - AS3 docs generator - reorganized to distinguish float and float 4 instructions,
   hilight float instruction blue
+- Icons for every tag type
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
