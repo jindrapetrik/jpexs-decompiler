@@ -56,6 +56,7 @@ All notable changes to this project will be documented in this file.
 - The hex view does not display bytes if there are too few of them
 - SymbolClass export/import did not support obfuscated names
 - Configuration TOML file encoding (UTF-8)
+- [#2496] Fonts - adding characters - truncating too wide advance widths
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3954,6 +3955,7 @@ Major version of SWF to XML export changed to 2.
 [#2493]: https://www.free-decompiler.com/flash/issues/2493
 [#1295]: https://www.free-decompiler.com/flash/issues/1295
 [#116]: https://www.free-decompiler.com/flash/issues/116
+[#2496]: https://www.free-decompiler.com/flash/issues/2496
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
