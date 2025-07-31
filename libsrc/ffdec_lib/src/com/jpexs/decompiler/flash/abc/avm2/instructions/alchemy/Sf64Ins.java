@@ -62,6 +62,7 @@ public class Sf64Ins extends InstructionDefinition implements AlchemyTypeIns {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
+        stack.moveToOutput(output, false);
         output.add(new AlchemyStoreAVM2Item(ins, localData.lineStartInstruction, value, ofs, "f", 64));
     }
 

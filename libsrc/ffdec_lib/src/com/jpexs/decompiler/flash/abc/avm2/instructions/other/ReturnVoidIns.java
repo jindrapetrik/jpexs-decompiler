@@ -49,6 +49,7 @@ public class ReturnVoidIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.moveToOutput(output, true);
         output.add(new ReturnVoidAVM2Item(ins, localData.lineStartInstruction));
     }
 

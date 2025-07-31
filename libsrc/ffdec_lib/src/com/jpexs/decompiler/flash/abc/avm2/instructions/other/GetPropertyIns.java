@@ -91,8 +91,8 @@ public class GetPropertyIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        int multinameIndex = ins.operands[0];
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        int multinameIndex = ins.operands[0];        
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
         //remove dups
         if (obj instanceof FindPropertyAVM2Item) {

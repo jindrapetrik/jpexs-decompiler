@@ -62,6 +62,8 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import java.io.Serializable;
@@ -377,7 +379,8 @@ public abstract class InstructionDefinition implements Serializable {
      * @param ins Instruction
      * @return Resolved multiname
      */
-    protected FullMultinameAVM2Item resolveMultiname(AVM2LocalData localData, boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
+    protected FullMultinameAVM2Item resolveMultiname(AVM2LocalData localData, boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<GraphTargetItem> output) {
+        stack.allowSwap(output);
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
@@ -543,15 +546,17 @@ public abstract class InstructionDefinition implements Serializable {
      * @param path Path
      */
     public void handleSetProperty(boolean init, AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.allowSwap(output);        
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
         //assembled/TestIncrement
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
             if (value.value instanceof DuplicateItem) {
                 GraphTargetItem duplicated = value.value.value;
+                stack.moveToStack(output);
                 if (!stack.isEmpty()) {
                     if (stack.peek() == duplicated) {
                         GraphTargetItem notCoerced = duplicated.getNotCoerced();
@@ -602,6 +607,7 @@ public abstract class InstructionDefinition implements Serializable {
                 GetLexAVM2Item getLex = (GetLexAVM2Item) value.value.getNotCoercedNoDup();
                 if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
                         && (obj instanceof FindPropertyAVM2Item)) {
+                    stack.moveToOutput(output, false);
                     if (hasConvert) {
                         if (isIncrement) {
                             output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
@@ -629,6 +635,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                     if (Objects.equals(getProp.object, obj)) {
+                        stack.moveToOutput(output, false);
                         if (hasConvert) {
                             if (isIncrement) {
                                 output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
@@ -652,6 +659,7 @@ public abstract class InstructionDefinition implements Serializable {
             GraphTargetItem duplicated = value.value;
             if ((duplicated instanceof IncrementAVM2Item) || (duplicated instanceof DecrementAVM2Item)) {
                 boolean isIncrement = (duplicated instanceof IncrementAVM2Item);
+                stack.moveToStack(output);
                 if (!stack.isEmpty()) {
                     if (stack.peek() == duplicated) {
                         GraphTargetItem incrementedProp = duplicated.value;
@@ -702,7 +710,8 @@ public abstract class InstructionDefinition implements Serializable {
                             boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
                             if (valueSetLocalReg.value.value instanceof DuplicateItem) {
                                 GraphTargetItem duplicated = valueSetLocalReg.value.value.value;
-                                if (!stack.isEmpty() && stack.peek() == duplicated) {
+                                if (output.size() >= 2 && output.get(output.size() - 2) instanceof PushItem && ((PushItem) output.get(output.size() - 2)).value == duplicated) {
+                                //if (!stack.isEmpty() && stack.peek() == duplicated) {
                                     GraphTargetItem notCoerced = duplicated.getNotCoerced();
                                     if (notCoerced instanceof GetPropertyAVM2Item) {
                                         GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) notCoerced;
@@ -723,7 +732,9 @@ public abstract class InstructionDefinition implements Serializable {
                                                 }
                                                 getProperty.object = objSetLocalReg.value;
                                                 output.remove(output.size() - 1);
-                                                stack.pop();
+                                                output.remove(output.size() - 1);
+                                                stack.moveToStack(output);
+                                                //stack.pop();
                                                 if (isIncrement) {
                                                     stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty));
                                                 } else {
@@ -739,6 +750,7 @@ public abstract class InstructionDefinition implements Serializable {
                     }
                 }
 
+                stack.moveToStack(output);
                 if (!stack.isEmpty()) {
                     GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
                     if (checked != null) {
@@ -758,6 +770,29 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
 
+        if (obj instanceof PopItem) {
+            if (output.size() >= 2
+                    && output.get(output.size() - 1) instanceof SetLocalAVM2Item 
+                    && output.get(output.size() - 2) instanceof PushItem
+                    && multiname.name instanceof LocalRegAVM2Item) {
+                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);                
+                LocalRegAVM2Item localReg = (LocalRegAVM2Item) multiname.name;
+                PushItem pi = (PushItem) output.get(output.size() - 2);
+                if (setLocal.regIndex == localReg.regIndex) {
+                    GraphSourceItem src = setLocal.getSrc();
+                    if (src != null) {
+                        if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {
+                            output.remove(output.size() - 1);
+                            output.remove(output.size() - 1);
+                            stack.moveToStack(output);
+                            obj = pi.value;
+                            multiname.name = setLocal.value;                            
+                        }
+                    }                    
+                }
+            }
+        }
+        
         if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {
             ConstructAVM2Item c = (ConstructAVM2Item) obj.getThroughDuplicate();
             if (c.object instanceof ApplyTypeAVM2Item) {

@@ -83,6 +83,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         localData.localRegAssignmentIps.put(regId, localData.localRegAssignmentIps.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
         if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
+            stack.moveToOutput(output, false);
             output.add(new StoreNewActivationAVM2Item(ins, localData.lineStartInstruction, regId));
             return;
         }
@@ -102,9 +103,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                             stack.pop();
                             stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
+                            stack.moveToOutput(output, false);
                             output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
+                        stack.moveToOutput(output, false);
                         output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
@@ -125,9 +128,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                             stack.pop();
                             stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
+                            stack.moveToOutput(output, false);
                             output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
+                        stack.moveToOutput(output, false);
                         output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;

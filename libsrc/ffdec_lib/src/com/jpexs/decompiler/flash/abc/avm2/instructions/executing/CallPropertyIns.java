@@ -83,7 +83,7 @@ public class CallPropertyIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
 
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);

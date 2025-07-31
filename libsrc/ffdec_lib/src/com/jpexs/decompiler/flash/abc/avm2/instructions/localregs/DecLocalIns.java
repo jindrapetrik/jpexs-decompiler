@@ -74,6 +74,7 @@ public class DecLocalIns extends InstructionDefinition {
             }
         }
         if (!isPostDec) {
+            stack.moveToOutput(output, false);
             output.add(new DecLocalAVM2Item(ins, localData.lineStartInstruction, regId));
         }
         if (localData.localRegs.containsKey(regId)) {

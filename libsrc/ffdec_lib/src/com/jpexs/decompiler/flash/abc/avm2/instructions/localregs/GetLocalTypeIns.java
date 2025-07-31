@@ -134,6 +134,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                             result = new PostDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
                                         }
                                         output.remove(output.size() - 1);
+                                        stack.moveToStack(output);
                                         stack.add(result);
                                         return;
                                     }
@@ -153,6 +154,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                             }
 
                             output.remove(output.size() - 1);
+                            stack.moveToStack(output);
 
                             if (setItem instanceof SetPropertyAVM2Item) {
                                 if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
@@ -176,7 +178,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                 }
                             }
 
-                            stack.add(setItem);
+                            stack.push(setItem);
                             return;
                         }
                     }

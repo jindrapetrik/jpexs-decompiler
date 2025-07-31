@@ -80,6 +80,7 @@ public class CallIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
+        stack.allowSwap(output);
         GraphTargetItem receiver = stack.pop();
         GraphTargetItem function = stack.pop();
 

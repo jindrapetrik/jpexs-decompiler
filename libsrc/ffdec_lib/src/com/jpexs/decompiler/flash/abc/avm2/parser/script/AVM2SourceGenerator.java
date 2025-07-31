@@ -104,6 +104,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -3579,6 +3580,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<GraphSourceItem> ret = new ArrayList<>();
         return ret;
     }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(ins(AVM2Instructions.Swap));
+        return ret;
+    }        
 
     /**
      * For some strange reasons, &amp;&amp; and || operators must have coerced

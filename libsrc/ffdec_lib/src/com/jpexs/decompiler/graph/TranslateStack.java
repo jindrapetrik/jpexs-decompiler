@@ -16,7 +16,12 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
+import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +149,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem peek() {
         if (path != null) {
             if (this.isEmpty()) {
+                /*if (connectedOutput != null && !connectedOutput.isEmpty() && connectedOutput.get(connectedOutput.size() - 1) instanceof PushItem) {
+                   PushItem pi = (PushItem) connectedOutput.get(connectedOutput.size() - 1);
+                   return pi.value;
+                }*/
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Peek empty stack", path);
                 return getPop();
             }
@@ -160,6 +169,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem peek(int index) {
         if (path != null) {
             if (index > this.size()) {
+                /*if (connectedOutput != null && connectedOutput.size() >= index - this.size() && connectedOutput.get(connectedOutput.size() - (index - this.size())) instanceof PushItem) {
+                   PushItem pi = (PushItem) connectedOutput.get(connectedOutput.size() - (index - this.size()));
+                   return pi.value;
+                }*/
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Peek item from stack", path);
                 return getPop();
             }
@@ -176,6 +189,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem pop() {
         if (path != null) {
             if (this.isEmpty()) {
+                /*if (connectedOutput != null && !connectedOutput.isEmpty() && connectedOutput.get(connectedOutput.size() - 1) instanceof PushItem) {
+                   PushItem pi = (PushItem) connectedOutput.remove(connectedOutput.size() - 1);
+                   return pi.value;
+                }*/
+                
                 PopItem oldpop = getPop();
                 pop = null;
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Pop empty stack", path);
@@ -183,5 +201,69 @@ public class TranslateStack extends Stack<GraphTargetItem> {
             }
         }
         return super.pop();
+    }
+    
+    public void moveToStack(List<GraphTargetItem> output) {
+        if (!isEmpty()) {
+            return;
+        }
+        int i = output.size() - 1;
+        for (; i >= 0; i--) {
+            if (!(output.get(i) instanceof PushItem)) {
+                break;
+            }
+        }
+        i++;
+        while(i < output.size()) {
+            PushItem pi = (PushItem) output.remove(i);
+            push(pi.value);
+        }
+    }
+    
+    public void moveToOutput(List<GraphTargetItem> output, boolean beforeExit) {
+        if (true) {
+            //return;
+        }
+        int pos = output.size();
+        
+        for (int i = size() - 1; i >= 0; i--) {
+            GraphTargetItem item = get(i);
+            if (item instanceof BranchStackResistant) {
+                continue;
+            }
+            if (item instanceof NewActivationAVM2Item) {
+                break;
+            }
+            if (item instanceof  ExceptionAVM2Item) {
+                break;
+            }
+            remove(i);
+            output.add(pos, beforeExit ? item : new PushItem(item));
+        }
+    }
+    
+    public void allowSwap(List<GraphTargetItem> output) {
+        if (!isEmpty()) {
+            return;
+        }
+        if (output.size() < 3) {
+            return;
+        }
+        if (!(output.get(output.size() - 1) instanceof SwapItem)) {
+            return;
+        }
+        
+        if (!(output.get(output.size() - 2) instanceof PushItem)) {
+            return;
+        }
+        
+        if (!(output.get(output.size() - 3) instanceof PushItem)) {
+            return;
+        }
+        
+        output.remove(output.size() - 1);
+        push(((PushItem)output.remove(output.size() - 1)).value);
+        push(((PushItem)output.remove(output.size() - 1)).value);
+        //moveToStack(output);
     }
 }

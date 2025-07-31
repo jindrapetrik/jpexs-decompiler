@@ -118,6 +118,7 @@ import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -2459,6 +2460,9 @@ public class ActionScript3Parser {
                     case "pop":
                         ret = new PopItem(DIALECT, null, null);
                         allowMemberOrCall = true;
+                        break;
+                    case "swap":
+                        ret = new SwapItem(DIALECT, null, null);
                         break;
                     case "goto": //TODO
                     case "multiname":

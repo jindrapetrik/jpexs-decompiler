@@ -1342,6 +1342,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         ret = true;
                         allowMemberOrCall = true;
                         break;
+                    case "swap":
+                        ret = true;
+                        break;
                     case "strict":
                         s = lexer.lex();
                         expected(errors, s, lexer.yyline(), SymbolType.INTEGER);

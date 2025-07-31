@@ -73,6 +73,7 @@ public interface SetTypeIns {
         if (notCoercedValue instanceof DuplicateItem) {
             GraphTargetItem insideDup = notCoercedValue.value;
             if (!AVM2Item.mustStayIntact1(insideDup.getNotCoercedNoDup())) {
+                stack.moveToStack(output);
                 if (!stack.isEmpty() && stack.peek() == insideDup) {
                     stack.pop();
 
@@ -89,6 +90,7 @@ public interface SetTypeIns {
                             value = insideDup;
                         }
                         result.value = value;
+                        stack.moveToOutput(output, false);                        
                         output.add(result);
                         for (int i = 0; i < numDups; i++) {
                             stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : value.returnType()));
@@ -109,6 +111,7 @@ public interface SetTypeIns {
                         }
 
                         if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
+                            stack.moveToOutput(output, false);                        
                             output.add(result);
                             stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : TypeItem.UNBOUNDED));
                             return;
@@ -120,6 +123,7 @@ public interface SetTypeIns {
                 }
             }
         }
+        stack.moveToOutput(output, false);                        
         output.add(result);
     }
 }

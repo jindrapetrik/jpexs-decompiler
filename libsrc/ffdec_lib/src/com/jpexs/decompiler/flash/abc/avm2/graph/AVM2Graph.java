@@ -1390,6 +1390,7 @@ public class AVM2Graph extends Graph {
                         //should not happen
                         finallyCommands.clear();
                     }
+                    stack.pop(); //duplicated switched value
                     stack.pop(); //value switched by lookupswitch                   
                 }
             }

@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
+import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -1191,7 +1193,6 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
 
     }
-    
     private int checkOffsetBounds(int offset, String errorItem, int errorLine) throws CompilationException {
         if (offset < -32768) {
             throw new CompilationException("Generated offset for " + errorItem + " is lower than mininum allowed for SI16.", errorLine);
@@ -1201,4 +1202,10 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         return offset;
     }
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new ActionStackSwap());
+        return ret;
+    }        
 }

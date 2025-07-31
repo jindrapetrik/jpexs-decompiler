@@ -20,11 +20,18 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import java.util.List;
 
 /**
@@ -55,10 +62,35 @@ public class SwapIns extends InstructionDefinition {
 
         GraphTargetItem o1 = stack.pop();
         GraphTargetItem o2 = stack.pop();
-        stack.push(o1);
-        stack.push(o2);
-        o1.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
-        o2.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+        
+        if (((o1 instanceof ExceptionAVM2Item) && (o2 instanceof ExceptionAVM2Item))
+                ||
+                (
+                (
+                    ((o1 instanceof SimpleValue) && ((SimpleValue) o1).isSimpleValue() && !(o1 instanceof DuplicateItem))
+                    ||
+                    (o1 instanceof EscapeXAttrAVM2Item)
+                )
+                &&
+                (
+                    ((o2 instanceof SimpleValue) && ((SimpleValue) o2).isSimpleValue() && !(o2 instanceof DuplicateItem))
+                    ||
+                    (o2 instanceof EscapeXAttrAVM2Item)
+                )
+                
+                )                
+            ) {
+            stack.push(o1);
+            stack.push(o2);
+            o1.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+            o2.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+            return;
+        }
+        
+        stack.moveToOutput(output, false);
+        output.add(new PushItem(o2));
+        output.add(new PushItem(o1));
+        output.add(new SwapItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction));        
     }
 
     @Override
