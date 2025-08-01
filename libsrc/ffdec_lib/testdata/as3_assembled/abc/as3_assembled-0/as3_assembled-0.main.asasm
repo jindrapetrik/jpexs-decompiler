@@ -41,5 +41,6 @@ program
  #include "tests/TestAlwaysBreak2.script.asasm"
  #include "tests/TestPushPlacement.script.asasm"
  #include "tests/TestConstructDynamically.script.asasm"
+ #include "tests/TestCollidingPublicTraits.script.asasm"
  ; place to add next
 end ; program

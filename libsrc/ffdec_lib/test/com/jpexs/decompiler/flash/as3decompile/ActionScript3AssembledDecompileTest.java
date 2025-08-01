@@ -91,6 +91,13 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testCollidingPublicTraits() {
+        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#87);\r\n"
+                + "trace(\"ns2 = \" + this.a#88);\r\n",
+                 false);
+    }
+
+    @Test
     public void testDeclareReg() {
         decompileMethod("assembled", "testDeclareReg", "var other:XML;\r\n"
                 + "with(other)\r\n"

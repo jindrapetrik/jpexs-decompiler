@@ -174,6 +174,14 @@ public class Multiname {
     public void setDisplayNamespace(boolean displayNamespace) {
         this.displayNamespace = displayNamespace;
     }
+    
+    /**
+     * Checks whether this multiname displays its namespace as #suffix
+     * @return True when displays
+     */
+    public boolean doesDisplayNamespace() {
+        return displayNamespace;
+    }
 
     /**
      * Checks if the multiname kind is valid.

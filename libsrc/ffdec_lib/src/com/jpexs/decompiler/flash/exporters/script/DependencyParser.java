@@ -140,7 +140,7 @@ public class DependencyParser {
             Namespace ns = m.getNamespace(abc.constants);
             String name = m.getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
-            if (ns != null) {
+            if (ns != null && !m.doesDisplayNamespace()) {
                 parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, m.namespace_index, ignorePackage, name, dependencyType, uses);
             }
             if (nss != null) {
