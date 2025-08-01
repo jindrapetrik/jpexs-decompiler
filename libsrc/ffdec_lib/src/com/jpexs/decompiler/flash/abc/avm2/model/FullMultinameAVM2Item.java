@@ -212,7 +212,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     writer.append("*");
                 } else {
                     Reference<DottedChain> customNsRef = new Reference<>(null);
-                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, fullyQualifiedNames, false, true, customNsRef);
                     DottedChain customNs = customNsRef.getVal();
                     if (customNs != null) {
                         String nsname = customNs.getLast();

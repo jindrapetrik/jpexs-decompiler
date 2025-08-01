@@ -52,7 +52,7 @@ public class MethodNameMultinameUsage extends MethodMultinameUsage implements De
         if ((other instanceof MethodNameMultinameUsage) || (other instanceof ConstVarNameMultinameUsage)) {
             TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
             if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
-                if (other.sameMultinameName(this)) {
+                if (other.sameMultinameName(this, false)) {
 
                     if (other instanceof MethodNameMultinameUsage) {
                         MethodNameMultinameUsage otherM = (MethodNameMultinameUsage) other;

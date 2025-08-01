@@ -89,7 +89,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
             }
         }
         if (other instanceof ClassNameMultinameUsage) {
-            return sameMultinameName(other);
+            return sameMultinameName(other, true);
         }
         return false;
     }
