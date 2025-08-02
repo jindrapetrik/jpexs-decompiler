@@ -61,6 +61,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
@@ -697,19 +698,19 @@ public abstract class InstructionDefinition implements Serializable {
             if (multiname.name instanceof LocalRegAVM2Item) {
                 nameLocalReg = (LocalRegAVM2Item) multiname.name;
             }
-            if (obj instanceof LocalRegAVM2Item) {
-                LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
-
-                if (!output.isEmpty()) {
-                    if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
-                        SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) output.get(output.size() - 1);
+            if (obj instanceof CommaExpressionItem) {
+                CommaExpressionItem ce = (CommaExpressionItem) obj;
+                if (ce.commands.size() == 2) {
+                    if (ce.commands.get(0) instanceof SetLocalAVM2Item && ce.commands.get(1) instanceof LocalRegAVM2Item) {
+                        SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) ce.commands.get(0);
+                        LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) ce.commands.get(1);    
                         if ((valueSetLocalReg.value instanceof IncrementAVM2Item)
                                 || (valueSetLocalReg.value instanceof DecrementAVM2Item)) {
                             boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
                             if (valueSetLocalReg.value.value instanceof DuplicateItem) {
                                 GraphTargetItem duplicated = valueSetLocalReg.value.value.value;
-                                if (output.size() >= 2 && output.get(output.size() - 2) instanceof PushItem && ((PushItem) output.get(output.size() - 2)).value == duplicated) {
-                                //if (!stack.isEmpty() && stack.peek() == duplicated) {
+                                //if (!output.isEmpty() && output.get(output.size() - 1) instanceof PushItem && ((PushItem) output.get(output.size() - 1)).value == duplicated) {
+                                if (!stack.isEmpty() && stack.peek() == duplicated) {
                                     GraphTargetItem notCoerced = duplicated.getNotCoerced();
                                     if (notCoerced instanceof GetPropertyAVM2Item) {
                                         GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) notCoerced;
@@ -729,10 +730,10 @@ public abstract class InstructionDefinition implements Serializable {
                                                     propertyName.name = nameSetLocalReg.value;
                                                 }
                                                 getProperty.object = objSetLocalReg.value;
-                                                output.remove(output.size() - 1);
-                                                output.remove(output.size() - 1);
-                                                stack.moveToStack(output);
-                                                //stack.pop();
+                                                //output.remove(output.size() - 1);
+                                                //output.remove(output.size() - 1);
+                                                //stack.moveToStack(output);
+                                                stack.pop();
                                                 if (isIncrement) {
                                                     stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty));
                                                 } else {
@@ -748,21 +749,25 @@ public abstract class InstructionDefinition implements Serializable {
                     }
                 }
 
-                stack.moveToStack(output);
-                if (!stack.isEmpty()) {
-                    GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
-                    if (checked != null) {
-                        stack.pop();
-                        stack.push(checked);
-                        return;
+                if (obj instanceof LocalRegAVM2Item) {
+                    LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
+
+                    stack.moveToStack(output);
+                    if (!stack.isEmpty()) {
+                        GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
+                        if (checked != null) {
+                            stack.pop();
+                            stack.push(checked);
+                            return;
+                        }
                     }
-                }
-                if (!output.isEmpty()) {
-                    GraphTargetItem checked = checkIncDec(true, multinameIndex, ins, localData, output.get(output.size() - 1), valueLocalReg, nameLocalReg, objLocalReg);
-                    if (checked != null) {
-                        output.remove(output.size() - 1);
-                        output.add(checked);
-                        return;
+                    if (!output.isEmpty()) {
+                        GraphTargetItem checked = checkIncDec(true, multinameIndex, ins, localData, output.get(output.size() - 1), valueLocalReg, nameLocalReg, objLocalReg);
+                        if (checked != null) {
+                            output.remove(output.size() - 1);
+                            output.add(checked);
+                            return;
+                        }
                     }
                 }
             }
