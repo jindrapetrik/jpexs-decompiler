@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,10 @@ import java.util.Set;
 public class ActionNop extends Action {
 
     /**
-     * Constructor.
-     * @param charset Charset
+     * Constructor.     
      */
-    public ActionNop(String charset) {
-        super(-1, 0, charset);
+    public ActionNop() {
+        super(-1, 0, Utf8Helper.charsetName);
     }
 
     /**

@@ -284,14 +284,14 @@ public class TryActionItem extends ActionItem implements Block {
                         fullCatchBody.addAll(0, GraphTargetItem.toSourceMerge(localData, generator,
                                 new DirectValueActionItem(new RegisterNumber(catchRegister)),
                                 ename,
-                                new ActionStackSwap(charset),
+                                new ActionStackSwap(),
                                 new ActionDefineLocal(),
                                 ebody
                         ));
                     } else {
                         List<GraphSourceItem> ifBody = GraphTargetItem.toSourceMerge(localData, generator,
                                 ename,
-                                new ActionStackSwap(charset),
+                                new ActionStackSwap(),
                                 new ActionDefineLocal(),
                                 ebody);
                         fullCatchBody.add(0, new ActionPop());
@@ -306,7 +306,7 @@ public class TryActionItem extends ActionItem implements Block {
                                         etype,
                                         new ActionPush(new RegisterNumber(catchRegister), charset),
                                         new ActionCastOp(),
-                                        new ActionPushDuplicate(charset),
+                                        new ActionPushDuplicate(),
                                         new ActionPush(Null.INSTANCE, charset),
                                         new ActionEquals2(),
                                         new ActionIf(ifBodySize, charset)

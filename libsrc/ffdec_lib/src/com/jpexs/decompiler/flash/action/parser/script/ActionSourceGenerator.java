@@ -769,7 +769,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        ret.add(new ActionPushDuplicate(charset));
+        ret.add(new ActionPushDuplicate());
         ret.add(new ActionNot());
         List<Action> andExpr = generateToActionList(localData, item.rightSide);
         andExpr.add(0, new ActionPop());
@@ -784,7 +784,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
-        ret.add(new ActionPushDuplicate(charset));
+        ret.add(new ActionPushDuplicate());
         List<Action> orExpr = generateToActionList(localData, item.rightSide);
         orExpr.add(0, new ActionPop());
         int orExprLen = Action.actionsToBytes(orExpr, false, SWF.DEFAULT_VERSION).length;
@@ -1016,7 +1016,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item) {
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(new ActionPushDuplicate(charset));
+        ret.add(new ActionPushDuplicate());
         return ret;
     }
 

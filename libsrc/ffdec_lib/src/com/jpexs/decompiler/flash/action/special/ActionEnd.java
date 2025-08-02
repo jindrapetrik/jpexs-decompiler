@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +39,9 @@ public class ActionEnd extends Action {
 
     /**
      * Constructor.
-     * @param charset Charset
      */
-    public ActionEnd(String charset) {
-        super(0, 0, charset);
+    public ActionEnd() {
+        super(0, 0, Utf8Helper.charsetName);
         setIgnored(true, 0);
     }
 

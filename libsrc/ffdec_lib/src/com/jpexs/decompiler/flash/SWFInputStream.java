@@ -1928,7 +1928,7 @@ public class SWFInputStream implements AutoCloseable {
         try {
             actionCode = readUI8("actionCode");
             if (actionCode == 0) {
-                return new ActionEnd(getCharset());
+                return new ActionEnd();
             }
             if (actionCode == -1) {
                 return null;
@@ -1980,7 +1980,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x0D:
                     return new ActionDivide();
                 case 0x0E:
-                    return new ActionEquals(getCharset());
+                    return new ActionEquals();
                 case 0x0F:
                     return new ActionLess();
                 case 0x10:
@@ -2115,11 +2115,11 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x50:
                     return new ActionIncrement();
                 case 0x4C:
-                    return new ActionPushDuplicate(getCharset());
+                    return new ActionPushDuplicate();
                 case 0x3E:
                     return new ActionReturn();
                 case 0x4D:
-                    return new ActionStackSwap(getCharset());
+                    return new ActionStackSwap();
                 case 0x87:
                     return new ActionStoreRegister(actionLength, this);
                 // SWF6 Actions

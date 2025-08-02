@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +43,9 @@ public class ActionStackSwap extends Action {
     /**
      * Constructor.
      *
-     * @param charset Charset
      */
-    public ActionStackSwap(String charset) {
-        super(0x4D, 0, charset);
+    public ActionStackSwap() {
+        super(0x4D, 0, Utf8Helper.charsetName);
     }
 
     @Override

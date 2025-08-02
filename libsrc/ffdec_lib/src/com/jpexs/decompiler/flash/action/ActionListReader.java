@@ -144,7 +144,7 @@ public class ActionListReader {
         Action lastAction = actionMap.get(addresses.get(addresses.size() - 1));
         long endAddress;
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(sis.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(nextOffsets.get(lastAction.getAddress()));
             endAddress = aEnd.getAddress();
             actionMap.put(aEnd.getAddress(), aEnd);
@@ -703,7 +703,7 @@ public class ActionListReader {
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(actions.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(lastAction.getAddress() + lastAction.getTotalActionLength());
             actions.add(aEnd);
             lastAction = aEnd;
@@ -769,7 +769,7 @@ public class ActionListReader {
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(actions.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(lastAction.getAddress() + lastAction.getTotalActionLength());
             actions.add(aEnd);
             lastAction = aEnd;

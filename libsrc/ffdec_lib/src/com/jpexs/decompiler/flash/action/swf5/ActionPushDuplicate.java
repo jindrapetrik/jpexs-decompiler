@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +45,9 @@ public class ActionPushDuplicate extends Action {
     /**
      * Constructor.
      *
-     * @param charset Charset
      */
-    public ActionPushDuplicate(String charset) {
-        super(0x4C, 0, charset);
+    public ActionPushDuplicate() {
+        super(0x4C, 0, Utf8Helper.charsetName);
     }
 
     @Override
