@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
@@ -82,9 +83,13 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     @Override
     public GraphTargetItem push(GraphTargetItem item) {
         if (!outputQueue.isEmpty()) {
-            outputQueue.add(item);
-            item = new CommaExpressionItem(item.dialect, null, item.lineStartItem, outputQueue);
-            outputQueue = new ArrayList<>();
+            if (item instanceof FindPropertyAVM2Item) {
+                finishBlock(connectedOutput);
+            } else {
+                outputQueue.add(item);                                    
+                item = new CommaExpressionItem(item.dialect, null, item.lineStartItem, outputQueue);
+                outputQueue = new ArrayList<>();
+            }
         }
         if (connectedOutput != null && item != null) {
             item.outputPos = prevOutputSize + connectedOutput.size();
@@ -288,13 +293,14 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                 continue;
             }
             output.add(pos, beforeExit ? item : new PushItem(item));
-        }*/
-        
-        output.addAll(outputQueue);
-        outputQueue.clear();
+        }*/                
         
         int clen = output.size();
         boolean isExit = false;
+        
+        if (!outputQueue.isEmpty() && outputQueue.get(outputQueue.size() - 1) instanceof ExitItem) {
+            isExit = true;
+        }
         if (clen > 0) {
             if (output.get(clen - 1) instanceof ScriptEndItem) {
                 clen--;
@@ -337,7 +343,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                     output.add(clen, new PushItem(p));
                 }
             }
-        }
+        }                
+        
+        output.addAll(outputQueue);
+        outputQueue.clear();
     }
     
     public void allowSwap(List<GraphTargetItem> output) {

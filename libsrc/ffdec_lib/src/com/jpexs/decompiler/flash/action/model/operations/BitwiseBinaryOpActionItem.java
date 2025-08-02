@@ -61,6 +61,6 @@ public abstract class BitwiseBinaryOpActionItem extends BinaryOpItem implements 
                 return;
             }
         }
-        operand.toString(writer, localData, "");
+        operand.toString(writer, localData, "", false);
     }
 }

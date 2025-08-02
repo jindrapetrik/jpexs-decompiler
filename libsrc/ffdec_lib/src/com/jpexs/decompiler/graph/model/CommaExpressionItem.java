@@ -59,6 +59,17 @@ public class CommaExpressionItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (commands.isEmpty()) {
+            return writer;
+        }
+        writer.append("(");
+        appendNoParenthesis(writer, localData);
+        writer.append(")");
+        return writer;
+    }
+
+    @Override
+    public GraphTextWriter appendNoParenthesis(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (t.isEmpty()) {
@@ -72,6 +83,8 @@ public class CommaExpressionItem extends GraphTargetItem {
         }
         return writer;
     }
+    
+    
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

@@ -61,6 +61,6 @@ public abstract class BitwiseBinaryOpAVM2Item extends BinaryOpItem implements Co
                 return;
             }
         }
-        operand.toString(writer, localData, "");
+        operand.toString(writer, localData, "", false);
     }
 }

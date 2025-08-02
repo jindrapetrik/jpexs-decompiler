@@ -2390,6 +2390,7 @@ public class Graph {
      */
     protected final void translatePart(List<GraphTargetItem> output, BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         List<GraphPart> sub = part.getSubParts();
+        stack.setConnectedOutput(0, output);
         int end;
         for (GraphPart p : sub) {
             if (p.end == -1) {

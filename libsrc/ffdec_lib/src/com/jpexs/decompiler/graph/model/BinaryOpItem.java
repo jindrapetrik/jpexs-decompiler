@@ -140,7 +140,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
      * @throws InterruptedException On interrupt
      */
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        operand.toString(writer, localData, "");
+        operand.toString(writer, localData, "", false);
     }
 
     @Override

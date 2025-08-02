@@ -47,9 +47,16 @@ public class ParenthesisItem extends GraphTargetItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("(");
-        value.toString(writer, localData);
+        appendNoParenthesis(writer, localData);
         return writer.append(")");
     }
+
+    @Override
+    public GraphTextWriter appendNoParenthesis(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        value.toString(writer, localData);
+        return writer;
+    }   
+    
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

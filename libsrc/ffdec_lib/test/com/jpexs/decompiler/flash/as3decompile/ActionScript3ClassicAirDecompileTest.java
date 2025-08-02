@@ -177,7 +177,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testComma() {
         decompileMethod("classic_air", "testComma", "var a:int = 5;\r\n"
                 + "var b:int = 0;\r\n"
-                + "trace(a > 4 ? (b = 5, a) : 35);\r\n",
+                + "trace(a > 4 ? (b = 5,a) : 35);\r\n",
                  false);
     }
 
@@ -529,9 +529,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testDotParent() {
         decompileMethod("classic_air", "testDotParent", "var d:* = new TestClass1();\r\n"
                 + "var k:* = null;\r\n"
-                + "k.(d.attrib++, false);\r\n"
+                + "k.(d.attrib++,false);\r\n"
                 + "trace(\"between\");\r\n"
-                + "var g:* = k.(d.attrib++, false);\r\n"
+                + "var g:* = k.(d.attrib++,false);\r\n"
                 + "trace(\"end\");\r\n",
                  false);
     }
@@ -2108,7 +2108,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "break;\r\n"
                 + "case \"B\":\r\n"
                 + "trace(\"is B\");\r\n"
-                + "case 7, \"C\":\r\n"
+                + "case 7,\"C\":\r\n"
                 + "trace(\"is C\");\r\n"
                 + "}\r\n",
                  false);

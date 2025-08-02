@@ -45,6 +45,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
@@ -107,10 +108,20 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
 
+        GraphTargetItem type = TypeItem.UNBOUNDED;
+
+        if (localData.localRegTypes.containsKey(regId)) {
+            type = localData.localRegTypes.get(regId);
+        } else if (computedValue != null) {
+            type = computedValue.returnType();
+        }
+        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type));
+        
         //chained assignments and/or ASC post/pre increment
-        if (!output.isEmpty()) {
-            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
-                GraphTargetItem setItem = output.get(output.size() - 1);
+        if (stack.peek() instanceof CommaExpressionItem) {
+            CommaExpressionItem ce = (CommaExpressionItem) stack.peek();
+            if (ce.commands.size() == 2 && ce.commands.get(0) instanceof SetTypeAVM2Item) {
+                GraphTargetItem setItem = ce.commands.get(0);
                 if ((setItem instanceof SetPropertyAVM2Item)
                         && ((setItem.value.getNotCoerced() instanceof DecrementAVM2Item)
                         || (setItem.value.getNotCoerced() instanceof IncrementAVM2Item))) {
@@ -133,9 +144,10 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                         } else {
                                             result = new PostDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
                                         }
-                                        output.remove(output.size() - 1);
-                                        stack.moveToStack(output);
-                                        stack.add(result);
+                                        //output.remove(output.size() - 1);
+                                        //stack.moveToStack(output);
+                                        stack.pop();
+                                        stack.push(result);
                                         return;
                                     }
                                 }
@@ -153,6 +165,53 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                 setItem.value = setLocal.value;
                             }
 
+                            //output.remove(output.size() - 1);
+                            //stack.moveToStack(output);
+                            stack.pop();
+
+                            if (setItem instanceof SetPropertyAVM2Item) {
+                                if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
+                                    boolean isIncrement = (setItem.value instanceof IncrementAVM2Item);
+                                    if (setItem.value.value instanceof GetPropertyAVM2Item) {
+                                        SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
+                                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
+                                        if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                            if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
+                                                if (getProp.object instanceof DuplicateItem) {
+                                                    getProp.object = getProp.object.value;
+                                                }
+                                                if (isIncrement) {
+                                                    setItem = new PreIncrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                                } else {
+                                                    setItem = new PreDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            stack.push(setItem);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (!output.isEmpty()) {
+            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
+                GraphTargetItem setItem = output.get(output.size() - 1);
+                if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
+                    if (setLocal.regIndex == regId) {
+                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());
+                        if (localData.getSetLocalUsages(setLocalIp).size() == 1) {
+                            if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
+                                setItem.value.value = setLocal.value;
+                            } else {
+                                setItem.value = setLocal.value;
+                            }
+        
+                            stack.pop();
                             output.remove(output.size() - 1);
                             stack.moveToStack(output);
 
@@ -185,14 +244,8 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 }
             }
         }
-        GraphTargetItem type = TypeItem.UNBOUNDED;
-
-        if (localData.localRegTypes.containsKey(regId)) {
-            type = localData.localRegTypes.get(regId);
-        } else if (computedValue != null) {
-            type = computedValue.returnType();
-        }
-        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type));
+        
+        
     }
 
     @Override

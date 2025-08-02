@@ -177,7 +177,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testComma() {
         decompileMethod("classic", "testComma", "var a:int = 5;\r\n"
                 + "var b:int = 0;\r\n"
-                + "trace(a > 4 ? (b = 5, a) : 35);\r\n",
+                + "trace(a > 4 ? (b = 5,a) : 35);\r\n",
                  false);
     }
 
@@ -531,9 +531,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var g:* = undefined;\r\n"
                 + "d = new TestClass1();\r\n"
                 + "k = null;\r\n"
-                + "k.(++d.attrib, 0);\r\n"
+                + "k.(++d.attrib,0);\r\n"
                 + "trace(\"between\");\r\n"
-                + "g = k.(++d.attrib, 0);\r\n"
+                + "g = k.(++d.attrib,0);\r\n"
                 + "trace(\"end\");\r\n",
                  false);
     }
@@ -2091,7 +2091,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case \"B\":\r\n"
                 + "trace(\"is B\");\r\n"
-                + "case TestSwitchComma.X, \"C\":\r\n"
+                + "case TestSwitchComma.X,\"C\":\r\n"
                 + "trace(\"is C\");\r\n"
                 + "}\r\n",
                  false);

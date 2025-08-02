@@ -151,7 +151,7 @@ public class SwitchItem extends LoopItem implements Block {
                     if (!(caseValues.get(k) instanceof DefaultItem)) {
                         writer.append("case ");
                     }
-                    caseValues.get(k).toString(writer, localData);
+                    caseValues.get(k).toString(writer, localData, "", true);
                     writer.append(":").newLine();
                 }
             }
