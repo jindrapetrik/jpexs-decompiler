@@ -747,54 +747,49 @@ public abstract class InstructionDefinition implements Serializable {
                             }
                         }
                     }
-                }
+                }                
+            }
+            
+            if (obj instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
 
-                if (obj instanceof LocalRegAVM2Item) {
-                    LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
-
-                    stack.moveToStack(output);
-                    if (!stack.isEmpty()) {
-                        GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
-                        if (checked != null) {
-                            stack.pop();
-                            stack.push(checked);
-                            return;
-                        }
+                stack.moveToStack(output);
+                if (!stack.isEmpty()) {
+                    GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
+                    if (checked != null) {
+                        stack.pop();
+                        stack.push(checked);
+                        return;
                     }
-                    if (!output.isEmpty()) {
-                        GraphTargetItem checked = checkIncDec(true, multinameIndex, ins, localData, output.get(output.size() - 1), valueLocalReg, nameLocalReg, objLocalReg);
-                        if (checked != null) {
-                            output.remove(output.size() - 1);
-                            output.add(checked);
-                            return;
-                        }
+                }
+                if (!output.isEmpty()) {
+                    GraphTargetItem checked = checkIncDec(true, multinameIndex, ins, localData, output.get(output.size() - 1), valueLocalReg, nameLocalReg, objLocalReg);
+                    if (checked != null) {
+                        output.remove(output.size() - 1);
+                        output.add(checked);
+                        return;
                     }
                 }
             }
         }
 
-        if (obj instanceof PopItem) {
-            if (output.size() >= 2
-                    && output.get(output.size() - 1) instanceof SetLocalAVM2Item 
-                    && output.get(output.size() - 2) instanceof PushItem
-                    && multiname.name instanceof LocalRegAVM2Item) {
-                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);                
-                LocalRegAVM2Item localReg = (LocalRegAVM2Item) multiname.name;
-                PushItem pi = (PushItem) output.get(output.size() - 2);
-                if (setLocal.regIndex == localReg.regIndex) {
-                    GraphSourceItem src = setLocal.getSrc();
-                    if (src != null) {
-                        if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {
-                            output.remove(output.size() - 1);
-                            output.remove(output.size() - 1);
-                            stack.moveToStack(output);
-                            obj = pi.value;
-                            multiname.name = setLocal.value;                            
-                        }
-                    }                    
+        if (multiname.name instanceof CommaExpressionItem) {
+            CommaExpressionItem ce = (CommaExpressionItem) multiname.name;
+            if (ce.commands.size() == 2) {
+                if (ce.commands.get(0) instanceof SetLocalAVM2Item && ce.commands.get(1) instanceof LocalRegAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) ce.commands.get(0);
+                    LocalRegAVM2Item localReg = (LocalRegAVM2Item) ce.commands.get(1);
+                    if (setLocal.regIndex == localReg.regIndex) {
+                        GraphSourceItem src = setLocal.getSrc();
+                        if (src != null) {
+                            if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {                                
+                                multiname.name = setLocal.value;
+                            }
+                        }                    
+                    }
                 }
             }
-        }
+        }        
         
         if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {
             ConstructAVM2Item c = (ConstructAVM2Item) obj.getThroughDuplicate();
