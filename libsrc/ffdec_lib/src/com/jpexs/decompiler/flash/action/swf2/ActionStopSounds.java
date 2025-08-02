@@ -14,16 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.swf3;
+package com.jpexs.decompiler.flash.action.swf2;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.DisplayObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
-import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
-import com.jpexs.decompiler.flash.action.model.PlayActionItem;
+import com.jpexs.decompiler.flash.action.model.StopAllSoundsActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -36,38 +32,33 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Play action - Plays the current timeline.
+ * StopSounds action - Stops all sounds.
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3)
-public class ActionPlay extends Action {
+@SWFVersion(from = 2)
+public class ActionStopSounds extends Action {
 
     /**
      * Constructor
      */
-    public ActionPlay() {
-        super(0x06, 0, Utf8Helper.charsetName);
+    public ActionStopSounds() {
+        super(0x09, 0, Utf8Helper.charsetName);
     }
 
     @Override
     public String toString() {
-        return "Play";
+        return "StopSounds";
     }
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        ((DisplayObject) lda.target).play();
+        lda.stage.stopSounds();
         return true;
     }
 
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        if (!output.isEmpty() && (output.get(output.size() - 1) instanceof GotoFrameActionItem)) {
-            GotoFrameActionItem gta = (GotoFrameActionItem) output.remove(output.size() - 1);
-            output.add(new GotoFrame2ActionItem(this, lineStartAction, new DirectValueActionItem(gta.frame + 1), false, true, 0));
-        } else {
-            output.add(new PlayActionItem(this, lineStartAction));
-        }
+        output.add(new StopAllSoundsActionItem(this, lineStartAction));
     }
 }

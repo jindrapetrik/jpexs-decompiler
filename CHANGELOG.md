@@ -70,6 +70,7 @@ All notable changes to this project will be documented in this file.
 - Quotes in tree node parameter values that need them
 - The label of option "automatic deobfuscation" changed to "deobfuscate code"
 - SetTabIndex tag moved from others to frames folder
+- SWF3 actions split into SWF1, SWF2 and SWF3 actions (in FFDec source code, docs, etc.)
 
 ### Removed
 - Resample wav to 44kHz feature from GUI

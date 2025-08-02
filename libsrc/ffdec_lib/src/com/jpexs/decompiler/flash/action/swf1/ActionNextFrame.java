@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.swf3;
+package com.jpexs.decompiler.flash.action.swf1;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.ToggleHighQualityActionItem;
+import com.jpexs.decompiler.flash.action.model.NextFrameActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -32,33 +33,37 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * ToggleQuality action - Toggles the quality of the Flash Player.
+ * NextFrame action - Jumps to the next frame in the current timeline.
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3)
-public class ActionToggleQuality extends Action {
+@SWFVersion(from = 1)
+public class ActionNextFrame extends Action {
 
     /**
      * Constructor
      */
-    public ActionToggleQuality() {
-        super(0x08, 0, Utf8Helper.charsetName);
+    public ActionNextFrame() {
+        super(0x04, 0, Utf8Helper.charsetName);
     }
 
     @Override
     public String toString() {
-        return "ToggleQuality";
+        return "NextFrame";
     }
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        lda.stage.toggleQuality();
+        int f = ((DisplayObject) lda.target).getCurrentFrame();
+        if (f < ((DisplayObject) lda.target).getTotalFrames()) {
+            ((DisplayObject) lda.target).gotoFrame(f + 1);
+        }
+
         return true;
     }
 
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        output.add(new ToggleHighQualityActionItem(this, lineStartAction));
+        output.add(new NextFrameActionItem(this, lineStartAction));
     }
 }

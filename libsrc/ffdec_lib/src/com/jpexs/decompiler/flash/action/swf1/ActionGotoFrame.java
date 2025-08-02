@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.swf3;
+package com.jpexs.decompiler.flash.action.swf1;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3)
+@SWFVersion(from = 1)
 public class ActionGotoFrame extends Action {
 
     /**
