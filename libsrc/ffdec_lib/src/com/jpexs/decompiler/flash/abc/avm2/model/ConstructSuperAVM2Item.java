@@ -79,7 +79,13 @@ public class ConstructSuperAVM2Item extends AVM2Item {
             if (a > 0) {
                 writer.allowWrapHere().append(",");
             }
+            if (args.get(a).getPrecedence() >= PRECEDENCE_COMMA) {
+                writer.append("(");
+            }
             args.get(a).toString(writer, localData);
+            if (args.get(a).getPrecedence() >= PRECEDENCE_COMMA) {
+                writer.append(")");
+            }
         }
         return writer.append(")");
     }

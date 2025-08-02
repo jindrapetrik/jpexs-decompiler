@@ -65,7 +65,7 @@ public class CommaExpressionItem extends GraphTargetItem {
                 continue;
             }
             if (!first) {
-                writer.append(", ");
+                writer.allowWrapHere().append(",");
             }
             t.toString(writer, localData);
             first = false;

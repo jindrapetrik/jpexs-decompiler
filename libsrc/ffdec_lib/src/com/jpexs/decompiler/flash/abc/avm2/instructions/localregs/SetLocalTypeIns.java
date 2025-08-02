@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.PopItem;
@@ -74,8 +75,13 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          } else {
          localRegs.put(regId, value);
          }*/
-        if (!(value instanceof PopItem)) {
-            localData.localRegs.put(regId, value);
+        if (value instanceof CommaExpressionItem) {
+            CommaExpressionItem ce = (CommaExpressionItem) value;
+            if (!ce.commands.isEmpty()) {
+                localData.localRegs.put(regId, ce.commands.get(ce.commands.size() - 1));
+            }
+        } else if (!(value instanceof PopItem)) {
+            localData.localRegs.put(regId, value);        
         }
         if (!localData.localRegAssignmentIps.containsKey(regId)) {
             localData.localRegAssignmentIps.put(regId, 0);

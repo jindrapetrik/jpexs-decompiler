@@ -493,6 +493,12 @@ public abstract class InstructionDefinition implements Serializable {
      * @return Slot multiname or null if not found
      */
     private static Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, int multiNameIndex, Reference<GraphTargetItem> realObj) {
+        if (obj instanceof CommaExpressionItem) {
+            CommaExpressionItem ce = (CommaExpressionItem) obj;
+            if (!ce.commands.isEmpty()) {
+                obj = ce.commands.get(ce.commands.size() - 1);
+            }
+        }
         if ((obj instanceof ExceptionAVM2Item) && (multiNameIndex == -1 || ((ExceptionAVM2Item) obj).exception.name_index == multiNameIndex)) {
             return localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         }

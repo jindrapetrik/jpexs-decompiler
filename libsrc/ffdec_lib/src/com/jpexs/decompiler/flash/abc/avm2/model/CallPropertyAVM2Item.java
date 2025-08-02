@@ -104,7 +104,13 @@ public class CallPropertyAVM2Item extends AVM2Item {
             if (a > 0) {               
                 writer.allowWrapHere().append(",");
             }
+            if (arguments.get(a).getPrecedence() >= PRECEDENCE_COMMA) {
+                writer.append("(");
+            }
             arguments.get(a).toString(writer, localData);
+            if (arguments.get(a).getPrecedence() >= PRECEDENCE_COMMA) {
+                writer.append(")");
+            }
         }
         return writer.append(")");
     }
