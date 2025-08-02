@@ -339,6 +339,7 @@ public class AVM2Graph extends Graph {
             localData2.localScopeStack = new ScopeStack();
 
             List<GraphTargetItem> targetOutput = new GraphPartMarkedArrayList<>();
+            finallyTryTargetStack.setConnectedOutput(0, targetOutput);
             try {
                 translatePart(targetOutput, localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
             } catch (GraphPartChangeException ex1) { //should not happen
@@ -1249,6 +1250,7 @@ public class AVM2Graph extends Graph {
                         el.phase = 4; //Special case: try inside loop. 4 is immediately switched back to 1 inside printGraph
                     }
                 }
+                stack = (TranslateStack) stack.clone();
                 tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
             }
 
@@ -1427,6 +1429,7 @@ public class AVM2Graph extends Graph {
                 }
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
+                st2.finishBlock(currentCatchCommands);
                 /*if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof SetLocalAVM2Item)) {
                     if (currentCatchCommands.get(0).value.getNotCoerced() instanceof ExceptionAVM2Item) {
                         currentCatchCommands.remove(0);

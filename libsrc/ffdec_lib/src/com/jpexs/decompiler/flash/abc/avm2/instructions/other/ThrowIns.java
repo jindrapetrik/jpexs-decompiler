@@ -52,8 +52,7 @@ public class ThrowIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem value = stack.pop();
-        stack.moveToOutput(output, true);
-        output.add(new ThrowAVM2Item(ins, localData.lineStartInstruction, value));
+        stack.addToOutput(new ThrowAVM2Item(ins, localData.lineStartInstruction, value));
     }
 
     @Override

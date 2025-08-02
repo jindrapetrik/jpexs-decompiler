@@ -111,12 +111,10 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                             stack.pop();
                             stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            stack.moveToOutput(output, false);
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        stack.moveToOutput(output, false);
-                        output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -139,12 +137,10 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                             stack.pop();
                             stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            stack.moveToOutput(output, false);
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        stack.moveToOutput(output, false);
-                        output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }

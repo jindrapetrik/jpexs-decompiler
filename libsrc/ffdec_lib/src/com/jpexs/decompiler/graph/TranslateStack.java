@@ -19,9 +19,15 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SwapItem;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +57,23 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     private int prevOutputSize = 0;
 
     private Map<String, GraphTargetItem> marks = new HashMap<>();
+    
+    public List<GraphTargetItem> outputQueue = new ArrayList<>();
 
+    @Override
+    public synchronized Object clone() {
+        TranslateStack st =  (TranslateStack) super.clone();
+        st.outputQueue = new ArrayList<>(outputQueue);
+        return st;
+    }      
+    
+    @Override
+    public void clear() {
+        super.clear();
+        outputQueue.clear();
+    }
+    
+    
     public void setConnectedOutput(int prevOutputSize, List<GraphTargetItem> connectedOutput) {
         this.prevOutputSize = prevOutputSize;
         this.connectedOutput = connectedOutput;
@@ -59,6 +81,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     
     @Override
     public GraphTargetItem push(GraphTargetItem item) {
+        if (!outputQueue.isEmpty()) {
+            outputQueue.add(item);
+            item = new CommaExpressionItem(item.dialect, null, item.lineStartItem, outputQueue);
+            outputQueue = new ArrayList<>();
+        }
         if (connectedOutput != null && item != null) {
             item.outputPos = prevOutputSize + connectedOutput.size();
         }
@@ -187,6 +214,14 @@ public class TranslateStack extends Stack<GraphTargetItem> {
      */
     @Override
     public synchronized GraphTargetItem pop() {
+        if (!outputQueue.isEmpty()) {
+            List<GraphTargetItem> oldQueue = outputQueue;
+            outputQueue = new ArrayList<>();
+            finishBlock(connectedOutput);
+            connectedOutput.addAll(oldQueue);
+        }
+        
+        
         if (path != null) {
             if (this.isEmpty()) {
                 /*if (connectedOutput != null && !connectedOutput.isEmpty() && connectedOutput.get(connectedOutput.size() - 1) instanceof PushItem) {
@@ -220,11 +255,22 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         }
     }
     
-    public void moveToOutput(List<GraphTargetItem> output, boolean beforeExit) {
-        if (true) {
-            //return;
+    public void addToOutput(GraphTargetItem item) {
+        if (isEmpty() 
+                || peek() instanceof ExceptionAVM2Item
+                || peek() instanceof NewActivationAVM2Item
+                ) {
+            connectedOutput.add(item);
+            return;
         }
-        int pos = output.size();
+        outputQueue.add(item);
+        if (item instanceof ExitItem) {            
+            finishBlock(connectedOutput);            
+        }                
+    }
+    
+    public void finishBlock(List<GraphTargetItem> output) {
+        /*int pos = output.size();
         
         for (int i = size() - 1; i >= 0; i--) {
             GraphTargetItem item = get(i);
@@ -238,7 +284,59 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                 break;
             }
             remove(i);
+            if (item instanceof PopItem) {
+                continue;
+            }
             output.add(pos, beforeExit ? item : new PushItem(item));
+        }*/
+        
+        output.addAll(outputQueue);
+        outputQueue.clear();
+        
+        int clen = output.size();
+        boolean isExit = false;
+        if (clen > 0) {
+            if (output.get(clen - 1) instanceof ScriptEndItem) {
+                clen--;
+                isExit = true;
+            }
+        }
+        if (clen > 0) {
+            if (output.get(clen - 1) instanceof ExitItem) {
+                isExit = true;
+                clen--;
+            }
+        }
+        if (clen > 0) {
+            if (output.get(clen - 1) instanceof BreakItem) {
+                clen--;
+            }
+        }
+        if (clen > 0) {
+            if (output.get(clen - 1) instanceof ContinueItem) {
+                clen--;
+            }
+        }
+        for (int i = size() - 1; i >= 0; i--) {
+            GraphTargetItem p = get(i);
+            if (p instanceof BranchStackResistant) {
+                continue;
+            }
+            remove(i);
+            if (!(p instanceof PopItem)) {
+                if (isExit) {
+                    //ASC2 leaves some function calls unpopped on stack before returning from a method
+                    output.add(clen, p);
+                } else {
+                    /*int pos = 0;
+                    if (p.outputPos < output.size()) {
+                        output.add(p.outputPos, new PushItem(p));
+                    } else {
+                        output.add(clen + pos, new PushItem(p));
+                    }*/
+                    output.add(clen, new PushItem(p));
+                }
+            }
         }
     }
     

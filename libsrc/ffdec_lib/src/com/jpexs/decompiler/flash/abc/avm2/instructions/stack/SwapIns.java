@@ -63,7 +63,13 @@ public class SwapIns extends InstructionDefinition {
         GraphTargetItem o1 = stack.pop();
         GraphTargetItem o2 = stack.pop();
         
-        if (((o1 instanceof ExceptionAVM2Item) && (o2 instanceof ExceptionAVM2Item))
+        
+        stack.push(o1);
+        stack.push(o2);
+        o1.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+        o2.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+        
+        /*if (((o1 instanceof ExceptionAVM2Item) && (o2 instanceof ExceptionAVM2Item))
                 ||
                 (
                 (
@@ -90,7 +96,8 @@ public class SwapIns extends InstructionDefinition {
         stack.moveToOutput(output, false);
         output.add(new PushItem(o2));
         output.add(new PushItem(o1));
-        output.add(new SwapItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction));        
+        output.add(new SwapItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction)); 
+        */
     }
 
     @Override

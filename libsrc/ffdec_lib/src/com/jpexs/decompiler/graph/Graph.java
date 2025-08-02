@@ -3369,8 +3369,7 @@ public class Graph {
 
             if (code.size() <= part.start) {
                 if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
-                    stack.moveToOutput(ret, true);
-                    ret.add(new ScriptEndItem(dialect));
+                    stack.addToOutput(new ScriptEndItem(dialect));                  
                 }
                 return ret;
             }
@@ -3534,8 +3533,7 @@ public class Graph {
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
                     if (!(!output.isEmpty() && output.get(output.size() - 1) instanceof ExitItem)) {
-                        stack.moveToOutput(output, true);
-                        output.add(new ScriptEndItem(dialect));
+                        stack.addToOutput(new ScriptEndItem(dialect));                        
                     }
                 }
             }
@@ -4541,50 +4539,7 @@ public class Graph {
      * @param stack Stack
      */
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
-        int clen = commands.size();
-        boolean isExit = false;
-        if (clen > 0) {
-            if (commands.get(clen - 1) instanceof ScriptEndItem) {
-                clen--;
-                isExit = true;
-            }
-        }
-        if (clen > 0) {
-            if (commands.get(clen - 1) instanceof ExitItem) {
-                isExit = true;
-                clen--;
-            }
-        }
-        if (clen > 0) {
-            if (commands.get(clen - 1) instanceof BreakItem) {
-                clen--;
-            }
-        }
-        if (clen > 0) {
-            if (commands.get(clen - 1) instanceof ContinueItem) {
-                clen--;
-            }
-        }
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            GraphTargetItem p = stack.get(i);
-            if (p instanceof BranchStackResistant) {
-                continue;
-            }
-            stack.remove(i);
-            if (!(p instanceof PopItem)) {
-                if (isExit) {
-                    //ASC2 leaves some function calls unpopped on stack before returning from a method
-                    commands.add(clen, p);
-                } else {
-                    int pos = 0;
-                    if (p.outputPos < commands.size()) {
-                        commands.add(p.outputPos, new PushItem(p));
-                    } else {
-                        commands.add(clen + pos, new PushItem(p));
-                    }
-                }
-            }
-        }
+        stack.finishBlock(commands);
     }
 
     /**

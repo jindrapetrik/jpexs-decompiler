@@ -606,19 +606,18 @@ public abstract class InstructionDefinition implements Serializable {
             if (value.value.getNotCoercedNoDup() instanceof GetLexAVM2Item) {
                 GetLexAVM2Item getLex = (GetLexAVM2Item) value.value.getNotCoercedNoDup();
                 if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
-                        && (obj instanceof FindPropertyAVM2Item)) {
-                    stack.moveToOutput(output, false);
+                        && (obj instanceof FindPropertyAVM2Item)) {                    
                     if (hasConvert) {
                         if (isIncrement) {
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
                         }
                     } else {
                         if (isIncrement) {
-                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                            stack.addToOutput(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
                         } else {
-                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                            stack.addToOutput(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
                         }
                     }
                     return;
@@ -635,18 +634,17 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                     if (Objects.equals(getProp.object, obj)) {
-                        stack.moveToOutput(output, false);
                         if (hasConvert) {
                             if (isIncrement) {
-                                output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                             } else {
-                                output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                             }
                         } else {
                             if (isIncrement) {
-                                output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                stack.addToOutput(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                             } else {
-                                output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                stack.addToOutput(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                             }
                         }
                         return;

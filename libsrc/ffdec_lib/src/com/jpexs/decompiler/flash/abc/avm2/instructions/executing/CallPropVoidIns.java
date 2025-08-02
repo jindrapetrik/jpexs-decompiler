@@ -89,8 +89,7 @@ public class CallPropVoidIns extends InstructionDefinition {
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        stack.moveToOutput(output, false);
-        output.add(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, obj, multiname, args, callType.getVal(), isStatic.getVal()));
+        stack.addToOutput(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, obj, multiname, args, callType.getVal(), isStatic.getVal()));
     }
 
     @Override

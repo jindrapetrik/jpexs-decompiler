@@ -236,6 +236,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
                     return;
                 }
 
+                stack.setConnectedOutput(0, output);        
                 ins.translate(localData, stack, output, 0, "");
             }
 

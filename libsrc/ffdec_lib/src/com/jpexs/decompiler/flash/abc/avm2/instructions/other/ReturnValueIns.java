@@ -55,8 +55,7 @@ public class ReturnValueIns extends InstructionDefinition {
         if (value instanceof SetLocalAVM2Item) {
             value = value.value;
         }
-        stack.moveToOutput(output, true);
-        output.add(new ReturnValueAVM2Item(ins, localData.lineStartInstruction, value));
+        stack.addToOutput(new ReturnValueAVM2Item(ins, localData.lineStartInstruction, value));
     }
 
     @Override

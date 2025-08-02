@@ -74,8 +74,7 @@ public class IncLocalIns extends InstructionDefinition {
             }
         }
         if (!isPostInc) {
-            stack.moveToOutput(output, false);
-            output.add(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId));
+            stack.addToOutput(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId));
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new AddAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));

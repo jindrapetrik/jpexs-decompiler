@@ -370,6 +370,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     }
                 }
 
+                stack.setConnectedOutput(0, output);        
                 ins.translate(localData, stack, output, 0, "");
             }
 
