@@ -547,9 +547,9 @@ public class FlashPlayerTest {
                     newActions.add(new ActionPush(p1o, Utf8Helper.charsetName));
 
                     newActions.add(opAction);
-                    newActions.add(new ActionPushDuplicate(Utf8Helper.charsetName));
+                    newActions.add(new ActionPushDuplicate());
                     newActions.add(new ActionTypeOf());
-                    newActions.add(new ActionStackSwap(Utf8Helper.charsetName));
+                    newActions.add(new ActionStackSwap());
                     newActions.add(new ActionStringAdd());
 
                     AS2ExecuteTask task = new AS2ExecuteTask();
@@ -740,7 +740,7 @@ public class FlashPlayerTest {
             case 9:
                 return new ActionDivide();
             case 10:
-                return new ActionEquals(Utf8Helper.charsetName);
+                return new ActionEquals();
             case 11:
                 return new ActionEquals2();
             case 12:
