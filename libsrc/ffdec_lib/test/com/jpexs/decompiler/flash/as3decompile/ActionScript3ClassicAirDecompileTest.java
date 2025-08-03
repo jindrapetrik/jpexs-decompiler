@@ -1297,67 +1297,198 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
-    public void testInc2() {
-        decompileMethod("classic_air", "testInc2", "var a:* = [1];\r\n"
-                + "var d:* = a[this.getInt()]++;\r\n"
-                + "var e:* = ++a[this.getInt()];\r\n"
-                + "a[this.getInt()]++;\r\n"
-                + "++a[this.getInt()];\r\n"
-                + "var b:* = 1;\r\n"
-                + "b++;\r\n"
-                + "var c:int = 1;\r\n"
-                + "b = c++;\r\n",
+    public void testIncDec1() {
+        decompileMethod("classic_air", "testIncDec1", "var a:int = 5;\r\n"
+                + "trace(\"++a with result\");\r\n"
+                + "trace(++a);\r\n"
+                + "trace(\"--a with result\");\r\n"
+                + "trace(--a);\r\n"
+                + "trace(\"++a no result\");\r\n"
+                + "a++;\r\n"
+                + "trace(\"--a no result\");\r\n"
+                + "a--;\r\n",
                  false);
     }
 
     @Test
-    public void testIncDec() {
-        decompileMethod("classic_air", "testIncDec", "var a:int = 5;\r\n"
-                + "var b:* = 0;\r\n"
-                + "trace(\"++var\");\r\n"
-                + "b = ++a;\r\n"
-                + "trace(\"var++\");\r\n"
-                + "b = a++;\r\n"
-                + "trace(\"--var\");\r\n"
-                + "b = --a;\r\n"
-                + "trace(\"var--\");\r\n"
-                + "b = a--;\r\n"
-                + "var c:* = [1,2,3,4,5];\r\n"
-                + "trace(\"++arr\");\r\n"
-                + "b = ++c[2];\r\n"
-                + "trace(\"arr++\");\r\n"
-                + "b = c[2]++;\r\n"
-                + "trace(\"--arr\");\r\n"
-                + "b = --c[2];\r\n"
-                + "trace(\"arr--\");\r\n"
-                + "b = c[2]--;\r\n"
-                + "var d:* = new TestClass1();\r\n"
-                + "trace(\"++property\");\r\n"
-                + "trace(++d.attrib);\r\n"
-                + "trace(\"property++\");\r\n"
-                + "trace(d.attrib++);\r\n"
-                + "trace(\"--property\");\r\n"
-                + "trace(--d.attrib);\r\n"
-                + "trace(\"property--\");\r\n"
-                + "trace(d.attrib--);\r\n"
-                + "trace(\"arr[e++]\");\r\n"
-                + "var chars:Array = new Array(36);\r\n"
-                + "var index:uint = 0;\r\n"
-                + "chars[index++] = 5;\r\n"
-                + "trace(\"arr[++e]\");\r\n"
-                + "chars[++index] = 5;\r\n"
-                + "trace(\"attr++\");\r\n"
-                + "trace(attrx++);\r\n"
-                + "attrx++;\r\n"
-                + "trace(\"attr--\");\r\n"
-                + "trace(attrx--);\r\n"
-                + "attrx--;\r\n"
-                + "trace(\"++attr\");\r\n"
-                + "trace(++attrx);\r\n"
-                + "++attrx;\r\n"
-                + "trace(\"--attr\");\r\n"
-                + "trace(--attrx);\r\n"
-                + "--attrx;\r\n",
+    public void testIncDec2() {
+        decompileMethod("classic_air", "testIncDec2", "var a:int = 5;\r\n"
+                + "trace(\"a++ with result\");\r\n"
+                + "trace(a++);\r\n"
+                + "trace(\"a-- with result\");\r\n"
+                + "trace(a--);\r\n"
+                + "trace(\"a++ no result\");\r\n"
+                + "a++;\r\n"
+                + "trace(\"a-- no result\");\r\n"
+                + "a--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec3() {
+        decompileMethod("classic_air", "testIncDec3", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"++a[2] with result\");\r\n"
+                + "trace(++a[2]);\r\n"
+                + "trace(\"--a[2] with result\");\r\n"
+                + "trace(--a[2]);\r\n"
+                + "trace(\"++a[2] no result\");\r\n"
+                + "++a[2];\r\n"
+                + "trace(\"--a[2] no result\");\r\n"
+                + "--a[2];\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec4() {
+        decompileMethod("classic_air", "testIncDec4", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"a[2]++ with result\");\r\n"
+                + "trace(a[2]++);\r\n"
+                + "trace(\"a[2]-- with result\");\r\n"
+                + "trace(a[2]--);\r\n"
+                + "trace(\"a[2]++ no result\");\r\n"
+                + "a[2]++;\r\n"
+                + "trace(\"a[2]-- no result\");\r\n"
+                + "a[2]--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec5() {
+        decompileMethod("classic_air", "testIncDec5", "var a:* = new TestClass1();\r\n"
+                + "trace(\"++a.attrib with result\");\r\n"
+                + "trace(++a.attrib);\r\n"
+                + "trace(\"--a.attrib with result\");\r\n"
+                + "trace(--a.attrib);\r\n"
+                + "trace(\"++a.attrib no result\");\r\n"
+                + "++a.attrib;\r\n"
+                + "trace(\"--a.attrib no result\");\r\n"
+                + "--a.attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec6() {
+        decompileMethod("classic_air", "testIncDec6", "var a:* = new TestClass1();\r\n"
+                + "trace(\"a.attrib++ with result\");\r\n"
+                + "trace(a.attrib++);\r\n"
+                + "trace(\"a.attrib-- with result\");\r\n"
+                + "trace(a.attrib--);\r\n"
+                + "trace(\"a.attrib++ no result\");\r\n"
+                + "a.attrib++;\r\n"
+                + "trace(\"a.attrib-- no result\");\r\n"
+                + "a.attrib--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec7() {
+        decompileMethod("classic_air", "testIncDec7", "var a:* = [1,2,3,4,5];\r\n"
+                + "var index:int = 0;\r\n"
+                + "trace(\"a[++index]\");\r\n"
+                + "index++;\r\n"
+                + "trace(a[index]);\r\n"
+                + "trace(\"a[--index]\");\r\n"
+                + "index--;\r\n"
+                + "trace(a[index]);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec8() {
+        decompileMethod("classic_air", "testIncDec8", "var a:* = [1,2,3,4,5];\r\n"
+                + "var index:int = 0;\r\n"
+                + "trace(\"a[index++]\");\r\n"
+                + "trace(a[index++]);\r\n"
+                + "trace(\"a[index--]\");\r\n"
+                + "trace(a[index--]);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec9() {
+        decompileMethod("classic_air", "testIncDec9", "trace(\"++attrib with result\");\r\n"
+                + "trace(++attrib);\r\n"
+                + "trace(\"--attrib with result\");\r\n"
+                + "trace(--attrib);\r\n"
+                + "trace(\"++attrib no result\");\r\n"
+                + "++attrib;\r\n"
+                + "trace(\"--attrib no result\");\r\n"
+                + "--attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec10() {
+        decompileMethod("classic_air", "testIncDec10", "trace(\"attrib++ with result\");\r\n"
+                + "trace(attrib++);\r\n"
+                + "trace(\"attrib-- with result\");\r\n"
+                + "trace(attrib--);\r\n"
+                + "trace(\"attrib++ no result\");\r\n"
+                + "attrib++;\r\n"
+                + "trace(\"attrib-- no result\");\r\n"
+                + "attrib--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec11() {
+        decompileMethod("classic_air", "testIncDec11", "var f:Function = function():void\r\n"
+                + "{\r\n"
+                + "};\r\n"
+                + "var slot:int = 0;\r\n"
+                + "trace(\"++slot with result\");\r\n"
+                + "trace(++slot);\r\n"
+                + "trace(\"--slot with result\");\r\n"
+                + "trace(--slot);\r\n"
+                + "trace(\"++slot no result\");\r\n"
+                + "++slot;\r\n"
+                + "trace(\"--slot no result\");\r\n"
+                + "--slot;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec12() {
+        decompileMethod("classic_air", "testIncDec12", "var f:Function = function():void\r\n"
+                + "{\r\n"
+                + "};\r\n"
+                + "var slot:int = 0;\r\n"
+                + "trace(\"slot++ with result\");\r\n"
+                + "trace(slot++);\r\n"
+                + "trace(\"slot-- with result\");\r\n"
+                + "trace(slot--);\r\n"
+                + "trace(\"slot++ no result\");\r\n"
+                + "slot++;\r\n"
+                + "trace(\"slot-- no result\");\r\n"
+                + "slot--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec13() {
+        decompileMethod("classic_air", "testIncDec13", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"++a[this.f()] with result\");\r\n"
+                + "trace(++a[this.f()]);\r\n"
+                + "trace(\"--a[this.f()] with result\");\r\n"
+                + "trace(--a[this.f()]);\r\n"
+                + "trace(\"++a[this.f()] no result\");\r\n"
+                + "++a[this.f()];\r\n"
+                + "trace(\"--a[this.f()] no result\");\r\n"
+                + "--a[this.f()];\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec14() {
+        decompileMethod("classic_air", "testIncDec14", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"a[this.f()]++ with result\");\r\n"
+                + "trace(a[this.f()]++);\r\n"
+                + "trace(\"a[this.f()]-- with result\");\r\n"
+                + "trace(a[this.f()]--);\r\n"
+                + "trace(\"a[this.f()]++ no result\");\r\n"
+                + "a[this.f()]++;\r\n"
+                + "trace(\"a[this.f()]-- no result\");\r\n"
+                + "a[this.f()]--;\r\n",
                  false);
     }
 
@@ -1501,7 +1632,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testLoopInLoop() {
-        decompileMethod("classic_air", "testLoopInLoop", "var i:* = undefined;\r\n"
+        decompileMethod("classic_air", "testLoopInLoop", "var i:int = 0;\r\n"
                 + "var a:Boolean = true;\r\n"
                 + "var b:Boolean = true;\r\n"
                 + "var c:Boolean = true;\r\n"

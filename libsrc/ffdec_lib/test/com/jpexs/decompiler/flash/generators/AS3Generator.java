@@ -37,12 +37,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import natorder.NaturalOrderComparator;
 
 /**
  *
@@ -52,13 +54,14 @@ import java.util.TreeMap;
  */
 public class AS3Generator {
 
+    @SuppressWarnings("unchecked")
     private static void useFile(String testClassName, String[][] swfAndIdentifierList, boolean multipleProviders) throws FileNotFoundException, IOException, InterruptedException {
         StringBuilder s = new StringBuilder();
         File f = new File(swfAndIdentifierList[0][0]);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag tag = null;
         List<ScriptPack> scriptPacks = swf.getAS3Packs();
-        Map<String, ScriptPack> sortedPacks = new TreeMap<>();
+        Map<String, ScriptPack> sortedPacks = new TreeMap<>(new NaturalOrderComparator());
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
