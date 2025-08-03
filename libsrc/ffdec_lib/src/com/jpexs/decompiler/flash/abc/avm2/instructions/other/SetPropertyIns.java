@@ -92,13 +92,13 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
                 if (binaryOp.getLeftSide() instanceof GetLexAVM2Item) {
                     GetLexAVM2Item getLex = (GetLexAVM2Item) binaryOp.getLeftSide();
-                    if ((obj instanceof FindPropertyAVM2Item) && localData.abc.constants.getMultiname(multiname.multinameIndex).equals(getLex.propertyName)) {
+                    if ((obj.getThroughDuplicate() instanceof FindPropertyAVM2Item) && localData.abc.constants.getMultiname(multiname.multinameIndex).equals(getLex.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
                     }
                 } else if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
-                    if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
+                    if (Objects.equals(obj.getThroughDuplicate(), propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
                     }

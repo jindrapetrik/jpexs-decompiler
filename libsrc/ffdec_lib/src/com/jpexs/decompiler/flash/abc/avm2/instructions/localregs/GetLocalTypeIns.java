@@ -47,6 +47,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import java.util.List;
 
 /**
@@ -133,9 +134,9 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                             if (setLocal.value.getNotCoerced() instanceof GetPropertyAVM2Item) {
                                 SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocal.value.getNotCoerced();
-                                if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                if (getProp.object.getThroughDuplicate() == setProp.object.getThroughDuplicate()) {
                                     if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
-                                        if (getProp.object instanceof DuplicateItem) {
+                                        if ((getProp.object instanceof DuplicateItem) || (getProp.object instanceof DuplicateSourceItem)) {
                                             getProp.object = getProp.object.value;
                                         }
                                         GraphTargetItem result;
@@ -175,9 +176,10 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                     if (setItem.value.value instanceof GetPropertyAVM2Item) {
                                         SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
                                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
-                                        if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                        if (getProp.object.getThroughDuplicate() == setProp.object.getThroughDuplicate()) {
                                             if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
-                                                if (getProp.object instanceof DuplicateItem) {
+                                                if (getProp.object instanceof DuplicateItem
+                                                        || getProp.object instanceof DuplicateSourceItem)  {
                                                     getProp.object = getProp.object.value;
                                                 }
                                                 if (isIncrement) {
@@ -223,7 +225,8 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
                                         if (getProp.object.getThroughDuplicate() == setProp.object) {
                                             if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
-                                                if (getProp.object instanceof DuplicateItem) {
+                                                if (getProp.object instanceof DuplicateItem
+                                                        || getProp.object instanceof DuplicateSourceItem) {
                                                     getProp.object = getProp.object.value;
                                                 }
                                                 if (isIncrement) {
@@ -243,9 +246,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                     }
                 }
             }
-        }
-        
-        
+        }        
     }
 
     @Override

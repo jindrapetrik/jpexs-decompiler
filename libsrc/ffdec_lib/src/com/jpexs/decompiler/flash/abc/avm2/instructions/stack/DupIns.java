@@ -23,9 +23,12 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import java.util.List;
 
 /**
@@ -52,8 +55,14 @@ public class DupIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        GraphTargetItem v = stack.pop();        
-        stack.push(v);
+        GraphTargetItem v = stack.pop();
+        if (v instanceof NewActivationAVM2Item 
+                || v instanceof ExceptionAVM2Item) {
+            stack.push(v);
+        } else {
+            stack.push(new DuplicateSourceItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v));
+        }
+        //stack.push(v);
         stack.push(new DuplicateItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v));
         //v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 

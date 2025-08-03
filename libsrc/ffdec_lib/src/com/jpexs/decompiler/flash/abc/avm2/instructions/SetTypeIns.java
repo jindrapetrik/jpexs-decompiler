@@ -74,12 +74,12 @@ public interface SetTypeIns {
             GraphTargetItem insideDup = notCoercedValue.value;
             if (!AVM2Item.mustStayIntact1(insideDup.getNotCoercedNoDup())) {
                 stack.moveToStack(output);
-                if (!stack.isEmpty() && stack.peek() == insideDup) {
+                if (!stack.isEmpty() && stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
                     stack.pop();
 
                     if ((insideDup instanceof DuplicateItem) && regId > -1) {
                         int numDups = 1;
-                        while ((insideDup instanceof DuplicateItem) && !stack.isEmpty() && stack.peek() == insideDup.value) {
+                        while ((insideDup instanceof DuplicateItem) && !stack.isEmpty() && stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
                             insideDup = insideDup.value;
                             stack.pop();
                             numDups++;

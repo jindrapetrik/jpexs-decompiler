@@ -155,7 +155,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         
         if (value instanceof DuplicateItem) {
             result.directlyCausedByDup = true;
-        }
+        }                
 
         SetTypeIns.handleResult(value, stack, output, localData, result, regId, value.returnType());
     }

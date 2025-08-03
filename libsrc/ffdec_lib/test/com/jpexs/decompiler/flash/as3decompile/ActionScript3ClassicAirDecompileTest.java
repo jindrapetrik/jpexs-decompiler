@@ -1385,11 +1385,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testIncDec7", "var a:* = [1,2,3,4,5];\r\n"
                 + "var index:int = 0;\r\n"
                 + "trace(\"a[++index]\");\r\n"
-                + "index++;\r\n"
-                + "trace(a[index]);\r\n"
+                + "trace(a[(index++,index)]);\r\n"
                 + "trace(\"a[--index]\");\r\n"
-                + "index--;\r\n"
-                + "trace(a[index]);\r\n",
+                + "trace(a[(index--,index)]);\r\n",
                  false);
     }
 

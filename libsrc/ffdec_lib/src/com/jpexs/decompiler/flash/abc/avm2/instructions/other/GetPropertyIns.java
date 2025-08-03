@@ -114,7 +114,7 @@ public class GetPropertyIns extends InstructionDefinition {
                     }
                 }
                 if (findPropName.name instanceof DuplicateItem) {
-                    if (findPropName.name.value == multiname.name) {
+                    if (findPropName.name.getThroughDuplicate() == multiname.name.getThroughDuplicate()) {
                         findPropName.name = findPropName.name.value;
                     }
                 }
@@ -131,7 +131,7 @@ public class GetPropertyIns extends InstructionDefinition {
                     }
                 }
                 if (findPropName.namespace instanceof DuplicateItem) {
-                    if (findPropName.namespace.value == multiname.namespace) {
+                    if (findPropName.namespace.getThroughDuplicate() == multiname.namespace.getThroughDuplicate()) {
                         findPropName.namespace = findPropName.namespace.value;
                     }
                 }

@@ -87,8 +87,8 @@ public class CallIns extends InstructionDefinition {
         if (function instanceof GetPropertyAVM2Item) {
             GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) function;
             if (getProperty.object instanceof DuplicateItem) {
-                if (getProperty.object.value == receiver) {
-                    getProperty.object = receiver;
+                if (getProperty.object.value == receiver.getThroughDuplicate()) {
+                    getProperty.object = receiver.getThroughDuplicate();
                 }
             } else if (getProperty.object instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;

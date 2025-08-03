@@ -63,6 +63,7 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.helpers.LinkedIdentityHashSet;
@@ -562,10 +563,10 @@ public abstract class InstructionDefinition implements Serializable {
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
             if (value.value instanceof DuplicateItem) {
-                GraphTargetItem duplicated = value.value.value;
+                GraphTargetItem duplicated = value.value.value.getThroughDuplicate();
                 stack.moveToStack(output);
                 if (!stack.isEmpty()) {
-                    if (stack.peek() == duplicated) {
+                    if (stack.peek().getThroughDuplicate() == duplicated) {
                         GraphTargetItem notCoerced = duplicated.getNotCoerced();
                         if (notCoerced instanceof GetLexAVM2Item) {
                             GetLexAVM2Item getLex = (GetLexAVM2Item) notCoerced;
@@ -584,9 +585,9 @@ public abstract class InstructionDefinition implements Serializable {
                             GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) notCoerced;
                             if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
 
-                                if (getProp.object instanceof DuplicateItem) { //assembled/TestIncrement3
-                                    if (getProp.object.value == obj) {
-                                        getProp.object = obj;
+                                if ((getProp.object instanceof DuplicateItem) || (getProp.object instanceof DuplicateSourceItem)) { //assembled/TestIncrement3
+                                    if (getProp.object.value == obj.getThroughDuplicate()) {
+                                        getProp.object = obj.getThroughDuplicate();
                                     }
                                 }
 
@@ -635,12 +636,12 @@ public abstract class InstructionDefinition implements Serializable {
                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.getNotCoercedNoDup();
                 if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
 
-                    if (getProp.object instanceof DuplicateItem) {
-                        if (getProp.object.value == obj) {
-                            getProp.object = obj;
+                    if ((getProp.object instanceof DuplicateItem) || (getProp.object instanceof DuplicateSourceItem)) {
+                        if (getProp.object.value == obj.getThroughDuplicate()) {
+                            getProp.object = obj.getThroughDuplicate();
                         }
                     }
-                    if (Objects.equals(getProp.object, obj)) {
+                    if (Objects.equals(getProp.object.getThroughDuplicate(), obj.getThroughDuplicate())) {
                         if (hasConvert) {
                             if (isIncrement) {
                                 stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
@@ -666,7 +667,7 @@ public abstract class InstructionDefinition implements Serializable {
                 boolean isIncrement = (duplicated instanceof IncrementAVM2Item);
                 stack.moveToStack(output);
                 if (!stack.isEmpty()) {
-                    if (stack.peek() == duplicated) {
+                    if (stack.peek().getThroughDuplicate() == duplicated.getThroughDuplicate()) {
                         GraphTargetItem incrementedProp = duplicated.value;
                         if (incrementedProp instanceof GetLexAVM2Item) {
                             GetLexAVM2Item getLex = (GetLexAVM2Item) incrementedProp;
@@ -716,7 +717,7 @@ public abstract class InstructionDefinition implements Serializable {
                             if (valueSetLocalReg.value.value instanceof DuplicateItem) {
                                 GraphTargetItem duplicated = valueSetLocalReg.value.value.value;
                                 //if (!output.isEmpty() && output.get(output.size() - 1) instanceof PushItem && ((PushItem) output.get(output.size() - 1)).value == duplicated) {
-                                if (!stack.isEmpty() && stack.peek() == duplicated) {
+                                if (!stack.isEmpty() && stack.peek().getThroughDuplicate() == duplicated) {
                                     GraphTargetItem notCoerced = duplicated.getNotCoerced();
                                     if (notCoerced instanceof GetPropertyAVM2Item) {
                                         GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) notCoerced;
@@ -797,7 +798,7 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }        
         
-        if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {
+        if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {           
             ConstructAVM2Item c = (ConstructAVM2Item) obj.getThroughDuplicate();
             if (c.object instanceof ApplyTypeAVM2Item) {
                 ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) c.object;
@@ -805,10 +806,24 @@ public abstract class InstructionDefinition implements Serializable {
                 List<GraphTargetItem> vals = new ArrayList<>();
                 vals.add(value);
                 c.object = new InitVectorAVM2Item(c.getInstruction(), c.getLineStartIns(), at.params.get(0), vals);
+                if (obj instanceof DuplicateItem) {
+                    if (!stack.isEmpty() 
+                            && stack.peek() instanceof DuplicateSourceItem
+                            && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
+                        stack.push(stack.pop().value);
+                    }                    
+                }
                 return;
             } else if (c.object instanceof InitVectorAVM2Item) {
                 InitVectorAVM2Item iv = (InitVectorAVM2Item) c.object;
                 iv.arguments.add(value);
+                if (obj instanceof DuplicateItem) {
+                    if (!stack.isEmpty() 
+                            && stack.peek() instanceof DuplicateSourceItem
+                            && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
+                        stack.push(stack.pop().value);
+                    }                    
+                }
                 return;
             }
         }
