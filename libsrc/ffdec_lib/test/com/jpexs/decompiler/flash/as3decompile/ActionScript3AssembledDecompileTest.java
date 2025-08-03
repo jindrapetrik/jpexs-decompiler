@@ -340,7 +340,13 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
-                + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+§§dupsrc(\"ByteArray\")))());\r\n"
+                + "§§push(§§dupsrc(new (getDefinitionByName(\"flash.utils\"+\".\"+§§dupsrc(\"ByteArray\")))()));\r\n"
+                + "§§push(§§dup(new (getDefinitionByName(\"flash.utils\"+\".\"+§§dupsrc(\"ByteArray\")))()));\r\n"
+                + "§§push(obfuscated);\r\n"
+                + "§§swap();\r\n"
+                + "§§push(\"xxx\");\r\n"
+                + "§§swap();\r\n"
+                + "§§pop()[§§pop()] = §§pop();\r\n"
                 + "§§push(50);\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
@@ -350,10 +356,12 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "break;\r\n"
                 + "}\r\n"
                 + "§§push(§§pop() - 1);\r\n"
+                + "§§swap();\r\n"
                 + "§§push(§§dupsrc(§§pop()));\r\n"
                 + "§§dupsrc(§§dup(§§pop()))[§§dup(§§dup(§§pop())).length] = 0x29 ^ 0x6F;\r\n"
                 + "§§push(§§dupsrc(§§pop()));\r\n"
                 + "§§dupsrc(§§dup(§§pop()))[§§dup(§§dup(§§pop())).length] = 9 ^ 0x54;\r\n"
+                + "§§swap();\r\n"
                 + "}\r\n"
                 + "§§pop();\r\n"
                 + "§§pop();\r\n",

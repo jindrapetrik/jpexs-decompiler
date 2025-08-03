@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwapItem;
 import java.util.List;
@@ -64,12 +65,12 @@ public class SwapIns extends InstructionDefinition {
         GraphTargetItem o2 = stack.pop();
         
         
-        stack.push(o1);
+        /*stack.push(o1);
         stack.push(o2);
         o1.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
         o2.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
-        
-        /*if (((o1 instanceof ExceptionAVM2Item) && (o2 instanceof ExceptionAVM2Item))
+        */
+        if (((o1 instanceof ExceptionAVM2Item) && (o2 instanceof ExceptionAVM2Item))
                 ||
                 (
                 (
@@ -93,11 +94,14 @@ public class SwapIns extends InstructionDefinition {
             return;
         }
         
-        stack.moveToOutput(output, false);
-        output.add(new PushItem(o2));
-        output.add(new PushItem(o1));
-        output.add(new SwapItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction)); 
-        */
+        stack.finishBlock(output);
+        if (!(o2 instanceof PopItem)) {
+            output.add(new PushItem(o2));
+        }
+        if (!(o2 instanceof PopItem && o1 instanceof PopItem)) {
+            output.add(new PushItem(o1));
+        }
+        output.add(new SwapItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction));         
     }
 
     @Override
