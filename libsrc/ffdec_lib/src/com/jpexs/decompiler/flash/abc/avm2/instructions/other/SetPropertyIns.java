@@ -28,10 +28,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -101,7 +104,14 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                     if (Objects.equals(obj.getThroughDuplicate(), propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
-                    }
+                        
+                        if (result instanceof SetPropertyAVM2Item) {
+                            SetPropertyAVM2Item sp = (SetPropertyAVM2Item) result;
+                            if (sp.object instanceof DuplicateSourceItem) {
+                                sp.object = sp.object.value;
+                            }
+                        }
+                    }                    
                 }
             }
         }

@@ -407,6 +407,42 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     }
     
     public void allowSwap(List<GraphTargetItem> output) {
+        /*
+        if (!isEmpty()) {
+            return;
+        }
+        if (output.isEmpty()) {
+            return;
+        }
+        if (size() != 2) {
+            return;
+        }
+        
+        if (!(output.get(output.size() - 1) instanceof SetTemporaryItem)) {
+            return;
+        }
+                
+        if (!(peek() instanceof TemporaryItem)) {
+            return;
+        }
+        
+        TemporaryItem ti = (TemporaryItem) peek();
+        
+        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+        
+        if (!"swap".equals(st.getSuffix())) {
+            return;
+        }
+        
+        if (st.getTempIndex() != ti.getTempIndex()) {
+            return;
+        }
+        
+        output.remove(output.size() - 1);
+        pop();
+        push(ti.value);
+        
+        */
         if (!isEmpty()) {
             return;
         }
@@ -420,7 +456,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         if (!(output.get(output.size() - 2) instanceof PushItem)) {
             return;
         }
-        
+
         if (!(output.get(output.size() - 3) instanceof SetTemporaryItem)) {
             return;
         }

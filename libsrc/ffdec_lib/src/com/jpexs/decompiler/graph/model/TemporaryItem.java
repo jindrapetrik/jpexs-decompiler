@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
@@ -136,4 +137,7 @@ public class TemporaryItem extends GraphTargetItem implements SimpleValue, HasTe
         return tempIndex;
     }
 
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+    }   
 }

@@ -130,6 +130,26 @@ public class SwapIns extends InstructionDefinition {
             return;
         }
         */
+        /*int temp = localData.maxTempIndex.getVal() + 1;
+        localData.maxTempIndex.setVal(temp);
+        stack.finishBlock(output);
+        stack.addToOutput(new SetTemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, o2, temp, "swap"));
+        stack.finishBlock(output);  
+        stack.push(o1);
+        stack.push(new TemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, o2, temp)); */
+        
+        if (o2 instanceof TemporaryItem) {
+            stack.push(o1);
+            stack.push(o2);
+            return;
+        }
+        if (o2 instanceof DuplicateItem) {
+            stack.push(o1);
+            stack.push(o2);
+            return;
+        }
+        
+        
         int temp = localData.maxTempIndex.getVal() + 1;
         localData.maxTempIndex.setVal(temp);
         stack.finishBlock(output);
