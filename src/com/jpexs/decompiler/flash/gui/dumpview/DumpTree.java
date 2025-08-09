@@ -33,6 +33,8 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
+import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -41,15 +43,21 @@ import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontInfo2Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontInfoTag;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
+import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -63,20 +71,36 @@ import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
+import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
+import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
+import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.ProductInfoTag;
+import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
+import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -197,17 +221,21 @@ public class DumpTree extends JTree {
                             case DefineSoundTag.NAME:
                             case SoundStreamHeadTag.NAME:
                             case SoundStreamHead2Tag.NAME:
-                            case SoundStreamBlockTag.NAME:
                                 nodeType = TreeNodeType.SOUND;
+                                break;
+                            case SoundStreamBlockTag.NAME:
+                                nodeType = TreeNodeType.SOUND_STREAM_BLOCK;
                                 break;
                             case DefineBinaryDataTag.NAME:
                                 nodeType = TreeNodeType.BINARY_DATA;
                                 break;
                             case DoActionTag.NAME:
                             case DoInitActionTag.NAME:
+                                nodeType = TreeNodeType.AS;
+                                break;
                             case DoABCTag.NAME:
                             case DoABC2Tag.NAME:
-                                nodeType = TreeNodeType.AS;
+                                nodeType = TreeNodeType.ABC;
                                 break;
                             case ShowFrameTag.NAME:
                                 nodeType = TreeNodeType.FRAME; //show_frame?
@@ -233,6 +261,68 @@ public class DumpTree extends JTree {
                                 break;
                             case DefineScalingGridTag.NAME:
                                 nodeType = TreeNodeType.SCALING_GRID;
+                                break;
+                            case DefineFontInfoTag.NAME:
+                            case DefineFontInfo2Tag.NAME:
+                                nodeType = TreeNodeType.FONT_INFO;
+                                break;
+                            case DefineFontNameTag.NAME:
+                                nodeType = TreeNodeType.FONT_NAME;
+                                break;
+                            case CSMTextSettingsTag.NAME:
+                                nodeType = TreeNodeType.CSM_TEXT_SETTINGS;
+                                break;
+                            case DefineButtonCxformTag.NAME:
+                                nodeType = TreeNodeType.BUTTON_CXFORM;
+                                break;
+                            case DefineButtonSoundTag.NAME:
+                                nodeType = TreeNodeType.BUTTON_SOUND;
+                                break;
+                            case FrameLabelTag.NAME:
+                                nodeType = TreeNodeType.FRAME_LABEL;
+                                break;
+                            case StartSoundTag.NAME:
+                            case StartSound2Tag.NAME:
+                                nodeType = TreeNodeType.START_SOUND;
+                                break;
+                            case VideoFrameTag.NAME:
+                                nodeType = TreeNodeType.VIDEO_FRAME;
+                                break;
+                            case EnableDebuggerTag.NAME:
+                            case EnableDebugger2Tag.NAME:
+                            case ProtectTag.NAME:
+                                nodeType = TreeNodeType.ENABLE_DEBUGGER;
+                                break;
+                            case EnableTelemetryTag.NAME:
+                                nodeType = TreeNodeType.ENABLE_TELEMETRY;
+                                break;
+                            case ExportAssetsTag.NAME:
+                                nodeType = TreeNodeType.EXPORT_ASSETS;
+                                break;
+                            case ImportAssetsTag.NAME:
+                            case ImportAssets2Tag.NAME:
+                                nodeType = TreeNodeType.IMPORT_ASSETS;
+                                break;
+                            case JPEGTablesTag.NAME:
+                                nodeType = TreeNodeType.JPEG_TABLES;
+                                break;
+                            case ProductInfoTag.NAME:
+                                nodeType = TreeNodeType.PRODUCT_INFO;
+                                break;
+                            case ScriptLimitsTag.NAME:
+                                nodeType = TreeNodeType.SCRIPT_LIMITS;
+                                break;
+                            case SetTabIndexTag.NAME:
+                                nodeType = TreeNodeType.SET_TABINDEX;
+                                break;
+                            case SymbolClassTag.NAME:
+                                nodeType = TreeNodeType.SYMBOL_CLASS;
+                                break;
+                            case DefineSceneAndFrameLabelDataTag.NAME:
+                                nodeType = TreeNodeType.SCENE_AND_FRAME_LABEL_DATA;
+                                break;
+                            case DebugIDTag.NAME:
+                                nodeType = TreeNodeType.DEBUG_ID;
                                 break;
                             default:
                                 nodeType = TreeNodeType.OTHER_TAG;
