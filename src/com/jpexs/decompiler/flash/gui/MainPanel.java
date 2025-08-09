@@ -2178,6 +2178,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (nodeType == TreeNodeType.SOUND) {
                         sounds.add((SoundTag) d);
                     }
+                    if (nodeType == TreeNodeType.SOUND_STREAM_RANGE) {
+                        sounds.add((SoundStreamFrameRange) d);
+                    }
                     if (nodeType == TreeNodeType.BINARY_DATA) {
                         binaryData.add((BinaryDataInterface) d);
                     }
@@ -2189,10 +2192,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     } else if (nodeType == TreeNodeType.FONT) {
                         fonts.add((Tag) d);
                     }
-                    if (nodeType == TreeNodeType.OTHER_TAG) {
-                        if (d instanceof SymbolClassTypeTag) {
-                            symbolNames.add((Tag) d);
-                        }
+                    if (nodeType == TreeNodeType.SYMBOL_CLASS) {
+                        symbolNames.add((Tag) d);
                     }
                 }
 

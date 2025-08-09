@@ -384,7 +384,7 @@ public abstract class AbstractTagTree extends JTree {
         }
         
         if (t instanceof SoundStreamFrameRange) {
-            return TreeNodeType.SOUND_STREAM_BLOCK;
+            return TreeNodeType.SOUND_STREAM_RANGE;
         }
         
         if (t instanceof SoundStreamBlockTag) {
@@ -822,6 +822,9 @@ public abstract class AbstractTagTree extends JTree {
                 if (nodeType == TreeNodeType.SOUND) {
                     ret.add(d);
                 }
+                if (nodeType == TreeNodeType.SOUND_STREAM_RANGE) {
+                    ret.add(d);
+                }
                 if (nodeType == TreeNodeType.BINARY_DATA) {
                     ret.add(d);
                 }
@@ -831,11 +834,8 @@ public abstract class AbstractTagTree extends JTree {
                 if (nodeType == TreeNodeType.FONT) {
                     ret.add(d);
                 }
-
-                if (nodeType == TreeNodeType.OTHER_TAG) {
-                    if (d instanceof SymbolClassTypeTag) {
-                        ret.add(d);
-                    }
+                if (nodeType == TreeNodeType.SYMBOL_CLASS) {
+                    ret.add(d);
                 }
             }
 

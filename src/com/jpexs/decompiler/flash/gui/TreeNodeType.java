@@ -58,6 +58,7 @@ public enum TreeNodeType {
     VIDEO_FRAME,
     SOUND,
     SOUND_STREAM_BLOCK,
+    SOUND_STREAM_RANGE,
     BINARY_DATA,
     OTHER_TAG,
     FOLDER,

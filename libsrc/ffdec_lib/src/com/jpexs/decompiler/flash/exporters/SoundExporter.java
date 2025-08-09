@@ -191,7 +191,7 @@ public class SoundExporter {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
 
-                int ms = (int) (1000.0 / ((Tag) st).getSwf().frameRate);
+                int ms = (int) (1000.0 / sh.getSwf().frameRate);
                 for (int b = 0; b < blocks.size(); b++) {
                     byte[] data = blocks.get(b).streamSoundData.getRangeData();
                     if (st.getSoundFormatId() == 2) { //MP3
