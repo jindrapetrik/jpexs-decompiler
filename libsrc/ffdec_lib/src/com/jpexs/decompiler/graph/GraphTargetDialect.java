@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.model.LocalData;
+
 /**
  * Dialect - high level language type.
  *
@@ -45,4 +48,15 @@ public abstract class GraphTargetDialect {
      * @return True when allows
      */
     public abstract boolean doesAllowMultilevelBreaks();
+    
+    /**
+     * Prints temporary declaration
+     * @param writer Writer
+     * @param localData Local data
+     * @param suffix Suffix
+     * @param tempIndex Temporary index
+     * @param value Value
+     * @return Writer
+     */
+    public abstract GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException;
 }

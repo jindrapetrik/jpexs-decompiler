@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +90,9 @@ public class CallIns extends InstructionDefinition {
             if (getProperty.object instanceof DuplicateItem) {
                 if (getProperty.object.value == receiver.getThroughDuplicate()) {
                     getProperty.object = receiver.getThroughDuplicate();
+                }
+                if (receiver instanceof DuplicateSourceItem) {
+                    receiver = receiver.getThroughDuplicate();
                 }
             } else if (getProperty.object instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;

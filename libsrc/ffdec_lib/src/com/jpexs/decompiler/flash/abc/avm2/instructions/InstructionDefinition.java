@@ -835,6 +835,8 @@ public abstract class InstructionDefinition implements Serializable {
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
 
+        obj = obj.getThroughDuplicate();
+        
         SetTypeAVM2Item result;
         if (init) {
             result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());

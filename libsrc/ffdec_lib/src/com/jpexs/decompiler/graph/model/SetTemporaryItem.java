@@ -38,6 +38,8 @@ public class SetTemporaryItem extends GraphTargetItem implements SimpleValue, Ha
     private static final boolean SHOW_SUFFIX = false;
 
     public int tempIndex;
+    public boolean declaration = false;
+    
     private final String suffix;
 
     public String getSuffix() {
@@ -53,7 +55,7 @@ public class SetTemporaryItem extends GraphTargetItem implements SimpleValue, Ha
      * @param value Value
      */
     public SetTemporaryItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex, String suffix) {
-        super(dialect, src, lineStartIns, value.getPrecedence(), value);
+        super(dialect, src, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.tempIndex = tempIndex;
         this.suffix = suffix;
     }
@@ -74,13 +76,15 @@ public class SetTemporaryItem extends GraphTargetItem implements SimpleValue, Ha
         while ((val instanceof HasTempIndex) && ((HasTempIndex) val).getTempIndex() == tempIndex) {
             val = val.value;
         }
-        writer.append("_temp");
+        if (declaration) {
+            return dialect.writeTemporaryDeclaration(writer, localData, SHOW_SUFFIX ? suffix : "", tempIndex, val);
+        }
+        writer.append("_temp");        
         if (SHOW_SUFFIX) {
             writer.append(suffix);
         }
         writer.append("_").append(tempIndex).append(" = ");
-        val.appendTry(writer, localData);
-        return writer;
+        return value.appendTry(writer, localData);
     }
 
     @Override

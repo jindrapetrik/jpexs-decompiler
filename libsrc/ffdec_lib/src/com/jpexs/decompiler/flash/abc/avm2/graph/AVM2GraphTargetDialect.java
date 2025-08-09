@@ -28,9 +28,11 @@ import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,5 +108,17 @@ public class AVM2GraphTargetDialect extends GraphTargetDialect {
     @Override
     public boolean doesAllowMultilevelBreaks() {
         return true;
+    }
+    
+    @Override
+    public GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException {
+        writer.append("var ");
+        writer.append("_temp");        
+        writer.append("_").append(tempIndex).append(":*");
+        if (value != null) {
+            writer.append(" = ");
+            value.appendTry(writer, localData);
+        }
+        return writer;
     }
 }

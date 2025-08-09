@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
@@ -47,6 +48,7 @@ import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -1034,7 +1036,49 @@ public class Graph {
         makeAllCommands(ret, stack);
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
+        handleSetTemporaryDeclarations(ret);
         return ret;
+    }        
+    private void handleSetTemporaryDeclarations(List<GraphTargetItem> items) {
+        for (int i = 0; i < items.size(); i++) {
+            GraphTargetItem item = items.get(i);
+            if (item instanceof SetTemporaryItem) {
+                SetTemporaryItem s = (SetTemporaryItem) item;
+                s.declaration = true;
+            }
+            if (item instanceof DuplicateSourceItem) {
+                DuplicateSourceItem s = (DuplicateSourceItem) item;
+                s.declaration = true;
+            }
+            
+            Reference<Integer> iRef = new Reference<>(i);
+            item.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                @Override
+                public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                    if (item instanceof SetTemporaryItem) {
+                        SetTemporaryItem st = (SetTemporaryItem) item;
+                        SetTemporaryItem dec = new SetTemporaryItem(dialect, null, null, null, st.tempIndex, st.getSuffix());
+                        dec.declaration = true;
+                        items.add(iRef.getVal(), dec);
+                        iRef.setVal(iRef.getVal() + 1);
+                    }
+                    if (item instanceof DuplicateSourceItem) {
+                        DuplicateSourceItem st = (DuplicateSourceItem) item;
+                        SetTemporaryItem dec = new SetTemporaryItem(dialect, null, null, null, st.tempIndex, "");
+                        dec.declaration = true;
+                        items.add(iRef.getVal(), dec);
+                        iRef.setVal(iRef.getVal() + 1);
+                    }
+                }                
+            });
+            i = iRef.getVal();
+            if (item instanceof Block) {
+                Block blk = (Block) item;
+                for (List<GraphTargetItem> sub : blk.getSubs()) {
+                    handleSetTemporaryDeclarations(sub);
+                }
+            }
+        }
     }
 
     /*

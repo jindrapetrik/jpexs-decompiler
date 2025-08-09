@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -37,7 +36,9 @@ import java.util.Set;
 public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
 
     public int tempIndex;
-
+    public boolean declaration = false;
+    
+    
     /**
      * Constructor.
      * 
@@ -75,7 +76,10 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue,
         while ((val instanceof HasTempIndex) && ((HasTempIndex) val).getTempIndex() == tempIndex) {
             val = val.value;
         }
-        writer.append("_tempdup_").append(tempIndex).append(" = ");
+        if (declaration) {
+            return dialect.writeTemporaryDeclaration(writer, localData, "", tempIndex, val);
+        }
+        writer.append("_temp_").append(tempIndex).append(" = ");
         val.appendTry(writer, localData);
         return writer;
     }

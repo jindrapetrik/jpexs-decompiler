@@ -46,6 +46,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,9 +114,10 @@ public class GetPropertyIns extends InstructionDefinition {
                         }
                     }
                 }
-                if (findPropName.name instanceof DuplicateItem) {
+                if (findPropName.name instanceof DuplicateItem || findPropName.name instanceof DuplicateSourceItem) {
                     if (findPropName.name.getThroughDuplicate() == multiname.name.getThroughDuplicate()) {
                         findPropName.name = findPropName.name.value;
+                        multiname.name = multiname.name.getThroughDuplicate();
                     }
                 }
                 if (findPropName.namespace instanceof SetLocalAVM2Item) {
@@ -130,9 +132,10 @@ public class GetPropertyIns extends InstructionDefinition {
                         }
                     }
                 }
-                if (findPropName.namespace instanceof DuplicateItem) {
+                if (findPropName.namespace instanceof DuplicateItem || findPropName.namespace instanceof DuplicateSourceItem) {
                     if (findPropName.namespace.getThroughDuplicate() == multiname.namespace.getThroughDuplicate()) {
-                        findPropName.namespace = findPropName.namespace.value;
+                        findPropName.namespace = findPropName.namespace.getThroughDuplicate();
+                        multiname.namespace = multiname.namespace.getThroughDuplicate();
                     }
                 }
             }
