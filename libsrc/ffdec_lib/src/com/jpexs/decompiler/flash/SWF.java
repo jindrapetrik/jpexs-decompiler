@@ -3823,7 +3823,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 break;
             }
 
-            stack.setConnectedOutput(0, output);        
+            stack.setConnectedOutput(0, output, localData);
             ins.translate(localData, stack, output, staticOperation, path);
             if (ins.isExit()) {
                 break;

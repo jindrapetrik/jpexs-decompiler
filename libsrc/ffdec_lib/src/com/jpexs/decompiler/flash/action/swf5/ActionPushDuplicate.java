@@ -68,7 +68,8 @@ public class ActionPushDuplicate extends Action {
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.peek();
-        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction, value));
+        //TODO: implement logic similar to Avm2
+        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction, value, 0));
         value.getMoreSrc().add(new GraphSourceItemPos(this, 0));
     }
 

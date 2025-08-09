@@ -298,6 +298,7 @@ public class AVM2LocalData extends BaseLocalData {
         bottomSetLocals = localData.bottomSetLocals;
         swfVersion = localData.swfVersion;
         usedDeobfuscations = localData.usedDeobfuscations;
+        maxTempIndex = localData.maxTempIndex;
     }
 
     /**

@@ -339,7 +339,7 @@ public class AVM2Graph extends Graph {
             localData2.localScopeStack = new ScopeStack();
 
             List<GraphTargetItem> targetOutput = new GraphPartMarkedArrayList<>();
-            finallyTryTargetStack.setConnectedOutput(0, targetOutput);
+            finallyTryTargetStack.setConnectedOutput(0, targetOutput, localData);
             try {
                 translatePart(targetOutput, localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
             } catch (GraphPartChangeException ex1) { //should not happen

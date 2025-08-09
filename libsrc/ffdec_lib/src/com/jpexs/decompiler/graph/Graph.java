@@ -2390,7 +2390,7 @@ public class Graph {
      */
     protected final void translatePart(List<GraphTargetItem> output, BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         List<GraphPart> sub = part.getSubParts();
-        stack.setConnectedOutput(0, output);
+        stack.setConnectedOutput(0, output, localData);
         int end;
         for (GraphPart p : sub) {
             if (p.end == -1) {
@@ -3370,7 +3370,7 @@ public class Graph {
 
             if (code.size() <= part.start) {                
                 if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
-                    stack.setConnectedOutput(0, ret);
+                    stack.setConnectedOutput(0, ret, localData);
                     stack.addToOutput(new ScriptEndItem(dialect));                  
                 }
                 return ret;
@@ -3503,7 +3503,7 @@ public class Graph {
             if (currentRet instanceof GraphPartMarkedArrayList) {
                 ((GraphPartMarkedArrayList) currentRet).startPart(part);
             }
-            stack.setConnectedOutput(0, currentRet);
+            stack.setConnectedOutput(0, currentRet, localData);
             if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
                 parseNext = false;
             } else {
@@ -3512,7 +3512,7 @@ public class Graph {
                 do {
                     exHappened = false;
                     try {
-                        stack.setConnectedOutput(currentRet.size(), output);
+                        stack.setConnectedOutput(currentRet.size(), output, localData);
                         code.translatePart(output, this, part, localData, stack, ipStart, part.end, staticOperation, path);
                     } catch (GraphPartChangeException ex) { //Special case for ifFrameLoaded when it's over multiple parts
                         //output.addAll(ex.getOutput());

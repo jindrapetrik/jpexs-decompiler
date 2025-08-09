@@ -76,7 +76,9 @@ import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.TemporaryItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
@@ -342,6 +344,17 @@ public class ActionGraph extends Graph {
                         }
                     }
                 }
+                if (it instanceof SetTemporaryItem) {
+                    SetTemporaryItem st = (SetTemporaryItem) it;
+                    if (st.value instanceof GetPropertyActionItem) {
+                        GetPropertyActionItem gp = (GetPropertyActionItem) st.value;
+                        if (gp.propertyIndex == 11 /*_target*/) {
+                            list.remove(t);
+                            t--;
+                            continue;
+                        }
+                    }
+                }
                 if (it instanceof SetTargetActionItem) {
                     SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.isEmpty()) {
@@ -358,6 +371,11 @@ public class ActionGraph extends Graph {
                 if (it instanceof SetTarget2ActionItem) {
                     SetTarget2ActionItem st = (SetTarget2ActionItem) it;
                     if (st.target instanceof PopItem) {
+                        list.remove(t);
+                        t--;
+                        continue;
+                    }
+                    if (st.target instanceof TemporaryItem) {
                         list.remove(t);
                         t--;
                         continue;

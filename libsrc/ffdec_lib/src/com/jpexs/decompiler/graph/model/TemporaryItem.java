@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
+public class TemporaryItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
 
     public int tempIndex;
     /**
@@ -44,7 +45,7 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
      * @param lineStartIns Line start item
      * @param value Value
      */
-    public DuplicateItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex) {
+    public TemporaryItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex) {
         super(dialect, src, lineStartIns, value.getPrecedence(), value);
         this.tempIndex = tempIndex;
     }
@@ -61,14 +62,6 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        /*if (!value.hasSideEffect() || !Configuration.displayDupInstructions.get()) {
-            return value.appendTry(writer, localData);
-        }*/
-        if (tempIndex == 0) {
-            writer.append("§§dup(");
-            value.appendTry(writer, localData);
-            return writer.append(")");
-        }
         return writer.append("_temp_").append(tempIndex);
     }
 
@@ -110,7 +103,7 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return generator.generate(localData, this);
+        return new ArrayList<>();
     }
 
     @Override
@@ -128,10 +121,6 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
         return value.returnType();
     }
 
-    /*@Override
-     public GraphTargetItem invert(GraphSourceItem src) {
-     return //new DuplicateItem(src, value instanceof NotItem ? (value.value) : new NotItem(src, value));
-     }*/
     @Override
     public boolean isSimpleValue() {
         return ((value instanceof SimpleValue) && ((SimpleValue) value).isSimpleValue());
@@ -141,9 +130,10 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
     public boolean hasSideEffect() {
         return value.hasSideEffect();
     }
-
+    
     @Override
     public int getTempIndex() {
         return tempIndex;
     }
+
 }

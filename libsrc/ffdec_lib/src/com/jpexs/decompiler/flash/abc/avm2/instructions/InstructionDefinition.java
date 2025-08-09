@@ -271,6 +271,7 @@ public abstract class InstructionDefinition implements Serializable {
     /**
      * Translates instruction to high level code.
      *
+     * @param maxTempIndex Max temp index
      * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param switchParts Switch parts
@@ -300,7 +301,7 @@ public abstract class InstructionDefinition implements Serializable {
      * @param bottomSetLocals Bottom set locals
      * @throws InterruptedException On interrupt
      */
-    public void translate(Set<String> usedDeobfuscations, int swfVersion, Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive, LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals) throws InterruptedException {
+    public void translate(Reference<Integer> maxTempIndex, Set<String> usedDeobfuscations, int swfVersion, Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive, LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.allSwitchParts = switchParts;
         localData.isStatic = isStatic;
@@ -325,6 +326,7 @@ public abstract class InstructionDefinition implements Serializable {
         localData.bottomSetLocals = bottomSetLocals;
         localData.swfVersion = swfVersion;
         localData.usedDeobfuscations = usedDeobfuscations;
+        localData.maxTempIndex = maxTempIndex;
         translate(localData, stack, ins, output, path);
         lineStartItem.setVal(localData.lineStartInstruction);
     }

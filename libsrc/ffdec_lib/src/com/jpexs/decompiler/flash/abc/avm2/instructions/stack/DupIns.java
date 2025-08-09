@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import java.util.List;
 
 /**
@@ -56,14 +57,23 @@ public class DupIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
+        int temp = 0;
+                        
         if (v instanceof NewActivationAVM2Item 
                 || v instanceof ExceptionAVM2Item) {
             stack.push(v);
         } else {
-            stack.push(new DuplicateSourceItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v));
+            if (v instanceof HasTempIndex) {
+                temp = ((HasTempIndex) v).getTempIndex();
+                stack.push(v);
+            } else {
+                temp = localData.maxTempIndex.getVal() + 1;
+                localData.maxTempIndex.setVal(temp);
+                stack.push(new DuplicateSourceItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v, temp));
+            }            
         }
         //stack.push(v);
-        stack.push(new DuplicateItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v));
+        stack.push(new DuplicateItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v, temp));
         //v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 
     }

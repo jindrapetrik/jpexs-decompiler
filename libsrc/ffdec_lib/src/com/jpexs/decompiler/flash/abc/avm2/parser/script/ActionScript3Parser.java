@@ -2451,7 +2451,7 @@ public class ActionScript3Parser {
                         break;
                     //Both ASs
                     case "dup":
-                        ret = new DuplicateItem(DIALECT, null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc));
+                        ret = new DuplicateItem(DIALECT, null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc), 0);
                         allowMemberOrCall = true;
                         break;
                     case "push":

@@ -34,7 +34,9 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue {
+public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
+
+    public int tempIndex;
 
     /**
      * Constructor.
@@ -44,10 +46,11 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue 
      * @param lineStartIns Line start item
      * @param value Value
      */
-    public DuplicateSourceItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
+    public DuplicateSourceItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex) {
         super(dialect, src, lineStartIns, value.getPrecedence(), value);
+        this.tempIndex = tempIndex;
     }
-
+    
     @Override
     public Object getResult() {
         return value.getResult();
@@ -63,9 +66,18 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue 
         /*if (!value.hasSideEffect() || !Configuration.displayDupInstructions.get()) {
             return value.appendTry(writer, localData);
         }*/
-        writer.append("§§dupsrc(");
-        value.appendTry(writer, localData);
-        return writer.append(")");
+        if (tempIndex == 0) {
+            writer.append("§§dupsrc(");
+            value.appendTry(writer, localData);
+            return writer.append(")");
+        }
+        GraphTargetItem val = value;
+        while ((val instanceof HasTempIndex) && ((HasTempIndex) val).getTempIndex() == tempIndex) {
+            val = val.value;
+        }
+        writer.append("_tempdup_").append(tempIndex).append(" = ");
+        val.appendTry(writer, localData);
+        return writer;
     }
 
     @Override
@@ -138,4 +150,8 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue 
         return value.hasSideEffect();
     }
 
+    @Override
+    public int getTempIndex() {
+        return tempIndex;
+    }
 }
