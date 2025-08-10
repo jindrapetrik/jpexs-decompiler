@@ -182,6 +182,7 @@ import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -5253,10 +5254,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             //}
         }
         if (ti0 instanceof ImageTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp", true, "importimage");
+            String filters = "*.jpg;*.jpeg;*.gif;*.png;*.bmp";
+            if (ImageFormat.WEBP.available()) {
+                filters += ";*.webp";
+            }
+            file = showImportFileChooser("filter.images|" + filters, true, "importimage");
         }
         if (ti0 instanceof ShapeTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, "importshape");
+            String filters = "*.jpg;*.jpeg;*.gif;*.png;*.bmp";
+            if (ImageFormat.WEBP.available()) {
+                filters += ";*.webp";
+            }
+            filters += ";*.svg";
+            file = showImportFileChooser("filter.images|" + filters, true, "importshape");
         }
         if (ti0 instanceof MorphShapeTag) {
             return replaceMorphShape((MorphShapeTag) ti0, create, true);

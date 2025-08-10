@@ -59,10 +59,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -141,7 +145,7 @@ public class ExportDialog extends AppDialog {
         ButtonExportMode.class
     };
 
-    private final JComboBox[] combos;
+    private final JComboBox<ComboValue>[] combos;
 
     private final JCheckBox[] checkBoxes;
 
@@ -157,9 +161,8 @@ public class ExportDialog extends AppDialog {
 
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
-            if (option == optionClasses[i]) {
-                E[] values = option.getEnumConstants();
-                return values[combos[i].getSelectedIndex()];
+            if (option == optionClasses[i]) {                
+                return (E) ((ComboValue) combos[i].getSelectedItem()).value;
             }
         }
 
@@ -199,10 +202,9 @@ public class ExportDialog extends AppDialog {
     private void saveConfig() {
         StringBuilder cfg = new StringBuilder();
         for (int i = 0; i < optionNames.length; i++) {
-            int selIndex = combos[i].getSelectedIndex();
+            Object val = ((ComboValue) combos[i].getSelectedItem()).value;
             Class c = optionClasses[i];
-            Object[] vals = c.getEnumConstants();
-            String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase(Locale.ENGLISH);
+            String key = optionNames[i] + "." + val.toString().toLowerCase(Locale.ENGLISH);
             if (i > 0) {
                 cfg.append(",");
             }
@@ -321,17 +323,31 @@ public class ExportDialog extends AppDialog {
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
             Object[] vals = c.getEnumConstants();
-            String[] names = new String[vals.length];
+            List<ComboValue> namesList = new ArrayList<>();
             int itemIndex = -1;
             for (int j = 0; j < vals.length; j++) {
-
+                try {
+                    Method availableMethod = c.getMethod("available");
+                    if (!(Boolean)availableMethod.invoke(vals[j]))
+                    {
+                        continue;
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                    //ignore
+                }
+                //ignore
+                //ignore
+                
                 String key = optionNames[i] + "." + vals[j].toString().toLowerCase(Locale.ENGLISH);
                 if (exportFormats.contains(key)) {
                     itemIndex = j;
                 }
-                names[j] = translate(key);
+                
+                namesList.add(new ComboValue(vals[j], translate(key)));
             }
 
+            ComboValue[] names = namesList.toArray(new ComboValue[0]);
+            
             combos[i] = new JComboBox<>(names);
             if (itemIndex > -1) {
                 combos[i].setSelectedIndex(itemIndex);
@@ -493,5 +509,20 @@ public class ExportDialog extends AppDialog {
     public int showExportDialog() {
         setVisible(true);
         return result;
+    }
+    
+    private class ComboValue {
+        public Object value;
+        public String text;
+
+        public ComboValue(Object value, String text) {
+            this.value = value;
+            this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }                
     }
 }

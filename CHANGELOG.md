@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
   hilight float instruction blue
 - Icons for every tag type
 - [#2499] Information about frames which do not have ShowFrame tag
+- [#2504] WebP image format for export/import (not animated)
+  Limitation: It's not available on Mac x86-64 platform
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -3951,6 +3953,7 @@ Major version of SWF to XML export changed to 2.
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
 [#2499]: https://www.free-decompiler.com/flash/issues/2499
+[#2504]: https://www.free-decompiler.com/flash/issues/2504
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338

@@ -48,6 +48,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -158,6 +159,7 @@ public class MorphShapeExporter {
                             break;
                         case PNG_START_END:
                         case BMP_START_END:
+                        case WEBP_START_END:
                             double unzoom = settings.zoom;
                             st = mst.getStartShapeTag();
                             rect = st.getRect();
@@ -178,6 +180,10 @@ public class MorphShapeExporter {
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileStart);
+                            } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
+                                try(FileOutputStream fos = new FileOutputStream(fileStart)) {
+                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), fileStart);
                             }
@@ -201,6 +207,10 @@ public class MorphShapeExporter {
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
+                            } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
+                                try(FileOutputStream fos = new FileOutputStream(fileEnd)) {
+                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), fileEnd);
                             }

@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -77,6 +78,20 @@ public class ImageImporter extends TagImporter {
             ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();
         }
+        if (newData.length >= 4 
+                && newData[0] == 'R'
+                && newData[1] == 'I'
+                && newData[2] == 'F'
+                && newData[3] == 'F')
+        {
+            if (!ImageFormat.WEBP.available()) {
+                throw new RuntimeException("WEBP format is not supported on your platform");
+            }
+            BufferedImage b = WebPCodec.decodeImage(newData);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageHelper.write(b, ImageFormat.PNG, baos);
+            newData = baos.toByteArray();
+        }
 
         if (tagType == 0) {
             if (it instanceof DefineBitsTag) {
@@ -94,7 +109,7 @@ public class ImageImporter extends TagImporter {
                     && newData[3] == (byte) 0xe0) {
                 tagType = DefineBitsJPEG2Tag.ID;
             } else {
-                tagType = DefineBitsLosslessTag.ID;
+                tagType = DefineBitsLossless2Tag.ID;
             }
         }
 

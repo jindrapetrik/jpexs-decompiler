@@ -33,6 +33,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -110,6 +111,11 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = ImageFormat.BMP;
                 }
+                
+                if (settings.mode == ImageExportMode.WEBP) {
+                    fileFormat = ImageFormat.WEBP;
+                }
+                
                 final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
 
                 final ImageFormat ffileFormat = fileFormat;
@@ -121,6 +127,10 @@ public class ImageExporter {
                         }
                     } else if (ffileFormat == ImageFormat.BMP) {
                         BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
+                    } else if (ffileFormat == ImageFormat.WEBP) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                            fos.write(WebPCodec.encodeImage(imageTag.getImageCached().getBufferedImage(), 100f));
+                        }
                     } else {
                         ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
                     }

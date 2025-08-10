@@ -64,6 +64,8 @@ public class ShapeExportSettings {
                 return ".bmp";
             case CANVAS:
                 return ".html";
+            case WEBP:
+                return ".webp";
             case SWF:
                 return ".swf";
             default:

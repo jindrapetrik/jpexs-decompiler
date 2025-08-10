@@ -38,10 +38,12 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -158,6 +160,21 @@ public class ShapeImporter {
 
         if (newData[0] == 'B' && newData[1] == 'M') {
             BufferedImage b = ImageHelper.read(newData);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageHelper.write(b, ImageFormat.PNG, baos);
+            newData = baos.toByteArray();
+        }
+        
+        if (newData.length >= 4 
+                && newData[0] == 'R'
+                && newData[1] == 'I'
+                && newData[2] == 'F'
+                && newData[3] == 'F')
+        {
+            if (!ImageFormat.WEBP.available()) {
+                throw new RuntimeException("WEBP format is not supported on your platform");
+            }
+            BufferedImage b = WebPCodec.decodeImage(newData);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();

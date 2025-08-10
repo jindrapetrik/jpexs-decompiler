@@ -63,6 +63,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
@@ -120,6 +121,9 @@ public class FrameExporter {
             case SVG:
                 fem = FrameExportMode.SVG;
                 break;
+            case WEBP:
+                fem = FrameExportMode.WEBP;
+                break;
             case SWF:
                 fem = FrameExportMode.SWF;
                 break;
@@ -159,6 +163,9 @@ public class FrameExporter {
                 break;
             case BMP:
                 fem = FrameExportMode.BMP;
+                break;
+            case WEBP:
+                fem = FrameExportMode.WEBP;
                 break;
             case SWF:
                 fem = FrameExportMode.SWF;
@@ -513,7 +520,9 @@ public class FrameExporter {
         }
 
         final Color fbackgroundColor = backgroundColor;
-        final boolean usesTransparency = settings.mode == FrameExportMode.PNG || settings.mode == FrameExportMode.GIF;
+        final boolean usesTransparency = settings.mode == FrameExportMode.PNG 
+                || settings.mode == FrameExportMode.GIF 
+                || settings.mode == FrameExportMode.WEBP;
         final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
         switch (settings.mode) {
@@ -539,6 +548,26 @@ public class FrameExporter {
                             BufferedImage img = frameImages.next();
                             if (img != null) {
                                 BMPFile.saveBitmap(img, f);
+                            }
+                            ret.add(f);
+                        }, handler).run();
+                    }
+                }
+                break;
+            case WEBP:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    for (int i = 0; frameImages.hasNext(); i++) {
+                        final int fi = i;
+                        new RetryTask(() -> {
+                            int fileNum = subFramesLength > 1 ? fi + 1 : (fframes.get(fi) + 1);
+
+                            File f = new File(foutdir + File.separator + fileNum + ".webp");
+                            BufferedImage img = frameImages.next();
+                            if (img != null) {
+                                try(FileOutputStream fos = new FileOutputStream(f)) {
+                                    fos.write(WebPCodec.encodeImage(img, 100f));
+                                }
                             }
                             ret.add(f);
                         }, handler).run();

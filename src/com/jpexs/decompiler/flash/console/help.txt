@@ -210,8 +210,7 @@ alias /?
     -format <format> (optional, html is default) Selects output format
     <format> is currently only html
     -locale <locale> (optional) Override default locale
-    <locale> is localization identifier, en for english for example
-    <format> is currently only html
+    <locale> is localization identifier, en for english for example    
 
 -getInstanceMetadata -instance <instanceName> [-outputFormat <outputFormat>] \
                      [-key <key> ] [-datafile <datafile>] <swffile>
@@ -324,8 +323,12 @@ Pre-options:
         shape:png - PNG format for Shapes
         shape:canvas - HTML5 Canvas format for Shapes
         shape:bmp - BMP format for Shapes
+        shape:webp - WEBP format for Shapes
         morphshape:svg - SVG format for MorphShapes
         morphshape:canvas - HTML5 Canvas  format for MorphShapes
+        morpshape:png_start_end - PNG start-end format for MorphShapes
+        morpshape:bmp_start_end - BMP start-end format for MorphShapes
+        morpshape:webp_start_end - WEBP start-end format for MorphShapes
         frame:png - PNG format for Frames
         frame:gif - GIF format for Frames
         frame:avi - AVI format for Frames
@@ -333,6 +336,7 @@ Pre-options:
         frame:canvas - HTML5 Canvas format for Frames
         frame:pdf - PDF format for Frames
         frame:bmp - BMP format for Frames
+        frame:webp - WEBP format for Frames
         sprite:png - PNG format for Sprites
         sprite:gif - GIF format for Sprites
         sprite:avi - AVI format for Sprites
@@ -340,14 +344,17 @@ Pre-options:
         sprite:canvas - HTML5 Canvas format for Sprites
         sprite:pdf - PDF format for Sprites
         sprite:bmp - BMP format for Sprites
+        sprite:webp - WEBP format for Sprites
         button:png - PNG format for Buttons
         button:svg - SVG format for Buttons
         button:bmp - BMP format for Buttons
+        button:webp - WEBP format for Buttons
         image:png_gif_jpeg - PNG/GIF/JPEG format for Images
         image:png - PNG format for Images
         image:jpeg - JPEG format for Images
         image:bmp - BMP format for Images
         image:png_gif_jpeg_alpha - PNG/GIF/JPEG+ALPHA format for Images
+        image:webp - WEBP format for Images
         text:plain - Plain text format for Texts
         text:formatted - Formatted text format for Texts
         text:svg - SVG format for Texts

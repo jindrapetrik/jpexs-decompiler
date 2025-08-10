@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters.modes;
 
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+
 /**
  * Image export mode.
  *
@@ -42,5 +44,16 @@ public enum ImageExportMode {
     /**
      * PNG, GIF or JPEG, depending on what suits the best, plus alpha channel
      */
-    PNG_GIF_JPEG_ALPHA
+    PNG_GIF_JPEG_ALPHA,
+    /*
+     * WEBP
+     */    
+    WEBP;
+    
+    public boolean available() {
+        if (this == WEBP) {
+            return ImageFormat.WEBP.available();
+        }
+        return true;
+    }
 }

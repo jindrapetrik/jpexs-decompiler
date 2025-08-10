@@ -226,6 +226,8 @@ public class ImageHelper {
                 return "png";
             case BMP:
                 return "bmp";
+            case WEBP:
+                return "webp";
         }
 
         throw new Error("Unsupported image format: " + format);

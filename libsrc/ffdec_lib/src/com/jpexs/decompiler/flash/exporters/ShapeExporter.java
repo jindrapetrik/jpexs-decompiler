@@ -46,6 +46,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -122,6 +123,7 @@ public class ShapeExporter {
                             break;
                         case PNG:
                         case BMP:
+                        case WEBP:
                             int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
@@ -137,6 +139,10 @@ public class ShapeExporter {
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
+                            } else if (settings.mode == ShapeExportMode.WEBP) {
+                                try(FileOutputStream fos = new FileOutputStream(file)) {
+                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), file);
                             }

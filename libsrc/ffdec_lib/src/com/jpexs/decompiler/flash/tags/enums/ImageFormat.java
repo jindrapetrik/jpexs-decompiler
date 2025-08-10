@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.tags.enums;
 
+import dev.matrixlab.webp4j.NativeWebP;
+import dev.matrixlab.webp4j.WebPCodec;
+
 /**
  * Image format.
  *
@@ -42,7 +45,11 @@ public enum ImageFormat {
     /**
      * BMP
      */
-    BMP(".bmp");
+    BMP(".bmp"),
+    /**
+     * WEBP
+     */
+    WEBP(".webp");
 
     private final String extension;
 
@@ -56,5 +63,16 @@ public enum ImageFormat {
      */
     public String getExtension() {
         return extension;
+    }
+    
+    public boolean available() {
+        if (this == WEBP) {
+            try {
+                new NativeWebP();
+            } catch (Throwable t) {
+                return false;
+            }
+        }
+        return true;
     }
 }

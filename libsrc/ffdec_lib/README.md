@@ -124,9 +124,10 @@ It uses modified code of these libraries:
 * UAB "DKD" NellyMoser ASAO codec (Decoding Nelly Moser sound format) - LGPL
 * [Animated GIF Writer] (Frames to GIF export) - Creative Commons Attribution 3.0 Unported
 * [Animated GIF Encoder] (Frames to GIF export)
-* [gnujpdf] (PDF export) - LGPL License
-* [openjdk8 Stroker] (Shapes - Miter clip drawing) - GPL License
-* [Apache Flex SDK] (Decimal numbers support - Decimal128 class) - Apache Licence 2.0
+* [gnujpdf] (PDF export) - LGPL
+* [openjdk8 Stroker] (Shapes - Miter clip drawing) - GPL
+* [Apache Flex SDK] (Decimal numbers support - Decimal128 class) - Apache License 2.0
+* [webp4j] (WEBP format export/import) - MIT
 
 And also links to these libraries:
 
@@ -166,3 +167,4 @@ And also links to these libraries:
 [FLA Compound Document Tools]: https://github.com/jindrapetrik/flacomdoc
 [TomlJ]: https://github.com/tomlj/tomlj
 [ANTLR]: https://www.antlr.org/
+[webp4j]: https://github.com/jindrapetrik/webp4j/tree/java8
