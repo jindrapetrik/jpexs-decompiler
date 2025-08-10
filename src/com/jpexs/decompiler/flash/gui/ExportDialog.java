@@ -161,7 +161,7 @@ public class ExportDialog extends AppDialog {
 
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
-            if (option == optionClasses[i]) {                
+            if (option == optionClasses[i]) {
                 return (E) ((ComboValue) combos[i].getSelectedItem()).value;
             }
         }
@@ -242,7 +242,7 @@ public class ExportDialog extends AppDialog {
         }
         return false;
     }
-    
+
     private String translateTitle(String title) {
         return translate("titleFormat").replace("%title%", translate(title));
     }
@@ -258,7 +258,7 @@ public class ExportDialog extends AppDialog {
         comboPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 2, 2, 2);
-        
+
         int labWidth = 0;
         boolean[] exportableExistsArray = new boolean[optionNames.length];
         for (int i = 0; i < optionNames.length; i++) {
@@ -315,8 +315,8 @@ public class ExportDialog extends AppDialog {
         });
         gbc.gridy = 0;
         gbc.gridx = 3;
-        comboPanel.add(selectAllCheckBox, gbc);        
-        
+        comboPanel.add(selectAllCheckBox, gbc);
+
         List<Class> visibleOptionClasses = new ArrayList<>();
 
         boolean zoomable = false;
@@ -328,31 +328,28 @@ public class ExportDialog extends AppDialog {
             for (int j = 0; j < vals.length; j++) {
                 try {
                     Method availableMethod = c.getMethod("available");
-                    if (!(Boolean)availableMethod.invoke(vals[j]))
-                    {
+                    if (!(Boolean) availableMethod.invoke(vals[j])) {
                         continue;
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
                     //ignore
                 }
-                //ignore
-                //ignore
-                
+
                 String key = optionNames[i] + "." + vals[j].toString().toLowerCase(Locale.ENGLISH);
                 if (exportFormats.contains(key)) {
                     itemIndex = j;
                 }
-                
+
                 namesList.add(new ComboValue(vals[j], translate(key)));
             }
 
             ComboValue[] names = namesList.toArray(new ComboValue[0]);
-            
+
             combos[i] = new JComboBox<>(names);
             if (itemIndex > -1) {
                 combos[i].setSelectedIndex(itemIndex);
             }
-            
+
             checkBoxes[i] = new JCheckBox();
             checkBoxes[i].setSelected(true);
 
@@ -376,13 +373,13 @@ public class ExportDialog extends AppDialog {
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridwidth = 2;
             comboPanel.add(combos[i], gbc);
-            gbc.gridx += 2;      
+            gbc.gridx += 2;
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.CENTER;
             comboPanel.add(checkBoxes[i], gbc);
             lab.setLabelFor(combos[i]);
-        }                
+        }
 
         embedCheckBox = new JCheckBox(translate("embed"));
         embedCheckBox.setVisible(false);
@@ -398,16 +395,16 @@ public class ExportDialog extends AppDialog {
                 }
             }
         }
-        
-        gbc.gridx = 0;            
-        gbc.gridwidth = 4;   
+
+        gbc.gridx = 0;
+        gbc.gridwidth = 4;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.LINE_START;
-        
+
         if (hasAs3 && visibleOptionClasses.contains(ScriptExportMode.class)) {
             gbc.gridy++;
             embedCheckBox.setVisible(true);
-            comboPanel.add(embedCheckBox, gbc);         
+            comboPanel.add(embedCheckBox, gbc);
             if (Configuration.lastExportEnableEmbed.get()) {
                 embedCheckBox.setSelected(true);
             }
@@ -439,18 +436,18 @@ public class ExportDialog extends AppDialog {
 
         if (zoomable) {
             JLabel zlab = new JLabel(translateTitle("zoom"));
-            JLabel pctLabel = new JLabel(translate("zoom.percent"));   
+            JLabel pctLabel = new JLabel(translate("zoom.percent"));
             zlab.setLabelFor(zoomTextField);
             gbc.gridy++;
             gbc.gridx = 0;
-            gbc.gridwidth = 1;            
+            gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.LINE_END;
             comboPanel.add(zlab, gbc);
             gbc.gridx++;
             gbc.anchor = GridBagConstraints.LINE_START;
             comboPanel.add(zoomTextField, gbc);
             gbc.gridx++;
-            gbc.anchor = GridBagConstraints.LINE_START;            
+            gbc.anchor = GridBagConstraints.LINE_START;
             comboPanel.add(pctLabel, gbc);
         }
 
@@ -510,8 +507,9 @@ public class ExportDialog extends AppDialog {
         setVisible(true);
         return result;
     }
-    
+
     private class ComboValue {
+
         public Object value;
         public String text;
 
@@ -523,6 +521,6 @@ public class ExportDialog extends AppDialog {
         @Override
         public String toString() {
             return text;
-        }                
+        }
     }
 }

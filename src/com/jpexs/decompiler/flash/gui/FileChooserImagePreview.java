@@ -104,7 +104,7 @@ public class FileChooserImagePreview extends JComponent
                 }
             }
         } else {
-            try(FileInputStream fis = new FileInputStream(file)) {
+            try (FileInputStream fis = new FileInputStream(file)) {
                 img = ImageHelper.read(fis);
             } catch (IOException ex) {
                 //ignore

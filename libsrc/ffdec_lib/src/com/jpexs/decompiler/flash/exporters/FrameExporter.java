@@ -565,7 +565,7 @@ public class FrameExporter {
                             File f = new File(foutdir + File.separator + fileNum + ".webp");
                             BufferedImage img = frameImages.next();
                             if (img != null) {
-                                try(FileOutputStream fos = new FileOutputStream(f)) {
+                                try (FileOutputStream fos = new FileOutputStream(f)) {
                                     fos.write(WebPCodec.encodeImage(img, 100f));
                                 }
                             }

@@ -140,7 +140,7 @@ public class ShapeExporter {
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else if (settings.mode == ShapeExportMode.WEBP) {
-                                try(FileOutputStream fos = new FileOutputStream(file)) {
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
                                     fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
                                 }
                             } else {

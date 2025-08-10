@@ -111,11 +111,11 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = ImageFormat.BMP;
                 }
-                
+
                 if (settings.mode == ImageExportMode.WEBP) {
                     fileFormat = ImageFormat.WEBP;
                 }
-                
+
                 final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
 
                 final ImageFormat ffileFormat = fileFormat;

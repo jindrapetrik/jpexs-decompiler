@@ -54,6 +54,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image.
+     *
      * @param it Image tag
      * @param newData New data
      * @return Imported tag
@@ -65,6 +66,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image.
+     *
      * @param it Image tag
      * @param newData New data
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
@@ -78,12 +80,12 @@ public class ImageImporter extends TagImporter {
             ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();
         }
-        if (newData.length >= 4 
+        if (newData.length >= 4
                 && newData[0] == 'R'
                 && newData[1] == 'I'
                 && newData[2] == 'F'
-                && newData[3] == 'F')
-        {
+                && newData[3] == 'F'
+            ) {
             if (!ImageFormat.WEBP.available()) {
                 throw new RuntimeException("WEBP format is not supported on your platform");
             }
@@ -162,6 +164,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image alpha.
+     *
      * @param it Image tag
      * @param newData New data
      * @return Imported tag
@@ -197,6 +200,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Converts image.
+     *
      * @param it Image tag
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
      * @throws IOException On I/O error
@@ -207,6 +211,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Gets image tag type.
+     *
      * @param format Format
      * @return Image tag type
      */
@@ -235,6 +240,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Bulk import images.
+     *
      * @param imagesDir Images directory
      * @param swf SWF
      * @param printOut Print out

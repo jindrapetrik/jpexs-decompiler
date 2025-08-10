@@ -181,7 +181,7 @@ public class MorphShapeExporter {
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileStart);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
-                                try(FileOutputStream fos = new FileOutputStream(fileStart)) {
+                                try (FileOutputStream fos = new FileOutputStream(fileStart)) {
                                     fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
                                 }
                             } else {
@@ -208,7 +208,7 @@ public class MorphShapeExporter {
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
-                                try(FileOutputStream fos = new FileOutputStream(fileEnd)) {
+                                try (FileOutputStream fos = new FileOutputStream(fileEnd)) {
                                     fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
                                 }
                             } else {
