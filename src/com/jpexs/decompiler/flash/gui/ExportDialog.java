@@ -159,6 +159,7 @@ public class ExportDialog extends AppDialog {
 
     private JCheckBox transparentFrameBackgroundCheckBox;
 
+    @SuppressWarnings("unchecked")
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
             if (option == optionClasses[i]) {
@@ -247,6 +248,7 @@ public class ExportDialog extends AppDialog {
         return translate("titleFormat").replace("%title%", translate(title));
     }
 
+    @SuppressWarnings("unchecked")        
     public ExportDialog(Window owner, List<TreeItem> exportables) {
         super(owner);
         setTitle(translate("dialog.title"));
