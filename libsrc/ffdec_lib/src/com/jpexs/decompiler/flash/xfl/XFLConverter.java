@@ -1627,22 +1627,29 @@ public class XFLConverter {
 
                             for (BUTTONRECORD rec : records) {
                                 if (rec.placeDepth == i) {
-                                    boolean ok = false;
-                                    switch (frame) {
-                                        case 1:
-                                            ok = rec.buttonStateUp;
+                                    int duration = 0;
+                                    while (frame + duration <= 4) {
+                                        boolean ok = false;
+                                        switch (frame + duration) {
+                                            case 1:
+                                                ok = rec.buttonStateUp;
+                                                break;
+                                            case 2:
+                                                ok = rec.buttonStateOver;
+                                                break;
+                                            case 3:
+                                                ok = rec.buttonStateDown;
+                                                break;
+                                            case 4:
+                                                ok = rec.buttonStateHitTest;
+                                                break;
+                                        }       
+                                        if (!ok) {
                                             break;
-                                        case 2:
-                                            ok = rec.buttonStateOver;
-                                            break;
-                                        case 3:
-                                            ok = rec.buttonStateDown;
-                                            break;
-                                        case 4:
-                                            ok = rec.buttonStateHitTest;
-                                            break;
+                                        }
+                                        duration++;
                                     }
-                                    if (!ok) {
+                                    if (duration == 0) {
                                         continue;
                                     }
                                     CXFORMWITHALPHA colorTransformAlpha = null;
@@ -1659,13 +1666,18 @@ public class XFLConverter {
                                     }
                                     CharacterTag character = button.getSwf().getCharacter(rec.characterId);
                                     if (character != null) {
-                                        MATRIX matrix = rec.placeMatrix;
+                                        MATRIX matrix = rec.placeMatrix;                                        
                                         XFLXmlWriter recCharWriter = new XFLXmlWriter();
 
                                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(character))) {
                                             ShapeTag shape = (ShapeTag) character;
                                             statusStack.pushStatus(character.toString());
                                             convertShape(lastImportedId, characterNameMap, character.getSwf(), matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
+                                            statusStack.popStatus();
+                                        } else if (character instanceof MorphShapeTag) { //can happen for HIT_TEST frame
+                                            ShapeTag shape = ((MorphShapeTag) character).getStartShapeTag();
+                                            statusStack.pushStatus(character.toString());
+                                            convertShape(lastImportedId, characterNameMap, character.getSwf(), matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, true, false, recCharWriter);
                                             statusStack.popStatus();
                                         } else if (character instanceof TextTag) {
                                             statusStack.pushStatus(character.toString());
@@ -1683,25 +1695,34 @@ public class XFLConverter {
                                             convertSymbolInstance(-1, new AccessibilityBag() /*???*/, lastImportedId, characterNameMap, swf, null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, character.getSwf().getCharacter(rec.characterId), flaVersion, recCharWriter);
                                         }
 
-                                        int duration = frame - lastFrame;
-                                        lastFrame = frame;
-                                        if (duration > 0) {
-                                            if (duration > 1) {
-                                                symbolStr.writeStartElement("DOMFrame", new String[]{
-                                                    "index", Integer.toString(frame - duration),
-                                                    "duration", Integer.toString(duration - 1),
-                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL)});
-                                                symbolStr.writeElementValue("elements", "");
-                                                symbolStr.writeEndElement();
-                                            }
+                                        int emptyDuration = frame - lastFrame - 1;
+                                        lastFrame = frame + duration - 1;
+                                        
+                                        
+                                        if (emptyDuration > 0) {
                                             symbolStr.writeStartElement("DOMFrame", new String[]{
-                                                "index", Integer.toString(frame),
-                                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});
-                                            symbolStr.writeStartElement("elements");
-                                            symbolStr.writeCharactersRaw(recCharWriter.toString());
-                                            symbolStr.writeEndElement();
+                                                    "index", Integer.toString(frame - emptyDuration),
+                                                    "duration", Integer.toString(emptyDuration),
+                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL)});
+                                            symbolStr.writeElementValue("elements", "");
                                             symbolStr.writeEndElement();
                                         }
+                                        
+                                        if (duration > 1) {
+                                            symbolStr.writeStartElement("DOMFrame", new String[]{
+                                                "index", Integer.toString(frame),
+                                                "duration", Integer.toString(duration),
+                                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});
+                                        } else {
+                                            symbolStr.writeStartElement("DOMFrame", new String[]{
+                                                "index", Integer.toString(frame),
+                                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});                                            
+                                        }
+                                        symbolStr.writeStartElement("elements");
+                                        symbolStr.writeCharactersRaw(recCharWriter.toString());
+                                        symbolStr.writeEndElement();
+                                        symbolStr.writeEndElement();   
+                                        frame += duration - 1;
                                     } else {
                                         logger.log(Level.WARNING, "Character with id={0} was not found.", rec.characterId);
                                     }
