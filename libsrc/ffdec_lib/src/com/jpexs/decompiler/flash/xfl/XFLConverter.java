@@ -1701,9 +1701,9 @@ public class XFLConverter {
                                         
                                         if (emptyDuration > 0) {
                                             symbolStr.writeStartElement("DOMFrame", new String[]{
-                                                    "index", Integer.toString(frame - emptyDuration),
-                                                    "duration", Integer.toString(emptyDuration),
-                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL)});
+                                                "index", Integer.toString(frame - emptyDuration),
+                                                "duration", Integer.toString(emptyDuration),
+                                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                                             symbolStr.writeElementValue("elements", "");
                                             symbolStr.writeEndElement();
                                         }
