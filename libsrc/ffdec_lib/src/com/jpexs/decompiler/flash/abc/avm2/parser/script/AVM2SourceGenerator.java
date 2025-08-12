@@ -278,8 +278,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException {
-        List<GraphSourceItem> ret = item.toSource(localData, this);
+    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException {        
+        List<GraphSourceItem> ret = new ArrayList<>(item.toSource(localData, this));
         ret.add(ins(AVM2Instructions.Pop));
         return ret;
     }
