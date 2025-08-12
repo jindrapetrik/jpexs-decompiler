@@ -64,6 +64,7 @@ All notable changes to this project will be documented in this file.
 - [#2503] Exporting sound streams as FLV
 - [#2507] FLA export - Button hit test frame placing morphshapes
 - [#2507] FLA export - Place characters over multiple button frames
+- [#2508] AS1/2 direct editation - first command in for loop header not compiled
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3969,6 +3970,7 @@ Major version of SWF to XML export changed to 2.
 [#2498]: https://www.free-decompiler.com/flash/issues/2498
 [#2503]: https://www.free-decompiler.com/flash/issues/2503
 [#2507]: https://www.free-decompiler.com/flash/issues/2507
+[#2508]: https://www.free-decompiler.com/flash/issues/2508
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418

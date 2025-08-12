@@ -880,6 +880,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         forajmp.setJumpOffset(-(forExprLen
                 + forBodyLen + forFinalLen + forajmpLen));
         foraif.setJumpOffset(forBodyLen + forFinalLen + forajmpLen);
+        ret.addAll(generateToActionList(localData, item.firstCommands));
         ret.addAll(forExpr);
         ret.addAll(forBody);
         ret.addAll(forFinalCommands);
