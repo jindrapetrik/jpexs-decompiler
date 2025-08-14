@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -80,7 +81,7 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
     /**
      * Serial version major
      */
-    private static final int SERIAL_VERSION_MAJOR = 1;
+    private static final int SERIAL_VERSION_MAJOR = 2;
     /**
      * Serial version minor
      */
@@ -98,14 +99,27 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         ObjectInputStream ois = new ObjectInputStream(is);
         int versionMajor = ois.read();
         ois.read(); //minor
+        if (versionMajor == 1) {
+            throw new IOException("Cannot read older version results");
+        }
         if (versionMajor != SERIAL_VERSION_MAJOR) {
             throw new IOException("Unknown search result version: " + versionMajor);
         }
 
+        SWF swf = null;
+        if (openable instanceof SWF) {
+            swf = (SWF) openable;
+        }
+        if (openable instanceof ABC) {
+            swf = ((ABC) openable).getSwf();
+        }
+        
         ClassPath cp;
         List<Integer> traitIndices;
         try {
-            cp = (ClassPath) ois.readObject();
+            String classPathDC = ois.readUTF();
+            DottedChain dc = DottedChain.parseWithSuffix(classPathDC);
+            cp = new ClassPath(dc.getWithoutLast(), dc.getLast(), dc.getLastNamespaceSuffix(), swf);
             traitIndices = (List<Integer>) ois.readObject();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ABCSearchResult.class.getName()).log(Level.SEVERE, null, ex);
@@ -149,7 +163,7 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.write(SERIAL_VERSION_MAJOR);
         oos.write(SERIAL_VERSION_MINOR);
-        oos.writeObject(scriptPack.getClassPath());
+        oos.writeUTF(scriptPack.getClassPath().toRawString());
         oos.writeObject(scriptPack.traitIndices);
         oos.writeBoolean(pcode);
         oos.writeInt(classIndex);

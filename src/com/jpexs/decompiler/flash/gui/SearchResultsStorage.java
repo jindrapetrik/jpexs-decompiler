@@ -176,13 +176,12 @@ public class SearchResultsStorage {
                             if (kind == DATA_ACTION) {
                                 currentResults.add(new ActionSearchResult((SWF) openable, bais));
                             }
-                        } catch (ScriptNotFoundException | IOException ex) {
-                            ex.printStackTrace();
+                        } catch (ScriptNotFoundException ex) {
                             //ignore
                         }
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
+                    //ignore
                 }
                 unpackedData.set(j, currentResults);
                 result.addAll(currentResults);

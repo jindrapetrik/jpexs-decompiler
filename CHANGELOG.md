@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file.
 - [#2507] FLA export - Place characters over multiple button frames
 - [#2508] AS1/2 direct editation - first command in for loop header not compiled
 - [#2510] AS direct editation - popped value
+- [#2511] Allowing to jump from search window while editation causing problems
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -78,6 +79,8 @@ All notable changes to this project will be documented in this file.
 - The label of option "automatic deobfuscation" changed to "deobfuscate code"
 - SetTabIndex tag moved from others to frames folder
 - SWF3 actions split into SWF1, SWF2 and SWF3 actions (in FFDec source code, docs, etc.)
+- Serial form of AS3 search results changed so the decompiler is unable to read
+  saved AS3 search result from older versions and vice-versa
 
 ### Removed
 - Resample wav to 44kHz feature from GUI
@@ -3973,6 +3976,7 @@ Major version of SWF to XML export changed to 2.
 [#2507]: https://www.free-decompiler.com/flash/issues/2507
 [#2508]: https://www.free-decompiler.com/flash/issues/2508
 [#2510]: https://www.free-decompiler.com/flash/issues/2510
+[#2511]: https://www.free-decompiler.com/flash/issues/2511
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
