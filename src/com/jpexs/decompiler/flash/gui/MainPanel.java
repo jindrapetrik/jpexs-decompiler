@@ -2940,8 +2940,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void searchInActionScriptOrText(Boolean searchInText, Openable openable, boolean useSelection) {
         View.checkAccess();
         
-        if (checkEdited())
-        {
+        if (checkEdited()) {
             return;
         }
 
