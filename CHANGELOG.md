@@ -66,7 +66,7 @@ All notable changes to this project will be documented in this file.
 - [#2507] FLA export - Place characters over multiple button frames
 - [#2508] AS1/2 direct editation - first command in for loop header not compiled
 - [#2510] AS direct editation - popped value
-- [#2511] Allowing to jump from search window while editation causing problems
+- [#2511] Allowing to search or to jump from search window while in editation mode
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

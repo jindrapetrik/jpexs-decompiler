@@ -2939,6 +2939,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void searchInActionScriptOrText(Boolean searchInText, Openable openable, boolean useSelection) {
         View.checkAccess();
+        
+        if (checkEdited())
+        {
+            return;
+        }
 
         /*if (!(openable instanceof SWF)) { //FIXME for ABCs
             return;
