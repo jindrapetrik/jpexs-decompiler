@@ -106,8 +106,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             //GraphTargetItem.checkDup(stack, output, inside, top);
-                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup().value);
                             //stack.pop();
+                            //TestIncDec12 with result
                             stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
@@ -135,8 +136,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                     if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
-                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup().value);
                             //stack.pop();
+                            //TestIncDec12 with result
                             stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
