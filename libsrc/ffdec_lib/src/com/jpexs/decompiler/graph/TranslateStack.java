@@ -260,16 +260,18 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                        SetTemporaryItem st = (SetTemporaryItem) pi.value;
                        connectedOutput.set(i, st);
                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, st.tempIndex);
-                   } /*else if (pi.value instanceof DuplicateSourceItem) {
-                       //DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
+                   } else if (pi.value instanceof DuplicateSourceItem) {
+                       DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
                        //connectedOutput.set(i, new SetTemporaryItem(pi.dialect, ds.getSrc(), ds.getLineStartItem(), ds.value, ds.tempIndex,"push"));
+                       connectedOutput.remove(i);
                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), ds.value, ds.tempIndex);
                    } else if (pi.value instanceof DuplicateItem) {
                        DuplicateItem d = (DuplicateItem) pi.value;
                        //connectedOutput.remove(i);                       
-                       connectedOutput.set(i, new SetTemporaryItem(pi.dialect, d.getSrc(), d.getLineStartItem(), d.value, d.tempIndex));
-                       return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, d.tempIndex);                       
-                   } */else if (pi.value instanceof TemporaryItem) {
+                       //connectedOutput.set(i, new SetTemporaryItem(pi.dialect, d.getSrc(), d.getLineStartItem(), d.value, d.tempIndex));
+                       connectedOutput.remove(i);
+                       return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, d.tempIndex);
+                   } else if (pi.value instanceof TemporaryItem) {
                        connectedOutput.remove(i);
                        return pi.value;
                    } else {
