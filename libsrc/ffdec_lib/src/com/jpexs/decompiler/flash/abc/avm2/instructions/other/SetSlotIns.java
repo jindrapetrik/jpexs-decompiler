@@ -105,10 +105,14 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                     if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
-                            stack.pop();
+                            //GraphTargetItem.checkDup(stack, output, inside, top);
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            //stack.pop();
                             stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            //stack.pop();
+                            //TestIncDec11 with result
                             stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
                             stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
@@ -131,10 +135,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                     if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            //stack.pop();
                             stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
+                            //stack.pop();
+                            //TestIncDec11 with result
                             stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
                             stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
