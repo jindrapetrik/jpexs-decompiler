@@ -78,6 +78,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
 
         int regId = getRegisterId(ins);

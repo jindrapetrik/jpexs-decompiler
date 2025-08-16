@@ -769,7 +769,34 @@ public abstract class InstructionDefinition implements Serializable {
 
         // ==> TestIncDec5 with result AIR is in GetLocalTypeIns
         
-            
+        //TestIncDec5 no result AIR
+        if (value instanceof IncrementAVM2Item
+                || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item;
+            if (value.value instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value;
+                if (getProp.object instanceof DuplicateItem
+                        && obj instanceof DuplicateSourceItem) {
+                    if (getProp.object.getThroughDuplicate() == obj.getThroughDuplicate()) {
+                        DuplicateItem d = (DuplicateItem) getProp.object;
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            if (st.tempIndex == d.tempIndex) {
+                                output.remove(output.size() - 1);
+                                getProp.object = st.value;
+                                if (isIncrement) {
+                                    stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                } else {
+                                    stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+                           
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;
