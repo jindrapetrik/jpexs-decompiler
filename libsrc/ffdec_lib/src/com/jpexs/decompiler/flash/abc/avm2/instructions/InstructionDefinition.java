@@ -1077,9 +1077,9 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                         stack.moveToStack(output);
                         if (isIncrement) {
-                            stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
+                            stack.push(new PostIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
                         } else {
-                            stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
+                            stack.push(new PostDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
                         }
                         return;
                     } while(false);
