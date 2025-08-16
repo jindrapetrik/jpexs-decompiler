@@ -65,6 +65,7 @@ public interface SetTypeIns {
      * @param type Type
      */
     public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId, GraphTargetItem type) {
+        //stack.addToOutput(result);
         GraphTargetItem notCoercedValue = value;
         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
             notCoercedValue = value.value;
@@ -121,6 +122,6 @@ public interface SetTypeIns {
                 }
             }
         }
-        stack.addToOutput(result);
+        stack.addToOutput(result);        
     }
 }

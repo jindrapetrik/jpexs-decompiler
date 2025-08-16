@@ -92,7 +92,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     @Override
     public GraphTargetItem push(GraphTargetItem item) {
         if (!outputQueue.isEmpty()) {
-            if (item instanceof FindPropertyAVM2Item) {
+            if ((item instanceof FindPropertyAVM2Item) || isDupsOnly()) {
                 finishBlock(connectedOutput);
             } else {
                 outputQueue.add(item);                                                    
@@ -104,6 +104,19 @@ public class TranslateStack extends Stack<GraphTargetItem> {
             item.outputPos = prevOutputSize + connectedOutput.size();
         }
         return super.push(item);
+    }
+    
+    private boolean isDupsOnly() {
+        for (GraphTargetItem item : this) {
+            if (item instanceof DuplicateItem) {
+                continue;
+            }
+            if (item instanceof DuplicateSourceItem) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -247,11 +260,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                        SetTemporaryItem st = (SetTemporaryItem) pi.value;
                        connectedOutput.set(i, st);
                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, st.tempIndex);
-                   } else if (pi.value instanceof DuplicateSourceItem) {
-                       DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
-                       connectedOutput.set(i, new SetTemporaryItem(pi.dialect, ds.getSrc(), ds.getLineStartItem(), ds.value, ds.tempIndex,"push"));
+                   } /*else if (pi.value instanceof DuplicateSourceItem) {
+                       //DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
+                       //connectedOutput.set(i, new SetTemporaryItem(pi.dialect, ds.getSrc(), ds.getLineStartItem(), ds.value, ds.tempIndex,"push"));
                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), ds.value, ds.tempIndex);
-                   } /*else if (pi.value instanceof DuplicateItem) {
+                   } else if (pi.value instanceof DuplicateItem) {
                        DuplicateItem d = (DuplicateItem) pi.value;
                        //connectedOutput.remove(i);                       
                        connectedOutput.set(i, new SetTemporaryItem(pi.dialect, d.getSrc(), d.getLineStartItem(), d.value, d.tempIndex));
@@ -486,5 +499,5 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         push(pi2.value);
         push(ti.value);        
         //moveToStack(output);
-    }
+    }        
 }

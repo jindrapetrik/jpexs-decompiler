@@ -70,12 +70,10 @@ public class DupIns extends InstructionDefinition {
             } else {
                 temp = localData.maxTempIndex.getVal() + 1;
                 localData.maxTempIndex.setVal(temp);
-                /*
-                //TODO: somehow implement this. Currently it fails many tests:-(
                 stack.finishBlock(output);
                 stack.addToOutput(new SetTemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v, temp, "dup"));
                 stack.finishBlock(output);
-                */
+                
                 stack.push(new DuplicateSourceItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, v, temp));
             }            
         }

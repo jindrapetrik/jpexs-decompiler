@@ -38,7 +38,9 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 
 /**
@@ -99,18 +101,24 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
-                    if (stack.size() > 0) {
+                    if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
-                        if (top == inside) {
-                            stack.pop();
+                        if (top == inside) {                                                        
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
+                            //stack.pop();     
+                            //TestIncDec2 with result
                             stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
-                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            
+                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {                            
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value);                                                        
+                            //stack.pop();
+                            //TestIncDec1 with result
                             stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
                             stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
+                        //TestIncDec1 no result
                         stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
@@ -122,18 +130,23 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
-                    if (stack.size() > 0) {
+                    if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
+                            //stack.pop();
+                            //TestIncDec2 with result
                             stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value);            
+                            //stack.pop();
+                            //TestIncDec1 with result
                             stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
                             stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
+                        //TestIncDec1 no result
                         stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;

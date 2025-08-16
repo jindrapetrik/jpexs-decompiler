@@ -79,8 +79,9 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue,
         if (declaration) {
             return dialect.writeTemporaryDeclaration(writer, localData, "", tempIndex, val);
         }
-        writer.append("_temp_").append(tempIndex).append(" = ");
-        val.appendTry(writer, localData);
+        writer.append("_temp_").append(tempIndex);
+        //.append(" = ");
+        //val.appendTry(writer, localData);
         return writer;
     }
 

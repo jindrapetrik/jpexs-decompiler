@@ -24,8 +24,11 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
@@ -1140,5 +1143,39 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             }
         }
         return o1.equals(o2);
-    }      
+    }
+    
+    /**
+     * Checks set temporary at the end of output and expected dupSource, dup.
+     * Then removes the last output command when neccessary.
+     * @param stack Stack
+     * @param output Output
+     * @param dupSource Expected DuplicateSourceItem, if not, the command won't do anything
+     * @param dup Expected DuplicateItem, if not the command won't do anything
+     */
+    public static void checkDup(TranslateStack stack, List<GraphTargetItem> output, GraphTargetItem dupSource, GraphTargetItem dup) {
+        if (output.isEmpty()) {
+            return;
+        }
+        if (!(output.get(output.size() - 1) instanceof SetTemporaryItem)) {
+            return;
+        }        
+        dupSource = dupSource.getNotCoercedNoDup();
+        if (!(dupSource instanceof DuplicateSourceItem)) {
+            return;
+        }
+        dup = dup.getNotCoercedNoDup();
+        if (!(dup instanceof DuplicateItem)) {
+            return;
+        }        
+        DuplicateSourceItem ds = (DuplicateSourceItem) dupSource;
+        DuplicateItem d = (DuplicateItem) dup;
+        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+        if (ds.tempIndex != d.tempIndex || d.tempIndex != st.tempIndex) {
+            return;
+        }
+           
+        output.remove(output.size() - 1); 
+        stack.moveToStack(output);
+    }
 }

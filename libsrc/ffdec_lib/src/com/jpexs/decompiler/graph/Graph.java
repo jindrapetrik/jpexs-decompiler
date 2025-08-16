@@ -1046,10 +1046,10 @@ public class Graph {
                 SetTemporaryItem s = (SetTemporaryItem) item;
                 s.declaration = true;
             }
-            if (item instanceof DuplicateSourceItem) {
+            /*if (item instanceof DuplicateSourceItem) {
                 DuplicateSourceItem s = (DuplicateSourceItem) item;
                 s.declaration = true;
-            }
+            }*/
             
             Reference<Integer> iRef = new Reference<>(i);
             item.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
@@ -1062,13 +1062,13 @@ public class Graph {
                         items.add(iRef.getVal(), dec);
                         iRef.setVal(iRef.getVal() + 1);
                     }
-                    if (item instanceof DuplicateSourceItem) {
+                    /*if (item instanceof DuplicateSourceItem) {
                         DuplicateSourceItem st = (DuplicateSourceItem) item;
                         SetTemporaryItem dec = new SetTemporaryItem(dialect, null, null, null, st.tempIndex, "");
                         dec.declaration = true;
                         items.add(iRef.getVal(), dec);
                         iRef.setVal(iRef.getVal() + 1);
-                    }
+                    }*/
                 }                
             });
             i = iRef.getVal();

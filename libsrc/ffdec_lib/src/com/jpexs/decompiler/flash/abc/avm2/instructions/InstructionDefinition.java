@@ -891,11 +891,13 @@ public abstract class InstructionDefinition implements Serializable {
                                 if (hasConvert && standalone) {
                                     return new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                                 }
+                                //TestIncDec3 with result
                                 return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                             } else {
                                 if (hasConvert && standalone) {
                                     return new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                                 }
+                                //TestIncDec3 with result
                                 return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                             }
                         }
