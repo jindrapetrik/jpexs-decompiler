@@ -25,9 +25,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
@@ -303,6 +305,23 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 }
                 return;
             } while(false);
+        }
+        
+        //TestIncDec7 AIR
+        if (!output.isEmpty()) {
+            GraphTargetItem lastOutput = output.get(output.size() - 1);
+            if (lastOutput instanceof IncLocalAVM2Item) {
+                output.remove(output.size() - 1);
+                stack.moveToStack(output);
+                stack.push(new PreIncrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                return;
+            }
+            if (output.get(output.size() - 1) instanceof DecLocalAVM2Item) {
+                output.remove(output.size() - 1);
+                stack.moveToStack(output);   
+                stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                return;
+            }
         }
         
         stack.moveToStack(output);        
