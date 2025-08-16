@@ -209,6 +209,102 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             } while(false);
         }
         
+        //TestIncDec6 with result AIR
+        /*
+         //var _temp_4:* = trace;
+         //var _temp_3:* = global;
+         var _temp_1:* = a;
+         var _temp_2:* = _temp_1.attrib;
+         var _loc2_:* = _temp_2;
+         _temp_1.attrib = _temp_2 + 1;
+         _temp_4(_loc2_);                
+        */
+        expectedClasses = new Class[] {
+            SetTemporaryItem.class,
+            SetTemporaryItem.class,
+            SetLocalAVM2Item.class,
+            SetPropertyAVM2Item.class
+        };
+                                                
+        if (output.size() >= expectedClasses.length) {
+
+            loopout: do {
+                for (int i = 0; i < expectedClasses.length; i++) {
+                    if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
+                        break loopout;
+                    }
+                }
+
+                SetPropertyAVM2Item setProperty = (SetPropertyAVM2Item) output.get(output.size() - 1);
+                SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 2);
+                SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
+                SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 4);
+
+
+                if (setLocalValue.regIndex != result.regIndex) {
+                    break;
+                }
+                if (!(setProperty.object instanceof DuplicateSourceItem)) {
+                    break;
+                }
+                if (!(setProperty.value instanceof IncrementAVM2Item
+                    || setProperty.value instanceof DecrementAVM2Item)) {
+                    break;
+                }
+                
+                if (!(setProperty.value.value instanceof DuplicateSourceItem)) {
+                    break;
+                }
+                                
+                if (!(setProperty.value.value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item)) {
+                    break;
+                }
+                boolean isIncrement = setProperty.value instanceof IncrementAVM2Item;
+
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setProperty.value.value.value.getNotCoercedNoDup();
+                if (!(getProp.object instanceof DuplicateItem)) {
+                    break;
+                }
+                if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
+                    break;
+                }
+                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                FullMultinameAVM2Item setFm = (FullMultinameAVM2Item) setProperty.propertyName;
+                
+                if (!fm.compareSame(setFm)) {
+                    break;
+                }
+                
+                if (!(setLocalValue.value instanceof DuplicateItem)) {
+                    break;
+                }
+                DuplicateSourceItem  dupSourceObj = (DuplicateSourceItem) setProperty.object;
+                DuplicateItem dupObj = (DuplicateItem) getProp.object;
+                if (dupObj.tempIndex != setTempObj.tempIndex
+                    || dupSourceObj.tempIndex != setTempObj.tempIndex) {
+                    break;
+                }                
+                
+                DuplicateSourceItem dupValue = (DuplicateSourceItem) setProperty.value.value;
+                DuplicateItem dupSourceValue = (DuplicateItem) setLocalValue.value;               
+                if (dupValue.tempIndex != setTempValue.tempIndex
+                    || dupSourceValue.tempIndex != setTempValue.tempIndex) {
+                    break;
+                }               
+                getProp.object = setTempObj.value;
+                for (int i = 0; i < expectedClasses.length; i++) {
+                    output.remove(output.size() - 1);
+                }
+                stack.moveToStack(output);
+                if (isIncrement) {
+                    stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
+                } else {
+                    stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
+                }
+                return;
+            } while(false);
+        }
+        
         stack.moveToStack(output);        
         stack.push(result);
         

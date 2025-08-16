@@ -770,6 +770,10 @@ public abstract class InstructionDefinition implements Serializable {
         // ==> TestIncDec5 with result AIR is in GetLocalTypeIns
         
         //TestIncDec5 no result AIR
+        /*
+        var _temp_5:* = a;
+         _temp_5.attrib = _temp_5.attrib + 1;
+        */
         if (value instanceof IncrementAVM2Item
                 || value instanceof DecrementAVM2Item) {
             boolean isIncrement = value instanceof IncrementAVM2Item;
@@ -796,6 +800,43 @@ public abstract class InstructionDefinition implements Serializable {
                 }
             }
         }
+        
+         //TestIncDec6 no result AIR
+        //In air, this is *POST* inc/decrement
+        /*
+        var _temp_5:* = a;
+         _temp_5.attrib = _temp_5.attrib + 1;
+        */
+        if (value instanceof IncrementAVM2Item
+                || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item;
+            if (value.value instanceof ConvertAVM2Item) {
+                if (value.value.value instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.value;
+                    if (getProp.object instanceof DuplicateItem
+                            && obj instanceof DuplicateSourceItem) {
+                        if (getProp.object.getThroughDuplicate() == obj.getThroughDuplicate()) {
+                            DuplicateItem d = (DuplicateItem) getProp.object;
+                            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                                if (st.tempIndex == d.tempIndex) {
+                                    output.remove(output.size() - 1);
+                                    getProp.object = st.value;
+                                    if (isIncrement) {
+                                        stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                    } else {
+                                        stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
                            
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
@@ -866,21 +907,21 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
                             break;
                         }
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                        if (!(fm.name instanceof TemporaryItem)) {
+                        if (!(fm.name instanceof DuplicateSourceItem)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
-                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        DuplicateSourceItem tempName = (DuplicateSourceItem) fm.name;
                         if (tempName.tempIndex != setTempName.tempIndex) {
                             break;
                         }                        
@@ -973,21 +1014,21 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value;
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
                             break;
                         }
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                        if (!(fm.name instanceof TemporaryItem)) {
+                        if (!(fm.name instanceof DuplicateSourceItem)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
-                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        DuplicateSourceItem tempName = (DuplicateSourceItem) fm.name;
                         if (tempName.tempIndex != setTempName.tempIndex) {
                             break;
                         }                                                
@@ -1064,21 +1105,21 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value.getNotCoercedNoDup();
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
                             break;
                         }
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                        if (!(fm.name instanceof TemporaryItem)) {
+                        if (!(fm.name instanceof DuplicateSourceItem)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
-                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        DuplicateSourceItem tempName = (DuplicateSourceItem) fm.name;
                         if (tempName.tempIndex != setTempName.tempIndex) {
                             break;
                         }                        
@@ -1167,21 +1208,21 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
                             break;
                         }
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                        if (!(fm.name instanceof TemporaryItem)) {
+                        if (!(fm.name instanceof DuplicateSourceItem)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
-                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        DuplicateSourceItem tempName = (DuplicateSourceItem) fm.name;
                         if (tempName.tempIndex != setTempName.tempIndex) {
                             break;
                         }                        
@@ -1259,7 +1300,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
@@ -1270,7 +1311,7 @@ public abstract class InstructionDefinition implements Serializable {
                             break;
                         }
                         
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
@@ -1349,7 +1390,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value;
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
@@ -1359,7 +1400,7 @@ public abstract class InstructionDefinition implements Serializable {
                         if (!fm.compareSame(multiname)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
@@ -1430,7 +1471,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
                         
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value.getNotCoercedNoDup();
-                        if (!(getProp.object instanceof TemporaryItem)) {
+                        if (!(getProp.object instanceof DuplicateSourceItem)) {
                             break;
                         }
                         if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
@@ -1440,7 +1481,7 @@ public abstract class InstructionDefinition implements Serializable {
                         if (!fm.compareSame(multiname)) {
                             break;
                         }
-                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        DuplicateSourceItem tempObj = (DuplicateSourceItem) getProp.object;
                         if (tempObj.tempIndex != setTempObj.tempIndex) {
                             break;
                         }
@@ -1541,8 +1582,8 @@ public abstract class InstructionDefinition implements Serializable {
                 }
                 return;
             }
-        }
-
+        }      
+        
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
