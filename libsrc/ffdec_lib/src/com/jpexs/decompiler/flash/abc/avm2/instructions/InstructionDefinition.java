@@ -975,6 +975,115 @@ public abstract class InstructionDefinition implements Serializable {
                     } while(false);
                 }
                 
+                //TestIncDec4 with result
+                expectedClasses = new Class[]{
+                        //PushItem.class
+                        SetTemporaryItem.class, 
+                        SetLocalAVM2Item.class,
+                        SetTemporaryItem.class,
+                        SetLocalAVM2Item.class,
+                        SetTemporaryItem.class,
+                        PushItem.class,
+                        SetLocalAVM2Item.class
+                    };
+                
+                /*
+                //var _temp_4:* = §§findproperty(trace);
+                var _temp_1:* = a;
+                var _loc2_:* = _temp_1;
+                var _temp_2:* = 2;
+                var _loc3_:int = _temp_2;
+                var _temp_3:* = Number(_temp_1[_temp_2]);
+                var _loc4_:* = _temp_3 + 1;
+                _loc2_[_loc3_] = _loc4_;
+                trace(_temp_3);
+                */
+                
+                if (output.size() >= expectedClasses.length) {
+                    
+                    loopout: do {
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
+                                break loopout;
+                            }
+                        }
+
+                        SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 1);
+                        PushItem pushValue = (PushItem) output.get(output.size() - 2);
+                        SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
+                        SetLocalAVM2Item setLocalName = (SetLocalAVM2Item) output.get(output.size() - 4);
+                        SetTemporaryItem setTempName = (SetTemporaryItem) output.get(output.size() - 5);
+                        SetLocalAVM2Item setLocalObj = (SetLocalAVM2Item) output.get(output.size() - 6);
+                        SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 7);
+                        
+                        
+                        if (setLocalValue.regIndex != valueLocalReg.regIndex) {
+                            break;
+                        }
+                        if (!(setLocalValue.value instanceof IncrementAVM2Item
+                            || setLocalValue.value instanceof DecrementAVM2Item)) {
+                            break;
+                        }
+                        if (!(setLocalValue.value.value instanceof DuplicateItem)) {
+                            break;
+                        }
+                        if (!(setLocalValue.value.value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item)) {
+                            break;
+                        }
+                        boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
+                        
+                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value.getNotCoercedNoDup();
+                        if (!(getProp.object instanceof TemporaryItem)) {
+                            break;
+                        }
+                        if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
+                            break;
+                        }
+                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                        if (!(fm.name instanceof TemporaryItem)) {
+                            break;
+                        }
+                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        if (tempObj.tempIndex != setTempObj.tempIndex) {
+                            break;
+                        }
+                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        if (tempName.tempIndex != setTempName.tempIndex) {
+                            break;
+                        }                        
+                        DuplicateItem dupValue = (DuplicateItem) setLocalValue.value.value;
+                        if (dupValue.tempIndex != setTempValue.tempIndex) {
+                            break;
+                        }
+                        
+                        if (!(pushValue.value instanceof DuplicateSourceItem)) {
+                            break;
+                        }
+                        DuplicateSourceItem dupSourceValue = (DuplicateSourceItem) pushValue.value;
+                        if (dupSourceValue.tempIndex != dupValue.tempIndex) {
+                            break;
+                        }
+                        if (setLocalName.regIndex != nameLocalReg.regIndex) {
+                            break;
+                        }         
+                        if (setLocalObj.regIndex != objLocalReg.regIndex) {
+                            break;
+                        }
+                        
+                        fm.name = setTempName.value;
+                        getProp.object = setTempObj.value;
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            output.remove(output.size() - 1);
+                        }
+                        stack.moveToStack(output);
+                        if (isIncrement) {
+                            stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
+                        } else {
+                            stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
+                        }
+                        return;
+                    } while(false);
+                }
 
                 /*stack.moveToStack(output);
                 if (!stack.isEmpty()) {
