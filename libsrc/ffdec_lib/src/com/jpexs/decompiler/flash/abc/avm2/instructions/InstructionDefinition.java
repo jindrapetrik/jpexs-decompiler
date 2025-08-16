@@ -1084,6 +1084,97 @@ public abstract class InstructionDefinition implements Serializable {
                         return;
                     } while(false);
                 }
+                
+                //TestIncDec4 no result AIR
+                expectedClasses = new Class[]{
+                        //PushItem.class
+                        SetTemporaryItem.class,
+                        SetLocalAVM2Item.class,
+                        SetTemporaryItem.class,
+                        SetLocalAVM2Item.class,
+                        SetLocalAVM2Item.class
+                    };
+                
+                /*
+                var _temp_7:* = a;
+                var _loc2_:* = _temp_7;
+                var _temp_8:* = 2;
+                var _loc3_:int = _temp_8;
+                var _loc4_:* = Number(_temp_7[_temp_8]) + 1;
+                _loc2_[_loc3_] = _loc4_;
+                */
+                
+                if (output.size() >= expectedClasses.length) {
+                    
+                    loopout: do {
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
+                                break loopout;
+                            }
+                        }
+
+                        SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 1);
+                        SetLocalAVM2Item setLocalName = (SetLocalAVM2Item) output.get(output.size() - 2);
+                        SetTemporaryItem setTempName = (SetTemporaryItem) output.get(output.size() - 3);
+                        SetLocalAVM2Item setLocalObj = (SetLocalAVM2Item) output.get(output.size() - 4);
+                        SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 5);
+                        
+                        
+                        if (setLocalValue.regIndex != valueLocalReg.regIndex) {
+                            break;
+                        }
+                        if (!(setLocalValue.value instanceof IncrementAVM2Item
+                            || setLocalValue.value instanceof DecrementAVM2Item)) {
+                            break;
+                        }
+                        if (!(setLocalValue.value.value instanceof ConvertAVM2Item)) {
+                            break;
+                        }                        
+                        if (!(setLocalValue.value.value.value instanceof GetPropertyAVM2Item)) {
+                            break;
+                        }
+                        boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
+                        
+                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
+                        if (!(getProp.object instanceof TemporaryItem)) {
+                            break;
+                        }
+                        if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
+                            break;
+                        }
+                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                        if (!(fm.name instanceof TemporaryItem)) {
+                            break;
+                        }
+                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        if (tempObj.tempIndex != setTempObj.tempIndex) {
+                            break;
+                        }
+                        TemporaryItem tempName = (TemporaryItem) fm.name;
+                        if (tempName.tempIndex != setTempName.tempIndex) {
+                            break;
+                        }                        
+                        if (setLocalName.regIndex != nameLocalReg.regIndex) {
+                            break;
+                        }         
+                        if (setLocalObj.regIndex != objLocalReg.regIndex) {
+                            break;
+                        }
+                        
+                        fm.name = setTempName.value;
+                        getProp.object = setTempObj.value;
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            output.remove(output.size() - 1);
+                        }
+                        stack.moveToStack(output);
+                        if (isIncrement) {
+                            stack.addToOutput(new PostIncrementAVM2Item(setLocalValue.value.getSrc(), setLocalValue.value.lineStartItem, getProp));
+                        } else {
+                            stack.addToOutput(new PostDecrementAVM2Item(setLocalValue.value.getSrc(), setLocalValue.value.lineStartItem, getProp));                        
+                        }
+                        return;
+                    } while(false);
+                }
 
                 //TestIncDec5 with result
                 expectedClasses = new Class[]{
