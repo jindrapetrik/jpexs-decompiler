@@ -48,6 +48,8 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
+import com.jpexs.decompiler.graph.model.TemporaryItem;
 import java.util.List;
 
 /**
@@ -116,9 +118,101 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         } else if (computedValue != null) {
             type = computedValue.returnType();
         }
-        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type));
+        LocalRegAVM2Item result = new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type);
+        
+        
+        //TestIncDec5 with result AIR
+        /*
+        //var _temp_4:* = trace;
+        //var _temp_3:* = global;
+        var _temp_1:* = a;
+        var _temp_2:* = _temp_1.attrib + 1;
+        var _loc2_:* = _temp_2;
+        _temp_1.attrib = _temp_2;
+        _temp_4(_loc2_);
+        */
+        
+        stack.finishBlock(output);
+        
+        Class[] expectedClasses = new Class[]{
+            SetTemporaryItem.class,
+            SetTemporaryItem.class,
+            SetLocalAVM2Item.class,
+            SetPropertyAVM2Item.class
+        };
+                                                
+        if (output.size() >= expectedClasses.length) {
+
+            loopout: do {
+                for (int i = 0; i < expectedClasses.length; i++) {
+                    if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
+                        break loopout;
+                    }
+                }
+
+                SetPropertyAVM2Item setProperty = (SetPropertyAVM2Item) output.get(output.size() - 1);
+                SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 2);
+                SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
+                SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 4);
+
+
+                if (setLocalValue.regIndex != result.regIndex) {
+                    break;
+                }
+                if (!(setLocalValue.value instanceof DuplicateItem)) {
+                    break;
+                }
+                if (!(setLocalValue.value.value instanceof IncrementAVM2Item
+                    || setLocalValue.value.value instanceof DecrementAVM2Item)) {
+                    break;
+                }
+                if (!(setLocalValue.value.value.value instanceof GetPropertyAVM2Item)) {
+                    break;
+                }
+                boolean isIncrement = setLocalValue.value.value instanceof IncrementAVM2Item;
+
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
+                if (!(getProp.object instanceof DuplicateItem)) {
+                    break;
+                }
+                if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
+                    break;
+                }
+                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                FullMultinameAVM2Item setFm = (FullMultinameAVM2Item) setProperty.propertyName;
+                
+                if (!fm.compareSame(setFm)) {
+                    break;
+                }
+
+                DuplicateItem dupObj = (DuplicateItem) getProp.object;
+                if (dupObj.tempIndex != setTempObj.tempIndex) {
+                    break;
+                }
+
+                DuplicateItem dupValue = (DuplicateItem) setLocalValue.value;
+                if (dupValue.tempIndex != setTempValue.tempIndex) {
+                    break;
+                }               
+                getProp.object = setTempObj.value;
+                for (int i = 0; i < expectedClasses.length; i++) {
+                    output.remove(output.size() - 1);
+                }
+                stack.moveToStack(output);
+                if (isIncrement) {
+                    stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
+                } else {
+                    stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
+                }
+                return;
+            } while(false);
+        }
+        
+        stack.moveToStack(output);        
+        stack.push(result);
         
         //chained assignments and/or ASC post/pre increment
+        /*
         if (stack.peek() instanceof CommaExpressionItem) {
             CommaExpressionItem ce = (CommaExpressionItem) stack.peek();
             if (ce.commands.size() == 2 && ce.commands.get(0) instanceof SetTypeAVM2Item) {
@@ -130,7 +224,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                     GraphTargetItem val = setItem.value.getNotCoerced();
                     if (val.value instanceof SetLocalAVM2Item) {
                         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) val.value;
-                        if (setLocal.regIndex == regId) {
+                        if (setLocal.regIndex == regId) {                           
                             if (setLocal.value.getNotCoerced() instanceof GetPropertyAVM2Item) {
                                 SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocal.value.getNotCoerced();
@@ -169,7 +263,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                             //output.remove(output.size() - 1);
                             //stack.moveToStack(output);
                             stack.pop();
-
+                            
                             if (setItem instanceof SetPropertyAVM2Item) {
                                 if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
                                     boolean isIncrement = (setItem.value instanceof IncrementAVM2Item);
@@ -214,6 +308,9 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                             }
         
                             stack.pop();
+                            
+
+                            
                             output.remove(output.size() - 1);
                             stack.moveToStack(output);
 
@@ -246,7 +343,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                     }
                 }
             }
-        }        
+        }*/
     }
 
     @Override

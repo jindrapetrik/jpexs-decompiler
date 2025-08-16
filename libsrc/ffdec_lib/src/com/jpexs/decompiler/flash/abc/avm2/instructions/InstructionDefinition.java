@@ -765,7 +765,11 @@ public abstract class InstructionDefinition implements Serializable {
                 }                
             }*/
         
+            
+
+        // ==> TestIncDec5 with result AIR is in GetLocalTypeIns
         
+            
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;
@@ -1272,7 +1276,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                         return;
                     } while(false);
-                }
+                }                                
                 
                 //TestIncDec5 no result
                 expectedClasses = new Class[]{
