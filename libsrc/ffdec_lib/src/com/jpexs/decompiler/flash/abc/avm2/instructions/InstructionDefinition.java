@@ -1256,6 +1256,103 @@ public abstract class InstructionDefinition implements Serializable {
                     } while(false);
                 }
                 
+                //TestIncDec6 with result
+                expectedClasses = new Class[]{
+                        //PushItem.class
+                        SetTemporaryItem.class, 
+                        SetLocalAVM2Item.class,
+                        SetTemporaryItem.class,
+                        PushItem.class,
+                        SetLocalAVM2Item.class
+                    };
+                
+                /*
+                //var _temp_3:* = §§findproperty(trace);
+                var _temp_1:* = a;
+                var _loc2_:* = _temp_1;
+                var _temp_2:* = Number(_temp_1.attrib);
+                var _loc3_:* = _temp_2 + 1;
+                _loc2_.attrib = _loc3_;
+                trace(_temp_2);
+                */
+                
+                if (output.size() >= expectedClasses.length) {
+                    
+                    loopout: do {
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
+                                break loopout;
+                            }
+                        }
+
+                        SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 1);
+                        PushItem pushValue = (PushItem) output.get(output.size() - 2);
+                        SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
+                        SetLocalAVM2Item setLocalObj = (SetLocalAVM2Item) output.get(output.size() - 4);
+                        SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 5);
+                        
+                        
+                        if (setLocalValue.regIndex != valueLocalReg.regIndex) {
+                            break;
+                        }
+                        if (!(setLocalValue.value instanceof IncrementAVM2Item
+                            || setLocalValue.value instanceof DecrementAVM2Item)) {
+                            break;
+                        }
+                        if (!(setLocalValue.value.value instanceof DuplicateItem)) {
+                            break;
+                        }
+                        if (!(setLocalValue.value.value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item)) {
+                            break;
+                        }
+                        boolean isIncrement = setLocalValue.value instanceof IncrementAVM2Item;
+                        
+                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value.getNotCoercedNoDup();
+                        if (!(getProp.object instanceof TemporaryItem)) {
+                            break;
+                        }
+                        if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
+                            break;
+                        }
+                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                        if (!fm.compareSame(multiname)) {
+                            break;
+                        }
+                        TemporaryItem tempObj = (TemporaryItem) getProp.object;
+                        if (tempObj.tempIndex != setTempObj.tempIndex) {
+                            break;
+                        }
+                                   
+                        DuplicateItem dupValue = (DuplicateItem) setLocalValue.value.value;
+                        if (dupValue.tempIndex != setTempValue.tempIndex) {
+                            break;
+                        }
+                        
+                        if (!(pushValue.value instanceof DuplicateSourceItem)) {
+                            break;
+                        }
+                        DuplicateSourceItem dupSourceValue = (DuplicateSourceItem) pushValue.value;
+                        if (dupSourceValue.tempIndex != dupValue.tempIndex) {
+                            break;
+                        }
+                        if (setLocalObj.regIndex != objLocalReg.regIndex) {
+                            break;
+                        }
+                        
+                        getProp.object = setTempObj.value;
+                        for (int i = 0; i < expectedClasses.length; i++) {
+                            output.remove(output.size() - 1);
+                        }
+                        stack.moveToStack(output);
+                        if (isIncrement) {
+                            stack.push(new PostIncrementAVM2Item(setLocalValue.value.getSrc(), setLocalValue.value.lineStartItem, getProp));
+                        } else {
+                            stack.push(new PostDecrementAVM2Item(setLocalValue.value.getSrc(), setLocalValue.value.lineStartItem, getProp));                        
+                        }
+                        return;
+                    } while(false);
+                }
+                
                 /*stack.moveToStack(output);
                 if (!stack.isEmpty()) {
                     GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
