@@ -3910,21 +3910,37 @@ public class Graph {
                                     boolean hideEmptyTrueFalse = true;
 
                                     if (leftSide instanceof DuplicateItem) {
+                                        if (!currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
+                                            DuplicateItem d = (DuplicateItem) leftSide;
+                                            SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
+                                            if (st.tempIndex == d.tempIndex) {
+                                                currentRet.remove(currentRet.size() - 1);
+                                                stack.moveToStack(currentRet);
+                                            }
+                                        }
                                         isIf = false;
                                         if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(rightSide);
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(prevExpr);
-                                        } else {
+                                        } else {                                            
                                             stack.push(new OrItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
+                                        if (!currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
+                                            DuplicateItem d = (DuplicateItem) leftSide.invert(null).getNotCoercedNoDup();
+                                            SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
+                                            if (st.tempIndex == d.tempIndex) {
+                                                currentRet.remove(currentRet.size() - 1);
+                                                stack.moveToStack(currentRet);
+                                            }
+                                        }
                                         isIf = false;
                                         if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(rightSide);
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(prevExpr);
-                                        } else {
+                                        } else {                                            
                                             stack.push(new AndItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (prevExpr instanceof FalseItem) {
