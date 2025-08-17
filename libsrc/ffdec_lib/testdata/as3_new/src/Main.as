@@ -24,7 +24,10 @@ package
         TestCallLocal;
         TestCatchFinally;
         TestChain2;
-        TestChainedAssignments;
+        TestChainedAssignments1;
+        TestChainedAssignments2;
+        TestChainedAssignments3;
+        TestChainedAssignments4;
         TestCollidingTraitNames;
         TestCollidingTry;        
         TestComplexExpressions;

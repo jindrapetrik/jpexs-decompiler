@@ -124,188 +124,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         LocalRegAVM2Item result = new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type);
         
         
-        //TestIncDec5 with result AIR
-        /*
-        //var _temp_4:* = trace;
-        //var _temp_3:* = global;
-        var _temp_1:* = a;
-        var _temp_2:* = _temp_1.attrib + 1;
-        var _loc2_:* = _temp_2;
-        _temp_1.attrib = _temp_2;
-        _temp_4(_loc2_);
-        */
-        
         stack.finishBlock(output);
-        
-        Class[] expectedClasses = new Class[]{
-            SetTemporaryItem.class,
-            SetTemporaryItem.class,
-            SetLocalAVM2Item.class,
-            SetPropertyAVM2Item.class
-        };
-                                                
-        if (output.size() >= expectedClasses.length) {
-
-            loopout: do {
-                for (int i = 0; i < expectedClasses.length; i++) {
-                    if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
-                        break loopout;
-                    }
-                }
-
-                SetPropertyAVM2Item setProperty = (SetPropertyAVM2Item) output.get(output.size() - 1);
-                SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 2);
-                SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
-                SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 4);
-
-
-                if (setLocalValue.regIndex != result.regIndex) {
-                    break;
-                }
-                if (!(setLocalValue.value instanceof DuplicateItem)) {
-                    break;
-                }
-                if (!(setLocalValue.value.value instanceof IncrementAVM2Item
-                    || setLocalValue.value.value instanceof DecrementAVM2Item)) {
-                    break;
-                }
-                if (!(setLocalValue.value.value.value instanceof GetPropertyAVM2Item)) {
-                    break;
-                }
-                boolean isIncrement = setLocalValue.value.value instanceof IncrementAVM2Item;
-
-                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocalValue.value.value.value;
-                if (!(getProp.object instanceof DuplicateItem)) {
-                    break;
-                }
-                if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
-                    break;
-                }
-                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                FullMultinameAVM2Item setFm = (FullMultinameAVM2Item) setProperty.propertyName;
-                
-                if (!fm.compareSame(setFm)) {
-                    break;
-                }
-
-                DuplicateItem dupObj = (DuplicateItem) getProp.object;
-                if (dupObj.tempIndex != setTempObj.tempIndex) {
-                    break;
-                }
-
-                DuplicateItem dupValue = (DuplicateItem) setLocalValue.value;
-                if (dupValue.tempIndex != setTempValue.tempIndex) {
-                    break;
-                }               
-                getProp.object = setTempObj.value;
-                for (int i = 0; i < expectedClasses.length; i++) {
-                    output.remove(output.size() - 1);
-                }
-                stack.moveToStack(output);
-                if (isIncrement) {
-                    stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
-                } else {
-                    stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
-                }
-                return;
-            } while(false);
-        }
-        
-        //TestIncDec6 with result AIR
-        /*
-         //var _temp_4:* = trace;
-         //var _temp_3:* = global;
-         var _temp_1:* = a;
-         var _temp_2:* = _temp_1.attrib;
-         var _loc2_:* = _temp_2;
-         _temp_1.attrib = _temp_2 + 1;
-         _temp_4(_loc2_);                
-        */
-        expectedClasses = new Class[] {
-            SetTemporaryItem.class,
-            SetTemporaryItem.class,
-            SetLocalAVM2Item.class,
-            SetPropertyAVM2Item.class
-        };
-                                                
-        if (output.size() >= expectedClasses.length) {
-
-            loopout: do {
-                for (int i = 0; i < expectedClasses.length; i++) {
-                    if (!expectedClasses[expectedClasses.length - 1 - i].isAssignableFrom(output.get(output.size() - 1 - i).getClass())) {
-                        break loopout;
-                    }
-                }
-
-                SetPropertyAVM2Item setProperty = (SetPropertyAVM2Item) output.get(output.size() - 1);
-                SetLocalAVM2Item setLocalValue = (SetLocalAVM2Item) output.get(output.size() - 2);
-                SetTemporaryItem setTempValue = (SetTemporaryItem) output.get(output.size() - 3);
-                SetTemporaryItem setTempObj = (SetTemporaryItem) output.get(output.size() - 4);
-
-
-                if (setLocalValue.regIndex != result.regIndex) {
-                    break;
-                }
-                if (!(setProperty.object instanceof DuplicateSourceItem)) {
-                    break;
-                }
-                if (!(setProperty.value instanceof IncrementAVM2Item
-                    || setProperty.value instanceof DecrementAVM2Item)) {
-                    break;
-                }
-                
-                if (!(setProperty.value.value instanceof DuplicateSourceItem)) {
-                    break;
-                }
-                                
-                if (!(setProperty.value.value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item)) {
-                    break;
-                }
-                boolean isIncrement = setProperty.value instanceof IncrementAVM2Item;
-
-                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setProperty.value.value.value.getNotCoercedNoDup();
-                if (!(getProp.object instanceof DuplicateItem)) {
-                    break;
-                }
-                if (!(getProp.propertyName instanceof FullMultinameAVM2Item)) {
-                    break;
-                }
-                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                FullMultinameAVM2Item setFm = (FullMultinameAVM2Item) setProperty.propertyName;
-                
-                if (!fm.compareSame(setFm)) {
-                    break;
-                }
-                
-                if (!(setLocalValue.value instanceof DuplicateItem)) {
-                    break;
-                }
-                DuplicateSourceItem  dupSourceObj = (DuplicateSourceItem) setProperty.object;
-                DuplicateItem dupObj = (DuplicateItem) getProp.object;
-                if (dupObj.tempIndex != setTempObj.tempIndex
-                    || dupSourceObj.tempIndex != setTempObj.tempIndex) {
-                    break;
-                }                
-                
-                DuplicateSourceItem dupValue = (DuplicateSourceItem) setProperty.value.value;
-                DuplicateItem dupSourceValue = (DuplicateItem) setLocalValue.value;               
-                if (dupValue.tempIndex != setTempValue.tempIndex
-                    || dupSourceValue.tempIndex != setTempValue.tempIndex) {
-                    break;
-                }               
-                getProp.object = setTempObj.value;
-                for (int i = 0; i < expectedClasses.length; i++) {
-                    output.remove(output.size() - 1);
-                }
-                stack.moveToStack(output);
-                if (isIncrement) {
-                    stack.push(new PreIncrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));
-                } else {
-                    stack.push(new PreDecrementAVM2Item(setLocalValue.value.value.getSrc(), setLocalValue.value.value.lineStartItem, getProp));                        
-                }
-                return;
-            } while(false);
-        }
         
         //TestIncDec7 AIR
         if (!output.isEmpty()) {
@@ -322,6 +141,137 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
                 return;
             }
+        }
+        
+        
+        //TestIncDec6 with result AIR
+        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetPropertyAVM2Item) {
+            SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) output.get(output.size() - 1);
+            if (setProp.value instanceof IncrementAVM2Item
+                    || setProp.value instanceof DecrementAVM2Item) {
+                boolean isIncrement = setProp.value instanceof IncrementAVM2Item;
+                if (setProp.value.value instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLoc = (SetLocalAVM2Item) setProp.value.value;
+                    if (setLoc.regIndex == regId) {
+                        if (setLoc.getSrc() instanceof AVM2Instruction) {
+                            AVM2Instruction src = (AVM2Instruction) setLoc.getSrc();
+                            if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {
+                                if (setLoc.value instanceof ConvertAVM2Item) {
+                                    if (setLoc.value.value instanceof GetPropertyAVM2Item) {
+                                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLoc.value.value;
+                                        if (setProp.object instanceof DuplicateSourceItem) {
+                                            DuplicateSourceItem ds = (DuplicateSourceItem) setProp.object;
+                                            if (getProp.object instanceof DuplicateItem) {
+                                                DuplicateItem d = (DuplicateItem) getProp.object;
+                                                if (output.size() >= 2 && output.get(output.size() - 2) instanceof SetTemporaryItem) {
+                                                    SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 2);
+                                                    if (st.tempIndex == d.tempIndex) {
+                                                        getProp.object = st.value;
+                                                        output.remove(output.size() - 1);
+                                                        output.remove(output.size() - 1);
+                                                        stack.moveToStack(output);
+                                                        if (isIncrement) {
+                                                            stack.push(new PostIncrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp));
+                                                        } else {
+                                                            stack.push(new PostDecrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp));                                                        
+                                                        }
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }                            
+                        }
+                    }
+                }
+            }
+        }
+        
+        //TestChainedAssignments1
+        /*
+         trace("c = b = a = 5;");
+         var a:int = 0;
+         var b:int = 0;
+         var c:int = 0;
+         var _loc4_:*;
+         a = _loc4_ = 5;
+         b = _loc4_ = _loc4_;
+         c = _loc4_;
+        */
+        stack.moveToStack(output);            
+        if (!output.isEmpty()) {
+            //chained assignments
+            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
+                GraphTargetItem setItem = output.get(output.size() - 1);
+                if (setItem.value.getNotCoercedNoDup() instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoercedNoDup();
+                    if (setLocal.regIndex == regId) {
+                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());
+                        if (localData.getSetLocalUsages(setLocalIp).size() == 1) {
+                                                 
+                            
+                            //TestIncDec5 with result AIR
+                            if (setItem instanceof SetPropertyAVM2Item
+                                    && (setLocal.value instanceof IncrementAVM2Item
+                                    || setLocal.value instanceof DecrementAVM2Item
+                                    )) {
+                                SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
+                                boolean isIncrement = setLocal.value instanceof IncrementAVM2Item;
+                                if (setLocal.value.value instanceof GetPropertyAVM2Item) {
+                                    
+                                    //TestIncDec6 with result AIR
+                                    /*
+                                    var _temp_4:* = trace;
+                                    var _temp_3:* = global;
+                                    var _temp_1:* = a;
+                                    var _loc2_:Number;
+                                    _temp_1.attrib = (_loc2_ = _temp_1.attrib) + 1;
+                                    _temp_4(_loc2_);
+                                    */
+                                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocal.value.value;
+                                    if (getProp.object instanceof DuplicateItem) {
+                                        DuplicateItem d = (DuplicateItem) getProp.object;
+                                        if (setProp.object instanceof DuplicateSourceItem) {
+                                            DuplicateSourceItem ds = (DuplicateSourceItem) setProp.object;
+                                            if (ds.tempIndex == d.tempIndex) {
+                                                if (output.size() >= 2 && output.get(output.size() - 2) instanceof SetTemporaryItem) {
+                                                    SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 2);
+                                                    if (st.tempIndex == d.tempIndex) {
+                                                        getProp.object = st.value;
+                                                        output.remove(output.size() - 1);
+                                                        output.remove(output.size() - 1);
+                                                        stack.moveToStack(output);
+                                                        if (isIncrement) {
+                                                            stack.push(new PreIncrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp));
+                                                        } else {
+                                                            stack.push(new PreDecrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp));                                                        
+                                                        }
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
+                                setItem.value.value = setLocal.value;
+                            } else {
+                                setItem.value = setLocal.value;
+                            }
+                            output.remove(output.size() - 1);
+                            stack.moveToStack(output);                           
+
+                            stack.push(setItem);
+                            return;                                                              
+                        }
+                    }                                        
+                }
+            }
+            stack.finishBlock(output);
         }
         
         stack.moveToStack(output);        

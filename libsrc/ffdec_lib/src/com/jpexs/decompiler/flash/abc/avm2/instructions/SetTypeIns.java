@@ -20,12 +20,19 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 
 /**
@@ -65,15 +72,48 @@ public interface SetTypeIns {
      * @param type Type
      */
     public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId, GraphTargetItem type) {
+        
+        GraphTargetItem notCoercedValue = value;
+        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+            notCoercedValue = value.value;
+        }               
+        
+        //TestChainedAssignments1 both AIR and nonair
+        if (notCoercedValue instanceof DuplicateItem) {
+            DuplicateItem d = (DuplicateItem) notCoercedValue;
+            stack.moveToStack(output);
+            if (!stack.isEmpty() && stack.peek() instanceof DuplicateSourceItem) {
+                DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
+                if (ds.tempIndex == d.tempIndex) {  
+                    GraphTargetItem newValue = d.value;                    
+                    if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                        if (st.tempIndex == ds.tempIndex) {
+                            output.remove(output.size() - 1);
+                        }
+                    }                    
+                    
+                    if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                        result.value.value = newValue;
+                    } else {
+                        result.value = newValue;
+                    }
+                                        
+                    stack.pop();
+                    stack.moveToStack(output);                    
+                    stack.push(result);
+                    return;
+                }
+            }
+            stack.finishBlock(output);
+        }
+        
         stack.addToOutput(result);
         if (true) { //FIXME??
             return;
         }
         //
-        GraphTargetItem notCoercedValue = value;
-        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
-            notCoercedValue = value.value;
-        }
+        
 
         if (notCoercedValue instanceof DuplicateItem) {
             GraphTargetItem insideDup = notCoercedValue.value;
