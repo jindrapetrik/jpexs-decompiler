@@ -1536,6 +1536,139 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
 
+        //TestIncDec9 with result AIR
+        /*
+         //var _temp_3:* = trace;
+         //var _temp_2:* = global;
+         var _temp_1:* = attrib + 1;
+         attrib = _temp_1;
+         _temp_3(_temp_1);
+        */
+        if (value instanceof DuplicateItem) {
+            if (!stack.isEmpty() && stack.peek() instanceof DuplicateSourceItem) {
+                DuplicateItem d = (DuplicateItem) value;
+                DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
+                if (d.tempIndex == ds.tempIndex) {
+                    if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                        if (st.tempIndex == d.tempIndex) {
+                            if (st.value instanceof IncrementAVM2Item
+                                    || st.value instanceof DecrementAVM2Item) {
+                                boolean isIncrement = st.value instanceof IncrementAVM2Item;
+                                if (st.value.value instanceof GetPropertyAVM2Item) {
+                                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) st.value.value;
+                                    if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                                        if (fm.compareSame(multiname)) {
+                                            output.remove(output.size() - 1);
+                                            stack.pop();
+                                            stack.moveToStack(output);
+                                            if (isIncrement) {
+                                                stack.push(new PreIncrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), getProp));
+                                            } else {
+                                                stack.push(new PreDecrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), getProp));
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //TestIncDec9 no result AIR
+        //attrib = attrib + 1;
+        if (value instanceof IncrementAVM2Item
+           || value instanceof DecrementAVM2Item) {
+           boolean isIncrement = value instanceof IncrementAVM2Item; 
+           if (value.value instanceof GetPropertyAVM2Item) {
+               GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value;
+               if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                   FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                   if (fm.compareSame(multiname)) {
+                        if (isIncrement) {
+                            stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                        } else {
+                            stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                        }
+                        return;
+                   }
+               }
+           }
+        }
+        
+        //TestInc10 with result AIR
+        /*
+         //var _temp_4:* = trace;
+         //var _temp_3:* = global;
+         var _temp_1:* = attrib;
+         attrib = _temp_1 + 1;
+         _temp_4(_temp_1);
+        */
+        if (value instanceof IncrementAVM2Item
+           || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item; 
+            if (value.value instanceof DuplicateItem) {
+                DuplicateItem d = (DuplicateItem) value.value;
+                if (!output.isEmpty() && output.get(output.size() - 1) instanceof PushItem
+                        && output.get(output.size() - 1) .value instanceof DuplicateSourceItem) {
+                    DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 1) .value ;
+                    if (d.tempIndex == ds.tempIndex) {
+                        if (output.size() >= 2 && output.get(output.size() - 2) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 2);
+                            if (st.tempIndex == d.tempIndex) {
+                                if (st.value instanceof ConvertAVM2Item) {
+                                    if (st.value.value instanceof GetPropertyAVM2Item) {
+                                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) st.value.value;
+                                        if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                                            FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                                            if (fm.compareSame(multiname)) {
+                                                output.remove(output.size() - 1);
+                                                output.remove(output.size() - 1);
+                                                stack.moveToStack(output);
+                                                if (isIncrement) {
+                                                    stack.push(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                                                } else {
+                                                    stack.push(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }            
+            }
+        }
+        
+        //TestInc10 no result AIR
+        //attrib = attrib + 1;
+        if (value instanceof IncrementAVM2Item
+           || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item; 
+            if (value.value instanceof ConvertAVM2Item) {
+                if (value.value.value instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.value;
+                    if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                        if (fm.compareSame(multiname)) {                            
+                             if (isIncrement) {
+                                 stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                             } else {
+                                 stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                             }
+                             return;
+                        }
+                    }
+                }                
+            }
+        }
+        
         if (multiname.name instanceof CommaExpressionItem) {
             CommaExpressionItem ce = (CommaExpressionItem) multiname.name;
             if (ce.commands.size() == 2) {
