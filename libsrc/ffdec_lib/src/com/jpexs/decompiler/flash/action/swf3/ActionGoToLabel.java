@@ -98,7 +98,7 @@ public class ActionGoToLabel extends Action {
      */
     @Override
     protected int getContentBytesLength() {
-        return Utf8Helper.getBytesLength(label) + 1;
+        return Utf8Helper.getBytesLength(label, charset) + 1;
     }
 
     /**

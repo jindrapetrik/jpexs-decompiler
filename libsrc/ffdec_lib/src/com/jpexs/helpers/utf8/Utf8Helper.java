@@ -152,6 +152,17 @@ public class Utf8Helper {
         // todo: make it faster without actually writing it to an array
         return getBytes(string).length;
     }
+    
+    public static int getBytesLength(String string, String charset) {
+        if (charset.toLowerCase().equals(charsetName)) {
+            return getBytesLength(string);
+        }
+        try {
+            return string.getBytes(charset).length;
+        } catch (UnsupportedEncodingException ex) {
+            return 0; //Should not happen
+        }
+    }
 
     private static String escapeInvalidUtf8Char(int v) {
         //Note: for writing the string "{invalid_utf8=xxx}" itself, you can escape it with "{+invalid_utf8=xxx}"

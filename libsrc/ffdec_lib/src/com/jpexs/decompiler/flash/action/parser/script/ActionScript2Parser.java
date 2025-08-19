@@ -2204,7 +2204,7 @@ public class ActionScript2Parser {
 
         int index = constantPool.indexOf(s);
         if (index == -1) {
-            if (ActionConstantPool.calculateSize(constantPool) + ActionConstantPool.calculateSize(s) <= 0xffff) {
+            if (ActionConstantPool.calculateSize(constantPool, charset) + ActionConstantPool.calculateSize(s, charset) <= 0xffff) {
                 // constant pool is not full
                 constantPool.add(s);
                 index = constantPool.indexOf(s);

@@ -121,7 +121,7 @@ public class ActionGetURL extends Action {
      */
     @Override
     protected int getContentBytesLength() {
-        return Utf8Helper.getBytesLength(urlString) + Utf8Helper.getBytesLength(targetString) + 2;
+        return Utf8Helper.getBytesLength(urlString, charset) + Utf8Helper.getBytesLength(targetString, charset) + 2;
     }
 
     @Override

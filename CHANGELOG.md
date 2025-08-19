@@ -68,6 +68,7 @@ All notable changes to this project will be documented in this file.
 - [#2510] AS direct editation - popped value
 - [#2511] Allowing to search or to jump from search window while in editation mode
 - [#2515] AS1/2 direct editation - getURL incorrect casing, generating ActionGetURL2 when not needed
+- AS1/2 actions must use SWF charset when writing its length
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

@@ -104,7 +104,7 @@ public class ActionSetTarget extends Action {
      */
     @Override
     protected int getContentBytesLength() {
-        return Utf8Helper.getBytesLength(targetName) + 1;
+        return Utf8Helper.getBytesLength(targetName, charset) + 1;
     }
 
     /**

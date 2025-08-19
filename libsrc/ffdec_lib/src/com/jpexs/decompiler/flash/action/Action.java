@@ -145,7 +145,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Charset - SWFs version 5 and lower do not use UTF-8
      */
-    private String charset;
+    protected String charset;
 
     /**
      * Names of ActionScript properties
@@ -538,7 +538,7 @@ public abstract class Action implements GraphSourceItem {
                     ActionConstantPool cPool = (ActionConstantPool) action;
                     List<String> constantPool = constantPools.get(poolIdx);
 
-                    int size = ActionConstantPool.calculateSize(constantPool);
+                    int size = ActionConstantPool.calculateSize(constantPool, action.getCharset());
                     if (size > 0xffff && tryInline) {
                         for (int i = 0; i < constantPool.size(); i++) {
                             int refCount = actions.getConstantPoolIndexReferenceCount(i);
@@ -548,7 +548,7 @@ public abstract class Action implements GraphSourceItem {
                             }
                         }
 
-                        size = ActionConstantPool.calculateSize(constantPool);
+                        size = ActionConstantPool.calculateSize(constantPool, action.getCharset());
                     }
 
                     if (size > 0xffff) {

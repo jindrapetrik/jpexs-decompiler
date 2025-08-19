@@ -216,7 +216,7 @@ public class ActionPush extends Action {
         int res = 0;
         for (Object o : vals) {
             if (o instanceof String) {
-                res += Utf8Helper.getBytesLength((String) o) + 2;
+                res += Utf8Helper.getBytesLength((String) o, charset) + 2;
             } else if (o instanceof Float) {
                 res += 5;
             } else if (o == Null.INSTANCE) {

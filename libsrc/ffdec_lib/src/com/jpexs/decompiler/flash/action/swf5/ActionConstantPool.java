@@ -125,29 +125,31 @@ public class ActionConstantPool extends Action {
      */
     @Override
     protected int getContentBytesLength() {
-        return calculateSize(constantPool);
+        return calculateSize(constantPool, charset);
     }
 
     /**
      * Calculates size of string converted to bytes
      *
      * @param str String
+     * @param charset Charset
      * @return Size
      */
-    public static int calculateSize(String str) {
-        return Utf8Helper.getBytesLength(str) + 1;
+    public static int calculateSize(String str, String charset) {
+        return Utf8Helper.getBytesLength(str, charset) + 1;
     }
 
     /**
      * Calculates the size of the action converted to bytes
      *
      * @param strings Strings
+     * @param charset Charset
      * @return Size
      */
-    public static int calculateSize(List<String> strings) {
+    public static int calculateSize(List<String> strings, String charset) {
         int res = 2;
         for (String s : strings) {
-            res += Utf8Helper.getBytesLength(s) + 1;
+            res += Utf8Helper.getBytesLength(s, charset) + 1;
         }
 
         return res;
