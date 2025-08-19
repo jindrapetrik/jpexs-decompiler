@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetTimeActionItem;
 import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
+import com.jpexs.decompiler.flash.action.model.GetURLActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
@@ -659,10 +660,32 @@ public class ActionScript2Parser {
 
             case GETURL:
                 expectedType(SymbolType.PARENT_OPEN);
+                s = lex();
+                if (s.type == SymbolType.STRING) {
+                    ParsedSymbol urlSymb = s;
+                    s = lex();
+                    if (s.type == SymbolType.COMMA) {
+                        ParsedSymbol targetSymb = lex();
+                        if (targetSymb.type == SymbolType.STRING) {
+                            ParsedSymbol s2 = lex();
+                            if (s2.type == SymbolType.PARENT_CLOSE) {
+                                ret = new GetURLActionItem(null, null, urlSymb.value.toString(), targetSymb.value.toString());
+                                break;
+                            } 
+                            lexer.pushback(s2);
+                        }
+                        lexer.pushback(targetSymb);                                                
+                    } else if (s.type == SymbolType.PARENT_CLOSE) {
+                        ret = new GetURLActionItem(null, null, urlSymb.value.toString(), "");
+                        break;                        
+                    }
+                    lexer.pushback(s);
+                    lexer.pushback(urlSymb);                    
+                }
                 GraphTargetItem url = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
-                int getuMethod = 0;
+                int sendVarsMethod = 0;
                 GraphTargetItem target;
                 if (s.type == SymbolType.COMMA) {
                     target = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
@@ -671,9 +694,9 @@ public class ActionScript2Parser {
                         s = lex();
                         expected(s, lexer.yyline(), SymbolType.STRING);
                         if (s.value.equals("GET")) {
-                            getuMethod = 1;
+                            sendVarsMethod = 1;
                         } else if (s.value.equals("POST")) {
-                            getuMethod = 2;
+                            sendVarsMethod = 2;
                         } else {
                             throw new ActionParseException("Invalid method, \"GET\" or \"POST\" expected.", lexer.yyline());
                         }
@@ -685,7 +708,7 @@ public class ActionScript2Parser {
                     target = new DirectValueActionItem(null, null, 0, "", new ArrayList<>());
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new GetURL2ActionItem(null, null, url, target, getuMethod);
+                ret = new GetURL2ActionItem(null, null, url, target, sendVarsMethod);
                 break;
             case GOTOANDSTOP:
             case GOTOANDPLAY:

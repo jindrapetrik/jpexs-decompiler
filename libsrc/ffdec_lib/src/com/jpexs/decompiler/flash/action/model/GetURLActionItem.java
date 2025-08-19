@@ -48,13 +48,18 @@ public class GetURLActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append("getUrl");
+        writer.append("getURL");
         writer.spaceBeforeCallParenthesis(2);
         writer.append("(\"");
         writer.append(Helper.escapeActionScriptString(urlString));
-        writer.append("\", \"");
-        writer.append(Helper.escapeActionScriptString(targetString));
-        return writer.append("\")");
+        writer.append("\"");
+        if (!targetString.isEmpty()) {
+            writer.append(", \"");
+            writer.append(Helper.escapeActionScriptString(targetString));
+            writer.append("\"");
+        }
+        writer.append(")");
+        return writer;
     }
 
     /**

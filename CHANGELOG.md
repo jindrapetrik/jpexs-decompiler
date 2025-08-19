@@ -67,6 +67,7 @@ All notable changes to this project will be documented in this file.
 - [#2508] AS1/2 direct editation - first command in for loop header not compiled
 - [#2510] AS direct editation - popped value
 - [#2511] Allowing to search or to jump from search window while in editation mode
+- [#2515] AS1/2 direct editation - getURL incorrect casing, generating ActionGetURL2 when not needed
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3977,6 +3978,7 @@ Major version of SWF to XML export changed to 2.
 [#2508]: https://www.free-decompiler.com/flash/issues/2508
 [#2510]: https://www.free-decompiler.com/flash/issues/2510
 [#2511]: https://www.free-decompiler.com/flash/issues/2511
+[#2515]: https://www.free-decompiler.com/flash/issues/2515
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
