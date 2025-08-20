@@ -38,7 +38,7 @@ import java.util.Objects;
 public class MBStringExtractActionItem extends ActionItem {
 
     /**
-     * Index
+     * Index - 1 based
      */
     public GraphTargetItem index;
 
@@ -107,7 +107,7 @@ public class MBStringExtractActionItem extends ActionItem {
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
         int idx = EcmaScript.toInt32(index);
-        idx--; // index seems to be 1 based
+        idx--; // index is 1 based
 
         int cnt = EcmaScript.toInt32(count);
 

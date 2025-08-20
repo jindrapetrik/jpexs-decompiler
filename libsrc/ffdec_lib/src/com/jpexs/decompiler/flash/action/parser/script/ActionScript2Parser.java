@@ -943,7 +943,7 @@ public class ActionScript2Parser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new MBStringExtractActionItem(null, null, val1, index1, len1);
                 break;
-            case SUBSTR:
+            case SUBSTRING:
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem val2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);

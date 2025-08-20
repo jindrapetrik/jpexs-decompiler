@@ -343,7 +343,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case MBCHR:
             case MBLENGTH:
             case MBSUBSTRING:
-            case SUBSTR:
+            case SUBSTRING:
             case LENGTH:
             case RANDOM:
             case INT:
@@ -611,7 +611,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
-            case SUBSTR:
+            case SUBSTRING:
                 expectedType(errors, SymbolType.PARENT_OPEN);
                 expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);

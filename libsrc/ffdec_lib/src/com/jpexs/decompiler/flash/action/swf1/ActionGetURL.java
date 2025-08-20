@@ -126,7 +126,7 @@ public class ActionGetURL extends Action {
 
     @Override
     public String toString() {
-        return "GetUrl \"" + Helper.escapeActionScriptString(urlString) + "\", \"" + Helper.escapeActionScriptString(targetString) + "\"";
+        return "GetURL \"" + Helper.escapeActionScriptString(urlString) + "\", \"" + Helper.escapeActionScriptString(targetString) + "\"";
     }
 
     @Override
