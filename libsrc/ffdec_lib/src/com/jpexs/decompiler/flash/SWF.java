@@ -3773,10 +3773,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         continue;
                     }
                     ip = code.adr2pos(addr);
-                    addr += size;
-                    int nextip = code.adr2pos(addr);
-                    getVariables(swf, aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(0, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>(), code.getCharset(), ip), 0, path + (cntName == null ? "" : "/" + cntName));
+                    long nextaddr = addr + size;
+                    int nextip = code.adr2pos(nextaddr);
+                    getVariables(swf, aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(0, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>(), code.getCharset(), ip), addr, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
+                    addr = nextaddr;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
                 r.add(new ArrayList<>());
@@ -3800,7 +3801,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (ins instanceof ActionSetMember) {
                 usageType = "member";
             }
-
+            
             if (name instanceof DirectValueActionItem) {
                 variables.add(new MyEntry<>((DirectValueActionItem) name, constantPool));
                 usageTypes.put((DirectValueActionItem) name, usageType);
@@ -3880,7 +3881,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param path Path
      * @throws InterruptedException On interrupt
      */
-    private static void getVariables(SWF swf, boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
+    private static void getVariables(SWF swf, boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, long addr, String path) throws InterruptedException {
         ActionLocalData localData = new ActionLocalData(null, insideDoInitAction, new HashMap<>() /*??*/, new LinkedHashSet<>());
         getVariables(swf, null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
@@ -4242,7 +4243,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 if (classNameParts.length - 1 - pos < 0) {
                                     break;
                                 }
-                            }
+                            }                                                            
                             String changedNameStr = nameStr;
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
@@ -4323,11 +4324,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        int vc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
-            vc++;
             String name = it.getKey().toStringNoH(it.getValue());
-            String changed = deobfuscation.deobfuscateName(false, name, false, usageTypes.get(it.getKey()), deobfuscated, renameType, selected);
+            String usageType = usageTypes.get(it.getKey());
+            if ("member".equals(usageType) && name.matches("^(0|[1-9][0-9]*)$")) {
+                continue;
+            }
+            String changed = deobfuscation.deobfuscateName(false, name, false, usageType, deobfuscated, renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
                 String h = System.identityHashCode(it.getKey()) + "_" + name;
@@ -4367,6 +4370,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         for (ASMSource src : actionsMap.keySet()) {
             actionsMap.get(src).removeNops();
+            actionsMap.get(src).fixActionList();
             try {
                 src.setActions(actionsMap.get(src));
             } catch (ValueTooLargeException vtle) {

@@ -71,6 +71,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2 actions must use SWF charset when writing its length
 - [#2515] AS1/2 Most of built-in global functions must be case in-sensitive
 - AS1/2 ActionStringExtract incorrectly decompiled as String.substr instead of substring global function
+- [#2516] AS1/2 Renaming of identifiers not setting function length correctly
+- AS1/2 Renaming of identifiers must not rename integer array offsets
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3982,6 +3984,7 @@ Major version of SWF to XML export changed to 2.
 [#2510]: https://www.free-decompiler.com/flash/issues/2510
 [#2511]: https://www.free-decompiler.com/flash/issues/2511
 [#2515]: https://www.free-decompiler.com/flash/issues/2515
+[#2516]: https://www.free-decompiler.com/flash/issues/2516
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
