@@ -2562,5 +2562,51 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "}\r\n"
         );
     }
+
+    @Test
+    public void frame95_breakDetectionTest() {
+        compareSrc(95, "function myFunction(item)\r\n"
+                + "{\r\n"
+                + "var _loc2_;\r\n"
+                + "var _loc4_;\r\n"
+                + "if(!isNaN(item))\r\n"
+                + "{\r\n"
+                + "_loc2_ = [1,2,3];\r\n"
+                + "for(var _loc3_ in _loc2_)\r\n"
+                + "{\r\n"
+                + "switch(_loc3_)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "if(item == \"a\")\r\n"
+                + "{\r\n"
+                + "return true;\r\n"
+                + "}\r\n"
+                + "case \"B\":\r\n"
+                + "if(item == \"b\")\r\n"
+                + "{\r\n"
+                + "return true;\r\n"
+                + "}\r\n"
+                + "case \"C\":\r\n"
+                + "if(item == \"c\")\r\n"
+                + "{\r\n"
+                + "return true;\r\n"
+                + "}\r\n"
+                + "case \"D\":\r\n"
+                + "if(item == \"d\")\r\n"
+                + "{\r\n"
+                + "return true;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"item is nan\");\r\n"
+                + "}\r\n"
+                + "return false;\r\n"
+                + "}\r\n"
+                + "trace(\"breakDetectionTest\");\r\n"
+        );
+    }
     //--FRAMES-END--
 }

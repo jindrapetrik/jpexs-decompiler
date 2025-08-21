@@ -37,30 +37,27 @@
                     </StrokeStyle>
                   </strokes>
                   <edges>
-                    <Edge fillStyle0="1" fillStyle1="2" strokeStyle="1" edges="!7000 0|7000 1000!7000 1000|8000 1000"/>
-                    <Edge fillStyle0="1" strokeStyle="1" edges="!8000 1000|8000 0"/>
                     <Edge fillStyle0="1" edges="!8000 0|7000 0"/>
-                    <Edge fillStyle0="2" fillStyle1="3" strokeStyle="1" edges="!7000 4000|7000 3000!7000 3000|8000 3000"/>
-                    <Edge fillStyle0="2" strokeStyle="1" edges="!8000 3000|8000 1000"/>
+                    <Edge fillStyle0="1" fillStyle1="2" strokeStyle="1" edges="!7000 0|7000 1000!7000 1000|8000 1000"/>
+                    <Edge fillStyle1="2" strokeStyle="1" edges="!8000 1000|8000 3000"/>
+                    <Edge fillStyle0="3" fillStyle1="2" strokeStyle="1" edges="!8000 3000|7000 3000!7000 3000|7000 4000"/>
+                    <Edge fillStyle1="2" strokeStyle="1" edges="!7000 4000|1000 4000"/>
+                    <Edge fillStyle0="5" fillStyle1="2" strokeStyle="1" edges="!1000 4000|1000 3000!1000 3000|0 3000"/>
+                    <Edge fillStyle0="5" strokeStyle="1" edges="!0 3000|0 4000!0 4000|1000 4000"/>
+                    <Edge fillStyle0="1" strokeStyle="1" edges="!8000 1000|8000 0"/>
                     <Edge fillStyle1="3" strokeStyle="1" edges="!8000 3000|8000 4000!8000 4000|7000 4000"/>
                     <Edge fillStyle0="2" fillStyle1="6" strokeStyle="1" edges="!4000 3000[2757 3000 1878 2707!1878 2707[1000 2414 1000 2000!1000 2000[1000 1586 1878 1293!1878 1293[2757 1000 4000 1000!4000 1000[5243 1000 6121 1293!6121 1293[7000 1586 7000 2000!7000 2000[7000 2414 6121 2707!6121 2707[5243 3000 4000
  3000"/>
+                    <Edge fillStyle1="4" strokeStyle="1" edges="
+!0 1000|0 0"/>
                     <Edge fillStyle1="4" edges="
 !0 0|1000 0"/>
+                    <Edge fillStyle1="2" strokeStyle="1" edges="
+!1000 0|7000 0"/>
                     <Edge fillStyle0="2" fillStyle1="4" strokeStyle="1" edges="
 !1000 0|1000 1000!1000 1000|0 1000"/>
                     <Edge fillStyle0="2" strokeStyle="1" edges="
 !0 1000|0 3000"/>
-                    <Edge fillStyle0="5" strokeStyle="1" edges="
-!0 3000|0 4000!0 4000|1000 4000"/>
-                    <Edge fillStyle0="5" fillStyle1="2" strokeStyle="1" edges="
-!1000 4000|1000 3000!1000 3000|0 3000"/>
-                    <Edge fillStyle1="4" strokeStyle="1" edges="
-!0 1000|0 0"/>
-                    <Edge fillStyle1="2" strokeStyle="1" edges="
-!7000 4000|1000 4000"/>
-                    <Edge fillStyle0="2" strokeStyle="1" edges="
-!7000 0|1000 0"/>
                   </edges>
                 </DOMShape>
               </elements>

@@ -2656,6 +2656,7 @@ public class Graph {
                 currentLoop = null;
                 if (isLoop) {
                     currentLoop = new Loop(loops.size(), part, null);
+                    currentLoop.stopParts = stopPart == null ? new ArrayList<>() : stopPart;
                     currentLoop.phase = 1;
                     loops.add(currentLoop);
                 }
@@ -2803,6 +2804,29 @@ public class Graph {
 
                 }
 
+                
+                //When some of breakcandidates pass through current stoppart,
+                //Remove other candidantes.
+                if (!currentLoop.stopParts.isEmpty()) {
+                    List<Integer> bcsLeft = new ArrayList<>();
+                    for (int c = 0; c < currentLoop.breakCandidates.size(); c++) {
+                        GraphPart cand = currentLoop.breakCandidates.get(c);
+                        GraphPart sp = currentLoop.stopParts.get(currentLoop.stopParts.size() - 1);
+                        if (cand == sp || cand.leadsTo(localData, this, code, sp, new ArrayList<>() /*ingore existing loop states*/, throwStates, false /* ?? */)) {
+                            bcsLeft.add(c);
+                        }
+                    }
+                    
+                    if (!bcsLeft.isEmpty()) {
+                         for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {
+                             if (!bcsLeft.contains(c)) {
+                                 currentLoop.breakCandidates.remove(c);
+                                 currentLoop.breakCandidatesLevels.remove(c);
+                             }
+                         }
+                    }
+                }
+                
                 do {
                     found = null;
 
