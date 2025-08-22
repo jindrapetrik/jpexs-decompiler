@@ -74,6 +74,7 @@ All notable changes to this project will be documented in this file.
 - [#2516] AS1/2 Renaming of identifiers not setting function length correctly
 - AS1/2 Renaming of identifiers must not rename integer array offsets
 - [#2517] Loop break detection problems in some cases
+- [#2519] AS1/2 avoid multi-level loops in cases where possible
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3987,6 +3988,7 @@ Major version of SWF to XML export changed to 2.
 [#2515]: https://www.free-decompiler.com/flash/issues/2515
 [#2516]: https://www.free-decompiler.com/flash/issues/2516
 [#2517]: https://www.free-decompiler.com/flash/issues/2517
+[#2519]: https://www.free-decompiler.com/flash/issues/2519
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418

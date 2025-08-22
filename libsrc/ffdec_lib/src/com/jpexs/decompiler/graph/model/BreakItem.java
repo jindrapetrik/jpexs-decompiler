@@ -45,6 +45,11 @@ public class BreakItem extends GraphTargetItem {
     private boolean labelRequired;
 
     /**
+     * Is placed at end of the script (or function)
+     */
+    public boolean isScriptEnd = false;
+    
+    /**
      * Constructor.
      *
      * @param dialect Dialect
@@ -59,6 +64,10 @@ public class BreakItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (isScriptEnd) {
+            writer.append("return");
+            return writer;
+        }
         writer.append("break");
         if (writer instanceof NulWriter) {
             NulWriter nulWriter = (NulWriter) writer;

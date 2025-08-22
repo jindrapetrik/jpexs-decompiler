@@ -3287,7 +3287,13 @@ public class Graph {
                         System.err.println("Adding break");
                     }
                     makeAllCommands(ret, stack);
-                    ret.add(new BreakItem(dialect, null, localData.lineStartInstruction, el.id));
+                    
+                    BreakItem br = new BreakItem(dialect, null, localData.lineStartInstruction, el.id);
+                    if (part.start >= code.size() - 1) {
+                        br.isScriptEnd = true;
+                    }
+                    ret.add(br);
+                    
                     return ret;
                 }
                 if (el.loopPreContinue == part) {
