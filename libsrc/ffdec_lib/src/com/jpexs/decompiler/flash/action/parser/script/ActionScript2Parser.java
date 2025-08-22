@@ -681,6 +681,8 @@ public class ActionScript2Parser {
                     }
                     lexer.pushback(s);
                     lexer.pushback(urlSymb);                    
+                } else {
+                    lexer.pushback(s);
                 }
                 GraphTargetItem url = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 s = lex();
