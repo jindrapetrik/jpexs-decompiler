@@ -48,7 +48,7 @@ public class BreakItem extends GraphTargetItem {
      * Is placed at end of the script (or function)
      */
     public boolean isScriptEnd = false;
-    
+
     /**
      * Constructor.
      *
@@ -64,18 +64,24 @@ public class BreakItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        if (isScriptEnd) {
-            writer.append("return");
-            return writer;
-        }
-        writer.append("break");
         if (writer instanceof NulWriter) {
             NulWriter nulWriter = (NulWriter) writer;
             labelRequired = loopId != nulWriter.getLoop();
             if (labelRequired) {
+                if (!dialect.doesAllowMultilevelBreaks() && isScriptEnd) {
+                    writer.append("return");
+                    return writer;
+                }
                 nulWriter.setLoopUsed(loopId);
             }
         }
+        if (labelRequired) {
+            if (!dialect.doesAllowMultilevelBreaks() && isScriptEnd) {
+                writer.append("return");
+                return writer;
+            }
+        }
+        writer.append("break");
         if (labelRequired) {
             writer.append(" loop").append(loopId);
         }

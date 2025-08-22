@@ -18,21 +18,31 @@ package com.jpexs.decompiler.graph;
 
 /**
  * Dialect - high level language type.
+ *
  * @author JPEXS
  */
 public abstract class GraphTargetDialect {
 
     /**
      * Identifier of the dialect.
+     *
      * @return Name
      */
     public abstract String getName();
-    
+
     /**
-     * Conversion of ECMA value (that's used in simplifications)
-     * back to GraphTarget item.
+     * Conversion of ECMA value (that's used in simplifications) back to
+     * GraphTarget item.
+     *
      * @param value Ecma value
      * @return GraphTarget item
      */
     public abstract GraphTargetItem valToItem(Object value);
+
+    /**
+     * Checks whether this dialect allows multi level breaks
+     *
+     * @return True when allows
+     */
+    public abstract boolean doesAllowMultilevelBreaks();
 }

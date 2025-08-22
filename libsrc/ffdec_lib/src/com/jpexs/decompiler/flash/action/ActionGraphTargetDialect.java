@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * AVM1 dialect.
+ *
  * @author JPEXS
  */
 public class ActionGraphTargetDialect extends GraphTargetDialect {
@@ -105,5 +106,10 @@ public class ActionGraphTargetDialect extends GraphTargetDialect {
             return new InitObjectActionItem(null, null, names, vals);
         }
         return null;
+    }
+
+    @Override
+    public boolean doesAllowMultilevelBreaks() {
+        return false;
     }
 }

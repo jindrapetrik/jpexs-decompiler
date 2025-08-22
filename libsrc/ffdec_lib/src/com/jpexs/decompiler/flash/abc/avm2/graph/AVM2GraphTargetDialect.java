@@ -37,20 +37,21 @@ import java.util.List;
 
 /**
  * AVM2 dialect.
+ *
  * @author JPEXS
  */
 public class AVM2GraphTargetDialect extends GraphTargetDialect {
 
     public static final GraphTargetDialect INSTANCE = new AVM2GraphTargetDialect();
-    
+
     private AVM2GraphTargetDialect() {
-        
+
     }
-    
+
     @Override
     public String getName() {
         return "AVM2";
-    }        
+    }
 
     @Override
     public GraphTargetItem valToItem(Object r) {
@@ -100,5 +101,10 @@ public class AVM2GraphTargetDialect extends GraphTargetDialect {
             return new NewObjectAVM2Item(null, null, props);
         }
         return null;
+    }
+
+    @Override
+    public boolean doesAllowMultilevelBreaks() {
+        return true;
     }
 }
