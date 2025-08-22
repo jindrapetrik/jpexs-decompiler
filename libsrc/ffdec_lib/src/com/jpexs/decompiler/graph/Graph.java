@@ -2804,7 +2804,8 @@ public class Graph {
                 }
 
                 //When some of breakcandidates pass through current stoppart,
-                //Remove other candidantes.
+                //Remove other candidantes.                                
+                Set<GraphPart> removedX = new LinkedHashSet<>();
                 if (!currentLoop.stopParts.isEmpty()) {
                     List<Integer> bcsLeft = new ArrayList<>();
                     for (int c = 0; c < currentLoop.breakCandidates.size(); c++) {
@@ -2816,10 +2817,10 @@ public class Graph {
                     }
 
                     if (!bcsLeft.isEmpty()) {
-                        for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {
+                        for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {                            
                             if (!bcsLeft.contains(c)) {
-                                currentLoop.breakCandidates.remove(c);
-                                currentLoop.breakCandidatesLevels.remove(c);
+                                GraphPart cand = currentLoop.breakCandidates.get(c);
+                                removedX.add(cand);
                             }
                         }
                     }
@@ -2916,6 +2917,12 @@ public class Graph {
                 }
 
                 for (GraphPart cand : currentLoop.breakCandidates) {
+                    if (removedX.contains(cand)) {
+                        if (debugPrintLoopList) {
+                            System.err.println("cand " + cand + " is removed");
+                        }                        
+                        continue;
+                    }
                     if (bannedCandidates.contains(cand)) {
                         if (debugPrintLoopList) {
                             System.err.println("cand " + cand + " is banned");
