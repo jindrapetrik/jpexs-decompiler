@@ -181,7 +181,9 @@ public class HexView extends JTable {
             int col = table.columnAtPoint(point);
             int row = table.rowAtPoint(point);
             mouseOverIdx = -1;
-            getModel().fireTableCellUpdated(row, col);
+            if (row > -1 && col > -1) {
+                getModel().fireTableCellUpdated(row, col);
+            }
             if (listener != null) {
                 listener.byteMouseMoved(-1, (byte) 0);
             }
