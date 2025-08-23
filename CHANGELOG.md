@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#2499] Information about frames which do not have ShowFrame tag
 - [#2504] WebP image format for export/import (not animated)
   Limitation: It's not available on Mac x86-64 platform
+- [#2519] AS1/2 P-code editation - better handling of "too large" error messages
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -3969,6 +3970,7 @@ Major version of SWF to XML export changed to 2.
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
 [#2499]: https://www.free-decompiler.com/flash/issues/2499
 [#2504]: https://www.free-decompiler.com/flash/issues/2504
+[#2519]: https://www.free-decompiler.com/flash/issues/2519
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338
@@ -3988,7 +3990,6 @@ Major version of SWF to XML export changed to 2.
 [#2515]: https://www.free-decompiler.com/flash/issues/2515
 [#2516]: https://www.free-decompiler.com/flash/issues/2516
 [#2517]: https://www.free-decompiler.com/flash/issues/2517
-[#2519]: https://www.free-decompiler.com/flash/issues/2519
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418

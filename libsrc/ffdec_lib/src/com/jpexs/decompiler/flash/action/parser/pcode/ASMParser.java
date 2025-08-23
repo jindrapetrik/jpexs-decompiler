@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
@@ -386,7 +387,12 @@ public class ASMParser {
                     throw new ActionParseException("Block end without start", lexer.yyline());
                 }
                 GraphSourceItemContainer a = containers.peek();
-                if (!a.parseDivision(0, lexer)) {
+                if (!a.parseDivision(0, lexer)) {                    
+                    try {
+                        ((Action) a).getBytes(version);
+                    } catch (ValueTooLargeException vtl) {
+                        throw new ActionParseException("Action container is too large", lexer.yyline());
+                    }
                     containers.pop();
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
@@ -394,6 +400,12 @@ public class ASMParser {
                 Action a = parseAction(instructionName, lexer, emptyList, version, charset);
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
+                } else if (a != null) {
+                    try {
+                        ((Action) a).getBytes(version);
+                    } catch (ValueTooLargeException vtl) {
+                        throw new ActionParseException("Action is too large", lexer.yyline());
+                    }
                 }
                 if (a != null) {
                     list.add(a);
@@ -455,6 +467,12 @@ public class ASMParser {
                 GraphSourceItemContainer a = containers.peek();
                 if (!a.parseDivision(address - ((Action) a).getAddress(), lexer)) {
                     containers.pop();
+                    
+                    try {
+                        ((Action) a).getBytes(version);
+                    } catch (ValueTooLargeException vtl) {
+                        throw new ActionParseException("Action container is too large", lexer.yyline());
+                    }
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = (String) symb.value;
@@ -474,6 +492,12 @@ public class ASMParser {
                 }
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
+                } else if (a != null) {
+                    try {
+                        ((Action) a).getBytes(version);
+                    } catch (ValueTooLargeException vtl) {
+                        throw new ActionParseException("Action is too large", lexer.yyline());
+                    }
                 }
                 if (a != null) {
                     list.add(a);
@@ -533,7 +557,7 @@ public class ASMParser {
                     if (actionJump.identifier.equals(label.name)) {
                         int offset = (int) (label.address - (actionJump.getAddress() + actionJump.getTotalActionLength()));
                         if (offset < -0x8000 || offset > 0x7fff) {
-                            String message = "Jump offset is too large:" + offset + " addr: ofs" + Helper.formatAddress(link.getAddress());
+                            String message = "ActionJump offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress())+", target label: " + label.name;
                             if (throwOnError) {
                                 Integer line = lineMap.get(link);
                                 if (line == null) {
@@ -559,7 +583,7 @@ public class ASMParser {
                     if (actionIf.identifier.equals(label.name)) {
                         int offset = (int) (label.address - (actionIf.getAddress() + actionIf.getTotalActionLength()));
                         if (offset < -0x8000 || offset > 0x7fff) {
-                            String message = "If offset is too large:" + offset + " addr: ofs" + Helper.formatAddress(link.getAddress());
+                            String message = "ActionIf offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress())+", target label: " + label.name;
                             if (throwOnError) {
                                 Integer line = lineMap.get(link);
                                 if (line == null) {

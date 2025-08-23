@@ -1394,9 +1394,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                     Action.setConstantPools(src, constantPools, true);
                 } catch (ConstantPoolTooBigException ex) {
                     ViewMessages.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
             } else {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset()));
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, true, src.getSwf().getCharset()));                
             }
 
             SWF.uncache(src);
@@ -1420,6 +1421,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             editor.gotoLine((int) ex.line);
             editor.markError();
             ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (ValueTooLargeException vl) {
+            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
