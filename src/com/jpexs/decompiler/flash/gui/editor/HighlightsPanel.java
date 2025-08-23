@@ -179,6 +179,9 @@ public class HighlightsPanel extends JPanel {
         int currentLine = editorPane.getLine();
 
         for (Highlighter.Highlight highlight : highlights) {
+            if (highlight == null) {
+                continue;
+            }
             Highlighter.HighlightPainter painter = highlight.getPainter();
             if ((painter instanceof UnderlinePainter) && ((UnderlinePainter) painter).getColor() == null) {
                 continue;

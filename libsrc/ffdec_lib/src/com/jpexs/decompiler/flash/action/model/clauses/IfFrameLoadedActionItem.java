@@ -116,6 +116,9 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         List<GraphSourceItem> body = generator.generate(localData, actions);
         ActionSourceGenerator actionGenerator = (ActionSourceGenerator) generator;
         String charset = actionGenerator.getCharset();
+        if (body.size() > 0xFF) {
+            throw new CompilationException("ifFrameLoaded body exceeds limit of 255 actions", line);
+        }
         return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size(), charset), body);
     }
 

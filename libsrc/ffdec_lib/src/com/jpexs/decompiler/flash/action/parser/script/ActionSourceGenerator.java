@@ -73,8 +73,10 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -156,7 +158,14 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     private List<GraphSourceItem> groupPushes(List<GraphSourceItem> items) {
 
-        //TODO: This should take in account important offsets (jumps)
+        if (swfVersion <= 4) {
+            return items;
+        }
+        
+
+        return items;
+        
+        //TODO: This should take into account important offsets (jumps)
         //And not group Pushes over different parts of code
         /*Like:
            If locA
@@ -166,12 +175,25 @@ public class ActionSourceGenerator implements SourceGenerator {
            Push "C"
         
            Should not be grouped to Push "A","B","C"
-         */
-        return items;
-        //Commented out for now...
-        /*if (swfVersion <= 4) {
-            return items;
+         
+        
+        //commented out for now...
+        Map<GraphSourceItem, Long> addresses = new LinkedHashMap<>();
+        List<Long> referencedAddresses = new ArrayList<>();
+        long addr = 0;
+        for (GraphSourceItem item : items) {
+            addresses.put(item, addr);
+            if (item instanceof ActionIf) {
+                ActionIf aIf = (ActionIf) item;
+                referencedAddresses.add(addr + 5 + aIf.getJumpOffset());
+            }
+            if (item instanceof ActionJump) {
+                ActionJump aJump = (ActionJump) item;
+                referencedAddresses.add(addr + 5 + aJump.getJumpOffset());
+            }
+            addr += item.getBytesLength();            
         }
+        
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionPush prevPush = null;
         for (GraphSourceItem s : items) {            
@@ -180,15 +202,21 @@ public class ActionSourceGenerator implements SourceGenerator {
                     prevPush = (ActionPush) s;
                     ret.add(prevPush);                    
                 } else {
-                    prevPush.values.addAll(((ActionPush) s).values);
-                    ((ActionPush) s).values.clear();
+                    long itemAddr = addresses.get(s);
+                    if (referencedAddresses.contains(itemAddr)) {
+                        prevPush = (ActionPush) s;
+                        ret.add(prevPush);
+                    } else {
+                        prevPush.values.addAll(((ActionPush) s).values);
+                        ((ActionPush) s).values.clear();
+                    }
                 }
             } else {
                 ret.add(s);
                 prevPush = null;
             }                      
         }
-        return ret;*/
+        return ret;   */                          
     }
 
     private List<Action> nonempty(List<Action> list) {
@@ -198,7 +226,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return list;
     }
 
-    private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) throws CompilationException {
+    private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar, int errorLine, String errorTitle) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         if (expression instanceof NotItem) {
             ret.addAll(expression.value.toSource(localData, this));
@@ -223,6 +251,10 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         byte[] onTrueBytes = Action.actionsToBytes(onTrue, false, SWF.DEFAULT_VERSION);
         int onTrueLen = onTrueBytes.length;
+        
+        if (onTrueLen > 32767) {
+            throw new CompilationException("Generated offset for onTrue part of " + errorTitle + " is larger than maximum allowed for SI16.", errorLine);
+        }
 
         ActionIf ifaif = new ActionIf(0, charset);
         ret.add(ifaif);
@@ -237,33 +269,48 @@ public class ActionSourceGenerator implements SourceGenerator {
                 ret.add(ajmp);
                 onTrueLen += ajmp.getTotalActionLength();
             }
+            if (onTrueLen > 32767) {
+                throw new CompilationException("Generated offset for onTrue part of " + errorTitle + " is larger than maximum allowed for SI16.", errorLine);
+            }
             ifaif.setJumpOffset(onTrueLen);
             byte[] onFalseBytes = Action.actionsToBytes(onFalse, false, SWF.DEFAULT_VERSION);
             int onFalseLen = onFalseBytes.length;
             if (ajmp != null) {
                 ajmp.setJumpOffset(onFalseLen);
             }
+            if (onTrueLen > 32767) {
+                throw new CompilationException("Generated offset for onFalse part of " + errorTitle + " is larger than maximum allowed for SI16.", errorLine);
+            }
             ret.addAll(onFalse);
         }
         return ret;
     }
 
-    private void fixLoop(List<Action> code, int breakOffset) {
-        fixLoop(code, breakOffset, Integer.MAX_VALUE);
+    private void fixLoop(List<Action> code, int breakOffset, GraphTargetItem item) throws CompilationException {
+        fixLoop(code, breakOffset, Integer.MAX_VALUE, item);
     }
 
-    private void fixLoop(List<Action> code, int breakOffset, int continueOffset) {
+    private void fixLoop(List<Action> code, int breakOffset, int continueOffset, GraphTargetItem item) throws CompilationException {
         int pos = 0;
         for (Action a : code) {
             pos += a.getBytesLength();
             if (a instanceof ActionJump) {
                 ActionJump aj = (ActionJump) a;
                 if (aj.isContinue && (continueOffset != Integer.MAX_VALUE)) {
-                    aj.setJumpOffset(-pos + continueOffset);
+                    int nOffset = -pos + continueOffset;
+                    if (nOffset < -32768 || nOffset > 32767) {
+                        throw new CompilationException("Generated offset for Continue is outside bounds of SI16.", item.line);
+                    } 
+                    
+                    aj.setJumpOffset(nOffset);
                     aj.isContinue = false;
                 }
                 if (aj.isBreak) {
-                    aj.setJumpOffset(-pos + breakOffset);
+                    int nOffset = -pos + breakOffset;
+                    if (nOffset < -32768 || nOffset > 32767) {
+                        throw new CompilationException("Generated offset for Break is outside bounds of SI16.", item.line);
+                    } 
+                    aj.setJumpOffset(nOffset);
                     aj.isBreak = false;
                 }
             }
@@ -835,7 +882,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) throws CompilationException {
-        return generateIf(localData, item.expression, item.onTrue, item.onFalse, false);
+        return generateIf(localData, item.expression, item.onTrue, item.onFalse, false, item.line, "If");
     }
 
     @Override
@@ -844,7 +891,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         onTrue.add(item.onTrue);
         List<GraphTargetItem> onFalse = new ArrayList<>();
         onFalse.add(item.onFalse);
-        return generateIf(localData, item.expression, onTrue, onFalse, true);
+        return generateIf(localData, item.expression, onTrue, onFalse, true, item.line, "Ternar");
     }
 
     @Override
@@ -867,11 +914,19 @@ public class ActionSourceGenerator implements SourceGenerator {
         whileBody.add(whileajmp);
         int whileExprLen = Action.actionsToBytes(whileExpr, false, SWF.DEFAULT_VERSION).length;
         int whileBodyLen = Action.actionsToBytes(whileBody, false, SWF.DEFAULT_VERSION).length;
-        whileajmp.setJumpOffset(-(whileExprLen
-                + whileBodyLen));
+        
+        if (whileBodyLen > 32767) {
+            throw new CompilationException("Generated offset for While is larger than maximum allowed for SI16.", item.line);
+        }
+        
+        int whileJumpOffset = -(whileExprLen + whileBodyLen);
+        if (whileJumpOffset < -32768) {
+            throw new CompilationException("Generated offset for While is lower than mininum allowed for SI16.", item.line);
+        }        
+        whileajmp.setJumpOffset(whileJumpOffset);
         whileaif.setJumpOffset(whileBodyLen);
         ret.addAll(whileExpr);
-        fixLoop(whileBody, whileBodyLen, -whileExprLen);
+        fixLoop(whileBody, whileBodyLen, -whileExprLen, item);
         ret.addAll(whileBody);
         return ret;
     }
@@ -896,9 +951,13 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(doExpr);
         ActionIf doif = new ActionIf(0, charset);
         ret.add(doif);
-        int offset = doBodyLen + doExprLen + doif.getTotalActionLength();
+        int offset = doBodyLen + doExprLen + doif.getTotalActionLength();       
+        if (-offset < -32768) {
+            throw new CompilationException("Generated offset for DoWhile is lower than mininum allowed for SI16.", item.line);
+        }  
+        
         doif.setJumpOffset(-offset);
-        fixLoop(doBody, offset, doBodyLen);
+        fixLoop(doBody, offset, doBodyLen, item);
         return ret;
     }
 
@@ -917,18 +976,26 @@ public class ActionSourceGenerator implements SourceGenerator {
         int forExprLen = Action.actionsToBytes(forExpr, false, SWF.DEFAULT_VERSION).length;
         int forBodyLen = Action.actionsToBytes(forBody, false, SWF.DEFAULT_VERSION).length;
         int forFinalLen = Action.actionsToBytes(forFinalCommands, false, SWF.DEFAULT_VERSION).length;
-        forajmp.setJumpOffset(-(forExprLen
-                + forBodyLen + forFinalLen + forajmpLen));
-        foraif.setJumpOffset(forBodyLen + forFinalLen + forajmpLen);
+        int jmpOffset = -(forExprLen + forBodyLen + forFinalLen + forajmpLen);
+        int ifOffset = forBodyLen + forFinalLen + forajmpLen;
+        if (jmpOffset < -32768) {
+            throw new CompilationException("Generated offset for For is lower than mininum allowed for SI16.", item.line);
+        }
+        if (ifOffset > 32767) {
+            throw new CompilationException("Generated offset for For is larger than maximum allowed for SI16.", item.line);
+        }
+        
+        forajmp.setJumpOffset(jmpOffset);
+        foraif.setJumpOffset(ifOffset);
         ret.addAll(generateToActionList(localData, item.firstCommands));
         ret.addAll(forExpr);
         ret.addAll(forBody);
         ret.addAll(forFinalCommands);
         ret.add(forajmp);
-        fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen);
+        fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen, item);
         return ret;
-    }
-
+    }        
+    
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -1022,6 +1089,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 for (int n = 0; n < i; n++) {
                     jmpPos += caseLengths.get(n);
                 }
+                checkOffsetBounds(jmpPos, "Switch", item.line);
                 caseIfs.get(i).get(c).setJumpOffset(jmpPos);
             }
         }
@@ -1032,6 +1100,8 @@ public class ActionSourceGenerator implements SourceGenerator {
             }
         }
 
+        checkOffsetBounds(defJmpPos, "Switch", item.line);
+                
         defJump.setJumpOffset(defJmpPos);
         List<Action> caseCmdsAll = new ArrayList<>();
         int breakOffset = 0;
@@ -1039,7 +1109,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             caseCmdsAll.addAll(caseCmds.get(i));
             breakOffset += caseLengths.get(i);
         }
-        fixLoop(caseCmdsAll, breakOffset);
+        fixLoop(caseCmdsAll, breakOffset, item);
         return ret;
     }
 
@@ -1120,5 +1190,15 @@ public class ActionSourceGenerator implements SourceGenerator {
         List<GraphSourceItem> ret = new ArrayList<>();
         return ret;
 
+    }
+    
+    private int checkOffsetBounds(int offset, String errorItem, int errorLine) throws CompilationException {
+        if (offset < -32768) {
+            throw new CompilationException("Generated offset for " + errorItem + " is lower than mininum allowed for SI16.", errorLine);
+        }
+        if (offset > 32767) {
+            throw new CompilationException("Generated offset for " + errorItem + " is larger than maximum allowed for SI16.", errorLine);
+        }
+        return offset;
     }
 }

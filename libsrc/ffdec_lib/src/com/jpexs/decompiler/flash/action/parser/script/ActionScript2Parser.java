@@ -416,6 +416,7 @@ public class ActionScript2Parser {
     }
 
     private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+        int functionLine = lexer.yyline();
         GraphTargetItem ret = null;
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
@@ -455,6 +456,7 @@ public class ActionScript2Parser {
 
         FunctionActionItem retf = new FunctionActionItem(null, null, functionName, paramNames, new HashMap<>() /*?*/, body, constantPool, -1, subvariables, subfunctions, subHasEval.getVal(), new ArrayList<>(), null);
         functions.add(retf);
+        retf.line = functionLine;
         return retf;
     }
 
@@ -1082,6 +1084,7 @@ public class ActionScript2Parser {
 
         switch (s.type) {
             case WITH:
+                int withLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem wvar = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1089,6 +1092,7 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> wcmd = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new WithActionItem(null, null, wvar, wcmd);
+                ret.line = withLine;
                 break;
             case DELETE:
                 GraphTargetItem varDel = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
@@ -1107,6 +1111,7 @@ public class ActionScript2Parser {
                 }
                 break;
             case TELLTARGET:
+                int tellTargetLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem tellTarget = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1116,11 +1121,13 @@ public class ActionScript2Parser {
                 TellTargetActionItem tt = new TellTargetActionItem(null, null, tellTarget, tellcmds);
                 if (inTellTarget) {
                     tt.nested = true;
-                }
+                }                
                 ret = tt;
+                ret.line = tellTargetLine;
                 break;
 
             case IFFRAMELOADED:
+                int ifFrameLoadedLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem iflExpr = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1128,8 +1135,10 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> iflComs = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new IfFrameLoadedActionItem(iflExpr, iflComs, null, null);
+                ret.line = ifFrameLoadedLine;
                 break;
             case CLASS:
+                int classLine = lexer.yyline();
                 GraphTargetItem classTypeStr = type(variables);
                 s = lex();
                 GraphTargetItem extendsTypeStr = null;
@@ -1147,6 +1156,7 @@ public class ActionScript2Parser {
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
                 ret = (traits(false, classTypeStr, extendsTypeStr, implementsTypeStrs, variables, functions, inTellTarget, hasEval));
+                ret.line = classLine;
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
             case INTERFACE:
@@ -1217,6 +1227,7 @@ public class ActionScript2Parser {
                 }
                 break;
             case IF:
+                int ifLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem ifExpr = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1232,8 +1243,10 @@ public class ActionScript2Parser {
                     lexer.pushback(s);
                 }
                 ret = new IfItem(DIALECT, null, null, ifExpr, onTrueList, onFalseList);
+                ret.line = ifLine;
                 break;
             case WHILE:
+                int whileLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 List<GraphTargetItem> whileExpr = new ArrayList<>();
                 whileExpr.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
@@ -1241,8 +1254,10 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> whileBody = new ArrayList<>();
                 whileBody.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 ret = new WhileItem(DIALECT, null, null, null, whileExpr, whileBody);
+                ret.line = whileLine;
                 break;
             case DO:
+                int doLine = lexer.yyline();
                 List<GraphTargetItem> doBody = new ArrayList<>();
                 doBody.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 expectedType(SymbolType.WHILE);
@@ -1251,8 +1266,10 @@ public class ActionScript2Parser {
                 doExpr.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new DoWhileItem(DIALECT, null, null, null, doBody, doExpr);
+                ret.line = doLine;
                 break;
             case FOR:
+                int forLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 s = lex();
                 boolean forin = false;
@@ -1353,8 +1370,10 @@ public class ActionScript2Parser {
                 } else {
                     ret = new ForItem(DIALECT, null, null, null, forFirstCommands, forExpr, forFinalCommands, forBody);
                 }
+                ret.line = forLine;
                 break;
             case SWITCH:
+                int switchLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem switchExpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1392,6 +1411,7 @@ public class ActionScript2Parser {
                 }
                 expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
                 ret = new SwitchItem(DIALECT, null, null, null, switchExpr, caseExprsAll, caseCmds, valueMapping);
+                ret.line = switchLine;
                 break;
             case BREAK:
                 ret = new BreakItem(DIALECT, null, null, 0); //? There is no more than 1 level continue/break in AS1/2
@@ -1407,6 +1427,7 @@ public class ActionScript2Parser {
                 ret = new ReturnActionItem(null, null, retexpr);
                 break;
             case TRY:
+                int tryLine = lexer.yyline();
                 List<GraphTargetItem> tryCommands = new ArrayList<>();
                 tryCommands.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 s = lex();
@@ -1446,6 +1467,7 @@ public class ActionScript2Parser {
                 }
                 lexer.pushback(s);
                 ret = new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands);
+                ret.line = tryLine;
                 break;
             case THROW:
                 ret = new ThrowActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
@@ -1590,6 +1612,7 @@ public class ActionScript2Parser {
 
                 case TERNAR:
                     lhs = new TernarOpItem(DIALECT, null, null, lhs, mhs, rhs);
+                    lhs.line = lexer.yyline();
                     break;
                 case SHIFT_LEFT:
                     lhs = new LShiftActionItem(null, null, lhs, rhs);

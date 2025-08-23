@@ -22,7 +22,8 @@ All notable changes to this project will be documented in this file.
 - [#2499] Information about frames which do not have ShowFrame tag
 - [#2504] WebP image format for export/import (not animated)
   Limitation: It's not available on Mac x86-64 platform
-- [#2519] AS1/2 P-code editation - better handling of "too large" error messages
+- [#2519] AS1/2 Direct editation + P-code - better handling of "too large"
+  error messages - highlight actual problematic structure
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

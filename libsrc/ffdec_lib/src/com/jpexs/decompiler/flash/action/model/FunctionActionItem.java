@@ -548,6 +548,9 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
         }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
+        if (len > 0xFFFF) {
+            throw new CompilationException("Function body is too large to fit into UI16.", line);
+        }
         if (!needsFun2 && paramNames.isEmpty()) {
             ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION, charset));
         } else {

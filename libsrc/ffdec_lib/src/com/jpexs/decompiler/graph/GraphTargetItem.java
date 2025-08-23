@@ -133,6 +133,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public int outputPos = -1;
     
     /**
+     * Line in decompiled source code. Used mainly in Parsers/Code generators to report bugs.
+     */
+    public int line;
+    
+    /**
      * Gets the line start item
      *
      * @return Line start item
