@@ -124,6 +124,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -1430,11 +1431,11 @@ public class AVM2Graph extends Graph {
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
                 st2.finishBlock(currentCatchCommands);
-                /*if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof SetLocalAVM2Item)) {
-                    if (currentCatchCommands.get(0).value.getNotCoerced() instanceof ExceptionAVM2Item) {
-                        currentCatchCommands.remove(0);
-                    }
-                }*/
+                while (!currentCatchCommands.isEmpty() 
+                        && currentCatchCommands.get(0) instanceof SetTemporaryItem
+                        && currentCatchCommands.get(0).value.getNotCoerced() instanceof ExceptionAVM2Item) {
+                    currentCatchCommands.remove(0);
+                }
                 loopwith:
                 while (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof WithAVM2Item)) {
                     WithAVM2Item w = (WithAVM2Item) currentCatchCommands.get(0);
