@@ -2206,10 +2206,13 @@ public class ActionScript2Parser {
 
         int index = constantPool.indexOf(s);
         if (index == -1) {
-            if (ActionConstantPool.calculateSize(constantPool, charset) + ActionConstantPool.calculateSize(s, charset) <= 0xffff) {
+            int newItemLen = ActionConstantPool.calculateSize(s, charset);
+            if (constantPool.size() < 0xffff 
+                    && constantPoolLength + newItemLen <= 0xffff) {
                 // constant pool is not full
                 constantPool.add(s);
                 index = constantPool.indexOf(s);
+                constantPoolLength += newItemLen;
             }
         }
 
@@ -2223,7 +2226,9 @@ public class ActionScript2Parser {
     private ActionScriptLexer lexer = null;
 
     private List<String> constantPool;
-
+    
+    private int constantPoolLength = 2; //ActionConstantPool starts with UI16 constant count
+    
     /**
      * Convert a string to a high-level model.
      *
@@ -2244,6 +2249,7 @@ public class ActionScript2Parser {
 
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
+        this.constantPoolLength = ActionConstantPool.calculateSize(constantPool, charset);
         lexer = new ActionScriptLexer(new StringReader(str));
         if (swfVersion >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
             lexer.setCaseSensitiveIdentifiers(true);
@@ -2475,7 +2481,7 @@ public class ActionScript2Parser {
     }
 
     private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool, boolean secondRun) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, charset);
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, constantPoolLength, charset);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
         localData.secondRun = secondRun;
         return gen.generate(localData, tree);

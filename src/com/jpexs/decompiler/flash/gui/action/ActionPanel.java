@@ -1459,6 +1459,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 mainPanel.refreshTree(src.getSwf());
             }
         } catch (ValueTooLargeException ex) {
+            logger.log(Level.SEVERE, "Cannot save", ex);
             ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "IOException during action compiling", ex);

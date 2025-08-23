@@ -154,7 +154,7 @@ public class Utf8Helper {
     }
     
     public static int getBytesLength(String string, String charset) {
-        if (charset.toLowerCase().equals(charsetName)) {
+        if (charset.toUpperCase().equals(charsetName)) {
             return getBytesLength(string);
         }
         try {

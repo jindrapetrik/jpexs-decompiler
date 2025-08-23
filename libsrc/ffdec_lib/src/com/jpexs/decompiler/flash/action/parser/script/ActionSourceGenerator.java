@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
@@ -85,6 +86,8 @@ import java.util.logging.Logger;
 public class ActionSourceGenerator implements SourceGenerator {
 
     private final List<String> constantPool;
+    
+    private int constantPoolLength;
 
     private final int swfVersion;
 
@@ -97,11 +100,13 @@ public class ActionSourceGenerator implements SourceGenerator {
      *
      * @param swfVersion SWF version
      * @param constantPool Constant pool
+     * @param constantPoolLength Constant pool length
      * @param charset Charset
      */
-    public ActionSourceGenerator(int swfVersion, List<String> constantPool, String charset) {
+    public ActionSourceGenerator(int swfVersion, List<String> constantPool, int constantPoolLength, String charset) {
         this.constantPool = constantPool;
         this.swfVersion = swfVersion;
+        this.constantPoolLength = constantPoolLength;
         this.charset = charset;
     }
 
@@ -501,12 +506,29 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @return Push constant item
      */
     public DirectValueActionItem pushConstTargetItem(String s) {
+        
+        //ActionConstantPool was introduced in SWF 5
+        if (swfVersion < 5) {
+            return new DirectValueActionItem(null, null, 0, s, constantPool);
+        }
+
         int index = constantPool.indexOf(s);
         if (index == -1) {
-            constantPool.add(s);
-            index = constantPool.indexOf(s);
+            int newItemLen = ActionConstantPool.calculateSize(s, charset);
+            if (constantPool.size() < 0xffff 
+                    && constantPoolLength + newItemLen <= 0xffff) {
+                // constant pool is not full
+                constantPool.add(s);
+                index = constantPool.indexOf(s);
+                constantPoolLength += newItemLen;
+            }
         }
-        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);
+
+        if (index == -1) {
+            return new DirectValueActionItem(null, null, 0, s, constantPool);
+        }
+
+        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);                
     }
 
     /**
@@ -516,10 +538,28 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @return Push constant action
      */
     public ActionPush pushConst(String s) {
+        
+        if (swfVersion < 5) {
+            return new ActionPush(s, charset);
+        }        
+        
         int index = constantPool.indexOf(s);
-        if (index == -1) {
+        if (index == -1) {            
+            
+            if (constantPool.size() == 0xffff) {
+                return new ActionPush(s, charset);
+            }                
+            
+            int newItemLen = ActionConstantPool.calculateSize(s, charset);
+            
+            //constant pool is full
+            if (constantPoolLength + newItemLen > 0xffff) {
+                return new ActionPush(s, charset);
+            }
+            
             constantPool.add(s);
             index = constantPool.indexOf(s);
+            constantPoolLength += newItemLen;
         }
         return new ActionPush(new ConstantIndex(index), charset);
     }
