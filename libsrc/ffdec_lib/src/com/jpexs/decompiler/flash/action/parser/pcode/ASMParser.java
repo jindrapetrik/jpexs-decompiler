@@ -387,7 +387,7 @@ public class ASMParser {
                     throw new ActionParseException("Block end without start", lexer.yyline());
                 }
                 GraphSourceItemContainer a = containers.peek();
-                if (!a.parseDivision(0, lexer)) {                    
+                if (!a.parseDivision(0, lexer)) {
                     try {
                         ((Action) a).getBytes(version);
                     } catch (ValueTooLargeException vtl) {
@@ -418,6 +418,7 @@ public class ASMParser {
 
     /**
      * Parses ActionScript 1-2.
+     *
      * @param ignoreNops Ignore NOPs
      * @param labels Labels
      * @param lineMap Line map
@@ -467,7 +468,7 @@ public class ASMParser {
                 GraphSourceItemContainer a = containers.peek();
                 if (!a.parseDivision(address - ((Action) a).getAddress(), lexer)) {
                     containers.pop();
-                    
+
                     try {
                         ((Action) a).getBytes(version);
                     } catch (ValueTooLargeException vtl) {
@@ -515,6 +516,7 @@ public class ASMParser {
 
     /**
      * Parses ActionScript 1-2.
+     *
      * @param address Address
      * @param ignoreNops Ignore NOPs
      * @param source Source
@@ -557,7 +559,7 @@ public class ASMParser {
                     if (actionJump.identifier.equals(label.name)) {
                         int offset = (int) (label.address - (actionJump.getAddress() + actionJump.getTotalActionLength()));
                         if (offset < -0x8000 || offset > 0x7fff) {
-                            String message = "ActionJump offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress())+", target label: " + label.name;
+                            String message = "ActionJump offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress()) + ", target label: " + label.name;
                             if (throwOnError) {
                                 Integer line = lineMap.get(link);
                                 if (line == null) {
@@ -583,7 +585,7 @@ public class ASMParser {
                     if (actionIf.identifier.equals(label.name)) {
                         int offset = (int) (label.address - (actionIf.getAddress() + actionIf.getTotalActionLength()));
                         if (offset < -0x8000 || offset > 0x7fff) {
-                            String message = "ActionIf offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress())+", target label: " + label.name;
+                            String message = "ActionIf offset is too large. offset: " + offset + ", jump action addr: ofs" + Helper.formatAddress(link.getAddress()) + ", target label: " + label.name;
                             if (throwOnError) {
                                 Integer line = lineMap.get(link);
                                 if (line == null) {
