@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -108,7 +109,7 @@ public class TagIdClassMap {
     private static final Map<Class, Integer> classTagIdMap = new HashMap<>();
 
     static {
-        addTag(CSMTextSettingsTag.ID, CSMTextSettingsTag.class);
+        addTag(CSMSettingsTag.ID, CSMSettingsTag.class);
         addTag(DebugIDTag.ID, DebugIDTag.class);
         addTag(DefineBinaryDataTag.ID, DefineBinaryDataTag.class);
         addTag(DefineBitsJPEG2Tag.ID, DefineBitsJPEG2Tag.class);
@@ -162,6 +163,7 @@ public class TagIdClassMap {
         addTag(PlaceObject3Tag.ID, PlaceObject3Tag.class);
         addTag(PlaceObject4Tag.ID, PlaceObject4Tag.class);
         addTag(PlaceObjectTag.ID, PlaceObjectTag.class);
+        addTag(PlaceImagePrivateTag.ID, PlaceImagePrivateTag.class);
         addTag(ProductInfoTag.ID, ProductInfoTag.class);
         addTag(ProtectTag.ID, ProtectTag.class);
         addTag(RemoveObject2Tag.ID, RemoveObject2Tag.class);

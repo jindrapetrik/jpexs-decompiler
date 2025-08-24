@@ -34,7 +34,7 @@ import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -67,6 +67,7 @@ import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -326,8 +327,8 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.TEXT;
         }
         
-        if (t instanceof CSMTextSettingsTag) {
-            return TreeNodeType.CSM_TEXT_SETTINGS;
+        if (t instanceof CSMSettingsTag) {
+            return TreeNodeType.CSM_SETTINGS;
         }
 
         // DefineBits, DefineBitsJPEG2, DefineBitsJPEG3, DefineBitsJPEG4, DefineBitsLossless, DefineBitsLossless2
@@ -518,6 +519,9 @@ public abstract class AbstractTagTree extends JTree {
         }
         if (t instanceof PlaceObjectTypeTag) {
             return TreeNodeType.PLACE_OBJECT;
+        }
+        if (t instanceof PlaceImagePrivateTag) {
+            return TreeNodeType.PLACE_IMAGE_PRIVATE;
         }
         if (t instanceof RemoveTag) {
             return TreeNodeType.REMOVE_OBJECT;
@@ -869,7 +873,7 @@ public abstract class AbstractTagTree extends JTree {
                 RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                 StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
                 SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
-                SetTabIndexTag.ID
+                SetTabIndexTag.ID, PlaceImagePrivateTag.ID
         );
     }
 
@@ -945,8 +949,8 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.TEXT;
         }
         
-        if (cl == CSMTextSettingsTag.class) {
-            return TreeNodeType.CSM_TEXT_SETTINGS;
+        if (cl == CSMSettingsTag.class) {
+            return TreeNodeType.CSM_SETTINGS;
         }
 
         // DefineBits, DefineBitsJPEG2, DefineBitsJPEG3, DefineBitsJPEG4, DefineBitsLossless, DefineBitsLossless2
@@ -1036,6 +1040,9 @@ public abstract class AbstractTagTree extends JTree {
         if (PlaceObjectTypeTag.class.isAssignableFrom(cl)) {
             return TreeNodeType.PLACE_OBJECT;
         }
+        if (cl == PlaceImagePrivateTag.class) {
+            return TreeNodeType.PLACE_IMAGE_PRIVATE;
+        }
         if (RemoveTag.class.isAssignableFrom(cl)) {
             return TreeNodeType.REMOVE_OBJECT;
         }
@@ -1110,7 +1117,7 @@ public abstract class AbstractTagTree extends JTree {
             return Arrays.asList(DefineFontNameTag.ID, DefineFontAlignZonesTag.ID, DefineFontInfoTag.ID, DefineFontInfo2Tag.ID);
         }
         if (TextTag.class.isAssignableFrom(cls)) {
-            return Arrays.asList(CSMTextSettingsTag.ID);
+            return Arrays.asList(CSMSettingsTag.ID);
         }
         if (cls == DefineButtonTag.class) {
             return Arrays.asList(DefineButtonCxformTag.ID, DefineButtonSoundTag.ID, DefineScalingGridTag.ID);

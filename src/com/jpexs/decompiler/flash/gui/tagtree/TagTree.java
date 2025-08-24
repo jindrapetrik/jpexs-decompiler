@@ -62,6 +62,7 @@ import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -292,7 +293,7 @@ public class TagTree extends AbstractTagTree {
                         RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                         StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
                         SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
-                        SetTabIndexTag.ID);
+                        SetTabIndexTag.ID, PlaceImagePrivateTag.ID);
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(

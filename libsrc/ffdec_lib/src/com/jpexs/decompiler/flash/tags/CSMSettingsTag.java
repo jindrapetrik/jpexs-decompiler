@@ -35,11 +35,11 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 8)
-public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
+public class CSMSettingsTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 74;
 
-    public static final String NAME = "CSMTextSettings";
+    public static final String NAME = "CSMSettings";
 
     @SWFType(BasicType.UI16)
     public int textID;
@@ -69,7 +69,7 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
      *
      * @param swf SWF
      */
-    public CSMTextSettingsTag(SWF swf) {
+    public CSMSettingsTag(SWF swf) {
         super(swf, ID, NAME, null);
     }
 
@@ -80,7 +80,7 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
      * @param data Data
      * @throws IOException On I/O error
      */
-    public CSMTextSettingsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public CSMSettingsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }

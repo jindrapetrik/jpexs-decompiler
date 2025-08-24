@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Debugging - _global variable accessible
 - AS Debugging - Variables with flag DontEnumerate are hidden by default
   (can be changed in Advanced Settings)
+- Basic support for PlaceImagePrivate tag
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -96,6 +97,7 @@ All notable changes to this project will be documented in this file.
 - SWF3 actions split into SWF1, SWF2 and SWF3 actions (in FFDec source code, docs, etc.)
 - Serial form of AS3 search results changed so the decompiler is unable to read
   saved AS3 search result from older versions and vice-versa
+- CSMTextSettings tag renamed to CSMSettings
 
 ### Removed
 - Resample wav to 44kHz feature from GUI

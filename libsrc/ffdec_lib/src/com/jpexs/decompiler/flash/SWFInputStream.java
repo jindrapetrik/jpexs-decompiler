@@ -127,7 +127,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -181,6 +181,7 @@ import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.PathsArePostScriptTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -1632,7 +1633,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 37:
                     ret = new DefineEditTextTag(sis, data);
                     break;
-                //case 38: DefineMouseTarget
+                //case 38: DefineVideo / DefineMouseTarget
                 case 39:
                     ret = new DefineSpriteTag(sis, level, data, parallel, skipUnusualTags);
                     break;
@@ -1715,7 +1716,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new DefineFontAlignZonesTag(sis, data);
                     break;
                 case 74:
-                    ret = new CSMTextSettingsTag(sis, data);
+                    ret = new CSMSettingsTag(sis, data);
                     break;
                 case 75:
                     ret = new DefineFont3Tag(sis, data);
@@ -1740,7 +1741,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 84:
                     ret = new DefineMorphShape2Tag(sis, data);
                     break;
-                //case 85: PlaceImagePrivate
+                case 85:
+                    ret = new PlaceImagePrivateTag(sis, data);
+                    break;
                 case 86:
                     ret = new DefineSceneAndFrameLabelDataTag(sis, data);
                     break;

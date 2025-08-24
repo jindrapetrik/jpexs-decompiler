@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -5848,6 +5849,7 @@ public class TagTreeContextMenu extends JPopupMenu {
      */
     private boolean isFrameTagToDelete(Tag tag) {
         return (tag instanceof PlaceObjectTypeTag)
+                || (tag instanceof PlaceImagePrivateTag)
                 || (tag instanceof RemoveTag)
                 || (tag instanceof FrameLabelTag)
                 || (tag instanceof StartSoundTag)

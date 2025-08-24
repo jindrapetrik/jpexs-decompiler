@@ -325,7 +325,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                 if (knownTagInfosById == null) {
                     Map<Integer, TagTypeInfo> map = new HashMap<>();
                     Map<String, TagTypeInfo> map2 = new HashMap<>();
-                    addTagInfo(map, map2, CSMTextSettingsTag.ID, CSMTextSettingsTag.class, CSMTextSettingsTag.NAME);
+                    addTagInfo(map, map2, CSMSettingsTag.ID, CSMSettingsTag.class, CSMSettingsTag.NAME);
                     addTagInfo(map, map2, DebugIDTag.ID, DebugIDTag.class, DebugIDTag.NAME);
                     addTagInfo(map, map2, DefineBinaryDataTag.ID, DefineBinaryDataTag.class, DefineBinaryDataTag.NAME);
                     addTagInfo(map, map2, DefineBitsJPEG2Tag.ID, DefineBitsJPEG2Tag.class, DefineBitsJPEG2Tag.NAME);
@@ -379,6 +379,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, PlaceObject3Tag.ID, PlaceObject3Tag.class, PlaceObject3Tag.NAME);
                     addTagInfo(map, map2, PlaceObject4Tag.ID, PlaceObject4Tag.class, PlaceObject4Tag.NAME);
                     addTagInfo(map, map2, PlaceObjectTag.ID, PlaceObjectTag.class, PlaceObjectTag.NAME);
+                    addTagInfo(map, map2, PlaceImagePrivateTag.ID, PlaceImagePrivateTag.class, PlaceImagePrivateTag.NAME);
                     addTagInfo(map, map2, ProductInfoTag.ID, ProductInfoTag.class, ProductInfoTag.NAME);
                     addTagInfo(map, map2, ProtectTag.ID, ProtectTag.class, ProtectTag.NAME);
                     addTagInfo(map, map2, RemoveObject2Tag.ID, RemoveObject2Tag.class, RemoveObject2Tag.NAME);

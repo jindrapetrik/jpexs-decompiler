@@ -43,6 +43,7 @@ public class ShowFrameTag extends Tag {
             add(PlaceObject2Tag.ID);
             add(PlaceObject3Tag.ID);
             add(PlaceObject4Tag.ID);
+            add(PlaceImagePrivateTag.ID);
             add(RemoveObjectTag.ID);
             add(RemoveObject2Tag.ID);
             add(FrameLabelTag.ID);

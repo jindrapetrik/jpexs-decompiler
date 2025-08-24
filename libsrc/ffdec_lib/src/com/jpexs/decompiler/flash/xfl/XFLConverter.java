@@ -67,7 +67,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
@@ -4966,7 +4966,7 @@ public class XFLConverter {
 
     private static void convertText(int frame, AccessibilityBag accessibility, String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, XFLXmlWriter writer, Map<CharacterTag, String> characterImportLinkageURL, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Set<CharacterTag> characters) throws XMLStreamException {
         MATRIX matrix = new MATRIX(m);
-        CSMTextSettingsTag csmts = null;
+        CSMSettingsTag csmts = null;
         XFLXmlWriter filterStr = new XFLXmlWriter();
         if (filters != null) {
             filterStr.writeStartElement("filters");
@@ -4978,8 +4978,8 @@ public class XFLConverter {
 
         SWF swf = tag.getSwf();
         for (Tag t : swf.getTags()) {
-            if (t instanceof CSMTextSettingsTag) {
-                CSMTextSettingsTag c = (CSMTextSettingsTag) t;
+            if (t instanceof CSMSettingsTag) {
+                CSMSettingsTag c = (CSMSettingsTag) t;
                 if (c.textID == tag.getCharacterId()) {
                     csmts = c;
                     break;

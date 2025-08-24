@@ -28,7 +28,7 @@ public enum TreeNodeType {
     FONT_INFO,
     FONT_NAME,
     TEXT,
-    CSM_TEXT_SETTINGS,
+    CSM_SETTINGS,
     IMAGE,
     SHAPE,
     MORPH_SHAPE,
@@ -88,5 +88,6 @@ public enum TreeNodeType {
     SET_TABINDEX,
     SYMBOL_CLASS,
     SCENE_AND_FRAME_LABEL_DATA,
-    DEBUG_ID
+    DEBUG_ID,
+    PLACE_IMAGE_PRIVATE
 }

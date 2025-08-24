@@ -33,7 +33,7 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -255,6 +256,9 @@ public class DumpTree extends JTree {
                             case PlaceObject4Tag.NAME:
                                 nodeType = TreeNodeType.PLACE_OBJECT;
                                 break;
+                            case PlaceImagePrivateTag.NAME:
+                                nodeType = TreeNodeType.PLACE_IMAGE_PRIVATE;
+                                break;
                             case RemoveObjectTag.NAME:
                             case RemoveObject2Tag.NAME:
                                 nodeType = TreeNodeType.REMOVE_OBJECT;
@@ -269,8 +273,8 @@ public class DumpTree extends JTree {
                             case DefineFontNameTag.NAME:
                                 nodeType = TreeNodeType.FONT_NAME;
                                 break;
-                            case CSMTextSettingsTag.NAME:
-                                nodeType = TreeNodeType.CSM_TEXT_SETTINGS;
+                            case CSMSettingsTag.NAME:
+                                nodeType = TreeNodeType.CSM_SETTINGS;
                                 break;
                             case DefineButtonCxformTag.NAME:
                                 nodeType = TreeNodeType.BUTTON_CXFORM;
@@ -323,7 +327,7 @@ public class DumpTree extends JTree {
                                 break;
                             case DebugIDTag.NAME:
                                 nodeType = TreeNodeType.DEBUG_ID;
-                                break;
+                                break;                            
                             default:
                                 nodeType = TreeNodeType.OTHER_TAG;
                         }
