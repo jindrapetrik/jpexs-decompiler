@@ -42,13 +42,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * Incorrect class header remover.
+ * Attempt to remove incorrect class header.
  * This neutralizes ActionIfs from the beginning of the class.
  * Without this, the ifs can contain long and incorrect values.
  * The AS2 class detector handles this properly.
  * @author JPEXS
  */
-public class ActionIncorrectClassHeaderRemover extends SWFDecompilerAdapter {
+public class ActionClassHeaderCrippler extends SWFDecompilerAdapter {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {

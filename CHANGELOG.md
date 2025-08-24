@@ -41,7 +41,6 @@ All notable changes to this project will be documented in this file.
 - [#2477] AS1/2 deobfuscation - and/or operators, jumps before function start, 
   jumps to function end, jumps in for..in return/break
 - [#2477] AS1/2 Switch in last statement of switch break labels
-- [#2338] AS2 Reading large classes with incorrect if jumps on the beginning
 - [#2338] AS1/2/3 Obfuscated code - jump to jump handling
 - [#1277] AS1/2 Propagate break/continue to avoid loop/switch labels
 - [#2483] Editing shape gradient records - RGB vs RGBA

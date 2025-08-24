@@ -1086,7 +1086,7 @@ public abstract class Action implements GraphSourceItem {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, fixActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
+            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, crippleActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
@@ -1096,18 +1096,20 @@ public abstract class Action implements GraphSourceItem {
         }
     }
     
-    private static List<Action> fixActionsClassHeader(List<Action> actions, boolean needsUninitializedClassFieldsDetection, String charset, String path) {
-        ActionList alist = new ActionList(actions, charset);
+    private static List<Action> crippleActionsClassHeader(List<Action> actions, boolean needsUninitializedClassFieldsDetection, String charset, String path) {
+        return actions;
+        //This does not work well, better comment it out.
+        /*ActionList alist = new ActionList(actions, charset);
         if (needsUninitializedClassFieldsDetection) {
             try {
-                new ActionIncorrectClassHeaderRemover().actionListParsed(alist, null);
+                new ActionClassHeaderCrippler().actionListParsed(alist, null);
             } catch (InterruptedException ex) {
                 //ignored
             } catch (Throwable ex) {
                 Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Removing incorrect class header failed: " + path, ex);
             }  
         }
-        return alist;
+        return alist;*/        
     }
 
     /**
