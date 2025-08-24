@@ -34,6 +34,7 @@ import com.jpexs.debugger.flash.messages.in.InErrorException;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
+import com.jpexs.debugger.flash.messages.in.InPlaceObject;
 import com.jpexs.debugger.flash.messages.in.InProcessTag;
 import com.jpexs.debugger.flash.messages.in.InScript;
 import com.jpexs.debugger.flash.messages.in.InSetBreakpoint;
@@ -45,6 +46,7 @@ import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.debugger.flash.messages.out.OutPlay;
 import com.jpexs.debugger.flash.messages.out.OutProcessedTag;
 import com.jpexs.debugger.flash.messages.out.OutRewind;
+import com.jpexs.debugger.flash.messages.out.OutStopDebug;
 import com.jpexs.debugger.flash.messages.out.OutSwfInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -53,6 +55,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +114,8 @@ public class DebuggerHandler implements DebugConnectionListener {
     private List<Integer> stackLines = new ArrayList<>();
 
     private List<SWF> debuggedSwfs = new ArrayList<>();
+    
+    private Map<String, Long> placedObjects = new LinkedHashMap<>();
 
     public static class ActionScriptException extends Exception {
 
@@ -723,6 +728,8 @@ public class DebuggerHandler implements DebugConnectionListener {
             moduleToTraitIndex.clear();
             moduleToMethodIndex.clear();
             moduleToSwfIndex.clear();
+            
+            placedObjects.clear();
 
             con.addMessageListener(new DebugMessageListener<InScript>() {
                 @Override
@@ -834,6 +841,14 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }*/
                     con.dropMessage(t);
                 }
+            });
+            
+            con.addMessageListener(new DebugMessageListener<InPlaceObject>() {
+                @Override
+                public void message(InPlaceObject t) {
+                    placedObjects.put(t.path, t.objId);
+                    con.dropMessage(t);
+                }                
             });
 
             InSetBreakpoint isb = con.getMessage(InSetBreakpoint.class);
@@ -1155,5 +1170,9 @@ public class DebuggerHandler implements DebugConnectionListener {
             //ignored
         }
         return null;
+    }
+    
+    public Map<String, Long> getPlacedObjects() {
+        return new LinkedHashMap<>(placedObjects);
     }
 }

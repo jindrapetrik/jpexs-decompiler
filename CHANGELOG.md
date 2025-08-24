@@ -24,6 +24,9 @@ All notable changes to this project will be documented in this file.
   Limitation: It's not available on Mac x86-64 platform
 - [#2519] AS1/2 Direct editation + P-code - better handling of "too large"
   error messages - highlight actual problematic structure
+- AS1/2 Debugging - _global variable accessible
+- AS Debugging - Variables with flag DontEnumerate are hidden by default
+  (can be changed in Advanced Settings)
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

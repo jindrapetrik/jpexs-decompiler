@@ -400,6 +400,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             Variable curTrait = null;
             for (int i = 0; i < igv.childs.size(); i++) {
+                if (!Configuration.showVarsWithDontEnumerateFlag.get() && (igv.childs.get(i).flags & VariableFlags.DONT_ENUMERATE) > 0) {
+                    continue;
+                }
+                        
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(varInsideGetter);
                     childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
