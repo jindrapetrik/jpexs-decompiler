@@ -200,7 +200,10 @@ public class HexView extends JTable {
             int row = table.rowAtPoint(point);
             int idx = getIdxByColAndRow(row, col);
             mouseOverIdx = idx;
-            getModel().fireTableCellUpdated(row, col);
+            
+            if (row > -1 && col > -1) {
+                getModel().fireTableCellUpdated(row, col);
+            }
 
             if (listener != null) {
                 listener.byteMouseMoved(idx, idx == -1 ? 0 : getModel().getData()[idx]);

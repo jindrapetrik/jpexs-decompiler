@@ -82,6 +82,7 @@ All notable changes to this project will be documented in this file.
 - [#2519] AS1/2 avoid multi-level loops in cases where possible
 - [#2522] Hex view - reseting view when mouse over panel bottom
 - [#2519] AS1/2 direct editation - generating too large ConstantPool
+- Hex View - incorrect table height when switching tags
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

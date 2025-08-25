@@ -83,6 +83,7 @@ public class HexViewTableModel extends AbstractTableModel {
 
     public void setData(byte[] data) {
         this.data = data;
+        fireTableDataChanged();
     }
 
     @Override
