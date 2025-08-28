@@ -30,13 +30,13 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3)
+@SWFVersion(from = 7)
 public class ProductInfoTag extends Tag {
 
     public static final int ID = 41;
 
-    public static final String NAME = "ProductInfo";
-
+    public static final String NAME = "ProductInfo";   
+    
     @SWFType(BasicType.UI32)
     public long productID;
 

@@ -128,6 +128,7 @@ import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -160,8 +161,10 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextFormatTag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -172,9 +175,11 @@ import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.FreeAllTag;
 import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -191,6 +196,7 @@ import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SerialNumberTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -275,6 +281,10 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.flash.types.text.format.ControlTextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.EndTextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextTextFormatRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.FakeMemoryInputStream;
@@ -1633,7 +1643,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 37:
                     ret = new DefineEditTextTag(sis, data);
                     break;
-                //case 38: DefineVideo / DefineMouseTarget
+                case 38: // or DefineMouseTarget
+                    ret = new DefineVideoTag(sis, data);
+                    break;
                 case 39:
                     ret = new DefineSpriteTag(sis, level, data, parallel, skipUnusualTags);
                     break;
@@ -1641,9 +1653,15 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new NameCharacterTag(sis, data);
                     break;
                 case 41: //or NameObject
-                    ret = new ProductInfoTag(sis, data);
+                    if (swf == null || swf.version >= 7) {
+                        ret = new ProductInfoTag(sis, data);
+                    } else {
+                        ret = new SerialNumberTag(sis, data);
+                    }
                     break;
-                //case 42: DefineTextFormat
+                case 42:
+                    ret = new DefineTextFormatTag(sis, data);
+                    break;
                 case 43:
                     ret = new FrameLabelTag(sis, data);
                     break;
@@ -1658,10 +1676,16 @@ public class SWFInputStream implements AutoCloseable {
                 case 48:
                     ret = new DefineFont2Tag(sis, data);
                     break;
-                //case 49: GenCommand
+                case 49:
+                    ret = new GenCommandTag(sis, data);
+                    break;
                 //case 50: DefineCommandObj
-                //case 51: CharacterSet
-                //case 52: FontRef
+                case 51:
+                    ret = new CharacterSetTag(sis, data);
+                    break;
+                case 52:
+                    ret = new FontRefTag(sis, data);
+                    break;
                 //case 53: DefineFunction
                 //case 54: PlaceFunction
                 //case 55: GenTagObject
@@ -3796,6 +3820,108 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Reads one TextFormatRecord value from the stream
+     * @param name Name
+     * @return TextFormatRecord value
+     * @throws IOException On I/O error
+     */
+    public TextFormatRecord readTextFormatRecord(String name) throws IOException {
+        newDumpLevel(name, "TextFormatRecord");
+        int controlFlag = (int) readUB(1, "controlFlag");
+        
+        if (controlFlag == 0) {
+            int length = (int) readUB(7, "length");        
+            if (length > 0) {
+                TextTextFormatRecord textRecord = new TextTextFormatRecord();            
+                byte[] bytes = readBytes(length * 2, "text");
+                byte[] halfBytes = new byte[length];
+                for (int i = 0; i < halfBytes.length; i++) {
+                    halfBytes[i] = bytes[i * 2];
+                }
+                textRecord.text = new String(halfBytes, swf.getCharset());
+                DumpInfo di = dumpInfo;
+                if (di != null) {
+                    di.name = "TextTextFormatRecord";
+                }
+                endDumpLevel();
+                return textRecord;
+            }        
+        
+            DumpInfo di = dumpInfo;
+            if (di != null) {
+                di.name = "EndTextFormatRecord";
+            }
+            endDumpLevel();
+            return new EndTextFormatRecord();
+        }
+        int controlType = (int) readUB(7, "controlType"); 
+        
+        ControlTextFormatRecord controlRecord = new ControlTextFormatRecord();
+        controlRecord.type = controlType;
+        switch (controlType) {
+            case ControlTextFormatRecord.TYPE_STYLE:
+                controlRecord.style = readUI8("style");
+                break;
+            case ControlTextFormatRecord.TYPE_FONT_ID:
+                controlRecord.fontId = readUI16("fontId");
+                break;
+            case ControlTextFormatRecord.TYPE_FONT_HEIGHT:
+                controlRecord.fontHeight = readUI16("fontHeight");
+                break;
+            case ControlTextFormatRecord.TYPE_COLOR:
+                controlRecord.color = readRGBA("color");
+                break;
+            case ControlTextFormatRecord.TYPE_SCRIPT:
+                controlRecord.script = readUI8("script");
+                break;
+            case ControlTextFormatRecord.TYPE_KERNING:
+                controlRecord.kerning = readSI16("kerning");
+                break;
+            case ControlTextFormatRecord.TYPE_ALIGN:
+                controlRecord.align = readUI8("align");
+                break;
+            case ControlTextFormatRecord.TYPE_INDENT:
+                controlRecord.indent = readSI16("indent");
+                break;
+            case ControlTextFormatRecord.TYPE_LEFT_MARGIN:
+                controlRecord.leftMargin = readSI16("leftMargin");
+                break;
+            case ControlTextFormatRecord.TYPE_RIGHT_MARGIN:
+                controlRecord.rightMargin = readSI16("rightMargin");
+                break;
+            case ControlTextFormatRecord.TYPE_LINE_SPACE:
+                controlRecord.lineSpace = readSI16("lineSpace");
+                break;
+        }
+        DumpInfo di = dumpInfo;
+        if (di != null) {
+            di.name = "ControlTextFormatRecord";
+        }
+        endDumpLevel();
+        return controlRecord;                        
+    }
+    
+    /**
+     * Reads List of TextFormatRecord values from the stream
+     * @param name Name
+     * @return List of TextFormatRecord values
+     * @throws IOException On I/O error
+     */
+    public List<TextFormatRecord> readTextFormatRecords(String name) throws IOException {
+        newDumpLevel(name, "TextFormatRecords");
+        List<TextFormatRecord> records = new ArrayList<>();
+        while (true) {
+            TextFormatRecord record = readTextFormatRecord("record");
+            if (record instanceof EndTextFormatRecord) {
+                break;
+            }
+            records.add(record);
+        }             
+        endDumpLevel();
+        return records;
+    }
+    
     /**
      * Gets number of available bytes in the stream.
      *

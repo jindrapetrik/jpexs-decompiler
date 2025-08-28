@@ -207,8 +207,9 @@ public class OpenableSourceInfo {
                         || !(
                             extension.equals(".swf")
                             || extension.equals(".spl")
+                            || extension.equals(".swt")
                             || extension.equals(".gfx") 
-                            || extension.equals(".abc")
+                            || extension.equals(".abc")                            
                             )
                     );
         }

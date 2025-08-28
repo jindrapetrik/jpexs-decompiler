@@ -19,66 +19,41 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
-import java.util.Set;
 
 /**
- * NameCharacter tag - Assign a Library name to a character.
- * Used in Flash Templates.
+ * SerialNumber tag - Serial number of Flash Generator
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3)
-public class NameCharacterTag extends Tag implements CharacterIdTag {
+@SWFVersion(to = 6)
+public class SerialNumberTag extends Tag {
 
-    public static final int ID = 40;
+    public static final int ID = 41;
 
-    public static final String NAME = "NameCharacter";
-
+    public static final String NAME = "SerialNumber";   
     
-    public static final int TYPE_BITMAP = 1;
-    public static final int TYPE_SYMBOL = 6;
-    public static final int TYPE_SOUND = 0xFFFF;
-    
-    
-    /**
-     * ID of character to name
-     */
-    @SWFType(BasicType.UI16)
-    public int characterId = 0;
+    public String serialNumber = "";
 
-    /**
-     * Name of the character
-     */
-    public String name = "Symbol";
-
-    @SWFType(BasicType.UI16)    
-    public int type = TYPE_SYMBOL;
-    
     /**
      * Constructor
      *
      * @param swf SWF
      */
-    public NameCharacterTag(SWF swf) {
+    public SerialNumberTag(SWF swf) {
         super(swf, ID, NAME, null);
     }
 
-    public NameCharacterTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public SerialNumberTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterId = sis.readUI16("characterId");
-        name = sis.readString("name");
-        type = sis.readUI16("type");
+        serialNumber = sis.readString("serialNumber");
     }
 
     /**
@@ -89,23 +64,6 @@ public class NameCharacterTag extends Tag implements CharacterIdTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI16(characterId);
-        sos.writeString(name);
-        sos.writeUI16(type);
-    }
-
-    @Override
-    public int getCharacterId() {
-        return characterId;
-    }
-
-    @Override
-    public void setCharacterId(int characterId) {
-        this.characterId = characterId;
-    }
-
-    @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        needed.add(characterId);
+        sos.writeString(serialNumber);
     }
 }

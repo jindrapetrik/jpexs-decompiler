@@ -28,6 +28,10 @@ All notable changes to this project will be documented in this file.
 - AS Debugging - Variables with flag DontEnumerate are hidden by default
   (can be changed in Advanced Settings)
 - Basic support for PlaceImagePrivate tag
+- Generator Templates (.swt) files support and related tags (Flash 3-5)
+  (CharacterSet, GenCommand, NameCharacter, DefineTextFormat, FontRef)
+- DefineVideo tag support (Flash 4)
+- SerialNumber tag support (before Flash 7)
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

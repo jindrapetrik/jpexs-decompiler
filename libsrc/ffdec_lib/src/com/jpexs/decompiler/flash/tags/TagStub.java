@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,9 +80,21 @@ public class TagStub extends Tag {
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
-        Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
-        if (classes.containsKey(id)) {
-            ret.put("tcl", classes.get(id).getName());
+        Map<Integer, List<TagTypeInfo>> classes = Tag.getKnownClasses();
+        int swfVersion = getSwf().version;
+                
+        if (classes.containsKey(id)) {            
+            TagTypeInfo selectedTagTypeInfo = classes.get(id).get(0);
+            if (classes.get(id).size() > 1) {
+                for (TagTypeInfo tagTypeInfo : classes.get(id)) {
+                    SWFVersion ver = (SWFVersion) tagTypeInfo.getCls().getAnnotation(SWFVersion.class);
+                    if (swfVersion >= ver.from() && swfVersion <= ver.to()) {
+                        selectedTagTypeInfo = tagTypeInfo;
+                        break;
+                    }
+                }
+            }                    
+            ret.put("tcl", selectedTagTypeInfo.getName());
         }
         ret.put("tid", "" + id);
         return ret;

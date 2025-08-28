@@ -21,64 +21,54 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.text.format.TextFormatRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * NameCharacter tag - Assign a Library name to a character.
- * Used in Flash Templates.
+ * DefineTextFormat tag - define text format. Used by Flash Generator Templates.
  *
  * @author JPEXS
  */
 @SWFVersion(from = 3)
-public class NameCharacterTag extends Tag implements CharacterIdTag {
+public class DefineTextFormatTag extends Tag implements CharacterIdTag {
 
-    public static final int ID = 40;
+    public static final int ID = 42;
 
-    public static final String NAME = "NameCharacter";
-
+    public static final String NAME = "DefineTextFormat";   
     
-    public static final int TYPE_BITMAP = 1;
-    public static final int TYPE_SYMBOL = 6;
-    public static final int TYPE_SOUND = 0xFFFF;
-    
-    
-    /**
-     * ID of character to name
-     */
     @SWFType(BasicType.UI16)
-    public int characterId = 0;
-
-    /**
-     * Name of the character
-     */
-    public String name = "Symbol";
-
-    @SWFType(BasicType.UI16)    
-    public int type = TYPE_SYMBOL;
+    public int textId;
+    
+    public RECT bounds;
+    
+    public List<TextFormatRecord> records = new ArrayList<>();
+    
     
     /**
      * Constructor
      *
      * @param swf SWF
      */
-    public NameCharacterTag(SWF swf) {
+    public DefineTextFormatTag(SWF swf) {
         super(swf, ID, NAME, null);
     }
 
-    public NameCharacterTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public DefineTextFormatTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterId = sis.readUI16("characterId");
-        name = sis.readString("name");
-        type = sis.readUI16("type");
+        textId = sis.readUI16("textId");
+        bounds = sis.readRECT("textBounds");
+        records = sis.readTextFormatRecords("textFormatRecords");
     }
 
     /**
@@ -89,23 +79,18 @@ public class NameCharacterTag extends Tag implements CharacterIdTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI16(characterId);
-        sos.writeString(name);
-        sos.writeUI16(type);
+        sos.writeUI16(textId);
+        sos.writeRECT(bounds);
+        sos.writeTextFormatRecords(records);
     }
 
     @Override
     public int getCharacterId() {
-        return characterId;
+        return textId;
     }
 
     @Override
     public void setCharacterId(int characterId) {
-        this.characterId = characterId;
-    }
-
-    @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        needed.add(characterId);
+        this.textId = characterId;
     }
 }

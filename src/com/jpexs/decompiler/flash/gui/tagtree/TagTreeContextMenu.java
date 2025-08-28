@@ -142,6 +142,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.HasCharacterId;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
@@ -2021,17 +2022,29 @@ public class TagTreeContextMenu extends JPopupMenu {
         void call(ActionEvent evt, TreeItem item, Class<?> cl, TreeNodeType createNodeType);
     }
 
-    private void addAddTagMenuFolder(JMenu addTagMenu, String folder, boolean gfx, TreeItem item, AddTagActionListener listener) {
+    @SuppressWarnings("unchecked")
+    private void addAddTagMenuFolder(JMenu addTagMenu, String folder, int swfVersion, boolean gfx, TreeItem item, AddTagActionListener listener) {
         String folderTranslated = AppStrings.translate("node." + folder);
         JMenu folderMenu = new JMenu(folderTranslated);
         folderMenu.setIcon(View.getIcon("folder" + folder.toLowerCase(Locale.ENGLISH) + "16"));
 
-        Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
+        Map<Integer, List<TagTypeInfo>> classes = Tag.getKnownClasses();
 
         List<Integer> allowedTagTypes = new ArrayList<>(TagTree.getSwfFolderItemNestedTagIds(folder, gfx));
         Set<Integer> mappedTagTypes = new LinkedHashSet<>();
         for (int i : allowedTagTypes) {
-            mappedTagTypes.addAll(AbstractTagTree.getMappedTagIdsForClass(classes.get(i).getCls()));
+            List<TagTypeInfo> tagTypeInfos = classes.get(i);
+            for (TagTypeInfo tagTypeInfo : tagTypeInfos) {
+                if (tagTypeInfos.size() > 1) {
+                    SWFVersion ver = (SWFVersion) tagTypeInfo.getCls().getAnnotation(SWFVersion.class);
+                    if (ver != null) {
+                        if (swfVersion < ver.from() || swfVersion > ver.to()) {
+                            continue;
+                        }
+                    }
+                }
+                mappedTagTypes.addAll(AbstractTagTree.getMappedTagIdsForClass(tagTypeInfo.getCls()));
+            }
         }
         if (allowedTagTypes.isEmpty() && mappedTagTypes.isEmpty()) {
             return;
@@ -2053,7 +2066,6 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void addAddTagInsideMenuItems(TreeItem item) {
         AddTagActionListener listener = this::addTagInsideActionPerformed;
-        Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
         SWF currentSwf = mainPanel.getCurrentSwf();
         if (currentSwf == null) {
             return;
@@ -2104,8 +2116,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (parent == null) {
             return;
         }
-        Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
-
         SWF currentSwf = mainPanel.getCurrentSwf();
 
         if (currentSwf == null) {
@@ -2175,6 +2185,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void addAddTagMenuItems(List<Integer> allowedTagTypes, JMenu addTagMenu, TreeItem item, AddTagActionListener listener, String parentFolder) {
+        int swfVersion = mainPanel.getCurrentSwf().version;
         if (allowedTagTypes == null) {
             boolean gfx = mainPanel.getCurrentSwf().gfx;
 
@@ -2193,14 +2204,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                 TagTreeModel.FOLDER_OTHERS
             };
             for (String folder : folders) {
-                addAddTagMenuFolder(addTagMenu, folder, gfx, item, listener);
+                addAddTagMenuFolder(addTagMenu, folder, swfVersion, gfx, item, listener);
             }
 
             return;
         }
 
         for (Integer tagId : allowedTagTypes) {
-            final Class<?> cl = TagIdClassMap.getClassByTagId(tagId);
+            final Class<?> cl = TagIdClassMap.getClassByTagId(tagId, swfVersion);
             String className = cl.getSimpleName();
             if (className.endsWith("Tag")) {
                 className = className.substring(0, className.length() - 3);

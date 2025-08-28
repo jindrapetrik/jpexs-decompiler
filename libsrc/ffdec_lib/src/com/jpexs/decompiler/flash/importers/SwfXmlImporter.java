@@ -157,13 +157,15 @@ public class SwfXmlImporter {
 
     static {
         Map<String, Class> tags = new HashMap<>();
-        Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
+        Map<Integer, List<TagTypeInfo>> knownTags = Tag.getKnownClasses();
         for (Integer key : knownTags.keySet()) {
-            Class cls = knownTags.get(key).getCls();
-            if (!ReflectionTools.canInstantiate(cls)) {
-                System.err.println("Can't instantiate: " + cls.getName());
+            for (TagTypeInfo tagTypeInfo : knownTags.get(key)) {
+                Class cls = tagTypeInfo.getCls();
+                if (!ReflectionTools.canInstantiate(cls)) {
+                    System.err.println("Can't instantiate: " + cls.getName());
+                }
+                tags.put(cls.getSimpleName(), cls);
             }
-            tags.put(cls.getSimpleName(), cls);
         }
 
         swfTags = tags;
