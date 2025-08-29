@@ -89,6 +89,7 @@ All notable changes to this project will be documented in this file.
 - [#2522] Hex view - reseting view when mouse over panel bottom
 - [#2519] AS1/2 direct editation - generating too large ConstantPool
 - Hex View - incorrect table height when switching tags
+- [#2525] AMF editor (like in Sol cookie editor) - saving empty standard array `[]`
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -4005,6 +4006,7 @@ Major version of SWF to XML export changed to 2.
 [#2516]: https://www.free-decompiler.com/flash/issues/2516
 [#2517]: https://www.free-decompiler.com/flash/issues/2517
 [#2522]: https://www.free-decompiler.com/flash/issues/2522
+[#2525]: https://www.free-decompiler.com/flash/issues/2525
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418

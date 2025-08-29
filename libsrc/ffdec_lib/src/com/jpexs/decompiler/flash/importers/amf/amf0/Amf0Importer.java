@@ -101,9 +101,8 @@ public class Amf0Importer {
                 arrayVals.add(value(objectTable));
                 s = lex();
             }
-            pushback(s);
         }
-        expectedType(SymbolType.BRACKET_CLOSE);
+        expectedType(s, lexer.yyline(), SymbolType.BRACKET_CLOSE);
         return new JsArray(arrayVals);
     }
 
