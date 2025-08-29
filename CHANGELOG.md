@@ -32,6 +32,8 @@ All notable changes to this project will be documented in this file.
   (CharacterSet, GenCommand, NameCharacter, DefineTextFormat, FontRef)
 - DefineVideo tag support (Flash 4)
 - SerialNumber tag support (before Flash 7)
+- FreeCharacter tag support
+- SyncFrame tag support
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

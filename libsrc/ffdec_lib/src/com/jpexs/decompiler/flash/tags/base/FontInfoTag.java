@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public abstract class FontInfoTag extends Tag implements CharacterIdTag {
+public abstract class FontInfoTag extends Tag implements CharacterModifier {
 
     /**
      * Font ID

@@ -413,6 +413,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, NameCharacterTag.ID, NameCharacterTag.class, NameCharacterTag.NAME);
                     addTagInfo(map, map2, CharacterSetTag.ID, CharacterSetTag.class, CharacterSetTag.NAME);
                     addTagInfo(map, map2, SerialNumberTag.ID, SerialNumberTag.class, SerialNumberTag.NAME);
+                    
+                    addTagInfo(map, map2, FreeCharacterTag.ID, FreeCharacterTag.class, FreeCharacterTag.NAME);
+                    addTagInfo(map, map2, SyncFrameTag.ID, SyncFrameTag.class, SyncFrameTag.NAME);
+                    
                     knownTagInfosById = map;
                     knownTagInfosByName = map2;
                 }

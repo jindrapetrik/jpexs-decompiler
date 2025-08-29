@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
 import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
@@ -92,6 +93,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
@@ -207,6 +209,9 @@ public class TagIdClassMap {
         addTag(NameCharacterTag.ID, NameCharacterTag.class);
         addTag(CharacterSetTag.ID, CharacterSetTag.class);
         addTag(SerialNumberTag.ID, SerialNumberTag.class);
+        
+        addTag(FreeCharacterTag.ID, FreeCharacterTag.class);
+        addTag(SyncFrameTag.ID, SyncFrameTag.class);
     }
 
     private static void addTag(int tagId, Class<?> cl) {

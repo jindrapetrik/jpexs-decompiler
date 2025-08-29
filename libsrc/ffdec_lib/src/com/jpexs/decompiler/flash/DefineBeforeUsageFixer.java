@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterModifier;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
@@ -64,11 +66,8 @@ public class DefineBeforeUsageFixer {
         int i = 0;
         for (int j = 0; j < swf.getTags().size(); j++) {
             Tag t2 = swf.getTags().get(j);
-            if ((t2 instanceof CharacterIdTag)
-                    && !(t2 instanceof PlaceObjectTypeTag)
-                    && !(t2 instanceof RemoveTag)
-                    && !(t2 instanceof VideoFrameTag)) {
-                CharacterIdTag chit = (CharacterIdTag) t2;                
+            if (t2 instanceof CharacterModifier) {
+                CharacterModifier chit = (CharacterModifier) t2;                
                 if (chit.getCharacterId() == characterId) {                    
                     swf.removeTag(j);
                     swf.addTag(usageIndex + i, (Tag) chit);

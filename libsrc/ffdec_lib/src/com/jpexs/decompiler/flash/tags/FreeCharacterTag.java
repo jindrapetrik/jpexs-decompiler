@@ -25,10 +25,11 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * FreeCharacter tag - undocumented.
+ * FreeCharacter tag - undocumented. Frees a character.
  *
  * @author JPEXS
  */
@@ -89,4 +90,13 @@ public class FreeCharacterTag extends Tag implements CharacterIdTag {
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(characterId);
     }
+
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("chid", "" + characterId);
+        return ret;
+    }
+    
+    
 }
