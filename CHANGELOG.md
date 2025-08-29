@@ -34,6 +34,11 @@ All notable changes to this project will be documented in this file.
 - SerialNumber tag support (before Flash 7)
 - FreeCharacter tag support
 - SyncFrame tag support
+- Hex dump improvements:
+  - view bit count in SB, UB fields
+  - view tagIDTagLength field parts
+  - show type after colon, not in parenthesis
+  - view bytes length in bytes fields
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled

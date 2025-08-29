@@ -933,7 +933,7 @@ public class SWFInputStream implements AutoCloseable {
             return BYTE_ARRAY_EMPTY;
         }
 
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         byte[] ret = readBytesInternalEx(count);
         endDumpLevel();
         return ret;
@@ -983,7 +983,7 @@ public class SWFInputStream implements AutoCloseable {
             throw new RuntimeException("Data not available - use constructor with data rather than inputstream");
         }
 
-        newDumpLevel(name, "bytes", specialType, specialValue);
+        newDumpLevel(name, "byte[" + count + "]", specialType, specialValue);
 
         int startPos = (int) is.getPos();
         skipBytesEx(count);
@@ -1045,7 +1045,7 @@ public class SWFInputStream implements AutoCloseable {
             return;
         }
 
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         skipBytesEx(count);
         endDumpLevel();
     }
@@ -1076,7 +1076,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return BYTE_ARRAY_EMPTY;
         }
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         byte[] ret = new byte[count];
         int i = 0;
         try {
@@ -1104,7 +1104,7 @@ public class SWFInputStream implements AutoCloseable {
             return BYTE_ARRAY_EMPTY;
         }
 
-        newDumpLevel(name, "bytesZlib");
+        newDumpLevel(name, "byteZlib[" + count + "]");
         byte[] data = readBytesInternalEx(count);
         endDumpLevel();
         return uncompressByteArray(data);
@@ -1188,7 +1188,7 @@ public class SWFInputStream implements AutoCloseable {
         if (nBits == 0) {
             return 0;
         }
-        newDumpLevel(name, "UB");
+        newDumpLevel(name, "UB" + (nBits > 1 ? "[" + nBits + "]" : ""));
         long ret = readUBInternal(nBits);
         endDumpLevel(ret);
         return ret;
@@ -1235,7 +1235,7 @@ public class SWFInputStream implements AutoCloseable {
         if (nBits == 0) {
             return 0;
         }
-        newDumpLevel(name, "SB");
+        newDumpLevel(name, "SB" + (nBits > 1 ? "[" + nBits + "]" : ""));
         long ret = readSBInternal(nBits);
         endDumpLevel(ret);
         return ret;
@@ -1872,10 +1872,14 @@ public class SWFInputStream implements AutoCloseable {
 
         logger.log(Level.FINE, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
 
-        long tagLength = (tagIDTagLength & 0x003F);
+        long tagLength = (tagIDTagLength & 0x003F);   
+        DumpInfo di = dumpInfo;
+        if (di != null) {
+            di.getChildInfos().get(0).previewValue = tagIDTagLength + " (tagID = " + tagID + ", tagLength = " + tagLength + (tagLength == 0x3f ? " => use UI32" : "") + ")";
+        }
         boolean readLong = false;
         if (tagLength == 0x3f) {
-            tagLength = readSI32("tagLength");
+            tagLength = readUI32("tagLength");
             readLong = true;
         }
         int headerLength = readLong ? 6 : 2;
@@ -1897,7 +1901,7 @@ public class SWFInputStream implements AutoCloseable {
         }
 
         if (resolve) {
-            DumpInfo di = dumpInfo;
+            di = dumpInfo;
             try {
                 ret = resolveTag(tagStub, level, parallel, skipUnusualTags, lazy, true);
             } catch (Exception ex) {
