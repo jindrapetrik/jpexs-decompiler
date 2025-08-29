@@ -2102,6 +2102,9 @@ public class Timeline {
      */
     public Shape getOutline(boolean fast, int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         Frame fr = getFrame(frame);
+        if (fr == null) {
+            return new Rectangle2D.Double();
+        }
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
         for (int d = maxDepth; d >= 0; d--) {
