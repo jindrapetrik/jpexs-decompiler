@@ -50,8 +50,8 @@ public class ControlTextFormatRecord implements TextFormatRecord {
     public static final int SCRIPT_SUBSCRIPT = 2;                
     
     public static final int ALIGN_LEFT = 0;
-    public static final int ALIGN_CENTER = 1;
-    public static final int ALIGN_RIGHT = 2;
+    public static final int ALIGN_RIGHT = 1;
+    public static final int ALIGN_CENTER = 2;
     public static final int ALIGN_JUSTIFY = 3;
     
     @EnumValue(value = TYPE_STYLE, text = "style")    
@@ -97,11 +97,11 @@ public class ControlTextFormatRecord implements TextFormatRecord {
     @SWFType(BasicType.SI16)    
     public int kerning;
     
-    @Conditional(value = "type", options = {TYPE_ALIGN})    
+    @Conditional(value = "type", options = {TYPE_ALIGN})
     @SWFType(BasicType.UI8)
     @EnumValue(value = ALIGN_LEFT, text = "left")
-    @EnumValue(value = ALIGN_CENTER, text = "center")
     @EnumValue(value = ALIGN_RIGHT, text = "right")
+    @EnumValue(value = ALIGN_CENTER, text = "center")
     @EnumValue(value = ALIGN_JUSTIFY, text = "justify")
     public int align;
     
