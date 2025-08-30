@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -55,6 +56,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineTextFormatTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
@@ -63,6 +65,7 @@ import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
 import com.jpexs.decompiler.flash.tags.GenCommandTag;
@@ -81,6 +84,7 @@ import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SerialNumberTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -603,6 +607,42 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.DEBUG_ID;
         }
         
+        if (t instanceof DefineVideoTag) {
+            return TreeNodeType.MOVIE_REF;
+        }
+        
+        if (t instanceof FreeCharacterTag) {
+            return TreeNodeType.FREE_CHARACTER;
+        }
+        
+        if (t instanceof SyncFrameTag) {
+            return TreeNodeType.SYNC_FRAME;
+        }
+        
+        if (t instanceof NameCharacterTag) {
+            return TreeNodeType.NAME_CHARACTER;
+        }
+        
+        if (t instanceof DefineTextFormatTag) {
+            return TreeNodeType.TEXT_FORMAT;
+        }                
+        
+        if (t instanceof CharacterSetTag) {
+            return TreeNodeType.CHARACTER_SET;
+        }
+        
+        if (t instanceof FontRefTag) {
+            return TreeNodeType.FONT_REF;
+        }                
+        
+        if (t instanceof GenCommandTag) {
+            return TreeNodeType.GEN_COMMAND;
+        }
+        
+        if (t instanceof SerialNumberTag) {
+            return TreeNodeType.SERIAL_NUMBER;
+        }
+        
         if (t instanceof TagStub) {
             return TreeNodeType.ERRORED;
         }
@@ -1108,6 +1148,42 @@ public abstract class AbstractTagTree extends JTree {
         
         if (cl == DebugIDTag.class) {
             return TreeNodeType.DEBUG_ID;
+        }
+        
+        if (cl == DefineVideoTag.class) {
+            return TreeNodeType.MOVIE_REF;
+        }
+        
+        if (cl == FreeCharacterTag.class) {
+            return TreeNodeType.FREE_CHARACTER;
+        }
+        
+        if (cl == SyncFrameTag.class) {
+            return TreeNodeType.SYNC_FRAME;
+        }
+        
+        if (cl == NameCharacterTag.class) {
+            return TreeNodeType.NAME_CHARACTER;
+        }
+        
+        if (cl == DefineTextFormatTag.class) {
+            return TreeNodeType.TEXT_FORMAT;
+        }
+                        
+        if (cl == CharacterSetTag.class) {
+            return TreeNodeType.CHARACTER_SET;
+        }
+        
+        if (cl == FontRefTag.class) {
+            return TreeNodeType.FONT_REF;
+        }                
+        
+        if (cl == GenCommandTag.class) {
+            return TreeNodeType.GEN_COMMAND;
+        }
+        
+        if (cl == SerialNumberTag.class) {
+            return TreeNodeType.SERIAL_NUMBER;
         }
         
         if (Tag.class.isAssignableFrom(cl)) {

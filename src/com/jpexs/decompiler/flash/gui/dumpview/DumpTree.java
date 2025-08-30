@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -65,8 +66,10 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextFormatTag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -76,11 +79,15 @@ import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
 import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
@@ -91,6 +98,7 @@ import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SerialNumberTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -100,6 +108,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -112,6 +121,7 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
+import com.jpexs.decompiler.flash.types.text.format.TextFormatRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -284,7 +294,7 @@ public class DumpTree extends JTree {
                                 break;
                             case FrameLabelTag.NAME:
                                 nodeType = TreeNodeType.FRAME_LABEL;
-                                break;
+                                break;                            
                             case StartSoundTag.NAME:
                             case StartSound2Tag.NAME:
                                 nodeType = TreeNodeType.START_SOUND;
@@ -327,7 +337,35 @@ public class DumpTree extends JTree {
                                 break;
                             case DebugIDTag.NAME:
                                 nodeType = TreeNodeType.DEBUG_ID;
-                                break;                            
+                                break;
+                            case DefineVideoTag.NAME:
+                                nodeType = TreeNodeType.MOVIE_REF;
+                                break;
+                            case FreeCharacterTag.NAME:
+                                nodeType = TreeNodeType.FREE_CHARACTER;
+                                break;
+                            case SyncFrameTag.NAME:
+                                nodeType = TreeNodeType.SYNC_FRAME;
+                                break;
+                            
+                            case NameCharacterTag.NAME:
+                                nodeType = TreeNodeType.NAME_CHARACTER;
+                                break;
+                            case DefineTextFormatTag.NAME:
+                                nodeType = TreeNodeType.TEXT_FORMAT;
+                                break;
+                            case CharacterSetTag.NAME:
+                                nodeType = TreeNodeType.CHARACTER_SET;
+                                break;
+                            case FontRefTag.NAME:
+                                nodeType = TreeNodeType.FONT_REF;
+                                break;
+                            case GenCommandTag.NAME:
+                                nodeType = TreeNodeType.GEN_COMMAND;
+                                break;
+                            case SerialNumberTag.NAME:
+                                nodeType = TreeNodeType.SERIAL_NUMBER;
+                                break;
                             default:
                                 nodeType = TreeNodeType.OTHER_TAG;
                         }
