@@ -228,11 +228,14 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -273,6 +276,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -284,6 +288,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -442,6 +447,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private Map<SWF, BreakpointListDialog> breakpointsListDialogs = new WeakHashMap<>();
 
     private boolean loadingScrollPosEnabled = true;
+    
+    private static final DataFlavor TREE_FILE_FLAVOR = new DataFlavor(TreeFileFlavor.class, "TreeFile");
 
     public synchronized void setLoadingScrollPosEnabled(boolean loadingScrollPosEnabled) {
         this.loadingScrollPosEnabled = loadingScrollPosEnabled;
@@ -833,7 +840,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 || (actionPanel != null && actionPanel.isEditing())
                 || previewPanel.isEditing() || headerPanel.isEditing();
     }
-
+    
+    private class TreeFileFlavor {
+        
+    }
+            
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
 
         @Override
@@ -1146,26 +1157,37 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         tagListTree = new TagListTree(null, this);
         tagListTree.addTreeSelectionListener(this);
-        tagListTree.setSelectionModel(new MyTreeSelectionModel());
-
+        tagListTree.setSelectionModel(new MyTreeSelectionModel());                              
+                                                        
         DragSource dragSource = DragSource.getDefaultDragSource();
-        dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
+        dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {                                    
             @Override
             public void dragGestureRecognized(DragGestureEvent dge) {
+                if (!Configuration.allowDragAndDropFromResourcesTree.get()) {
+                    return;
+                }
                 dge.startDrag(DragSource.DefaultCopyDrop, new Transferable() {
+                    
+                    private List<File> cachedFiles = null;
+                    
                     @Override
                     public DataFlavor[] getTransferDataFlavors() {
-                        return new DataFlavor[]{DataFlavor.javaFileListFlavor};
+                        return new DataFlavor[]{TREE_FILE_FLAVOR, DataFlavor.javaFileListFlavor};
                     }
 
                     @Override
                     public boolean isDataFlavorSupported(DataFlavor flavor) {
-                        return flavor.equals(DataFlavor.javaFileListFlavor);
-                    }
-
+                        return flavor.equals(TREE_FILE_FLAVOR) || flavor.equals(DataFlavor.javaFileListFlavor);
+                    }                                       
+                    
                     @Override
                     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                            if (cachedFiles != null) {
+                                Main.stopWork();
+                                return cachedFiles;
+                            }
+                            
                             List<File> files;
                             String tempDir = System.getProperty("java.io.tmpdir");
                             if (!tempDir.endsWith(File.separator)) {
@@ -1183,6 +1205,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             } catch (InterruptedException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                                 return null;
+                            } catch (Throwable t) {
+                                logger.log(Level.SEVERE, null, t);
+                                return null;
                             }
 
                             files.clear();
@@ -1196,34 +1221,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 f.deleteOnExit();
                             }
                             new File(tempDir).deleteOnExit();
-                            return files;
+                            cachedFiles = files;
+                            
+                            return cachedFiles;
 
                         }
                         return null;
                     }
-                }, new DragSourceListener() {
-                    @Override
-                    public void dragEnter(DragSourceDragEvent dsde) {
-                        enableDrop(false);
-                    }
-
-                    @Override
-                    public void dragOver(DragSourceDragEvent dsde) {
-                    }
-
-                    @Override
-                    public void dropActionChanged(DragSourceDragEvent dsde) {
-                    }
-
-                    @Override
-                    public void dragExit(DragSourceEvent dse) {
-                    }
-
-                    @Override
-                    public void dragDropEnd(DragSourceDropEvent dsde) {
-                        enableDrop(true);
-                    }
-                });
+                }, new DragSourceAdapter() {});
             }
         });
 
@@ -1411,7 +1416,53 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         });
 
         //Opening files with drag&drop to main window
-        enableDrop(true);
+        new DropTarget(this, new DropTargetAdapter() {
+            @Override
+            public void dragEnter(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported(TREE_FILE_FLAVOR)
+                    || !dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dtde.rejectDrag();
+                } else {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                }
+            }                 
+
+            @Override
+            public void dragOver(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported(TREE_FILE_FLAVOR) 
+                    || !dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dtde.rejectDrag();
+                } else {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                }
+            }                                
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {       
+                if (dtde.isDataFlavorSupported(TREE_FILE_FLAVOR)
+                    || !dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dtde.rejectDrop();
+                    return;
+                }
+                try {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                    @SuppressWarnings("unchecked")                                
+                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    if (droppedFiles != null && !droppedFiles.isEmpty()) {
+                        OpenableSourceInfo[] sourceInfos = new OpenableSourceInfo[droppedFiles.size()];
+                        for (int i = 0; i < droppedFiles.size(); i++) {
+                            sourceInfos[i] = new OpenableSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
+                        }
+                        Main.openFile(sourceInfos, null, true);
+                        dtde.dropComplete(true);
+                    }
+                } catch (UnsupportedFlavorException | IOException ex) {
+                    dtde.dropComplete(false);
+                    //ignored
+                }
+            }            
+        });                                     
+        
         calculateMissingNeededThread = new CalculateMissingNeededThread();
         calculateMissingNeededThread.start();
         pinsPanel.load();
@@ -1886,31 +1937,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return true;
     }
 
-    private void enableDrop(boolean value) {
-        if (value) {
-            setDropTarget(new DropTarget() {
-                @Override
-                public synchronized void drop(DropTargetDropEvent dtde) {
-                    try {
-                        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-                        @SuppressWarnings("unchecked")
-                        List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                        if (droppedFiles != null && !droppedFiles.isEmpty()) {
-                            OpenableSourceInfo[] sourceInfos = new OpenableSourceInfo[droppedFiles.size()];
-                            for (int i = 0; i < droppedFiles.size(); i++) {
-                                sourceInfos[i] = new OpenableSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
-                            }
-                            Main.openFile(sourceInfos, null, true);
-                        }
-                    } catch (UnsupportedFlavorException | IOException ex) {
-                        //ignored
-                    }
-                }
-            });
-        } else {
-            setDropTarget(null);
-        }
-    }
 
     public void updateClassesList() {
         String selectionPath = getCurrentTree().getSelectionPathString();
@@ -2086,7 +2112,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         List<File> ret = new ArrayList<>();
         List<TreeItem> sel = getSelection(null, selection);
-
+        
         Set<Openable> usedOpenables = new HashSet<>();
         Set<OpenableList> usedOpenableLists = new HashSet<>();
 
@@ -2101,7 +2127,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 usedOpenableLists.add(list);
             }
         }
-
+              
         Map<String, Integer> usedSwfsIds = new HashMap<>();
         for (Openable openable : usedOpenables) {
 
@@ -6778,7 +6804,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (calculateMissingNeededThread != null) {
             calculateMissingNeededThread.interrupt();
         }
-        setDropTarget(null);
+        //setDropTarget(null);
         disposeInner(this);
         Helper.emptyObject(this);
     }

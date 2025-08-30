@@ -1030,7 +1030,7 @@ public class Main {
             return;
         }
         lastTimeStartWork = nowTime;
-        View.execInEventDispatch(() -> {
+        View.execInEventDispatchLater(() -> {
             if (mainFrame != null) {
                 mainFrame.getPanel().setWorkStatus(name, worker);
                 if (percent == -1) {
@@ -1042,11 +1042,11 @@ public class Main {
             if (loadingDialog != null) {
                 loadingDialog.setDetail(name);
                 loadingDialog.setPercent(percent);
-            }
-            if (CommandLineArgumentParser.isCommandLineMode()) {
-                System.out.println(name);
-            }
+            }            
         });
+        if (CommandLineArgumentParser.isCommandLineMode()) {
+            System.out.println(name);
+        }
     }
 
     public static void stopWork() {

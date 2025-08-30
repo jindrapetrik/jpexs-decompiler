@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
   - view tagIDTagLength field parts
   - show type after colon, not in parenthesis
   - view bytes length in bytes fields
+- [#2526] Option to disable drag & drop from Resources view to avoid problems on Mac OS
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -3991,6 +3992,7 @@ Major version of SWF to XML export changed to 2.
 [#2499]: https://www.free-decompiler.com/flash/issues/2499
 [#2504]: https://www.free-decompiler.com/flash/issues/2504
 [#2519]: https://www.free-decompiler.com/flash/issues/2519
+[#2526]: https://www.free-decompiler.com/flash/issues/2526
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338

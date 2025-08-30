@@ -50,7 +50,7 @@ public class TagListTree extends AbstractTagTree {
     public TagListTree(TagListTreeModel model, MainPanel mainPanel) {
         super(model, mainPanel);
         setCellRenderer(new TagListTreeCellRenderer());
-        setDragEnabled(true);
+        setDragEnabled(true);        
         setDropMode(DropMode.ON_OR_INSERT);
         setTransferHandler(new TreeTransferHandler(mainPanel));
     }

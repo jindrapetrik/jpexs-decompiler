@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.configuration;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.enums.GridSnapAccuracy;
 import com.jpexs.decompiler.flash.configuration.enums.GuidesSnapAccuracy;
@@ -1163,6 +1162,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> showVarsWithDontEnumerateFlag = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> allowDragAndDropFromResourcesTree = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
