@@ -709,25 +709,27 @@ public abstract class TextTag extends DrawableTag {
                 textHeight = rec.textHeight;
                 
                 
-                if (!font.hasLayout()) {
-                    String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
-                    Font aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
+                if (font != null) {
+                    if (!font.hasLayout()) {
+                        String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
+                        Font aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
 
-                    Map<TextAttribute, Integer> attr = new HashMap<>();
+                        Map<TextAttribute, Integer> attr = new HashMap<>();
 
-                    attr.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
-                    attr.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
-                    aFont = aFont.deriveFont(attr);
+                        attr.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+                        attr.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
+                        aFont = aFont.deriveFont(attr);
 
-                    fontMetrics = graphics.getFontMetrics(aFont);
-                    LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
-                    ascent = lm.getAscent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
-                    descent = lm.getDescent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
-                    leading = lm.getLeading() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
-                } else {
-                    ascent =  font.getAscent(); //((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
-                    descent = font.getDescent(); //(double) font.getDescent() * textHeight / 1024.0 / font.getDivider());
-                    leading = font.getLeading(); //(double) font.getLeading()* textHeight / 1024.0 / font.getDivider());
+                        fontMetrics = graphics.getFontMetrics(aFont);
+                        LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
+                        ascent = lm.getAscent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                        descent = lm.getDescent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                        leading = lm.getLeading() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
+                    } else {
+                        ascent =  font.getAscent(); //((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
+                        descent = font.getDescent(); //(double) font.getDescent() * textHeight / 1024.0 / font.getDivider());
+                        leading = font.getLeading(); //(double) font.getLeading()* textHeight / 1024.0 / font.getDivider());
+                    }
                 }
             }
             if (rec.styleFlagsHasXOffset) {
