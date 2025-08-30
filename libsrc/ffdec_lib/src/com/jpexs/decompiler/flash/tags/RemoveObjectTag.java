@@ -59,7 +59,6 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
      */
     public RemoveObjectTag(SWF swf) {
         super(swf, ID, NAME, null);
-        characterId = swf.getNextCharacterId();
     }
 
     /**
