@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,6 +105,16 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                     if (Objects.equals(obj.getThroughDuplicate(), propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
+                        
+                        if (propItem.object instanceof DuplicateItem) {
+                            DuplicateItem d = (DuplicateItem) propItem.object;
+                            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                                if (st.tempIndex == d.tempIndex) {
+                                    output.remove(output.size() - 1);
+                                }
+                            }
+                        }
                         
                         if (result instanceof SetPropertyAVM2Item) {
                             SetPropertyAVM2Item sp = (SetPropertyAVM2Item) result;
