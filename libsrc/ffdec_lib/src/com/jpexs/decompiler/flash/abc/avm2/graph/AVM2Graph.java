@@ -2124,6 +2124,18 @@ public class AVM2Graph extends Graph {
                             }
                             GraphTargetItem ft = w.commands.get(pos);
                             if (ft instanceof WithAVM2Item) {
+                                WithAVM2Item wi = (WithAVM2Item) ft;
+                                if (wi.scope instanceof SetLocalAVM2Item) {
+                                    if (wi.scope.value instanceof NextValueAVM2Item) {
+                                        NextValueAVM2Item nextValueItem = (NextValueAVM2Item) wi.scope.value;
+                                        if (nextValueItem.index instanceof LocalRegAVM2Item) {
+                                            localRegsToKill.add(((LocalRegAVM2Item) nextValueItem.index).regIndex);
+                                        }
+                                        if (nextValueItem.obj instanceof LocalRegAVM2Item) {
+                                            localRegsToKill.add(((LocalRegAVM2Item) nextValueItem.obj).regIndex);
+                                        }
+                                    }
+                                }
                                 pos++;
                                 List<GraphTargetItem> withCommands = new ArrayList<>();
                                 while (pos < w.commands.size() && !(w.commands.get(pos) instanceof WithEndAVM2Item)) {
