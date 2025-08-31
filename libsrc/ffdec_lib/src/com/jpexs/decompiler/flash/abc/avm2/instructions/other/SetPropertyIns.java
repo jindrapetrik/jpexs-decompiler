@@ -58,7 +58,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         handleSetProperty(false, localData, stack, ins, output, path);
     }
 
-    public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {
+    public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, TranslateStack stack, SetTypeAVM2Item result) {
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
             if (multiname.name instanceof LocalRegAVM2Item) {
@@ -111,7 +111,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
                                 SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
                                 if (st.tempIndex == d.tempIndex) {
-                                    output.remove(output.size() - 1);
+                                    output.remove(output.size() - 1);          
+                                    stack.moveToStack(output);
                                 }
                             }
                         }

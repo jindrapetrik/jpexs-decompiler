@@ -1423,6 +1423,7 @@ public abstract class InstructionDefinition implements Serializable {
                             DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
                             if (st.tempIndex == ds.tempIndex) {
                                 output.remove(output.size() - 1);
+                                stack.moveToStack(output);
                             }
                         }
                         stack.push(stack.pop().value);
@@ -1463,7 +1464,7 @@ public abstract class InstructionDefinition implements Serializable {
         } else {
             result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
         }
-        SetPropertyIns.handleCompound(localData, obj, multiname, value, output, result);
+        SetPropertyIns.handleCompound(localData, obj, multiname, value, output, stack, result);
         SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem) result, -1, type.getVal());
     }
 

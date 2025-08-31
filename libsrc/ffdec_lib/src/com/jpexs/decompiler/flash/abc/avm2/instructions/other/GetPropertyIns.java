@@ -111,7 +111,7 @@ public class GetPropertyIns extends InstructionDefinition {
                             Set<Integer> usage = localData.getSetLocalUsages(localData.code.adr2pos(setLocal.getSrc().getAddress()));
                             if (usage.size() == 2) {
                                 findPropName.name = setLocal.value;
-                                output.remove(output.size() - 1);
+                                output.remove(output.size() - 1);                                
                             }
                         }
                     }
@@ -158,6 +158,7 @@ public class GetPropertyIns extends InstructionDefinition {
                         }
                     }
                 }
+                stack.moveToStack(output);
             }
         }
         Reference<Boolean> isStatic = new Reference<>(false);

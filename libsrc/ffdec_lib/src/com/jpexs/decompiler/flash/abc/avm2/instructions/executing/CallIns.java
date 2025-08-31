@@ -100,6 +100,7 @@ public class CallIns extends InstructionDefinition {
                     SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
                     if (st.tempIndex == d.tempIndex) {
                         output.remove(output.size() - 1);
+                        stack.moveToStack(output);
                     }
                 }
             } else if (getProperty.object instanceof SetLocalAVM2Item) {
