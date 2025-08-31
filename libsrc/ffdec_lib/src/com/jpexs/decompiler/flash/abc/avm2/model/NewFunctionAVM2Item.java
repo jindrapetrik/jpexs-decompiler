@@ -104,8 +104,8 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.abc = abc;
         this.methodIndex = methodIndex;
         this.scopeStack = scopeStack;
-    }
-
+    }  
+    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.seenMethods.contains(methodIndex)) {
@@ -177,4 +177,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean isEmpty() {
+        //Assuming isEmpty is called only for commands = not in expressions
+        //Do not allow functions with empty names as commands.
+        return functionName.isEmpty();
+    }    
 }
