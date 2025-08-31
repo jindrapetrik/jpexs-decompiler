@@ -1306,7 +1306,14 @@ public class AVM2Graph extends Graph {
                     boolean isEmpty = true;
                     for (int i = 0; i < finallyTargetItems.size(); i++) {
                         GraphTargetItem it = finallyTargetItems.get(i);
-                        if (it instanceof SetLocalAVM2Item) {
+                        if (it instanceof SetTemporaryItem) {
+                            if (it.value.getNotCoerced() instanceof ExceptionAVM2Item) {
+                                //okay
+                            } else {
+                                isEmpty = false;
+                                break;
+                            }
+                        } else if (it instanceof SetLocalAVM2Item) {
                             if (it.value.getNotCoerced() instanceof ExceptionAVM2Item) {
                                 //okay
                             } else {
@@ -1431,10 +1438,14 @@ public class AVM2Graph extends Graph {
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
                 st2.finishBlock(currentCatchCommands);
-                while (!currentCatchCommands.isEmpty() 
-                        && currentCatchCommands.get(0) instanceof SetTemporaryItem
-                        && currentCatchCommands.get(0).value.getNotCoerced() instanceof ExceptionAVM2Item) {
-                    currentCatchCommands.remove(0);
+                int tempExceptionPos = 0;
+                if (!currentCatchCommands.isEmpty() && currentCatchCommands.get(0) instanceof WithAVM2Item) {
+                    tempExceptionPos++;
+                }
+                while (currentCatchCommands.size() > tempExceptionPos
+                        && currentCatchCommands.get(tempExceptionPos) instanceof SetTemporaryItem
+                        && currentCatchCommands.get(tempExceptionPos).value.getNotCoerced() instanceof ExceptionAVM2Item) {
+                    currentCatchCommands.remove(tempExceptionPos);
                 }
                 loopwith:
                 while (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof WithAVM2Item)) {
