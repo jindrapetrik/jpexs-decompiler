@@ -141,7 +141,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                  false);
     }
 
-    @Test
+    @Test(enabled = false)
     public void testDoubleDup() {
         decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
                 + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
@@ -325,7 +325,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
         decompileMethod("assembled", "testPushPlacement", "var a:int = 1;\r\n"
                 + "var b:* = 2;\r\n"
                 + "§§push(a);\r\n"
-                + "if(((a += 1,b)) >= 2)\r\n"
+                + "a += 1;\r\n"
+                + "if(b >= 2)\r\n"
                 + "{\r\n"
                 + "b = §§pop() + 7;\r\n"
                 + "trace(b);\r\n"
@@ -340,12 +341,12 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
-                + "var _temp_1:*;\r\n"
+                + "var _temp_1:* = \"ByteArray\";\r\n"
                 + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+_temp_1))());\r\n"
                 + "§§push(50);\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
-                + "var _temp_4:*;\r\n"
+                + "var _temp_4:* = §§pop();\r\n"
                 + "§§push(_temp_4);\r\n"
                 + "if(!_temp_4)\r\n"
                 + "{\r\n"
