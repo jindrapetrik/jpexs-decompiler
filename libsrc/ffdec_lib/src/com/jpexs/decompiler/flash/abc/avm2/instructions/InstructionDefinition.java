@@ -1418,6 +1418,13 @@ public abstract class InstructionDefinition implements Serializable {
                     if (!stack.isEmpty() 
                             && stack.peek() instanceof DuplicateSourceItem
                             && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
+                            if (st.tempIndex == ds.tempIndex) {
+                                output.remove(output.size() - 1);
+                            }
+                        }
                         stack.push(stack.pop().value);
                     }                    
                 }
@@ -1429,6 +1436,13 @@ public abstract class InstructionDefinition implements Serializable {
                     if (!stack.isEmpty() 
                             && stack.peek() instanceof DuplicateSourceItem
                             && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
+                            if (st.tempIndex == ds.tempIndex) {
+                                output.remove(output.size() - 1);
+                            }
+                        }
                         stack.push(stack.pop().value);
                     }                    
                 }
