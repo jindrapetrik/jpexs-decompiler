@@ -32,6 +32,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,11 +89,18 @@ public class CallIns extends InstructionDefinition {
         if (function instanceof GetPropertyAVM2Item) {
             GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) function;
             if (getProperty.object instanceof DuplicateItem) {
+                DuplicateItem d = (DuplicateItem) getProperty.object;
                 if (getProperty.object.value == receiver.getThroughDuplicate()) {
                     getProperty.object = receiver.getThroughDuplicate();
                 }
                 if (receiver instanceof DuplicateSourceItem) {
                     receiver = receiver.getThroughDuplicate();
+                }
+                if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                    SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                    if (st.tempIndex == d.tempIndex) {
+                        output.remove(output.size() - 1);
+                    }
                 }
             } else if (getProperty.object instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;
