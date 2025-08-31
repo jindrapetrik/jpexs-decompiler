@@ -567,54 +567,6 @@ public abstract class InstructionDefinition implements Serializable {
         
         
         /*
-        //assembled/TestIncrement
-        if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
-            boolean isIncrement = (value instanceof IncrementAVM2Item);
-            if (value.value instanceof DuplicateItem) {
-                GraphTargetItem duplicated = value.value.value.getThroughDuplicate();
-                stack.moveToStack(output);
-                if (!stack.isEmpty()) {
-                    if (stack.peek().getThroughDuplicate() == duplicated) {
-                        GraphTargetItem notCoerced = duplicated.getNotCoerced();
-                        if (notCoerced instanceof GetLexAVM2Item) {
-                            GetLexAVM2Item getLex = (GetLexAVM2Item) notCoerced;
-                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
-                                    && (obj instanceof FindPropertyAVM2Item)) {
-                                stack.pop();
-                                if (isIncrement) {
-                                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
-                                } else {
-                                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
-                                }
-                                return;
-                            }
-                        }
-                        if (notCoerced instanceof GetPropertyAVM2Item) {
-                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) notCoerced;
-                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
-
-                                if ((getProp.object instanceof DuplicateItem) || (getProp.object instanceof DuplicateSourceItem)) { //assembled/TestIncrement3
-                                    if (getProp.object.value == obj.getThroughDuplicate()) {
-                                        getProp.object = obj.getThroughDuplicate();
-                                    }
-                                }
-
-                                if (Objects.equals(obj, getProp.object)) {
-                                    stack.pop();
-                                    if (isIncrement) {
-                                        stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                                    } else {
-                                        stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                                    }
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
 
@@ -668,45 +620,7 @@ public abstract class InstructionDefinition implements Serializable {
                 }
             }
         }
-        //assembled/TestIncrement2
-        if (value instanceof DuplicateItem) {
-            GraphTargetItem duplicated = value.value;
-            if ((duplicated instanceof IncrementAVM2Item) || (duplicated instanceof DecrementAVM2Item)) {
-                boolean isIncrement = (duplicated instanceof IncrementAVM2Item);
-                stack.moveToStack(output);
-                if (!stack.isEmpty()) {
-                    if (stack.peek().getThroughDuplicate() == duplicated.getThroughDuplicate()) {
-                        GraphTargetItem incrementedProp = duplicated.value;
-                        if (incrementedProp instanceof GetLexAVM2Item) {
-                            GetLexAVM2Item getLex = (GetLexAVM2Item) incrementedProp;
-                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
-                                    && (obj instanceof FindPropertyAVM2Item)) {
-                                stack.pop();
-                                if (isIncrement) {
-                                    stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
-                                } else {
-                                    stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
-                                }
-                                return;
-                            }
-                        }
-                        if (incrementedProp instanceof GetPropertyAVM2Item) {
-                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) incrementedProp;
-                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)
-                                    && (Objects.equals(getProp.object, obj))) {
-                                stack.pop();
-                                if (isIncrement) {
-                                    stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                                } else {
-                                    stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                                }
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;
@@ -1274,22 +1188,33 @@ public abstract class InstructionDefinition implements Serializable {
                             if (st.value instanceof IncrementAVM2Item
                                     || st.value instanceof DecrementAVM2Item) {
                                 boolean isIncrement = st.value instanceof IncrementAVM2Item;
-                                if (st.value.value instanceof GetPropertyAVM2Item) {
+                                
+                                boolean ok = false;
+                                //assembled.TestIncrement2
+                                if (st.value.value instanceof GetLexAVM2Item) {
+                                    GetLexAVM2Item getLex = (GetLexAVM2Item) st.value.value;
+                                    if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                                        ok = true;
+                                    }
+                                } else if (st.value.value instanceof GetPropertyAVM2Item) {
                                     GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) st.value.value;
                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                                         if (fm.compareSame(multiname)) {
-                                            output.remove(output.size() - 1);
-                                            stack.pop();
-                                            stack.moveToStack(output);
-                                            if (isIncrement) {
-                                                stack.push(new PreIncrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), getProp));
-                                            } else {
-                                                stack.push(new PreDecrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), getProp));
-                                            }
-                                            return;
+                                            ok = true;
                                         }
                                     }
+                                }
+                                if (ok) {
+                                    output.remove(output.size() - 1);
+                                    stack.pop();
+                                    stack.moveToStack(output);
+                                    if (isIncrement) {
+                                        stack.push(new PreIncrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value));
+                                    } else {
+                                        stack.push(new PreDecrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value));
+                                    }
+                                    return;
                                 }
                             }
                         }
@@ -1340,22 +1265,33 @@ public abstract class InstructionDefinition implements Serializable {
                             SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 2);
                             if (st.tempIndex == d.tempIndex) {
                                 if (st.value instanceof ConvertAVM2Item) {
-                                    if (st.value.value instanceof GetPropertyAVM2Item) {
+                                    boolean ok = false;
+                                    //assembled.TestIncrement
+                                    if (st.value.value instanceof GetLexAVM2Item) {
+                                        GetLexAVM2Item getLex = (GetLexAVM2Item) st.value.value;
+                                        if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                                            ok = true;
+                                        }
+                                    } else if (st.value.value instanceof GetPropertyAVM2Item) {
                                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) st.value.value;
                                         if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                             FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                                             if (fm.compareSame(multiname)) {
-                                                output.remove(output.size() - 1);
-                                                output.remove(output.size() - 1);
-                                                stack.moveToStack(output);
-                                                if (isIncrement) {
-                                                    stack.push(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
-                                                } else {
-                                                    stack.push(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
-                                                }
-                                                return;
+                                                ok = true;
                                             }
                                         }
+                                    }
+                                    
+                                    if (ok) {
+                                        output.remove(output.size() - 1);
+                                        output.remove(output.size() - 1);
+                                        stack.moveToStack(output);
+                                        if (isIncrement) {
+                                            stack.push(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value));
+                                        } else {
+                                            stack.push(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value));
+                                        }
+                                        return;
                                     }
                                 }
                             }

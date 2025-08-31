@@ -107,6 +107,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     }
     
     private boolean isDupsOnly() {
+        if (true) {
+            return false;
+        }
         for (GraphTargetItem item : this) {
             if (item instanceof DuplicateItem) {
                 continue;
