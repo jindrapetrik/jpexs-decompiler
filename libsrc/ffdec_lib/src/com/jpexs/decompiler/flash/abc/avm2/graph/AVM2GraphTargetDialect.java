@@ -114,6 +114,7 @@ public class AVM2GraphTargetDialect extends GraphTargetDialect {
     public GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException {
         writer.append("var ");
         writer.append("_temp");        
+        writer.append(suffix);
         writer.append("_").append(tempIndex).append(":*");
         if (value != null) {
             writer.append(" = ");

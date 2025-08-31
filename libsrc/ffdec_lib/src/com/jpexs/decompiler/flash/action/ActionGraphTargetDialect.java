@@ -119,6 +119,7 @@ public class ActionGraphTargetDialect extends GraphTargetDialect {
     public GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException {
         writer.append("var ");
         writer.append("_temp");
+        writer.append(suffix);
         writer.append("_").append(tempIndex);
         if (value != null) {
             writer.append(" = ");        

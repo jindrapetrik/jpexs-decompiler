@@ -1057,7 +1057,7 @@ public class Graph {
                 public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
                     if (item instanceof SetTemporaryItem) {
                         SetTemporaryItem st = (SetTemporaryItem) item;
-                        SetTemporaryItem dec = new SetTemporaryItem(dialect, null, null, null, st.tempIndex, st.getSuffix());
+                        SetTemporaryItem dec = new SetTemporaryItem(dialect, null, null, null, st.tempIndex, st.getSuffix(), st.refCount);
                         dec.declaration = true;
                         items.add(iRef.getVal(), dec);
                         iRef.setVal(iRef.getVal() + 1);

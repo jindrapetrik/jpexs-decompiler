@@ -39,6 +39,7 @@ public class SetTemporaryItem extends GraphTargetItem implements SimpleValue, Ha
 
     public int tempIndex;
     public boolean declaration = false;
+    public int refCount = 0;
     
     private final String suffix;
 
@@ -54,10 +55,11 @@ public class SetTemporaryItem extends GraphTargetItem implements SimpleValue, Ha
      * @param lineStartIns Line start item
      * @param value Value
      */
-    public SetTemporaryItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex, String suffix) {
+    public SetTemporaryItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex, String suffix, int refCount) {
         super(dialect, src, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.tempIndex = tempIndex;
         this.suffix = suffix;
+        this.refCount = refCount;
     }
     
     @Override

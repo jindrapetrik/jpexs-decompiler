@@ -27,12 +27,10 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
-import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
-import com.jpexs.decompiler.graph.model.SwapItem;
 import com.jpexs.decompiler.graph.model.TemporaryItem;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,10 +104,8 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.push(item);
     }
     
-    private boolean isDupsOnly() {
-        if (true) {
-            return false;
-        }
+    //for #116
+    private boolean isDupsOnly() {        
         for (GraphTargetItem item : this) {
             if (item instanceof DuplicateItem) {
                 continue;
@@ -280,7 +276,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                    } else {
                         int temp = localData.maxTempIndex.getVal() + 1;
                         localData.maxTempIndex.setVal(temp);
-                        connectedOutput.set(i, new SetTemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, temp, "push"));
+                        connectedOutput.set(i, new SetTemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, temp, "push", 1));
                         return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, temp);
                    }
                }

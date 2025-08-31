@@ -153,7 +153,7 @@ public class SwapIns extends InstructionDefinition {
         int temp = localData.maxTempIndex.getVal() + 1;
         localData.maxTempIndex.setVal(temp);
         stack.finishBlock(output);
-        stack.addToOutput(new SetTemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, o2, temp, "swap"));
+        stack.addToOutput(new SetTemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, o2, temp, "swap", 1));
         stack.push(o1);
         stack.push(new TemporaryItem(AVM2GraphTargetDialect.INSTANCE, ins, localData.lineStartInstruction, o2, temp));       
         stack.finishBlock(output);        
