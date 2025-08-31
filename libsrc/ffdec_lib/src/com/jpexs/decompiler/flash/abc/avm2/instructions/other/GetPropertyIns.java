@@ -47,6 +47,8 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,9 +118,18 @@ public class GetPropertyIns extends InstructionDefinition {
                 }
                 if (findPropName.name instanceof DuplicateItem || findPropName.name instanceof DuplicateSourceItem) {
                     if (findPropName.name.getThroughDuplicate() == multiname.name.getThroughDuplicate()) {
+                        int tempIndex = ((HasTempIndex) findPropName.name).getTempIndex();
+                        
                         findPropName.name = findPropName.name.value;
                         multiname.name = multiname.name.getThroughDuplicate();
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            if (st.tempIndex == tempIndex) {
+                                output.remove(output.size() - 1);
+                            }                            
+                        }
                     }
+                    
                 }
                 if (findPropName.namespace instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) findPropName.namespace;
@@ -134,8 +145,17 @@ public class GetPropertyIns extends InstructionDefinition {
                 }
                 if (findPropName.namespace instanceof DuplicateItem || findPropName.namespace instanceof DuplicateSourceItem) {
                     if (findPropName.namespace.getThroughDuplicate() == multiname.namespace.getThroughDuplicate()) {
+                        int tempIndex = ((HasTempIndex) findPropName.namespace).getTempIndex();
+                        
                         findPropName.namespace = findPropName.namespace.getThroughDuplicate();
                         multiname.namespace = multiname.namespace.getThroughDuplicate();
+                        
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            if (st.tempIndex == tempIndex) {
+                                output.remove(output.size() - 1);
+                            }                            
+                        }
                     }
                 }
             }
