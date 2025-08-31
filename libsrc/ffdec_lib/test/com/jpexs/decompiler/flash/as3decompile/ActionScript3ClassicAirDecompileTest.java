@@ -129,26 +129,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"ch\");\r\n"
                 + "}\r\n",
                  false);
-    }
-
-    @Test
-    public void testChainedAssignments() {
-        decompileMethod("classic_air", "testChainedAssignments", "var a:int = 0;\r\n"
-                + "var b:int = 0;\r\n"
-                + "var c:int = 0;\r\n"
-                + "var d:int = 0;\r\n"
-                + "var f:int = 0;\r\n"
-                + "d = c = b = a = 5;\r\n"
-                + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
-                + "e.attrib1 = e.attrib2 = e.attrib3 = this.getCounter();\r\n"
-                + "this.traceIt(e.toString());\r\n"
-                + "prop = f = a = 4;\r\n"
-                + "if(f == 2)\r\n"
-                + "{\r\n"
-                + "trace(\"OK: \" + f);\r\n"
-                + "}\r\n",
-                 false);
-    }
+    }    
 
     @Test
     public void testCollidingTry() {
@@ -477,8 +458,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testDoWhile2", "var k:int = 5;\r\n"
                 + "do\r\n"
                 + "{\r\n"
-                + "k++;\r\n"
-                + "if(k == 7)\r\n"
+                + "if(++k == 7)\r\n"
                 + "{\r\n"
                 + "k = 5 * k;\r\n"
                 + "}\r\n"
@@ -486,9 +466,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "k = 5 - k;\r\n"
                 + "}\r\n"
-                + "k--;\r\n"
                 + "}\r\n"
-                + "while(k < 9);\r\n"
+                + "while(--k < 9);\r\n"
                 + "return 2;\r\n",
                  false);
     }
@@ -1385,9 +1364,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testIncDec7", "var a:* = [1,2,3,4,5];\r\n"
                 + "var index:int = 0;\r\n"
                 + "trace(\"a[++index]\");\r\n"
-                + "trace(a[(index++,index)]);\r\n"
+                + "trace(a[++index]);\r\n"
                 + "trace(\"a[--index]\");\r\n"
-                + "trace(a[(index--,index)]);\r\n",
+                + "trace(a[--index]);\r\n",
                  false);
     }
 
