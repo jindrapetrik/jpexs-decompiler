@@ -1400,8 +1400,15 @@ public class AVM2Graph extends Graph {
                         //should not happen
                         finallyCommands.clear();
                     }
+                    //remove Dup before switch
+                    if (!finallyCommands.isEmpty() && finallyCommands.get(finallyCommands.size() - 1) instanceof SetTemporaryItem) {
+                        SetTemporaryItem st = (SetTemporaryItem) finallyCommands.get(finallyCommands.size() - 1);
+                        if (st.value instanceof PopItem) {
+                            finallyCommands.remove(finallyCommands.size() - 1);
+                        }
+                    }
                     stack.pop(); //duplicated switched value
-                    stack.pop(); //value switched by lookupswitch                   
+                    stack.pop(); //value switched by lookupswitch
                 }
             }
 
