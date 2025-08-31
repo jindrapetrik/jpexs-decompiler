@@ -347,6 +347,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     }
     
     public void finishBlock(List<GraphTargetItem> output) {
+        if (connectedOutput == null) {
+            return;
+        }
         /*int pos = output.size();
         
         for (int i = size() - 1; i >= 0; i--) {

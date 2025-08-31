@@ -27,7 +27,9 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.HashSet;
 import java.util.List;
 
@@ -49,7 +51,19 @@ public class NewClassIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.pop().toString(writer, LocalData.create(localData.callStack /*??*/, localData.abcIndex, localData.abc, localData.localRegNames, localData.fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, localData.swfVersion, localData.usedDeobfuscations));
+        GraphTargetItem obj = stack.pop();
+        
+        if (obj instanceof DuplicateSourceItem) {
+            DuplicateSourceItem ds = (DuplicateSourceItem) obj;
+            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                if (ds.tempIndex == st.tempIndex) {
+                    output.remove(output.size() - 1);
+                    stack.moveToStack(output);
+                }
+            }
+        }                
+        obj.toString(writer, LocalData.create(localData.callStack /*??*/, localData.abcIndex, localData.abc, localData.localRegNames, localData.fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, localData.swfVersion, localData.usedDeobfuscations));
         writer.finishHilights();
         String baseType = writer.toString();
         ABC abc = localData.abc;
