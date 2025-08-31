@@ -98,6 +98,17 @@ public interface SetTypeIns {
                     } else {
                         result.value = newValue;
                     }
+                    
+                    //Assembled - TestForEach
+                    if (AVM2Item.mustStayIntact2(newValue) && result instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) result;
+                        stack.pop();
+                        stack.moveToStack(output);
+                        stack.addToOutput(result);                               
+                        stack.push(new LocalRegAVM2Item(null, null, setLocal.regIndex, setLocal.value, setLocal.type));
+                        return;
+                    }
+                    
                                         
                     stack.pop();
                     stack.moveToStack(output);                    
