@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 
 /**
@@ -67,7 +69,16 @@ public class DeobfuscatePopIns extends PopIns {
      */
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.pop(); //Just ignore the value
+        GraphTargetItem item = stack.pop();
+        if (item instanceof DuplicateSourceItem) {
+            DuplicateSourceItem ds = (DuplicateSourceItem) item;
+            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                if (st.tempIndex == ds.tempIndex) {
+                    output.remove(output.size() - 1);
+                }
+            }
+        }
     }
 
     /**
