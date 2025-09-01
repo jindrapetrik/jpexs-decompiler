@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
@@ -1177,5 +1178,37 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
            
         output.remove(output.size() - 1); 
         stack.moveToStack(output);
+    }
+    
+    /**
+     * Checks whether items are result of dup instruction and removes SetTemportary from output when neccessary
+     * @param item1
+     * @param item2
+     * @param output
+     * @param stack
+     * @return -2 when no duplicate, -1 when equal, >= 0 temp index
+     */
+    public static int checkDup2(GraphTargetItem item1, GraphTargetItem item2, List<GraphTargetItem> output, TranslateStack stack) {
+        if (item1 == item2) {
+            return -1;
+        }
+        if (!((item1 instanceof DuplicateSourceItem && item2 instanceof DuplicateItem)
+            || (item1 instanceof DuplicateItem && item2 instanceof DuplicateSourceItem))
+                ) {
+            return -2;
+        }
+        if (((HasTempIndex) item1).getTempIndex() != ((HasTempIndex) item2).getTempIndex()) {
+            return -2;
+        }
+        
+        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+            if (st.getTempIndex() == ((HasTempIndex) item1).getTempIndex()) {
+                output.remove(output.size() - 1);
+                stack.moveToStack(output);
+            }
+        }
+        
+        return ((HasTempIndex) item1).getTempIndex();
     }
 }

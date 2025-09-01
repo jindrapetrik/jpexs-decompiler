@@ -79,9 +79,37 @@ public interface SetTypeIns {
         }               
         
         //TestChainedAssignments1 both AIR and nonair
-        if (notCoercedValue instanceof DuplicateItem) {
+        stack.moveToStack(output);
+        if (!stack.isEmpty()) {
+            if (GraphTargetItem.checkDup2(notCoercedValue, stack.peek(), output, stack) >= -1) {
+                GraphTargetItem newValue = notCoercedValue.getThroughDuplicate();
+                if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                    result.value.value = newValue;
+                } else {
+                    result.value = newValue;
+                }
+
+                //Assembled - TestForEach
+                if (AVM2Item.mustStayIntact2(newValue) && result instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) result;
+                    stack.pop();
+                    stack.moveToStack(output);
+                    stack.addToOutput(result);                               
+                    stack.push(new LocalRegAVM2Item(null, null, setLocal.regIndex, setLocal.value, setLocal.type));
+                    return;
+                }
+
+
+                stack.pop();
+                stack.moveToStack(output);                    
+                stack.push(result);
+                return;
+            }
+        }
+        stack.finishBlock(output);
+        /*if (notCoercedValue instanceof DuplicateItem) {
             DuplicateItem d = (DuplicateItem) notCoercedValue;
-            stack.moveToStack(output);
+            
             if (!stack.isEmpty() && stack.peek() instanceof DuplicateSourceItem) {
                 DuplicateSourceItem ds = (DuplicateSourceItem) stack.peek();
                 if (ds.tempIndex == d.tempIndex) {  
@@ -116,8 +144,10 @@ public interface SetTypeIns {
                     return;
                 }
             }
-            stack.finishBlock(output);
-        }
+            
+        }*/
+        
+        
         
         stack.addToOutput(result);
         if (true) { //FIXME??

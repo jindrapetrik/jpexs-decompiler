@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
@@ -60,7 +60,16 @@ public class DupIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
         int temp = 0;
-                        
+                  
+        if (v instanceof SimpleValue) {
+            SimpleValue sv = (SimpleValue) v;
+            if (sv.isSimpleValue()) {
+                stack.push(v);
+                stack.push(v);
+                return;
+            }
+        }
+        
         if (v instanceof NewActivationAVM2Item 
                 || v instanceof ExceptionAVM2Item) {
             stack.push(v);

@@ -141,10 +141,11 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                  false);
     }
 
-    @Test(enabled = false)
+    @Test
     public void testDoubleDup() {
-        decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
-                + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
+        decompileMethod("assembled", "testDoubleDup", "var _temp_1:* = myprop(_loc5_);\r\n"
+                + "var _loc10_:* = _temp_1;\r\n"
+                + "_temp_1.mymethod(-_temp_1.width,-_loc10_.height);\r\n",
                  false);
     }
 
@@ -341,23 +342,22 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
-                + "var _temp_1:* = \"ByteArray\";\r\n"
-                + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+_temp_1))());\r\n"
+                + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+\"ByteArray\"))());\r\n"
                 + "§§push(50);\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
-                + "var _temp_4:* = §§pop();\r\n"
-                + "§§push(_temp_4);\r\n"
-                + "if(!_temp_4)\r\n"
+                + "var _temp_3:* = §§pop();\r\n"
+                + "§§push(_temp_3);\r\n"
+                + "if(!_temp_3)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
-                + "var _temp_5:* = §§pop();\r\n"
-                + "var _temp_6:* = §§pop() - 1;\r\n"
-                + "_temp_5[_temp_5.length] = 0x29 ^ 0x6F;\r\n"
-                + "_temp_5[_temp_5.length] = 9 ^ 0x54;\r\n"
+                + "var _temp_4:* = §§pop();\r\n"
+                + "var _temp_5:* = §§pop() - 1;\r\n"
+                + "_temp_4[_temp_4.length] = 0x29 ^ 0x6F;\r\n"
+                + "_temp_4[_temp_4.length] = 9 ^ 0x54;\r\n"
+                + "§§push(_temp_4);\r\n"
                 + "§§push(_temp_5);\r\n"
-                + "§§push(_temp_6);\r\n"
                 + "}\r\n"
                 + "§§pop();\r\n"
                 + "§§pop();\r\n",
