@@ -105,7 +105,41 @@ public interface SetTypeIns {
                 stack.push(result);
                 return;
             }
+            
+            if (notCoercedValue instanceof DuplicateItem) {
+                GraphTargetItem insideDup = notCoercedValue.value;
+                if (!AVM2Item.mustStayIntact1(insideDup.getNotCoercedNoDup())) {
+                    if (stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
+                        stack.pop();
+
+                        if ((insideDup instanceof DuplicateItem) && regId > -1) {
+                            int numDups = 1;
+                            while ((insideDup instanceof DuplicateItem) && !stack.isEmpty() && stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
+                                insideDup = insideDup.value;
+                                stack.pop();
+                                numDups++;
+                            }
+                            if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                                value.value = insideDup;
+                            } else {
+                                value = insideDup;
+                            }
+                            result.value = value;
+                            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                                output.remove(output.size() - 1);
+                            }                            
+                            stack.addToOutput(result);
+                            for (int i = 0; i < numDups; i++) {
+                                stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : value.returnType()));
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
         }
+        
+        
         stack.finishBlock(output);
         /*if (notCoercedValue instanceof DuplicateItem) {
             DuplicateItem d = (DuplicateItem) notCoercedValue;

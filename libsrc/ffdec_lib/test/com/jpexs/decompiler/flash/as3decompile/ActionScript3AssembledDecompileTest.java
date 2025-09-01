@@ -143,9 +143,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testDoubleDup() {
-        decompileMethod("assembled", "testDoubleDup", "var _temp_1:* = myprop(_loc5_);\r\n"
-                + "var _loc10_:* = _temp_1;\r\n"
-                + "_temp_1.mymethod(-_temp_1.width,-_loc10_.height);\r\n",
+        decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
+                + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
                  false);
     }
 
