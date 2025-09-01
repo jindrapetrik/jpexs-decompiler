@@ -149,6 +149,12 @@ public class SwapIns extends InstructionDefinition {
             return;
         }
         
+        if (o2 instanceof DuplicateSourceItem) {
+            stack.push(o1);
+            stack.push(o2);
+            return;
+        }
+        
         
         int temp = localData.maxTempIndex.getVal() + 1;
         localData.maxTempIndex.setVal(temp);
