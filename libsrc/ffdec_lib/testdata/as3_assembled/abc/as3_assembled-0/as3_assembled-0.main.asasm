@@ -42,5 +42,6 @@ program
  #include "tests/TestPushPlacement.script.asasm"
  #include "tests/TestConstructDynamically.script.asasm"
  #include "tests/TestCollidingPublicTraits.script.asasm"
+ #include "tests/TestSetGetLocalOnStack.script.asasm"
  ; place to add next
 end ; program

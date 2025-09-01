@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Duplicate item.
+ * Set temporary item.
  *
  * @author JPEXS
  */

@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
@@ -47,11 +46,10 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
-import com.jpexs.decompiler.graph.model.TemporaryItem;
 import java.util.List;
 
 /**
@@ -125,6 +123,24 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         
         
         stack.finishBlock(output);
+        
+        if (!output.isEmpty()) {            
+            if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
+                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);
+                if (setLocal.regIndex == regId) {
+                    if (setLocal.getSrc() != null) {
+                        if (localData.getSetLocalUsages(localData.code.adr2pos(setLocal.getSrc().getAddress())).size() == 1) {
+                            if (output.size() >= 2 && output.get(output.size() - 2) instanceof PushItem) {
+                                output.remove(output.size() - 1);
+                                stack.moveToStack(output);
+                                stack.push(setLocal.value);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         //TestIncDec7 AIR
         if (!output.isEmpty()) {

@@ -92,8 +92,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testCollidingPublicTraits() {
-        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#87);\r\n"
-                + "trace(\"ns2 = \" + this.a#88);\r\n",
+        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#89);\r\n"
+                + "trace(\"ns2 = \" + this.a#90);\r\n",
                  false);
     }
 
@@ -360,6 +360,12 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "}\r\n"
                 + "§§pop();\r\n"
                 + "§§pop();\r\n",
+                 false);
+    }
+
+    @Test
+    public void testSetGetLocalOnStack() {
+        decompileMethod("assembled", "testSetGetLocalOnStack", "this.arr[this.cnt++] = param1;\r\n",
                  false);
     }
 
