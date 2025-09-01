@@ -249,6 +249,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         }
 
         if (isEmpty() && connectedOutput != null) {
+            moveToStack(connectedOutput);
+            if (!isEmpty()) {
+                return pop();
+            }
             for (int i = connectedOutput.size() - 1; i >= 0; i--) {
                 GraphTargetItem item = connectedOutput.get(i);
                 if (item instanceof Block) {
