@@ -96,6 +96,7 @@ All notable changes to this project will be documented in this file.
 - [#2519] AS1/2 direct editation - generating too large ConstantPool
 - Hex View - incorrect table height when switching tags
 - [#2525] AMF editor (like in Sol cookie editor) - saving empty standard array `[]`
+- AS3 - names with custom namespaces not being deobfuscated
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit

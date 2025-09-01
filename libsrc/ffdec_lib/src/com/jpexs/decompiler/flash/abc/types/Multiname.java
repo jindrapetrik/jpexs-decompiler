@@ -740,7 +740,6 @@ public class Multiname {
                     String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
                         customNamespaceRef.setVal(dc);
-                        return name;
                     }
                 }
             }
