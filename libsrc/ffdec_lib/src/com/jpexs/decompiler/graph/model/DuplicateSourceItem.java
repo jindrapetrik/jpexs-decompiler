@@ -48,7 +48,7 @@ public class DuplicateSourceItem extends GraphTargetItem implements SimpleValue,
      * @param value Value
      */
     public DuplicateSourceItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value, int tempIndex) {
-        super(dialect, src, lineStartIns, value.getPrecedence(), value);
+        super(dialect, src, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.tempIndex = tempIndex;
     }
     
