@@ -36,9 +36,10 @@ import java.util.Set;
 public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
 
     public int tempIndex;
+
     /**
      * Constructor.
-     * 
+     *
      * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start item
@@ -149,5 +150,5 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue, HasTe
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
-    }        
+    }
 }

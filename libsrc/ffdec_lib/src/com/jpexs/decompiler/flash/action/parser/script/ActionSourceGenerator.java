@@ -90,7 +90,7 @@ import java.util.logging.Logger;
 public class ActionSourceGenerator implements SourceGenerator {
 
     private final List<String> constantPool;
-    
+
     private int constantPoolLength;
 
     private final int swfVersion;
@@ -163,10 +163,9 @@ public class ActionSourceGenerator implements SourceGenerator {
         if (swfVersion <= 4) {
             return items;
         }
-        
 
         return items;
-        
+
         //TODO: This should take into account important offsets (jumps)
         //And not group Pushes over different parts of code
         /*Like:
@@ -218,7 +217,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 prevPush = null;
             }                      
         }
-        return ret;   */                          
+        return ret;   */
     }
 
     private List<Action> nonempty(List<Action> list) {
@@ -253,7 +252,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         byte[] onTrueBytes = Action.actionsToBytes(onTrue, false, SWF.DEFAULT_VERSION);
         int onTrueLen = onTrueBytes.length;
-        
+
         if (onTrueLen > 32767) {
             throw new CompilationException("Generated offset for onTrue part of " + errorTitle + " is larger than maximum allowed for SI16.", errorLine);
         }
@@ -302,8 +301,8 @@ public class ActionSourceGenerator implements SourceGenerator {
                     int nOffset = -pos + continueOffset;
                     if (nOffset < -32768 || nOffset > 32767) {
                         throw new CompilationException("Generated offset for Continue is outside bounds of SI16.", item.line);
-                    } 
-                    
+                    }
+
                     aj.setJumpOffset(nOffset);
                     aj.isContinue = false;
                 }
@@ -311,7 +310,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                     int nOffset = -pos + breakOffset;
                     if (nOffset < -32768 || nOffset > 32767) {
                         throw new CompilationException("Generated offset for Break is outside bounds of SI16.", item.line);
-                    } 
+                    }
                     aj.setJumpOffset(nOffset);
                     aj.isBreak = false;
                 }
@@ -555,7 +554,7 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @return Push constant item
      */
     public DirectValueActionItem pushConstTargetItem(String s) {
-        
+
         //ActionConstantPool was introduced in SWF 5
         if (swfVersion < 5) {
             return new DirectValueActionItem(null, null, 0, s, constantPool);
@@ -564,7 +563,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         int index = constantPool.indexOf(s);
         if (index == -1) {
             int newItemLen = ActionConstantPool.calculateSize(s, charset);
-            if (constantPool.size() < 0xffff 
+            if (constantPool.size() < 0xffff
                     && constantPoolLength + newItemLen <= 0xffff) {
                 // constant pool is not full
                 constantPool.add(s);
@@ -577,7 +576,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             return new DirectValueActionItem(null, null, 0, s, constantPool);
         }
 
-        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);                
+        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);
     }
 
     /**
@@ -587,25 +586,25 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @return Push constant action
      */
     public ActionPush pushConst(String s) {
-        
+
         if (swfVersion < 5) {
             return new ActionPush(s, charset);
-        }        
-        
+        }
+
         int index = constantPool.indexOf(s);
-        if (index == -1) {            
-            
+        if (index == -1) {
+
             if (constantPool.size() == 0xffff) {
                 return new ActionPush(s, charset);
-            }                
-            
+            }
+
             int newItemLen = ActionConstantPool.calculateSize(s, charset);
-            
+
             //constant pool is full
             if (constantPoolLength + newItemLen > 0xffff) {
                 return new ActionPush(s, charset);
             }
-            
+
             constantPool.add(s);
             index = constantPool.indexOf(s);
             constantPoolLength += newItemLen;
@@ -916,15 +915,15 @@ public class ActionSourceGenerator implements SourceGenerator {
         whileBody.add(whileajmp);
         int whileExprLen = Action.actionsToBytes(whileExpr, false, SWF.DEFAULT_VERSION).length;
         int whileBodyLen = Action.actionsToBytes(whileBody, false, SWF.DEFAULT_VERSION).length;
-        
+
         if (whileBodyLen > 32767) {
             throw new CompilationException("Generated offset for While is larger than maximum allowed for SI16.", item.line);
         }
-        
+
         int whileJumpOffset = -(whileExprLen + whileBodyLen);
         if (whileJumpOffset < -32768) {
             throw new CompilationException("Generated offset for While is lower than mininum allowed for SI16.", item.line);
-        }        
+        }
         whileajmp.setJumpOffset(whileJumpOffset);
         whileaif.setJumpOffset(whileBodyLen);
         ret.addAll(whileExpr);
@@ -953,11 +952,11 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(doExpr);
         ActionIf doif = new ActionIf(0, charset);
         ret.add(doif);
-        int offset = doBodyLen + doExprLen + doif.getTotalActionLength();       
+        int offset = doBodyLen + doExprLen + doif.getTotalActionLength();
         if (-offset < -32768) {
             throw new CompilationException("Generated offset for DoWhile is lower than mininum allowed for SI16.", item.line);
-        }  
-        
+        }
+
         doif.setJumpOffset(-offset);
         fixLoop(doBody, offset, doBodyLen, item);
         return ret;
@@ -986,7 +985,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         if (ifOffset > 32767) {
             throw new CompilationException("Generated offset for For is larger than maximum allowed for SI16.", item.line);
         }
-        
+
         forajmp.setJumpOffset(jmpOffset);
         foraif.setJumpOffset(ifOffset);
         ret.addAll(generateToActionList(localData, item.firstCommands));
@@ -996,8 +995,8 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(forajmp);
         fixLoop(forBody, forBodyLen + forFinalLen + forajmpLen, forBodyLen, item);
         return ret;
-    }        
-    
+    }
+
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -1103,7 +1102,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
 
         checkOffsetBounds(defJmpPos, "Switch", item.line);
-                
+
         defJump.setJumpOffset(defJmpPos);
         List<Action> caseCmdsAll = new ArrayList<>();
         int breakOffset = 0;
@@ -1193,6 +1192,14 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
 
     }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new ActionStackSwap());
+        return ret;
+    }
+    
     private int checkOffsetBounds(int offset, String errorItem, int errorLine) throws CompilationException {
         if (offset < -32768) {
             throw new CompilationException("Generated offset for " + errorItem + " is lower than mininum allowed for SI16.", errorLine);
@@ -1202,10 +1209,4 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         return offset;
     }
-    @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException {
-        List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(new ActionStackSwap());
-        return ret;
-    }        
 }

@@ -234,16 +234,6 @@ public interface SourceGenerator {
      * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException;
-
-    /**
-     * Generates DiscardValue action.
-     *
-     * @param localData Local data
-     * @param item GraphTargetItem
-     * @return List of GraphSourceItem
-     * @throws CompilationException On compilation error
-     */
-    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException;
     
     /**
      * Generates source code for SwapItem.
@@ -254,4 +244,14 @@ public interface SourceGenerator {
      * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException;   
+
+    /**
+     * Generates DiscardValue action.
+     *
+     * @param localData Local data
+     * @param item GraphTargetItem
+     * @return List of GraphSourceItem
+     * @throws CompilationException On compilation error
+     */
+    public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException;
 }

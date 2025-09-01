@@ -1038,7 +1038,8 @@ public class Graph {
         //fixSwitchEnds(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
-    }        
+    }
+
     private void handleSetTemporaryDeclarations(List<GraphTargetItem> items) {
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem item = items.get(i);
@@ -1050,7 +1051,7 @@ public class Graph {
                 DuplicateSourceItem s = (DuplicateSourceItem) item;
                 s.declaration = true;
             }*/
-            
+
             Reference<Integer> iRef = new Reference<>(i);
             item.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                 @Override
@@ -1069,7 +1070,7 @@ public class Graph {
                         items.add(iRef.getVal(), dec);
                         iRef.setVal(iRef.getVal() + 1);
                     }*/
-                }                
+                }
             });
             i = iRef.getVal();
             if (item instanceof Block) {
@@ -2862,7 +2863,7 @@ public class Graph {
                     }
 
                     if (!bcsLeft.isEmpty()) {
-                        for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {                            
+                        for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {
                             if (!bcsLeft.contains(c)) {
                                 GraphPart cand = currentLoop.breakCandidates.get(c);
                                 removedX.add(cand);
@@ -2965,7 +2966,7 @@ public class Graph {
                     if (removedX.contains(cand)) {
                         if (debugPrintLoopList) {
                             System.err.println("cand " + cand + " is removed");
-                        }                        
+                        }
                         continue;
                     }
                     if (bannedCandidates.contains(cand)) {
@@ -3332,13 +3333,13 @@ public class Graph {
                         System.err.println("Adding break");
                     }
                     makeAllCommands(ret, stack);
-                    
+
                     BreakItem br = new BreakItem(dialect, null, localData.lineStartInstruction, el.id);
                     if (part.start >= code.size() - 1) {
                         br.isScriptEnd = true;
                     }
                     ret.add(br);
-                    
+
                     return ret;
                 }
                 if (el.loopPreContinue == part) {
@@ -3412,10 +3413,10 @@ public class Graph {
                 }
             }
 
-            if (code.size() <= part.start) {                
+            if (code.size() <= part.start) {
                 if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
                     stack.setConnectedOutput(0, ret, localData);
-                    stack.addToOutput(new ScriptEndItem(dialect));                  
+                    stack.addToOutput(new ScriptEndItem(dialect));
                 }
                 return ret;
             }
@@ -3579,7 +3580,7 @@ public class Graph {
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
                     if (!(!output.isEmpty() && output.get(output.size() - 1) instanceof ExitItem)) {
-                        stack.addToOutput(new ScriptEndItem(dialect));                        
+                        stack.addToOutput(new ScriptEndItem(dialect));
                     }
                 }
             }
@@ -3904,7 +3905,7 @@ public class Graph {
                                     GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
                                     GraphTargetItem prevExpr = stack.pop();
                                     GraphTargetItem leftSide = expr.getNotCoercedNoDup();
-                                    
+
                                     prevExpr = prevExpr.getThroughDuplicate();
 
                                     boolean hideEmptyTrueFalse = true;
@@ -3923,7 +3924,7 @@ public class Graph {
                                             stack.push(rightSide);
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(prevExpr);
-                                        } else {                                            
+                                        } else {
                                             stack.push(new OrItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
@@ -3940,7 +3941,7 @@ public class Graph {
                                             stack.push(rightSide);
                                         } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(prevExpr);
-                                        } else {                                            
+                                        } else {
                                             stack.push(new AndItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (prevExpr instanceof FalseItem) {

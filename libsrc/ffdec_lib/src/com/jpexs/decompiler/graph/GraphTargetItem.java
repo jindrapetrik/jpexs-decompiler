@@ -77,7 +77,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public static final int PRECEDENCE_LOGICALOR = 12;
 
     public static final int PRECEDENCE_NULLCOALESCE = 13;
-    
+
     public static final int PRECEDENCE_CONDITIONAL = 14;
 
     public static final int PRECEDENCE_ASSIGNMENT = 15;
@@ -120,27 +120,28 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * Line start item
      */
     public GraphSourceItem lineStartItem;
-    
+
     /**
      * ASM Position
      */
     protected int pos = 0;
-    
+
     /**
      * Dialect
      */
     public GraphTargetDialect dialect;
-    
+
     /**
      * Position in output - current list of GraphTargetItems
-     */    
+     */
     public int outputPos = -1;
-    
+
     /**
-     * Line in decompiled source code. Used mainly in Parsers/Code generators to report bugs.
+     * Line in decompiled source code. Used mainly in Parsers/Code generators to
+     * report bugs.
      */
     public int line;
-    
+
     /**
      * Gets the line start item
      *
@@ -149,7 +150,6 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphSourceItem getLineStartItem() {
         return lineStartItem;
     }
-   
 
     /**
      * Simplifies something
@@ -243,10 +243,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Constructs GraphTargetItem
+     *
      * @param dialect Dialect
      */
     public GraphTargetItem(GraphTargetDialect dialect) {
-        this(dialect, null, null, NOPRECEDENCE);        
+        this(dialect, null, null, NOPRECEDENCE);
     }
 
     /**
@@ -255,7 +256,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param dialect Dialect
      * @param src Source item
      * @param lineStartItem Line start item
-     * @param precedence Precedence     
+     * @param precedence Precedence
      */
     public GraphTargetItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, int precedence) {
         this(dialect, src, lineStartItem, precedence, null);
@@ -321,9 +322,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public int getPos() {
         return pos;
     }
-    
+
     /**
      * Sets position
+     *
      * @param pos Position
      */
     public void setPos(int pos) {
@@ -494,15 +496,16 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
-    
+
     /**
-     * Append this to a writer, ignoring parenthesis (in CommaExpression and/or Parenthesis)
+     * Append this to a writer, ignoring parenthesis (in CommaExpression and/or
+     * Parenthesis)
      *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
      * @throws InterruptedException On interrupt
-     */    
+     */
     public GraphTextWriter appendNoParenthesis(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return appendTo(writer, localData);
     }
@@ -755,9 +758,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public boolean handlesNewLine() {
         return false;
     }
-    
+
     /**
      * Checks whether this item needs single newline before and after.
+     *
      * @return True if needs
      */
     public boolean hasSingleNewLineAround() {
@@ -1145,13 +1149,15 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
         return o1.equals(o2);
     }
-    
+
     /**
      * Checks set temporary at the end of output and expected dupSource, dup.
      * Then removes the last output command when neccessary.
+     *
      * @param stack Stack
      * @param output Output
-     * @param dupSource Expected DuplicateSourceItem, if not, the command won't do anything
+     * @param dupSource Expected DuplicateSourceItem, if not, the command won't
+     * do anything
      * @param dup Expected DuplicateItem, if not the command won't do anything
      */
     public static void checkDup(TranslateStack stack, List<GraphTargetItem> output, GraphTargetItem dupSource, GraphTargetItem dup) {
@@ -1160,7 +1166,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
         if (!(output.get(output.size() - 1) instanceof SetTemporaryItem)) {
             return;
-        }        
+        }
         dupSource = dupSource.getNotCoercedNoDup();
         if (!(dupSource instanceof DuplicateSourceItem)) {
             return;
@@ -1168,20 +1174,22 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         dup = dup.getNotCoercedNoDup();
         if (!(dup instanceof DuplicateItem)) {
             return;
-        }        
+        }
         DuplicateSourceItem ds = (DuplicateSourceItem) dupSource;
         DuplicateItem d = (DuplicateItem) dup;
         SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
         if (ds.tempIndex != d.tempIndex || d.tempIndex != st.tempIndex) {
             return;
         }
-           
-        output.remove(output.size() - 1); 
+
+        output.remove(output.size() - 1);
         stack.moveToStack(output);
     }
-    
+
     /**
-     * Checks whether items are result of dup instruction and removes SetTemportary from output when neccessary
+     * Checks whether items are result of dup instruction and removes
+     * SetTemportary from output when neccessary
+     *
      * @param item1
      * @param item2
      * @param output
@@ -1193,14 +1201,13 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             return -1;
         }
         if (!((item1 instanceof DuplicateSourceItem && item2 instanceof DuplicateItem)
-            || (item1 instanceof DuplicateItem && item2 instanceof DuplicateSourceItem))
-                ) {
+                || (item1 instanceof DuplicateItem && item2 instanceof DuplicateSourceItem))) {
             return -2;
         }
         if (((HasTempIndex) item1).getTempIndex() != ((HasTempIndex) item2).getTempIndex()) {
             return -2;
         }
-        
+
         if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
             SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
             if (st.getTempIndex() == ((HasTempIndex) item1).getTempIndex()) {
@@ -1208,7 +1215,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                 stack.moveToStack(output);
             }
         }
-        
+
         return ((HasTempIndex) item1).getTempIndex();
     }
 }

@@ -38,9 +38,10 @@ import java.util.Set;
 public class TemporaryItem extends GraphTargetItem implements SimpleValue, HasTempIndex {
 
     public int tempIndex;
+
     /**
      * Constructor.
-     * 
+     *
      * @param dialect Dialect
      * @param src Source
      * @param lineStartIns Line start item
@@ -131,7 +132,7 @@ public class TemporaryItem extends GraphTargetItem implements SimpleValue, HasTe
     public boolean hasSideEffect() {
         return value.hasSideEffect();
     }
-    
+
     @Override
     public int getTempIndex() {
         return tempIndex;
@@ -139,5 +140,5 @@ public class TemporaryItem extends GraphTargetItem implements SimpleValue, HasTe
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
-    }   
+    }
 }

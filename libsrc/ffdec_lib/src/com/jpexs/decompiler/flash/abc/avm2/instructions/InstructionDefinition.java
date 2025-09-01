@@ -523,7 +523,7 @@ public abstract class InstructionDefinition implements Serializable {
         Traits traits = null;
         if (obj instanceof NewActivationAVM2Item) {
             traits = localData.methodBody.traits;
-        } else if (obj instanceof ThisAVM2Item && localData.classIndex > -1) {            
+        } else if (obj instanceof ThisAVM2Item && localData.classIndex > -1) {
             traits = localData.abc.instance_info.get(localData.classIndex).instance_traits;
         } else if (obj instanceof ClassAVM2Item && localData.classIndex > -1) {
             traits = localData.abc.class_info.get(localData.classIndex).static_traits;
@@ -559,13 +559,12 @@ public abstract class InstructionDefinition implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public void handleSetProperty(boolean init, AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.allowSwap(output);        
+        stack.allowSwap(output);
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
-        
-        
+
         /*
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
@@ -678,16 +677,11 @@ public abstract class InstructionDefinition implements Serializable {
                     }
                 }                
             }*/
-        
-            
-
-        
-
         //TestIncDec5 no result AIR
         /*
          var _temp_5:* = a;
          _temp_5.attrib = _temp_5.attrib + 1;
-        */
+         */
         if (value instanceof IncrementAVM2Item
                 || value instanceof DecrementAVM2Item) {
             boolean isIncrement = value instanceof IncrementAVM2Item;
@@ -714,13 +708,13 @@ public abstract class InstructionDefinition implements Serializable {
                 }
             }
         }
-        
-         //TestIncDec6 no result AIR
+
+        //TestIncDec6 no result AIR
         //In air, this is *POST* inc/decrement
         /*
         var _temp_5:* = a;
          _temp_5.attrib = _temp_5.attrib + 1;
-        */
+         */
         if (value instanceof IncrementAVM2Item
                 || value instanceof DecrementAVM2Item) {
             boolean isIncrement = value instanceof IncrementAVM2Item;
@@ -749,19 +743,17 @@ public abstract class InstructionDefinition implements Serializable {
                 }
             }
         }
-        
-        
-                           
+
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;
             if (multiname.name instanceof LocalRegAVM2Item) {
                 nameLocalReg = (LocalRegAVM2Item) multiname.name;
-            }       
-                        
+            }
+
             if (obj instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
-            
+
                 //TestIncDec3 with result
                 /*
                 //var _temp_5:* = §§findproperty(trace);
@@ -771,7 +763,7 @@ public abstract class InstructionDefinition implements Serializable {
                 var _temp_4:* = _loc4_ = (_loc2_ = a)[_loc3_ = 2] + 1;
                 _loc2_[_loc3_] = _loc4_;
                 trace(_temp_4);
-                */
+                 */
                 if (!stack.isEmpty() && stack.peek() instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) stack.peek();
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -786,15 +778,15 @@ public abstract class InstructionDefinition implements Serializable {
                                     if (fm.name instanceof SetLocalAVM2Item) {
                                         SetLocalAVM2Item setLocName = (SetLocalAVM2Item) fm.name;
                                         if (valueLocalReg.regIndex == setLocValue.regIndex
-                                            && objLocalReg.regIndex == setLocObj.regIndex
-                                            && nameLocalReg.regIndex == setLocName.regIndex) {
+                                                && objLocalReg.regIndex == setLocObj.regIndex
+                                                && nameLocalReg.regIndex == setLocName.regIndex) {
                                             getProp.object = setLocObj.value;
                                             fm.name = setLocName.value;
                                             stack.pop();
                                             if (isIncrement) {
                                                 stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             } else {
-                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             }
                                             return;
                                         }
@@ -804,15 +796,14 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
+
                 //TestIncDec3 no result
                 /*
                 var _loc2_:* = a;
                 var _loc3_:int;
                 var _loc4_:* = _loc2_[_loc3_ = 2] + 1;
                 _loc2_[_loc3_] = _loc4_;
-                */
-                
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -827,15 +818,15 @@ public abstract class InstructionDefinition implements Serializable {
                                     if (fm.name instanceof SetLocalAVM2Item) {
                                         SetLocalAVM2Item setLocName = (SetLocalAVM2Item) fm.name;
                                         if (valueLocalReg.regIndex == setLocValue.regIndex
-                                            && objLocalReg.regIndex == setLocObj.regIndex
-                                            && nameLocalReg.regIndex == setLocName.regIndex) {
+                                                && objLocalReg.regIndex == setLocObj.regIndex
+                                                && nameLocalReg.regIndex == setLocName.regIndex) {
                                             getProp.object = setLocObj.value;
                                             fm.name = setLocName.value;
                                             output.remove(output.size() - 1);
                                             if (isIncrement) {
                                                 stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             } else {
-                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             }
                                             return;
                                         }
@@ -845,8 +836,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
-                
+
                 //TestIncDec4 with result
                 /*
                 var _temp_4:* = §§findproperty(trace);
@@ -856,7 +846,7 @@ public abstract class InstructionDefinition implements Serializable {
                 var _loc4_:* = _temp_3 + 1;
                 _loc2_[_loc3_] = _loc4_;
                 trace(_temp_3);
-                */
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -864,7 +854,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocValue.value instanceof IncrementAVM2Item;
                         if (setLocValue.value.value instanceof DuplicateItem) {
                             DuplicateItem d = (DuplicateItem) setLocValue.value.value;
-                            if (output.size() >= 2 
+                            if (output.size() >= 2
                                     && output.get(output.size() - 2) instanceof PushItem
                                     && output.get(output.size() - 2).value instanceof DuplicateSourceItem) {
                                 DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 2).value;
@@ -882,8 +872,8 @@ public abstract class InstructionDefinition implements Serializable {
                                                             if (fm.name instanceof SetLocalAVM2Item) {
                                                                 SetLocalAVM2Item setLocName = (SetLocalAVM2Item) fm.name;
                                                                 if (valueLocalReg.regIndex == setLocValue.regIndex
-                                                                    && objLocalReg.regIndex == setLocObj.regIndex
-                                                                    && nameLocalReg.regIndex == setLocName.regIndex) {
+                                                                        && objLocalReg.regIndex == setLocObj.regIndex
+                                                                        && nameLocalReg.regIndex == setLocName.regIndex) {
                                                                     getProp.object = setLocObj.value;
                                                                     fm.name = setLocName.value;
                                                                     output.remove(output.size() - 1);
@@ -893,7 +883,7 @@ public abstract class InstructionDefinition implements Serializable {
                                                                     if (isIncrement) {
                                                                         stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                     } else {
-                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                     }
                                                                     return;
                                                                 }
@@ -909,14 +899,14 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-               
+
                 //TestIncDec4 no result AIR
                 /*
                 var _loc2_:* = a;
                 var _loc3_:int;
                 var _loc4_:* = Number(_loc2_[_loc3_ = 2]) + 1;
                 _loc2_[_loc3_] = _loc4_;
-                */
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -932,8 +922,8 @@ public abstract class InstructionDefinition implements Serializable {
                                         if (fm.name instanceof SetLocalAVM2Item) {
                                             SetLocalAVM2Item setLocName = (SetLocalAVM2Item) fm.name;
                                             if (valueLocalReg.regIndex == setLocValue.regIndex
-                                                && objLocalReg.regIndex == setLocObj.regIndex
-                                                && nameLocalReg.regIndex == setLocName.regIndex) {
+                                                    && objLocalReg.regIndex == setLocObj.regIndex
+                                                    && nameLocalReg.regIndex == setLocName.regIndex) {
                                                 getProp.object = setLocObj.value;
                                                 fm.name = setLocName.value;
                                                 output.remove(output.size() - 1);
@@ -941,7 +931,7 @@ public abstract class InstructionDefinition implements Serializable {
                                                 if (isIncrement) {
                                                     stack.addToOutput(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                 } else {
-                                                    stack.addToOutput(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                    stack.addToOutput(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                 }
                                                 return;
                                             }
@@ -952,7 +942,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
+
                 //TestIncDec5 with result
                 /*
                 var _temp_4:* = §§findproperty(trace);
@@ -961,7 +951,7 @@ public abstract class InstructionDefinition implements Serializable {
                 var _temp_3:* = _loc3_ = (_loc2_ = a).attrib + 1;
                 _loc2_.attrib = _loc3_;
                 trace(_temp_3);
-                */
+                 */
                 if (!stack.isEmpty() && stack.peek() instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) stack.peek();
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -975,13 +965,13 @@ public abstract class InstructionDefinition implements Serializable {
                                     FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                                     if (fm.compareSame(multiname)) {
                                         if (valueLocalReg.regIndex == setLocValue.regIndex
-                                            && objLocalReg.regIndex == setLocObj.regIndex) {
+                                                && objLocalReg.regIndex == setLocObj.regIndex) {
                                             getProp.object = setLocObj.value;
                                             stack.pop();
                                             if (isIncrement) {
                                                 stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             } else {
-                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             }
                                             return;
                                         }
@@ -991,14 +981,13 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                 
-                
+
                 //TestIncDec5 no result
                 /*
                 var _loc2_:* = a;
                 var _loc3_:* = _loc2_.attrib + 1;
                 _loc2_.attrib = _loc3_;
-                */
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -1012,14 +1001,14 @@ public abstract class InstructionDefinition implements Serializable {
                                     FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                                     if (fm.compareSame(multiname)) {
                                         if (valueLocalReg.regIndex == setLocValue.regIndex
-                                            && objLocalReg.regIndex == setLocObj.regIndex) {
+                                                && objLocalReg.regIndex == setLocObj.regIndex) {
                                             getProp.object = setLocObj.value;
                                             output.remove(output.size() - 1);
                                             stack.moveToStack(output);
                                             if (isIncrement) {
                                                 stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             } else {
-                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                             }
                                             return;
                                         }
@@ -1029,8 +1018,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
-                
+
                 //TestIncDec6 with result
                 /*
                 var _temp_3:* = §§findproperty(trace);
@@ -1039,7 +1027,7 @@ public abstract class InstructionDefinition implements Serializable {
                 var _loc3_:* = _temp_2 + 1;
                 _loc2_.attrib = _loc3_;
                 trace(_temp_2);
-                */
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -1047,7 +1035,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocValue.value instanceof IncrementAVM2Item;
                         if (setLocValue.value.value instanceof DuplicateItem) {
                             DuplicateItem d = (DuplicateItem) setLocValue.value.value;
-                            if (output.size() >= 2 
+                            if (output.size() >= 2
                                     && output.get(output.size() - 2) instanceof PushItem
                                     && output.get(output.size() - 2).value instanceof DuplicateSourceItem) {
                                 DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 2).value;
@@ -1073,7 +1061,7 @@ public abstract class InstructionDefinition implements Serializable {
                                                                     if (isIncrement) {
                                                                         stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                     } else {
-                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                     }
                                                                     return;
                                                                 }
@@ -1089,7 +1077,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
+
                 //TestIncDec10 with result
                 /*
                 var _temp_3:* = §§findproperty(trace);
@@ -1098,7 +1086,7 @@ public abstract class InstructionDefinition implements Serializable {
                 var _loc2_:* = _temp_2 + 1;
                 _loc1_.attrib = _loc2_;
                 trace(_temp_2);
-                */
+                 */
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocValue = (SetLocalAVM2Item) output.get(output.size() - 1);
                     if (setLocValue.value instanceof IncrementAVM2Item
@@ -1106,7 +1094,7 @@ public abstract class InstructionDefinition implements Serializable {
                         boolean isIncrement = setLocValue.value instanceof IncrementAVM2Item;
                         if (setLocValue.value.value instanceof DuplicateItem) {
                             DuplicateItem d = (DuplicateItem) setLocValue.value.value;
-                            if (output.size() >= 2 
+                            if (output.size() >= 2
                                     && output.get(output.size() - 2) instanceof PushItem
                                     && output.get(output.size() - 2).value instanceof DuplicateSourceItem) {
                                 DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 2).value;
@@ -1131,13 +1119,13 @@ public abstract class InstructionDefinition implements Serializable {
                                                                 if (isIncrement) {
                                                                     stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                 } else {
-                                                                    stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));                                            
+                                                                    stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
                                                                 }
                                                                 return;
                                                             }
                                                         }
                                                     }
-                                                }                                                
+                                                }
                                             }
                                         }
                                     }
@@ -1146,9 +1134,7 @@ public abstract class InstructionDefinition implements Serializable {
                         }
                     }
                 }
-                
-                
-                
+
                 /*stack.moveToStack(output);
                 if (!stack.isEmpty()) {
                     GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
@@ -1176,7 +1162,7 @@ public abstract class InstructionDefinition implements Serializable {
          var _temp_1:* = attrib + 1;
          attrib = _temp_1;
          _temp_3(_temp_1);
-        */
+         */
         if (value instanceof DuplicateItem) {
             if (!stack.isEmpty() && stack.peek() instanceof DuplicateSourceItem) {
                 DuplicateItem d = (DuplicateItem) value;
@@ -1188,7 +1174,7 @@ public abstract class InstructionDefinition implements Serializable {
                             if (st.value instanceof IncrementAVM2Item
                                     || st.value instanceof DecrementAVM2Item) {
                                 boolean isIncrement = st.value instanceof IncrementAVM2Item;
-                                
+
                                 boolean ok = false;
                                 //assembled.TestIncrement2
                                 if (st.value.value instanceof GetLexAVM2Item) {
@@ -1222,28 +1208,28 @@ public abstract class InstructionDefinition implements Serializable {
                 }
             }
         }
-        
+
         //TestIncDec9 no result AIR
         //attrib = attrib + 1;
         if (value instanceof IncrementAVM2Item
-           || value instanceof DecrementAVM2Item) {
-           boolean isIncrement = value instanceof IncrementAVM2Item; 
-           if (value.value instanceof GetPropertyAVM2Item) {
-               GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value;
-               if (getProp.propertyName instanceof FullMultinameAVM2Item) {
-                   FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                   if (fm.compareSame(multiname)) {
+                || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item;
+            if (value.value instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value;
+                if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                    FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
+                    if (fm.compareSame(multiname)) {
                         if (isIncrement) {
                             stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
                         } else {
                             stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
                         }
                         return;
-                   }
-               }
-           }
+                    }
+                }
+            }
         }
-        
+
         //TestInc10 with result AIR
         /*
          //var _temp_4:* = trace;
@@ -1251,15 +1237,15 @@ public abstract class InstructionDefinition implements Serializable {
          var _temp_1:* = attrib;
          attrib = _temp_1 + 1;
          _temp_4(_temp_1);
-        */
+         */
         if (value instanceof IncrementAVM2Item
-           || value instanceof DecrementAVM2Item) {
-            boolean isIncrement = value instanceof IncrementAVM2Item; 
+                || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item;
             if (value.value instanceof DuplicateItem) {
                 DuplicateItem d = (DuplicateItem) value.value;
                 if (!output.isEmpty() && output.get(output.size() - 1) instanceof PushItem
-                        && output.get(output.size() - 1) .value instanceof DuplicateSourceItem) {
-                    DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 1) .value ;
+                        && output.get(output.size() - 1).value instanceof DuplicateSourceItem) {
+                    DuplicateSourceItem ds = (DuplicateSourceItem) output.get(output.size() - 1).value;
                     if (d.tempIndex == ds.tempIndex) {
                         if (output.size() >= 2 && output.get(output.size() - 2) instanceof SetTemporaryItem) {
                             SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 2);
@@ -1281,7 +1267,7 @@ public abstract class InstructionDefinition implements Serializable {
                                             }
                                         }
                                     }
-                                    
+
                                     if (ok) {
                                         output.remove(output.size() - 1);
                                         output.remove(output.size() - 1);
@@ -1297,33 +1283,33 @@ public abstract class InstructionDefinition implements Serializable {
                             }
                         }
                     }
-                }            
+                }
             }
         }
-        
+
         //TestInc10 no result AIR
         //attrib = attrib + 1;
         if (value instanceof IncrementAVM2Item
-           || value instanceof DecrementAVM2Item) {
-            boolean isIncrement = value instanceof IncrementAVM2Item; 
+                || value instanceof DecrementAVM2Item) {
+            boolean isIncrement = value instanceof IncrementAVM2Item;
             if (value.value instanceof ConvertAVM2Item) {
                 if (value.value.value instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.value;
                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
-                        if (fm.compareSame(multiname)) {                            
-                             if (isIncrement) {
-                                 stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
-                             } else {
-                                 stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
-                             }
-                             return;
+                        if (fm.compareSame(multiname)) {
+                            if (isIncrement) {
+                                stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                            } else {
+                                stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                            }
+                            return;
                         }
                     }
-                }                
+                }
             }
         }
-        
+
         if (multiname.name instanceof CommaExpressionItem) {
             CommaExpressionItem ce = (CommaExpressionItem) multiname.name;
             if (ce.commands.size() == 2) {
@@ -1333,16 +1319,16 @@ public abstract class InstructionDefinition implements Serializable {
                     if (setLocal.regIndex == localReg.regIndex) {
                         GraphSourceItem src = setLocal.getSrc();
                         if (src != null) {
-                            if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {                                
+                            if (localData.getSetLocalUsages(localData.code.adr2pos(src.getAddress())).size() == 1) {
                                 multiname.name = setLocal.value;
                             }
-                        }                    
+                        }
                     }
                 }
             }
-        }        
-        
-        if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {           
+        }
+
+        if (obj.getThroughDuplicate() instanceof ConstructAVM2Item) {
             ConstructAVM2Item c = (ConstructAVM2Item) obj.getThroughDuplicate();
             if (c.object instanceof ApplyTypeAVM2Item) {
                 ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) c.object;
@@ -1351,7 +1337,7 @@ public abstract class InstructionDefinition implements Serializable {
                 vals.add(value);
                 c.object = new InitVectorAVM2Item(c.getInstruction(), c.getLineStartIns(), at.params.get(0), vals);
                 if (obj instanceof DuplicateItem) {
-                    if (!stack.isEmpty() 
+                    if (!stack.isEmpty()
                             && stack.peek() instanceof DuplicateSourceItem
                             && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
                         if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
@@ -1363,14 +1349,14 @@ public abstract class InstructionDefinition implements Serializable {
                             }
                         }
                         stack.push(stack.pop().value);
-                    }                    
+                    }
                 }
                 return;
             } else if (c.object instanceof InitVectorAVM2Item) {
                 InitVectorAVM2Item iv = (InitVectorAVM2Item) c.object;
                 iv.arguments.add(value);
                 if (obj instanceof DuplicateItem) {
-                    if (!stack.isEmpty() 
+                    if (!stack.isEmpty()
                             && stack.peek() instanceof DuplicateSourceItem
                             && stack.peek().getThroughDuplicate() == obj.getThroughDuplicate()) {
                         if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
@@ -1381,19 +1367,18 @@ public abstract class InstructionDefinition implements Serializable {
                             }
                         }
                         stack.push(stack.pop().value);
-                    }                    
+                    }
                 }
                 return;
             }
-        }      
-        
+        }
+
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
 
         //obj = obj.getThroughDuplicate();
-        
         SetTypeAVM2Item result;
         if (init) {
             result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
