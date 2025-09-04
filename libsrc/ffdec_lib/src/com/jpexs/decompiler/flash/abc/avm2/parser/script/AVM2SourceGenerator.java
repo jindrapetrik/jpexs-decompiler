@@ -2909,34 +2909,33 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.add(forwardJump);
 
         int defIndex = item.caseValues.size();
+        boolean hasDefault = false;
 
         for (int i = item.caseValues.size() - 1; i >= 0; i--) {
             if (item.caseValues.get(i) instanceof DefaultItem) {
+                hasDefault = true;
                 defIndex = i;
                 break;
             }
         }
+        
+        int realCasesCount = item.caseValues.size() + (hasDefault ? -1 : 0);
 
         List<AVM2Instruction> cases = new ArrayList<>();
-        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, defIndex).toSource(localData, this)));
-        int cLen = insToBytes(cases).length;
-        List<AVM2Instruction> caseLast = new ArrayList<>();
-        caseLast.add(0, ins(AVM2Instructions.Jump, cLen));
-        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, defIndex).toSource(localData, this)));
-        int cLastLen = insToBytes(caseLast).length;
-        caseLast.add(0, ins(AVM2Instructions.Jump, cLastLen));
-        cases.addAll(0, caseLast);
+        cases.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, -1).toSource(localData, this)));               
 
         List<AVM2Instruction> preCases = new ArrayList<>();
         preCases.addAll(toInsList(item.switchedObject.toSource(localData, this)));
         preCases.addAll(toInsList(AssignableAVM2Item.setTemp(localData, this, switchedReg)));
 
+        
+        int pos =  realCasesCount - 1;
         for (int i = item.caseValues.size() - 1; i >= 0; i--) {
             if (item.caseValues.get(i) instanceof DefaultItem) {
                 continue;
-            }
+            }            
             List<AVM2Instruction> sub = new ArrayList<>();
-            sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, i).toSource(localData, this)));
+            sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, pos--).toSource(localData, this)));
             sub.add(ins(AVM2Instructions.Jump, insToBytes(cases).length));
             int subLen = insToBytes(sub).length;
 
@@ -2946,8 +2945,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
             cases.addAll(0, toInsList(item.caseValues.get(i).toSource(localData, this)));
         }
         cases.addAll(0, preCases);
+        
+        
 
-        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[1 + 1 + item.caseValues.size() + 1]);
+        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[1 + 1 + realCasesCount]);
         cases.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(switchedReg))));
         List<AVM2Instruction> bodies = new ArrayList<>();
         List<Integer> bodiesOffsets = new ArrayList<>();
@@ -2956,18 +2957,25 @@ public class AVM2SourceGenerator implements SourceGenerator {
         bodies.add(0, ins(AVM2Instructions.Label));
         bodies.add(ins(new BreakJumpIns(item.loop.id), 0));  //There could be two breaks when default clause ends with break, but official compiler does this too, so who cares...
         defOffset = -(insToBytes(bodies).length + casesLen);
-        for (int i = item.caseCommands.size() - 1; i >= 0; i--) {
+        for (int i = item.caseCommands.size() - 1; i >= 0; i--) {            
             bodies.addAll(0, generateToInsList(localData, item.caseCommands.get(i)));
             bodies.add(0, ins(AVM2Instructions.Label));
             bodiesOffsets.add(0, -(insToBytes(bodies).length + casesLen));
         }
-        lookupOp.operands[0] = defOffset;
-        lookupOp.operands[1] = item.valuesMapping.size();
-        // as per avm2 spec: "There are case_count+1 case offsets"
-        for (int i = 0; i < item.valuesMapping.size(); i++) {
-            lookupOp.operands[2 + i] = bodiesOffsets.get(item.valuesMapping.get(i));
+        if (hasDefault) {
+            defOffset = bodiesOffsets.get(item.valuesMapping.get(defIndex));
         }
-        lookupOp.operands[2 + item.valuesMapping.size()] = defOffset;
+        lookupOp.operands[0] = defOffset;
+        lookupOp.operands[1] = realCasesCount - 1;
+        // as per avm2 spec: "There are case_count+1 case offsets"
+        pos = 0;
+        for (int i = 0; i < item.valuesMapping.size(); i++) {
+            if (item.caseValues.get(i) instanceof DefaultItem) {
+                continue;
+            } 
+            lookupOp.operands[2 + pos++] = bodiesOffsets.get(item.valuesMapping.get(i));
+        }
+        //lookupOp.operands[2 + item.valuesMapping.size()] = defOffset;
 
         forwardJump.operands[0] = insToBytes(bodies).length;
         ret.addAll(bodies);

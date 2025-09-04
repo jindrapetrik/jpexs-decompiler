@@ -3753,10 +3753,13 @@ public class Graph {
 
                     GraphPart defaultPart = hasExpr ? getNextParts(localData, part).get(1 + defaultBranch) : getNextParts(localData, part).get(0);
                     List<GraphPart> caseBodyParts = new ArrayList<>();
+                    List<GraphTargetItem> additionalDefaultValues = new ArrayList<>();
+                    int additionalDefaultPosition = -1;
                     for (int i = 1; i < getNextParts(localData, part).size(); i++) {
                         if (!hasExpr) {
-                            //This if probably should be removed, but it fails some tests...
                             if (getNextParts(localData, part).get(i) == defaultPart) {
+                                additionalDefaultPosition = caseValues.size();
+                                additionalDefaultValues.add(new IntegerValueItem(dialect, null, localData.lineStartInstruction, pos));
                                 pos++;
                                 continue;
                             }
@@ -3781,6 +3784,8 @@ public class Graph {
                     makeAllCommands(currentRet, stack);
                     SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path,
                             caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
+                    sw.additionalDefaultPosition = additionalDefaultPosition;
+                    sw.additionalDefaultValues = additionalDefaultValues;
                     GraphPart next = nextRef.getVal();
                     checkSwitch(localData, sw, caseExpressionOtherSides.values(), currentRet);
                     currentRet.add(sw);
