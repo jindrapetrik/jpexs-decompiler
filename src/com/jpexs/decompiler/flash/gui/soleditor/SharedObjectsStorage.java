@@ -25,6 +25,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class SharedObjectsStorage {
 
     public static Map<WatchKey, File> watchedCookieDirectories = new HashMap<>();
 
-    private static Map<File, List<CookiesChangedListener>> swfFileToListeners = new LinkedHashMap<>();
+    private static Map<File, List<CookiesChangedListener>> swfFileToListeners = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public static void addChangedListener(File file, CookiesChangedListener listener) {
         if (!swfFileToListeners.containsKey(file)) {

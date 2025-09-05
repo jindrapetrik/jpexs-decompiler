@@ -991,7 +991,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
             con.addMessageListener(new DebugMessageListener<InTrace>() {
                 @Override
-                public void message(InTrace tr) {
+                public synchronized void message(InTrace tr) {
                     for (TraceListener l : traceListeners) {
                         l.trace(tr.text);
                     }
