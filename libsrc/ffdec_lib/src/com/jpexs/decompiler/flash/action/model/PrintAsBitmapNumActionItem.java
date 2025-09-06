@@ -100,6 +100,13 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
         } else {
             lev = new StringAddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num);
         }
+        
+        if (boundingBox instanceof DirectValueActionItem) {
+            DirectValueActionItem directValue = ((DirectValueActionItem) boundingBox);
+            if (directValue.isString() && "bmovie".equals(directValue.getAsString())) {
+                return toSourceMerge(localData, generator, asGenerator.pushConstTargetItem("printasbitmap:"), lev, new ActionGetURL2(0, false, false, charset), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset) : null);
+            }
+        }
         return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), lev, new ActionGetURL2(0, false, false, charset), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset) : null);
     }
 

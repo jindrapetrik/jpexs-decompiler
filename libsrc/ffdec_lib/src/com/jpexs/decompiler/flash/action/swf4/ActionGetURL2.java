@@ -258,6 +258,12 @@ public class ActionGetURL2 extends Action {
                 } else if (urlStr.startsWith(fscommandPrefix)) {
                     urlString = new DirectValueActionItem(urlStr.substring(fscommandPrefix.length()));
                     doFSCommand = true;
+                } else if (urlStr.equals("print:")) {
+                    printType = new DirectValueActionItem("bmovie");
+                    doPrint = true;
+                } else if (urlStr.equals("printasbitmap:")) {
+                    printType = new DirectValueActionItem("bmovie");
+                    doPrintAsBitmap = true;
                 }
             } else if (urlString instanceof StringAddActionItem) {
                 StringAddActionItem sa = (StringAddActionItem) urlString;
@@ -289,8 +295,7 @@ public class ActionGetURL2 extends Action {
                 if (doUnload) {
                     output.add(new UnLoadMovieNumActionItem(this, lineStartAction, num));
                 } else if (doPrint) {
-                    output.add(new PrintNumActionItem(this, lineStartAction, num,
-                            printType));
+                    output.add(new PrintNumActionItem(this, lineStartAction, num, printType));
                 } else if (doPrintAsBitmap) {
                     output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, num, printType));
                 } else {

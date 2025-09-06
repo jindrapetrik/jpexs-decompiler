@@ -99,6 +99,8 @@ All notable changes to this project will be documented in this file.
 - [#2525] AMF editor (like in Sol cookie editor) - saving empty standard array `[]`
 - AS3 - names with custom namespaces not being deobfuscated
 - AS Debugger - order of trace commands
+- AS1/2 print/printNum/printAsBitmap/printAsBitmapNum not correctly
+  handling bmovie boundingBox parameter
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
