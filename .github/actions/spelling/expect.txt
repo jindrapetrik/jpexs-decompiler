@@ -55,6 +55,7 @@ actioncontainers
 Actionlist
 ACTIONRECORD
 actionscript
+actionscriptdoc
 actionscriptsyntaxkit
 activex
 adata
@@ -71,6 +72,7 @@ addtrait
 Adelta
 adl
 adobehomepage
+ADOC
 adpcm
 ADPCME
 adr
@@ -78,6 +80,7 @@ advancedsettings
 Advapi
 aeiouy
 AEnd
+aev
 aex
 AFile
 aforinif
@@ -87,6 +90,7 @@ agentpath
 ags
 Aguilera
 ahoj
+aip
 airglobal
 airpath
 ajmp
@@ -125,6 +129,7 @@ antfile
 antialiasing
 anticlock
 antlib
+antlr
 anttask
 antversion
 anzeigen
@@ -158,6 +163,7 @@ asciitochar
 asclass
 asconfig
 asdec
+asdoc
 ASender
 ASF
 asinterface
@@ -185,7 +191,6 @@ ATTRIBUTENAME
 ATTRIBUTEVALUE
 ATTRNAMEVAR
 ATTRVALVAR
-attrx
 atype
 audiocodecid
 AUDIODATA
@@ -566,6 +571,7 @@ colorizing
 COLORKEY
 COLORMAPDATA
 colormapped
+colormatrix
 COLORMATRIXFILTER
 colorschemes
 colortransform
@@ -592,6 +598,7 @@ COMPUTERNAME
 COMQC
 comtext
 condnode
+configfile
 CONSOLIDATIONFAILED
 constantindices
 constantpool
@@ -674,6 +681,7 @@ CYICON
 dacl
 danielreese
 darkcornersoftware
+darkmodeawaresyntaxkit
 dashmatch
 Dasm
 datamodified
@@ -753,9 +761,11 @@ deo
 deobf
 deobfuscatenew
 deobfuscateold
-deobfuscateoptions
 deobfuscatepop
 deobfuscating
+deobfuscations
+deobufscation
+deobuscations
 depcache
 Depnd
 depthstate
@@ -885,8 +895,6 @@ drun
 DSAs
 DSAT
 dsd
-dsde
-dse
 dsf
 dsh
 DSPGROUP
@@ -909,6 +917,7 @@ dumpsplit
 dumpswf
 dumpview
 DUPLICATEMOVIECLIP
+dupsrc
 dval
 DVD
 dvf
@@ -917,7 +926,8 @@ dvp
 dvt
 DVTARGETDEVICE
 DWL
-DWM
+dwm
+dwmapi
 DWOR
 dwordlong
 dxat
@@ -1045,6 +1055,7 @@ exportidea
 exportjava
 exportname
 exportsel
+exportsubsprites
 exporttimeout
 exportvscode
 exportxml
@@ -1231,6 +1242,7 @@ fpt
 fqn
 fractpart
 frameadd
+FRAMECHANGED
 framecnt
 framecount
 framedata
@@ -1268,14 +1280,12 @@ ftimeline
 Ftm
 ftn
 ftrait
-fue
 fuer
 FULLAND
 fulldf
 FULLOR
 FULLTEXT
 functionitem
-funname
 fval
 fvalues
 FVE
@@ -1318,7 +1328,6 @@ GETTIMER
 gettinghilights
 gettingvariables
 gettoset
-getu
 getvariable
 gfill
 gfx
@@ -1358,7 +1367,9 @@ gotomainclass
 GOVERNSID
 gpt
 gpu
+gradientbevel
 GRADIENTBEVELFILTER
+gradientglow
 GRADIENTGLOWFILTER
 GRADIENTIMAGE
 gradrecord
@@ -1380,6 +1391,8 @@ gta
 gti
 gts
 GTX
+guidemovex
+guidemovey
 GUITHREADINFO
 gvt
 GWL
@@ -1476,14 +1489,25 @@ hshift
 hsize
 hsstell
 htab
+HTBOTTOM
+HTBOTTOMLEFT
+HTBOTTOMRIGHT
+HTCAPTION
+HTCLIENT
 htext
+HTLEFT
+HTMAXBUTTON
 HTN
+HTRIGHT
+HTTOP
+HTTOPLEFT
+HTTOPRIGHT
 htw
 huffcodetab
 huffcodtable
 huffmann
-Hutter
 huu
+HWCHECK
 hwnd
 HWNDFIRST
 HWNDLAST
@@ -1756,6 +1780,7 @@ jindent
 jindr
 jindra
 jindrapetrik
+jip
 jitpack
 jla
 jlap
@@ -1860,6 +1885,7 @@ LANGCODE
 LANGDLL
 LANGLOAD
 LANGNAME
+laplacian
 lastc
 lastcols
 lastframe
@@ -1872,6 +1898,7 @@ lbl
 Lbr
 LBUTTON
 LBUTTONDOWN
+LBUTTONUP
 Lby
 lcanvas
 lcid
@@ -1921,6 +1948,7 @@ linestart
 linestyle
 LINESTYLEARRAY
 linetokenizer
+linkbreak
 linkreport
 linmax
 listconfigs
@@ -2135,6 +2163,7 @@ mdm
 MEDIASERVER
 MEDIASPACE
 MEDIAVISION
+medkit
 membername
 membuf
 memorysearch
@@ -2214,6 +2243,7 @@ MORPHLINESTYLE
 MORPHLINESTYLEARRAY
 morphshape
 mostcommon
+MOUSEHOVER
 MOUSEINPUT
 MOVEFILE
 MOVETODEPS
@@ -2298,6 +2328,7 @@ nai
 namespacekind
 namespaceset
 NAMESPACESUFFIX
+Nanko
 Naohide
 napr
 Nathaan
@@ -2317,8 +2348,15 @@ NBSTAT
 NBTSTAT
 Nbytes
 ncanvas
+NCCALCSIZE
 NCCREATE
 NCDESTROY
+NCHITTEST
+NCLBUTTONDOWN
+NCLBUTTONUP
+NCMOUSEHOVER
+NCMOUSELEAVE
+NCMOUSEMOVE
 NCPAINT
 NCs
 nctx
@@ -2387,7 +2425,6 @@ newversionavailable
 nex
 nextbody
 nextframe
-nextip
 nextname
 nextpart
 nexts
@@ -2400,7 +2437,6 @@ nga
 nic
 Nickals
 nidx
-nightlybuild
 nimport
 nins
 nio
@@ -2417,6 +2453,7 @@ noagent
 nobak
 nobj
 nobundle
+noc
 noch
 nocharacter
 nocheck
@@ -2432,6 +2469,7 @@ nohup
 NOINTERFACE
 NOINTERNALPAINT
 nojump
+NOMOVE
 noname
 nonbreak
 nonchild
@@ -2466,6 +2504,7 @@ noscale
 noselect
 noselection
 noserializer
+NOSIZE
 nospaces
 NOSUBSCRIBERS
 nosys
@@ -2514,6 +2553,7 @@ nssa
 nsset
 nswf
 NTczkc
+ntdll
 NTDS
 NTE
 nthe
@@ -2674,6 +2714,7 @@ PChar
 pcinit
 pcnt
 pcode
+PCodec
 pcodehex
 pcr
 pctzoom
@@ -2715,6 +2756,7 @@ plattform
 Playercontrols
 playerglobal
 playerpath
+playflash
 pleasewait
 plii
 PLUSEQ
@@ -2924,6 +2966,7 @@ removefromcontextmenu
 removeinstancemetadata
 REMOVEMOVIECLIP
 removemultiple
+removeobject
 removesprite
 removetrait
 removetraps
@@ -2934,6 +2977,7 @@ renameinvalididentifiers
 renice
 reparray
 reparse
+reparsing
 REPEATBLOCK
 replacealpha
 replacecharacter
@@ -3085,6 +3129,7 @@ scenebias
 sceneframe
 scfsi
 SChannel
+Scharr
 Scheerer
 Schroeter
 scm
@@ -3094,7 +3139,6 @@ Scopeand
 SCOPECHAIN
 scopepos
 scopestack
-screenloc
 screenshots
 scriptadd
 SCRIPTDATA
@@ -3135,6 +3179,7 @@ secondp
 secpol
 segw
 Seite
+selectall
 selectas
 selectbkcolor
 selectclass
@@ -3228,6 +3273,7 @@ sideeffect
 sidex
 sids
 SIF
+simpleparser
 SIMPLEREGION
 SINGLEQUOTED
 singlescript
@@ -3244,6 +3290,9 @@ slashesh
 Slispinner
 slist
 slocate
+slota
+slotb
+slotc
 slotconst
 slotconsttrait
 slotid
@@ -3352,6 +3401,7 @@ standalonenight
 startdrag
 STARTF
 STARTFINISHTAG
+startframe
 STARTMENU
 STARTMENUPAGE
 startpos
@@ -3378,6 +3428,7 @@ stopclassname
 STOPDRAG
 stopparts
 stopsounds
+storeconfigfile
 storepass
 storeregister
 storetype
@@ -3408,6 +3459,7 @@ subclassof
 subcnt
 subdata
 subdiv
+subframes
 subkeys
 sublimiter
 subloader
@@ -3443,6 +3495,7 @@ SWFNAME
 swfpreview
 swfs
 swftext
+swftextsyntaxkit
 swftools
 swfver
 swi
@@ -3538,7 +3591,7 @@ textfields
 textfile
 textindent
 textplain
-TEXTRECORD
+textrecord
 textsfolder
 textsformatted
 textsplain
@@ -3560,6 +3613,7 @@ thel
 thepic
 thepicture
 thes
+THICKFRAME
 thirdp
 THIRTYTWO
 thn
@@ -3596,12 +3650,14 @@ TObject
 tocolor
 todd
 todir
+todos
 TOGGLEHIGHQUALITY
 TOGGLEMENUITEM
 togglequality
 tokenfilter
 TOKENTYPES
 tolocal
+tomlj
 Toolhelp
 TOOLWINDOW
 TOOMANY
@@ -3872,6 +3928,8 @@ vom
 vot
 voxware
 VQLPC
+vret
+vsa
 vsb
 VScale
 vstr
@@ -3955,7 +4013,6 @@ XBefore
 XButton
 xcenter
 xcontent
-XControl
 xcopy
 XCount
 XCursor
@@ -3965,7 +4022,6 @@ xelem
 XEnd
 XENROLL
 XEvent
-XException
 xfl
 XFloat
 Xfm
@@ -3976,6 +4032,7 @@ xing
 XInstance
 XInteger
 XIntercept
+XInternal
 xlen
 xlist
 xlr
@@ -4013,9 +4070,12 @@ xpathsyntaxkit
 XPels
 XPoint
 xpos
+XPrewitt
 xrefs
 xscale
+XScharr
 xsi
+XSobel
 XSpring
 xstate
 xtaga
@@ -4060,8 +4120,11 @@ Yoyodyne
 YPels
 YPoint
 ypos
+YPrewitt
 YRef
 yscale
+YScharr
+YSobel
 YSpring
 YText
 YUV
@@ -4095,7 +4158,6 @@ ZONERECORD
 zoomable
 zoomfit
 zoomin
-zoomint
 zoomnone
 zoomout
 zos
