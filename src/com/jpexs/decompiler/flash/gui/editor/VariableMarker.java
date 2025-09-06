@@ -146,20 +146,20 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
     private KeyEventPostProcessor kevEventPostProcessor;
 
-    private Set<Integer> occurencesPositions = new HashSet<>();
+    private Set<Integer> occurrencesPositions = new HashSet<>();
 
     private Color basicUnderlineColor = new Color(0, 0, 255);
     private Color otherScriptUnderlineColor = new Color(0, 255, 0);
     private Color otherFileUnderlineColor = new Color(255, 0, 255);
 
     private UnderlinePainter underLinePainter = new UnderlinePainter(basicUnderlineColor, null);
-    private UnderlinePainter underLineMarkOccurencesPainter = new UnderlinePainter(basicUnderlineColor, DEFAULT_COLOR);
+    private UnderlinePainter underLineMarkOccurrencesPainter = new UnderlinePainter(basicUnderlineColor, DEFAULT_COLOR);
 
     private UnderlinePainter underLineOtherScriptPainter = new UnderlinePainter(otherScriptUnderlineColor, null);
-    private UnderlinePainter underLineOtherScriptMarkOccurencesPainter = new UnderlinePainter(otherScriptUnderlineColor, DEFAULT_COLOR);
+    private UnderlinePainter underLineOtherScriptMarkOccurrencesPainter = new UnderlinePainter(otherScriptUnderlineColor, DEFAULT_COLOR);
 
     private UnderlinePainter underLineOtherFilePainter = new UnderlinePainter(otherFileUnderlineColor, null);
-    private UnderlinePainter underLineOtherFileMarkOccurencesPainter = new UnderlinePainter(otherFileUnderlineColor, DEFAULT_COLOR);
+    private UnderlinePainter underLineOtherFileMarkOccurrencesPainter = new UnderlinePainter(otherFileUnderlineColor, DEFAULT_COLOR);
 
     private Token lastUnderlined;
     private LinkType lastUnderlinedLinkType = LinkType.NO_LINK;
@@ -278,12 +278,12 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     public void removeMarkers() {
         Markers.removeMarkers(pane, marker);
         Markers.removeMarkers(pane, underLinePainter);
-        Markers.removeMarkers(pane, underLineMarkOccurencesPainter);
+        Markers.removeMarkers(pane, underLineMarkOccurrencesPainter);
         Markers.removeMarkers(pane, underLineOtherScriptPainter);
-        Markers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+        Markers.removeMarkers(pane, underLineOtherScriptMarkOccurrencesPainter);
         Markers.removeMarkers(pane, underLineOtherFilePainter);
-        Markers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
-        occurencesPositions.clear();
+        Markers.removeMarkers(pane, underLineOtherFileMarkOccurrencesPainter);
+        occurrencesPositions.clear();
     }
 
     public void removeErrorMarkers() {
@@ -387,15 +387,15 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         Markers.SimpleMarker markerKind = marker;
                         if (lastUnderlined == referenceToken) {
                             if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                                markerKind = underLineOtherScriptMarkOccurencesPainter;
+                                markerKind = underLineOtherScriptMarkOccurrencesPainter;
                             } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
-                                markerKind = underLineOtherFileMarkOccurencesPainter;
+                                markerKind = underLineOtherFileMarkOccurrencesPainter;
                             } else {
-                                markerKind = underLineMarkOccurencesPainter;
+                                markerKind = underLineMarkOccurrencesPainter;
                             }
                         }
                         Markers.markToken(pane, referenceToken, markerKind);
-                        occurencesPositions.add(referenceToken.start);
+                        occurrencesPositions.add(referenceToken.start);
                     }
                 }
                 sDoc.readUnlock();
@@ -412,15 +412,15 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                             Markers.SimpleMarker markerKind = marker;
                             if (lastUnderlined == referenceToken) {
                                 if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                                    markerKind = underLineOtherScriptMarkOccurencesPainter;
+                                    markerKind = underLineOtherScriptMarkOccurrencesPainter;
                                 } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
-                                    markerKind = underLineOtherFileMarkOccurencesPainter;
+                                    markerKind = underLineOtherFileMarkOccurrencesPainter;
                                 } else {
-                                    markerKind = underLineMarkOccurencesPainter;
+                                    markerKind = underLineMarkOccurrencesPainter;
                                 }
                             }
                             Markers.markToken(pane, referenceToken, markerKind);
-                            occurencesPositions.add(referenceToken.start);
+                            occurrencesPositions.add(referenceToken.start);
                         }
                     }
                 }
@@ -433,17 +433,17 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 Markers.SimpleMarker markerKind = marker;
                 if (lastUnderlined == definitionToken) {
                     if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                        markerKind = underLineOtherScriptMarkOccurencesPainter;
+                        markerKind = underLineOtherScriptMarkOccurrencesPainter;
                     } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
-                        markerKind = underLineOtherFileMarkOccurencesPainter;
+                        markerKind = underLineOtherFileMarkOccurrencesPainter;
                     } else {
-                        markerKind = underLineMarkOccurencesPainter;
+                        markerKind = underLineMarkOccurrencesPainter;
                     }
                 }
                 if (tokenTypes.contains(definitionToken.type)) {
                     Markers.markToken(pane, definitionToken, markerKind);
                 }
-                occurencesPositions.add(definitionToken.start);
+                occurrencesPositions.add(definitionToken.start);
                 for (int i : definitionPosToReferences.get(definitionPos)) {
                     if (separatorPosToType.containsKey(i)) {
                         continue;
@@ -453,15 +453,15 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                         markerKind = marker;
                         if (lastUnderlined == referenceToken) {
                             if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                                markerKind = underLineOtherScriptMarkOccurencesPainter;
+                                markerKind = underLineOtherScriptMarkOccurrencesPainter;
                             } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
-                                markerKind = underLineOtherFileMarkOccurencesPainter;
+                                markerKind = underLineOtherFileMarkOccurrencesPainter;
                             } else {
-                                markerKind = underLineMarkOccurencesPainter;
+                                markerKind = underLineMarkOccurrencesPainter;
                             }
                         }
                         Markers.markToken(pane, referenceToken, markerKind);
-                        occurencesPositions.add(referenceToken.start);
+                        occurrencesPositions.add(referenceToken.start);
                     }
                 }
             }
@@ -820,11 +820,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 if (t != lastUnderlined) {
                     if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
                         MyMarkers.removeMarkers(pane, underLinePainter);
-                        MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+                        MyMarkers.removeMarkers(pane, underLineMarkOccurrencesPainter);
                         MyMarkers.removeMarkers(pane, underLineOtherScriptPainter);
-                        MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+                        MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurrencesPainter);
                         MyMarkers.removeMarkers(pane, underLineOtherFilePainter);
-                        MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
+                        MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurrencesPainter);
 
                         lastUnderlinedLinkType = t == null ? LinkType.NO_LINK : getLinkType(t);
                         if (t != null && lastUnderlinedLinkType != LinkType.NO_LINK) {
@@ -844,13 +844,13 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
 
                 if (lastUnderlined != null) {
                     Highlighter.HighlightPainter painter = underLinePainter;
-                    if (occurencesPositions.contains(lastUnderlined.start)) {
+                    if (occurrencesPositions.contains(lastUnderlined.start)) {
                         if (lastUnderlinedLinkType == LinkType.LINK_OTHER_SCRIPT) {
-                            painter = underLineOtherScriptMarkOccurencesPainter;
+                            painter = underLineOtherScriptMarkOccurrencesPainter;
                         } else if (lastUnderlinedLinkType == LinkType.LINK_OTHER_FILE) {
-                            painter = underLineOtherFileMarkOccurencesPainter;
+                            painter = underLineOtherFileMarkOccurrencesPainter;
                         } else {
-                            painter = underLineMarkOccurencesPainter;
+                            painter = underLineMarkOccurrencesPainter;
                         }
                         removeMarkers();
                         markTokenAt(pane.getCaretPosition());
@@ -870,11 +870,11 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
                 if (lastUnderlined != null) {
                     lastUnderlined = null;
                     MyMarkers.removeMarkers(pane, underLinePainter);
-                    MyMarkers.removeMarkers(pane, underLineMarkOccurencesPainter);
+                    MyMarkers.removeMarkers(pane, underLineMarkOccurrencesPainter);
                     MyMarkers.removeMarkers(pane, underLineOtherScriptPainter);
-                    MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurencesPainter);
+                    MyMarkers.removeMarkers(pane, underLineOtherScriptMarkOccurrencesPainter);
                     MyMarkers.removeMarkers(pane, underLineOtherFilePainter);
-                    MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurencesPainter);
+                    MyMarkers.removeMarkers(pane, underLineOtherFileMarkOccurrencesPainter);
 
                     removeMarkers();
                     markTokenAt(pane.getCaretPosition());

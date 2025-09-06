@@ -227,7 +227,7 @@ public class Timeline {
 
     static {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        svgPathDecimalFormat = new DecimalFormat("0.##", symbols); // max 3 desetinná místa, žádné zbytečné nuly
+        svgPathDecimalFormat = new DecimalFormat("0.##", symbols); // max 3 decimal places, no additional zeros
     }
 
     private static String formatDoubleSvg(double value) {

@@ -112,10 +112,10 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnNextActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLblOccurences">
+        <Component class="javax.swing.JLabel" name="jLblOccurrences">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="jsyntaxpane/Bundle.properties" key="QuickFindDialog.Occurences.Zero" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="jsyntaxpane/Bundle.properties" key="QuickFindDialog.Occurrences.Zero" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
