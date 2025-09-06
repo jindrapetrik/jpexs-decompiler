@@ -113,7 +113,7 @@ public class AS2ScriptExporter {
             @Override
             public void status(String status) {
                 if (evl != null) {
-                    evl.handleEvent("unitializedClassFields", status);
+                    evl.handleEvent("uninitializedClassFields", status);
                 }
             }
         };

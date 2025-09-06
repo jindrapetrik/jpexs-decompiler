@@ -922,7 +922,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         int whileJumpOffset = -(whileExprLen + whileBodyLen);
         if (whileJumpOffset < -32768) {
-            throw new CompilationException("Generated offset for While is lower than mininum allowed for SI16.", item.line);
+            throw new CompilationException("Generated offset for While is lower than minimum allowed for SI16.", item.line);
         }
         whileajmp.setJumpOffset(whileJumpOffset);
         whileaif.setJumpOffset(whileBodyLen);
@@ -954,7 +954,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(doif);
         int offset = doBodyLen + doExprLen + doif.getTotalActionLength();
         if (-offset < -32768) {
-            throw new CompilationException("Generated offset for DoWhile is lower than mininum allowed for SI16.", item.line);
+            throw new CompilationException("Generated offset for DoWhile is lower than minimum allowed for SI16.", item.line);
         }
 
         doif.setJumpOffset(-offset);
@@ -980,7 +980,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         int jmpOffset = -(forExprLen + forBodyLen + forFinalLen + forajmpLen);
         int ifOffset = forBodyLen + forFinalLen + forajmpLen;
         if (jmpOffset < -32768) {
-            throw new CompilationException("Generated offset for For is lower than mininum allowed for SI16.", item.line);
+            throw new CompilationException("Generated offset for For is lower than minimum allowed for SI16.", item.line);
         }
         if (ifOffset > 32767) {
             throw new CompilationException("Generated offset for For is larger than maximum allowed for SI16.", item.line);
@@ -1202,7 +1202,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     
     private int checkOffsetBounds(int offset, String errorItem, int errorLine) throws CompilationException {
         if (offset < -32768) {
-            throw new CompilationException("Generated offset for " + errorItem + " is lower than mininum allowed for SI16.", errorLine);
+            throw new CompilationException("Generated offset for " + errorItem + " is lower than minimum allowed for SI16.", errorLine);
         }
         if (offset > 32767) {
             throw new CompilationException("Generated offset for " + errorItem + " is larger than maximum allowed for SI16.", errorLine);

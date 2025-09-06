@@ -326,9 +326,9 @@ Pre-options:
         shape:webp - WEBP format for Shapes
         morphshape:svg - SVG format for MorphShapes
         morphshape:canvas - HTML5 Canvas  format for MorphShapes
-        morpshape:png_start_end - PNG start-end format for MorphShapes
-        morpshape:bmp_start_end - BMP start-end format for MorphShapes
-        morpshape:webp_start_end - WEBP start-end format for MorphShapes
+        morphshape:png_start_end - PNG start-end format for MorphShapes
+        morphshape:bmp_start_end - BMP start-end format for MorphShapes
+        morphshape:webp_start_end - WEBP start-end format for MorphShapes
         frame:png - PNG format for Frames
         frame:gif - GIF format for Frames
         frame:avi - AVI format for Frames

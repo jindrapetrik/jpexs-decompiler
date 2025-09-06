@@ -57,7 +57,7 @@ public class AS3Package extends AS3ClassTreeItem {
      */
     @SuppressWarnings("unchecked")
     private final Map<String, AS3Package> subPackages = new TreeMap<>(new Comparator<String>() {
-            NaturalOrderComparator noc = new NaturalOrderComparator();
+            NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
             
             
             @Override
@@ -71,7 +71,7 @@ public class AS3Package extends AS3ClassTreeItem {
                 if (DEFAULT_PACKAGE_NAME.equals(o2)) {
                     return 1;
                 }                
-                return noc.compare(o1, o2);
+                return naturalOrderComparator.compare(o1, o2);
             }
         }
     );

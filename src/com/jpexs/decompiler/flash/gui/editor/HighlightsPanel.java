@@ -134,7 +134,7 @@ public class HighlightsPanel extends JPanel {
                                     setToolTipText(AppStrings.translate("highlighter.error").replace("%error%", errors.get(highlight.getStartOffset())));
                                     return;
                                 }
-                                if (line != currentLine && painter instanceof OccurencesMarker) {
+                                if (line != currentLine && painter instanceof OccurrencesMarker) {
                                     setToolTipText(AppStrings.translate("highlighter.occurences"));
                                     return;
                                 }

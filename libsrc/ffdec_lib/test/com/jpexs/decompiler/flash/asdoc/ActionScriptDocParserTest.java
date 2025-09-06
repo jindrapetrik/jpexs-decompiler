@@ -32,13 +32,13 @@ public class ActionScriptDocParserTest {
                 + " * second line\n"
                 + " * @tag1 First tag\n"
                 + " * @secondTag Second\n"
-                + " * tag\n"
+                + " * Tag\n"
                 + " */"
                 + "a = a + 2;");
         assertTrue(comments.size() == 1);
         String actual = comments.get(0).toString();
         assertEquals(actual, "First text second line\n" +
 "@tag First tag\n" +
-"@secondTag Secondtag\n");
+"@secondTag SecondTag\n");
     }
 }

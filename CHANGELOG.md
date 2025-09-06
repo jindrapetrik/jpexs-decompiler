@@ -44,7 +44,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
-- AS1/2/3 highligter - brackets parsing error causing memory leak / crash
+- AS1/2/3 highlighter - brackets parsing error causing memory leak / crash
 - Comments color highlighting
 - AS1/2 Obfuscated registers names not resolving because of trimming
 - Escaping HTML in raw tag editor
@@ -93,7 +93,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Renaming of identifiers must not rename integer array offsets
 - [#2517] Loop break detection problems in some cases
 - [#2519] AS1/2 avoid multi-level loops in cases where possible
-- [#2522] Hex view - reseting view when mouse over panel bottom
+- [#2522] Hex view - resetting view when mouse over panel bottom
 - [#2519] AS1/2 direct editation - generating too large ConstantPool
 - Hex View - incorrect table height when switching tags
 - [#2525] AMF editor (like in Sol cookie editor) - saving empty standard array `[]`
@@ -128,11 +128,11 @@ All notable changes to this project will be documented in this file.
 - Simple editor - edit parameters of items inside buttons
 - Simple editor - add/remove frames in buttons, button timeline header
 - Configuration is now stored in easily readable/editable textual format (TOML)
-  (saved also to older binary format, but loading is preffered from
+  (saved also to older binary format, but loading is preferred from
    the new TOML file, when exists)
 - `-configFile` and `-storeConfigFile` commandline parameters for loading/storing configuration file
 - Option to .bat and .sh file to enable J2D_D3D_NO_HWCHECK
-- [#2404] Quick find in text/script editors - show number of occurences
+- [#2404] Quick find in text/script editors - show number of occurrences
 - [#1418] Option to make main window Always on top
 - [#289] Support for Aero Snap on Windows
 - [#2412] Show coordinates on stage mouse move for up to 2 decimal places
@@ -233,7 +233,7 @@ All notable changes to this project will be documented in this file.
 - Simple editor - change background color
 - Simple editor - filters
 - Simple editor - convolution filter presets
-- Simple editor - ratio (shapetweens, video)
+- Simple editor - ratio (shape tweens, video)
 
 ### Fixed
 - [#2424] DefineEditText handling of letterSpacing, font size on incorrect values

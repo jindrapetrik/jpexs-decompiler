@@ -584,7 +584,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);
-                            if (!Configuration.skipDetectionOfUnitializedClassFields.get() && src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
+                            if (!Configuration.skipDetectionOfUninitializedClassFields.get() && src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
                                 setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; ...", "text/flasm");
                                 setDecompiledText("-", "-", 
                                         "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "..." + "\r\n"
@@ -1004,10 +1004,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         });
 
-        Configuration.skipDetectionOfUnitializedClassFields.addListener(new ConfigurationItemChangeListener<Boolean>() {
+        Configuration.skipDetectionOfUninitializedClassFields.addListener(new ConfigurationItemChangeListener<Boolean>() {
             @Override
             public void configurationItemChanged(Boolean newValue) {
-                mainPanel.skipDetectionOfUnitializedClassFieldsChanged();
+                mainPanel.skipDetectionOfUninitializedClassFieldsChanged();
             }            
         });
         
@@ -1028,7 +1028,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(ActionPanel.this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                 JCheckBox skipUninitializedClassFieldsDetectionMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.skip_uninitialized_class_fields_detection"));
-                skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUnitializedClassFields.get());
+                skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUninitializedClassFields.get());
                 skipUninitializedClassFieldsDetectionMenuItem.addActionListener(ActionPanel.this::skipUninitializedClassFieldsDetectionMenuItemActionPerformed);
                 
                 popupMenu.add(deobfuscateIdentifiersMenuItem);
@@ -1182,8 +1182,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     
     private void skipUninitializedClassFieldsDetectionMenuItemActionPerformed(ActionEvent evt) {
         JCheckBox checkBox = (JCheckBox) evt.getSource();
-        Configuration.skipDetectionOfUnitializedClassFields.set(checkBox.isSelected());
-        mainPanel.skipDetectionOfUnitializedClassFieldsChanged();
+        Configuration.skipDetectionOfUninitializedClassFields.set(checkBox.isSelected());
+        mainPanel.skipDetectionOfUninitializedClassFieldsChanged();
     }
     
     private void autoDeobfuscateIdentifiersMenuItemActionPerformed(ActionEvent evt) {

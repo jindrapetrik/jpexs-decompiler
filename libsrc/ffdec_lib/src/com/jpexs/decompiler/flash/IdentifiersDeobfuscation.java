@@ -879,8 +879,8 @@ public class IdentifiersDeobfuscation {
     }
 
     public static Map<String, String> getReplacementsFromDoc(String s) throws Exception {
-        ActionScriptDocParser asd = new ActionScriptDocParser();
-        List<AsDocComment> comments = asd.parse(s);
+        ActionScriptDocParser docParser = new ActionScriptDocParser();
+        List<AsDocComment> comments = docParser.parse(s);
         Map<String, String> replacements = new LinkedHashMap<>();
         for (AsDocComment comment : comments) {
             for (AsDocTag tag : comment.tags) {

@@ -1698,12 +1698,12 @@ public class Graph {
         for (Loop el : loops) {
             el.backEdges.clear();
             Set<GraphPart> uniqueRefs = new HashSet<>(el.loopContinue.refs);
-            loopr:
+            loopR:
             for (GraphPart r : uniqueRefs) {
                 for (Loop el2 : loops) {
                     if (el2.phase == 1) {
                         if (el2.loopContinue == r) {
-                            continue loopr;
+                            continue loopR;
                         }
                     }
                 }
@@ -2849,22 +2849,22 @@ public class Graph {
 
                 }
 
-                //When some of breakcandidates pass through current stoppart,
-                //Remove other candidantes.                                
+                //When some of breakcandidates pass through current stopPart,
+                //Remove other candidates.                                
                 Set<GraphPart> removedX = new LinkedHashSet<>();
                 if (!currentLoop.stopParts.isEmpty()) {
-                    List<Integer> bcsLeft = new ArrayList<>();
+                    List<Integer> breakCandidatesLeft = new ArrayList<>();
                     for (int c = 0; c < currentLoop.breakCandidates.size(); c++) {
                         GraphPart cand = currentLoop.breakCandidates.get(c);
                         GraphPart sp = currentLoop.stopParts.get(currentLoop.stopParts.size() - 1);
-                        if (cand == sp || cand.leadsTo(localData, this, code, sp, new ArrayList<>() /*ingore existing loop states*/, throwStates, false /* ?? */)) {
-                            bcsLeft.add(c);
+                        if (cand == sp || cand.leadsTo(localData, this, code, sp, new ArrayList<>() /*ignore existing loop states*/, throwStates, false /* ?? */)) {
+                            breakCandidatesLeft.add(c);
                         }
                     }
 
-                    if (!bcsLeft.isEmpty()) {
+                    if (!breakCandidatesLeft.isEmpty()) {
                         for (int c = currentLoop.breakCandidates.size() - 1; c >= 0; c--) {
-                            if (!bcsLeft.contains(c)) {
+                            if (!breakCandidatesLeft.contains(c)) {
                                 GraphPart cand = currentLoop.breakCandidates.get(c);
                                 removedX.add(cand);
                             }

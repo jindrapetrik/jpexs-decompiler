@@ -1662,8 +1662,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         TextTag text = mouseOverText;
                         if (text != null) {
                             if (text instanceof DefineEditTextTag) {
-                                DefineEditTextTag dtext = (DefineEditTextTag) text;
-                                List<TEXTRECORD> recs = dtext.getTextRecords(dtext.getSwf());
+                                DefineEditTextTag defineEditText = (DefineEditTextTag) text;
+                                List<TEXTRECORD> recs = defineEditText.getTextRecords(defineEditText.getSwf());
                                 FontTag font = null;
                                 int pos = 0;
                                 int selStart = getSelectionStartInt();
@@ -1672,7 +1672,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 int y = 0;
                                 for (TEXTRECORD r : recs) {
                                     if (r.styleFlagsHasFont) {
-                                        font = r.getFont(dtext.getSwf());                                        
+                                        font = r.getFont(defineEditText.getSwf());                                        
                                     }
                                     if (r.styleFlagsHasYOffset) {
                                         int oldY = y;

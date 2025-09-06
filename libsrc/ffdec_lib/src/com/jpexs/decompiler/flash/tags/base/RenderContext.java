@@ -87,7 +87,7 @@ public class RenderContext {
     public int glyphPosUnderCursor = -1;
     
     /**
-     * Bouding rect of the glyph under cursor
+     * Bounding rect of the glyph under cursor
      */
     public Rectangle2D glyphUnderCursorRect = null;
     

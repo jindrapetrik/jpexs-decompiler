@@ -576,7 +576,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private volatile Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
     
     /**
-     * Detecting uninitilized class fields
+     * Detecting uninitialized class fields
      */
     @Internal
     private boolean detectingUninitializedClassFields = false;       
@@ -761,7 +761,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         try {
             SWF.initPlayer();
         } catch (IOException ex) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "IOException during SWF.initplayer", ex);
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "IOException during SWF.initPlayer", ex);
         } catch (InterruptedException ex) {
             return new AbcIndexing();
         }
@@ -3773,11 +3773,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         continue;
                     }
                     ip = code.adr2pos(addr);
-                    long nextaddr = addr + size;
-                    int nextip = code.adr2pos(nextaddr);
-                    getVariables(swf, aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(0, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>(), code.getCharset(), ip), addr, path + (cntName == null ? "" : "/" + cntName));
-                    ip = nextip;
-                    addr = nextaddr;
+                    long nextAddr = addr + size;
+                    int nextIp = code.adr2pos(nextAddr);
+                    getVariables(swf, aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(0, nextIp), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>(), code.getCharset(), ip), addr, path + (cntName == null ? "" : "/" + cntName));
+                    ip = nextIp;
+                    addr = nextAddr;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
                 r.add(new ArrayList<>());
@@ -6306,7 +6306,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @return Map of class name to map of trait name to trait
      */
     public Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() throws InterruptedException {
-        if (Configuration.skipDetectionOfUnitializedClassFields.get()) {
+        if (Configuration.skipDetectionOfUninitializedClassFields.get()) {
             return new LinkedHashMap<>();
         }
         if (CancellableWorker.isInterrupted()) {

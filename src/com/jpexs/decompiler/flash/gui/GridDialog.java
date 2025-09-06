@@ -188,7 +188,7 @@ public class GridDialog extends AppDialog {
         Configuration.showGrid.set(showGridCheckBox.isSelected());
         Configuration.snapToGrid.set(snapToGridCheckBox.isSelected());
         Configuration.gridOverObjects.set(showOverObjectsCheckBox.isSelected());
-        Configuration.gridSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
+        Configuration.gridSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).accuracy);
         setVisible(false);
     }
     
@@ -197,20 +197,20 @@ public class GridDialog extends AppDialog {
     }
     
     private class AccuracyItem {
-        private GridSnapAccuracy acurracy;
+        private GridSnapAccuracy accuracy;
 
-        public AccuracyItem(GridSnapAccuracy acurracy) {
-            this.acurracy = acurracy;
+        public AccuracyItem(GridSnapAccuracy accuracy) {
+            this.accuracy = accuracy;
         }
 
-        public GridSnapAccuracy getAcurracy() {
-            return acurracy;
+        public GridSnapAccuracy getAccuracy() {
+            return accuracy;
         }                
 
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + Objects.hashCode(this.acurracy);
+            hash = 67 * hash + Objects.hashCode(this.accuracy);
             return hash;
         }
 
@@ -226,14 +226,14 @@ public class GridDialog extends AppDialog {
                 return false;
             }
             final AccuracyItem other = (AccuracyItem) obj;
-            return this.acurracy == other.acurracy;
+            return this.accuracy == other.accuracy;
         }
 
         
         
         @Override
         public String toString() {
-            switch (acurracy) {
+            switch (accuracy) {
                 case MUST_BE_CLOSE:
                     return translate("snapAccuracy.mustBeClose");
                 case NORMAL:

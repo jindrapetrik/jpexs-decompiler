@@ -656,7 +656,7 @@ public class EasySwfPanel extends JPanel {
                 timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
                 closeTimelineButton.setVisible(true);
             }
-            timelinePanel.setTimelined(timelined); //tohle se volá blbě rekurzivně!!!
+            timelinePanel.setTimelined(timelined);
             
             if (updateStage) {
                 stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);

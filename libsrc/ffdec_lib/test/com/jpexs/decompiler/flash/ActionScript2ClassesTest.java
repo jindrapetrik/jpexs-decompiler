@@ -47,7 +47,7 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
         Configuration.simplifyExpressions.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
-        Configuration.skipDetectionOfUnitializedClassFields.set(false);        
+        Configuration.skipDetectionOfUninitializedClassFields.set(false);        
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 

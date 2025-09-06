@@ -168,19 +168,19 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
 
             if (linkedField != null && linkEnabled) {
                 Object linkedFieldValue = ReflectionTools.getValue(obj, linkedField);
-                Object newLinkefFieldValue = null;
+                Object newLinkedFieldValue = null;
                 if (oldFieldValue instanceof Double) {
                     Double v = (Double) oldFieldValue;
                     Double v2 = (Double) val;
                     Double vL = (Double) linkedFieldValue;
-                    newLinkefFieldValue = v == 0.0 ? v2 : v2 * vL / v;
+                    newLinkedFieldValue = v == 0.0 ? v2 : v2 * vL / v;
                 } else if (oldFieldValue instanceof Float) {
                     Float v = (Float) oldFieldValue;
                     Float v2 = (Float) val;
                     Float vL = (Float) linkedFieldValue;
-                    newLinkefFieldValue = v == 0f ? v2 : v2 * vL / v;
+                    newLinkedFieldValue = v == 0f ? v2 : v2 * vL / v;
                 }
-                ReflectionTools.setValue(obj, linkedField, -1, newLinkefFieldValue);
+                ReflectionTools.setValue(obj, linkedField, -1, newLinkedFieldValue);
             }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore

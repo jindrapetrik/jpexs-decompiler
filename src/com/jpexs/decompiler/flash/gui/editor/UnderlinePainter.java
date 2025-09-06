@@ -31,7 +31,7 @@ import javax.swing.text.View;
  *
  * @author JPEXS
  */
-public class UnderlinePainter extends OccurencesMarker {
+public class UnderlinePainter extends OccurrencesMarker {
 
     private final Color underlineColor;
 

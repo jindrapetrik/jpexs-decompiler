@@ -2730,7 +2730,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         gotoScriptName(swf, scriptName);
     }
 
-    public void findOrLoadOpanableListByFilePath(String filePath, OpenableListLoaded executeAfterOpen, boolean loadSession) {
+    public void findOrLoadOpenableListByFilePath(String filePath, OpenableListLoaded executeAfterOpen, boolean loadSession) {
         for (OpenableList ol : openables) {
             String existingFilePath = ol.sourceInfo.getFile();
             if (existingFilePath == null) {
@@ -2744,7 +2744,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Main.openFile(filePath, null, new Runnable() {
             @Override
             public void run() {
-                findOrLoadOpanableListByFilePath(filePath, executeAfterOpen, loadSession);
+                findOrLoadOpenableListByFilePath(filePath, executeAfterOpen, loadSession);
             }
         }, loadSession);
     }
@@ -3414,7 +3414,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(true);
     }
     
-    public void skipDetectionOfUnitializedClassFieldsChanged() {
+    public void skipDetectionOfUninitializedClassFieldsChanged() {
         clearAllScriptCache();
         updateClassesList();
         reload(true);

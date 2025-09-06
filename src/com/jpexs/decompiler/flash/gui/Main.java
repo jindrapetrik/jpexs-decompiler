@@ -1545,7 +1545,7 @@ public class Main {
                         if (event.equals("importing_as")) {
                             startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);
                         }
-                        if (event.equals("unitializedClassFields")) {
+                        if (event.equals("uninitializedClassFields")) {
                             continueWork(AppStrings.translate("work.decompiling") + "..." + (String) data);
                         }
                     }
@@ -3158,10 +3158,10 @@ public class Main {
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
         
         ResourceBundle advancedSettingsBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
-        Set<String> confirationNames = Configuration.getConfigurationFields(false, true).keySet();
+        Set<String> configurationNames = Configuration.getConfigurationFields(false, true).keySet();
         Map<String, String> titles = new LinkedHashMap<>();
         Map<String, String> descriptions = new LinkedHashMap<>();
-        for (String name : confirationNames) {
+        for (String name : configurationNames) {
             if (advancedSettingsBundle.containsKey("config.name." + name)) {
                 titles.put(name, advancedSettingsBundle.getString("config.name." + name));
             }

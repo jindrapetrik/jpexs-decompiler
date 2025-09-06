@@ -1148,7 +1148,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static ConfigurationItem<Boolean> skipDetectionOfUnitializedClassFields = null;
+    public static ConfigurationItem<Boolean> skipDetectionOfUninitializedClassFields = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
@@ -1177,12 +1177,12 @@ public final class Configuration {
         Configuration.configurationTitles = configurationTitles;
     }
 
-    public static String getConfigurationTitle(String confirationName) {
-        return configurationTitles.get(confirationName);
+    public static String getConfigurationTitle(String configurationName) {
+        return configurationTitles.get(configurationName);
     }
 
-    public static String getConfigurationDescription(String confirationName) {
-        return configurationDescriptions.get(confirationName);
+    public static String getConfigurationDescription(String configurationName) {
+        return configurationDescriptions.get(configurationName);
     }
 
     public static Font getSourceFont() {

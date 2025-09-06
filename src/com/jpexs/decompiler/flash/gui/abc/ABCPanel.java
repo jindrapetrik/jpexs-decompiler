@@ -1811,10 +1811,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             };
 
             if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
-                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
+                mainPanel.findOrLoadOpenableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
                 return;
             } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
-                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
+                mainPanel.findOrLoadOpenableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
                 return;
             }
 

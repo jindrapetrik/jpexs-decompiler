@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Convolution prset;
+ * Convolution preset
  *
  * @author JPEXS
  */

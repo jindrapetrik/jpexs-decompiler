@@ -38,7 +38,7 @@ public class ActionParseException extends ParseException {
      * Constructs a new parse exception.
      * @param text Text of the exception
      * @param line Line number where the exception occurred
-     * @param position Position where the exception occured
+     * @param position Position where the exception occurred
      */
     public ActionParseException(String text, long line, long position) {
         super(text, line, position);

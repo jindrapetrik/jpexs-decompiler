@@ -23,9 +23,9 @@ import jsyntaxpane.components.Markers;
  *
  * @author JPEXS
  */
-public class OccurencesMarker extends Markers.SimpleMarker {
+public class OccurrencesMarker extends Markers.SimpleMarker {
 
-    public OccurencesMarker(Color color) {
+    public OccurrencesMarker(Color color) {
         super(color);
     }
 }

@@ -100,16 +100,16 @@ import org.pushingpixels.substance.internal.ui.SubstanceScrollBarUI;
  */
 public class VariableMarker implements SyntaxComponent, CaretListener, PropertyChangeListener, DocumentListener {
 
-    public static final String DEFAULT_TOKENTYPES = "IDENTIFIER, KEYWORD, REGEX";
+    public static final String DEFAULT_TOKEN_TYPES = "IDENTIFIER, KEYWORD, REGEX";
     public static final String PROPERTY_COLOR = "ActionVariableMarker.Color";
-    public static final String PROPERTY_ERRORCOLOR = "ActionVariableMarker.ErrorColor";
-    public static final String PROPERTY_TOKENTYPES = "ActionVariableMarker.TokenTypes";
+    public static final String PROPERTY_ERROR_COLOR = "ActionVariableMarker.ErrorColor";
+    public static final String PROPERTY_TOKEN_TYPES = "ActionVariableMarker.TokenTypes";
     private static final Color DEFAULT_COLOR = new Color(0xffeedd);
-    private static final Color DEFAULT_ERRORCOLOR = new Color(0xff0000);
+    private static final Color DEFAULT_ERROR_COLOR = new Color(0xff0000);
 
     private JEditorPane pane;
     private final Set<TokenType> tokenTypes = new HashSet<>();
-    private OccurencesMarker marker;
+    private OccurrencesMarker marker;
     private Markers.SimpleMarker errorMarker;
     private Status status;
     private Map<Integer, String> errors = new LinkedHashMap<>();
@@ -472,7 +472,7 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
     @Override
     public void config(Configuration config) {
         Color markerColor = config.getColor(PROPERTY_COLOR, DEFAULT_COLOR);
-        Color errorColor = config.getColor(PROPERTY_ERRORCOLOR, DEFAULT_ERRORCOLOR);
+        Color errorColor = config.getColor(PROPERTY_ERROR_COLOR, DEFAULT_ERROR_COLOR);
         
         
         Color editorBackground = UIManager.getColor("EditorPane.background");
@@ -481,10 +481,9 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             markerColor = new Color(0x443322);
         }
         
-        this.marker = new OccurencesMarker(markerColor);
+        this.marker = new OccurrencesMarker(markerColor);
         this.errorMarker = new WavyUnderLinePainter(errorColor); //Markers.SimpleMarker(errorColor);
-        String types = config.getString(
-                PROPERTY_TOKENTYPES, DEFAULT_TOKENTYPES);
+        String types = config.getString(PROPERTY_TOKEN_TYPES, DEFAULT_TOKEN_TYPES);
 
         for (String type : types.split("\\s*,\\s*")) {
             try {
@@ -637,8 +636,8 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
             });
             if (!identText.isEmpty()) {
                 for (int i = suggestions.size() - 1; i >= 0; i--) {
-                    String sug = suggestions.get(i).name.getLast().toString();
-                    if (!sug.startsWith(identText)) {
+                    String suggestion = suggestions.get(i).name.getLast().toString();
+                    if (!suggestion.startsWith(identText)) {
                         suggestions.remove(i);
                     }
                 }

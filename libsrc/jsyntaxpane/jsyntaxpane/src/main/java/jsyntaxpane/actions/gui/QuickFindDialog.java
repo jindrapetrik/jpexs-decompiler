@@ -278,7 +278,7 @@ public class QuickFindDialog extends javax.swing.JDialog
 
         //JPEXS
         private void updateOccurences() {
-                if (dsd.get().getOccurencesCount(target.get()) == 0)
+                if (dsd.get().getOccurrencesCount(target.get()) == 0)
                 {
                         jLblOccurences.setText(
                             java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.Occurences.Zero")
@@ -287,8 +287,8 @@ public class QuickFindDialog extends javax.swing.JDialog
                 }
                 jLblOccurences.setText(
                         java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.Occurences")
-                                .replace("%current%", "" + dsd.get().getCurrentOccurence(target.get()))
-                                .replace("%total%", "" + dsd.get().getOccurencesCount(target.get()))
+                                .replace("%current%", "" + dsd.get().getCurrentOccurrence(target.get()))
+                                .replace("%total%", "" + dsd.get().getOccurrencesCount(target.get()))
                 );
         } 
         

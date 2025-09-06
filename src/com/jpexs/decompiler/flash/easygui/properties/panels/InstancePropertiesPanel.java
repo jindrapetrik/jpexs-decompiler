@@ -397,7 +397,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 });
                 menu.add(removeAllMenuItem);
                 menu.addSeparator();
-                Class[] possilbleFilters = new Class[] {
+                Class[] possibleFilters = new Class[] {
                     DROPSHADOWFILTER.class,
                     BLURFILTER.class,
                     GLOWFILTER.class,
@@ -408,7 +408,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                     CONVOLUTIONFILTER.class
                 };
                 
-                for (Class filterClass : possilbleFilters) {
+                for (Class filterClass : possibleFilters) {
                     
                     String filterName = filterClass.getSimpleName();
                     filterName = filterName.substring(0, filterName.length() - "FILTER".length());

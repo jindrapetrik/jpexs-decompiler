@@ -87,6 +87,7 @@ public class TagStub extends Tag {
             TagTypeInfo selectedTagTypeInfo = classes.get(id).get(0);
             if (classes.get(id).size() > 1) {
                 for (TagTypeInfo tagTypeInfo : classes.get(id)) {
+                    @SuppressWarnings("unchecked")
                     SWFVersion ver = (SWFVersion) tagTypeInfo.getCls().getAnnotation(SWFVersion.class);
                     if (swfVersion >= ver.from() && swfVersion <= ver.to()) {
                         selectedTagTypeInfo = tagTypeInfo;

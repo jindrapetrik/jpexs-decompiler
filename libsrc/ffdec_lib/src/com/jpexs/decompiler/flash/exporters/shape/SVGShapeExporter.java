@@ -96,7 +96,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
      * @param defaultColor Default color
      * @param colorTransform Color transform
      * @param zoom Zoom - shape zoom
-     * @param displayZoom Display zoom - overal SVG zoom
+     * @param displayZoom Display zoom - overall SVG zoom
      * @param strokeTransformation Stroke transformation
      */
     public SVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom, double displayZoom, Matrix strokeTransformation) {

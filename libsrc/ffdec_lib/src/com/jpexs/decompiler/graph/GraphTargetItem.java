@@ -1152,7 +1152,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks set temporary at the end of output and expected dupSource, dup.
-     * Then removes the last output command when neccessary.
+     * Then removes the last output command when necessary.
      *
      * @param stack Stack
      * @param output Output
@@ -1188,7 +1188,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether items are result of dup instruction and removes
-     * SetTemportary from output when neccessary
+     * SetTemporary from output when necessary
      *
      * @param item1
      * @param item2

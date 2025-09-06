@@ -659,7 +659,7 @@ public class ActionGraph extends Graph {
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
-            if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUnitializedClassFields.get()) {
+            if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUninitializedClassFields.get()) {
                 ret.add(0, new CommentItem(AppResources.translate("decompilationWarning.as2.noUninitializedClassFieldsDetection")));
             }
         }

@@ -118,7 +118,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
     private List<FunctionActionItem> innerFunctions;
     
     /**
-     * Parameter positions in the codde
+     * Parameter positions in the code
      */
     public List<Integer> paramPositions;
 
