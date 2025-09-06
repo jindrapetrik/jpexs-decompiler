@@ -566,7 +566,7 @@ public class FrameExporter {
                             BufferedImage img = frameImages.next();
                             if (img != null) {
                                 try (FileOutputStream fos = new FileOutputStream(f)) {
-                                    fos.write(WebPCodec.encodeImage(img, 100f));
+                                    fos.write(WebPCodec.encodeLosslessImage(img));
                                 }
                             }
                             ret.add(f);

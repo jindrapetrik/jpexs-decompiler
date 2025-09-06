@@ -329,7 +329,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/jpproxy.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-fix.jar;lib/substance-6.2.jar;libsrc/ffdec_lib/src;lib/tablelayout.jar;lib/jsyntaxpane-0.9.5.jar;lib/JavactiveX.jar;lib/flashdebugger.jar;lib/treetable.jar;lib/minimal-json-0.9.5.jar;libsrc/ffdec_lib/lib/gnujpdf.jar;libsrc/ffdec_lib/lib/jna-3.5.1.jar;libsrc/ffdec_lib/lib/jna-platform-3.5.1.jar;libsrc/ffdec_lib/lib/flashdebugger.jar;lib/gifreader.jar;lib/jansi-2.4.0.jar;lib/decimal.jar;lib/webp4j-1.1.0.jar</classpath>
+                <classpath mode="compile">lib/jpproxy.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-fix.jar;lib/substance-6.2.jar;libsrc/ffdec_lib/src;lib/tablelayout.jar;lib/jsyntaxpane-0.9.5.jar;lib/JavactiveX.jar;lib/flashdebugger.jar;lib/treetable.jar;lib/minimal-json-0.9.5.jar;libsrc/ffdec_lib/lib/gnujpdf.jar;libsrc/ffdec_lib/lib/jna-3.5.1.jar;libsrc/ffdec_lib/lib/jna-platform-3.5.1.jar;libsrc/ffdec_lib/lib/flashdebugger.jar;lib/gifreader.jar;lib/jansi-2.4.0.jar;lib/decimal.jar;lib/webp4j-1.2.0.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>

@@ -242,7 +242,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">../../src;lib/LZMA.jar;lib/avi.jar;lib/cmykjpeg.jar;lib/ddsreader.jar;lib/gif.jar;lib/gnujpdf.jar;lib/jlayer-1.0.2.jar;lib/jpacker.jar;lib/nellymoser.jar;lib/sfntly.jar;lib/tga.jar;lib/ttf.jar;lib/vlcj-4.7.3.jar;lib/vlcj-natives-4.7.0.jar;lib/flashdebugger.jar;lib/jna-3.5.1.jar;lib/jna-platform-3.5.1.jar;lib/gifreader.jar;lib/miterstroke.jar;lib/decimal.jar;lib/flacomdoc.jar;lib/tomlj-1.1.1.jar;lib/decimal.jar;lib/webp4j-1.1.0.jar</classpath>
+                <classpath mode="compile">../../src;lib/LZMA.jar;lib/avi.jar;lib/cmykjpeg.jar;lib/ddsreader.jar;lib/gif.jar;lib/gnujpdf.jar;lib/jlayer-1.0.2.jar;lib/jpacker.jar;lib/nellymoser.jar;lib/sfntly.jar;lib/tga.jar;lib/ttf.jar;lib/vlcj-4.7.3.jar;lib/vlcj-natives-4.7.0.jar;lib/flashdebugger.jar;lib/jna-3.5.1.jar;lib/jna-platform-3.5.1.jar;lib/gifreader.jar;lib/miterstroke.jar;lib/decimal.jar;lib/flacomdoc.jar;lib/tomlj-1.1.1.jar;lib/decimal.jar;lib/webp4j-1.2.0.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>reports</built-to>
                 <built-to>dist</built-to>

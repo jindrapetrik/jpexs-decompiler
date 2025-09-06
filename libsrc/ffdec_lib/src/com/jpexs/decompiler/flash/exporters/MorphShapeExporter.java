@@ -209,7 +209,7 @@ public class MorphShapeExporter {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
                                 try (FileOutputStream fos = new FileOutputStream(fileEnd)) {
-                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
                                 }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), fileEnd);

@@ -129,7 +129,13 @@ public class ImageExporter {
                         BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
                     } else if (ffileFormat == ImageFormat.WEBP) {
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                            fos.write(WebPCodec.encodeImage(imageTag.getImageCached().getBufferedImage(), 100f));
+                            byte[] webPData;
+                            if (originalFormat == ImageFormat.PNG || originalFormat == ImageFormat.GIF) {
+                                webPData = WebPCodec.encodeLosslessImage(imageTag.getImageCached().getBufferedImage());
+                            } else {
+                                webPData = WebPCodec.encodeImage(imageTag.getImageCached().getBufferedImage(), 100f);
+                            }
+                            fos.write(webPData);
                         }
                     } else {
                         ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);

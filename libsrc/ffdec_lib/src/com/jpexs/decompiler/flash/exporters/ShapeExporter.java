@@ -141,7 +141,7 @@ public class ShapeExporter {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else if (settings.mode == ShapeExportMode.WEBP) {
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
                                 }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), file);
