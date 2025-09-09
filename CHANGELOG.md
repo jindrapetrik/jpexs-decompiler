@@ -41,6 +41,13 @@ All notable changes to this project will be documented in this file.
   - view bytes length in bytes fields
 - [#2526] Option to disable drag & drop from Resources view to avoid problems on Mac OS
 - [#2497] AS3 - temp variables for better handling swap/dup instructions
+- [#2529], [#2471] Font normalization
+  - available as context menu command on SWFs
+  - automatically executed on PDF/SVG export
+  - shrinks oversized fonts to 1024 em
+  - fixes vertically flipped fonts / texts
+  - fixes zero/1unit spaces font glyph advance
+  - fixes zero last glyph advance in texts
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -101,6 +108,9 @@ All notable changes to this project will be documented in this file.
 - AS Debugger - order of trace commands
 - AS1/2 print/printNum/printAsBitmap/printAsBitmapNum not correctly
   handling bmovie boundingBox parameter
+- Font export - not setting ascent and descent
+- [#2471] PDF export - ignore control characters
+- [#2471] SVG export with typeface - white-space:pre style
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3999,6 +4009,8 @@ Major version of SWF to XML export changed to 2.
 [#2519]: https://www.free-decompiler.com/flash/issues/2519
 [#2526]: https://www.free-decompiler.com/flash/issues/2526
 [#2497]: https://www.free-decompiler.com/flash/issues/2497
+[#2529]: https://www.free-decompiler.com/flash/issues/2529
+[#2471]: https://www.free-decompiler.com/flash/issues/2471
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338
@@ -4043,7 +4055,6 @@ Major version of SWF to XML export changed to 2.
 [#2405]: https://www.free-decompiler.com/flash/issues/2405
 [#1646]: https://www.free-decompiler.com/flash/issues/1646
 [#2469]: https://www.free-decompiler.com/flash/issues/2469
-[#2471]: https://www.free-decompiler.com/flash/issues/2471
 [#2475]: https://www.free-decompiler.com/flash/issues/2475
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
 [#1826]: https://www.free-decompiler.com/flash/issues/1826

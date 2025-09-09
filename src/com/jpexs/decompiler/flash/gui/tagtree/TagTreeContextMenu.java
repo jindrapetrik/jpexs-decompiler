@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
+import com.jpexs.decompiler.flash.FontNormalizer;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
@@ -35,6 +36,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
@@ -116,6 +119,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
@@ -143,9 +147,17 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.HasCharacterId;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
@@ -155,6 +167,7 @@ import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -169,6 +182,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -372,6 +386,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem convertShapeTypeMenuItem;
 
     private JMenuItem convertPlaceObjectTypeMenuItem;
+    
+    private JMenuItem normalizeFontsMenuItem;
 
     private List<TreeItem> items = new ArrayList<>();
 
@@ -625,6 +641,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         convertPlaceObjectTypeMenuItem.setIcon(View.getIcon("placeobject16"));
         add(convertPlaceObjectTypeMenuItem);
 
+        
+        normalizeFontsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.normalizeFonts"));
+        normalizeFontsMenuItem.addActionListener(this::normalizeFontsActionPerformed);
+        normalizeFontsMenuItem.setIcon(View.getIcon("font16"));
+        add(normalizeFontsMenuItem);
+              
         addSeparator();
 
         gotoDocumentClassMenuItem = new JMenuItem(mainPanel.translate("menu.tools.gotoDocumentClass"));
@@ -1170,10 +1192,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean allSelectedIsShape = true;
         boolean allSelectedIsPlaceObject = true;
+        boolean allSelectedIsFont = true;
 
         if (items.isEmpty()) {
             allSelectedIsShape = false;
             allSelectedIsPlaceObject = false;
+            allSelectedIsFont = false;
         }
 
         for (TreeItem item : items) {
@@ -1183,6 +1207,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (!(item instanceof PlaceObjectTypeTag)) {
                 allSelectedIsPlaceObject = false;
+            }
+            if (!(item instanceof FontTag)) {
+                allSelectedIsFont = false;
             }
 
             if (item instanceof Tag) {
@@ -1348,6 +1375,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setVisible(false);
         convertShapeTypeMenuItem.setVisible(false);
         convertPlaceObjectTypeMenuItem.setVisible(false);
+        normalizeFontsMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
@@ -1838,6 +1866,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsPlaceObject) {
             convertPlaceObjectTypeMenuItem.setVisible(true);
+        }
+        if (allSelectedIsSwf) {
+            normalizeFontsMenuItem.setVisible(true);
         }
 
         moveTagToMenu.removeAll();
@@ -2859,6 +2890,17 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), lastConverted);
         }
     }
+    
+    private void normalizeFontsActionPerformed(ActionEvent evt) {
+        for (TreeItem item : getSelectedItems()) {
+            SWF swf = (SWF) item;
+            FontNormalizer normalizer = new FontNormalizer();
+            normalizer.normalizeFonts(swf);                      
+        }
+        mainPanel.getCurrentTree().repaint();
+    }
+    
+    
 
     private void replaceRefsWithTagActionPerformed(ActionEvent evt) {
         TreeItem itemr = getCurrentItem();

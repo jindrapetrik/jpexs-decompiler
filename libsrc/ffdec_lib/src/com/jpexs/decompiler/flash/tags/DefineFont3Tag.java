@@ -349,6 +349,13 @@ public class DefineFont3Tag extends FontTag {
             return -1;
         }
     }
+    
+    @Override
+    public synchronized void setGlyphAdvance(int glyphIndex, double advanceValue) {
+        if (fontFlagsHasLayout && glyphIndex != -1) {
+            fontAdvanceTable.set(glyphIndex, (int) Math.round(advanceValue));
+        }
+    }
 
     @Override
     public synchronized char glyphToChar(int glyphIndex) {
@@ -646,6 +653,15 @@ public class DefineFont3Tag extends FontTag {
         return super.getGlyphBounds(glyphIndex);
     }
 
+    @Override
+    public void updateBounds() {
+        if (fontFlagsHasLayout) {
+            for (int i = 0; i < fontBoundsTable.size(); i++) {
+                fontBoundsTable.set(i, super.getGlyphBounds(i));
+            }
+        }
+    }   
+    
     @Override
     public synchronized int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {

@@ -990,6 +990,7 @@ public abstract class TextTag extends DrawableTag {
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom, Matrix transformation) {
         int textColor = 0;
         FontTag font = null;
+        int fontId = -1;
         double textHeight = 12;
         int x = 0;
         int y = 0;
@@ -1009,6 +1010,10 @@ public abstract class TextTag extends DrawableTag {
             }
             if (rec.styleFlagsHasFont) {
                 font = rec.getFont(swf);
+                fontId = swf.getCharacterId(font);
+                if (exporter.getNormalizedFonts().containsKey(fontId)) {
+                    font = exporter.getNormalizedFonts().get(fontId);
+                }
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -1049,6 +1054,7 @@ public abstract class TextTag extends DrawableTag {
                 textElement.setAttribute("font-family", fontFamily);
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
+                textElement.setAttribute("style", "white-space: pre");
                 textElement.setTextContent(text.toString());
 
                 RGBA colorA = new RGBA(textColor);

@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.RequiresNormalizedFonts;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -31,6 +34,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,7 +63,7 @@ import org.w3c.dom.NodeList;
  *
  * @author JPEXS
  */
-public class SVGExporter {
+public class SVGExporter implements RequiresNormalizedFonts {
 
     protected static final String sNamespace = "http://www.w3.org/2000/svg";
 
@@ -92,6 +96,25 @@ public class SVGExporter {
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     private double zoom;
+    
+    private Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+    private Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+
+    @Override
+    public void setNormalizedFonts(Map<Integer, FontTag> normalizedFonts, Map<Integer, StaticTextTag> normalizedTexts) {
+        this.normalizedFonts = normalizedFonts;
+        this.normalizedTexts = normalizedTexts;
+    }
+
+    @Override
+    public Map<Integer, FontTag> getNormalizedFonts() {
+        return normalizedFonts;
+    }
+
+    @Override
+    public Map<Integer, StaticTextTag> getNormalizedTexts() {
+        return normalizedTexts;
+    }
 
     public static class ExportKey {
 

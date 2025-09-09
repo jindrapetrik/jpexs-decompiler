@@ -193,7 +193,9 @@ public class FontExporter {
             f.setCreationDate(date);
             f.setModificationDate(date);
         }
-
+        
+        f.setDefaultMetrics();
+        
         int ascent = t.getAscent();
         if (ascent != -1) {
             float value = Math.round(ascent / divider);

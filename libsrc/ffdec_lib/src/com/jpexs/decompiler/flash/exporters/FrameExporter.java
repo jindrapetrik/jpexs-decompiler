@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpacker.JPacker;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.FontNormalizer;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -86,6 +88,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -318,6 +321,13 @@ public class FrameExporter {
         }
 
         if (settings.mode == FrameExportMode.SVG) {
+            
+            FontNormalizer normalizer = new FontNormalizer();
+            Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+            normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
+
+            
             int max = frames.size();
             if (subFramesLength > 1) {
                 max = subFramesLength;
@@ -341,7 +351,7 @@ public class FrameExporter {
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
-
+                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);
                             tim.toSVG(frame, subFramesLength > 1 ? fi : 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
@@ -595,6 +605,12 @@ public class FrameExporter {
                 if (frameImages.hasNext()) {
                     for (File foutdir : foutdirs) {
                         new RetryTask(() -> {
+                            
+                            FontNormalizer normalizer = new FontNormalizer();
+                            Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+                            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+                            normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
+                            
                             File f = new File(foutdir + File.separator + "frames.pdf");
                             PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
                             PageFormat pf = new PageFormat();
@@ -643,7 +659,8 @@ public class FrameExporter {
                                             return compositeGraphics;
                                         }
                                         final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
+                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);                                        
+                                        ((DualPdfGraphics2D) compositeGraphics).setNormalizedFonts(normalizedFonts, normalizedTexts);
                                         return compositeGraphics;
                                     }
 

@@ -358,6 +358,15 @@ public class DefineFont2Tag extends FontTag {
         }
         return super.getGlyphBounds(glyphIndex);
     }
+    
+    @Override
+    public void updateBounds() {
+        if (fontFlagsHasLayout) {
+            for (int i = 0; i < fontBoundsTable.size(); i++) {
+                fontBoundsTable.set(i, super.getGlyphBounds(i));
+            }
+        }
+    } 
 
     @Override
     public synchronized double getGlyphAdvance(int glyphIndex) {
@@ -365,6 +374,13 @@ public class DefineFont2Tag extends FontTag {
             return fontAdvanceTable.get(glyphIndex);
         } else {
             return -1;
+        }
+    }
+    
+    @Override
+    public synchronized void setGlyphAdvance(int glyphIndex, double advanceValue) {
+        if (fontFlagsHasLayout && glyphIndex != -1) {
+            fontAdvanceTable.set(glyphIndex, (int) Math.round(advanceValue));
         }
     }
 
