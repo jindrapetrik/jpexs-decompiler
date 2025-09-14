@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
   - fixes vertically flipped fonts / texts
   - fixes zero/1unit spaces font glyph advance
   - fixes zero last glyph advance in texts
+- [PR222] Replace fonts from commandline
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -5224,6 +5225,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR222]: https://github.com/jindrapetrik/jpexs-decompiler/pull/222
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
 [PR216]: https://github.com/jindrapetrik/jpexs-decompiler/pull/216
 [PR203]: https://github.com/jindrapetrik/jpexs-decompiler/pull/203

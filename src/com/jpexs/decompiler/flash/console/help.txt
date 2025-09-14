@@ -106,7 +106,7 @@ alias /?
        [(<characterId2>|<scriptName2>) <importDataFile2> \
        [nofill] [-startFrame <startFrame>] ([<format2>][<methodBodyIndex2>])]...
     Replace data.
-    Replaces the data of the specified BinaryData, Image, Shape, Text,
+    Replaces the data of the specified BinaryData, Image, Shape, Text, Font,
     Sound tag or Script.
     nofill parameter can be specified only for shape replace.
     <startFrame> parameter sets sound range start frame (for sound streams)
