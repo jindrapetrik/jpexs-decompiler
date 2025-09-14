@@ -141,6 +141,8 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -178,11 +180,13 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
@@ -3100,6 +3104,86 @@ public class CommandLineArgumentParser {
                                     return false;
                                 }
                             }).importText(textTag, new String(data, Utf8Helper.charset));
+                        } else if (characterTag instanceof FontTag) {
+							FontTag fontTag = (FontTag) characterTag;
+							fontTag.reload();
+							Set<Integer> selChars = new HashSet<>();
+							Font font = null;
+							try {
+								font = Font.createFont(Font.TRUETYPE_FONT, new File(repFile));
+								int[] required = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
+								loopi:
+								for (char i = 0; i < Character.MAX_VALUE; i++) {
+									for (int r : required) {
+										if (r == i) {
+											continue loopi;
+										}
+									}
+									if (font.canDisplay((int) i)) {
+										selChars.add((int) i);
+									}
+								}
+							} catch (Exception e) {
+								System.err.println("replace font tag fail: " + e.getMessage());
+							}
+
+							String oldchars = fontTag.getCharacters();
+							for (int ic : selChars) {
+								char c = (char) ic;
+								if (oldchars.indexOf((int) c) == -1) {
+									if (font.getSize() != 1024) { //Do not resize if not required so we can have single instance of custom fonts
+										font = font.deriveFont(fontTag.getFontStyle(), 1024);
+									}
+									if (Utf8Helper.charToCodePoint(c, fontTag.getCodesCharset()) == -1) {
+										System.err.println("error.charset.nocharacter:" + c);
+										return;
+									}
+									if (!font.canDisplay(c)) {
+										System.err.println("error.charset.nocharacter:" + c);
+										return;
+									}
+								}
+							}
+							boolean yestoall = false;
+							boolean notoall = false;
+							boolean replaced = false;
+							int numAdded = 0;
+							for (int ic : selChars) {
+								char c = (char) ic;
+								if (oldchars.indexOf((int) c) > -1) {
+									int opt = -1;
+									yestoall = true;
+									// notoall = true;
+
+									if (yestoall) {
+										opt = 0; // yes
+									} else if (notoall) {
+										opt = 1; // no
+									}
+
+									if (opt == 1) {
+										continue;
+									}
+
+									replaced = true;
+								}
+
+								if (!fontTag.addCharacter(c, font)) {
+									break;
+								}
+								numAdded++;
+								oldchars += c;
+							}
+                        } else if (characterTag instanceof DefineFont4Tag) {
+							try {
+								Field field = DefineFont4Tag.class.getDeclaredField("fontData");
+								Object oldValue = ReflectionTools.getValue(characterTag, field, 6);
+								Object newValue = new ByteArrayRange(data);
+								ReflectionTools.setValue(characterTag, field, 6, newValue);
+								characterTag.setModified(true);
+							} catch (Exception e) {
+								System.err.println("replace font tag fail: " + e.getMessage());
+							}
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
                             Integer startFrame = null;
