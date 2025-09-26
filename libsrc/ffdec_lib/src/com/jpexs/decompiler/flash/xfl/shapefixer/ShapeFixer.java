@@ -111,7 +111,7 @@ public class ShapeFixer {
         //int oldpct = 0;
         loopi1:
         for (int i1 = 0; i1 < shapes.size(); i1++) {
-            int layer = layers.get(i1);                                
+            int layer = layers.get(i1);
             /*if (i1 % 10 == 0) {
                 int pct = i1 * 100 / shapes.size();
                 if (oldpct != pct) {
@@ -132,20 +132,19 @@ public class ShapeFixer {
                     if (layers.get(i2) != layer) {
                         continue;
                     }
-                    
-                    
+
                     //its with fills vs stroke only, we can ignore these, I hope
-                    if (fillStyles0.get(i1) == 0 
+                    if (fillStyles0.get(i1) == 0
                             && fillStyles1.get(i1) == 0
                             && (fillStyles0.get(i2) != 0 || fillStyles1.get(i2) != 0)) {
                         continue;
                     }
-                    if (fillStyles0.get(i2) == 0 
+                    if (fillStyles0.get(i2) == 0
                             && fillStyles1.get(i2) == 0
                             && (fillStyles0.get(i1) != 0 || fillStyles1.get(i1) != 0)) {
                         continue;
                     }
-                    
+
                     loopj2:
                     for (int j2 = 0; j2 < shapes.get(i2).size(); j2++) {
                         BezierEdge be2 = shapes.get(i2).get(j2);
@@ -214,13 +213,49 @@ public class ShapeFixer {
                             continue;
                         }
 
-                        if (t1Ref.size() == 2) {
+                        if (t1Ref.size() > 1) {
+                            double eps = 1 / BezierEdge.ROUND_VALUE;
+                            Point2D last = intPoints.get(0);
+                            for (int i = 1; i < intPoints.size(); i++) {
+                                Point2D current = intPoints.get(i);
+                                if (current.distance(last) < eps) {
+                                    intPoints.remove(i);
+                                    t1Ref.remove(i);
+                                    t2Ref.remove(i);
+                                    i--;
+                                    continue;
+                                }
+                                last = current;
+                            }
+                        }
+
+                        /*if (t1Ref.size() == 2) {
+                            if (intPoints.get(0).distance(intPoints.get(1)) < 1/256f) {
+                                t1Ref.remove(1);
+                                t2Ref.remove(1);
+                                intPoints.remove(1);
+                            }
+                        }
+                        if (t1Ref.size() == 3) {
+                            
+                        }*/
+                        if (t1Ref.size() == 1) {
                             if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
                                     && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
                                 continue;
                             }
-                        }                       
-                        
+                        }
+
+                        //sharing start end end point
+                        if (t1Ref.size() == 2) {
+                            if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
+                                    && (t1Ref.get(1) == 0 || t1Ref.get(1) == 1)
+                                    && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)
+                                    && (t2Ref.get(1) == 0 || t2Ref.get(1) == 1)) {
+                                continue;
+                            }
+                        }
+
                         if (DEBUG_PRINT) {
                             System.err.println("intersects " + be1.toSvg() + "   " + be2.toSvg());
                             System.err.println(" fillstyle0: " + fillStyles0.get(i1) + " , " + fillStyles0.get(i2));
@@ -265,10 +300,15 @@ public class ShapeFixer {
                         be2L.setEndPoint(intP);
                         be2R.setBeginPoint(intP);
 
-                        be1L.roundHalf();
-                        be1R.roundHalf();
-                        be2L.roundHalf();
-                        be2R.roundHalf();
+                        /*be1L.roundX();
+                        be1R.roundX();
+                        be2L.roundX();
+                        be2R.roundX();*/
+                        be1L.roundX();
+                        be1R.roundX();
+                        be2L.roundX();
+                        be2R.roundX();
+
                         if (i1 == i2) {
                             if (j1 < j2) {
                                 shapes.get(i1).remove(j2);
@@ -331,6 +371,13 @@ public class ShapeFixer {
                         continue loopj1;
                     }
                 }
+            }
+        }
+
+        for (int i1 = 0; i1 < shapes.size(); i1++) {
+            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
+                BezierEdge be1 = shapes.get(i1).get(j1);
+                be1.shrinkToLine();
             }
         }
     }
@@ -493,6 +540,8 @@ public class ShapeFixer {
         beforeHandle(shapeNum, shapes, fillStyles0, fillStyles1, lineStyles, layers, baseFillStyles, baseLineStyles, fillStyleLayers, lineStyleLayers);
 
         if (Configuration.flaExportFixShapes.get()) {
+            SwitchedFillSidesFixer switchedFillSidesFixer = new SwitchedFillSidesFixer();
+            switchedFillSidesFixer.fixSwitchedFills(shapeNum, records, baseFillStyles, baseLineStyles, shapes, fillStyles0, fillStyles1, layers);
             detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
         }
 

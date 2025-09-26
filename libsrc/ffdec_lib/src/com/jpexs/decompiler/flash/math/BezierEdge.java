@@ -536,6 +536,18 @@ public class BezierEdge implements Serializable {
         }
         calcParams();
     }
+    
+    public static final double ROUND_VALUE = 1;
+    
+    public void roundX() {
+        for (int i = 0; i < this.points.size(); i++) {
+            this.points.set(i, new Point2D.Double(
+                    Math.round(this.points.get(i).getX() * ROUND_VALUE) / ROUND_VALUE,
+                    Math.round(this.points.get(i).getY() * ROUND_VALUE) / ROUND_VALUE
+            ));
+        }
+        calcParams();
+    }
 
     @Override
     public int hashCode() {
@@ -730,5 +742,20 @@ public class BezierEdge implements Serializable {
         //Rectangle2D out = new Rectangle2D.Double();
         //rectIntersection(new Rectangle2D.Double(0,0,50,50), new Rectangle2D.Double(0,50,50,50), out);
         //System.out.println("out = "+out);
+    }
+    
+    
+    public void shrinkToLine() {
+        if (points.size() == 3) {
+            double det = (points.get(1).getX() - points.get(0).getX()) 
+                            * (points.get(2).getY() - points.get(0).getY())
+                            - (points.get(1).getY() - points.get(0).getY())
+                            * (points.get(2).getX() - points.get(0).getX());
+            if (det == 0) {
+                points.remove(1);
+                revPoints.remove(1);
+                calcParams();
+            }
+        }
     }
 }

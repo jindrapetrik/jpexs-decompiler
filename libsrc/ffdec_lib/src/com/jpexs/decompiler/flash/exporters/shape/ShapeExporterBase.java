@@ -132,6 +132,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         _lineStyles = cachedData.lineStyles;
         _fillPaths = cachedData.fillPaths;
         _linePaths = cachedData.linePaths;
+        
+        handleFillPaths(_fillPaths);
+    }
+    
+    protected void handleFillPaths(List<List<IEdge>> fillPaths) {
+        
     }
 
     /**

@@ -112,6 +112,8 @@ All notable changes to this project will be documented in this file.
 - Font export - not setting ascent and descent
 - [#2471] PDF export - ignore control characters
 - [#2471] SVG export with typeface - white-space:pre style
+- [#1826], [#2416] FLA export - shapes - missing fills when fillStyle0/1 has incorrect orientation
+- [#2532], [#1011], [#2165] FLA export - shapes - missing fills on path crossings, small shapes
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
@@ -3830,7 +3832,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...dev
+,[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...dev
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
 [24.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...version24.0.0
 [23.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.0...version23.0.1
@@ -4033,6 +4035,11 @@ Major version of SWF to XML export changed to 2.
 [#2517]: https://www.free-decompiler.com/flash/issues/2517
 [#2522]: https://www.free-decompiler.com/flash/issues/2522
 [#2525]: https://www.free-decompiler.com/flash/issues/2525
+[#1826]: https://www.free-decompiler.com/flash/issues/1826
+[#2416]: https://www.free-decompiler.com/flash/issues/2416
+[#2532]: https://www.free-decompiler.com/flash/issues/2532
+[#1011]: https://www.free-decompiler.com/flash/issues/1011
+[#2165]: https://www.free-decompiler.com/flash/issues/2165
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
 [#1418]: https://www.free-decompiler.com/flash/issues/1418
@@ -4058,7 +4065,6 @@ Major version of SWF to XML export changed to 2.
 [#2469]: https://www.free-decompiler.com/flash/issues/2469
 [#2475]: https://www.free-decompiler.com/flash/issues/2475
 [#2427]: https://www.free-decompiler.com/flash/issues/2427
-[#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2448]: https://www.free-decompiler.com/flash/issues/2448
 [#2370]: https://www.free-decompiler.com/flash/issues/2370
 [#2453]: https://www.free-decompiler.com/flash/issues/2453
@@ -4071,7 +4077,6 @@ Major version of SWF to XML export changed to 2.
 [#2418]: https://www.free-decompiler.com/flash/issues/2418
 [#2397]: https://www.free-decompiler.com/flash/issues/2397
 [#2425]: https://www.free-decompiler.com/flash/issues/2425
-[#2416]: https://www.free-decompiler.com/flash/issues/2416
 [#2394]: https://www.free-decompiler.com/flash/issues/2394
 [#2400]: https://www.free-decompiler.com/flash/issues/2400
 [#2413]: https://www.free-decompiler.com/flash/issues/2413
@@ -4259,7 +4264,6 @@ Major version of SWF to XML export changed to 2.
 [#2031]: https://www.free-decompiler.com/flash/issues/2031
 [#1866]: https://www.free-decompiler.com/flash/issues/1866
 [#503]: https://www.free-decompiler.com/flash/issues/503
-[#1011]: https://www.free-decompiler.com/flash/issues/1011
 [#1257]: https://www.free-decompiler.com/flash/issues/1257
 [#1902]: https://www.free-decompiler.com/flash/issues/1902
 [#1903]: https://www.free-decompiler.com/flash/issues/1903
