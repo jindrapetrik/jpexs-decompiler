@@ -252,7 +252,7 @@ public class XFLConverter {
      */
     private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 
-    private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     private static final double SMALL_DIVISOR = 20;
 
@@ -311,9 +311,9 @@ public class XFLConverter {
         if (value % 1 == 0) {
             return "" + (int) value;
         }
-        //value = Math.round(value * 1000.0) / 1000.0;
-        //return EDGE_DECIMAL_FORMAT.format(value);
-        return numEdgeToString(value);
+        //value = Math.round(value * 2.0) / 2.0;
+        return EDGE_DECIMAL_FORMAT.format(value);
+        //return numEdgeToString(value);
     }
 
     private static String convertShapeEdge(MATRIX mat, ShapeRecordAdvanced record, double x, double y) {

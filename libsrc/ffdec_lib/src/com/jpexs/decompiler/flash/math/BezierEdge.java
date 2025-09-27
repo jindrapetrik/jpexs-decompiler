@@ -67,6 +67,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Constructor.
+     *
      * @param points Points
      */
     public BezierEdge(List<Point2D> points) {
@@ -81,6 +82,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Is the edge empty?
+     *
      * @return True if the edge is empty, false otherwise.
      */
     public boolean isEmpty() {
@@ -89,6 +91,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Constructor.
+     *
      * @param x0 Start x
      * @param y0 Start y
      * @param x1 End x
@@ -102,6 +105,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Constructor.
+     *
      * @param x0 Start x
      * @param y0 Start y
      * @param cx Control x
@@ -118,6 +122,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the begin point.
+     *
      * @return Begin point
      */
     public Point2D getBeginPoint() {
@@ -126,6 +131,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the end point.
+     *
      * @return End point
      */
     public Point2D getEndPoint() {
@@ -134,6 +140,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Sets the begin point.
+     *
      * @param p Begin point
      */
     public void setBeginPoint(Point2D p) {
@@ -143,6 +150,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Sets the end point.
+     *
      * @param p End point
      */
     public void setEndPoint(Point2D p) {
@@ -152,6 +160,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the point at specified position.
+     *
      * @param t Position
      * @return Point at position
      */
@@ -172,26 +181,31 @@ public class BezierEdge implements Serializable {
     }
 
     private void calcParams() {
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
-        for (Point2D p : points) {
-            if (p.getX() < minX) {
-                minX = p.getX();
+        if (points.size() == 2) {
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            double maxX = -Double.MAX_VALUE;
+            double maxY = -Double.MAX_VALUE;
+            for (Point2D p : points) {
+                if (p.getX() < minX) {
+                    minX = p.getX();
+                }
+                if (p.getX() > maxX) {
+                    maxX = p.getX();
+                }
+                if (p.getY() < minY) {
+                    minY = p.getY();
+                }
+                if (p.getY() > maxY) {
+                    maxY = p.getY();
+                }
             }
-            if (p.getX() > maxX) {
-                maxX = p.getX();
-            }
-            if (p.getY() < minY) {
-                minY = p.getY();
-            }
-            if (p.getY() > maxY) {
-                maxY = p.getY();
-            }
+
+            this.bbox = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
+        } else {
+            this.bbox = quadraticBBox(points.get(0), points.get(1), points.get(2));
         }
 
-        this.bbox = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
         this.hash = points.hashCode();
 
         revPoints = new ArrayList<>();
@@ -212,6 +226,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Calculates the bounding box.
+     *
      * @return Bounding box
      */
     public Rectangle2D bbox() {
@@ -222,6 +237,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Calculates the area.
+     *
      * @return Area
      */
     public double area() {
@@ -258,6 +274,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the intersections.
+     *
      * @param b2 Bezier edge
      * @return List of intersections
      */
@@ -282,6 +299,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the intersections. Old version.
+     *
      * @param b2 Bezier edge 2
      * @param t1Ref T1 reference
      * @param t2Ref T2 reference
@@ -329,6 +347,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Checks if the edges intersect.
+     *
      * @param b2 Bezier edge 2
      * @param t1Ref T1 reference
      * @param t2Ref T2 reference
@@ -420,6 +439,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Gets the length.
+     *
      * @return Length
      */
     public double length() {
@@ -456,6 +476,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Converts the edge to SVG.
+     *
      * @return SVG string
      */
     public String toSvg() {
@@ -488,6 +509,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Splits the edge.
+     *
      * @param t Position
      * @param left Left edge
      * @param right Right edge
@@ -502,9 +524,30 @@ public class BezierEdge implements Serializable {
         right.setVal(new BezierEdge(rightPoints));
     }
 
+    public List<BezierEdge> split(List<Double> tList) {
+        List<BezierEdge> result = new ArrayList<>();
+
+        double prevT = 0.0;
+        BezierEdge remaining = this;
+
+        for (double t : tList) {
+            double localT = (t - prevT) / (1.0 - prevT);
+
+            Reference<BezierEdge> leftRef = new Reference<>(null);
+            Reference<BezierEdge> rightRef = new Reference<>(null);
+            remaining.split(localT, leftRef, rightRef);
+            result.add(leftRef.getVal());
+            remaining = rightRef.getVal();
+            prevT = t;
+        }
+
+        result.add(remaining);
+        return result;
+    }
 
     /**
      * Reverses the edge.
+     *
      * @return Reversed edge
      */
     public BezierEdge reverse() {
@@ -536,9 +579,9 @@ public class BezierEdge implements Serializable {
         }
         calcParams();
     }
-    
-    public static final double ROUND_VALUE = 1;
-    
+
+    public static final double ROUND_VALUE = 2;
+
     public void roundX() {
         for (int i = 0; i < this.points.size(); i++) {
             this.points.set(i, new Point2D.Double(
@@ -576,6 +619,7 @@ public class BezierEdge implements Serializable {
 
     /**
      * Checks if the edge is equal to another edge in reverse order.
+     *
      * @param other Other edge
      * @return True if the edges are equal in reverse order, false otherwise
      */
@@ -594,168 +638,188 @@ public class BezierEdge implements Serializable {
         return true;
     }
 
-    /**
-     * Test main.
-     * @param args Arguments
-     */
-    public static void main(String[] args) {
-        List<Double> t1 = new ArrayList<>();
-        List<Double> t2 = new ArrayList<>();
-        /*/BezierEdge be1 = new BezierEdge(0,0,100,100);
-        BezierEdge be2 = new BezierEdge(75,100,75,0);
-        
-        System.out.println("lines "+ be1+ " and "+be2);
-        
-        
-        
-        
-        System.out.println("hasIntersection = "+be1.intersects(be2, t1, t2));
-        System.out.println("intersection points: "+t1+", "+t2);
-        
-        
-        BezierEdge be3 = new BezierEdge(0,0,100,0);
-        BezierEdge be4 = new BezierEdge(0,100,100,100);
-        
-        System.out.println("lines "+ be3+ " and "+be4);
-        
-        System.out.println("hasIntersection = "+be3.intersects(be4, t1, t2));
-        System.out.println("intersection points: "+t1+", "+t2);*/
-
-        BezierEdge be5 = new BezierEdge(25, 0, 25, 100);
-        BezierEdge be6 = new BezierEdge(0, 50, 100, 50);
-
-        //System.err.println("lines " + be5 + " and " + be6);
-        BezierEdge q1 = new BezierEdge(3469, 3124, 3320, 3148, 3355, 3215);
-        BezierEdge q2 = new BezierEdge(3442, 3191, 3316, 3146, 3317, 3071);
-        BezierEdge q3 = new BezierEdge(3310, 3222, 3450, 3172, 3300, 3181);
-        BezierEdge li = new BezierEdge(3423, 3040, 3277, 3164);
-        BezierEdge li2 = new BezierEdge(3399, 3095, 3365, 3039);
-
-        List<Point2D> ints;
-        /*ints = q2.getIntersections(q1);
-        System.err.println("intersections is "+ints);
-        ints = q2.getIntersections(li);
-        System.err.println("intersections is "+ints);
-        ints = li2.getIntersections(li);
-        System.err.println("intersections is "+ints);
-        ints = q1.getIntersections(q3);        
-        System.err.println("intersections is "+ints);*/
-
-        BezierEdge qa = new BezierEdge(-81.0, -78.0, -85.0, -76.0, -86.0, -66.0);
-        BezierEdge qb = new BezierEdge(-166.0, 37.0, -172.0, -21.0, -81.0, -78.0);
-        /*ints = qa.getIntersections(qb);
-        System.err.println("intersections is " + ints);        
-        BezierEdge qc = new BezierEdge(-106.0,39.0, -104.0,33.0);
-        BezierEdge qd = new BezierEdge(-104.0,33.0,-105.0,36.0,-102.0,26.0);
-        ints = qc.getIntersections(qd);
-        System.err.println("intersections is " + ints);
-        
-        ints = Intersections.intersectLineLine(new Point2D.Double(0,0), new Point2D.Double(10,0), new Point2D.Double(2,0), new Point2D.Double(5,0), true); 
-        System.err.println("intersections is " + ints);       
-        BezierEdge qe = new BezierEdge(-104,33,-104.5,35,-104,32);
-        BezierEdge qf = new BezierEdge(-106,39 ,-104,33);
-        ints = qe.getIntersections(qf);*/
-        BezierEdge qg = new BezierEdge(-66, 139, -67, 140, -61, 135);
-        BezierEdge qh = new BezierEdge(-64, 169, -66.5, 139.5, -66, 139);
-
-        //Error Y values of bounds must be of opposite sign
-        BezierEdge qi = new BezierEdge(6369.0, 13040.0, 6380.0, 13030.0, 6427.0, 13018.0);
-        BezierEdge qj = new BezierEdge(6338.0, 13099.0, 6358.0, 13050.0, 6369.0, 13040.0);
-
-        //Error Y values of bounds must be of opposite sign
-        BezierEdge qk = new BezierEdge(45334.0, 2421.0, 45348.0, 2373.0, 45348.0, 2330.0);
-        BezierEdge ql = new BezierEdge(45348.0, 2330.0, 45348.0, 2263.0, 45314.0, 2223.0);
-
-        BezierEdge qm = new BezierEdge(-1957, 2676, -1957, 2676.5, -1957.5, 2676.5);
-        BezierEdge qn = new BezierEdge(-1957, 2675.5, -1957, 2676, -1957, 2676);
-
-        /*List<Point2D> ps = new ArrayList<>();
-        qm.intersects(qn, t1, t2, ps);
-        System.err.println("t1 is " + t1);
-        System.err.println("t2 is " + t2);
-        System.err.println("intersections is " + ps);
-         */
- /*Shape r1 = new Rectangle2D.Double(0, 0, 200, 100);
-        GeneralPath r2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        r2.moveTo(0, 0);
-        r2.lineTo(100, 0);
-        r2.lineTo(150, 0);
-        r2.lineTo(200, 0);
-        r2.lineTo(200, 100);
-        r2.lineTo(0, 100);
-        r2.closePath();
-        
-        GeneralPath sh1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        sh1.moveTo(0, 0);
-        sh1.quadTo(100, 100, 0, 100);
-        sh1.lineTo(0, 0);
-        sh1.closePath();
-        
-        BezierEdge bex = new BezierEdge(0, 0, 100, 100, 0, 100);
-        Reference<BezierEdge> bex1Ref = new Reference<>(null);
-        Reference<BezierEdge> bex2Ref = new Reference<>(null);
-        bex.split(0.2, bex1Ref, bex2Ref);
-        BezierEdge bex1 = bex1Ref.getVal();
-        BezierEdge bex2 = bex2Ref.getVal();
-        GeneralPath sh2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        sh2.moveTo(bex1.getBeginPoint().getX(), bex1.getBeginPoint().getY());
-        sh2.quadTo(10+bex1.points.get(1).getX(), bex1.points.get(1).getY(), bex1.getEndPoint().getX(), bex1.getEndPoint().getY());
-        sh2.quadTo(bex2.points.get(1).getX(), bex2.points.get(1).getY(), bex2.getEndPoint().getX(), bex2.getEndPoint().getY());
-        sh2.lineTo(0, 0);
-        sh2.closePath();
-        
-        Area a1 = new Area(r1);
-        Area a2 = new Area(r2);
-        //a1.exclusiveOr(a2);
-                
-        
-         */
- /*GeneralPath p1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        p1.moveTo(0, 0);
-        p1.lineTo(200, 0);
-        p1.lineTo(200, 200);
-        p1.lineTo(0, 200);
-        p1.lineTo(0, 0);
-        p1.closePath();
-        p1.moveTo(50, 50);
-        p1.lineTo(150, 50);
-        p1.lineTo(150, 150);
-        p1.lineTo(50, 150);
-        p1.lineTo(50, 50);
-        p1.closePath();
-
-        System.err.println("cont:" + p1.contains(100, 100));
-        System.err.println("cont:" + p1.contains(150, 150));  */
-        //System.err.println("minDist = " + minDist+", maxDist = "+ maxDist);
-        //System.err.println("eArea = " + Areas.calcArea(a1));
-
-        /*Point2D c = new Point2D.Double(
-                (1 - t1.get(0)) * be5.points.get(0).getX() + t1.get(0) * be5.points.get(1).getX(),
-                (1 - t1.get(0)) * be5.points.get(0).getY() + t1.get(0) * be5.points.get(1).getY()
-        );
-
-        System.out.println("Intersection point: " + c);
-        
-        BezierEdge be = new BezierEdge(0, 0, 100, 50, 0, 100);
-        
-        System.out.println("be5.dist: " + be.length());*/
-        //Rectangle2D out = new Rectangle2D.Double();
-        //rectIntersection(new Rectangle2D.Double(0,0,50,50), new Rectangle2D.Double(0,50,50,50), out);
-        //System.out.println("out = "+out);
-    }
-    
-    
     public void shrinkToLine() {
         if (points.size() == 3) {
-            double det = (points.get(1).getX() - points.get(0).getX()) 
-                            * (points.get(2).getY() - points.get(0).getY())
-                            - (points.get(1).getY() - points.get(0).getY())
-                            * (points.get(2).getX() - points.get(0).getX());
+            double det = (points.get(1).getX() - points.get(0).getX())
+                    * (points.get(2).getY() - points.get(0).getY())
+                    - (points.get(1).getY() - points.get(0).getY())
+                    * (points.get(2).getX() - points.get(0).getX());
             if (det == 0) {
                 points.remove(1);
                 revPoints.remove(1);
                 calcParams();
             }
         }
+    }
+
+    public Double findXCriticalT() {
+        double EPS = 1e-12;
+
+        if (points.size() < 3) {
+            return null;
+        }
+
+        // dx/dt = 2 * ((x1 - x0) + t * (x2 - 2*x1 + x0))
+        final double a = (points.get(2).getX() - 2.0 * points.get(1).getX() + points.get(0).getX()); // coefficient of t
+        final double b = (points.get(1).getX() - points.get(0).getX());            // constant term
+
+        // If a ~ 0, dx/dt is (almost) constant -> x(t) is (almost) linear -> x-monotone already.
+        if (Math.abs(a) < EPS) {
+            return null;
+        }
+
+        double t = -b / a; // (x0 - x1) / (x0 - 2*x1 + x2)
+
+        // Accept strictly inside (0,1); relax by EPS to be robust.
+        if (t > EPS && t < 1.0 - EPS) {
+            return t;
+        }
+
+        return null;
+    }
+
+    private static double quad(double p0, double p1, double p2, double t) {
+        double u = 1.0 - t;
+        return u * u * p0 + 2.0 * u * t * p1 + t * t * p2;
+    }
+
+    public double yAt(double x) {
+        double EPS = 1e-12;
+        if (points.size() == 2) {
+            //line
+            double x0 = points.get(0).getX();
+            double y0 = points.get(0).getY();
+            double x1 = points.get(1).getX();
+            double y1 = points.get(1).getY();
+            double dx = x1 - x0;
+
+            // Guard for near-vertical segments: return stable representative y
+            if (Math.abs(dx) < EPS) {
+                return (y0 + y1) * 0.5;
+            }
+
+            double t = (x - x0) / dx;
+            if (t < 0) {
+                t = 0;
+            } else if (t > 1) {
+                t = 1;
+            }
+            return y0 + t * (y1 - y0);
+        }
+        //quad
+        final double A = (points.get(0).getX() - 2.0 * points.get(1).getX() + points.get(2).getX());
+        final double B = 2.0 * (points.get(1).getX() - points.get(0).getX());
+        final double C = points.get(0).getX() - x; // solve A t^2 + B t + C = 0
+
+        double t;
+        if (Math.abs(A) < EPS) {
+            t = (Math.abs(B) < EPS) ? 0.5 : (-C / B);
+        } else {
+            double disc = B * B - 4.0 * A * C;
+            if (disc < 0 && disc > -1e-14) {
+                disc = 0;
+            }
+            if (disc < 0) {
+                t = 0.5;
+            } else {
+                double sqrtD = Math.sqrt(disc);
+                double q = -0.5 * (B + Math.copySign(sqrtD, B));
+                double t1 = q / A;
+                double t2 = (Math.abs(q) < EPS) ? t1 : (C / q);
+                boolean t1In = t1 > -1e-9 && t1 < 1.0 + 1e-9;
+                boolean t2In = t2 > -1e-9 && t2 < 1.0 + 1e-9;
+                if (t1In && !t2In) {
+                    t = t1;
+                } else if (!t1In && t2In) {
+                    t = t2;
+                } else if (t1In && t2In) {
+                    t = (Math.abs(t1 - 0.5) < Math.abs(t2 - 0.5)) ? t1 : t2;
+                } else {
+                    double c1 = Math.min(Math.max(t1, 0.0), 1.0);
+                    double c2 = Math.min(Math.max(t2, 0.0), 1.0);
+                    double x1 = quad(points.get(0).getX(), points.get(1).getX(), points.get(2).getX(), c1);
+                    double x2 = quad(points.get(0).getX(), points.get(1).getX(), points.get(2).getX(), c2);
+                    t = (Math.abs(x1 - x) <= Math.abs(x2 - x)) ? c1 : c2;
+                }
+            }
+        }
+        if (t < 0) {
+            t = 0;
+        } else if (t > 1) {
+            t = 1;
+        }
+        return quad(points.get(0).getY(), points.get(1).getY(), points.get(2).getY(), t);
+    }
+
+    /**
+     * Compute B(t) for a quadratic Bezier defined by P0, P1, P2.
+     */
+    private static Point2D.Double evalQuad(Point2D p0, Point2D p1, Point2D p2, double t) {
+        // All math in double; t assumed in [0,1], but we'll still accept slightly outside due to numeric noise.
+        double u = 1.0 - t;
+        double x = u * u * p0.getX() + 2 * u * t * p1.getX() + t * t * p2.getX();
+        double y = u * u * p0.getY() + 2 * u * t * p1.getY() + t * t * p2.getY();
+        return new Point2D.Double(x, y);
+    }
+
+    /**
+     * Compute the bounding box of a quadratic Bezier (P0, P1, P2). We include
+     * endpoints and inner extrema where the derivative in x or y equals 0.
+     */
+    public static Rectangle2D quadraticBBox(Point2D p0, Point2D p1, Point2D p2) {
+        // Collect candidate t values: endpoints and potential inner extrema for x and y.
+        List<Double> candidates = new ArrayList<>();
+        candidates.add(0.0);
+        candidates.add(1.0);
+
+        // Derivative B'(t) = 2( (1 - t)(P1 - P0) + t(P2 - P1) )
+        // Setting x' = 0 gives linear equation in t with solution:
+        // t = (P0x - P1x) / (P0x - 2P1x + P2x), if denominator != 0
+        double denomX = p0.getX() - 2.0 * p1.getX() + p2.getX();
+        double denomY = p0.getY() - 2.0 * p1.getY() + p2.getY();
+
+        // Small epsilon to avoid floating point issues around 0 denominators
+        final double EPS = 1e-12;
+
+        if (Math.abs(denomX) > EPS) {
+            double tx = (p0.getX() - p1.getX()) / denomX;
+            if (tx > 0.0 && tx < 1.0) {
+                candidates.add(tx);
+            }
+        }
+        if (Math.abs(denomY) > EPS) {
+            double ty = (p0.getY() - p1.getY()) / denomY;
+            if (ty > 0.0 && ty < 1.0) {
+                candidates.add(ty);
+            }
+        }
+
+        // Evaluate all candidate points and take min/max
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+
+        for (double t : candidates) {
+            // Clamp t just in case of tiny numeric drifts
+            double tt = Math.max(0.0, Math.min(1.0, t));
+            Point2D.Double pt = evalQuad(p0, p1, p2, tt);
+            double x = pt.x;
+            double y = pt.y;
+            if (x < minX) {
+                minX = x;
+            }
+            if (y < minY) {
+                minY = y;
+            }
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (y > maxY) {
+                maxY = y;
+            }
+        }
+
+        return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 }

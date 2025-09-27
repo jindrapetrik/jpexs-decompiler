@@ -97,16 +97,11 @@ public class SwitchedFillSidesFixer {
 
         public Polygon(List<IEdge> list, int fillStyle) {
             this.list = list;
-            /*double polyArea = polygonArea(list);
-            if (polyArea < 0) {
-                ccw = true;
-            }*/
             path = toPath();
-            //this.ccw = PathOrientation.orientationSingleClosed(path) == PathOrientation.Orientation.COUNTER_CLOCKWISE;
-            Reference<PathOrientation.Orientation> orientationRef = new Reference<>(null);
+            Reference<PathArea.Orientation> orientationRef = new Reference<>(null);
             Reference<Double> areaRef = new Reference<>(0.0);
-            PathOrientation.orientationSingleClosed(path, orientationRef, areaRef);
-            this.ccw = orientationRef.getVal() == PathOrientation.Orientation.COUNTER_CLOCKWISE;
+            PathArea.orientationSingleClosed(path, orientationRef, areaRef);
+            this.ccw = orientationRef.getVal() == PathArea.Orientation.COUNTER_CLOCKWISE;
             this.area = areaRef.getVal();
             this.areaObj = new Area(path);
             this.bbox = this.areaObj.getBounds2D();
@@ -168,12 +163,14 @@ public class SwitchedFillSidesFixer {
         // Simple uniform grid over bbox domain
         private final double cellSize;
         private final Map<Long, List<Polygon>> cells = new HashMap<>();
-        private final double minX, minY;
+        private final double minX;
+        private final double minY;
 
         GridIndex(Collection<Polygon> polys, double cellSize) {
             this.cellSize = cellSize;
             // Compute global origin (minX/minY) to keep keys small
-            double minx = Double.POSITIVE_INFINITY, miny = Double.POSITIVE_INFINITY;
+            double minx = Double.POSITIVE_INFINITY;
+            double miny = Double.POSITIVE_INFINITY;
             for (Polygon w : polys) {
                 Rectangle2D b = w.bbox;
                 if (b.getMinX() < minx) {
@@ -237,7 +234,7 @@ public class SwitchedFillSidesFixer {
         void accept(int gx, int gy);
     }
 
-    public static void buildContainment(List<Polygon> polygons) {
+    private static void buildContainment(List<Polygon> polygons) {
 
         Map<Integer, List<Polygon>> byStyle = polygons.stream()
                 .collect(java.util.stream.Collectors.groupingBy(w -> w.fillStyle));
@@ -337,35 +334,6 @@ public class SwitchedFillSidesFixer {
             polygons.add(new Polygon(list, listFills.get(i)));
         }
 
-        /*for (Polygon outer : polygons) {
-            for (Polygon inner : polygons) {
-                if (outer != inner && inner.fillStyle == outer.fillStyle) {
-                    boolean cont = outer.contains(inner);
-
-                    if (cont) {
-                        if (inner.children.contains(outer)) {
-                            inner.children.remove(outer);
-                        }
-                        outer.children.add(inner);
-                    }
-                }
-            }
-        }
-
-        loopmod:
-        while (true) {
-            for (Polygon poly : polygons) {
-                for (int c = 0; c < poly.children.size(); c++) {
-                    for (int c2 = 0; c2 < poly.children.size(); c2++) {
-                        if (poly.children.get(c).children.contains(poly.children.get(c2))) {
-                            poly.children.remove(c2);
-                            continue loopmod;
-                        }
-                    }
-                }
-            }
-            break;
-        }*/
         buildContainment(polygons);
 
         for (Polygon poly : polygons) {
@@ -403,11 +371,10 @@ public class SwitchedFillSidesFixer {
                 BezierEdge beRev = be.reverse();
                 int localFs = globalToLocalFillStyleMap.get(fillStyleIdx);
 
-                BezierEdge search = new BezierEdge(180.0, -3040.0, 480.0, -3400.0);
-
+                //BezierEdge search = new BezierEdge(180.0, -3040.0, 480.0, -3400.0);
                 boolean print = false;
 
-                if (be.equals(search)) {
+                /*if (be.equals(search)) {
                     System.err.println("xxx");
                     System.err.println("" + polygon);
                     print = true;
@@ -415,8 +382,7 @@ public class SwitchedFillSidesFixer {
                 if (be.equals(search.reverse())) {
                     System.err.println("yyy");
                     print = true;
-                }
-
+                }*/
                 if (print) {
                     System.err.println("localFS: " + localFs);
                     System.err.println("filled: " + polygon.filled);

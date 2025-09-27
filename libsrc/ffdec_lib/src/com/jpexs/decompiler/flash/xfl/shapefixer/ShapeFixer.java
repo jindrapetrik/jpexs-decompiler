@@ -27,9 +27,21 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Shape fixer. This will walk a shape and split crossed edges so FLA editor can
@@ -97,6 +109,277 @@ public class ShapeFixer {
     ) {
     }
 
+    private static class BezierEdgeWrapper {
+
+        BezierEdge be;
+        int layer;
+        int shapeIndex;
+        int edgeIndex;
+
+        public BezierEdgeWrapper(BezierEdge be, int layer, int shapeIndex, int edgeIndex) {
+            this.be = be;
+            this.layer = layer;
+            this.shapeIndex = shapeIndex;
+            this.edgeIndex = edgeIndex;
+        }
+
+        double minX() {
+            return bbox().getMinX();
+        }
+
+        double maxX() {
+            return bbox().getMaxX();
+        }
+
+        double minY() {
+            return bbox().getMinY();
+        }
+
+        double maxY() {
+            return bbox().getMaxY();
+        }
+
+        Rectangle2D bbox() {
+            return be.bbox();
+        }
+    }
+
+    static final class Event implements Comparable<Event> {
+
+        final Type type;
+        final double x;
+        final BezierEdgeWrapper e;
+
+        enum Type {
+            START, END
+        }
+
+        public Event(Type type, double x, BezierEdgeWrapper e) {
+            this.type = type;
+            this.x = x;
+            this.e = e;
+        }
+
+        @Override
+        public int compareTo(Event o) {
+            int cx = Double.compare(this.x, o.x);
+            if (cx != 0) {
+                return cx;
+            }
+            int ct = this.type.ordinal() - o.type.ordinal();
+            if (ct != 0) {
+                return ct;
+            }
+            int ce = System.identityHashCode(this.e) - System.identityHashCode(o.e);
+            return ce;
+        }
+    }
+
+    static final class Sweep {
+
+        Map<BezierEdgeWrapper, List<Double>> splitPoints = new LinkedHashMap<>();
+        final java.util.Comparator<BezierEdgeWrapper> statusCmp = (e1, e2) -> {
+            int cMinY = Double.compare(e1.minY(), e2.minY());
+            if (cMinY != 0) {
+                return cMinY;
+            }
+            return Integer.compare(System.identityHashCode(e1), System.identityHashCode(e2));
+        };
+        final java.util.TreeSet<BezierEdgeWrapper> status = new TreeSet<>(statusCmp);
+        //final java.util.Set<BezierEdgeWrapper> status = new HashSet<>();
+        final java.util.PriorityQueue<Event> pq = new java.util.PriorityQueue<>();
+
+        // eps values for numeric robustness
+        static final double EPS = 1e-9;
+
+        void addEdge(BezierEdgeWrapper e) {
+            pq.add(new Event(Event.Type.START, e.minX(), e));
+            pq.add(new Event(Event.Type.END, e.maxX(), e));
+        }
+
+        void run() {
+            //int total = pq.size();
+            //int cnt = 0;
+            while (!pq.isEmpty()) {
+                /*if (cnt % 1000 == 0) {
+                    System.err.println("Percent done: " + (Math.round((cnt * 100.0 / total) * 100.0) / 100.0));
+                }
+                cnt++;*/
+                Event ev = pq.poll();
+
+                switch (ev.type) {
+                    case START:
+                        BezierEdgeWrapper beMaxY = new BezierEdgeWrapper(null, 0, 0, 0) {
+                            @Override
+                            double minY() {
+                                return ev.e.maxY();
+                            }
+                        };
+
+                        for (BezierEdgeWrapper e2 : status.headSet(beMaxY, true)) {
+                            /*if (e2.minY() > maxY) {
+                                break;
+                            }*/
+                            checkPair(ev.e, e2);
+                        }
+                        status.add(ev.e);
+                        break;
+                    case END:
+                        status.remove(ev.e);
+                        break;
+                }
+            }
+        }
+
+        private void checkPair(BezierEdgeWrapper e1, BezierEdgeWrapper e2) {
+            if (e1 == null || e2 == null) {
+                return;
+            }
+
+            List<Double> t1Ref = new ArrayList<>();
+            List<Double> t2Ref = new ArrayList<>();
+            List<Point2D> intPoint = new ArrayList<>();
+            if (!e1.be.intersects(e2.be, t1Ref, t2Ref, intPoint)) {
+                return;
+            }
+
+            if (!splitPoints.containsKey(e1)) {
+                splitPoints.put(e1, new ArrayList<>());
+            }
+            if (!splitPoints.containsKey(e2)) {
+                splitPoints.put(e2, new ArrayList<>());
+            }
+            splitPoints.get(e1).addAll(t1Ref);
+            splitPoints.get(e2).addAll(t2Ref);
+        }
+    }
+
+    private void handleBewList(List<BezierEdgeWrapper> bewList, List<List<BezierEdge>> shapes) {
+        Map<Integer, List<BezierEdgeWrapper>> bewMap = bewList.stream()
+                .collect(Collectors.groupingBy(b -> b.layer));
+
+        for (Map.Entry<Integer, List<BezierEdgeWrapper>> entry : bewMap.entrySet()) {
+
+            Set<BezierEdgeWrapper> bewsToIgnore = new LinkedHashSet<>();
+
+            Map<BezierEdge, BezierEdgeWrapper> existingEdges = new HashMap<>();
+
+            //eliminate duplicates
+            for (BezierEdgeWrapper bew1 : entry.getValue()) {
+                BezierEdge be = bew1.be;
+                BezierEdge rev = bew1.be.reverse();
+
+                BezierEdgeWrapper prevBew = existingEdges.get(be);
+                if (prevBew != null) {
+                    bewsToIgnore.add(prevBew);
+                }
+                existingEdges.put(be, bew1);
+
+                BezierEdgeWrapper prevRevBew = existingEdges.get(rev);
+                if (prevRevBew != null) {
+                    bewsToIgnore.add(prevRevBew);
+                }
+                existingEdges.put(rev, bew1);
+            }
+
+            //eliminate duplicates
+            /*for (BezierEdgeWrapper bew1 : entry.getValue()) {
+                for (BezierEdgeWrapper bew2 : entry.getValue()) {
+                    if (bew1 != bew2) {
+                        if (bew1.beOriginal.equals(bew2.beOriginal)
+                                || bew1.beOriginal.equalsReverse(bew2.beOriginal)) {
+                            bewsToIgnore.add(bew1);
+                        }
+                    }
+                }
+            }*/
+            boolean useSweep = true;
+
+            Map<BezierEdgeWrapper, List<Double>> splitPointsMap = new LinkedHashMap<>();
+
+            if (useSweep) {
+                Sweep sweep = new Sweep();
+                for (BezierEdgeWrapper bew : entry.getValue()) {
+                    if (bewsToIgnore.contains(bew)) {
+                        continue;
+                    }
+                    sweep.addEdge(bew);
+                }
+                sweep.run();
+                splitPointsMap = sweep.splitPoints;
+            } else {
+
+                for (BezierEdgeWrapper bew1 : entry.getValue()) {
+                    for (BezierEdgeWrapper bew2 : entry.getValue()) {
+                        if (bew1 != bew2) {
+                            List<Double> t1Ref = new ArrayList<>();
+                            List<Double> t2Ref = new ArrayList<>();
+                            List<Point2D> intPoints = new ArrayList<>();
+                            if (bew1.be.intersects(bew2.be, t1Ref, t2Ref, intPoints)) {
+                                if (!splitPointsMap.containsKey(bew1)) {
+                                    splitPointsMap.put(bew1, new ArrayList<>());
+                                }
+                                splitPointsMap.get(bew1).addAll(t1Ref);
+
+                                if (!splitPointsMap.containsKey(bew2)) {
+                                    splitPointsMap.put(bew2, new ArrayList<>());
+                                }
+                                splitPointsMap.get(bew2).addAll(t2Ref);
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<BezierEdgeWrapper> splittedBewList = new ArrayList<>(splitPointsMap.keySet());
+
+            splittedBewList.sort((BezierEdgeWrapper o1, BezierEdgeWrapper o2) -> {
+                int dShapeIndex = o1.shapeIndex - o2.shapeIndex;
+                if (dShapeIndex != 0) {
+                    return dShapeIndex;
+                }
+                int dEIndex = o1.edgeIndex - o2.edgeIndex;
+                if (dEIndex != 0) {
+                    return dEIndex;
+                }
+                return System.identityHashCode(o1) - System.identityHashCode(o2);
+            });
+
+            for (int i = splittedBewList.size() - 1; i >= 0; i--) {
+                BezierEdgeWrapper bew = splittedBewList.get(i);
+
+                List<Double> splitT = splitPointsMap.get(bew);
+                splitT.sort((a, b) -> Double.compare(a, b));
+
+                BezierEdge be = bew.be;
+                List<Double> realSplitT = new ArrayList<>();
+                for (double t : splitT) {
+                    if (t == 0.0 || t == 1.0) {
+                        continue;
+                    }
+
+                    realSplitT.add(t);
+                }
+
+                if (realSplitT.isEmpty()) {
+                    continue;
+                }
+
+                List<BezierEdge> splitted = be.split(realSplitT);
+                shapes.get(bew.shapeIndex).remove(bew.edgeIndex);
+                int pos = 0;
+                for (BezierEdge bes : splitted) {
+                    bes.roundX();
+                    if (bes.isEmpty()) {
+                        continue;
+                    }
+                    shapes.get(bew.shapeIndex).add(bew.edgeIndex + pos, bes);
+                    pos++;
+                }
+            }
+        }
+    }
+
     private void detectOverlappingEdges(
             List<List<BezierEdge>> shapes,
             List<Integer> fillStyles0,
@@ -104,26 +387,79 @@ public class ShapeFixer {
             List<Integer> lineStyles,
             List<Integer> layers
     ) {
+        
+        /*if (true) {
+            detectOverlappingEdgesOld(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+            return;
+        }*/
+
+        List<BezierEdgeWrapper> allBewList = new ArrayList<>();
+        for (int i1 = 0; i1 < shapes.size(); i1++) {
+            int layer = layers.get(i1);
+            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
+                BezierEdge be = shapes.get(i1).get(j1);
+                allBewList.add(new BezierEdgeWrapper(be, layer, i1, j1));
+            }
+        }
+
+        List<BezierEdgeWrapper> strokesBewList = new ArrayList<>();
+        List<BezierEdgeWrapper> fillsBewList = new ArrayList<>();
+
+        for (BezierEdgeWrapper bew : allBewList) {
+            if (fillStyles0.get(bew.shapeIndex) == 0 && fillStyles1.get(bew.shapeIndex) == 0) {
+                strokesBewList.add(bew);
+            } else {
+                fillsBewList.add(bew);
+            }
+        }
+
+        handleBewList(strokesBewList, shapes);
+        handleBewList(fillsBewList, shapes);
+
+        for (int i1 = 0; i1 < shapes.size(); i1++) {
+            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
+                BezierEdge be1 = shapes.get(i1).get(j1);
+                be1.shrinkToLine();
+            }
+        }
+    }
+
+    //Old unoptimized overlapping
+    private void detectOverlappingEdgesOld(
+            List<List<BezierEdge>> shapes,
+            List<Integer> fillStyles0,
+            List<Integer> fillStyles1,
+            List<Integer> lineStyles,
+            List<Integer> layers
+    ) {
+        /*Map<BezierEdge, Double> splitPoints = new TreeMap<>(new Comparator<BezierEdge>() {
+            @Override
+            public int compare(BezierEdge o1, BezierEdge o2) {
+                int dSize = o1.points.size() - o2.points.size();
+                if (dSize != 0) {
+                    return dSize;
+                }
+                for (int i = 0; i < o1.points.size(); i++) {
+                    int dX = Double.compare(o1.points.get(i).getX(), o2.points.get(i).getX());
+                    if (dX != 0) {
+                        return dX;
+                    }
+                    int dY = Double.compare(o1.points.get(i).getY(), o2.points.get(i).getY());
+                    if (dY != 0) {
+                        return dY;
+                    }
+                }
+                return 0;
+            }
+
+        });*/
+
         //------------------- detecting overlapping edges --------------------
         List<BezierPair> splittedPairs = new ArrayList<>();
 
-        //long t1 = System.currentTimeMillis();
-        //int oldpct = 0;
         loopi1:
         for (int i1 = 0; i1 < shapes.size(); i1++) {
             int layer = layers.get(i1);
-            /*if (i1 % 10 == 0) {
-                int pct = i1 * 100 / shapes.size();
-                if (oldpct != pct) {
-                    //System.err.println("pct: " + pct + "%");
-                    if (pct == 10) {
-                        long t2 = System.currentTimeMillis();
-                        long dt = t2 - t1;
-                        System.err.println("Time per 10%: " + Helper.formatTimeSec(dt));
-                    }
-                }
-                oldpct = pct;
-            }*/
 
             loopj1:
             for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
@@ -229,16 +565,6 @@ public class ShapeFixer {
                             }
                         }
 
-                        /*if (t1Ref.size() == 2) {
-                            if (intPoints.get(0).distance(intPoints.get(1)) < 1/256f) {
-                                t1Ref.remove(1);
-                                t2Ref.remove(1);
-                                intPoints.remove(1);
-                            }
-                        }
-                        if (t1Ref.size() == 3) {
-                            
-                        }*/
                         if (t1Ref.size() == 1) {
                             if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
                                     && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
@@ -300,15 +626,13 @@ public class ShapeFixer {
                         be2L.setEndPoint(intP);
                         be2R.setBeginPoint(intP);
 
-                        /*be1L.roundX();
-                        be1R.roundX();
-                        be2L.roundX();
-                        be2R.roundX();*/
                         be1L.roundX();
                         be1R.roundX();
                         be2L.roundX();
                         be2R.roundX();
 
+                        //splitPoints.put(be1, t1Ref.get(splitPointIndex));
+                        //splitPoints.put(be2, t2Ref.get(splitPointIndex));
                         if (i1 == i2) {
                             if (j1 < j2) {
                                 shapes.get(i1).remove(j2);
@@ -564,5 +888,38 @@ public class ShapeFixer {
             return cer;
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+
+        Map<BezierEdge, Double> splitPoints = new TreeMap<>(new Comparator<BezierEdge>() {
+            @Override
+            public int compare(BezierEdge o1, BezierEdge o2) {
+                int dSize = o1.points.size() - o2.points.size();
+                if (dSize != 0) {
+                    return dSize;
+                }
+                for (int i = 0; i < o1.points.size(); i++) {
+                    int dX = Double.compare(o1.points.get(i).getX(), o2.points.get(i).getX());
+                    if (dX != 0) {
+                        return dX;
+                    }
+                    int dY = Double.compare(o1.points.get(i).getY(), o2.points.get(i).getY());
+                    if (dY != 0) {
+                        return dY;
+                    }
+                }
+                return 0;
+            }
+
+        });
+
+        ShapeFixer f = new ShapeFixer();
+        List<List<BezierEdge>> shapes = new ArrayList<>();
+        List<BezierEdge> beList = new ArrayList<>();
+        beList.add(new BezierEdge(10000.0, 4980.0, 10040.0, 5060.0));
+        beList.add(new BezierEdge(10040.0, 5040.0, 9900.0, 4900.0, 9900.0, 4860.0));
+        shapes.add(beList);
+        f.detectOverlappingEdges(shapes, Arrays.asList(1), Arrays.asList(2), Arrays.asList(0), Arrays.asList(0));
     }
 }

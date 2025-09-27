@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Path orientation detector.
+ * Path area calculator and orientation detector.
+ *
  * @author JPEXS
  */
-public final class PathOrientation {
+public final class PathArea {
 
     public enum Orientation {
         CLOCKWISE, COUNTER_CLOCKWISE, DEGENERATE, OPEN_CONTOUR
@@ -33,7 +34,7 @@ public final class PathOrientation {
 
         double[] coords = new double[6];
         List<double[]> current = new ArrayList<>();
-        
+
         double startX = 0;
         double startY = 0;
         double lastX = 0;
@@ -94,7 +95,6 @@ public final class PathOrientation {
             hasOpen = true;
         }
 
-        
     }
 
     /**
@@ -121,9 +121,9 @@ public final class PathOrientation {
             areaRef.setVal(0.0);
             return;
         }
-    
+
         resultRef.setVal(area2 > 0 ? Orientation.CLOCKWISE : Orientation.COUNTER_CLOCKWISE);
-        areaRef.setVal(Math.abs(area2/2));
+        areaRef.setVal(Math.abs(area2 / 2));
     }
 
     public static void orientationSingleClosed(Shape shape, Reference<Orientation> orientationRef, Reference<Double> areaRef) {

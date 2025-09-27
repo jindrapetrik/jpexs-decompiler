@@ -113,7 +113,8 @@ All notable changes to this project will be documented in this file.
 - [#2471] PDF export - ignore control characters
 - [#2471] SVG export with typeface - white-space:pre style
 - [#1826], [#2416] FLA export - shapes - missing fills when fillStyle0/1 has incorrect orientation
-- [#2532], [#1011], [#2165] FLA export - shapes - missing fills on path crossings, small shapes
+- [#2532], [#1011], [#2165] FLA export - shapes - missing fills on path crossings, small shapes,
+  Optimized speed of Shape fixer
 
  ### Changed
 - Icon of "Deobfuscation options" menu from pile of pills to medkit
