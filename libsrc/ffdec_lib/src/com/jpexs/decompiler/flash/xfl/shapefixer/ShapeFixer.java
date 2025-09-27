@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -572,7 +571,7 @@ public class ShapeFixer {
                             }
                         }
 
-                        //sharing start end end point
+                        //sharing start end point
                         if (t1Ref.size() == 2) {
                             if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
                                     && (t1Ref.get(1) == 0 || t1Ref.get(1) == 1)

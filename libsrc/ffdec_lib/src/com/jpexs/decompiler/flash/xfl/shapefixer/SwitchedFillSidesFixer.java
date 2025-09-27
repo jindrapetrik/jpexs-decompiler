@@ -69,7 +69,7 @@ public class SwitchedFillSidesFixer {
         return area / 2.0;
     }
 
-    private BezierEdge iedgeToBezier(IEdge ie) {
+    private BezierEdge iEdgeToBezier(IEdge ie) {
         assert (ie != null);
         if (ie instanceof CurvedEdge) {
             CurvedEdge ce = (CurvedEdge) ie;
@@ -367,7 +367,7 @@ public class SwitchedFillSidesFixer {
             boolean clockwise = !polygon.ccw;
 
             for (IEdge e : list) {
-                BezierEdge be = iedgeToBezier(e);
+                BezierEdge be = iEdgeToBezier(e);
                 BezierEdge beRev = be.reverse();
                 int localFs = globalToLocalFillStyleMap.get(fillStyleIdx);
 

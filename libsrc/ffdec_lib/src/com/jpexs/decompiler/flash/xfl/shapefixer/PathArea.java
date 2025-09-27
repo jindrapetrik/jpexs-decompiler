@@ -29,8 +29,8 @@ public final class PathArea {
         final double flatness = 0.5;
         final int limit = 10;
 
-        PathIterator it = shape.getPathIterator((AffineTransform) null);
-        FlatteningPathIterator fpi = new FlatteningPathIterator(it, flatness, limit);
+        PathIterator pathIterator = shape.getPathIterator((AffineTransform) null);
+        FlatteningPathIterator flatteningPathIterator = new FlatteningPathIterator(pathIterator, flatness, limit);
 
         double[] coords = new double[6];
         List<double[]> current = new ArrayList<>();
@@ -41,8 +41,8 @@ public final class PathArea {
         double lastY = 0;
         boolean hasOpen = false;
 
-        while (!fpi.isDone()) {
-            int seg = fpi.currentSegment(coords);
+        while (!flatteningPathIterator.isDone()) {
+            int seg = flatteningPathIterator.currentSegment(coords);
             switch (seg) {
                 case PathIterator.SEG_MOVETO:
                     // Start a new subpath
@@ -85,7 +85,7 @@ public final class PathArea {
                     // Should not happen because we flattened, but keep for completeness
                     throw new IllegalStateException("Unexpected segment type: " + seg);
             }
-            fpi.next();
+            flatteningPathIterator.next();
         }
 
         // If path ended without SEG_CLOSE for the last subpath

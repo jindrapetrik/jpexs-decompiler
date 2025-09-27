@@ -274,6 +274,7 @@ betafreq
 betagamma
 betashift
 BEVELFILTER
+bew
 bex
 bez
 bezout
@@ -4014,6 +4015,7 @@ XButton
 xcenter
 xcontent
 xcopy
+XCritical
 XCount
 XCursor
 xdg
