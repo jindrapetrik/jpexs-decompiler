@@ -275,7 +275,6 @@ betagamma
 betashift
 BEVELFILTER
 bew
-bex
 bez
 bezout
 bfill
@@ -334,6 +333,7 @@ bmax
 BMHD
 bmi
 BMIH
+bmovie
 BMPDIB
 bname
 BNo
@@ -972,6 +972,7 @@ Ehigh
 eightynine
 eimages
 Eimantas
+EIndex
 Elimit
 elliot
 EMatch
@@ -2608,7 +2609,6 @@ oldchars
 oldctx
 oldframe
 oldop
-oldpct
 oldpop
 oldtp
 oldversion
@@ -4015,8 +4015,8 @@ XButton
 xcenter
 xcontent
 xcopy
-XCritical
 XCount
+XCritical
 XCursor
 xdg
 xdt
