@@ -65,6 +65,123 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="24.1.0" date="2025-09-28">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2477 Option to disable AS2 detection of uninitialized class fields</li>
+					<li>AS2 detection of uninitialized class fields is cancellable, faster (parallel) and shows its progress</li>
+					<li>AS2 - show deobfuscated class/package names in the class tree</li>
+					<li>Allow obfuscated DefineEditText variable identifiers</li>
+					<li>Selectable text (DefineEditTexts with noselect=0), copy to clipboard, select all</li>
+					<li>AS1/2 P-code curly braces pair highlighting</li>
+					<li>#2478 Simple editor - editing texts (not WYSIWYG, textual as in classic editor)</li>
+					<li>#2478 Simple editor - remembering last frame / timeline</li>
+					<li>Optional heap memory status widget in the titlebar</li>
+					<li>#2485 Show variable name in the text tree node label</li>
+					<li>Deobfuscate identifiers option - non destructible renaming identifiers for display purposes</li>
+					<li>Unknown and errored tags moved to special folders</li>
+					<li>AS3 docs generator - reorganized to distinguish float and float 4 instructions, hilight float instruction blue</li>
+					<li>Icons for every tag type</li>
+					<li>#2499 Information about frames which do not have ShowFrame tag</li>
+					<li>#2504 WebP image format for export/import (not animated) Limitation: It's not available on Mac x86-64 platform</li>
+					<li>#2519 AS1/2 Direct editation + P-code - better handling of "too large" error messages - highlight actual problematic structure</li>
+					<li>AS1/2 Debugging - _global variable accessible</li>
+					<li>AS Debugging - Variables with flag DontEnumerate are hidden by default (can be changed in Advanced Settings)</li>
+					<li>Basic support for PlaceImagePrivate tag</li>
+					<li>Generator Templates (.swt) files support and related tags (Flash 3-5) (CharacterSet, GenCommand, NameCharacter, DefineTextFormat, FontRef)</li>
+					<li>DefineVideo tag support (Flash 4)</li>
+					<li>SerialNumber tag support (before Flash 7)</li>
+					<li>FreeCharacter tag support</li>
+					<li>SyncFrame tag support</li>
+					<li>Hex dump improvements: - view bit count in SB, UB fields - view tagIDTagLength field parts - show type after colon, not in parenthesis - view bytes length in bytes fields</li>
+					<li>#2526 Option to disable drag &amp; drop from Resources view to avoid problems on Mac OS</li>
+					<li>#2497 AS3 - temp variables for better handling swap/dup instructions</li>
+					<li>#2529, #2471 Font normalization - available as context menu command on SWFs - automatically executed on PDF/SVG export - shrinks oversized fonts to 1024 em - fixes vertically flipped fonts / texts - fixes zero/1unit spaces font glyph advance - fixes zero last glyph advance in texts</li>
+					<li>PR222 Replace fonts from commandline</li>
+					<li>#2534 Create new GFX tags of type DefineExternalGradient, DefineGradientMap, ExporterInfo, FontTextureInfo, DefineExternalStreamSound</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2474 Gotos incorrectly decompiled</li>
+					<li>AS1/2/3 highlighter - brackets parsing error causing memory leak / crash</li>
+					<li>Comments color highlighting</li>
+					<li>AS1/2 Obfuscated registers names not resolving because of trimming</li>
+					<li>Escaping HTML in raw tag editor</li>
+					<li>Flash player preview not stripping scripts from DefineSprites</li>
+					<li>Not clearing selected depth after timelined change</li>
+					<li>#2480 AS1/2 P-code decompilation of try..catch with empty catch body at the end of function</li>
+					<li>#2477 AS1/2 deobfuscation - and/or operators, jumps before function start, jumps to function end, jumps in for..in return/break</li>
+					<li>#2477 AS1/2 Switch in last statement of switch break labels</li>
+					<li>#2338 AS1/2/3 Obfuscated code - jump to jump handling</li>
+					<li>#1277 AS1/2 Propagate break/continue to avoid loop/switch labels</li>
+					<li>#2483 Editing shape gradient records - RGB vs RGBA</li>
+					<li>#2486 AS Loop in loop producing gotos in some cases</li>
+					<li>#2486 AS1/2 Switch after function, problem with labels</li>
+					<li>#2486 AS ifs with direct breaks (in obfuscated code)</li>
+					<li>#2486 AS3 skipping label instruction</li>
+					<li>Highlighter nullpointer</li>
+					<li>AS3 search slot name Index out of bounds</li>
+					<li>AS text search - not being able to cancel search over multiple swf files</li>
+					<li>#2486 AS3 switches detection in some cases</li>
+					<li>AS1/2 Hide icons panel when editing</li>
+					<li>AS1/2 both pcode and AS editable at the same time</li>
+					<li>AS3 direct editation - Allow some special words (like `override`) as identifiers</li>
+					<li>#2486 AS1/2 if jump to function end as return</li>
+					<li>#2493 Incorrect placement of §§push instructions</li>
+					<li>AS3 direct editation/highlighter §§pop in class traits</li>
+					<li>AS direct editation/highlighter §§pop and §§dup can have getmember or call</li>
+					<li>#1295, #116 AS3 dynamic construction via MultinameL</li>
+					<li>ABC cleaner not properly fixing namespace sets</li>
+					<li>The hex view does not display bytes if there are too few of them</li>
+					<li>SymbolClass export/import did not support obfuscated names</li>
+					<li>Configuration TOML file encoding (UTF-8)</li>
+					<li>#2496 Fonts - adding characters - truncating too wide advance widths</li>
+					<li>#2498 Public traits with same name were not distinguishable</li>
+					<li>#2503 Exporting sound streams as FLV</li>
+					<li>#2507 FLA export - Button hit test frame placing morphshapes</li>
+					<li>#2507 FLA export - Place characters over multiple button frames</li>
+					<li>#2508 AS1/2 direct editation - first command in for loop header not compiled</li>
+					<li>#2510 AS direct editation - popped value</li>
+					<li>#2511 Allowing to search or to jump from search window while in editation mode</li>
+					<li>#2515 AS1/2 direct editation - getURL incorrect casing, generating ActionGetURL2 when not needed</li>
+					<li>AS1/2 actions must use SWF charset when writing its length</li>
+					<li>#2515 AS1/2 Most of built-in global functions must be case in-sensitive</li>
+					<li>AS1/2 ActionStringExtract incorrectly decompiled as String.substr instead of substring global function</li>
+					<li>#2516 AS1/2 Renaming of identifiers not setting function length correctly</li>
+					<li>AS1/2 Renaming of identifiers must not rename integer array offsets</li>
+					<li>#2517 Loop break detection problems in some cases</li>
+					<li>#2519 AS1/2 avoid multi-level loops in cases where possible</li>
+					<li>#2522 Hex view - resetting view when mouse over panel bottom</li>
+					<li>#2519 AS1/2 direct editation - generating too large ConstantPool</li>
+					<li>Hex View - incorrect table height when switching tags</li>
+					<li>#2525 AMF editor (like in Sol cookie editor) - saving empty standard array `[]`</li>
+					<li>AS3 - names with custom namespaces not being deobfuscated</li>
+					<li>AS Debugger - order of trace commands</li>
+					<li>AS1/2 print/printNum/printAsBitmap/printAsBitmapNum not correctly handling bmovie boundingBox parameter</li>
+					<li>Font export - not setting ascent and descent</li>
+					<li>#2471 PDF export - ignore control characters</li>
+					<li>#2471 SVG export with typeface - white-space:pre style</li>
+					<li>#1826, #2416 FLA export - shapes - missing fills when fillStyle0/1 has incorrect orientation</li>
+					<li>#2532, #1011, #2165 FLA export - shapes - missing fills on path crossings, small shapes, Optimized speed of Shape fixer ### Changed</li>
+					<li>Icon of "Deobfuscation options" menu from pile of pills to medkit</li>
+					<li>Error log window shows last 100 log entries (instead of first 100)</li>
+					<li>AS1/2 P-code double Push values have suffix ".0" to properly distinguish them</li>
+					<li>AS1/2 P-code float Push values have suffix "f" to properly distinguish them</li>
+					<li>AS1/2: Export names are deobfuscated only when start with `__Packages.`, if not, then classical escaping is performed</li>
+					<li>Quotes in tree node parameter values that need them</li>
+					<li>The label of option "automatic deobfuscation" changed to "deobfuscate code"</li>
+					<li>SetTabIndex tag moved from others to frames folder</li>
+					<li>SWF3 actions split into SWF1, SWF2 and SWF3 actions (in FFDec source code, docs, etc.)</li>
+					<li>Serial form of AS3 search results changed so the decompiler is unable to read saved AS3 search result from older versions and vice-versa</li>
+					<li>CSMTextSettings tag renamed to CSMSettings</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Resample wav to 44kHz feature from GUI</li>
+				</ul>
+			</description>
+		</release>
 		<release version="24.0.1" date="2025-06-27">
 			<description>
 				<p>Fixed</p>
