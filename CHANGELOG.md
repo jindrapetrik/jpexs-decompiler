@@ -49,6 +49,8 @@ All notable changes to this project will be documented in this file.
   - fixes zero/1unit spaces font glyph advance
   - fixes zero last glyph advance in texts
 - [PR222] Replace fonts from commandline
+- [#2534] Create new GFX tags of type DefineExternalGradient, DefineGradientMap,
+  ExporterInfo, FontTextureInfo, DefineExternalStreamSound
 
 ### Fixed
 - [#2474] Gotos incorrectly decompiled
@@ -4015,6 +4017,7 @@ Major version of SWF to XML export changed to 2.
 [#2497]: https://www.free-decompiler.com/flash/issues/2497
 [#2529]: https://www.free-decompiler.com/flash/issues/2529
 [#2471]: https://www.free-decompiler.com/flash/issues/2471
+[#2534]: https://www.free-decompiler.com/flash/issues/2534
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
 [#2338]: https://www.free-decompiler.com/flash/issues/2338

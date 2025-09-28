@@ -90,9 +90,15 @@ import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
+import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
@@ -266,12 +272,11 @@ public class TagTree extends AbstractTagTree {
                 ret = Arrays.asList(DefineTextTag.ID, DefineText2Tag.ID, DefineEditTextTag.ID);
                 break;
             case TagTreeModel.FOLDER_IMAGES:
+                ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
+                
                 if (gfx) {
-                    ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID,
-                            DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID
-                    );
-                } else {
-                    ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
+                    ret = new ArrayList<>(ret);
+                    ret.addAll(Arrays.asList(DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID));
                 }
                 break;
             case TagTreeModel.FOLDER_MOVIES:
@@ -279,6 +284,10 @@ public class TagTree extends AbstractTagTree {
                 break;
             case TagTreeModel.FOLDER_SOUNDS:
                 ret = Arrays.asList(DefineSoundTag.ID);
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.add(DefineExternalSound.ID);
+                }
                 break;
             case TagTreeModel.FOLDER_BUTTONS:
                 ret = Arrays.asList(DefineButtonTag.ID, DefineButton2Tag.ID);
@@ -304,6 +313,10 @@ public class TagTree extends AbstractTagTree {
                         FreeCharacterTag.ID,
                         SyncFrameTag.ID
                 );
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.add(DefineExternalStreamSound.ID);
+                }
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(
@@ -321,6 +334,10 @@ public class TagTree extends AbstractTagTree {
                         SymbolClassTag.ID,                        
                         CharacterSetTag.ID
                 );
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.addAll(Arrays.asList(DefineExternalGradient.ID, DefineGradientMap.ID, ExporterInfo.ID, FontTextureInfo.ID));
+                }
                 break;
         }
 

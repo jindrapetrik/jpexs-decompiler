@@ -921,7 +921,8 @@ public abstract class AbstractTagTree extends JTree {
                 SetTabIndexTag.ID, PlaceImagePrivateTag.ID,
                 GenCommandTag.ID,
                 FreeCharacterTag.ID,
-                SyncFrameTag.ID
+                SyncFrameTag.ID,
+                DefineExternalStreamSound.ID
         );
     }
 
