@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
+import java.util.Set;
 
 /**
  * coerce_b instruction - coerce to boolean.
@@ -60,7 +61,7 @@ public class CoerceBIns extends InstructionDefinition implements CoerceOrConvert
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         return new TypeItem(DottedChain.BOOLEAN);
     }
 }

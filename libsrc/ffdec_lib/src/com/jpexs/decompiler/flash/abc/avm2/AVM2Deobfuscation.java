@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -97,10 +98,17 @@ public class AVM2Deobfuscation {
      * @param s String
      * @return True if string is valid namespace part
      */
-    private boolean isValidNSPart(String s) {
+    public boolean isValidNSPart(String s) {
         boolean isValid = true;
         if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
+        }
+
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.contains(IdentifiersDeobfuscation.SAFE_STRING_PREFIX)
+                || s.contains(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)
+                || s.contains(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX))) {
+            return false;
         }
 
         if (isValid) {
@@ -180,6 +188,23 @@ public class AVM2Deobfuscation {
     }
 
     /**
+     * Checks whether string at given index is valid package name
+     *
+     * @param strIndex String index
+     * @return True if valid
+     */
+    public boolean isValidPackageName(int strIndex) {
+        if (strIndex <= 0) {
+            return true;
+        }
+        String s = constants.getString(strIndex);
+        if (builtInNs(s) != null) {
+            return true;
+        }
+        return isValidNSPart(s);
+    }
+
+    /**
      * Deobfuscates package name.
      *
      * @param stringUsageTypes String usage types
@@ -190,15 +215,8 @@ public class AVM2Deobfuscation {
      * @return Deobfuscated package name
      */
     public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, RenameType renameType) {
-        if (strIndex <= 0) {
-            return strIndex;
-        }
-        String s = constants.getString(strIndex);
-        if (builtInNs(s) != null) {
-            return strIndex;
-        }
-        boolean isValid = isValidNSPart(s);
-        if (!isValid) {
+        if (!isValidPackageName(strIndex)) {
+            String s = constants.getString(strIndex);
             DottedChain sChain = DottedChain.parseWithSuffix(s);
             DottedChain newName;
             if (namesMap.containsKey(sChain)) {
@@ -228,22 +246,24 @@ public class AVM2Deobfuscation {
     }
 
     /**
-     * Deobfuscates name.
+     * Checks whether string at given index is valid name
      *
-     * @param stringUsageTypes String usage types
-     * @param stringUsages String usages
-     * @param namespaceUsages Namespace usages
-     * @param namesMap Names map
      * @param strIndex String index
-     * @param firstUppercase First uppercase
-     * @param renameType Rename type
-     * @return Deobfuscated name string index
+     * @return True when valid
      */
-    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
+    public boolean isValidName(int strIndex) {
         if (strIndex <= 0) {
-            return strIndex;
+            return true;
         }
         String s = constants.getString(strIndex);
+
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.startsWith(IdentifiersDeobfuscation.SAFE_STRING_PREFIX)
+                || s.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)
+                || s.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX))) {
+            return false;
+        }
+
         boolean isValid = true;
         if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
@@ -264,8 +284,24 @@ public class AVM2Deobfuscation {
                 isValid = false;
             }
         }
+        return isValid;
+    }
 
-        if (!isValid) {
+    /**
+     * Deobfuscates name.
+     *
+     * @param stringUsageTypes String usage types
+     * @param stringUsages String usages
+     * @param namespaceUsages Namespace usages
+     * @param namesMap Names map
+     * @param strIndex String index
+     * @param firstUppercase First uppercase
+     * @param renameType Rename type
+     * @return Deobfuscated name string index
+     */
+    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<DottedChain, DottedChain> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
+        if (!isValidName(strIndex)) {
+            String s = constants.getString(strIndex);
             DottedChain newname;
             DottedChain sChain = DottedChain.parseNoSuffix(s);
             if (namesMap.containsKey(sChain)) {

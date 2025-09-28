@@ -163,9 +163,9 @@ public class TypeItem extends GraphTargetItem {
         boolean as3 = localData.constantsAvm2 != null;
 
         if (localData.fullyQualifiedNames.contains(DottedChain.parseWithSuffix(fullTypeName.getLast()))) {
-            writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
+            writer.hilightSpecial(fullTypeName.toPrintableString(localData.usedDeobfuscations, localData.swf, as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
         } else {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
+            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
         }
 
         return writer;

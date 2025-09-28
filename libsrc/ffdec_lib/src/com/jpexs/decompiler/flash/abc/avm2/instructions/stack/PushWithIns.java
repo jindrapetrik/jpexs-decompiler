@@ -45,7 +45,7 @@ public class PushWithIns extends InstructionDefinition {
         GraphTargetItem w = stack.pop();
         WithObjectAVM2Item wot = new WithObjectAVM2Item(ins, localData.lineStartInstruction, w);
         localData.localScopeStack.push(wot);
-        output.add(new WithAVM2Item(ins, localData.lineStartInstruction, w));
+        stack.addToOutput(new WithAVM2Item(ins, localData.lineStartInstruction, w));
     }
 
     @Override

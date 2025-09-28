@@ -27,6 +27,7 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -172,6 +173,14 @@ public class Multiname {
      */
     public void setDisplayNamespace(boolean displayNamespace) {
         this.displayNamespace = displayNamespace;
+    }
+    
+    /**
+     * Checks whether this multiname displays its namespace as #suffix
+     * @return True when displays
+     */
+    public boolean doesDisplayNamespace() {
+        return displayNamespace;
     }
 
     /**
@@ -624,18 +633,20 @@ public class Multiname {
     /**
      * Converts the typename to string.
      *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
      * @param withSuffix With suffix flag
      * @return Typename as string
      */
-    private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
+    private String typeNameToStr(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
         if (cyclic) {
             return "§§cyclic_typename()";
         }
         StringBuilder typeNameStr = new StringBuilder();
-        typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
+        typeNameStr.append(constants.getMultiname(qname_index).getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
         if (params != null && params.length > 0) {
             typeNameStr.append(".<");
             for (int i = 0; i < params.length; i++) {
@@ -646,7 +657,7 @@ public class Multiname {
                 if (param == 0) {
                     typeNameStr.append("*");
                 } else {
-                    typeNameStr.append(constants.getMultiname(param).getName(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
+                    typeNameStr.append(constants.getMultiname(param).getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
                 }
             }
             typeNameStr.append(">");
@@ -661,11 +672,12 @@ public class Multiname {
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
      * @param withSuffix With suffix flag
+     * @param usedDeobfuscations Used deobfuscations
      * @return Name with custom namespace
      */
-    public String getNameWithCustomNamespace(ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
+    public String getNameWithCustomNamespace(Set<String> usedDeobfuscations, ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
         if (kind == TYPENAME) {
-            return typeNameToStr(abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
+            return typeNameToStr(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
         }
         if (name_index == -1) {
             return "";
@@ -681,7 +693,7 @@ public class Multiname {
                 String nsname = dc != null ? dc.getLast() : null;
 
                 if (nsname != null && !"AS3".equals(nsname)) {
-                    String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                    String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
                         return identifier + "::" + name;
                     }
@@ -689,16 +701,17 @@ public class Multiname {
             }
 
             if (nskind == Namespace.KIND_PACKAGE && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
-                DottedChain dc = getNameWithNamespace(abc.constants, withSuffix);
-                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
+                DottedChain dc = getNameWithNamespace(usedDeobfuscations, abc, abc.constants, withSuffix);
+                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(usedDeobfuscations, abc.getSwf(), true);
             }
-            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(true, name)) + (withSuffix ? getNamespaceSuffix() : "");
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
-    
+
     /**
      * Gets the name with custom namespace.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
@@ -706,9 +719,9 @@ public class Multiname {
      * @param customNamespaceRef Custom namespace
      * @return Name with custom namespace
      */
-    public String getNameAndCustomNamespace(ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix, Reference<DottedChain> customNamespaceRef) {
+    public String getNameAndCustomNamespace(Set<String> usedDeobfuscations, ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix, Reference<DottedChain> customNamespaceRef) {
         if (kind == TYPENAME) {
-            return typeNameToStr(abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
+            return typeNameToStr(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
         }
         if (name_index == -1) {
             return "";
@@ -724,34 +737,35 @@ public class Multiname {
                 String nsname = dc != null ? dc.getLast() : null;
 
                 if (nsname != null && !"AS3".equals(nsname)) {
-                    String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                    String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
                         customNamespaceRef.setVal(dc);
-                        return name;
                     }
                 }
             }
 
             if (nskind == Namespace.KIND_PACKAGE && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
-                DottedChain dc = getNameWithNamespace(abc.constants, withSuffix);
-                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
+                DottedChain dc = getNameWithNamespace(usedDeobfuscations, abc, abc.constants, withSuffix);
+                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(usedDeobfuscations, abc.getSwf(), true);
             }
-            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(true, name)) + (withSuffix ? getNamespaceSuffix() : "");
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
 
     /**
      * Gets the name.
      *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
      * @param withSuffix With suffix flag
      * @return Name
      */
-    public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
+    public String getName(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
         if (kind == TYPENAME) {
-            return typeNameToStr(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
+            return typeNameToStr(usedDeobfuscations, abc, constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
         }
         if (name_index == -1) {
             return "";
@@ -766,29 +780,31 @@ public class Multiname {
                 NamespaceSet nss = getNamespaceSet(constants);
                 if (nss != null) {
                     if (nss.namespaces.length == 1) {
-                        ns = constants.getNamespace(nss.namespaces[0]);                        
+                        ns = constants.getNamespace(nss.namespaces[0]);
                     }
                 }
-            }            
+            }
             if (ns != null && (ns.kind == Namespace.KIND_PACKAGE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 isPublic = true;
-            } 
-            if (isPublic && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
-                DottedChain dc = getNameWithNamespace(constants, withSuffix);
-                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }
-            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(true, name)) + (withSuffix ? getNamespaceSuffix() : "");
+            if (isPublic && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+                DottedChain dc = getNameWithNamespace(usedDeobfuscations, abc, constants, withSuffix);
+                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(usedDeobfuscations, abc.getSwf(), true);
+            }
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
 
     /**
      * Gets the name with namespace.
      *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
      * @param constants Constant pool
      * @param withSuffix With suffix flag
      * @return Name with namespace
      */
-    public DottedChain getNameWithNamespace(AVM2ConstantPool constants, boolean withSuffix) {
+    public DottedChain getNameWithNamespace(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, boolean withSuffix) {
         DottedChain cached = constants.getCachedMultinameWithNamespace(this);
         if (cached != null) {
             return cached;
@@ -809,7 +825,7 @@ public class Multiname {
                 nsName = ns.getName(constants);
             }
         }
-        String name = getName(constants, null, true, false);
+        String name = getName(usedDeobfuscations, abc, constants, null, true, false);
         DottedChain ret;
         if (nsName != null) {
             ret = nsName.add(name, withSuffix ? getNamespaceSuffix() : "");
@@ -989,7 +1005,7 @@ public class Multiname {
      * @return True if this MULTINAME kind with only one namespace
      */
     public boolean isMULTINAMEwithOneNs(AVM2ConstantPool pool) {
-        return kind == MULTINAME && pool.getNamespaceSet(namespace_set_index).namespaces.length == 1;
+        return (kind == MULTINAME || kind == MULTINAMEL || kind == MULTINAMELA) && pool.getNamespaceSet(namespace_set_index).namespaces.length == 1;
     }
 
     /**
@@ -1023,8 +1039,8 @@ public class Multiname {
     }
 
     /**
-     * Checks if this multiname is effectively a QName. Effectively means that it
-     * is a QName or QNameA or MULTINAME with only one namespace.
+     * Checks if this multiname is effectively a QName. Effectively means that
+     * it is a QName or QNameA or MULTINAME with only one namespace.
      *
      * @param thisCpool This constant pool
      * @return True if it's effectively a QName
@@ -1041,7 +1057,7 @@ public class Multiname {
      * @param otherCpool Other constant pool
      * @return True if this qname effectively equals to other qname
      */
-    public boolean qnameEquals(AVM2ConstantPool thisCpool, Multiname other, AVM2ConstantPool otherCpool) {
+    public boolean qnameEquals(ABC thisAbc, AVM2ConstantPool thisCpool, Multiname other, ABC otherAbc, AVM2ConstantPool otherCpool) {
         if (!isEffectivelyQname(thisCpool) || !other.isEffectivelyQname(otherCpool)) {
             return false;
         }
@@ -1063,7 +1079,7 @@ public class Multiname {
             return false;
         }
 
-        if (!Objects.equals(other.getName(otherCpool, new ArrayList<>(), true, true), getName(thisCpool, new ArrayList<>(), true, true))) {
+        if (!Objects.equals(other.getName(new LinkedHashSet<>(), otherAbc, otherCpool, new ArrayList<>(), true, true), getName(new LinkedHashSet<>(), thisAbc, thisCpool, new ArrayList<>(), true, true))) {
             return false;
         }
 

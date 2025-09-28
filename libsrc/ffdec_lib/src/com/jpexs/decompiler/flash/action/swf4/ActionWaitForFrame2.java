@@ -64,6 +64,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
 
     /**
      * Constructor.
+     *
      * @param skipCount Number of actions to skip
      * @param charset Charset
      */
@@ -86,6 +87,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
 
     /**
      * Constructor.
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @throws IOException On I/O error
@@ -126,6 +128,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
 
     /**
      * Constructor.
+     *
      * @param lexer Flasm lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -176,19 +179,19 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
         GraphTargetItem frame = stack.pop();
         List<GraphTargetItem> body;
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            body = ActionGraph.translateViaGraph(uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
+            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            body = ActionGraph.translateViaGraph(uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
+            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
         }
         output.add(new IfFrameLoadedActionItem(frame, body, this, lineStartAction));
     }

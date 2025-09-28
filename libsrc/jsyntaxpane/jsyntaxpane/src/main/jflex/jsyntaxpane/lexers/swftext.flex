@@ -38,10 +38,14 @@ import jsyntaxpane.TokenType;
 
 
 Parameter = [a-z_][a-z0-9_]*
-Value = [^ \r\n\]]+
+Value = [^ \r\n\"\u00A7\]]+
 Divider = [ \r\n]+
+StringCharacter = [^\r\n\"\\]
+OctDigit          = [0-7]
+LineTerminator = \r|\n|\r\n
+OIdentifierCharacter = [^\r\n\u00A7\\]
 
-%state PARAMETER,VALUE
+%state PARAMETER,VALUE,STRING,OIDENTIFIER
 
 %%
 
@@ -80,6 +84,14 @@ Divider = [ \r\n]+
     {Parameter}                  {
                                     return token(TokenType.KEYWORD); 
                                  }
+    \"                           { yybegin(STRING);
+                                   tokenStart = yychar;
+                                   tokenLength = 1; 
+                                 }
+    "\u00A7"                     { yybegin(OIDENTIFIER);
+                                   tokenStart = yychar;
+                                   tokenLength = 1; 
+                                 }
     {Value}                      {
                                     return token(TokenType.NUMBER);
                                  }
@@ -87,7 +99,40 @@ Divider = [ \r\n]+
                                     yybegin(YYINITIAL);
                                     tokenStart = -1;
                                     return token(TokenType.OPERATOR,  -BRACKET);
+                                 }    
+}
+
+<STRING> {
+  \"                             {
+                                     yybegin(VALUE);
+                                     // length also includes the trailing quote
+                                     return token(TokenType.STRING, tokenStart, tokenLength + 1);
                                  }
+
+  {StringCharacter}+             { tokenLength += yylength(); }
+
+  \\[0-3]?{OctDigit}?{OctDigit}  { tokenLength += yylength(); }
+
+  /* escape sequences */
+
+  \\.                            { tokenLength += 2; }
+  {LineTerminator}               { yybegin(PARAMETER);  }
+}
+
+<OIDENTIFIER> {
+  "\u00A7"                            {
+                                     yybegin(PARAMETER);
+                                     // length also includes the trailing quote
+                                     return token(TokenType.REGEX, tokenStart, tokenLength + 1);
+                                 }
+
+  {OIdentifierCharacter}+             { tokenLength += yylength(); }
+
+
+  /* escape sequences */
+
+  \\.                            { tokenLength += 2; }
+  {LineTerminator}               { yybegin(PARAMETER);  }
 }
 
 /* error fallback */

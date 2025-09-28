@@ -163,7 +163,7 @@ public class ABCCleaner {
         }
 
         for (int i = 1; i < abc.constants.getNamespaceSetCount(); i++) {
-            if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.MULTINAME).contains(i)) {
+            if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.NAMESPACESET).contains(i)) {
                 continue;
             }
             NamespaceSet m = abc.constants.getNamespaceSet(i);

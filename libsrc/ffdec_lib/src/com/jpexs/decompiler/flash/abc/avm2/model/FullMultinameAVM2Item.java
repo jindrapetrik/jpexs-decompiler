@@ -32,6 +32,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -154,17 +155,17 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1));
+            cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>()));
         } else {
-            cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
+            cname = (abc.constants.getMultiname(multinameIndex).getName(new LinkedHashSet<>(), abc, abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1));
+            cns = namespace.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>()));
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {
-                cns = ns.getName(abc.constants).toPrintableString(true);
+                cns = ns.getName(abc.constants).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
             }
         }
         return cname.equals(tname) && cns.isEmpty();
@@ -206,16 +207,16 @@ public class FullMultinameAVM2Item extends AVM2Item {
             AVM2ConstantPool constants = localData.constantsAvm2;
             List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
-                String simpleName = constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, true, false);
+                String simpleName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, constants, fullyQualifiedNames, true, false);
                 if ("*".equals(simpleName)) {
                     writer.append("*");
                 } else {
                     Reference<DottedChain> customNsRef = new Reference<>(null);
-                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+                    String localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, fullyQualifiedNames, false, true, customNsRef);
                     DottedChain customNs = customNsRef.getVal();
                     if (customNs != null) {
                         String nsname = customNs.getLast();
-                        String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+                        String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
                         writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
                         writer.appendNoHilight("::");
                     }

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.configuration;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.enums.GridSnapAccuracy;
 import com.jpexs.decompiler.flash.configuration.enums.GuidesSnapAccuracy;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
@@ -59,10 +59,6 @@ public final class Configuration {
     private static final ConfigurationStorage legacyStorage = new LegacyConfigurationStorage();
 
     private static final ConfigurationStorage storage = new TomlConfigurationStorage();
-
-    private static final File UNSPECIFIED_FILE = new File("unspecified");
-
-    private static File directory = UNSPECIFIED_FILE;
 
     /**
      * Log level
@@ -1140,22 +1136,38 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> snapAlignCenterAlignmentVertical = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.linkTypes")
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningLinkTypes = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> showCodeCompletionOnDot = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> skipDetectionOfUninitializedClassFields = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> showHeapStatusWidget = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> autoDeobfuscateIdentifiers = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> showVarsWithDontEnumerateFlag = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> allowDragAndDropFromResourcesTree = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
-
-    private enum OSId {
-        WINDOWS, OSX, UNIX
-    }
 
     public static void setConfigurationDescriptions(Map<String, String> configurationDescriptions) {
         Configuration.configurationDescriptions = configurationDescriptions;
@@ -1165,107 +1177,12 @@ public final class Configuration {
         Configuration.configurationTitles = configurationTitles;
     }
 
-    public static String getConfigurationTitle(String confirationName) {
-        return configurationTitles.get(confirationName);
+    public static String getConfigurationTitle(String configurationName) {
+        return configurationTitles.get(configurationName);
     }
 
-    public static String getConfigurationDescription(String confirationName) {
-        return configurationDescriptions.get(confirationName);
-    }
-
-    private static OSId getOSId() {
-        String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-        if ((OS.indexOf("mac") >= 0) || (OS.indexOf("darwin") >= 0)) {
-            return OSId.OSX;
-        } else if (OS.indexOf("win") >= 0) {
-            return OSId.WINDOWS;
-        } else {
-            return OSId.UNIX;
-        }
-    }
-
-    /**
-     * Get FFDec home directory
-     *
-     * @return FFDec home directory
-     */
-    public static String getFFDecHome() {
-        if (directory == UNSPECIFIED_FILE) {
-            directory = null;
-            String userHome = null;
-            try {
-                userHome = System.getProperty("user.home");
-            } catch (SecurityException ignore) {
-                //ignored
-            }
-            if (userHome != null) {
-                String applicationId = ApplicationInfo.SHORT_APPLICATION_NAME;
-                OSId osId = getOSId();
-                if (osId == OSId.WINDOWS) {
-                    File appDataDir = null;
-                    try {
-                        String appDataEV = System.getenv("APPDATA");
-                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
-                            appDataDir = new File(appDataEV);
-                        }
-                    } catch (SecurityException ignore) {
-                        //ignored
-                    }
-                    String vendorId = ApplicationInfo.VENDOR;
-                    if ((appDataDir != null) && appDataDir.isDirectory()) {
-                        // ${APPDATA}\{vendorId}\${applicationId}
-                        String path = vendorId + "\\" + applicationId + "\\";
-                        directory = new File(appDataDir, path);
-                    } else {
-                        // ${userHome}\Application Data\${vendorId}\${applicationId}
-                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
-                        directory = new File(userHome, path);
-                    }
-                } else if (osId == OSId.OSX) {
-                    // ${userHome}/Library/Application Support/${applicationId}
-                    String path = "Library/Application Support/" + applicationId + "/";
-                    directory = new File(userHome, path);
-                } else {
-                    File xdgConfigHome = null;
-                    File oldConfigDir = new File(userHome, "." + applicationId + "/");
-                    try {
-                        String xdgConfigHomeEV = System.getenv("XDG_CONFIG_HOME");
-                        if ((xdgConfigHomeEV != null) && (xdgConfigHomeEV.length() > 0)) {
-                            xdgConfigHome = new File(xdgConfigHomeEV);
-                        }
-                    } catch (SecurityException ignore) {
-                        //ignored
-                    }
-                    if ((xdgConfigHome != null) && xdgConfigHome.isDirectory()) {
-                        // ${xdgConfigHome}/${applicationId}
-                        String path = applicationId + "/";
-                        directory = new File(xdgConfigHome, path);
-                    } else if (oldConfigDir.isDirectory()) {
-                        // ${userHome}/.${applicationId}
-                        directory = oldConfigDir;
-                    } else {
-                        // ${userHome}/.config/${applicationId}
-                        String path = ".config/" + applicationId + "/";
-                        directory = new File(userHome, path);
-                    }
-                }
-            } else {
-                //no home, then use application directory
-                directory = new File(".");
-            }
-        }
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                if (!directory.exists()) {
-                    directory = new File("."); //fallback to current directory
-                }
-            }
-        }
-        String ret = directory.getAbsolutePath();
-        if (!ret.endsWith(File.separator)) {
-            ret += File.separator;
-        }
-        return ret;
+    public static String getConfigurationDescription(String configurationName) {
+        return configurationDescriptions.get(configurationName);
     }
 
     public static Font getSourceFont() {
@@ -1397,6 +1314,16 @@ public final class Configuration {
     }
 
     /**
+     * Get per-swf custom configuration.
+     *
+     * @param swf SWF
+     * @return SWF specific custom configuration, null if not found
+     */
+    public static SwfSpecificCustomConfiguration getSwfSpecificCustomConfiguration(SWF swf) {
+        return getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+    }
+
+    /**
      * Get or create per-swf custom configuration.
      *
      * @param fileName SWF File name
@@ -1412,27 +1339,40 @@ public final class Configuration {
         return swfConf;
     }
 
+    /**
+     * Get or create per-swf custom configuration.
+     *
+     * @param swf SWF
+     * @return SWF specific custom configuration
+     */
+    public static SwfSpecificCustomConfiguration getOrCreateSwfSpecificCustomConfiguration(SWF swf) {
+        return getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+    }
+
     private static String getConfigFile() throws IOException {
-        return getFFDecHome() + storage.getConfigName();
+        return AppDirectoryProvider.getFFDecHome() + storage.getConfigName();
     }
 
     private static String getLegacyConfigFile() throws IOException {
-        return getFFDecHome() + legacyStorage.getConfigName();
+        return AppDirectoryProvider.getFFDecHome() + legacyStorage.getConfigName();
     }
 
     /**
      * Save configuration to file
      */
     public static void saveConfig() {
+        Logger.getLogger(Configuration.class.getName()).fine("Saving configuration...");
         try {
             storage.saveToFile(getConfigFile());
+            Logger.getLogger(Configuration.class.getName()).fine("TOML configuration saved.");
         } catch (IOException ex) {
-            // ignore
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot save TOML configuration", ex);
         }
         try {
             legacyStorage.saveToFile(getLegacyConfigFile());
+            Logger.getLogger(Configuration.class.getName()).fine("Legacy configuration saved.");
         } catch (IOException ex) {
-            // ignore
+            Logger.getLogger(Configuration.class.getName()).log(Level.WARNING, "Cannot save legacy configuration", ex);
         }
     }
 
@@ -1519,14 +1459,18 @@ public final class Configuration {
      * Set configuration fields.
      */
     public static void setConfigurationFields() {
+        Logger.getLogger(Configuration.class.getName()).log(Level.FINE, "Setting configuration fields...");
         try {
             Map<String, Object> config;
             if (new File(getConfigFile()).exists()) {
+                Logger.getLogger(Configuration.class.getName()).log(Level.FINE, "Using TOML file.");
                 config = storage.loadFromFile(getConfigFile());
             } else {
+                Logger.getLogger(Configuration.class.getName()).log(Level.FINE, "Using legacy file.");
                 config = legacyStorage.loadFromFile(getLegacyConfigFile());
             }
             loadFromMap(config);
+            Logger.getLogger(Configuration.class.getName()).log(Level.FINE, "Configuration fields set.");
         } catch (IOException ex) {
             Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1666,7 +1610,7 @@ public final class Configuration {
      * @return Folder
      */
     public static File getPath(String folder) {
-        String home = getFFDecHome();
+        String home = AppDirectoryProvider.getFFDecHome();
         File dir = new File(home + folder);
         if (!dir.exists()) {
             dir.mkdirs();

@@ -107,8 +107,9 @@ public class ActionGraphSource extends GraphSource {
      * @param functions Functions
      * @param charset Charset
      */
-    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, String charset) {
-        this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions, charset);
+    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, String charset, int startIp) {
+        this.startIp = startIp;
+        this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions, charset);        
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
@@ -195,6 +196,7 @@ public class ActionGraphSource extends GraphSource {
     /**
      * Translates the part of the graph source
      *
+     * @param output Output
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -203,17 +205,15 @@ public class ActionGraphSource extends GraphSource {
      * @param end End position
      * @param staticOperation Unused
      * @param path Path
-     * @return List of graph target items
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
     @Override
-    public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
+    public void translatePart(List<GraphTargetItem> output, Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree((ActionGraph) graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
+        Action.actionsPartToTree(localData.usedDeobfuscations, output, (ActionGraph) graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
-        return r;
     }
 
     /**
@@ -261,7 +261,7 @@ public class ActionGraphSource extends GraphSource {
                 return size();
             }
             if (ret == -1) {
-                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "{0} - address loc{1} not found", new Object[]{path, Helper.formatAddress(adr)});
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "address loc{1} not found in {0}", new Object[]{path, Helper.formatAddress(adr)});
             }
         }
         return ret;
@@ -307,4 +307,7 @@ public class ActionGraphSource extends GraphSource {
         return variables;
     }
 
+    public String getPath() {
+        return path;
+    }   
 }

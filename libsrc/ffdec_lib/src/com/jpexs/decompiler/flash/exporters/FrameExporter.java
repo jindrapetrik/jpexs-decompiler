@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters;
 import com.jpacker.JPacker;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.FontNormalizer;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -57,11 +59,13 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
@@ -84,6 +88,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +123,9 @@ public class FrameExporter {
                 break;
             case SVG:
                 fem = FrameExportMode.SVG;
+                break;
+            case WEBP:
+                fem = FrameExportMode.WEBP;
                 break;
             case SWF:
                 fem = FrameExportMode.SWF;
@@ -157,6 +166,9 @@ public class FrameExporter {
                 break;
             case BMP:
                 fem = FrameExportMode.BMP;
+                break;
+            case WEBP:
+                fem = FrameExportMode.WEBP;
                 break;
             case SWF:
                 fem = FrameExportMode.SWF;
@@ -272,6 +284,9 @@ public class FrameExporter {
             Set<String> classNames = swf.getCharacter(containerId).getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
+                    if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
+                    }
                     paths.add(File.separator + Helper.makeFileName(className) + subPath);
                 }
             } else {
@@ -306,6 +321,13 @@ public class FrameExporter {
         }
 
         if (settings.mode == FrameExportMode.SVG) {
+            
+            FontNormalizer normalizer = new FontNormalizer();
+            Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+            normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
+
+            
             int max = frames.size();
             if (subFramesLength > 1) {
                 max = subFramesLength;
@@ -329,7 +351,7 @@ public class FrameExporter {
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
-
+                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);
                             tim.toSVG(frame, subFramesLength > 1 ? fi : 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
@@ -508,7 +530,9 @@ public class FrameExporter {
         }
 
         final Color fbackgroundColor = backgroundColor;
-        final boolean usesTransparency = settings.mode == FrameExportMode.PNG || settings.mode == FrameExportMode.GIF;
+        final boolean usesTransparency = settings.mode == FrameExportMode.PNG 
+                || settings.mode == FrameExportMode.GIF 
+                || settings.mode == FrameExportMode.WEBP;
         final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
         switch (settings.mode) {
@@ -540,6 +564,26 @@ public class FrameExporter {
                     }
                 }
                 break;
+            case WEBP:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    for (int i = 0; frameImages.hasNext(); i++) {
+                        final int fi = i;
+                        new RetryTask(() -> {
+                            int fileNum = subFramesLength > 1 ? fi + 1 : (fframes.get(fi) + 1);
+
+                            File f = new File(foutdir + File.separator + fileNum + ".webp");
+                            BufferedImage img = frameImages.next();
+                            if (img != null) {
+                                try (FileOutputStream fos = new FileOutputStream(f)) {
+                                    fos.write(WebPCodec.encodeLosslessImage(img));
+                                }
+                            }
+                            ret.add(f);
+                        }, handler).run();
+                    }
+                }
+                break;
             case PNG:
                 for (File foutdir : foutdirs) {
                     frameImages.reset();
@@ -561,6 +605,12 @@ public class FrameExporter {
                 if (frameImages.hasNext()) {
                     for (File foutdir : foutdirs) {
                         new RetryTask(() -> {
+                            
+                            FontNormalizer normalizer = new FontNormalizer();
+                            Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+                            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+                            normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
+                            
                             File f = new File(foutdir + File.separator + "frames.pdf");
                             PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
                             PageFormat pf = new PageFormat();
@@ -609,7 +659,8 @@ public class FrameExporter {
                                             return compositeGraphics;
                                         }
                                         final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
+                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);                                        
+                                        ((DualPdfGraphics2D) compositeGraphics).setNormalizedFonts(normalizedFonts, normalizedTexts);
                                         return compositeGraphics;
                                     }
 

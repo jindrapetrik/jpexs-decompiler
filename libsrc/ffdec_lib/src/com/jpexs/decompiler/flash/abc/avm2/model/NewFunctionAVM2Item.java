@@ -104,8 +104,8 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.abc = abc;
         this.methodIndex = methodIndex;
         this.scopeStack = scopeStack;
-    }
-
+    }  
+    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.seenMethods.contains(methodIndex)) {
@@ -116,7 +116,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.startMethod(methodIndex, null);
         writer.append((!functionName.isEmpty() ? " " + functionName : ""));
         writer.appendNoHilight("(");
-        abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, localData.fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, localData.fullyQualifiedNames, localData.usedDeobfuscations);
         writer.appendNoHilight("):");
         if (Configuration.showMethodBodyId.get()) {
             writer.appendNoHilight("// method body index: ");
@@ -125,13 +125,13 @@ public class NewFunctionAVM2Item extends AVM2Item {
             writer.appendNoHilight(methodIndex);
             writer.newLine();
         }
-        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, localData.fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc, abc.constants, localData.fullyQualifiedNames, localData.usedDeobfuscations);
         writer.startBlock();
         if (body != null) {
             List<MethodBody> callStack = new ArrayList<>(localData.callStack);
             callStack.add(body);
-            body.convert(localData.swfVersion, callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, scopeStack, 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods), new ArrayList<>());
-            body.toString(localData.swfVersion, callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods));
+            body.convert(localData.swfVersion, callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, scopeStack, 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods), new ArrayList<>(), localData.usedDeobfuscations);
+            body.toString(localData.usedDeobfuscations, localData.swfVersion, callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods));
         }
         writer.endBlock();
         writer.endMethod();
@@ -177,4 +177,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean isEmpty() {
+        //Assuming isEmpty is called only for commands = not in expressions
+        //Do not allow functions with empty names as commands.
+        return functionName.isEmpty();
+    }    
 }

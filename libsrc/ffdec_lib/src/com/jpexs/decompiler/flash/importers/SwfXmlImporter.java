@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
@@ -156,13 +157,15 @@ public class SwfXmlImporter {
 
     static {
         Map<String, Class> tags = new HashMap<>();
-        Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
+        Map<Integer, List<TagTypeInfo>> knownTags = Tag.getKnownClasses();
         for (Integer key : knownTags.keySet()) {
-            Class cls = knownTags.get(key).getCls();
-            if (!ReflectionTools.canInstantiate(cls)) {
-                System.err.println("Can't instantiate: " + cls.getName());
+            for (TagTypeInfo tagTypeInfo : knownTags.get(key)) {
+                Class cls = tagTypeInfo.getCls();
+                if (!ReflectionTools.canInstantiate(cls)) {
+                    System.err.println("Can't instantiate: " + cls.getName());
+                }
+                tags.put(cls.getSimpleName(), cls);
             }
-            tags.put(cls.getSimpleName(), cls);
         }
 
         swfTags = tags;
@@ -485,6 +488,10 @@ public class SwfXmlImporter {
     private Object createObject(String type, int tagTypeId, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if ("UnknownTag".equals(type)) {
             return new UnknownTag(swf, tagTypeId);
+        }
+        
+        if ("CSMTextSettings".equals(type)) {
+            type = CSMSettingsTag.NAME;
         }
 
         Class cls = swfTags.get(type);

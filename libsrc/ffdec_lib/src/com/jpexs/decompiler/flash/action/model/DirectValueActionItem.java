@@ -129,14 +129,10 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     @Override
     public String toStringNoQuotes(LocalData localData) {
         if (value instanceof Double) {
-            if (Double.compare((double) (Double) value, 0) == 0) {
-                return "0";
-            }
+            return EcmaScript.toString(value);
         }
         if (value instanceof Float) {
-            if (Float.compare((float) (Float) value, 0) == 0) {
-                return "0";
-            }
+            return EcmaScript.toString(value);
         }
         if (value instanceof String) {
             return (String) value;
@@ -146,7 +142,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate());
+            return IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate());
         }
 
         return value.toString();
@@ -155,14 +151,10 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     @Override
     public GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) {
         if (value instanceof Double) {
-            if (Double.compare((double) (Double) value, 0) == 0) {
-                return writer.append("0");
-            }
+            return writer.append(EcmaScript.toString(value));
         }
         if (value instanceof Float) {
-            if (Float.compare((float) (Float) value, 0) == 0) {
-                return writer.append("0");
-            }
+            return writer.append(EcmaScript.toString(value));
         }
         if (value instanceof String) {
             return writer.append((String) value);
@@ -172,7 +164,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return writer.append(IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate()));
+            return writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate()));
         }
 
         return writer.append(value.toString());
@@ -193,17 +185,6 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        if (value instanceof Double) {
-            if (Double.compare((double) (Double) value, 0) == 0) {
-                return writer.append("0");
-            }
-        }
-        if (value instanceof Float) {
-            if (Float.compare((float) (Float) value, 0) == 0) {
-                return writer.append("0");
-            }
-        }
-
         if (value instanceof String) {
             return writer.append("\"").append(Helper.escapeActionScriptString((String) value)).append("\"");
         }
@@ -216,7 +197,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             srcData.localName = ((RegisterNumber) value).translate();
             srcData.regIndex = ((RegisterNumber) value).number;
             
-            return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate()), srcData);
+            return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, ((RegisterNumber) value).translate()), srcData);
         }
         return writer.append(EcmaScript.toString(value));
     }

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -101,6 +102,13 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      */
     public abstract void setAdvanceValues(Font font);
 
+    /**
+     * Sets advance value for glyph.
+     * @param glyphIndex Glyph index
+     * @param advanceValue Advance value
+     */
+    public abstract void setGlyphAdvance(int glyphIndex, double advanceValue);
+    
     /**
      * Converts glyph to character.
      * @param glyphIndex Glyph index
@@ -394,7 +402,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         ret.put("chid", "" + getCharacterId());
         String fontName = getFontNameIntag();
         if (fontName != null) {
-            ret.put("fn", fontName);
+            ret.put("fn", "\"" + Helper.escapePCodeString(fontName) + "\"");
         }
         return ret;
     }
@@ -814,4 +822,9 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      */
     public abstract String getCodesCharset();
 
+    
+    /**
+     * Update tables of bounds
+     */
+    public abstract void updateBounds();
 }

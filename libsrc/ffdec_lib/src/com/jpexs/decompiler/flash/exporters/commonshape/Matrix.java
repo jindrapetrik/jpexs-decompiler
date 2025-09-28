@@ -172,7 +172,7 @@ public final class Matrix implements Cloneable {
 
     public java.awt.Point transform(java.awt.Point point) {
         Point p = transform(point.x, point.y);
-        return new java.awt.Point((int) p.x, (int) p.y);
+        return new java.awt.Point((int) Math.round(p.x), (int) Math.round(p.y));
     }
 
     public Point2D transform(Point2D point) {

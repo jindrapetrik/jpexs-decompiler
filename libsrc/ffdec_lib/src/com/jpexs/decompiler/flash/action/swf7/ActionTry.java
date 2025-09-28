@@ -269,6 +269,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     /**
      * Gets the try size
+     *
      * @return Try size
      */
     public long getTrySize() {
@@ -279,25 +280,36 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     public List<Long> getContainerSizes() {
         List<Long> ret = new ArrayList<>();
         ret.add(trySize);
-        ret.add(catchSize);
-        ret.add(finallySize);
+        if (catchBlockFlag) {
+            ret.add(catchSize);
+        }
+        if (finallyBlockFlag) {
+            ret.add(finallySize);
+        }
         return ret;
     }
 
     @Override
     public void setContainerSize(int index, long size) {
-        switch (index) {
-            case 0:
-                trySize = size;
-                break;
-            case 1:
+        int pos = 0;
+        if (pos == index) {
+            trySize = size;
+        }
+        if (catchBlockFlag) {
+            pos++;
+            if (pos == index) {
                 catchSize = size;
-                break;
-            case 2:
+            }
+        }
+        if (finallyBlockFlag) {
+            pos++;
+            if (pos == index) {
                 finallySize = size;
-                break;
-            default:
-                throw new IllegalArgumentException("Valid indexes are 0, 1, and 2.");
+            }
+        }
+
+        if (index > pos) {
+            throw new IllegalArgumentException("Valid indexes are 0 to " + pos + ".");
         }
     }
 
@@ -354,8 +366,10 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         List<GraphTargetItem> catchExceptionTypes = new ArrayList<>();
         List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
 
+        int p = 0;
         if (catchBlockFlag) {
-            List<GraphTargetItem> body = contents.get(1);
+            p++;
+            List<GraphTargetItem> body = contents.get(p);
             if (catchInRegisterFlag) {
                 if (body.size() >= 2) {
                     int pos = 0;
@@ -453,7 +467,13 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                 catchCommands.add(body);
             }
         }
-        List<GraphTargetItem> finallyCommands = contents.get(2);
+
+        List<GraphTargetItem> finallyCommands = new ArrayList<>();
+
+        if (finallyBlockFlag) {
+            p++;
+            finallyCommands = contents.get(p);
+        }
         output.add(new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands));
     }
 

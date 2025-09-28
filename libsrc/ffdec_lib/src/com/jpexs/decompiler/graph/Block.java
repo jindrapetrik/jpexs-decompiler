@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import java.util.List;
 
@@ -33,6 +34,13 @@ public interface Block {
      * @return List of continues
      */
     public List<ContinueItem> getContinues();
+    
+    /**
+     * Gets all sub breaks.
+     *
+     * @return List of breaks
+     */
+    public List<BreakItem> getBreaks();
 
     /**
      * Gets all sub blocks.

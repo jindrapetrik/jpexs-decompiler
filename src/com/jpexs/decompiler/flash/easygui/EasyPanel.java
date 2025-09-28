@@ -42,7 +42,7 @@ public class EasyPanel extends JPanel {
         tabSwitcher.addTabSwitchedListener(new TabSwitchedListener<SWF>() {
             @Override
             public void tabSwitched(SWF value) {
-                easySwfPanel.setTimelined(value);
+                easySwfPanel.setSwf(value);
             }
         });
     }

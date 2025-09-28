@@ -19,7 +19,7 @@ import jsyntaxpane.TokenType;
 %{
 
   StringBuilder string = new StringBuilder();
-
+  private static final byte CURLY     = 3;
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -89,6 +89,9 @@ Constant= constant{NumberLiteral}
 
 <YYINITIAL> {
   
+  /* operator */
+  "{"                            { return token(TokenType.OPERATOR, CURLY); }
+  "}"                            { return token(TokenType.OPERATOR, -CURLY); }
 
   /* whitespace */
   {WhiteSpace}                   {  }
@@ -116,11 +119,15 @@ Constant= constant{NumberLiteral}
 
   /* operator*/  
   ","                            { return token(TokenType.OPERATOR);}
+  "{"                            { return token(TokenType.OPERATOR, CURLY); }
+  "}"                            { yybegin(YYINITIAL);
+                                   return token(TokenType.OPERATOR, -CURLY); }
 
   /* numeric literals */
 
   {NumberLiteral}            { return token(TokenType.NUMBER);  }
-  {FloatLiteral}                 { return token(TokenType.NUMBER);  }
+  {FloatLiteral} "f"         { return token(TokenType.NUMBER);  }
+  {FloatLiteral}             { return token(TokenType.NUMBER);  }
   {LineTerminator}      {yybegin(YYINITIAL); }
   {Comment}             {return token(TokenType.COMMENT);}
   {StartOfBlock}                        { }

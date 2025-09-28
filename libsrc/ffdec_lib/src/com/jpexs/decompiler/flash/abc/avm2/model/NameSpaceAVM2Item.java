@@ -60,7 +60,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
         String nsname = dc != null ? dc.getLast() : null;
 
         if (nsname != null) {
-            String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
+            String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);
             if (identifier != null && !identifier.isEmpty()) {
                 writer.append(identifier);
                 return writer;

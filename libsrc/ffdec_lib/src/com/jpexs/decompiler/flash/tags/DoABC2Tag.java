@@ -62,7 +62,7 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
 
     /**
      * The name assigned to the bytecode.
-     */
+     */    
     public String name;
 
     /**

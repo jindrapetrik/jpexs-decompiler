@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -178,7 +179,7 @@ public class CallAVM2Item extends AVM2Item {
                         if (mi.param_types[i] == 0) {
                             type = TypeItem.UNBOUNDED;
                         } else {                     
-                            type = new TypeItem(abc.constants.getMultiname(mi.param_types[i]).getNameWithNamespace(abc.constants, true /*??*/));
+                            type = new TypeItem(abc.constants.getMultiname(mi.param_types[i]).getNameWithNamespace(new LinkedHashSet<>() /*???*/, abc, abc.constants, true /*??*/));
                         }
                         arguments.set(i, AVM2SourceGenerator.handleAndOrCoerce(arguments.get(i), type));
                     }

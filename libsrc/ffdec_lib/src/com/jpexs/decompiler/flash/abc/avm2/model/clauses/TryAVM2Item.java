@@ -33,6 +33,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -141,7 +142,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
             writer.append("catch(");
-            String localName = catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames);
+            String localName = catchExceptions.get(e).getVarName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames);
             if (localName.isEmpty()) {
                 localName = finCatchName;
             }
@@ -152,10 +153,10 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
             int eti = catchExceptions.get(e).type_index;
 
-            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.constantsAvm2, true);
+            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, true);
             writer.hilightSpecial(localName, HighlightSpecialType.TRY_NAME, e, data);
             writer.append(":");
-            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);
+            writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);
             writer.append(")");
             List<GraphTargetItem> commands = catchCommands.get(e);
             appendBlock(null, writer, localData, commands);
@@ -196,6 +197,40 @@ public class TryAVM2Item extends AVM2Item implements Block {
                 }
                 if (ti instanceof Block) {
                     ret.addAll(((Block) ti).getContinues());
+                }
+            }
+        }
+        return ret;
+    }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        for (GraphTargetItem ti : tryCommands) {
+            if (ti instanceof BreakItem) {
+                ret.add((BreakItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getBreaks());
+            }
+        }
+        if (finallyCommands != null) {
+            for (GraphTargetItem ti : finallyCommands) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        for (List<GraphTargetItem> commands : catchCommands) {
+            for (GraphTargetItem ti : commands) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
                 }
             }
         }

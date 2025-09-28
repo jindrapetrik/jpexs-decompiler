@@ -39,6 +39,65 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testAlwaysBreak() {
+        decompileMethod("assembled", "testAlwaysBreak", "if(true)\r\n"
+                + "{\r\n"
+                + "var v:* = 5;\r\n"
+                + "trace(\"a\");\r\n"
+                + "if(v > 4)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "if(v > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"c\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"d\");\r\n"
+                + "addr003e:\r\n"
+                + "trace(\"e\");\r\n"
+                + "}\r\n"
+                + "§§goto(addr004e);\r\n"
+                + "}\r\n"
+                + "§§goto(addr003e);\r\n"
+                + "}\r\n"
+                + "addr004e:\r\n"
+                + "trace(\"f\");\r\n",
+                 false);
+    }
+
+    @Test
+    public void testAlwaysBreak2() {
+        decompileMethod("assembled", "testAlwaysBreak2", "var v:* = 5;\r\n"
+                + "trace(\"a\");\r\n"
+                + "if(v > 4)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "if(v > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"c\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"d\");\r\n"
+                + "addr003e:\r\n"
+                + "trace(\"e\");\r\n"
+                + "}\r\n"
+                + "trace(\"f\");\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "§§goto(addr003e);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testCollidingPublicTraits() {
+        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#89);\r\n"
+                + "trace(\"ns2 = \" + this.a#90);\r\n",
+                 false);
+    }
+
+    @Test
     public void testDeclareReg() {
         decompileMethod("assembled", "testDeclareReg", "var other:XML;\r\n"
                 + "with(other)\r\n"
@@ -134,6 +193,83 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testGoto() {
+        decompileMethod("assembled", "testGoto", "var v:* = 5;\r\n"
+                + "if(v > 1)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "if(v > 2)\r\n"
+                + "{\r\n"
+                + "trace(\"goto\");\r\n"
+                + "addr0052:\r\n"
+                + "trace(\"f\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "addr003d:\r\n"
+                + "trace(\"d\");\r\n"
+                + "if(v > 3)\r\n"
+                + "{\r\n"
+                + "trace(\"e\");\r\n"
+                + "§§goto(addr0052);\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"g\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"end\");\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "trace(\"c\");\r\n"
+                + "§§goto(addr003d);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testGoto2() {
+        decompileMethod("assembled", "testGoto2", "var v:* = 5;\r\n"
+                + "if(v > 1)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "if(v > 2)\r\n"
+                + "{\r\n"
+                + "trace(\"goto\");\r\n"
+                + "addr0062:\r\n"
+                + "trace(\"g\");\r\n"
+                + "addr0069:\r\n"
+                + "trace(\"h\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "addr003d:\r\n"
+                + "trace(\"d\");\r\n"
+                + "if(v > 3)\r\n"
+                + "{\r\n"
+                + "trace(\"e\");\r\n"
+                + "if(b > 5)\r\n"
+                + "{\r\n"
+                + "trace(\"f\");\r\n"
+                + "§§goto(addr0062);\r\n"
+                + "}\r\n"
+                + "§§goto(addr0069);\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"i\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"end\");\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "trace(\"c\");\r\n"
+                + "§§goto(addr003d);\r\n",
+                 false);
+    }
+
+    @Test
     public void testIncrement() {
         decompileMethod("assembled", "testIncrement", "super();\r\n"
                 + "b = a++;\r\n",
@@ -185,18 +321,51 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testPushPlacement() {
+        decompileMethod("assembled", "testPushPlacement", "var a:int = 1;\r\n"
+                + "var b:* = 2;\r\n"
+                + "§§push(a);\r\n"
+                + "a += 1;\r\n"
+                + "if(b >= 2)\r\n"
+                + "{\r\n"
+                + "b = §§pop() + 7;\r\n"
+                + "trace(b);\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "§§pop();\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
-                + "§§push(obfuscated[\"xxx\"] = new [\"ByteArray\"]());\r\n"
+                + "§§push(obfuscated[\"xxx\"] = new (getDefinitionByName(\"flash.utils\"+\".\"+\"ByteArray\"))());\r\n"
                 + "§§push(50);\r\n"
-                + "while(§§dup(§§pop()))\r\n"
+                + "while(true)\r\n"
                 + "{\r\n"
-                + "§§dup(§§pop())[§§dup(§§dup(§§pop())).length] = 0x29 ^ 0x6F;\r\n"
-                + "§§dup(§§pop())[§§dup(§§dup(§§pop())).length] = 9 ^ 0x54;\r\n"
-                + "§§push(§§pop() - 1);\r\n"
+                + "var _temp_3:* = §§pop();\r\n"
+                + "§§push(_temp_3);\r\n"
+                + "if(!_temp_3)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "var _temp_4:* = §§pop();\r\n"
+                + "var _temp_5:* = §§pop() - 1;\r\n"
+                + "_temp_4[_temp_4.length] = 0x29 ^ 0x6F;\r\n"
+                + "_temp_4[_temp_4.length] = 9 ^ 0x54;\r\n"
+                + "§§push(_temp_4);\r\n"
+                + "§§push(_temp_5);\r\n"
                 + "}\r\n"
                 + "§§pop();\r\n"
                 + "§§pop();\r\n",
+                 false);
+    }
+
+    @Test
+    public void testSetGetLocalOnStack() {
+        decompileMethod("assembled", "testSetGetLocalOnStack", "this.arr[this.cnt++] = param1;\r\n",
                  false);
     }
 
@@ -280,13 +449,16 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "case 1:\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
-                + "if(b)\r\n"
+                + "if(!b)\r\n"
                 + "{\r\n"
-                + "trace(\"a\");\r\n"
-                + "}\r\n"
                 + "break;\r\n"
                 + "}\r\n"
+                + "trace(\"a\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
                 + "trace(\"b\");\r\n"
+                + "}\r\n"
                 + "trace(\"c\");\r\n"
                 + "break;\r\n"
                 + "case 2:\r\n"
@@ -308,33 +480,33 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "case 1:\r\n"
                 + "case 6:\r\n"
                 + "trace(\"1-6\");\r\n"
-                + "addr106:\r\n"
+                + "addr0121:\r\n"
                 + "trace(\"F\");\r\n"
                 + "break;\r\n"
                 + "case 5:\r\n"
                 + "trace(\"5\");\r\n"
-                + "addr103:\r\n"
+                + "addr011a:\r\n"
                 + "trace(\"E\");\r\n"
-                + "§§goto(addr106);\r\n"
+                + "§§goto(addr0121);\r\n"
                 + "case 7:\r\n"
                 + "trace(\"7\");\r\n"
-                + "addr100:\r\n"
+                + "addr0113:\r\n"
                 + "trace(\"D\");\r\n"
-                + "§§goto(addr103);\r\n"
+                + "§§goto(addr011a);\r\n"
                 + "case 2:\r\n"
                 + "trace(\"2\");\r\n"
-                + "addr97:\r\n"
+                + "addr010c:\r\n"
                 + "trace(\"C\");\r\n"
-                + "§§goto(addr100);\r\n"
+                + "§§goto(addr0113);\r\n"
                 + "case 8:\r\n"
                 + "trace(\"8\");\r\n"
-                + "addr94:\r\n"
+                + "addr0105:\r\n"
                 + "trace(\"B\");\r\n"
-                + "§§goto(addr97);\r\n"
+                + "§§goto(addr010c);\r\n"
                 + "default:\r\n"
                 + "trace(\"def\");\r\n"
                 + "trace(\"A\");\r\n"
-                + "§§goto(addr94);\r\n"
+                + "§§goto(addr0105);\r\n"
                 + "}\r\n"
                 + "trace(\"G\");\r\n"
                 + "return null;\r\n",
@@ -427,6 +599,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
+                + "trace(\"second\");\r\n"
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"

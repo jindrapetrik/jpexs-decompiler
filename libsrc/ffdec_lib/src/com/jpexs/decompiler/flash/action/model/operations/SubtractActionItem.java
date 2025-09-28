@@ -80,10 +80,10 @@ public class SubtractActionItem extends BinaryOpItem implements CompoundableBina
             int rightPrecedence = rightSide.getPrecedence();
             if (rightPrecedence >= precedence && rightPrecedence != GraphTargetItem.NOPRECEDENCE) {
                 writer.append("(");
-                rightSide.toString(writer, localData, coerceRight);
+                rightSide.toString(writer, localData, coerceRight, false);
                 writer.append(")");
             } else {
-                rightSide.toString(writer, localData, coerceRight);
+                rightSide.toString(writer, localData, coerceRight, false);
             }
             return writer;
         } else if (rightSide.getPrecedence() >= precedence) { // >=  add or subtract too

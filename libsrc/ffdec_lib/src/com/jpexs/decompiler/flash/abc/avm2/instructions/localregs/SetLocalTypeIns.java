@@ -35,9 +35,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 
 /**
@@ -74,8 +77,13 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          } else {
          localRegs.put(regId, value);
          }*/
-        if (!(value instanceof PopItem)) {
-            localData.localRegs.put(regId, value);
+        if (value instanceof CommaExpressionItem) {
+            CommaExpressionItem ce = (CommaExpressionItem) value;
+            if (!ce.commands.isEmpty()) {
+                localData.localRegs.put(regId, ce.commands.get(ce.commands.size() - 1));
+            }
+        } else if (!(value instanceof PopItem)) {
+            localData.localRegs.put(regId, value);        
         }
         if (!localData.localRegAssignmentIps.containsKey(regId)) {
             localData.localRegAssignmentIps.put(regId, 0);
@@ -83,7 +91,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         localData.localRegAssignmentIps.put(regId, localData.localRegAssignmentIps.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
         if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
-            output.add(new StoreNewActivationAVM2Item(ins, localData.lineStartInstruction, regId));
+            stack.addToOutput(new StoreNewActivationAVM2Item(ins, localData.lineStartInstruction, regId));
             return;
         }
         if (value instanceof FindPropertyAVM2Item) {
@@ -93,19 +101,25 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
-                    if (stack.size() > 0) {
+                    if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
-                        if (top == inside) {
-                            stack.pop();
+                        if (top == inside) {                                                        
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
+                            //stack.pop();     
+                            //TestIncDec2 with result
                             stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
-                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            
+                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {                            
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value);                                                        
+                            //stack.pop();
+                            //TestIncDec1 with result
                             stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        //TestIncDec1 no result
+                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -116,19 +130,24 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
-                    if (stack.size() > 0) {
+                    if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
+                            //stack.pop();
+                            //TestIncDec2 with result
                             stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
-                            stack.pop();
+                            GraphTargetItem.checkDup(stack, output, stack.pop(), value);            
+                            //stack.pop();
+                            //TestIncDec1 with result
                             stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        //TestIncDec1 no result
+                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -149,7 +168,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         
         if (value instanceof DuplicateItem) {
             result.directlyCausedByDup = true;
-        }
+        }                
 
         SetTypeIns.handleResult(value, stack, output, localData, result, regId, value.returnType());
     }

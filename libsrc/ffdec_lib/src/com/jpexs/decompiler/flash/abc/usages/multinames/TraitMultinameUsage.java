@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.graph.DottedChain;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 /**
@@ -100,10 +101,10 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
         if (classIndex != -1) {
             InstanceInfo ii = abc.instance_info.get(classIndex);
             String kind = ii.isInterface() ? "interface" : "class";
-            return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+            return kind + " " + ii.getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
         }
-        DottedChain scriptSimpleName = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-        return "script " + (scriptSimpleName == null ? "" + scriptIndex : scriptSimpleName.toPrintableString(true));
+        DottedChain scriptSimpleName = abc.script_info.get(scriptIndex).getSimplePackName(abc, new LinkedHashSet<>());
+        return "script " + (scriptSimpleName == null ? "" + scriptIndex : scriptSimpleName.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
     }
 
     @Override

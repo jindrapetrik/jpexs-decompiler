@@ -35,7 +35,9 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Instance info.
@@ -156,6 +158,7 @@ public class InstanceInfo {
     /**
      * Gets class header string.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param assetsDir Assets directory
      * @param writer Writer
      * @param abc ABC
@@ -164,18 +167,22 @@ public class InstanceInfo {
      * @param allowEmbed Allow embed
      * @return Writer
      */
-    public GraphTextWriter getClassHeaderStr(String assetsDir, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
+    public GraphTextWriter getClassHeaderStr(Set<String> usedDeobfuscations, String assetsDir, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
 
         final String ASSETS_DIR = assetsDir; // "/_assets/";
         if (allowEmbed) {
             if (abc.getSwf() != null) {
-                String className = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
+                String className = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
                 CharacterTag ct = abc.getSwf().getCharacterByClass(className);
                 if (ct != null) {
                     String fileName = ct.getCharacterExportFileName();
                     if (Configuration.as3ExportNamesUseClassNamesOnly.get()) {
-                        fileName = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
-                    }                    
+                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
+                        } else {
+                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
+                        }
+                    }
 
                     String ext = "";
                     if (ct instanceof DefineBinaryDataTag) {
@@ -313,17 +320,17 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(abc.constants, true).toRawString();
+        String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true).toRawString();
 
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
         
         if (!isNullable()) {
             writer.appendNoHilight("!");
         }
 
         if (super_index > 0) {
-            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true).toRawString();
-            String parentName = abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false, true);
+            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true).toRawString();
+            String parentName = abc.constants.getMultiname(super_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true);
             if (!parentName.equals("Object")) {
                 writer.appendNoHilight(" extends ");
                 writer.hilightSpecial(parentName, HighlightSpecialType.TYPE_NAME, typeName);
@@ -339,8 +346,8 @@ public class InstanceInfo {
                 if (i > 0) {
                     writer.append(", ");
                 }
-                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true).toRawString();
-                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TYPE_NAME, typeName);
+                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true).toRawString();
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TYPE_NAME, typeName);
             }
         }
 

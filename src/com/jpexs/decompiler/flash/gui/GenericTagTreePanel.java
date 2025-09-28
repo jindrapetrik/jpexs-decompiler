@@ -35,16 +35,19 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
+import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.EnumValues;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
@@ -59,6 +62,7 @@ import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -157,7 +161,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 }
             });
             setCellRenderer(new MyTreeCellRenderer());
-            setCellEditor(new MyTreeCellEditor(this));
             setInvokesStopCellEditing(true);
 
         }
@@ -288,9 +291,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private final JTree tree;
 
         private FieldNode fnode;
+        private final SWF swf;
 
-        public MyTreeCellEditor(JTree tree) {
+        public MyTreeCellEditor(JTree tree, SWF swf) {
             this.tree = tree;
+            this.swf = swf;
         }
 
         @Override
@@ -356,7 +361,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
                         editor = new BooleanEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(String.class)) {
-                        editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null);
+                        editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null, swf);
                     } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
                         editor = new ColorEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(byte[].class) || type.equals(ByteArrayRange.class)) {
@@ -789,12 +794,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private MyTreeModel model;
 
         private Object parentObject;
+        private final SWF swf;
 
         public Object getParentObject() {
             return parentObject;
         }
 
-        public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index) {
+        public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index, SWF swf) {
             this.tag = tag;
             this.obj = obj;
             this.fieldSet = fieldSet;
@@ -815,6 +821,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                 }
             }
+            this.swf = swf;
         }
 
         @Override
@@ -903,15 +910,31 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     enumAdd = " - " + values.get(val);
                 }
 
-                if (val instanceof byte[]) {
+                DottedIdentifier di = field.getAnnotation(DottedIdentifier.class);
+                if (val instanceof String && di != null) {
+                    if (di.exportName()) {
+                        valStr += " = " + escapeHtml(Helper.escapeExportname(swf, val.toString(), true));
+                    } else {
+                        valStr += " = " + escapeHtml("\"" + Helper.escapePCodeString(val.toString()) + "\"");
+                        //escapeHtml(DottedChain.parseNoSuffix(val.toString()).toPrintableString(new LinkedHashSet<>(), swf, di.as3()));
+                    }
+                } else if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {
                     valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
+                } else if (val instanceof String) {
+                    valStr += " = \"" + escapeHtml(Helper.escapePCodeString(val.toString())) + "\"";
                 } else {
-                    valStr += " = " + colorAdd + val.toString() + enumAdd;
+                    valStr += " = " + colorAdd + escapeHtml(val.toString()) + enumAdd;
                 }
             }
             return getNameType(fieldIndex) + valStr;
+        }
+
+        private String escapeHtml(String val) {
+            return val.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
         }
 
         public String getType(int fieldIndex) {
@@ -952,6 +975,17 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
 
             String typeStr = type.getSimpleName();
+
+            if ("RGB".equals(typeStr)) {
+                try {
+                    Object val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
+                    if (val instanceof RGBA) {
+                        typeStr = "RGBA";
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    //ignore
+                }
+            }
 
             boolean bracketsDetected = false;
             if (swfType != null) {
@@ -1185,15 +1219,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private Object getChild(Object parent, int index, boolean limited) {
             if (parent == mtroot) {
-                return new FieldNode(null, this, mtroot, mtroot, filterFields(mtroot.getSwf(), this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1);
+                return new FieldNode(null, this, mtroot, mtroot, filterFields(mtroot.getSwf(), this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1, mtroot.getSwf());
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
-                return new FieldNode(parent, this, mtroot, fnode.obj, fnode.fieldSet, index);
+                return new FieldNode(parent, this, mtroot, fnode.obj, fnode.fieldSet, index, mtroot.getSwf());
             }
             parent = fnode.getValue(FIELD_INDEX);
-            return new FieldNode(parent, this, mtroot, parent, filterFields(mtroot.getSwf(), this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1);
+            return new FieldNode(parent, this, mtroot, parent, filterFields(mtroot.getSwf(), this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1, mtroot.getSwf());
         }
 
         @Override
@@ -1283,6 +1317,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tree.stopEditing();
         }
         tree.setEditable(edit);
+        if (editedTag != null) {
+            tree.setCellEditor(new MyTreeCellEditor(tree, editedTag.getSwf()));
+        }
         refreshTree();
     }
 
@@ -1587,6 +1624,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //Hack to set CLIPACTIONRECORD parent
                 if ((obj instanceof CLIPACTIONS) && (v instanceof CLIPACTIONRECORD)) {
                     ((CLIPACTIONRECORD) v).setParentClipActions((CLIPACTIONS) obj);
+                }
+
+                //Hack to set GRADRECORD to RGB or RGBA based on shape num
+                if (v instanceof GRADRECORD) {
+                    GRADRECORD grad = (GRADRECORD) v;
+                    if (editedTag instanceof ShapeTag) {
+                        ShapeTag shape = (ShapeTag) editedTag;
+                        if (shape.getShapeNum() >= 3) {
+                            grad.color = new RGBA(Color.black);
+                        } else {
+                            grad.color = new RGB(Color.black);
+                        }
+                    } else {
+                        grad.color = new RGBA(Color.black);
+                    }
                 }
 
                 if (obj instanceof HasSwfAndTag) {

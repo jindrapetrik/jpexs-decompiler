@@ -130,7 +130,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
             //TODO: handle result needed better, without identifierdeobfuscation
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, name.toStringNoQuotes(localData)));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, name.toStringNoQuotes(localData)));
             if (compoundOperator != null) {
                 writer.append(" ");
                 writer.append(compoundOperator);

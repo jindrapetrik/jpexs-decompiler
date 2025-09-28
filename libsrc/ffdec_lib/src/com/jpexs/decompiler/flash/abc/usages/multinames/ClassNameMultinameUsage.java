@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import java.util.LinkedHashSet;
 
 /**
  * Class name multiname usage.
@@ -49,7 +50,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " name";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true) + " name";
     }
 
     @Override
@@ -88,7 +89,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
             }
         }
         if (other instanceof ClassNameMultinameUsage) {
-            return sameMultinameName(other);
+            return sameMultinameName(other, true);
         }
         return false;
     }

@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -47,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -56,11 +59,15 @@ import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
 import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -79,16 +86,24 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
+import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
@@ -97,6 +112,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -256,19 +272,22 @@ public class TagTree extends AbstractTagTree {
                 ret = Arrays.asList(DefineTextTag.ID, DefineText2Tag.ID, DefineEditTextTag.ID);
                 break;
             case TagTreeModel.FOLDER_IMAGES:
+                ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
+                
                 if (gfx) {
-                    ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID,
-                            DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID
-                    );
-                } else {
-                    ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
+                    ret = new ArrayList<>(ret);
+                    ret.addAll(Arrays.asList(DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID));
                 }
                 break;
             case TagTreeModel.FOLDER_MOVIES:
-                ret = Arrays.asList(DefineVideoStreamTag.ID);
+                ret = Arrays.asList(DefineVideoStreamTag.ID, DefineVideoTag.ID);
                 break;
             case TagTreeModel.FOLDER_SOUNDS:
                 ret = Arrays.asList(DefineSoundTag.ID);
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.add(DefineExternalSound.ID);
+                }
                 break;
             case TagTreeModel.FOLDER_BUTTONS:
                 ret = Arrays.asList(DefineButtonTag.ID, DefineButton2Tag.ID);
@@ -277,7 +296,7 @@ public class TagTree extends AbstractTagTree {
                 if (gfx) {
                     ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID, DefineCompactedFont.ID);
                 } else {
-                    ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID);
+                    ret = Arrays.asList(DefineFontTag.ID, DefineFont2Tag.ID, DefineFont3Tag.ID, DefineFont4Tag.ID, FontRefTag.ID);
                 }
                 break;
             case TagTreeModel.FOLDER_BINARY_DATA:
@@ -288,7 +307,16 @@ public class TagTree extends AbstractTagTree {
                 ret = Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                         RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                         StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
+                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
+                        SetTabIndexTag.ID, PlaceImagePrivateTag.ID,
+                        GenCommandTag.ID,
+                        FreeCharacterTag.ID,
+                        SyncFrameTag.ID
+                );
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.add(DefineExternalStreamSound.ID);
+                }
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(
@@ -301,7 +329,15 @@ public class TagTree extends AbstractTagTree {
                         EnableDebuggerTag.ID, EnableDebugger2Tag.ID, EnableTelemetryTag.ID,
                         ExportAssetsTag.ID, FileAttributesTag.ID, ImportAssetsTag.ID, ImportAssets2Tag.ID,
                         JPEGTablesTag.ID, MetadataTag.ID, ProductInfoTag.ID, ProtectTag.ID, ScriptLimitsTag.ID,
-                        SetBackgroundColorTag.ID, SetTabIndexTag.ID, SymbolClassTag.ID);
+                        SetBackgroundColorTag.ID,
+                        //SetTabIndexTag.ID, 
+                        SymbolClassTag.ID,                        
+                        CharacterSetTag.ID
+                );
+                if (gfx) {
+                    ret = new ArrayList<>(ret);
+                    ret.addAll(Arrays.asList(DefineExternalGradient.ID, DefineGradientMap.ID, ExporterInfo.ID, FontTextureInfo.ID));
+                }
                 break;
         }
 
@@ -349,7 +385,11 @@ public class TagTree extends AbstractTagTree {
             String expName = tag.getSwf().getExportName(tag.getCharacterId());
             if (expName != null && !expName.isEmpty()) {
                 String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-                return pathParts[pathParts.length - 1];
+                if (expName.startsWith("__Packages.")) {
+                    return IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), new LinkedHashSet<>(), false, pathParts[pathParts.length - 1]);
+                } else {
+                    return Helper.escapeExportname(tag.getSwf(), expName, false);
+                }                
             }
         }
         if (value != null) {

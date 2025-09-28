@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -112,11 +113,11 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
         if (ii.deleted) {
             return true;
         }
-        if (ii.super_index != 0 && isParentDeleted(abc, allAbcs, abc.constants.getMultiname(ii.super_index).getNameWithNamespace(abc.constants, false))) {
+        if (ii.super_index != 0 && isParentDeleted(abc, allAbcs, abc.constants.getMultiname(ii.super_index).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false))) {
             return true;
         }
         for (int iface : ii.interfaces) {
-            if (isParentDeleted(abc, allAbcs, abc.constants.getMultiname(iface).getNameWithNamespace(abc.constants, false))) {
+            if (isParentDeleted(abc, allAbcs, abc.constants.getMultiname(iface).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false))) {
                 return true;
             }
         }

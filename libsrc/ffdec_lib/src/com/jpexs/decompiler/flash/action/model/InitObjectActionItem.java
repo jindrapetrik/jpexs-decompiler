@@ -81,7 +81,7 @@ public class InitObjectActionItem extends ActionItem {
             //AS1/2 does not allow quotes in name here            
             if ((names.get(i) instanceof DirectValueActionItem)
                     && (((DirectValueActionItem) names.get(i)).isSimpleValue())) {
-                writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));
+                writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, names.get(i).toStringNoQuotes(localData)));
             } else {
                 writer.append("(");
                 names.get(i).appendTo(writer, localData);

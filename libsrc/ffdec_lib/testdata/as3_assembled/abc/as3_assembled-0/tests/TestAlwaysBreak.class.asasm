@@ -1,0 +1,101 @@
+class
+ refid "tests:TestAlwaysBreak"
+ instance QName(PackageNamespace("tests"), "TestAlwaysBreak")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestAlwaysBreak")
+  iinit
+   refid "tests:TestAlwaysBreak/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestAlwaysBreak/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+      debug 1, "v", 0, 15
+            jump ofs0055
+   ofs000c:
+            label
+            pushbyte 5
+            coerce_a
+            setlocal1
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "a"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+            getlocal1
+            pushbyte 4
+            ifngt ofs0048
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "b"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+            getlocal1
+            pushbyte 10
+            ifngt ofs003e
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "c"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+            jump ofs005a
+   ofs003e:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "d"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+   ofs0048:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "e"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+            jump ofs005a
+   ofs0055:
+            pushtrue
+            iftrue ofs000c
+   ofs005a:
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")])
+            pushstring "f"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestAlwaysBreak"),ProtectedNamespace("tests:TestAlwaysBreak"),StaticProtectedNs("tests:TestAlwaysBreak"),PrivateNamespace("TestAlwaysBreak.as$33")]), 1
+            returnvoid
+      
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestAlwaysBreak/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

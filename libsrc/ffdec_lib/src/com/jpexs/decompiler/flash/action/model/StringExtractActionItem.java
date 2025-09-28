@@ -37,7 +37,7 @@ import java.util.Objects;
 public class StringExtractActionItem extends ActionItem {
 
     /**
-     * Index
+     * Index - 1 based
      */
     public GraphTargetItem index;
 
@@ -63,10 +63,11 @@ public class StringExtractActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        value.toString(writer, localData);
-        writer.append(".substr");
+        writer.append("substring");
         writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
+        value.toString(writer, localData);
+        writer.append(",");
         index.toString(writer, localData);
         writer.append(",");
         count.toString(writer, localData);
@@ -98,7 +99,7 @@ public class StringExtractActionItem extends ActionItem {
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
         int idx = EcmaScript.toInt32(index);
-        idx--; // index seems to be 1 based
+        idx--; // index is 1 based
 
         int cnt = EcmaScript.toInt32(count);
 

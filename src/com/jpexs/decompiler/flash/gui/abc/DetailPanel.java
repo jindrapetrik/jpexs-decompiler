@@ -35,6 +35,7 @@ import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -303,7 +304,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                 traitNameLabel.setText("-");
             } else if (abcPanel != null) {
                 Multiname traitName = trait.getName(abc);
-                String traitNameStr = traitName == null ? "" : traitName.getName(abc.constants, null, false, true);
+                String traitNameStr = traitName == null ? "" : traitName.getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
                 traitNameLabel.setText(traitNameStr);
             }
         });

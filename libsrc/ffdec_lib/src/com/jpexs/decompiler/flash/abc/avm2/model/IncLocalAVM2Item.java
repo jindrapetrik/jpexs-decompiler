@@ -47,7 +47,7 @@ public class IncLocalAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append(localRegName(localData.localRegNames, regIndex));
+        writer.append(localRegName(localData.abc.getSwf(), localData.localRegNames, regIndex, localData.usedDeobfuscations));
         return writer.append("++");
     }
 

@@ -33,6 +33,7 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -128,7 +129,7 @@ public class LinkReportExporter {
             ns = abc.constants.getNamespace(nss.namespaces[0]);
         }
         String pkgName = ns == null ? "" : ns.getName(abc.constants).toRawString();
-        String clsName = multiName.getName(abc.constants, new ArrayList<>(), true, true);
+        String clsName = multiName.getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, true);
         return pkgName.isEmpty() ? clsName : pkgName + ":" + clsName;
     }
 
@@ -174,7 +175,7 @@ public class LinkReportExporter {
             List<Dependency> dependencies = new ArrayList<>();
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
+            tc.getDependencies(new LinkedHashSet<>(), swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {

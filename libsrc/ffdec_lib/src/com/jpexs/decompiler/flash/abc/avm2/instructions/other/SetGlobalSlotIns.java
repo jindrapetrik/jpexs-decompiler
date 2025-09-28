@@ -44,6 +44,7 @@ public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIn
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int slotIndex = ins.operands[0];
+        stack.allowSwap(output);        
         GraphTargetItem value = stack.pop();
         GraphTargetItem obj = new GlobalAVM2Item(ins, localData.lineStartInstruction);
         SetSlotIns.handleSetSlot(localData, stack, ins, output, slotIndex, obj, value);

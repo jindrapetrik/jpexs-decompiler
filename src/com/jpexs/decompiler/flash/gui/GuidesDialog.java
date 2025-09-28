@@ -152,7 +152,7 @@ public class GuidesDialog extends AppDialog {
         Configuration.showGuides.set(showGuidesCheckBox.isSelected());
         Configuration.snapToGuides.set(snapToGuidesCheckBox.isSelected());
         Configuration.lockGuides.set(lockGuidesCheckBox.isSelected());
-        Configuration.guidesSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).acurracy);
+        Configuration.guidesSnapAccuracy.set(((AccuracyItem) snapAccuracyComboBox.getSelectedItem()).accuracy);
         setVisible(false);
     }
     
@@ -161,20 +161,20 @@ public class GuidesDialog extends AppDialog {
     }
     
     private class AccuracyItem {
-        private GuidesSnapAccuracy acurracy;
+        private GuidesSnapAccuracy accuracy;
 
-        public AccuracyItem(GuidesSnapAccuracy acurracy) {
-            this.acurracy = acurracy;
+        public AccuracyItem(GuidesSnapAccuracy accuracy) {
+            this.accuracy = accuracy;
         }
 
-        public GuidesSnapAccuracy getAcurracy() {
-            return acurracy;
+        public GuidesSnapAccuracy getAccuracy() {
+            return accuracy;
         }                
 
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + Objects.hashCode(this.acurracy);
+            hash = 67 * hash + Objects.hashCode(this.accuracy);
             return hash;
         }
 
@@ -190,14 +190,14 @@ public class GuidesDialog extends AppDialog {
                 return false;
             }
             final AccuracyItem other = (AccuracyItem) obj;
-            return this.acurracy == other.acurracy;
+            return this.accuracy == other.accuracy;
         }
 
         
         
         @Override
         public String toString() {
-            switch (acurracy) {
+            switch (accuracy) {
                 case MUST_BE_CLOSE:
                     return translate("snapAccuracy.mustBeClose");
                 case NORMAL:

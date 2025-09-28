@@ -33,6 +33,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
+import java.util.Set;
 
 /**
  * convert_f4 - Convert a value to a float4.
@@ -45,7 +46,7 @@ public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConve
      * Constructor
      */
     public ConvertF4Ins() {
-        super(0x7B, "convert_f4", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
+        super(0x7B, "convert_f4", new int[]{}, true, AVM2InstructionFlag.FLOAT4_SUPPORT, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
 
     @Override
@@ -78,11 +79,11 @@ public class ConvertF4Ins extends InstructionDefinition implements CoerceOrConve
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.getConstants(), ins)));
+        stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.usedDeobfuscations, localData.abc, localData.getConstants(), ins)));
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         return new TypeItem("float4");
     }
 }

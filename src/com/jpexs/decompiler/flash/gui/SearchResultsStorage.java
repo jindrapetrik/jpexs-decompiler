@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
@@ -54,7 +55,7 @@ public class SearchResultsStorage {
     private static final int DATA_ACTION = 2;
 
     private static String getConfigFile() throws IOException {
-        return Configuration.getFFDecHome() + SEARCH_RESULTS_FILE;
+        return AppDirectoryProvider.getFFDecHome() + SEARCH_RESULTS_FILE;
     }
 
     List<String> openableIds = new ArrayList<>();
@@ -175,13 +176,12 @@ public class SearchResultsStorage {
                             if (kind == DATA_ACTION) {
                                 currentResults.add(new ActionSearchResult((SWF) openable, bais));
                             }
-                        } catch (ScriptNotFoundException | IOException ex) {
-                            ex.printStackTrace();
+                        } catch (ScriptNotFoundException ex) {
                             //ignore
                         }
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
+                    //ignore
                 }
                 unpackedData.set(j, currentResults);
                 result.addAll(currentResults);

@@ -70,7 +70,7 @@ public class NewObjectActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        writer.append(IdentifiersDeobfuscation.printIdentifier(false, objectName.toStringNoQuotes(localData)));
+        writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, objectName.toStringNoQuotes(localData)));
         writer.spaceBeforeCallParenthesis(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {

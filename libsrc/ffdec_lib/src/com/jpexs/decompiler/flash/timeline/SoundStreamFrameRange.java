@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -28,8 +29,6 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * SoundStream blocks across frame range.
@@ -218,5 +217,10 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     @Override
     public int getInitialLatency() {
         return 0;
+    }
+
+    @Override
+    public SWF getSwf() {
+        return head.getSwf();
     }
 }

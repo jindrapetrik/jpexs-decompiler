@@ -60,7 +60,7 @@ public class GetGlobalSlotIns extends InstructionDefinition {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst) t;
                     if (tsc.slot_id == slotIndex) {
-                        slotType = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
+                        slotType = AbcIndexing.multinameToType(localData.usedDeobfuscations, tsc.type_index, localData.abc, localData.abc.constants);
                         break;
                     }
                 }

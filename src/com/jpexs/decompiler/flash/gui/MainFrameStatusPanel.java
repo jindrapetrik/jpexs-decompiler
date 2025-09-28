@@ -24,8 +24,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -81,7 +79,7 @@ public class MainFrameStatusPanel extends JPanel {
         cancelButton.addActionListener((ActionEvent e) -> {
             CancellableWorker w = currentWorker;
             if (w != null) {           
-                w.cancel(true);
+                w.userCancel(true);
             }
         });                               
         statusLeftPanel.add(loadingPanel);

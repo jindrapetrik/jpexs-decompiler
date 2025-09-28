@@ -126,7 +126,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
                 srcData.declaredType = DottedChain.ALL;
                 writer.append("var ");
             }
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, register.translate()));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, register.translate()));
 
             if (compoundOperator != null) {
                 writer.append(" ");

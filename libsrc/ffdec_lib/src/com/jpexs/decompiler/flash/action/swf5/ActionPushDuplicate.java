@@ -28,9 +28,11 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * PushDuplicate action - Push duplicate of top stack value.
@@ -42,10 +44,10 @@ public class ActionPushDuplicate extends Action {
 
     /**
      * Constructor.
-     * @param charset Charset
+     *
      */
-    public ActionPushDuplicate(String charset) {
-        super(0x4C, 0, charset);
+    public ActionPushDuplicate() {
+        super(0x4C, 0, Utf8Helper.charsetName);
     }
 
     @Override
@@ -64,9 +66,10 @@ public class ActionPushDuplicate extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.peek();
-        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction, value));
+        //TODO: implement logic similar to Avm2
+        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction, value, 0));
         value.getMoreSrc().add(new GraphSourceItemPos(this, 0));
     }
 

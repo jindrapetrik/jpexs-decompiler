@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -627,7 +626,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
             parseMetadata(errors);
 
             ParsedSymbol s = lex();
-            while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
+            loops: while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         errors.add(new SimpleParseException("Only one final keyword allowed", lexer.yyline(), s.position));
@@ -713,6 +712,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
 
                         } else {
                             lexer.pushback(s);
+                            break loops;
                         }
                         break;
                 }
@@ -1650,8 +1650,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 arrCnt++;
                 expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                 s = lex();
-                if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
-                    expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
+                if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
+                    break;
                 }
             }
         } else {
@@ -1876,12 +1876,17 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     case "dup":
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                         ret = true;
+                        allowMemberOrCall = true;                        
                         break;
                     case "push":
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, true, variables, false, abc);
                         ret = true;
                         break;
                     case "pop":
+                        ret = true;
+                        allowMemberOrCall = true;
+                        break;
+                    case "swap":
                         ret = true;
                         break;
                     case "goto":
@@ -2123,6 +2128,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
                 break;
             default:
                 lexer.pushback(s);
+                if (s.isType(SymbolGroup.IDENTIFIER)) {
+                    lastVarName = name(errors, thisType, needsActivation, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, importedClasses, abc);
+                    ret = true;
+                    allowMemberOrCall = true;                
+                }                                
         }
         if (allowMemberOrCall && ret) {
             memberOrCall(lastVarName, errors, thisType, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, isStatic, variables, abc);

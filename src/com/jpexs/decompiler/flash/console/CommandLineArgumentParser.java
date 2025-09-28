@@ -141,6 +141,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -178,11 +179,13 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
@@ -194,6 +197,7 @@ import com.sun.jna.Platform;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -231,6 +235,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -3000,7 +3005,7 @@ public class CommandLineArgumentParser {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
                 while (true) {
-                    String objectToReplace = args.pop();                    
+                    String objectToReplace = args.pop();
 
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
@@ -3099,6 +3104,44 @@ public class CommandLineArgumentParser {
                                     return false;
                                 }
                             }).importText(textTag, new String(data, Utf8Helper.charset));
+                        } else if (characterTag instanceof FontTag) {
+                            FontTag fontTag = (FontTag) characterTag;
+                            Set<Character> selChars = new HashSet<>();
+                            Font font;
+                            try {
+                                font = Font.createFont(Font.TRUETYPE_FONT, new File(repFile));
+                                List<Character> required = Arrays.asList((char) 0x01, (char) 0x00, (char) 0x0D, (char) 0x20);
+                                for (char c = 0; c < Character.MAX_VALUE; c++) {
+                                    if (required.contains(c)) {
+                                        continue;
+                                    }
+                                    if (!font.canDisplay(c)) {
+                                        continue;
+                                    }
+                                    if (Utf8Helper.charToCodePoint(c, fontTag.getCodesCharset()) == -1) {
+                                        continue;
+                                    }                                    
+                                    selChars.add(c);                                                                        
+                                }
+                            } catch (FontFormatException | IOException e) {
+                                System.err.println("replace font tag fail: " + e.getMessage());
+                                System.exit(1);
+                                return;
+                            }
+
+                            if (font.getSize() != 1024) {
+                                font = font.deriveFont(fontTag.getFontStyle(), 1024);
+                            }
+                                                                
+                            for (char c : selChars) {
+                                if (!fontTag.addCharacter(c, font)) {
+                                    break;
+                                }
+                            }
+                        } else if (characterTag instanceof DefineFont4Tag) {
+                            DefineFont4Tag font4 = (DefineFont4Tag) characterTag;
+                            font4.fontData = new ByteArrayRange(data);
+                            font4.setModified(true);
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
                             Integer startFrame = null;
@@ -4354,9 +4397,9 @@ public class CommandLineArgumentParser {
         if (dcs != null) {
             if (dcs.contains(".")) {
                 DottedChain dc = DottedChain.parseWithSuffix(dcs);
-                pw.println("documentClass=" + dc.toPrintableString(true));
+                pw.println("documentClass=" + dc.toPrintableString(new LinkedHashSet<>(), swf, true));
             } else {
-                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(true, dcs));
+                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(swf, new LinkedHashSet<>(), true, dcs));
             }
         } else {
             pw.println("documentClass=");

@@ -42,6 +42,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -191,6 +192,40 @@ public class TryActionItem extends ActionItem implements Block {
         }
         return ret;
     }
+   
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        for (GraphTargetItem ti : tryCommands) {
+            if (ti instanceof ContinueItem) {
+                ret.add((BreakItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getBreaks());
+            }
+        }
+        if (finallyCommands != null) {
+            for (GraphTargetItem ti : finallyCommands) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        for (List<GraphTargetItem> commands : catchCommands) {
+            for (GraphTargetItem ti : commands) {
+                if (ti instanceof ContinueItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        return ret;
+    }
 
     @Override
     public boolean needsSemicolon() {
@@ -249,14 +284,14 @@ public class TryActionItem extends ActionItem implements Block {
                         fullCatchBody.addAll(0, GraphTargetItem.toSourceMerge(localData, generator,
                                 new DirectValueActionItem(new RegisterNumber(catchRegister)),
                                 ename,
-                                new ActionStackSwap(charset),
+                                new ActionStackSwap(),
                                 new ActionDefineLocal(),
                                 ebody
                         ));
                     } else {
                         List<GraphSourceItem> ifBody = GraphTargetItem.toSourceMerge(localData, generator,
                                 ename,
-                                new ActionStackSwap(charset),
+                                new ActionStackSwap(),
                                 new ActionDefineLocal(),
                                 ebody);
                         fullCatchBody.add(0, new ActionPop());
@@ -271,7 +306,7 @@ public class TryActionItem extends ActionItem implements Block {
                                         etype,
                                         new ActionPush(new RegisterNumber(catchRegister), charset),
                                         new ActionCastOp(),
-                                        new ActionPushDuplicate(charset),
+                                        new ActionPushDuplicate(),
                                         new ActionPush(Null.INSTANCE, charset),
                                         new ActionEquals2(),
                                         new ActionIf(ifBodySize, charset)

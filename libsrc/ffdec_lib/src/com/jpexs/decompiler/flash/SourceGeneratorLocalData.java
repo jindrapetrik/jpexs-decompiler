@@ -129,7 +129,7 @@ public class SourceGeneratorLocalData implements Serializable {
     /**
      * Current script index
      */
-    public int scriptIndex;
+    public Integer scriptIndex = null;
 
     /**
      * Is in sub method

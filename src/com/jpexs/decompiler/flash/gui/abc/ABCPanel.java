@@ -20,7 +20,6 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -119,8 +118,8 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -401,6 +400,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             Variable curTrait = null;
             for (int i = 0; i < igv.childs.size(); i++) {
+                if (!Configuration.showVarsWithDontEnumerateFlag.get() && (igv.childs.get(i).flags & VariableFlags.DONT_ENUMERATE) > 0) {
+                    continue;
+                }
+                        
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(varInsideGetter);
                     childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
@@ -936,9 +939,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.addScriptListener(setTrait);
             String scriptName;
             if (classIndex > -1) {
-                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(newAbc.constants, true).toPrintableString(true);
+                scriptName = newAbc.instance_info.get(classIndex).getName(newAbc.constants).getNameWithNamespace(new LinkedHashSet<>(), newAbc, newAbc.constants, true).toPrintableString(new LinkedHashSet<>(), newAbc.getSwf(), true);
             } else if (scriptIndex > -1) {
-                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc).toPrintableString(true);
+                scriptName = newAbc.script_info.get(classIndex).getSimplePackName(newAbc, new LinkedHashSet<>()).toPrintableString(new LinkedHashSet<>(), newAbc.getSwf(), true);
             } else {
                 scriptName = "";
             }
@@ -1011,7 +1014,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     swfRef.setVal(ci.abc.getSwf());
                 }
 
-                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(true);
+                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(new LinkedHashSet<>(), ci.abc.getSwf(), true);
                 
                 if (swfRef.getVal() == abc.getSwf()) {                    
                     hilightScript(getOpenable(), scriptNamePrintable);
@@ -1147,7 +1150,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             public List<com.jpexs.decompiler.flash.simpleparser.Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
                 List<AbcIndexing.PropertyDef> propertyDefList = new ArrayList<>();
                 List<Boolean> isStaticList = new ArrayList<>();
-                abc.getSwf().getAbcIndex().getClassTraits(new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
+                abc.getSwf().getAbcIndex().getClassTraits(new LinkedHashSet<>(), new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
                 List<com.jpexs.decompiler.flash.simpleparser.Variable> ret = new ArrayList<>();
                 for (int i = 0; i < propertyDefList.size(); i++) {
                     AbcIndexing.PropertyDef def = propertyDefList.get(i);
@@ -1166,7 +1169,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         if (tmgs.kindType == Trait.TRAIT_SETTER) {
                             int[] paramTypes = ti.abc.method_info.get(tmgs.method_info).param_types;
                             if (paramTypes.length == 1) {
-                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(ti.abc.constants, false).getStringParts());
+                                type = new Path(ti.abc.constants.getMultiname(paramTypes[0]).getNameWithNamespace(new LinkedHashSet<>(), ti.abc, ti.abc.constants, false).getStringParts());
                                 callType = null;
                             } else {
                                 continue;
@@ -1255,10 +1258,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         });
 
-        PopupButton deobfuscateOptionsButton = new PopupButton(View.getIcon("deobfuscateoptions16")) {
+        PopupButton deobfuscateOptionsButton = new PopupButton(View.getIcon("medkit16")) {
             @Override
             protected JPopupMenu getPopupMenu() {
                 JPopupMenu popupMenu = new JPopupMenu();
+                JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
+                deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
+                deobfuscateIdentifiersMenuItem.addActionListener(ABCPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
+                
                 JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
                 simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
                 simplifyExpressionsMenuItem.addActionListener(ABCPanel.this::simplifyExpressionsMenuItemActionPerformed);
@@ -1266,8 +1273,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                  */
+                
+                
+                JCheckBoxMenuItem disableDecompilationMenuItem = new JCheckBoxMenuItem(AppStrings.translate("menu.settings.disabledecompilation"));
+                disableDecompilationMenuItem.setSelected(!Configuration.decompile.get());
+                disableDecompilationMenuItem.addActionListener(ABCPanel.this::disableDecompilationMenuItemActionPerformed);
+                
+                
+                popupMenu.add(deobfuscateIdentifiersMenuItem);                
                 popupMenu.add(simplifyExpressionsMenuItem);
                 //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+                popupMenu.add(disableDecompilationMenuItem);
 
                 return popupMenu;
             }
@@ -1548,7 +1564,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         continue;
                     }
 
-                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, a, usedAbc, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1601,7 +1617,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     if (a == usedAbc) {
                         continue;
                     }
-                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, a, usedAbc, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1795,10 +1811,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             };
 
             if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
-                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
+                mainPanel.findOrLoadOpenableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
                 return;
             } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
-                mainPanel.findOrLoadOpanableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
+                mainPanel.findOrLoadOpenableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
                 return;
             }
 
@@ -2133,6 +2149,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.simplifyExpressions.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void autoDeobfuscateIdentifiersMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.autoDeobfuscateIdentifiers.set(menuItem.isSelected());
+        mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void disableDecompilationMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.decompile.set(!menuItem.isSelected());
+        mainPanel.disableDecompilationChanged();
     }
 
     /*private void removeObfuscatedDeclarationsMenuItemActionPerformed(ActionEvent evt) {

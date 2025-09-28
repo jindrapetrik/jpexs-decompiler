@@ -18,9 +18,9 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf1.ActionGotoFrame;
+import com.jpexs.decompiler.flash.action.swf1.ActionPlay;
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
-import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
 import com.jpexs.decompiler.flash.action.swf4.ActionGotoFrame2;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.ecma.Undefined;

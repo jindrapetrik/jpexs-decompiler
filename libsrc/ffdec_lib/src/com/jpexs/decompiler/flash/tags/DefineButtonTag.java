@@ -285,7 +285,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
             if (r.buttonStateHitTest) {
                 frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, frameHit, false));
                 if (!r.buttonStateDown) {
-                    frameDown.layers.get(r.placeDepth).key = true;
+                    frameHit.layers.get(r.placeDepth).key = true;
                 }
             }
 

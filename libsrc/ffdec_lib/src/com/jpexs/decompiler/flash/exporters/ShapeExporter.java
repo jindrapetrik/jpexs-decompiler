@@ -40,11 +40,13 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,6 +58,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -120,6 +123,7 @@ public class ShapeExporter {
                             break;
                         case PNG:
                         case BMP:
+                        case WEBP:
                             int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
@@ -135,6 +139,10 @@ public class ShapeExporter {
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
+                            } else if (settings.mode == ShapeExportMode.WEBP) {
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
+                                }
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), file);
                             }
@@ -170,6 +178,9 @@ public class ShapeExporter {
                 Set<String> classNames = st.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
+                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), st.getSwf(), true);
+                        }
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

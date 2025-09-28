@@ -1,0 +1,80 @@
+class
+ refid "tests:TestCollidingPublicTraits"
+ instance QName(PackageNamespace("tests"), "TestCollidingPublicTraits")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestCollidingPublicTraits")
+  iinit
+   refid "tests:TestCollidingPublicTraits/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait slot QName(PackageNamespace("test1"),"a")
+   slotid 0
+   type QName(PackageNamespace(""),"int")
+   value Integer(1)
+  end ; trait
+  trait slot QName(PackageNamespace("test2"),"a")
+   slotid 0
+   type QName(PackageNamespace(""),"int")
+   value Integer(2)
+  end ; trait
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestCollidingPublicTraits/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+         getlocal0
+         pushscope
+         findpropstrict QName(PackageNamespace(""),"trace")
+         pushstring "ns1 = "
+         getlocal0
+         getproperty QName(PackageNamespace("test1"),"a")
+         add
+         callpropvoid QName(PackageNamespace(""),"trace"), 1
+         findpropstrict QName(PackageNamespace(""),"trace")
+         pushstring "ns2 = "
+         getlocal0
+         getproperty QName(PackageNamespace("test2"),"a")
+         add
+         callpropvoid QName(PackageNamespace(""),"trace"), 1
+         returnvoid
+      end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestCollidingPublicTraits/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

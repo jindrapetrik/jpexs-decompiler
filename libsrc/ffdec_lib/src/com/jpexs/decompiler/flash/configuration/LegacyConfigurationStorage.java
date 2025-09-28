@@ -54,6 +54,7 @@ public class LegacyConfigurationStorage implements ConfigurationStorage {
         return new HashMap<>();
     }
 
+    @Override
     public void saveToFile(String file) {
         Map<String, Object> config = new HashMap<>();
         for (Map.Entry<String, Field> entry : Configuration.getConfigurationFields(false, true).entrySet()) {

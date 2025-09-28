@@ -92,7 +92,7 @@ public class DeclarationAVM2Item extends AVM2Item {
 
         if (assignment instanceof LocalRegAVM2Item) { //for..in
             LocalRegAVM2Item lti = (LocalRegAVM2Item) assignment;
-            String localName = localRegName(localData.localRegNames, lti.regIndex);
+            String localName = localRegName(localData.abc.getSwf(), localData.localRegNames, lti.regIndex, localData.usedDeobfuscations);
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
@@ -116,7 +116,7 @@ public class DeclarationAVM2Item extends AVM2Item {
 
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
-            String localName = localRegName(localData.localRegNames, lti.regIndex);
+            String localName = localRegName(localData.abc.getSwf(), localData.localRegNames, lti.regIndex, localData.usedDeobfuscations);
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
@@ -163,7 +163,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             GraphTargetItem val = spti.value;
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
-            writer.append(IdentifiersDeobfuscation.printIdentifier(true, ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName));
             writer.append(":");
 
             type.appendTry(writer, localData);

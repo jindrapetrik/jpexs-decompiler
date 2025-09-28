@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.dynamictext;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import java.util.List;
 
 /**
  * Text record with font class.
@@ -26,6 +27,8 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
  */
 public class AdvancedTextRecord extends TEXTRECORD {
     public String fontClass = null;      
+    
+    public List<Integer> htmlSourcePositions = null;
     
     @Override
     public FontTag getFont(SWF swf) {

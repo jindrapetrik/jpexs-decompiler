@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.PopupButton;
 import com.jpexs.decompiler.flash.gui.SnappingDialog;
 import com.jpexs.decompiler.flash.gui.View;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;

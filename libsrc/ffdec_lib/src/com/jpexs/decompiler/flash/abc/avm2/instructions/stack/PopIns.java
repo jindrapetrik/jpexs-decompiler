@@ -63,7 +63,7 @@ public class PopIns extends InstructionDefinition {
             return;
         }
 
-        output.add(top);
+        stack.addToOutput(top);
     }
 
     @Override

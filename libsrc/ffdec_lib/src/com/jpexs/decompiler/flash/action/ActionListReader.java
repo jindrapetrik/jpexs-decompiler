@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.stat.Statistics;
@@ -70,6 +71,7 @@ public class ActionListReader {
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
+     * @param asm ASM source
      * @param listeners List of listeners
      * @param sis SWF input stream
      * @param version SWF version
@@ -82,13 +84,13 @@ public class ActionListReader {
      * @throws InterruptedException On interrupt
      * @throws TimeoutException On timeout
      */
-    public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
+    public static ActionList readActionListTimeout(ASMSource asm, final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
         try {
             ActionList actions = CancellableWorker.call("script.readActionList", new Callable<ActionList>() {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {
-                    return readActionList(listeners, sis, version, ip, endIp, path, deobfuscationMode);
+                    return readActionList(asm, listeners, sis, version, ip, endIp, path, deobfuscationMode);
                 }
             }, Configuration.decompilationTimeoutSingleMethod.get(), TimeUnit.SECONDS);
 
@@ -110,6 +112,7 @@ public class ActionListReader {
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
+     * @param asm ASM source
      * @param listeners List of listeners
      * @param sis SWF input stream
      * @param version SWF version
@@ -121,7 +124,7 @@ public class ActionListReader {
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
      */
-    public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
+    public static ActionList readActionList(ASMSource asm, List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         // actionMap and nextOffsets should contain exactly the same keys
         Map<Long, Action> actionMap = new TreeMap<>();
@@ -141,7 +144,7 @@ public class ActionListReader {
         Action lastAction = actionMap.get(addresses.get(addresses.size() - 1));
         long endAddress;
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(sis.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(nextOffsets.get(lastAction.getAddress()));
             endAddress = aEnd.getAddress();
             actionMap.put(aEnd.getAddress(), aEnd);
@@ -180,15 +183,14 @@ public class ActionListReader {
             System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
             p++;
         }*/
-        //TODO: This cleaner needs to be executed only before actual decompilation, not when disassembly only
         try {
-            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, sis.getSwf());
+            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, null);
         } catch (ThreadDeath | InterruptedException ex) {
-            throw ex;
+            //ignored
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
-        }
-
+            Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
+        }          
+        
         return actions;
     }
 
@@ -701,7 +703,7 @@ public class ActionListReader {
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(actions.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(lastAction.getAddress() + lastAction.getTotalActionLength());
             actions.add(aEnd);
             lastAction = aEnd;
@@ -767,7 +769,7 @@ public class ActionListReader {
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
         if (!(lastAction instanceof ActionEnd)) {
-            Action aEnd = new ActionEnd(actions.getCharset());
+            Action aEnd = new ActionEnd();
             aEnd.setAddress(lastAction.getAddress() + lastAction.getTotalActionLength());
             actions.add(aEnd);
             lastAction = aEnd;

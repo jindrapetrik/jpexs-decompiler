@@ -16,14 +16,21 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.helpers.Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -87,9 +94,26 @@ public class FileChooserImagePreview extends JComponent
             return;
         }
 
-        ImageIcon tmpIcon = new ImageIcon(file.getPath());
+        BufferedImage img = null;
+        if (file.getPath().toLowerCase().endsWith(".webp")) {
+            if (ImageFormat.WEBP.available()) {                
+                try {
+                    img = WebPCodec.decodeImage(Helper.readFile(file.getAbsolutePath()));
+                } catch (IOException ex) {
+                    //ignore
+                }
+            }
+        } else {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                img = ImageHelper.read(fis);
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
+                
+        if (img != null) {
+            ImageIcon tmpIcon = new ImageIcon(img);
 
-        if (tmpIcon != null) {
             if (tmpIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
                 if (tmpIcon.getIconWidth() > PREVIEW_SIZE) {
                     thumbnail = new ImageIcon(tmpIcon.getImage().getScaledInstance(PREVIEW_SIZE, -1, Image.SCALE_DEFAULT));

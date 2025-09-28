@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -121,6 +122,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Get parent CLIPACTIONS object
+     *
      * @return Parent CLIPACTIONS object
      */
     public CLIPACTIONS getParentClipActions() {
@@ -129,6 +131,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Converts key code to string
+     *
      * @param key Key code
      * @return String representation of key code
      */
@@ -142,6 +145,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Converts string to key code
+     *
      * @param str String representation of key code
      * @return Key code
      */
@@ -159,9 +163,6 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         return null;
     }
 
-
-
-
     /**
      * Constructor for Generic tag editor.
      */
@@ -174,6 +175,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Constructor.
+     *
      * @param swf SWF
      * @param tag Tag
      */
@@ -191,6 +193,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Sets parent CLIPACTIONS object
+     *
      * @param parentClipActions Parent CLIPACTIONS object
      */
     public void setParentClipActions(CLIPACTIONS parentClipActions) {
@@ -210,6 +213,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     /**
      * Constructor.
+     *
      * @param swf SWF
      * @param sis SWF input stream
      * @param tag Tag
@@ -405,7 +409,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, 0, "", swf.getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(), false, new HashMap<>(), false, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

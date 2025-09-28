@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import java.io.File;
-
 /**
  * URL resolver interface.
  *

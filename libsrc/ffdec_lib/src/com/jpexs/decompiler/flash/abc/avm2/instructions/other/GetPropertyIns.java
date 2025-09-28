@@ -46,6 +46,9 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,8 +94,8 @@ public class GetPropertyIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        int multinameIndex = ins.operands[0];
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        int multinameIndex = ins.operands[0];        
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
         //remove dups
         if (obj instanceof FindPropertyAVM2Item) {
@@ -108,15 +111,25 @@ public class GetPropertyIns extends InstructionDefinition {
                             Set<Integer> usage = localData.getSetLocalUsages(localData.code.adr2pos(setLocal.getSrc().getAddress()));
                             if (usage.size() == 2) {
                                 findPropName.name = setLocal.value;
-                                output.remove(output.size() - 1);
+                                output.remove(output.size() - 1);                                
                             }
                         }
                     }
                 }
-                if (findPropName.name instanceof DuplicateItem) {
-                    if (findPropName.name.value == multiname.name) {
+                if (findPropName.name instanceof DuplicateItem || findPropName.name instanceof DuplicateSourceItem) {
+                    if (findPropName.name.getThroughDuplicate() == multiname.name.getThroughDuplicate()) {
+                        int tempIndex = ((HasTempIndex) findPropName.name).getTempIndex();
+                        
                         findPropName.name = findPropName.name.value;
+                        multiname.name = multiname.name.getThroughDuplicate();
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            if (st.tempIndex == tempIndex) {
+                                output.remove(output.size() - 1);
+                            }                            
+                        }
                     }
+                    
                 }
                 if (findPropName.namespace instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) findPropName.namespace;
@@ -130,11 +143,22 @@ public class GetPropertyIns extends InstructionDefinition {
                         }
                     }
                 }
-                if (findPropName.namespace instanceof DuplicateItem) {
-                    if (findPropName.namespace.value == multiname.namespace) {
-                        findPropName.namespace = findPropName.namespace.value;
+                if (findPropName.namespace instanceof DuplicateItem || findPropName.namespace instanceof DuplicateSourceItem) {
+                    if (findPropName.namespace.getThroughDuplicate() == multiname.namespace.getThroughDuplicate()) {
+                        int tempIndex = ((HasTempIndex) findPropName.namespace).getTempIndex();
+                        
+                        findPropName.namespace = findPropName.namespace.getThroughDuplicate();
+                        multiname.namespace = multiname.namespace.getThroughDuplicate();
+                        
+                        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                            if (st.tempIndex == tempIndex) {
+                                output.remove(output.size() - 1);
+                            }                            
+                        }
                     }
                 }
+                stack.moveToStack(output);
             }
         }
         Reference<Boolean> isStatic = new Reference<>(false);
@@ -152,7 +176,7 @@ public class GetPropertyIns extends InstructionDefinition {
             Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
         type.setVal(TypeItem.UNKNOWN);
         callType.setVal(TypeItem.UNKNOWN);
-        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
+        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true);
         if (obj instanceof FindPropertyAVM2Item) {
             FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) obj;
             if (fprop.propertyName.equals(multiname)) {
@@ -162,10 +186,10 @@ public class GetPropertyIns extends InstructionDefinition {
                         if (t instanceof TraitSlotConst) {
                             TraitSlotConst tsc = (TraitSlotConst) t;
                             if (Objects.equals(
-                                    tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                                    tsc.getName(localData.abc).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true),
                                     multinameStr
                             )) {
-                                GraphTargetItem ty = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
+                                GraphTargetItem ty = AbcIndexing.multinameToType(localData.usedDeobfuscations, tsc.type_index, localData.abc, localData.abc.constants);
                                 type.setVal(ty);
                                 callType.setVal(ty);
                                 return;
@@ -176,13 +200,13 @@ public class GetPropertyIns extends InstructionDefinition {
 
                 if (type.getVal().equals(TypeItem.UNKNOWN)) {
                     if (localData.abcIndex != null) {
-                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
+                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.abc.constants, true).toRawString();
                         if (currentClassName != null) {
                             Reference<Boolean> foundStatic = new Reference<>(null);                
                             localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType, foundStatic);
                         }
                         if (type.getVal().equals(TypeItem.UNKNOWN)) {
-                            GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);
+                            GraphTargetItem ti = AbcIndexing.multinameToType(localData.usedDeobfuscations, multiname.multinameIndex, localData.abc, localData.abc.constants);
                             if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                                 type.setVal(ti);
                                 callType.setVal(ti); //coercion  i = int(xx);

@@ -32,6 +32,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -219,7 +220,7 @@ public class ButtonAction implements ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), buttonTag.getSwf().version, 0, "", buttonTag.getSwf().getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(), false, new HashMap<>(), false, false, getActions(), buttonTag.getSwf().version, 0, getScriptName(), buttonTag.getSwf().getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

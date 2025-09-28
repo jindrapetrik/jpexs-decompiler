@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Find and get property.
@@ -65,17 +67,18 @@ public class GetLexAVM2Item extends AVM2Item {
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param propertyName Property name
+     * @param abc ABC
      * @param constants Constants
      * @param type Type
      * @param callType Call type
      * @param isStatic Is static
      */
-    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
+    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, ABC abc, AVM2ConstantPool constants, GraphTargetItem type, GraphTargetItem callType, boolean isStatic, Set<String> usedDeobfuscations) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
         this.type = type;
         this.callType = callType;
-        this.fullPropertyName = propertyName.getNameWithNamespace(constants, true);
+        this.fullPropertyName = propertyName.getNameWithNamespace(usedDeobfuscations, abc, constants, true);
         this.isStatic = isStatic;
     }
 
@@ -90,11 +93,11 @@ public class GetLexAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         Reference<DottedChain> customNsRef = new Reference<>(null);
-        String localName = propertyName.getNameAndCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+        String localName = propertyName.getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
         DottedChain customNs = customNsRef.getVal();
         if (customNs != null) {
             String nsname = customNs.getLast();
-            String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);                    
+            String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
             writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
             writer.appendNoHilight("::");
             getSrcData().localName = nsname + "::" + localName;            

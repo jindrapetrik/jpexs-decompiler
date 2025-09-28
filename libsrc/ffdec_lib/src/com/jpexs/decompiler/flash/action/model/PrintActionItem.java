@@ -93,6 +93,12 @@ public class PrintActionItem extends ActionItem {
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         String charset = asGenerator.getCharset();
+        if (boundingBox instanceof DirectValueActionItem) {
+            DirectValueActionItem directValue = ((DirectValueActionItem) boundingBox);
+            if (directValue.isString() && "bmovie".equals(directValue.getAsString())) {
+                return toSourceMerge(localData, generator, asGenerator.pushConstTargetItem("print:"), target, new ActionGetURL2(0, false, false, charset), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset) : null);
+            }
+        }
         return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false, charset), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset) : null);
     }
 

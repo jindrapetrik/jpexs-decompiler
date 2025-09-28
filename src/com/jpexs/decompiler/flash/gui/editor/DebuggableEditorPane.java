@@ -16,14 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.Main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Set;
 import javax.swing.UIManager;

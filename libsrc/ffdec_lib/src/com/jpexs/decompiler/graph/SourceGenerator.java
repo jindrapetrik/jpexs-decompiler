@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SwapItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -233,6 +234,16 @@ public interface SourceGenerator {
      * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException;
+    
+    /**
+     * Generates source code for SwapItem.
+     *
+     * @param localData Local data
+     * @param item SwapItem
+     * @return List of GraphSourceItem
+     * @throws CompilationException On compilation error
+     */
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwapItem item) throws CompilationException;   
 
     /**
      * Generates DiscardValue action.

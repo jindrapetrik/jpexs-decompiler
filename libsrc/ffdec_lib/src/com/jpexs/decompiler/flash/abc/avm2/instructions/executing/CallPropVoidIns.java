@@ -82,14 +82,14 @@ public class CallPropVoidIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
 
         GraphTargetItem obj = stack.pop();
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        output.add(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, obj, multiname, args, callType.getVal(), isStatic.getVal()));
+        stack.addToOutput(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, obj, multiname, args, callType.getVal(), isStatic.getVal()));
     }
 
     @Override

@@ -114,9 +114,9 @@ public class ThisAVM2Item extends AVM2Item {
         if (showClassName) {
             if (className != null) {
                 if (localData.fullyQualifiedNames != null && localData.fullyQualifiedNames.contains(className)) {
-                    return writer.append(className.toPrintableString(true)).append(".this");
+                    return writer.append(className.toPrintableString(localData.usedDeobfuscations, localData.swf, true)).append(".this");
                 }
-                return writer.append(IdentifiersDeobfuscation.printIdentifier(true, className.getLast())).append(".this");
+                return writer.append(IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, className.getLast())).append(".this");
             }
         }
         return writer.append("this");

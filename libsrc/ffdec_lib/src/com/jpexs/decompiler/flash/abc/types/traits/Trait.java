@@ -183,12 +183,13 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets metadata table.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param parent Parent trait
      * @param convertData Convert data
      * @param abc ABC
      * @return Metadata table
      */
-    public final List<Entry<String, Map<String, String>>> getMetaDataTable(Trait parent, ConvertData convertData, ABC abc) {
+    public final List<Entry<String, Map<String, String>>> getMetaDataTable(Set<String> usedDeobfuscations, Trait parent, ConvertData convertData, ABC abc) {
         List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
         for (int m : metadata) {
             if (m >= 0 && m < abc.metadata_info.size()) {
@@ -211,11 +212,11 @@ public abstract class Trait implements Cloneable, Serializable {
             public var attr2;
              */
             if (parent instanceof TraitClass) {
-                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true, true);
+                String thisName = getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true);
                 List<Trait> classTraits = abc.class_info.get(((TraitClass) parent).class_info).static_traits.traits;
                 for (Trait t : classTraits) {
                     if (t.kindType == Trait.TRAIT_SLOT) {
-                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+                        if ("_skinParts".equals(t.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true))) {
                             if (t.getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                                 if (convertData.assignedValues.containsKey(t)) {
                                     if (convertData.assignedValues.get(t).value instanceof NewObjectAVM2Item) {
@@ -269,6 +270,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets dependencies.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -281,7 +283,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param uses Uses
      * @throws InterruptedException On interrupt
      */
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (customNamespace == null) {
             Multiname m = getName(abc);
             int nskind = m.getSimpleNamespaceKind(abc.constants);
@@ -289,7 +291,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 customNamespace = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(abcIndex, customNamespace, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
+        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
@@ -316,6 +318,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets all class trait names.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param traitNamesInThisScript Trait names in this script
      * @param abcIndex ABC indexing
      * @param abc ABC
@@ -323,7 +326,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scriptIndex Script index
      * @param isParent Is parent
      */
-    private static void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
+    private static void getAllClassTraitNames(Set<String> usedDeobfuscations, List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
         boolean publicProtectedOnly = isParent;
         for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {
             if (publicProtectedOnly) {
@@ -332,7 +335,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     continue;
                 }
             }
-            traitNamesInThisScript.add(it.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+            traitNamesInThisScript.add(it.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true));
         }
         for (Trait ct : abc.class_info.get(classIndex).static_traits.traits) {
             if (publicProtectedOnly) {
@@ -341,21 +344,22 @@ public abstract class Trait implements Cloneable, Serializable {
                     continue;
                 }
             }
-            traitNamesInThisScript.add(ct.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+            traitNamesInThisScript.add(ct.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true));
         }
         if (abc.instance_info.get(classIndex).super_index == 0) {
             return;
         }
-        DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, true);
+        DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true);
         AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(fullClassName), abc, scriptIndex);
         if (ci != null) {
-            getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);
+            getAllClassTraitNames(usedDeobfuscations, traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);
         }
     }
 
     /**
      * Writes imports.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param traits Traits
      * @param methodIndex Method index
      * @param abcIndex ABC indexing
@@ -369,13 +373,13 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return True if its not empty
      * @throws InterruptedException On interrupt
      */
-    public static boolean writeImports(List<Trait> traits, int methodIndex, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public static boolean writeImports(Set<String> usedDeobfuscations, List<Trait> traits, int methodIndex, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
-                    ClassPath classPath = t.getPath(tag.getABC());
+                    ClassPath classPath = t.getPath(usedDeobfuscations, tag.getABC());
                     if (classPath.packageStr.equals(ignorePackage)) {
                         namesInThisPackage.add(classPath.className);
                     }
@@ -386,9 +390,9 @@ public abstract class Trait implements Cloneable, Serializable {
         List<String> traitNamesInThisScript = new ArrayList<>();
         for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
             if (st instanceof TraitClass) {
-                getAllClassTraitNames(traitNamesInThisScript, abcIndex, abc, ((TraitClass) st).class_info, scriptIndex, false);
+                getAllClassTraitNames(usedDeobfuscations, traitNamesInThisScript, abcIndex, abc, ((TraitClass) st).class_info, scriptIndex, false);
             } else {
-                traitNamesInThisScript.add(st.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+                traitNamesInThisScript.add(st.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, true));
             }
         }
 
@@ -407,10 +411,10 @@ public abstract class Trait implements Cloneable, Serializable {
             if (nskind == Namespace.KIND_NAMESPACE) {
                 customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
             }
-            trait.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
+            trait.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
         }
         if (methodIndex != -1) {
-            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+            DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
         }
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
@@ -418,7 +422,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 imports.add(d.getId());
             }
         }
-        
+
         List<String> importedNames = new ArrayList<>();
 
         importedNames.addAll(Arrays.asList(builtInClasses));
@@ -481,13 +485,13 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight("import ");
 
                 if (imp.size() > 1) {
-                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
+                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(usedDeobfuscations, abc.getSwf(), true));
                     writer.appendNoHilight(".");
                 }
                 if ("*".equals(imp.getLast())) {
                     writer.appendNoHilight("*");
                 } else {
-                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
                 }
                 writer.appendNoHilight(";").newLine();
                 hasImport = true;
@@ -532,20 +536,21 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets metadata.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param parent Parent trait
      * @param convertData Convert data
      * @param abc ABC
      * @param writer Writer
      * @return Writer
      */
-    public final GraphTextWriter getMetaData(Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {
-        List<Entry<String, Map<String, String>>> md = getMetaDataTable(parent, convertData, abc);
+    public final GraphTextWriter getMetaData(Set<String> usedDeobfuscations, Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {
+        List<Entry<String, Map<String, String>>> md = getMetaDataTable(usedDeobfuscations, parent, convertData, abc);
         for (Entry<String, Map<String, String>> en : md) {
             String name = en.getKey();
             if (METADATA_DEFINITION.equals(name) || METADATA_CTOR_DEFINITION.equals(name)) {
                 continue;
             }
-            writer.append("[").append(IdentifiersDeobfuscation.printIdentifier(true, name));
+            writer.append("[").append(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, name));
             if (!en.getValue().isEmpty()) {
                 writer.append("(");
                 boolean first = true;
@@ -555,7 +560,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                     first = false;
                     if (key != null && !key.isEmpty()) {
-                        writer.append(IdentifiersDeobfuscation.printIdentifier(true, key)).append("=");
+                        writer.append(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, key)).append("=");
                     }
                     writer.append("\"");
                     String val = en.getValue().get(key);
@@ -599,6 +604,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets modifiers.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @param isStatic Is static
      * @param insideInterface Inside interface
@@ -606,7 +612,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param classIndex Class index
      * @return Writer
      */
-    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
+    public final GraphTextWriter getModifiers(Set<String> usedDeobfuscations, ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
                 writer.appendNoHilight("final ");
@@ -629,7 +635,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.append(Helper.escapeActionScriptString(m.getSimpleNamespaceName(abc.constants).toRawString()));
                 writer.append("\") ");
             } else if (dc != null && nsname != null) {
-                String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                String identifier = IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, nsname);
                 if (identifier != null && !identifier.isEmpty()) {
                     writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, dc.toRawString()).appendNoHilight(" ");
                 }
@@ -670,7 +676,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                 }
 
-                if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {                                    
+                if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                     String nsPrefix = Namespace.getPrefix(nskind);
                     if (nsPrefix != null && !nsPrefix.isEmpty()) {
                         writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
@@ -712,6 +718,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * To string.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param packageName Package name
@@ -730,7 +737,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
@@ -738,6 +745,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Converts trait.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param parent Parent trait
@@ -754,7 +762,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scopeStack Scope stack
      * @throws InterruptedException On interrupt
      */
-    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convert(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
     }
 
     /**
@@ -851,6 +859,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * ToString conversion including package.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param parent Parent trait
@@ -868,20 +877,20 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringPackaged(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toStringPackaged(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
             writer.appendNoHilight("package");
             if (!nsname.isEmpty()) {
                 writer.appendNoHilight(" " + nsname); //assume not null name
             }
             writer.startBlock();
             List<Trait> traits = new ArrayList<>();
-            traits.add(this);           
-            writeImports(traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);        
-            toString(swfVersion, abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+            traits.add(this);
+            writeImports(usedDeobfuscations, traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
+            toString(usedDeobfuscations, swfVersion, abcIndex, name.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
         }
@@ -891,6 +900,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Converts trait including package.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion
      * @param abcIndex ABC indexing
      * @param parent Parent trait
@@ -907,18 +917,19 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scopeStack Scope stack
      * @throws InterruptedException On interrupt
      */
-    public void convertPackaged(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convertPackaged(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
-            convert(swfVersion, abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
+            convert(usedDeobfuscations, swfVersion, abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
         }
     }
 
     /**
      * ToString of header.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param parent Parent trait
      * @param packageName Package name
@@ -936,14 +947,15 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringHeader(int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        toString(swfVersion, null, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+    public GraphTextWriter toStringHeader(Set<String> usedDeobfuscations, int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        toString(usedDeobfuscations, swfVersion, null, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         return writer;
     }
 
     /**
      * Converts header.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param parent Parent trait
      * @param convertData Convert data
@@ -958,8 +970,8 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param parallel Parallel
      * @throws InterruptedException On interrupt
      */
-    public void convertHeader(int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        convert(swfVersion, null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
+    public void convertHeader(Set<String> usedDeobfuscations, int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        convert(usedDeobfuscations, swfVersion, null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
     }
 
     /**
@@ -992,16 +1004,17 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Gets class path.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param abc ABC
      * @return Class path
      */
-    public final ClassPath getPath(ABC abc) {
+    public final ClassPath getPath(Set<String> usedDeobfuscations, ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         DottedChain packageName = ns == null ? DottedChain.EMPTY : ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, null, true, false);
+        String objectName = name.getName(usedDeobfuscations, abc, abc.constants, null, true, false);
         String namespaceSuffix = name.getNamespaceSuffix();
-        return new ClassPath(packageName, objectName, namespaceSuffix); //assume not null name
+        return new ClassPath(packageName, objectName, namespaceSuffix, abc.getSwf()); //assume not null name
     }
 
     /**

@@ -25,10 +25,13 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -137,7 +140,13 @@ public class ImportAssetsTag extends Tag implements ImportTag {
         Map<String, String> ret = super.getNameProperties();
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
-            ret.put("im", "" + names.get(0));
+            
+            String importName = names.get(0);
+            if (importName.startsWith("__Packages.")) {
+                ret.put("imp", DottedChain.parseNoSuffix(importName).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
+            } else {
+                ret.put("imp", "\"" + Helper.escapePCodeString(importName) +  "\"");
+            }
         }
         return ret;
     }

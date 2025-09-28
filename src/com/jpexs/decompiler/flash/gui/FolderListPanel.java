@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -35,6 +37,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -255,7 +258,11 @@ public class FolderListPanel extends JPanel {
                         String expName = tag.getSwf().getExportName(tag.getCharacterId());
                         if (expName != null && !expName.isEmpty()) {
                             String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-                            s = pathParts[pathParts.length - 1];
+                            if (expName.startsWith("__Packages.")) {
+                                s = IdentifiersDeobfuscation.printIdentifier(tag.getSwf(), new LinkedHashSet<>(), false, pathParts[pathParts.length - 1]);
+                            } else {
+                                s = Helper.escapeExportname(tag.getSwf(), expName, false);
+                            } 
                         }
                     }
                     if (s == null) {

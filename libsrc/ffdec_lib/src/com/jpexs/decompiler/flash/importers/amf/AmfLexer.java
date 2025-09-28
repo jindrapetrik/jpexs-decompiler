@@ -15,8 +15,6 @@
  * License along with this library.
  */
 package com.jpexs.decompiler.flash.importers.amf;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 

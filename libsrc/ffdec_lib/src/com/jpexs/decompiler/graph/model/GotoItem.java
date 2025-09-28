@@ -115,6 +115,20 @@ public class GotoItem extends GraphTargetItem implements Block {
         }
         return ret;
     }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+        if (targetCommands == null) {
+            return ret;
+        }
+        for (GraphTargetItem c : targetCommands) {
+            if (c instanceof BreakItem) {
+                ret.add((BreakItem) c);
+            }
+        }
+        return ret;
+    }
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {

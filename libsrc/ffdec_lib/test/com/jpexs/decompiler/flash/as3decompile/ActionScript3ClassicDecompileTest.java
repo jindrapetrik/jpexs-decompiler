@@ -132,21 +132,50 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
-    public void testChainedAssignments() {
-        decompileMethod("classic", "testChainedAssignments", "var a:int = 0;\r\n"
+    public void testChainedAssignments1() {
+        decompileMethod("classic", "testChainedAssignments1", "trace(\"c = b = a = 5;\");\r\n"
+                + "var a:int = 0;\r\n"
                 + "var b:int = 0;\r\n"
                 + "var c:int = 0;\r\n"
-                + "var d:int = 0;\r\n"
-                + "var f:int = 0;\r\n"
-                + "d = c = b = a = 5;\r\n"
-                + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
-                + "e.attrib1 = e.attrib2 = e.attrib3 = this.getCounter();\r\n"
-                + "this.traceIt(e.toString());\r\n"
-                + "this.prop = f = a = 4;\r\n"
-                + "if(f == 2)\r\n"
+                + "c = b = a = 5;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testChainedAssignments2() {
+        decompileMethod("classic", "testChainedAssignments2", "trace(\"e.attrib1 = e.attrib2 = e.attrib3 = 10;\");\r\n"
+                + "var e:TestClass = new TestClass();\r\n"
+                + "e.attrib1 = e.attrib2 = e.attrib3 = 10;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testChainedAssignments3() {
+        decompileMethod("classic", "testChainedAssignments3", "var a:int = 0;\r\n"
+                + "var b:int = 0;\r\n"
+                + "this.prop = a = b = 4;\r\n"
+                + "if(a == 2)\r\n"
                 + "{\r\n"
-                + "trace(\"OK: \" + f);\r\n"
+                + "trace(\"OK: \" + a);\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testChainedAssignments4() {
+        decompileMethod("classic", "testChainedAssignments4", "var slota:int;\r\n"
+                + "var slotb:int;\r\n"
+                + "var slotc:int;\r\n"
+                + "var f:Function;\r\n"
+                + "trace(\"slotc = slotb = slota = 5;\");\r\n"
+                + "slota = 0;\r\n"
+                + "slotb = 0;\r\n"
+                + "slotc = 0;\r\n"
+                + "f = function(n1:int, n2:int):int\r\n"
+                + "{\r\n"
+                + "return n1 + n2;\r\n"
+                + "};\r\n"
+                + "slotc = slotb = slota = 5;\r\n",
                  false);
     }
 
@@ -177,7 +206,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testComma() {
         decompileMethod("classic", "testComma", "var a:int = 5;\r\n"
                 + "var b:int = 0;\r\n"
-                + "trace(a > 4 ? (b = 5, a) : 35);\r\n",
+                + "trace(a > 4 ? (b = 5,a) : 35);\r\n",
                  false);
     }
 
@@ -227,7 +256,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:* = 5;\r\n"
-                + "loop3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -241,7 +269,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "if(b == 15)\r\n"
                 + "{\r\n"
-                + "break loop3;\r\n"
+                + "break;\r\n"
                 + "}\r\n"
                 + "b += 1;\r\n"
                 + "}\r\n"
@@ -425,8 +453,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
         decompileMethod("classic", "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
-                + "case \"six\":\r\n"
                 + "default:\r\n"
+                + "case \"six\":\r\n"
                 + "trace(\"def and 6\");\r\n"
                 + "case \"five\":\r\n"
                 + "trace(\"def and 6 and 5\");\r\n"
@@ -532,9 +560,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var g:* = undefined;\r\n"
                 + "d = new TestClass1();\r\n"
                 + "k = null;\r\n"
-                + "k.(++d.attrib, 0);\r\n"
+                + "k.(++d.attrib,0);\r\n"
                 + "trace(\"between\");\r\n"
-                + "g = k.(++d.attrib, 0);\r\n"
+                + "g = k.(++d.attrib,0);\r\n"
                 + "trace(\"end\");\r\n",
                  false);
     }
@@ -782,7 +810,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case 4:\r\n"
                 + "trace(\"4\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "if(c)\r\n"
                 + "{\r\n"
@@ -912,7 +939,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case \"c\":\r\n"
                 + "trace(\"val c\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"final\");\r\n"
                 + "}\r\n",
@@ -1296,69 +1322,196 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
-    public void testInc2() {
-        decompileMethod("classic", "testInc2", "var a:* = [1];\r\n"
-                + "var d:* = a[this.getInt()]++;\r\n"
-                + "var e:* = ++a[this.getInt()];\r\n"
-                + "++a[this.getInt()];\r\n"
-                + "++a[this.getInt()];\r\n"
-                + "var b:* = 1;\r\n"
-                + "b++;\r\n"
-                + "var c:* = 1;\r\n"
-                + "b = c++;\r\n",
+    public void testIncDec1() {
+        decompileMethod("classic", "testIncDec1", "var a:* = 5;\r\n"
+                + "trace(\"++a with result\");\r\n"
+                + "trace(++a);\r\n"
+                + "trace(\"--a with result\");\r\n"
+                + "trace(--a);\r\n"
+                + "trace(\"++a no result\");\r\n"
+                + "a++;\r\n"
+                + "trace(\"--a no result\");\r\n"
+                + "a--;\r\n",
                  false);
     }
 
     @Test
-    public void testIncDec() {
-        decompileMethod("classic", "testIncDec", "var a:* = 5;\r\n"
-                + "var b:* = 0;\r\n"
-                + "trace(\"++var\");\r\n"
-                + "b = ++a;\r\n"
-                + "trace(\"var++\");\r\n"
-                + "b = a++;\r\n"
-                + "trace(\"--var\");\r\n"
-                + "b = --a;\r\n"
-                + "trace(\"var--\");\r\n"
-                + "b = a--;\r\n"
-                + "var c:* = [1,2,3,4,5];\r\n"
-                + "trace(\"++arr\");\r\n"
-                + "b = ++c[2];\r\n"
-                + "trace(\"arr++\");\r\n"
-                + "b = c[2]++;\r\n"
-                + "trace(\"--arr\");\r\n"
-                + "b = --c[2];\r\n"
-                + "trace(\"arr--\");\r\n"
-                + "b = c[2]--;\r\n"
-                + "var d:* = new TestClass1();\r\n"
-                + "trace(\"++property\");\r\n"
-                + "trace(++d.attrib);\r\n"
-                + "trace(\"property++\");\r\n"
-                + "trace(d.attrib++);\r\n"
-                + "trace(\"--property\");\r\n"
-                + "trace(--d.attrib);\r\n"
-                + "trace(\"property--\");\r\n"
-                + "trace(d.attrib--);\r\n"
-                + "trace(\"arr[e++]\");\r\n"
-                + "var chars:Array = new Array(36);\r\n"
-                + "var index:uint = 0;\r\n"
-                + "var _loc7_:* = index++;\r\n"
-                + "chars[_loc7_] = 5;\r\n"
-                + "trace(\"arr[++e]\");\r\n"
-                + "var _loc8_:* = ++index;\r\n"
-                + "chars[_loc8_] = 5;\r\n"
-                + "trace(\"attr++\");\r\n"
-                + "trace(this.attrx++);\r\n"
-                + "++this.attrx;\r\n"
-                + "trace(\"attr--\");\r\n"
-                + "trace(this.attrx--);\r\n"
-                + "--this.attrx;\r\n"
-                + "trace(\"++attr\");\r\n"
-                + "trace(++this.attrx);\r\n"
-                + "++this.attrx;\r\n"
-                + "trace(\"--attr\");\r\n"
-                + "trace(--this.attrx);\r\n"
-                + "--this.attrx;\r\n",
+    public void testIncDec2() {
+        decompileMethod("classic", "testIncDec2", "var a:* = 5;\r\n"
+                + "trace(\"a++ with result\");\r\n"
+                + "trace(a++);\r\n"
+                + "trace(\"a-- with result\");\r\n"
+                + "trace(a--);\r\n"
+                + "trace(\"a++ no result\");\r\n"
+                + "a++;\r\n"
+                + "trace(\"a-- no result\");\r\n"
+                + "a--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec3() {
+        decompileMethod("classic", "testIncDec3", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"++a[2] with result\");\r\n"
+                + "trace(++a[2]);\r\n"
+                + "trace(\"--a[2] with result\");\r\n"
+                + "trace(--a[2]);\r\n"
+                + "trace(\"++a[2] no result\");\r\n"
+                + "++a[2];\r\n"
+                + "trace(\"--a[2] no result\");\r\n"
+                + "--a[2];\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec4() {
+        decompileMethod("classic", "testIncDec4", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"a[2]++ with result\");\r\n"
+                + "trace(a[2]++);\r\n"
+                + "trace(\"a[2]-- with result\");\r\n"
+                + "trace(a[2]--);\r\n"
+                + "trace(\"a[2]++ no result\");\r\n"
+                + "++a[2];\r\n"
+                + "trace(\"a[2]-- no result\");\r\n"
+                + "--a[2];\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec5() {
+        decompileMethod("classic", "testIncDec5", "var a:* = new TestClass1();\r\n"
+                + "trace(\"++a.attrib with result\");\r\n"
+                + "trace(++a.attrib);\r\n"
+                + "trace(\"--a.attrib with result\");\r\n"
+                + "trace(--a.attrib);\r\n"
+                + "trace(\"++a.attrib no result\");\r\n"
+                + "++a.attrib;\r\n"
+                + "trace(\"--a.attrib no result\");\r\n"
+                + "--a.attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec6() {
+        decompileMethod("classic", "testIncDec6", "var a:* = new TestClass1();\r\n"
+                + "trace(\"a.attrib++ with result\");\r\n"
+                + "trace(a.attrib++);\r\n"
+                + "trace(\"a.attrib-- with result\");\r\n"
+                + "trace(a.attrib--);\r\n"
+                + "trace(\"a.attrib++ no result\");\r\n"
+                + "++a.attrib;\r\n"
+                + "trace(\"a.attrib-- no result\");\r\n"
+                + "--a.attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec7() {
+        decompileMethod("classic", "testIncDec7", "var a:* = [1,2,3,4,5];\r\n"
+                + "var index:int = 0;\r\n"
+                + "trace(\"a[++index]\");\r\n"
+                + "trace(a[++index]);\r\n"
+                + "trace(\"a[--index]\");\r\n"
+                + "trace(a[--index]);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec8() {
+        decompileMethod("classic", "testIncDec8", "var a:* = [1,2,3,4,5];\r\n"
+                + "var index:int = 0;\r\n"
+                + "trace(\"a[index++]\");\r\n"
+                + "trace(a[index++]);\r\n"
+                + "trace(\"a[index--]\");\r\n"
+                + "trace(a[index--]);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec9() {
+        decompileMethod("classic", "testIncDec9", "trace(\"++attrib with result\");\r\n"
+                + "trace(++this.attrib);\r\n"
+                + "trace(\"--attrib with result\");\r\n"
+                + "trace(--this.attrib);\r\n"
+                + "trace(\"++attrib no result\");\r\n"
+                + "++this.attrib;\r\n"
+                + "trace(\"--attrib no result\");\r\n"
+                + "--this.attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec10() {
+        decompileMethod("classic", "testIncDec10", "trace(\"attrib++ with result\");\r\n"
+                + "trace(this.attrib++);\r\n"
+                + "trace(\"attrib-- with result\");\r\n"
+                + "trace(this.attrib--);\r\n"
+                + "trace(\"attrib++ no result\");\r\n"
+                + "++this.attrib;\r\n"
+                + "trace(\"attrib-- no result\");\r\n"
+                + "--this.attrib;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec11() {
+        decompileMethod("classic", "testIncDec11", "var f:Function = function():void\r\n"
+                + "{\r\n"
+                + "};\r\n"
+                + "var slot:int = 0;\r\n"
+                + "trace(\"++slot with result\");\r\n"
+                + "trace(++slot);\r\n"
+                + "trace(\"--slot with result\");\r\n"
+                + "trace(--slot);\r\n"
+                + "trace(\"++slot no result\");\r\n"
+                + "slot++;\r\n"
+                + "trace(\"--slot no result\");\r\n"
+                + "slot--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec12() {
+        decompileMethod("classic", "testIncDec12", "var f:Function = function():void\r\n"
+                + "{\r\n"
+                + "};\r\n"
+                + "var slot:int = 0;\r\n"
+                + "trace(\"slot++ with result\");\r\n"
+                + "trace(slot++);\r\n"
+                + "trace(\"slot-- with result\");\r\n"
+                + "trace(slot--);\r\n"
+                + "trace(\"slot++ no result\");\r\n"
+                + "slot++;\r\n"
+                + "trace(\"slot-- no result\");\r\n"
+                + "slot--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec13() {
+        decompileMethod("classic", "testIncDec13", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"++a[this.f()] with result\");\r\n"
+                + "trace(++a[this.f()]);\r\n"
+                + "trace(\"--a[this.f()] with result\");\r\n"
+                + "trace(--a[this.f()]);\r\n"
+                + "trace(\"++a[this.f()] no result\");\r\n"
+                + "++a[this.f()];\r\n"
+                + "trace(\"--a[this.f()] no result\");\r\n"
+                + "--a[this.f()];\r\n",
+                 false);
+    }
+
+    @Test
+    public void testIncDec14() {
+        decompileMethod("classic", "testIncDec14", "var a:* = [1,2,3,4,5];\r\n"
+                + "trace(\"a[this.f()]++ with result\");\r\n"
+                + "trace(a[this.f()]++);\r\n"
+                + "trace(\"a[this.f()]-- with result\");\r\n"
+                + "trace(a[this.f()]--);\r\n"
+                + "trace(\"a[this.f()]++ no result\");\r\n"
+                + "++a[this.f()];\r\n"
+                + "trace(\"a[this.f()]-- no result\");\r\n"
+                + "--a[this.f()];\r\n",
                  false);
     }
 
@@ -1495,6 +1648,46 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "b = true;\r\n"
                 + "}\r\n"
                 + "b = (i == 0 || i == 1) && j == 0;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testLoopInLoop() {
+        decompileMethod("classic", "testLoopInLoop", "var i:int = 0;\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "for(var c:Boolean = true; true; )\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "for(i = 0; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "if(!a)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"H\");\r\n"
+                + "}\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"L\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n",
                  false);
     }
 
@@ -1888,6 +2081,35 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testSwitchBig() {
+        decompileMethod("classic", "testSwitchBig", "var k:* = 10;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "case \"C\":\r\n"
+                + "trace(\"BC\");\r\n"
+                + "break;\r\n"
+                + "case \"D\":\r\n"
+                + "default:\r\n"
+                + "case \"E\":\r\n"
+                + "trace(\"D-default-E\");\r\n"
+                + "break;\r\n"
+                + "case \"F\":\r\n"
+                + "trace(\"F no break\");\r\n"
+                + "case \"G\":\r\n"
+                + "trace(\"G\");\r\n"
+                + "break;\r\n"
+                + "case \"H\":\r\n"
+                + "trace(\"H last\");\r\n"
+                + "}\r\n"
+                + "trace(\"after switch\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitchComma() {
         decompileMethod("classic", "testSwitchComma", "var b:int = 5;\r\n"
                 + "var a:String = \"A\";\r\n"
@@ -1898,7 +2120,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "break;\r\n"
                 + "case \"B\":\r\n"
                 + "trace(\"is B\");\r\n"
-                + "case TestSwitchComma.X, \"C\":\r\n"
+                + "case TestSwitchComma.X,\"C\":\r\n"
                 + "trace(\"is C\");\r\n"
                 + "}\r\n",
                  false);
@@ -1955,6 +2177,23 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testSwitchDefaultEndMultiple() {
+        decompileMethod("classic", "testSwitchDefaultEndMultiple", "var a:* = \"X\";\r\n"
+                + "switch(a)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "trace(\"B\");\r\n"
+                + "break;\r\n"
+                + "case \"C\":\r\n"
+                + "case \"D\":\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitchIf() {
         decompileMethod("classic", "testSwitchIf", "var code:String = \"4\";\r\n"
                 + "var a:Boolean = true;\r\n"
@@ -1965,7 +2204,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "if(a)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"B\");\r\n",
@@ -2279,6 +2517,37 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testWhileBreak3() {
+        decompileMethod("classic", "testWhileBreak3", "var i:int = Math.floor(Math.random() * 11);\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "if(i < 100)\r\n"
+                + "{\r\n"
+                + "if(i < 0)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "if(i < 4)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "if(i == 4)\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "return i;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return i;\r\n",
+                 false);
+    }
+
+    @Test
     public void testWhileContinue() {
         decompileMethod("classic", "testWhileContinue", "var a:* = 5;\r\n"
                 + "while(true)\r\n"
@@ -2345,6 +2614,18 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"E\");\r\n"
                 + "}\r\n"
                 + "i++;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testWhileTrue() {
+        decompileMethod("classic", "testWhileTrue", "var a:int = Math.floor(Math.random() * 6);\r\n"
+                + "if(a > 4)\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "}\r\n"
                 + "}\r\n",
                  false);
     }

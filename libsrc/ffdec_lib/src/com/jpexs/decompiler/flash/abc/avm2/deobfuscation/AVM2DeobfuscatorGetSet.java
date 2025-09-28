@@ -164,7 +164,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
         localData.localRegTypes = new HashMap<>();
         localData.scriptIndex = scriptIndex;
         localData.ip = 0;
-        localData.code = body.getCode();
+        localData.code = body.getCode();      
         return localData;
     }
 
@@ -236,6 +236,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
                     return;
                 }
 
+                stack.setConnectedOutput(0, output, localData);        
                 ins.translate(localData, stack, output, 0, "");
             }
 

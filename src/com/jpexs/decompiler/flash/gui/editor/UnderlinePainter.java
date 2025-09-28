@@ -23,7 +23,6 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.View;
@@ -32,7 +31,7 @@ import javax.swing.text.View;
  *
  * @author JPEXS
  */
-public class UnderlinePainter extends OccurencesMarker {
+public class UnderlinePainter extends OccurrencesMarker {
 
     private final Color underlineColor;
 

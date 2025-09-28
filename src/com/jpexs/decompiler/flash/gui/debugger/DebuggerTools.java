@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -106,9 +107,9 @@ public class DebuggerTools {
                 int debuggerNs = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    String rawNsName = m.getNameWithNamespace(a.constants, true).toRawString();
+                    String rawNsName = m.getNameWithNamespace(new LinkedHashSet<>(), a, a.constants, true).toRawString();
                     if (m.kind == Multiname.MULTINAME) {
-                        String simpleName = m.getName(a.constants, new ArrayList<>(), true, false);
+                        String simpleName = m.getName(new LinkedHashSet<>(), a, a.constants, new ArrayList<>(), true, false);
                         String nsToSearch;
                         if (displayTypes.contains(simpleName)) {
                             nsToSearch = "flash.display";
@@ -120,7 +121,7 @@ public class DebuggerTools {
 
                         int nsFoundId = -1;
                         for (int ns : a.constants.getNamespaceSet(m.namespace_set_index).namespaces) {
-                            String nsString = a.constants.namespaceToString(ns);
+                            String nsString = a.constants.namespaceToString(a, ns);
                             if (nsString != null) {
                                 if (nsString.equals(nsToSearch)) {
                                     nsFoundId = ns;
@@ -132,7 +133,7 @@ public class DebuggerTools {
                             m.kind = Multiname.QNAME;
                             m.namespace_index = nsFoundId;
                             m.namespace_set_index = 0;
-                            rawNsName = m.getNameWithNamespace(a.constants, true).toRawString();
+                            rawNsName = m.getNameWithNamespace(new LinkedHashSet<>(), a, a.constants, true).toRawString();
                         }
                     }
                     if (null != rawNsName) {
@@ -177,7 +178,7 @@ public class DebuggerTools {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    if ("trace".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
+                    if ("trace".equals(m.getNameWithNamespace(new LinkedHashSet<>(), a, a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
                         ((Tag) ct).setModified(true);
@@ -200,7 +201,7 @@ public class DebuggerTools {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    String packageStr = m.getNameWithNamespace(a.constants, true).toString();
+                    String packageStr = m.getNameWithNamespace(new LinkedHashSet<>(), a, a.constants, true).toString();
                     if (isDebuggerClass(packageStr, "debugTrace")
                             || isDebuggerClass(packageStr, "debugAlert")
                             || isDebuggerClass(packageStr, "debugSocket")

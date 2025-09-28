@@ -236,7 +236,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
                         TextTag textTag = (TextTag) tag;
                         if (textTag.getFontIds().contains(fontId)) {
                             String text = textTag.getFormattedText(true).text;
-                            mainPanel.saveText(textTag, text, null, null);
+                            mainPanel.saveText(textTag, text, null, null, null);
                         }
                     }
                 }

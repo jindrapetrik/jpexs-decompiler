@@ -12,8 +12,7 @@
         </nbjpdastart>
         <java classname="${main.class}" fork="true">
             <classpath refid="cp"/>
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx8192m"/>          
             <arg line="${run.params}"/>
         </java>

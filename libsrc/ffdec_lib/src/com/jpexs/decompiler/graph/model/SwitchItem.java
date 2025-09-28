@@ -58,7 +58,17 @@ public class SwitchItem extends LoopItem implements Block {
      * Values mapping
      */
     public List<Integer> valuesMapping;
+    
+    /**
+     * Additional default position. Mark for additional processing...
+     */
+    public int additionalDefaultPosition = -1;
 
+    /**
+     * Additional default values - they are not printed. This is just mark for additional processing...
+     */
+    public List<GraphTargetItem> additionalDefaultValues = new ArrayList<>();
+    
     /**
      * Label used
      */
@@ -128,7 +138,7 @@ public class SwitchItem extends LoopItem implements Block {
         for (int i = 0; i < caseCommands.size(); i++) {
 
             //if last is default and is empty, ignore it
-            if (i == caseCommands.size() - 1) {
+            /*if (i == caseCommands.size() - 1) {
                 if (caseCommands.get(i).isEmpty()) {
                     boolean hasDefault = false;
                     boolean hasNonDefault = false;
@@ -145,13 +155,13 @@ public class SwitchItem extends LoopItem implements Block {
                         continue;
                     }
                 }
-            }
+            }*/
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
                     if (!(caseValues.get(k) instanceof DefaultItem)) {
                         writer.append("case ");
                     }
-                    caseValues.get(k).toString(writer, localData);
+                    caseValues.get(k).toString(writer, localData, "", true);
                     writer.append(":").newLine();
                 }
             }
@@ -187,6 +197,23 @@ public class SwitchItem extends LoopItem implements Block {
         }
         return ret;
     }
+    
+    @Override
+    public List<BreakItem> getBreaks() {
+        List<BreakItem> ret = new ArrayList<>();
+
+        for (List<GraphTargetItem> onecase : caseCommands) {
+            for (GraphTargetItem ti : onecase) {
+                if (ti instanceof BreakItem) {
+                    ret.add((BreakItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getBreaks());
+                }
+            }
+        }
+        return ret;
+    }
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
@@ -211,5 +238,23 @@ public class SwitchItem extends LoopItem implements Block {
     @Override
     public List<GraphTargetItem> getBaseBodyCommands() {
         return null;
+    }
+    
+    public void removeValue(int index) {
+        int m = valuesMapping.get(index);
+        caseValues.remove(index);
+        valuesMapping.remove(index);
+        boolean otherFound = false;
+        for (int i = 0; i < valuesMapping.size(); i++) {
+            if (valuesMapping.get(i) == m) {
+                return;
+            }
+        }
+        caseCommands.remove(m);
+        for (int i = 0; i < valuesMapping.size(); i++) {
+            if (valuesMapping.get(i) > m) {
+                valuesMapping.set(i, valuesMapping.get(i) - 1);
+            }
+        }
     }
 }

@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

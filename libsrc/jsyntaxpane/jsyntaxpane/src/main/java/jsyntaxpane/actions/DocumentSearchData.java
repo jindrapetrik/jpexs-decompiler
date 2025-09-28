@@ -51,7 +51,7 @@ public class DocumentSearchData {
         /**
          * JPEXS
          */
-        private Map<JTextComponent, Integer> currentOccurenceMap = new WeakHashMap<>();
+        private Map<JTextComponent, Integer> currentOccurrenceMap = new WeakHashMap<>();
 
 	/**
 	 * This prevent creating a new instance.  You must call the getFromEditor
@@ -184,18 +184,18 @@ public class DocumentSearchData {
 		// go throw all matches, and stop when we reach current pos
 		int start = -1;
 		int end = -1;
-                int occurenceNumber = 0; //JPEXS
+                int occurrenceNumber = 0; //JPEXS
 		while (matcher.find()) {
 			if (matcher.end() >= dot) {
 				break;
 			}
-                        occurenceNumber++;
+                        occurrenceNumber++;
 			start = matcher.start();
 			end = matcher.end();
 		}
 		if (end > 0) {
 			target.select(start, end);
-                        currentOccurenceMap.put(target, occurenceNumber);
+                        currentOccurrenceMap.put(target, occurrenceNumber);
 			return true;
 		} else {
                         return false;
@@ -203,12 +203,12 @@ public class DocumentSearchData {
 	}
         
         /**
-         * Gets search occurences. (JPEXS)
+         * Gets search occurrences. (JPEXS)
          *
          * @param target
-         * @return Number of occurences
+         * @return Number of occurrences
          */
-        public int getOccurencesCount(JTextComponent target) {
+        public int getOccurrencesCount(JTextComponent target) {
                 if (getPattern() == null) {
 			return 0;
 		}
@@ -225,15 +225,15 @@ public class DocumentSearchData {
         }
         
         /**
-         * Gets current occurence number. (JPEXS)
+         * Gets current occurrence number. (JPEXS)
          * @param target
-         * @return Current occurence number.
+         * @return Current occurrence number.
          */
-        public int getCurrentOccurence(JTextComponent target) {
-                if (!currentOccurenceMap.containsKey(target)) {
+        public int getCurrentOccurrence(JTextComponent target) {
+                if (!currentOccurrenceMap.containsKey(target)) {
                     return 0;
                 }
-                return currentOccurenceMap.get(target);
+                return currentOccurrenceMap.get(target);
         }  
 
 	/**
@@ -262,11 +262,11 @@ public class DocumentSearchData {
 		Matcher matcher = sDoc.getMatcher(getPattern());
                 
                 //JPEXS
-                int occurenceNumber = 0;
+                int occurrenceNumber = 0;
                 boolean found = false;
                 if (matcher != null) {
                     while(matcher.find()) {                            
-                            occurenceNumber++;
+                            occurrenceNumber++;
                             if (matcher.start() >= start) {
                                     found = true;
                                     break;
@@ -276,17 +276,17 @@ public class DocumentSearchData {
                 
 		if (found) { //JPEXS
 			target.select(matcher.start(), matcher.end()); //JPEXS
-                        currentOccurenceMap.put(target, occurenceNumber);
+                        currentOccurrenceMap.put(target, occurrenceNumber);
 			return true;
 		} else {
 			if (isWrap()) {
 				matcher = sDoc.getMatcher(getPattern());
 				if (matcher != null && matcher.find()) {
 					target.select(matcher.start(), matcher.end());
-                                        currentOccurenceMap.put(target, 1);
+                                        currentOccurrenceMap.put(target, 1);
 					return true;
 				} else {
-                                        currentOccurenceMap.put(target, 0);
+                                        currentOccurrenceMap.put(target, 0);
 					return false;
 				}
 			} else {                                

@@ -51,7 +51,7 @@ public class PackageAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.appendNoHilight("package");
         if (!packageName.isEmpty()) {
-            writer.appendNoHilight(" " + DottedChain.parseWithSuffix(packageName).toPrintableString(true));
+            writer.appendNoHilight(" " + DottedChain.parseWithSuffix(packageName).toPrintableString(localData.usedDeobfuscations, localData.swf, true));
         }
         writer.startBlock();
         Graph.graphToString(items, writer, localData);

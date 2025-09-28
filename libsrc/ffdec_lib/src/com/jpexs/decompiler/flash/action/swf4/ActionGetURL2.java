@@ -47,10 +47,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * GetURL2 action - Gets a URL, stack-based.
@@ -189,7 +189,7 @@ public class ActionGetURL2 extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem targetString = stack.pop();
         GraphTargetItem urlString = stack.pop();
         GraphTargetItem num = null;
@@ -258,6 +258,12 @@ public class ActionGetURL2 extends Action {
                 } else if (urlStr.startsWith(fscommandPrefix)) {
                     urlString = new DirectValueActionItem(urlStr.substring(fscommandPrefix.length()));
                     doFSCommand = true;
+                } else if (urlStr.equals("print:")) {
+                    printType = new DirectValueActionItem("bmovie");
+                    doPrint = true;
+                } else if (urlStr.equals("printasbitmap:")) {
+                    printType = new DirectValueActionItem("bmovie");
+                    doPrintAsBitmap = true;
                 }
             } else if (urlString instanceof StringAddActionItem) {
                 StringAddActionItem sa = (StringAddActionItem) urlString;
@@ -289,8 +295,7 @@ public class ActionGetURL2 extends Action {
                 if (doUnload) {
                     output.add(new UnLoadMovieNumActionItem(this, lineStartAction, num));
                 } else if (doPrint) {
-                    output.add(new PrintNumActionItem(this, lineStartAction, num,
-                            printType));
+                    output.add(new PrintNumActionItem(this, lineStartAction, num, printType));
                 } else if (doPrintAsBitmap) {
                     output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, num, printType));
                 } else {

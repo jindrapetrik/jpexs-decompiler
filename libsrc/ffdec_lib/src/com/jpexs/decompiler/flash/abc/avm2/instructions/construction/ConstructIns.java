@@ -129,7 +129,7 @@ public class ConstructIns extends InstructionDefinition {
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isXML = glt.propertyName.getName(localData.getConstants(), localData.fullyQualifiedNames, true, true).equals("XML");
+            isXML = glt.propertyName.getName(localData.usedDeobfuscations, localData.abc, localData.getConstants(), localData.fullyQualifiedNames, true, true).equals("XML");
         }
 
         if (isXML) {
@@ -157,7 +157,7 @@ public class ConstructIns extends InstructionDefinition {
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isRegExp = glt.propertyName.getName(localData.getConstants(), localData.fullyQualifiedNames, true, true).equals("RegExp");
+            isRegExp = glt.propertyName.getName(localData.usedDeobfuscations, localData.abc, localData.getConstants(), localData.fullyQualifiedNames, true, true).equals("RegExp");
         }
 
         if (isRegExp && (args.size() >= 1) && (args.get(0) instanceof StringAVM2Item) && (args.size() == 1 || (args.size() == 2 && args.get(1) instanceof StringAVM2Item))) {

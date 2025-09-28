@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.SWF;
@@ -48,6 +49,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
@@ -67,12 +69,16 @@ import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.TemporaryItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
@@ -102,16 +108,22 @@ public class ActionGraph extends Graph {
      * Inside function
      */
     private boolean insideFunction;
+    
+    /**
+     * Needs uninitialized class fields detection
+     */
+    private final boolean needsUninitializedClassFieldsDetection;
 
     /**
      * Uninitialized class traits - maps class name to map of trait name to
      * trait
      */
     private Map<String, Map<String, Trait>> uninitializedClassTraits;
-
+    
     /**
      * Constructs ActionGraph
      *
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection 
      * @param uninitializedClassTraits Uninitialized class traits
      * @param path Path
      * @param insideDoInitAction Inside DoInitAction
@@ -122,14 +134,21 @@ public class ActionGraph extends Graph {
      * @param functions Functions
      * @param version Version
      * @param charset Charset
+     * @param startIp Start IP
      */
-    public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
-        super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
+    public ActionGraph(boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset, int startIp) {
+        super(ActionGraphTargetDialect.INSTANCE, new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset, startIp), new ArrayList<>(), startIp);
+        this.needsUninitializedClassFieldsDetection = needsUninitializedClassFieldsDetection;
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
     }
 
+    public boolean doesNeedUninitializedClassFieldsDetection() {
+        return needsUninitializedClassFieldsDetection;
+    }
+        
+          
     /**
      * Get uninitialized class traits
      *
@@ -161,18 +180,24 @@ public class ActionGraph extends Graph {
                 String functionName = (action instanceof ActionDefineFunction) ? ((ActionDefineFunction) action).functionName : ((ActionDefineFunction2) action).functionName;
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 List<ActionList> outs = new ArrayList<>();
+                List<Integer> startIps = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
+                        startIps.add(0);
                         continue;
                     }
-                    outs.add(new ActionList(alist.subList(Action.adr2ip(alist, endAddr), Action.adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
+                    int startIp = Action.adr2ip(alist, endAddr);
+                    startIps.add(startIp);
+                    outs.add(new ActionList(alist.subList(0, Action.adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
                     endAddr += size;
                 }
 
-                for (ActionList al : outs) {
+                for (int i = 0; i < outs.size(); i++) {
+                    ActionList al = outs.get(i);
+                    int startIp = startIps.get(i);
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph(uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset())
+                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
                     );
                 }
             }
@@ -203,6 +228,8 @@ public class ActionGraph extends Graph {
     /**
      * Translates via Graph - decompiles.
      *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection 
      * @param uninitializedClassTraits Uninitialized class traits
      * @param secondPassData Second pass data
      * @param insideDoInitAction Inside DoInitAction
@@ -218,9 +245,9 @@ public class ActionGraph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {        
-        ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
-        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
+    public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {        
+        ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
+        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits, usedDeobfuscations);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -277,7 +304,7 @@ public class ActionGraph extends Graph {
     
     @Override
     protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
-
+                               
         if (level == 0) {
             List<GraphTargetItem> removed = new ArrayList<>();
             for (int i = list.size() - 1; i >= 0; i--) {
@@ -292,7 +319,7 @@ public class ActionGraph extends Graph {
             }
             list.addAll(0, removed);
         }                
-
+             
         int targetStart;
         int targetEnd;
         GraphTargetItem targetStartItem = null;
@@ -317,6 +344,17 @@ public class ActionGraph extends Graph {
                         }
                     }
                 }
+                if (it instanceof SetTemporaryItem) {
+                    SetTemporaryItem st = (SetTemporaryItem) it;
+                    if (st.value instanceof GetPropertyActionItem) {
+                        GetPropertyActionItem gp = (GetPropertyActionItem) st.value;
+                        if (gp.propertyIndex == 11 /*_target*/) {
+                            list.remove(t);
+                            t--;
+                            continue;
+                        }
+                    }
+                }
                 if (it instanceof SetTargetActionItem) {
                     SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.isEmpty()) {
@@ -333,6 +371,11 @@ public class ActionGraph extends Graph {
                 if (it instanceof SetTarget2ActionItem) {
                     SetTarget2ActionItem st = (SetTarget2ActionItem) it;
                     if (st.target instanceof PopItem) {
+                        list.remove(t);
+                        t--;
+                        continue;
+                    }
+                    if (st.target instanceof TemporaryItem) {
                         list.remove(t);
                         t--;
                         continue;
@@ -616,6 +659,9 @@ public class ActionGraph extends Graph {
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
+            if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUninitializedClassFields.get()) {
+                ret.add(0, new CommentItem(AppResources.translate("decompilationWarning.as2.noUninitializedClassFieldsDetection")));
+            }
         }
         ActionLocalData ald = (ActionLocalData) localData;
         
@@ -861,7 +907,9 @@ public class ActionGraph extends Graph {
 
                 Reference<GraphPart> nextRef = new Reference<>(null);
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
+                makeAllCommands(output, stack);
                 SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
+                fixSwitchEnd(sw);
                 ret = new ArrayList<>();
                 ret.addAll(output);
                 ret.add(sw);
@@ -876,7 +924,19 @@ public class ActionGraph extends Graph {
         }
         return ret;
     }
-
+    
+    private int ipAfterJumps(int nip) {
+        while (nip < code.size() && code.get(nip) instanceof ActionJump) {
+            ActionJump j = (ActionJump) code.get(nip);
+            int nip2 = code.adr2pos(j.getTargetAddress());
+            if (nip2 == nip) {
+                break;
+            }
+            nip = nip2;            
+        }
+        return nip;
+    }
+            
     /**
      * Checks IP and allows to modify it.
      *
@@ -885,22 +945,67 @@ public class ActionGraph extends Graph {
      */
     @Override
     protected int checkIp(int ip) {
-        int oldIp = ip;
+        
+        if (ip >= code.size()) {
+            return ip;
+        }
+        
+        int oldIp = ip;        
+        
         //return/break in for..in
+        /*
+        We need to skip following:
+        
+        locA:Push null
+        Equals/Equals2
+        Not
+        If locA
+        ...
+        
+        Beware: There can be obfuscation jumps anywhere on the path!
+        */
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
+            int nip = ip;
+            if (nip + 1 < code.size()) {
+                nip++;
+                nip = ipAfterJumps(nip);
+                if (nip < code.size() && ((code.get(nip) instanceof ActionEquals) || (code.get(nip) instanceof ActionEquals2))) {
+                    nip++;
+                    nip = ipAfterJumps(nip);
+                    if (nip < code.size() && code.get(nip) instanceof ActionNot) {
+                        nip++;
+                        nip = ipAfterJumps(nip);
+                        if (nip < code.size() && code.get(nip) instanceof ActionIf) {
+                            ActionIf aif = (ActionIf) code.get(nip);
+                            
+                            int jip = code.adr2pos(aif.getTargetAddress());
+                            jip = ipAfterJumps(jip);
+                            if (jip == ip) {
+                                nip++;
+                                ip = nip;
+                            }
+                        }
+                    }
+                }                                    
+            }
+            
+            //The simple approach is not working, there may be jumps inside
+            /*
             if (ip + 3 <= code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {
                         if (code.get(ip + 3) instanceof ActionIf) {
                             ActionIf aif = (ActionIf) code.get(ip + 3);
-                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 /*IF numbytes*/ + aif.getJumpOffset()) == ip) {
+                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 //IF numbytes
+                            + aif.getJumpOffset()) == ip) {
                                 ip += 4;
                             }
                         }
                     }
                 }
             }
+            */
         }
         if (oldIp != ip) {
             if (ip == code.size()) { //no next checkIp call since its after code size
@@ -928,6 +1033,19 @@ public class ActionGraph extends Graph {
             return null; //no need to second pass
         }
         return spd;
+    }
+    
+    private GraphTargetItem getFirstListItem(List<GraphTargetItem> list) {
+        int i = 0;
+        while (i < list.size()) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof LabelItem) {
+                i++;
+                continue;
+            }
+            return item;
+        }
+        return null;        
     }
 
     /**
@@ -974,9 +1092,9 @@ public class ActionGraph extends Graph {
                             IfItem ii2 = ii;
                             IfItem lastOkayIi = ii;
                             while (true) {
-                                if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
-                                        || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
-                                    ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
+                                if ((isNeq && (getFirstListItem(ii2.onTrue) instanceof IfItem))
+                                        || (!isNeq && (getFirstListItem(ii2.onFalse) instanceof IfItem))) {
+                                    ii2 = (IfItem) (isNeq ? getFirstListItem(ii2.onTrue) : getFirstListItem(ii2.onFalse));
                                     if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
                                         isNeq = (ii2.expression instanceof StrictNeqActionItem);
                                         sneq = ((BinaryOpItem) ii2.expression);

@@ -66,9 +66,13 @@ import java.util.List;
             this.offset = ofst;
             prevToken = null;
             Token t = yylex();
-            prevToken = t;
+            if (t != null && t.type != TokenType.COMMENT) {
+                prevToken = t;            
+            }
             for (; t != null; t = yylex()) {
-                prevToken = t;
+                if (t.type != TokenType.COMMENT) {            
+                    prevToken = t;
+                }
                 tokens.add(t);
             }
         } catch (IOException ex) {
@@ -147,7 +151,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 VerbatimStringCharacter = [^\r\n\"]
 VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
-%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, XMLCOMMENT, XMLCDATA
+%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, XMLCOMMENT, XMLCDATA, ADOC, ADOC_TAG
 
 %%
 
@@ -210,6 +214,15 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   "void"                         { prevNew = false; return token(TokenType.KEYWORD); }
 
   "new"                          { prevNew = true; return token(TokenType.KEYWORD); }
+
+  // AsDoc comments need a state so that we can highlight the @ controls
+  "/**"                          {  
+                                    yybegin(ADOC); 
+                                    tokenStart = yychar; 
+                                    tokenLength = 3; 
+                                 }
+  /* comments */
+  {Comment}                      { return token(TokenType.COMMENT); }
 
   {RegExp}                       { 
                                     prevNew = false; 
@@ -324,12 +337,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
   {DoubleLiteral}                |
   {DoubleLiteral}[dD]            { prevNew = false; return token(TokenType.NUMBER); }
-
-  // JavaDoc comments need a state so that we can highlight the @ controls
-
-  /* comments */
-  {Comment}                      { prevNew = false; return token(TokenType.COMMENT); }
-
+  
   /* whitespace */
   {WhiteSpace}                   { }
   {XMLBeginOneTag}               { 
@@ -451,6 +459,44 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
   ~{XmlCDataEnd}                    {
                                      yypushback(3);
                                      return token(TokenType.STRING);
+                                 }
+}
+
+<ADOC> {
+  "*/"                           { 
+                                     yybegin(YYINITIAL); 
+                                     return token(TokenType.COMMENT, tokenStart, tokenLength + 2);
+                                 }
+
+  "@"                            {   
+                                     yybegin(ADOC_TAG); 
+                                     int start = tokenStart;
+                                     tokenStart = yychar;
+                                     int len = tokenLength;
+                                     tokenLength = 1;
+                                     return token(TokenType.COMMENT, start, len);
+                                 }
+
+  .|\n                           { tokenLength ++; }
+
+}
+
+<ADOC_TAG> {
+  ([:letter:])+                  { tokenLength += yylength(); }
+
+  "*/"                           { 
+                                     yybegin(YYINITIAL); 
+                                     return token(TokenType.COMMENT, tokenStart, tokenLength + 2);
+                                 }
+
+  .|\n                           {   
+                                     yybegin(ADOC); 
+                                     // length also includes the trailing quote
+                                     int start = tokenStart;
+                                     tokenStart = yychar;
+                                     int len = tokenLength;
+                                     tokenLength = 1;
+                                     return token(TokenType.COMMENT2, start, len);
                                  }
 }
 

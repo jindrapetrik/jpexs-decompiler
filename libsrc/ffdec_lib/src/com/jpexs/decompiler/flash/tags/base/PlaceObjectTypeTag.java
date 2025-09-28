@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -336,7 +337,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
                 ret.put("chid", "" + charId);
             }
             if (exportName != null) {
-                ret.put("exp", exportName);
+                ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));
             }
         }
 

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * ActionScript 1/2 parser.
@@ -344,7 +343,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case MBCHR:
             case MBLENGTH:
             case MBSUBSTRING:
-            case SUBSTR:
+            case SUBSTRING:
             case LENGTH:
             case RANDOM:
             case INT:
@@ -612,7 +611,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
-            case SUBSTR:
+            case SUBSTRING:
                 expectedType(errors, SymbolType.PARENT_OPEN);
                 expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
@@ -1249,8 +1248,8 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 arrCnt++;
                 expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
-                if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
-                    expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
+                if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
+                    break;
                 }
             }
         } else {
@@ -1333,12 +1332,17 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     case "dup":
                         expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
+                        allowMemberOrCall = true;                        
                         break;
                     case "push":
                         expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     case "pop":
+                        ret = true;
+                        allowMemberOrCall = true;
+                        break;
+                    case "swap":
                         ret = true;
                         break;
                     case "strict":

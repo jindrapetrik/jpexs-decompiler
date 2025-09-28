@@ -36,6 +36,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -78,7 +79,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 if (a == abc) {
                     continue;
                 }
-                List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                List<Integer> mids = a.constants.getMultinameIds(m, a, abc, abc.constants);
                 for (int mid : mids) {
                     usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid, exactMatch));
                 }
@@ -106,7 +107,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
         cont.add(new FasterScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants, true).toPrintableString(true));
+        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
@@ -164,9 +165,9 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 decompiledTextArea.addScriptListener(setTrait);
                 String scriptName;
                 if (icu.getClassIndex() > -1) {
-                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toPrintableString(true);
+                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(new LinkedHashSet<>(), icu.getAbc(), icu.getAbc().constants, true).toPrintableString(new LinkedHashSet<>(), icu.getAbc().getSwf(), true);
                 } else if (icu.getScriptIndex() > -1) {
-                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toPrintableString(true);
+                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc(), new LinkedHashSet<>()).toPrintableString(new LinkedHashSet<>(), icu.getAbc().getSwf(), true);
                 } else {
                     scriptName = "";
                 }

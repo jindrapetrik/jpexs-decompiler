@@ -152,7 +152,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         if (slotName == null) {
             return slotObject.toString(localData) + ".§§slot[" + slotIndex + "]";
         }
-        return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
+        return slotName.getName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
     /**

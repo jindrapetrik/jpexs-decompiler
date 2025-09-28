@@ -38,10 +38,12 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ public class ShapeImporter {
 
     /**
      * Imports an image to a shape tag.
+     *
      * @param st Shape tag
      * @param newData New image data
      * @return Imported tag
@@ -72,6 +75,7 @@ public class ShapeImporter {
 
     /**
      * Imports an image to a morph shape tag.
+     *
      * @param mst Morph shape tag
      * @param newData New image data
      * @return Imported tag
@@ -83,6 +87,7 @@ public class ShapeImporter {
 
     /**
      * Imports an image to morph shape tag.
+     *
      * @param mst Morph shape tag
      * @param newData New image data
      * @param tagType Tag type
@@ -96,6 +101,7 @@ public class ShapeImporter {
 
     /**
      * Imports an image to shape tag.
+     *
      * @param st Shape tag
      * @param newData New image data
      * @param tagType Tag type
@@ -163,6 +169,21 @@ public class ShapeImporter {
             newData = baos.toByteArray();
         }
 
+        if (newData.length >= 4
+                && newData[0] == 'R'
+                && newData[1] == 'I'
+                && newData[2] == 'F'
+                && newData[3] == 'F'
+            ) {
+            if (!ImageFormat.WEBP.available()) {
+                throw new RuntimeException("WEBP format is not supported on your platform");
+            }
+            BufferedImage b = WebPCodec.decodeImage(newData);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageHelper.write(b, ImageFormat.PNG, baos);
+            newData = baos.toByteArray();
+        }
+
         if (tagType == 0) {
             if (ImageTag.getImageFormat(newData) == ImageFormat.JPEG) {
                 tagType = DefineBitsJPEG2Tag.ID;
@@ -208,6 +229,7 @@ public class ShapeImporter {
 
     /**
      * Gets the shape tag type.
+     *
      * @param format Format
      * @return Shape tag type
      */
@@ -233,6 +255,7 @@ public class ShapeImporter {
 
     /**
      * Bulk import shapes.
+     *
      * @param shapesDir Shapes directory
      * @param swf SWF
      * @param noFill No fill flag

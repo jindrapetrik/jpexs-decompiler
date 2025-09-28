@@ -34,16 +34,23 @@ public class GlyphCharacter {
      * Character
      */
     public char character;
+    
+    /**
+     * Position in HTML source
+     */
+    public int htmlSourcePosition = -1;
 
     /**
      * Constructor.
      *
      * @param character Character
      * @param glyphEntry Glyph entry
+     * @param htmlSourcePosition Position in HTML source
      */
-    public GlyphCharacter(char character, GLYPHENTRY glyphEntry) {
+    public GlyphCharacter(char character, GLYPHENTRY glyphEntry, int htmlSourcePosition) {
 
         this.character = character;
         this.glyphEntry = glyphEntry;
+        this.htmlSourcePosition = htmlSourcePosition;
     }
 }

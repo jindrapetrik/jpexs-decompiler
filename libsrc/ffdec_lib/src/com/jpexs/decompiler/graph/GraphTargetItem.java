@@ -18,16 +18,18 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
@@ -75,7 +77,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public static final int PRECEDENCE_LOGICALOR = 12;
 
     public static final int PRECEDENCE_NULLCOALESCE = 13;
-    
+
     public static final int PRECEDENCE_CONDITIONAL = 14;
 
     public static final int PRECEDENCE_ASSIGNMENT = 15;
@@ -118,16 +120,27 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * Line start item
      */
     public GraphSourceItem lineStartItem;
-    
+
     /**
      * ASM Position
      */
     protected int pos = 0;
-    
+
     /**
      * Dialect
      */
     public GraphTargetDialect dialect;
+
+    /**
+     * Position in output - current list of GraphTargetItems
+     */
+    public int outputPos = -1;
+
+    /**
+     * Line in decompiled source code. Used mainly in Parsers/Code generators to
+     * report bugs.
+     */
+    public int line;
 
     /**
      * Gets the line start item
@@ -137,7 +150,6 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphSourceItem getLineStartItem() {
         return lineStartItem;
     }
-   
 
     /**
      * Simplifies something
@@ -231,10 +243,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Constructs GraphTargetItem
+     *
      * @param dialect Dialect
      */
     public GraphTargetItem(GraphTargetDialect dialect) {
-        this(dialect, null, null, NOPRECEDENCE);        
+        this(dialect, null, null, NOPRECEDENCE);
     }
 
     /**
@@ -243,7 +256,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param dialect Dialect
      * @param src Source item
      * @param lineStartItem Line start item
-     * @param precedence Precedence     
+     * @param precedence Precedence
      */
     public GraphTargetItem(GraphTargetDialect dialect, GraphSourceItem src, GraphSourceItem lineStartItem, int precedence) {
         this(dialect, src, lineStartItem, precedence, null);
@@ -309,9 +322,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public int getPos() {
         return pos;
     }
-    
+
     /**
      * Sets position
+     *
      * @param pos Position
      */
     public void setPos(int pos) {
@@ -376,8 +390,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "Boolean");
+    public final GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Boolean", false);
     }
 
     /**
@@ -388,8 +402,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "String");
+    public final GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "String", false);
     }
 
     /**
@@ -400,8 +414,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "int");
+    public final GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "int", false);
     }
 
     /**
@@ -412,8 +426,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "Number");
+    public final GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Number", false);
     }
 
     /**
@@ -432,16 +446,17 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @param implicitCoerce Implicit coerce
+     * @param noParenthesis Do not use parenthesis
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce, boolean noParenthesis) throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
 
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
-        appendTry(writer, localData, implicitCoerce);
+        appendTry(writer, localData, implicitCoerce, noParenthesis);
         writer.endOffset();
         return writer;
     }
@@ -455,7 +470,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "");
+        return toString(writer, localData, "", false);
     }
 
     /**
@@ -483,6 +498,19 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
     /**
+     * Append this to a writer, ignoring parenthesis (in CommaExpression and/or
+     * Parenthesis)
+     *
+     * @param writer Writer
+     * @param localData Local data
+     * @return Writer
+     * @throws InterruptedException On interrupt
+     */
+    public GraphTextWriter appendNoParenthesis(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return appendTo(writer, localData);
+    }
+
+    /**
      * Append this to a writer.
      *
      * @param writer Writer
@@ -491,7 +519,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return appendTry(writer, localData, "");
+        return appendTry(writer, localData, "", false);
     }
 
     /**
@@ -503,7 +531,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
+    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce, boolean noParenthesis) throws InterruptedException {
         GraphTargetItem t = this;
         if (!implicitCoerce.isEmpty()) {    //if implicit coerce equals explicit
             /*if (t instanceof ConvertAVM2Item) {
@@ -526,6 +554,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
         if (!implicitCoerce.isEmpty() && Configuration.simplifyExpressions.get()) {
             t = t.simplify(implicitCoerce);
+        }
+        if (noParenthesis) {
+            return t.appendNoParenthesis(writer, localData);
         }
         return t.appendTo(writer, localData);
 
@@ -727,9 +758,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public boolean handlesNewLine() {
         return false;
     }
-    
+
     /**
      * Checks whether this item needs single newline before and after.
+     *
      * @return True if needs
      */
     public boolean hasSingleNewLineAround() {
@@ -1116,5 +1148,74 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             }
         }
         return o1.equals(o2);
+    }
+
+    /**
+     * Checks set temporary at the end of output and expected dupSource, dup.
+     * Then removes the last output command when necessary.
+     *
+     * @param stack Stack
+     * @param output Output
+     * @param dupSource Expected DuplicateSourceItem, if not, the command won't
+     * do anything
+     * @param dup Expected DuplicateItem, if not the command won't do anything
+     */
+    public static void checkDup(TranslateStack stack, List<GraphTargetItem> output, GraphTargetItem dupSource, GraphTargetItem dup) {
+        if (output.isEmpty()) {
+            return;
+        }
+        if (!(output.get(output.size() - 1) instanceof SetTemporaryItem)) {
+            return;
+        }
+        dupSource = dupSource.getNotCoercedNoDup();
+        if (!(dupSource instanceof DuplicateSourceItem)) {
+            return;
+        }
+        dup = dup.getNotCoercedNoDup();
+        if (!(dup instanceof DuplicateItem)) {
+            return;
+        }
+        DuplicateSourceItem ds = (DuplicateSourceItem) dupSource;
+        DuplicateItem d = (DuplicateItem) dup;
+        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+        if (ds.tempIndex != d.tempIndex || d.tempIndex != st.tempIndex) {
+            return;
+        }
+
+        output.remove(output.size() - 1);
+        stack.moveToStack(output);
+    }
+
+    /**
+     * Checks whether items are result of dup instruction and removes
+     * SetTemporary from output when necessary
+     *
+     * @param item1
+     * @param item2
+     * @param output
+     * @param stack
+     * @return -2 when no duplicate, -1 when equal, >= 0 temp index
+     */
+    public static int checkDup2(GraphTargetItem item1, GraphTargetItem item2, List<GraphTargetItem> output, TranslateStack stack) {
+        if (item1 == item2) {
+            return -1;
+        }
+        if (!((item1 instanceof DuplicateSourceItem && item2 instanceof DuplicateItem)
+                || (item1 instanceof DuplicateItem && item2 instanceof DuplicateSourceItem))) {
+            return -2;
+        }
+        if (((HasTempIndex) item1).getTempIndex() != ((HasTempIndex) item2).getTempIndex()) {
+            return -2;
+        }
+
+        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+            SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+            if (st.getTempIndex() == ((HasTempIndex) item1).getTempIndex()) {
+                output.remove(output.size() - 1);
+                stack.moveToStack(output);
+            }
+        }
+
+        return ((HasTempIndex) item1).getTempIndex();
     }
 }

@@ -39,6 +39,10 @@ public enum AVM2InstructionFlag {
      */
     FLOAT_MAJOR,
     /**
+     * Requires Float4 support
+     */
+    FLOAT4_SUPPORT,
+    /**
      * Operands are unknown
      */
     UNKNOWN_OPERANDS,
@@ -53,5 +57,5 @@ public enum AVM2InstructionFlag {
     /**
      * Works with domain memory
      */
-    DOMAIN_MEMORY
+    DOMAIN_MEMORY    
 }

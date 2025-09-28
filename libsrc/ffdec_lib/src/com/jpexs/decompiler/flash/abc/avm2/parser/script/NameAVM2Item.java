@@ -39,6 +39,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -434,7 +435,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         for (MethodBody b : callStack) {
             for (int i = 0; i < b.traits.traits.size(); i++) {
                 Trait t = b.traits.traits.get(i);
-                if (t.getName(abcV).getName(constants, null, true, true).equals(variableName)) {
+                if (t.getName(abcV).getName(new LinkedHashSet<>(), abcV, constants, null, true, true).equals(variableName)) {
                     if (t instanceof TraitSlotConst) {
                         if (!localData.traitUsages.containsKey(b)) {
                             localData.traitUsages.put(b, new ArrayList<>());

@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -49,8 +50,10 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextFormatTag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -61,11 +64,16 @@ import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -75,6 +83,7 @@ import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SerialNumberTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -84,6 +93,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
@@ -95,7 +105,10 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -103,12 +116,12 @@ import java.util.Map;
  */
 public class TagIdClassMap {
 
-    private static final Map<Integer, Class<?>> tagIdClassMap = new HashMap<>();
+    private static final Map<Integer, List<Class<?>>> tagIdClassMap = new HashMap<>();
 
     private static final Map<Class, Integer> classTagIdMap = new HashMap<>();
 
     static {
-        addTag(CSMTextSettingsTag.ID, CSMTextSettingsTag.class);
+        addTag(CSMSettingsTag.ID, CSMSettingsTag.class);
         addTag(DebugIDTag.ID, DebugIDTag.class);
         addTag(DefineBinaryDataTag.ID, DefineBinaryDataTag.class);
         addTag(DefineBitsJPEG2Tag.ID, DefineBitsJPEG2Tag.class);
@@ -162,6 +175,7 @@ public class TagIdClassMap {
         addTag(PlaceObject3Tag.ID, PlaceObject3Tag.class);
         addTag(PlaceObject4Tag.ID, PlaceObject4Tag.class);
         addTag(PlaceObjectTag.ID, PlaceObjectTag.class);
+        addTag(PlaceImagePrivateTag.ID, PlaceImagePrivateTag.class);
         addTag(ProductInfoTag.ID, ProductInfoTag.class);
         addTag(ProtectTag.ID, ProtectTag.class);
         addTag(RemoveObject2Tag.ID, RemoveObject2Tag.class);
@@ -187,15 +201,41 @@ public class TagIdClassMap {
         addTag(DefineSubImage.ID, DefineSubImage.class);
         addTag(ExporterInfo.ID, ExporterInfo.class);
         addTag(FontTextureInfo.ID, FontTextureInfo.class);
+        
+        addTag(DefineVideoTag.ID, DefineVideoTag.class);
+        addTag(GenCommandTag.ID, GenCommandTag.class);
+        addTag(FontRefTag.ID, FontRefTag.class);
+        addTag(DefineTextFormatTag.ID, DefineTextFormatTag.class);
+        addTag(NameCharacterTag.ID, NameCharacterTag.class);
+        addTag(CharacterSetTag.ID, CharacterSetTag.class);
+        addTag(SerialNumberTag.ID, SerialNumberTag.class);
+        
+        addTag(FreeCharacterTag.ID, FreeCharacterTag.class);
+        addTag(SyncFrameTag.ID, SyncFrameTag.class);
     }
 
     private static void addTag(int tagId, Class<?> cl) {
-        tagIdClassMap.put(tagId, cl);
+        if (!tagIdClassMap.containsKey(tagId)) {
+            tagIdClassMap.put(tagId, new ArrayList<>());
+        }
+        tagIdClassMap.get(tagId).add(cl);
         classTagIdMap.put(cl, tagId);
     }
 
-    public static Class<?> getClassByTagId(int tagId) {
-        return tagIdClassMap.get(tagId);
+    public static Class<?> getClassByTagId(int tagId, int swfVersion) {
+        List<Class<?>> classes = tagIdClassMap.get(tagId);
+        if (classes.size() == 1) {
+            return classes.get(0);
+        }
+        for (Class<?> cls : classes) {
+            SWFVersion ver = cls.getAnnotation(SWFVersion.class);
+            if (ver != null) {
+                if (swfVersion >= ver.from() && swfVersion <= ver.to()) {
+                    return cls;
+                }
+            }
+        }
+        return null;
     }
 
     public static Integer getTagIdByClass(Class cl) {

@@ -42,6 +42,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -167,7 +168,7 @@ public class SwfToSwcExporter {
                 sb.append("        <dep id=\"AS3\" type=\"").append(DEPENDENCY_NAMESPACE).append("\" />\n");
                 if (!skipDependencies) {
                     List<Dependency> dependencies = new ArrayList<>();
-                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(swf.getAbcIndex(), pack.scriptIndex, -1, false, null, pack.abc, dependencies, new DottedChain(new String[]{"NO:PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
+                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(new LinkedHashSet<>(), swf.getAbcIndex(), pack.scriptIndex, -1, false, null, pack.abc, dependencies, new DottedChain(new String[]{"NO:PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
 
                     for (Dependency d : dependencies) {
                         if ("*".equals(d.getId().getLast())) {

@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterModifier;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -46,7 +46,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 8)
-public class DefineScalingGridTag extends Tag implements CharacterIdTag {
+public class DefineScalingGridTag extends Tag implements CharacterModifier {
 
     public static final int ID = 78;
 

@@ -51,7 +51,7 @@ public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implement
         if ((other instanceof ConstVarNameMultinameUsage) || (other instanceof MethodNameMultinameUsage)) {
             TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
             if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
-                if (other.sameMultinameName(this)) {
+                if (other.sameMultinameName(this, false)) {
                     return true;
                 }
             }

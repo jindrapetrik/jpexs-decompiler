@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.Map;
 
@@ -93,7 +94,7 @@ public class FrameLabelTag extends Tag {
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (!name.isEmpty()) {
-            ret.put("name", name);
+            ret.put("name", "\"" + Helper.escapePCodeString(name) + "\"");
         }
         return ret;
     }

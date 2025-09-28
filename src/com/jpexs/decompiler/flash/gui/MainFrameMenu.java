@@ -99,7 +99,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     //private ConfigurationItemChangeListener<Boolean> configListenerCacheOnDisk;
     private ConfigurationItemChangeListener<Boolean> configListenerGotoMainClassOnStartup;
 
-    private ConfigurationItemChangeListener<Boolean> configListenerAutoRenameIdentifiers;
+    //private ConfigurationItemChangeListener<Boolean> configListenerAutoRenameIdentifiers;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerAutoDeobfuscateIdentifiers;
 
     private ConfigurationItemChangeListener<Boolean> configListenerAutoOpenLoadedSWFs;
 
@@ -914,6 +916,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
             button.setSelected(Configuration.autoRenameIdentifiers.get());
         }
     }
+    
+    protected void autoDeobfuscateIdentifiersActionPerformed(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.autoDeobfuscateIdentifiers.set(selected);        
+        mainFrame.getPanel().autoDeobfuscateChanged();
+    }
 
     /*protected void cacheOnDiskActionPerformed(ActionEvent evt) {
      AbstractButton button = (AbstractButton) evt.getSource();
@@ -1379,13 +1389,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings", translate("menu.settings"), null, null, 0, null, false, null, false);
 
         addToggleMenuItem("/settings/autoDeobfuscation", translate("menu.settings.autodeobfuscation"), null, null, this::autoDeobfuscationActionPerformed, 0, null);
+        addToggleMenuItem("/settings/autoDeobfuscateIdentifiers", translate("menu.settings.autoDeobfuscateIdentifiers"), null, null, this::autoDeobfuscateIdentifiersActionPerformed, 0, null);
         addToggleMenuItem("/settings/simplifyExpressions", translate("menu.settings.simplifyExpressions"), null, null, this::simplifyExpressionsActionPerformed, 0, null);
         //addToggleMenuItem("/settings/internalViewer", translate("menu.settings.internalflashviewer"), null, null, this::internalViewerSwitchActionPerformed, 0, null);
-        addToggleMenuItem("/settings/parallelSpeedUp", translate("menu.settings.parallelspeedup"), null, null, this::parallelSpeedUpActionPerformed, 0, null);
         addToggleMenuItem("/settings/disableDecompilation", translate("menu.settings.disabledecompilation"), null, null, this::disableDecompilationActionPerformed, 0, null);
+        addToggleMenuItem("/settings/parallelSpeedUp", translate("menu.settings.parallelspeedup"), null, null, this::parallelSpeedUpActionPerformed, 0, null);
         //addToggleMenuItem("/settings/cacheOnDisk", translate("menu.settings.cacheOnDisk"), null, null, this::cacheOnDiskActionPerformed, 0, null);
         addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDocumentClassOnStartupActionPerformed, 0, null);
-        addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0, null);
+        //addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0, null);
         addToggleMenuItem("/settings/autoOpenLoadedSWFs", translate("menu.settings.autoOpenLoadedSWFs"), null, null, this::autoOpenLoadedSWFsActionPerformed, 0, null);
         addToggleMenuItem("/settings/flattenASPackages", translate("menu.settings.flattenASPackages"), null, null, this::flattenASPackagesActionPerformed, 0, null);
         if (Platform.isWindows()) {
@@ -1448,11 +1459,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuChecked("/settings/gotoMainClassOnStartup", newValue);
         });
 
-        setMenuChecked("/settings/autoRenameIdentifiers", Configuration.autoRenameIdentifiers.get());
+        /*setMenuChecked("/settings/autoRenameIdentifiers", Configuration.autoRenameIdentifiers.get());
         Configuration.autoRenameIdentifiers.addListener(configListenerAutoRenameIdentifiers = (Boolean newValue) -> {
             setMenuChecked("/settings/autoRenameIdentifiers", newValue);
+        });*/
+        
+        setMenuChecked("/settings/autoDeobfuscateIdentifiers", Configuration.autoDeobfuscateIdentifiers.get());
+        Configuration.autoDeobfuscateIdentifiers.addListener(configListenerAutoDeobfuscateIdentifiers = (Boolean newValue) -> {
+            setMenuChecked("/settings/autoDeobfuscateIdentifiers", newValue);
         });
-
+        
         setMenuChecked("/settings/autoOpenLoadedSWFs", Configuration.autoOpenLoadedSWFs.get());
         Configuration.autoOpenLoadedSWFs.addListener(configListenerAutoOpenLoadedSWFs = (Boolean newValue) -> {
             setMenuChecked("/settings/autoOpenLoadedSWFs", newValue);
@@ -1704,7 +1720,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.decompile.removeListener(configListenerDecompile);
         //Configuration.cacheOnDisk.removeListener(configListenerCacheOnDisk);
         Configuration.gotoMainClassOnStartup.removeListener(configListenerGotoMainClassOnStartup);
-        Configuration.autoRenameIdentifiers.removeListener(configListenerAutoRenameIdentifiers);
+        //Configuration.autoRenameIdentifiers.removeListener(configListenerAutoRenameIdentifiers);
+        Configuration.autoDeobfuscateIdentifiers.removeListener(configListenerAutoDeobfuscateIdentifiers);
         Configuration.autoOpenLoadedSWFs.removeListener(configListenerAutoOpenLoadedSWFs);
 
         Main.stopRun();

@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -179,6 +181,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * If PlaceFlagHasName, Name of character
      */
     @Conditional("placeFlagHasName")
+    @DottedIdentifier
     public String name;
 
     /**
@@ -695,7 +698,8 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         if (placeFlagHasName) {
-            ret.put("nm", "" + name);
+            ret.put("nm", "\"" + Helper.escapePCodeString(name) + "\"");
+            //ret.put("nm", DottedChain.parseNoSuffix(name).toPrintableString(new LinkedHashSet<>(), getSwf(), false));
         }
         return ret;
     }

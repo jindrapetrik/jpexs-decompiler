@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters.modes;
 
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+
 /**
  * Morph shape export mode.
  *
@@ -44,10 +46,21 @@ public enum MorphShapeExportMode {
      * BMP start and end frames - Windows Bitmap
      */
     BMP_START_END,
+    /**
+     * WEBP start and end frames
+     */
+    WEBP_START_END,
     //GIF,
     //AVI,
     /**
      * SWF - Shockwave Flash
      */
-    SWF,
+    SWF;
+    
+    public boolean available() {
+        if (this == WEBP_START_END) {
+            return ImageFormat.WEBP.available();
+        }
+        return true;
+    }
 }

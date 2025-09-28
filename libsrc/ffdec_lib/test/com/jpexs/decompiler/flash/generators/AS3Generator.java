@@ -37,10 +37,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import natorder.NaturalOrderComparator;
 
 /**
  *
@@ -50,18 +54,19 @@ import java.util.TreeMap;
  */
 public class AS3Generator {
 
+    @SuppressWarnings("unchecked")
     private static void useFile(String testClassName, String[][] swfAndIdentifierList, boolean multipleProviders) throws FileNotFoundException, IOException, InterruptedException {
         StringBuilder s = new StringBuilder();
         File f = new File(swfAndIdentifierList[0][0]);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag tag = null;
         List<ScriptPack> scriptPacks = swf.getAS3Packs();
-        Map<String, ScriptPack> sortedPacks = new TreeMap<>();
+        Map<String, ScriptPack> sortedPacks = new TreeMap<>(new NaturalOrderComparator());
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
         s.append("/*\r\n"
-                + " *  Copyright (C) 2010-2024 JPEXS, All rights reserved.\r\n"
+                + " *  Copyright (C) 2010-2025 JPEXS, All rights reserved.\r\n"
                 + " * \r\n"
                 + " * This library is free software; you can redistribute it and/or\r\n"
                 + " * modify it under the terms of the GNU Lesser General Public\r\n"
@@ -127,7 +132,7 @@ public class AS3Generator {
 
                 for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
-                        String name = t.getName(abc).getName(abc.constants, null, true, true);
+                        String name = t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
                         String identifier = swfAndIdentifierList[0][1];
@@ -159,8 +164,9 @@ public class AS3Generator {
 
                             List<MethodBody> callStack = new ArrayList<>();
                             callStack.add(b);
-                            b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>(), new ArrayList<>());
-                            b.toString(swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
+                            Set<String> usedDeobfuscations = new LinkedHashSet<>();
+                            b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>(), new ArrayList<>(), usedDeobfuscations);
+                            b.toString(usedDeobfuscations, swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             src.finishHilights();
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {

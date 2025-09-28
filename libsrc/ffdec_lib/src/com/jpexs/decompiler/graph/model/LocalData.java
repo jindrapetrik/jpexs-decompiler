@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -39,7 +40,17 @@ public class LocalData {
      * Empty local data
      */
     public static LocalData empty = new LocalData();
-
+    
+    /**
+     * Used deobfuscations
+     */
+    public Set<String> usedDeobfuscations;
+    
+    /**
+     * SWF
+     */
+    public SWF swf;
+    
     /**
      * Constant pool
      */
@@ -89,16 +100,25 @@ public class LocalData {
      * SWF version
      */
     public int swfVersion;
+
+    private LocalData() {
+    }
+    
+    
     
     /**
      * Creates a new local data
      *
      * @param constants Constant pool
+     * @param swf SWF
+     * @param usedDeobfuscations Used deobfuscations
      * @return Local data
      */
-    public static LocalData create(ConstantPool constants) {
+    public static LocalData create(ConstantPool constants, SWF swf, Set<String> usedDeobfuscations) {
         LocalData localData = new LocalData();
         localData.constants = constants;
+        localData.swf = swf;
+        localData.usedDeobfuscations = usedDeobfuscations;
         return localData;
     }
 
@@ -112,9 +132,10 @@ public class LocalData {
      * @param seenMethods Seen methods
      * @param exportMode Export mode 
      * @param swfVersion SWF version
+     * @param usedDeobfuscations Used deobfuscations
      * @return Local data
      */
-    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode, int swfVersion) {
+    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode, int swfVersion, Set<String> usedDeobfuscations) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
@@ -125,6 +146,8 @@ public class LocalData {
         localData.callStack = callStack;
         localData.exportMode = exportMode;                
         localData.swfVersion = swfVersion;
+        localData.swf = abc.getSwf();
+        localData.usedDeobfuscations = usedDeobfuscations;
         return localData;
     }
 }

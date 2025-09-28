@@ -29,9 +29,11 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -43,6 +45,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.imageio.ImageIO;
@@ -108,6 +111,11 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = ImageFormat.BMP;
                 }
+
+                if (settings.mode == ImageExportMode.WEBP) {
+                    fileFormat = ImageFormat.WEBP;
+                }
+
                 final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
 
                 final ImageFormat ffileFormat = fileFormat;
@@ -119,6 +127,16 @@ public class ImageExporter {
                         }
                     } else if (ffileFormat == ImageFormat.BMP) {
                         BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
+                    } else if (ffileFormat == ImageFormat.WEBP) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                            byte[] webPData;
+                            if (originalFormat == ImageFormat.PNG || originalFormat == ImageFormat.GIF) {
+                                webPData = WebPCodec.encodeLosslessImage(imageTag.getImageCached().getBufferedImage());
+                            } else {
+                                webPData = WebPCodec.encodeImage(imageTag.getImageCached().getBufferedImage(), 100f);
+                            }
+                            fos.write(webPData);
+                        }
                     } else {
                         ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
                     }
@@ -153,6 +171,9 @@ public class ImageExporter {
                 Set<String> classNames = imageTag.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
+                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), imageTag.getSwf(), true);
+                        }
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + "." + ImageHelper.getImageFormatString(fileFormat)));
                         File classAlphaPngFile = new File(outdir + File.separator + Helper.makeFileName(className + ".alpha.png"));
                         new RetryTask(() -> {

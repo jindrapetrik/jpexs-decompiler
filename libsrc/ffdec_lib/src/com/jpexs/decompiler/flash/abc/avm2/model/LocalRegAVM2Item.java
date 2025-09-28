@@ -91,7 +91,7 @@ public class LocalRegAVM2Item extends AVM2Item {
             return computedValue.toString(writer, localData);
         }
 
-        String localName = localRegName(localData.localRegNames, regIndex);
+        String localName = localRegName(localData.abc.getSwf(), localData.localRegNames, regIndex, localData.usedDeobfuscations);
         getSrcData().localName = localName;
         return writer.append(localName);
     }

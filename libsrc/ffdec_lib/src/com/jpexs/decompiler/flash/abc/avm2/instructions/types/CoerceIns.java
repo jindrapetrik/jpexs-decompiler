@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
+import java.util.Set;
 
 /**
  * coerce instruction - Coerce value to specified type.
@@ -84,7 +85,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), AbcIndexing.multinameToType(multinameIndex, localData.getConstants())));
+        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), AbcIndexing.multinameToType(localData.usedDeobfuscations, multinameIndex, localData.abc, localData.getConstants())));
     }
 
     @Override
@@ -98,8 +99,8 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         int multinameIndex = ins.operands[0];
-        return AbcIndexing.multinameToType(multinameIndex, constants);
+        return AbcIndexing.multinameToType(usedDeobfuscations, multinameIndex, abc, constants);
     }
 }

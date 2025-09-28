@@ -82,6 +82,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -965,11 +966,11 @@ public class ABCExplorerDialog extends AppDialog {
             }
         }
         if (found) {
-            DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+            DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc, new LinkedHashSet<>());
             if (scriptNameDc == null && scriptTraitIndex > -1) {
-                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false);
             }
-            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
             //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
             mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
         }
@@ -999,8 +1000,8 @@ public class ABCExplorerDialog extends AppDialog {
             switch (vwi.type) {
                 case SCRIPT_INFO:
                     scriptIndex = vwi.getIndex();
-                    DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+                    DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc, new LinkedHashSet<>());
+                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
                     mainPanel.gotoScriptName(abc.getSwf(), scriptName);
                     break;
                 case METHOD_BODY:
@@ -1031,11 +1032,11 @@ public class ABCExplorerDialog extends AppDialog {
                         }
                     }
                     if (scriptIndex != -1) {
-                        DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc, new LinkedHashSet<>());
                         if (scriptNameDc2 == null && scriptTraitIndex != -1) {
-                            scriptNameDc2 = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                            scriptNameDc2 = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false);
                         }
-                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(true));
+                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName2, classIndex, GraphTextWriter.TRAIT_CLASS_INITIALIZER);
                     }
                     break;
@@ -1084,12 +1085,12 @@ public class ABCExplorerDialog extends AppDialog {
                     }
 
                     if (scriptIndex != -1) {
-                        DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc, new LinkedHashSet<>());
                         if (scriptNameDc == null && scriptTraitIndex != -1) {
-                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false);
                         }
 
-                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
                     }
 
@@ -1654,9 +1655,9 @@ public class ABCExplorerDialog extends AppDialog {
                     StringBuilder miStrSb = new StringBuilder();
                     miStrSb.append("(");
                     StringBuilderTextWriter miParamStrSbW = new StringBuilderTextWriter(new CodeFormatting(), miStrSb);
-                    mi.getParamStr(miParamStrSbW, abc.constants, null, abc, new ArrayList<>());
+                    mi.getParamStr(miParamStrSbW, abc.constants, null, abc, new ArrayList<>(), new LinkedHashSet<>());
                     miStrSb.append("): ");
-                    String miReturnType = mi.getReturnTypeRaw(abc.constants, new ArrayList<>());
+                    String miReturnType = mi.getReturnTypeRaw(abc, abc.constants, new ArrayList<>());
                     miStrSb.append(miReturnType);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, mi, miStrSb.toString(), title);
                 case METHOD_BODY:
@@ -1678,7 +1679,7 @@ public class ABCExplorerDialog extends AppDialog {
                     if (ii.name_index >= abc.constants.getMultinameCount() || ii.getName(abc.constants).namespace_index >= abc.constants.getNamespaceCount()) {
                         iiName = "";
                     } else {
-                        iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
+                        iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, false).toRawString()) + "\"";
                     }
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), title);
                 case CLASS_INFO:
@@ -1694,7 +1695,7 @@ public class ABCExplorerDialog extends AppDialog {
                     ScriptInfo si = abc.script_info.get(index);
                     String siName = "";
                     try {
-                        DottedChain simplePackName = si.getSimplePackName(abc);
+                        DottedChain simplePackName = si.getSimplePackName(abc, new LinkedHashSet<>());
                         if (simplePackName != null) {
                             siName = " (\"" + Helper.escapePCodeString(simplePackName.toRawString()) + "\")";
                         }
@@ -2658,7 +2659,7 @@ public class ABCExplorerDialog extends AppDialog {
     private void cleanActionPerformed(ActionEvent e) {
         ABC abc = getSelectedAbc();
         if (abc != null) {
-            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.cleanAbc"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningAbcClean, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.cleanAbc"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningAbcClean, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
                 return;
             }
             int mainIndex = mainTabbedPane.getSelectedIndex();

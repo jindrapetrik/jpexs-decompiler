@@ -16,7 +16,6 @@
  */
 package com.jpexs.process;
 
-import com.jpexs.process.Process;
 import com.jpexs.process.win32.Win32ProcessTools;
 import com.sun.jna.Platform;
 import java.util.List;

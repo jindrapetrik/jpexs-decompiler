@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.easygui.properties.panels;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -44,6 +43,7 @@ public abstract class AbstractPropertiesPanel extends JPanel {
 
     protected String titleIdentifier;
 
+    private final Map<String, JPanel> cardHeaders = new LinkedHashMap<>();
     private final Map<String, JPanel> cardContents = new LinkedHashMap<>();
     private final Map<String, JLabel> cardPlusMinusLabels = new LinkedHashMap<>();
 
@@ -114,6 +114,7 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         //contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
         //cardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         //cardPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        cardHeaders.put(id, headerPanel);
         cardContents.put(id, contents);
         cardPlusMinusLabels.put(id, plusMinusLabel);
         
@@ -142,6 +143,15 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         } else {
             plusMinusLabel.setText("" + PLUS_CHAR);
         }
+    }
+    
+    protected void setCardVisible(String id, boolean visible) {
+        JPanel contents = cardContents.get(id);
+        if (!visible) {
+            contents.setVisible(false);
+        }
+        JPanel header = cardHeaders.get(id);
+        header.setVisible(visible);
     }
 
     protected void addToGrid(GridBagLayout layout, Container parent, Component component, int x, int y) {

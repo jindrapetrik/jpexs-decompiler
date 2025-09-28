@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.AppResources;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.event.TreeModelEvent;
@@ -51,6 +53,8 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     private boolean flat = true;
 
+    private SWF swf;
+
     public List<ScriptPack> getList() {
         return list;
     }
@@ -61,6 +65,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         root = new AS3Package(null, swf, flat, false, null, false, null);
         this.targetItem = swf;
         this.list = swf.getAS3Packs();
+        this.swf = swf;
         setFilter(null);
     }
 
@@ -156,7 +161,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         }
 
         if (flat) {
-            String fullName = packageStr.toPrintableString(true);
+            String fullName = packageStr.toPrintableString(new LinkedHashSet<>(), getSwf(), true);
             boolean defaultPackage = false;
             if (fullName.length() == 0) {
                 fullName = AppResources.translate("package.default");
@@ -171,7 +176,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         }
 
         for (int i = 0; i < packageStr.size(); i++) {
-            String pathElement = packageStr.get(i);
+            String pathElement = IdentifiersDeobfuscation.printIdentifier(getSwf(), new LinkedHashSet<>(), true, packageStr.get(i));
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
                 pkg = new AS3Package(pathElement, getOpenable(), false, false, null, scriptIndex != null, null);
@@ -284,5 +289,10 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     @Override
     public int hashCode() {
         return ClassesListTreeModel.class.hashCode() ^ targetItem.hashCode();
+    }
+
+    @Override
+    protected SWF getSwf() {
+        return swf;
     }
 }

@@ -38,6 +38,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * DefineFont3 tag - defines a font. Extends DefineFont2 functionality.
@@ -347,6 +349,13 @@ public class DefineFont3Tag extends FontTag {
             return -1;
         }
     }
+    
+    @Override
+    public synchronized void setGlyphAdvance(int glyphIndex, double advanceValue) {
+        if (fontFlagsHasLayout && glyphIndex != -1) {
+            fontAdvanceTable.set(glyphIndex, (int) Math.round(advanceValue));
+        }
+    }
 
     @Override
     public synchronized char glyphToChar(int glyphIndex) {
@@ -485,7 +494,7 @@ public class DefineFont3Tag extends FontTag {
         if (pos == -1) {
             pos = codeTable.size();
         }
-
+        
         if (!exists) {
             shiftGlyphIndices(fontID, pos, true);
             glyphShapeTable.add(pos, shp);
@@ -496,12 +505,21 @@ public class DefineFont3Tag extends FontTag {
         if (fontFlagsHasLayout) {
 
             Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
+            
+            int adv1024 = Math.round(FontHelper.getFontAdvance(advanceFont, character));                        
+            int adv = (int) getDivider() * adv1024;
+            if (adv > 0xFFFF) {
+                //Some fonts as arabic have too wide ligatures.
+                Logger.getLogger(DefineFont2Tag.class.getName()).log(Level.WARNING, "Character code {0} (glyph {1}) had advance value {2} which is larger than UI16. It was truncated to {3}.", new Object[]{(int) character, pos, adv, 65535});
+                adv = 0xFFFF;
+            }
+            
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds(1));
-                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
+                fontAdvanceTable.add(pos, adv);
             } else {
                 fontBoundsTable.set(pos, shp.getBounds(1));
-                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
+                fontAdvanceTable.set(pos, adv);
             }
 
             for (int k = 0; k < fontKerningTable.size(); k++) {
@@ -635,6 +653,15 @@ public class DefineFont3Tag extends FontTag {
         return super.getGlyphBounds(glyphIndex);
     }
 
+    @Override
+    public void updateBounds() {
+        if (fontFlagsHasLayout) {
+            for (int i = 0; i < fontBoundsTable.size(); i++) {
+                fontBoundsTable.set(i, super.getGlyphBounds(i));
+            }
+        }
+    }   
+    
     @Override
     public synchronized int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {

@@ -93,7 +93,7 @@ public class GetSlotAVM2Item extends AVM2Item {
         if (slotName == null) {
             return slotObject.toString(localData) + ".§§slot[" + slotIndex + "]";
         }
-        return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
+        return slotName.getName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
     public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) throws InterruptedException {

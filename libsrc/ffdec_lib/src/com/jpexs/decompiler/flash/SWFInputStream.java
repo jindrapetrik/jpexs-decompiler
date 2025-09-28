@@ -21,16 +21,16 @@ import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
-import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
+import com.jpexs.decompiler.flash.action.swf1.ActionGetURL;
+import com.jpexs.decompiler.flash.action.swf1.ActionGotoFrame;
+import com.jpexs.decompiler.flash.action.swf1.ActionNextFrame;
+import com.jpexs.decompiler.flash.action.swf1.ActionPlay;
+import com.jpexs.decompiler.flash.action.swf1.ActionPrevFrame;
+import com.jpexs.decompiler.flash.action.swf1.ActionStop;
+import com.jpexs.decompiler.flash.action.swf1.ActionToggleQuality;
+import com.jpexs.decompiler.flash.action.swf2.ActionStopSounds;
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
-import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionNextFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
-import com.jpexs.decompiler.flash.action.swf3.ActionPrevFrame;
 import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
-import com.jpexs.decompiler.flash.action.swf3.ActionStop;
-import com.jpexs.decompiler.flash.action.swf3.ActionStopSounds;
-import com.jpexs.decompiler.flash.action.swf3.ActionToggleQuality;
 import com.jpexs.decompiler.flash.action.swf3.ActionWaitForFrame;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
@@ -127,7 +127,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
+import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
+import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -160,8 +161,10 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextFormatTag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -172,15 +175,18 @@ import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FontRefTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.FreeAllTag;
 import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.PathsArePostScriptTag;
+import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -190,6 +196,7 @@ import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SerialNumberTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -274,6 +281,10 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.flash.types.text.format.ControlTextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.EndTextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextTextFormatRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.FakeMemoryInputStream;
@@ -922,7 +933,7 @@ public class SWFInputStream implements AutoCloseable {
             return BYTE_ARRAY_EMPTY;
         }
 
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         byte[] ret = readBytesInternalEx(count);
         endDumpLevel();
         return ret;
@@ -972,7 +983,7 @@ public class SWFInputStream implements AutoCloseable {
             throw new RuntimeException("Data not available - use constructor with data rather than inputstream");
         }
 
-        newDumpLevel(name, "bytes", specialType, specialValue);
+        newDumpLevel(name, "byte[" + count + "]", specialType, specialValue);
 
         int startPos = (int) is.getPos();
         skipBytesEx(count);
@@ -1034,7 +1045,7 @@ public class SWFInputStream implements AutoCloseable {
             return;
         }
 
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         skipBytesEx(count);
         endDumpLevel();
     }
@@ -1065,7 +1076,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return BYTE_ARRAY_EMPTY;
         }
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "byte[" + count + "]");
         byte[] ret = new byte[count];
         int i = 0;
         try {
@@ -1093,7 +1104,7 @@ public class SWFInputStream implements AutoCloseable {
             return BYTE_ARRAY_EMPTY;
         }
 
-        newDumpLevel(name, "bytesZlib");
+        newDumpLevel(name, "byteZlib[" + count + "]");
         byte[] data = readBytesInternalEx(count);
         endDumpLevel();
         return uncompressByteArray(data);
@@ -1177,7 +1188,7 @@ public class SWFInputStream implements AutoCloseable {
         if (nBits == 0) {
             return 0;
         }
-        newDumpLevel(name, "UB");
+        newDumpLevel(name, "UB" + (nBits > 1 ? "[" + nBits + "]" : ""));
         long ret = readUBInternal(nBits);
         endDumpLevel(ret);
         return ret;
@@ -1224,7 +1235,7 @@ public class SWFInputStream implements AutoCloseable {
         if (nBits == 0) {
             return 0;
         }
-        newDumpLevel(name, "SB");
+        newDumpLevel(name, "SB" + (nBits > 1 ? "[" + nBits + "]" : ""));
         long ret = readSBInternal(nBits);
         endDumpLevel(ret);
         return ret;
@@ -1632,7 +1643,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 37:
                     ret = new DefineEditTextTag(sis, data);
                     break;
-                //case 38: DefineMouseTarget
+                case 38: // or DefineMouseTarget
+                    ret = new DefineVideoTag(sis, data);
+                    break;
                 case 39:
                     ret = new DefineSpriteTag(sis, level, data, parallel, skipUnusualTags);
                     break;
@@ -1640,9 +1653,15 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new NameCharacterTag(sis, data);
                     break;
                 case 41: //or NameObject
-                    ret = new ProductInfoTag(sis, data);
+                    if (swf == null || swf.version >= 7) {
+                        ret = new ProductInfoTag(sis, data);
+                    } else {
+                        ret = new SerialNumberTag(sis, data);
+                    }
                     break;
-                //case 42: DefineTextFormat
+                case 42:
+                    ret = new DefineTextFormatTag(sis, data);
+                    break;
                 case 43:
                     ret = new FrameLabelTag(sis, data);
                     break;
@@ -1657,10 +1676,16 @@ public class SWFInputStream implements AutoCloseable {
                 case 48:
                     ret = new DefineFont2Tag(sis, data);
                     break;
-                //case 49: GenCommand
+                case 49:
+                    ret = new GenCommandTag(sis, data);
+                    break;
                 //case 50: DefineCommandObj
-                //case 51: CharacterSet
-                //case 52: FontRef
+                case 51:
+                    ret = new CharacterSetTag(sis, data);
+                    break;
+                case 52:
+                    ret = new FontRefTag(sis, data);
+                    break;
                 //case 53: DefineFunction
                 //case 54: PlaceFunction
                 //case 55: GenTagObject
@@ -1715,7 +1740,7 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new DefineFontAlignZonesTag(sis, data);
                     break;
                 case 74:
-                    ret = new CSMTextSettingsTag(sis, data);
+                    ret = new CSMSettingsTag(sis, data);
                     break;
                 case 75:
                     ret = new DefineFont3Tag(sis, data);
@@ -1740,7 +1765,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 84:
                     ret = new DefineMorphShape2Tag(sis, data);
                     break;
-                //case 85: PlaceImagePrivate
+                case 85:
+                    ret = new PlaceImagePrivateTag(sis, data);
+                    break;
                 case 86:
                     ret = new DefineSceneAndFrameLabelDataTag(sis, data);
                     break;
@@ -1845,10 +1872,14 @@ public class SWFInputStream implements AutoCloseable {
 
         logger.log(Level.FINE, "Reading tag. ID={0}, position: {1}", new Object[]{tagID, pos});
 
-        long tagLength = (tagIDTagLength & 0x003F);
+        long tagLength = (tagIDTagLength & 0x003F);   
+        DumpInfo di = dumpInfo;
+        if (di != null) {
+            di.getChildInfos().get(0).previewValue = tagIDTagLength + " (tagID = " + tagID + ", tagLength = " + tagLength + (tagLength == 0x3f ? " => use UI32" : "") + ")";
+        }
         boolean readLong = false;
         if (tagLength == 0x3f) {
-            tagLength = readSI32("tagLength");
+            tagLength = readUI32("tagLength");
             readLong = true;
         }
         int headerLength = readLong ? 6 : 2;
@@ -1870,7 +1901,7 @@ public class SWFInputStream implements AutoCloseable {
         }
 
         if (resolve) {
-            DumpInfo di = dumpInfo;
+            di = dumpInfo;
             try {
                 ret = resolveTag(tagStub, level, parallel, skipUnusualTags, lazy, true);
             } catch (Exception ex) {
@@ -1928,7 +1959,7 @@ public class SWFInputStream implements AutoCloseable {
         try {
             actionCode = readUI8("actionCode");
             if (actionCode == 0) {
-                return new ActionEnd(getCharset());
+                return new ActionEnd();
             }
             if (actionCode == -1) {
                 return null;
@@ -1980,7 +2011,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x0D:
                     return new ActionDivide();
                 case 0x0E:
-                    return new ActionEquals(getCharset());
+                    return new ActionEquals();
                 case 0x0F:
                     return new ActionLess();
                 case 0x10:
@@ -2115,11 +2146,11 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x50:
                     return new ActionIncrement();
                 case 0x4C:
-                    return new ActionPushDuplicate(getCharset());
+                    return new ActionPushDuplicate();
                 case 0x3E:
                     return new ActionReturn();
                 case 0x4D:
-                    return new ActionStackSwap(getCharset());
+                    return new ActionStackSwap();
                 case 0x87:
                     return new ActionStoreRegister(actionLength, this);
                 // SWF6 Actions
@@ -3793,6 +3824,108 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Reads one TextFormatRecord value from the stream
+     * @param name Name
+     * @return TextFormatRecord value
+     * @throws IOException On I/O error
+     */
+    public TextFormatRecord readTextFormatRecord(String name) throws IOException {
+        newDumpLevel(name, "TextFormatRecord");
+        int controlFlag = (int) readUB(1, "controlFlag");
+        
+        if (controlFlag == 0) {
+            int length = (int) readUB(7, "length");        
+            if (length > 0) {
+                TextTextFormatRecord textRecord = new TextTextFormatRecord();            
+                byte[] bytes = readBytes(length * 2, "text");
+                byte[] halfBytes = new byte[length];
+                for (int i = 0; i < halfBytes.length; i++) {
+                    halfBytes[i] = bytes[i * 2];
+                }
+                textRecord.text = new String(halfBytes, swf.getCharset());
+                DumpInfo di = dumpInfo;
+                if (di != null) {
+                    di.name = "TextTextFormatRecord";
+                }
+                endDumpLevel();
+                return textRecord;
+            }        
+        
+            DumpInfo di = dumpInfo;
+            if (di != null) {
+                di.name = "EndTextFormatRecord";
+            }
+            endDumpLevel();
+            return new EndTextFormatRecord();
+        }
+        int controlType = (int) readUB(7, "controlType"); 
+        
+        ControlTextFormatRecord controlRecord = new ControlTextFormatRecord();
+        controlRecord.type = controlType;
+        switch (controlType) {
+            case ControlTextFormatRecord.TYPE_STYLE:
+                controlRecord.style = readUI8("style");
+                break;
+            case ControlTextFormatRecord.TYPE_FONT_ID:
+                controlRecord.fontId = readUI16("fontId");
+                break;
+            case ControlTextFormatRecord.TYPE_FONT_HEIGHT:
+                controlRecord.fontHeight = readUI16("fontHeight");
+                break;
+            case ControlTextFormatRecord.TYPE_COLOR:
+                controlRecord.color = readRGBA("color");
+                break;
+            case ControlTextFormatRecord.TYPE_SCRIPT:
+                controlRecord.script = readUI8("script");
+                break;
+            case ControlTextFormatRecord.TYPE_KERNING:
+                controlRecord.kerning = readSI16("kerning");
+                break;
+            case ControlTextFormatRecord.TYPE_ALIGN:
+                controlRecord.align = readUI8("align");
+                break;
+            case ControlTextFormatRecord.TYPE_INDENT:
+                controlRecord.indent = readSI16("indent");
+                break;
+            case ControlTextFormatRecord.TYPE_LEFT_MARGIN:
+                controlRecord.leftMargin = readSI16("leftMargin");
+                break;
+            case ControlTextFormatRecord.TYPE_RIGHT_MARGIN:
+                controlRecord.rightMargin = readSI16("rightMargin");
+                break;
+            case ControlTextFormatRecord.TYPE_LINE_SPACE:
+                controlRecord.lineSpace = readSI16("lineSpace");
+                break;
+        }
+        DumpInfo di = dumpInfo;
+        if (di != null) {
+            di.name = "ControlTextFormatRecord";
+        }
+        endDumpLevel();
+        return controlRecord;                        
+    }
+    
+    /**
+     * Reads List of TextFormatRecord values from the stream
+     * @param name Name
+     * @return List of TextFormatRecord values
+     * @throws IOException On I/O error
+     */
+    public List<TextFormatRecord> readTextFormatRecords(String name) throws IOException {
+        newDumpLevel(name, "TextFormatRecords");
+        List<TextFormatRecord> records = new ArrayList<>();
+        while (true) {
+            TextFormatRecord record = readTextFormatRecord("record");
+            if (record instanceof EndTextFormatRecord) {
+                break;
+            }
+            records.add(record);
+        }             
+        endDumpLevel();
+        return records;
+    }
+    
     /**
      * Gets number of available bytes in the stream.
      *

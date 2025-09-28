@@ -29,7 +29,7 @@ public abstract class ParseException extends Exception {
     public long line;
     
     /**
-     * Position in the code where the exception occured. -1 where unknown
+     * Position in the code where the exception occurred. -1 where unknown
      */
     public long position = -1;
 

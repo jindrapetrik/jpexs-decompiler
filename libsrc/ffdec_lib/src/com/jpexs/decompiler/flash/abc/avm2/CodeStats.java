@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -84,7 +85,7 @@ public class CodeStats {
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
-            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(new ArrayList<>(), null, abc, null, fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, -1))).newLine();
+            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(new ArrayList<>(), null, abc, null, fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, -1, new LinkedHashSet<>()))).newLine();
             i++;
         }
         return writer;

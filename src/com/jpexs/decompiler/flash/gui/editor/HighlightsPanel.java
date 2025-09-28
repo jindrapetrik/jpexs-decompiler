@@ -134,8 +134,8 @@ public class HighlightsPanel extends JPanel {
                                     setToolTipText(AppStrings.translate("highlighter.error").replace("%error%", errors.get(highlight.getStartOffset())));
                                     return;
                                 }
-                                if (line != currentLine && painter instanceof OccurencesMarker) {
-                                    setToolTipText(AppStrings.translate("highlighter.occurences"));
+                                if (line != currentLine && painter instanceof OccurrencesMarker) {
+                                    setToolTipText(AppStrings.translate("highlighter.occurrences"));
                                     return;
                                 }
 
@@ -179,6 +179,9 @@ public class HighlightsPanel extends JPanel {
         int currentLine = editorPane.getLine();
 
         for (Highlighter.Highlight highlight : highlights) {
+            if (highlight == null) {
+                continue;
+            }
             Highlighter.HighlightPainter painter = highlight.getPainter();
             if ((painter instanceof UnderlinePainter) && ((UnderlinePainter) painter).getColor() == null) {
                 continue;

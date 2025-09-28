@@ -50,7 +50,7 @@ public class FindDefAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append(propertyName.getNamespace(localData.constantsAvm2).getName(localData.constantsAvm2).toPrintableString(true)); //assume not null name
+        return writer.append(propertyName.getNamespace(localData.constantsAvm2).getName(localData.constantsAvm2).toPrintableString(localData.usedDeobfuscations, localData.swf, true)); //assume not null name
     }
 
     @Override

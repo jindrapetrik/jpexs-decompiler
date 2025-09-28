@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.usages.Usage;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 /**
@@ -74,9 +75,10 @@ public abstract class MultinameUsage implements Usage {
     /**
      * Checks if this multiname name is the same as other multiname name.
      * @param other Other multiname usage
+     * @param includePublic Include public namespaces?
      * @return True if names are the same
      */
-    protected boolean sameMultinameName(MultinameUsage other) {
+    protected boolean sameMultinameName(MultinameUsage other, boolean includePublic) {
         Multiname thisM = abc.constants.getMultiname(multinameIndex);
         Multiname otherM = other.abc.constants.getMultiname(other.multinameIndex);
         if (thisM == null && otherM == null) {
@@ -86,8 +88,8 @@ public abstract class MultinameUsage implements Usage {
             return false;
         }
         if ((thisM.kind == Multiname.QNAME || thisM.kind == Multiname.QNAMEA) && otherM.kind == thisM.kind) {
-            String thisName = thisM.getName(abc.constants, new ArrayList<>(), true, true);
-            String otherName = otherM.getName(other.abc.constants, new ArrayList<>(), true, true);
+            String thisName = thisM.getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, true);
+            String otherName = otherM.getName(new LinkedHashSet<>(), other.abc, other.abc.constants, new ArrayList<>(), true, true);
             Namespace thisNs = thisM.getNamespace(abc.constants);
             Namespace otherNs = otherM.getNamespace(other.abc.constants);
             if (!Objects.equals(thisName, otherName)) {
@@ -105,8 +107,8 @@ public abstract class MultinameUsage implements Usage {
             }
 
             //public or package internal are colliding when have same package ns
-            if ((thisNs.kind == Namespace.KIND_PACKAGE || thisNs.kind == Namespace.KIND_PACKAGE_INTERNAL)
-                    && (otherNs.kind == Namespace.KIND_PACKAGE || otherNs.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+            if (includePublic && ((thisNs.kind == Namespace.KIND_PACKAGE || thisNs.kind == Namespace.KIND_PACKAGE_INTERNAL)
+                    && (otherNs.kind == Namespace.KIND_PACKAGE || otherNs.kind == Namespace.KIND_PACKAGE_INTERNAL))) {
                 return Objects.equals(thisNs.getName(abc.constants), otherNs.getName(other.abc.constants));
             }
 

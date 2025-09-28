@@ -17,21 +17,32 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptLexer;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ParsedSymbol;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType;
+import com.jpexs.decompiler.flash.asdoc.ActionScriptDocParser;
+import com.jpexs.decompiler.flash.asdoc.AsDocComment;
+import com.jpexs.decompiler.flash.asdoc.AsDocTag;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.model.DocCommentItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
+import natorder.NaturalOrderComparator;
 
 /**
  * Identifiers deobfuscation.
@@ -39,6 +50,24 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public class IdentifiersDeobfuscation {
+
+    /**
+     * Prefix to be put instead of obfuscated name. It will by suffixed with a
+     * number.
+     */
+    public static final String SAFE_STRING_PREFIX = "_SafeStr_";
+    
+    /**
+     * Safe prefix for packages
+     */
+    public static final String SAFE_PACKAGE_PREFIX = "_SafePkg_";
+    
+    /**
+     * Safe prefix for classes
+     */
+    public static final String SAFE_CLASS_PREFIX = "_SafeCls_";
+    
+    
 
     /**
      * Random number generator.
@@ -424,6 +453,13 @@ public class IdentifiersDeobfuscation {
         if (isReservedWord(s, as3)) {
             return false;
         }
+        
+        if (Configuration.autoDeobfuscateIdentifiers.get()
+                && (s.contains(SAFE_STRING_PREFIX)
+                    || s.contains(SAFE_PACKAGE_PREFIX)
+                    || s.contains(SAFE_CLASS_PREFIX))) {
+            return false;
+        }
 
         // simple fast test
         if (VALID_NAME_PATTERN_DOT.matcher(s).matches()) {
@@ -445,6 +481,14 @@ public class IdentifiersDeobfuscation {
      * @return True if string is valid name
      */
     public static boolean isValidName(boolean as3, String s, String... exceptions) {
+        
+        if (Configuration.autoDeobfuscateIdentifiers.get() 
+                && (s.startsWith(SAFE_STRING_PREFIX)
+                    || s.startsWith(SAFE_PACKAGE_PREFIX)
+                    || s.startsWith(SAFE_CLASS_PREFIX))) {
+            return false;
+        }
+        
         for (String e : exceptions) {
             if (e.equals(s)) {
                 return true;
@@ -526,11 +570,27 @@ public class IdentifiersDeobfuscation {
     /**
      * Appends obfuscated identifier.
      *
+     * @param swf SWF
+     * @param used Used deobfuscations
      * @param s String
      * @param writer Writer
      * @return Writer
      */
-    public static GraphTextWriter appendObfuscatedIdentifier(String s, GraphTextWriter writer) {
+    public static GraphTextWriter appendObfuscatedIdentifier(SWF swf, Set<String> used, String s, GraphTextWriter writer) {
+        Map<String, String> map = new LinkedHashMap<>();
+        if (Configuration.autoDeobfuscateIdentifiers.get() && swf != null) {
+            map = swf.getObfuscatedIdentifiersMap();
+            used.add(s);
+            if (map.containsKey(s)) {
+                writer.append(map.get(s));
+            } else {
+                String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();
+                map.put(s, ret);
+                writer.append(ret);
+            }
+            return writer;
+        }
+
         writer.append("\u00A7");
         escapeOIdentifier(s, writer);
         return writer.append("\u00A7");
@@ -539,15 +599,54 @@ public class IdentifiersDeobfuscation {
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax.
      *
+     * @param swf SWF
+     * @param used Set of used obfuscated identifiers in this script - the
+     * method will add to it
      * @param as3 Is ActionScript3
      * @param s Identifier
      * @param validExceptions Exceptions which are valid (e.g. some reserved
      * words)
      * @return Printable identifier
      */
-    public static String printIdentifier(boolean as3, String s, String... validExceptions) {
+    public static String printIdentifier(SWF swf, Set<String> used, boolean as3, String s, String... validExceptions) {
         if (s == null || s.isEmpty()) {
             return "";
+        }
+
+        Map<String, String> map = new LinkedHashMap<>();
+        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+
+            if (swf != null) {
+                map = swf.getObfuscatedIdentifiersMap();
+            }
+
+            if (map.containsKey(s)) {
+                used.add(s);
+                return map.get(s);
+            }
+            
+            if (s.startsWith(SAFE_STRING_PREFIX)
+                    || s.startsWith(SAFE_PACKAGE_PREFIX)
+                    || s.startsWith(SAFE_CLASS_PREFIX)) {
+                String foundKey = null;
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (entry.getValue().equals(s)) {
+                        foundKey = entry.getKey();
+                        break;
+                    }
+                }
+                if (foundKey == null) {
+                    map.put(s, s);
+                    return s;
+                } else {
+                    if (foundKey.equals(s)) {
+                        return s;
+                    }
+                    map.put(foundKey, SAFE_STRING_PREFIX + map.size());                    
+                    map.put(s, s);
+                    return s;
+                }
+            }
         }
 
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
@@ -569,6 +668,13 @@ public class IdentifiersDeobfuscation {
         if (isValidName(as3, s)) {
             nameCache.put(s, s);
             return s;
+        }
+
+        if (Configuration.autoDeobfuscateIdentifiers.get()) {
+            String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();            
+            map.put(s, ret);
+            used.add(s);
+            return ret;
         }
 
         String ret = "\u00A7" + escapeOIdentifier(s) + "\u00A7";
@@ -669,10 +775,136 @@ public class IdentifiersDeobfuscation {
     }
 
     /**
+     * Unescapes deobfuscated identifier
+     *
+     * @param swf SWF
+     * @param s String
+     * @return Unescaped string
+     */
+    public static String unescapeOIdentifier(SWF swf, String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+
+        Map<String, String> map = swf.getObfuscatedIdentifiersMap();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (s.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        if (s.length() < 2) {
+            return s;
+        }
+        if (!(s.startsWith("\u00A7") && s.endsWith("\u00A7"))) {
+            return s;
+        }
+        for (int i = 1; i < s.length() - 1; i++) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                if (i + 1 < s.length() - 1) {
+                    i++;
+                    c = s.charAt(i);
+                    if (c == 'n') {
+                        ret.append("\n");
+                    } else if (c == 'r') {
+                        ret.append("\r");
+                    } else if (c == 't') {
+                        ret.append("\t");
+                    } else if (c == 'b') {
+                        ret.append("\b");
+                    } else if (c == 'f') {
+                        ret.append("\f");
+                    } else if (c == '\\') {
+                        ret.append("\\");
+                    } else if (c == '\u00A7') {
+                        ret.append("\u00A7");
+                    } else if (c == 'x' && i + 2 < s.length() - 1) {
+                        ret.append((char) Integer.parseInt(s.substring(i + 1, i + 3), 16));
+                        i += 2;
+                    } else if (c == '{') {
+                        int endPos = s.indexOf("}", i);
+                        if (endPos != -1) {
+                            int numRepeat = Integer.parseInt(s.substring(i + 1, endPos));
+                            i = endPos + 1;
+                            c = s.charAt(i);
+                            for (int j = 0; j < numRepeat; j++) {
+                                ret.append(c);
+                            }
+                        }
+                    }
+                }
+            } else {
+                ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
+
+    /**
      * Clears cache.
      */
     public static void clearCache() {
         as2NameCache.clear();
         as3NameCache.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static GraphTextWriter writeCurrentScriptReplacements(GraphTextWriter writer, Set<String> usedDeobfuscations, SWF swf) {
+        if (usedDeobfuscations.isEmpty()) {
+            return writer;
+        }
+        if (!Configuration.autoDeobfuscateIdentifiers.get()) {
+            return writer;
+        }
+        
+        writer.newLine();
+        List<String> commentLines = new ArrayList<>();
+        Map<String, String> fullMap = swf.getObfuscatedIdentifiersMap();
+        for (String obfuscated : usedDeobfuscations) {
+            String deobfuscated = fullMap.get(obfuscated);
+            if (obfuscated.equals(deobfuscated)) {
+                continue;
+            }
+            commentLines.add("@identifier " + deobfuscated + " = \"" + Helper.escapePCodeString(obfuscated) + "\"");                
+        }
+        if (commentLines.isEmpty()) {
+            return writer;
+        }
+        commentLines.sort(new NaturalOrderComparator());
+        commentLines.add(0, AppResources.translate("decompilationWarning.obfuscatedIdentifiers"));
+        commentLines.add(1, AppResources.translate("decompilationWarning.replacementsFollow"));
+        String[] commentLinesArr = commentLines.toArray(new String[commentLines.size()]);
+        new DocCommentItem(commentLinesArr).appendTo(writer, LocalData.empty);
+        
+        return writer;
+    }
+
+    public static Map<String, String> getReplacementsFromDoc(String s) throws Exception {
+        ActionScriptDocParser docParser = new ActionScriptDocParser();
+        List<AsDocComment> comments = docParser.parse(s);
+        Map<String, String> replacements = new LinkedHashMap<>();
+        for (AsDocComment comment : comments) {
+            for (AsDocTag tag : comment.tags) {
+                if ("identifier".equals(tag.tagName)) {
+                    String tagText = tag.tagText;
+                    if (tagText != null && !tagText.isEmpty()) {
+                        ActionScriptLexer lexer = new ActionScriptLexer(tagText);
+                        ParsedSymbol symb = lexer.yylex();
+                        if (symb.type != SymbolType.IDENTIFIER) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. Identifier expected.");
+                        }
+                        ParsedSymbol symb2 = lexer.yylex();
+                        if (symb2.type != SymbolType.ASSIGN) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. Assign expected.");
+                        }
+                        ParsedSymbol symb3 = lexer.yylex();
+                        if (symb3.type != SymbolType.STRING) {
+                            throw new Exception("Invalid @identifier AsDoc tag value. String expected.");
+                        }
+                        replacements.put(symb.value.toString(), symb3.value.toString());
+                    }
+                }
+            }
+        }
+        return replacements;
     }
 }

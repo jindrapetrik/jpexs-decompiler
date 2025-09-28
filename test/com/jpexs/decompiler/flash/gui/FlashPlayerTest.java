@@ -87,6 +87,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import static org.testng.Assert.assertEquals;
@@ -546,9 +547,9 @@ public class FlashPlayerTest {
                     newActions.add(new ActionPush(p1o, Utf8Helper.charsetName));
 
                     newActions.add(opAction);
-                    newActions.add(new ActionPushDuplicate(Utf8Helper.charsetName));
+                    newActions.add(new ActionPushDuplicate());
                     newActions.add(new ActionTypeOf());
-                    newActions.add(new ActionStackSwap(Utf8Helper.charsetName));
+                    newActions.add(new ActionStackSwap());
                     newActions.add(new ActionStringAdd());
 
                     AS2ExecuteTask task = new AS2ExecuteTask();
@@ -559,7 +560,7 @@ public class FlashPlayerTest {
                     task.actions = newActions;
 
                     List<GraphTargetItem> output = new ArrayList<>();
-                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>());
+                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>(), new LinkedHashSet<>());
                     TranslateStack stack = new TranslateStack("");
                     for (Action a : newActions) {
                         a.translate(localData, stack, output, 0, "");
@@ -739,7 +740,7 @@ public class FlashPlayerTest {
             case 9:
                 return new ActionDivide();
             case 10:
-                return new ActionEquals(Utf8Helper.charsetName);
+                return new ActionEquals();
             case 11:
                 return new ActionEquals2();
             case 12:

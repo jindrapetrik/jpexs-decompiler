@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -625,7 +626,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 if (ci == null) {
                     ntype = new TypeItem("Object");
                 } else {
-                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants, true));
+                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(new LinkedHashSet<>(), ci.abc, ci.abc.constants, true));
                 }
             }
 
@@ -650,7 +651,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
 
         if (mustBeType) {
-            throw new CompilationException(name.toPrintableString(true) + " is not an existing type", line);
+            throw new CompilationException(name.toPrintableString(new LinkedHashSet<>(), abcIndex.getSelectedAbc().getSwf(), true) + " is not an existing type", line);
         }
         resolved = null;
         GraphTargetItem ret = null;

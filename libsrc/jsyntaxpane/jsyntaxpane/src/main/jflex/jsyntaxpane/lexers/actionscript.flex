@@ -64,9 +64,13 @@ import java.util.List;
             this.offset = ofst;
             prevToken = null;
             Token t = yylex();
-            prevToken = t;
+            if (t != null && t.type != TokenType.COMMENT) {
+                prevToken = t;            
+            }
             for (; t != null; t = yylex()) {
-                prevToken = t;
+                if (t.type != TokenType.COMMENT) {            
+                    prevToken = t;
+                }
                 tokens.add(t);
             }
         } catch (IOException ex) {
@@ -133,7 +137,7 @@ NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
-%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
+%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, ADOC, ADOC_TAG
 
 %%
 
@@ -187,9 +191,21 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "typeof"                       |
   "void"                         { return token(TokenType.KEYWORD); }
 
+  // AsDoc comments need a state so that we can highlight the @ controls
+  "/**"                          {  
+                                    yybegin(ADOC); 
+                                    tokenStart = yychar; 
+                                    tokenLength = 3; 
+                                 }
+
+  /* comments */
+  {Comment}                      { return token(TokenType.COMMENT); }
+
 
   {RegExp}                       { 
-                                    if (prevToken == null || (prevToken.type == TokenType.OPERATOR && prevToken.pairValue >= 0)) {
+                                    if (prevToken == null 
+                                        || (prevToken.type == TokenType.OPERATOR && prevToken.pairValue >= 0)                                        
+                                        ) {
                                         return token(TokenType.REGEX);
                                     } else {    
                                         int ch = yychar;
@@ -201,7 +217,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   /* operators */
 
-  "("                            { return  token(TokenType.OPERATOR,  PAREN); }
+  "("                            { return token(TokenType.OPERATOR,  PAREN); }
   ")"                            { return token(TokenType.OPERATOR, -PAREN); }
   "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
@@ -286,9 +302,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   // JavaDoc comments need a state so that we can highlight the @ controls
 
-  /* comments */
-  {Comment}                      { return token(TokenType.COMMENT); }
-
+  
   /* whitespace */
   {WhiteSpace}                   { }  
   /* identifiers */
@@ -349,6 +363,44 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   \\.                            { tokenLength += 2; }
   {LineTerminator}               { yybegin(YYINITIAL);  }
+}
+
+<ADOC> {
+  "*/"                           { 
+                                     yybegin(YYINITIAL); 
+                                     return token(TokenType.COMMENT, tokenStart, tokenLength + 2);
+                                 }
+
+  "@"                            {   
+                                     yybegin(ADOC_TAG); 
+                                     int start = tokenStart;
+                                     tokenStart = yychar;
+                                     int len = tokenLength;
+                                     tokenLength = 1;
+                                     return token(TokenType.COMMENT, start, len);
+                                 }
+
+  .|\n                           { tokenLength ++; }
+
+}
+
+<ADOC_TAG> {
+  ([:letter:])+             { tokenLength += yylength(); }
+
+  "*/"                           { 
+                                     yybegin(YYINITIAL); 
+                                     return token(TokenType.COMMENT, tokenStart, tokenLength + 2);
+                                 }
+
+  .|\n                           {   
+                                     yybegin(ADOC); 
+                                     // length also includes the trailing quote
+                                     int start = tokenStart;
+                                     tokenStart = yychar;
+                                     int len = tokenLength;
+                                     tokenLength = 1;
+                                     return token(TokenType.COMMENT2, start, len);
+                                 }
 }
 
 /* error fallback */

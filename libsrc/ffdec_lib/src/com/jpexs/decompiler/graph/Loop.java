@@ -87,6 +87,11 @@ public class Loop implements Serializable {
      * Break candidates are locked
      */
     public int breakCandidatesLocked = 0;
+    
+    /**
+     * Stop parts before entering the loop
+     */
+    public List<GraphPart> stopParts = new ArrayList<>();
 
     /**
      * Constructs a loop

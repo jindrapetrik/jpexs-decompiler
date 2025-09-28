@@ -47,7 +47,7 @@ public class ExceptionAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append(exception.getVarName(localData.constantsAvm2, localData.fullyQualifiedNames));
+        return writer.append(exception.getVarName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames));
     }
 
     @Override

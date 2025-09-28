@@ -75,7 +75,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
+                Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -126,7 +126,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             writer.finishHilights();
             String actualResult = writer.toString();
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
@@ -173,6 +173,52 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "trace(\"Hello\");\n"
                 + "}\n"
                 + "}");
+    }
+
+    @Test
+    public void testJumpAfterFunctionFix() {
+        String res = decompilePcode("ConstantPool \"F\", \"A\", \"f\", \"B\", \"C\"\n"
+                + "DefineFunction \"f\", 0 {\n"
+                + "Push \"F\"\n"
+                + "Trace\n"
+                + "Push 1, 1\n"
+                + "Equals2\n"
+                + "If loc005b\n"
+                + "Push \"G\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "Push \"A\"\n"
+                + "Trace\n"
+                + "Push 0\n"
+                + "Push \"f\"\n"
+                + "CallFunction\n"
+                + "Pop\n"
+                + "Push \"B\"\n"
+                + "Trace\n"
+                + "Push 1\n"
+                + "loc005b:Push 2\n"
+                + "Equals2\n"
+                + "If loc006e\n"
+                + "Push \"C\"\n"
+                + "Trace\n"
+                + "loc006e:Stop");
+        res = cleanPCode(res);
+        assertEquals(res, "function f()\n"
+                + "{\n"
+                + "trace(\"F\");\n"
+                + "if(1 != 1)\n"
+                + "{\n"
+                + "trace(\"G\");\n"
+                + "}\n"
+                + "}\n"
+                + "trace(\"A\");\n"
+                + "f();\n"
+                + "trace(\"B\");\n"
+                + "if(1 != 2)\n"
+                + "{\n"
+                + "trace(\"C\");\n"
+                + "}\n"
+                + "stop();");
     }
 
     @Test
@@ -331,5 +377,199 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "_loc1_[_loc0_] = _loc2_[_loc0_];\n"
                 + "}\n"
                 + "trace(\"after\");");
+    }
+
+    @Test
+    public void testStopPartEndFunction() {
+        String res = decompilePcode("DefineFunction \"test\", 1, \"param1\"  {\n"
+                + "Push \"param1\"\n"
+                + "GetVariable\n"
+                + "StoreRegister 1\n"
+                + "Pop\n"
+                + "Push \"Start\"\n"
+                + "Trace\n"
+                + "Push register1, 1\n"
+                + "Equals\n"
+                + "Not\n"
+                + "If loc007a\n"
+                + "Push register1, 2\n"
+                + "Equals\n"
+                + "Not\n"
+                + "If loc0075\n"
+                + "Push register1, 3\n"
+                + "Equals\n"
+                + "Not\n"
+                + "If loc006e\n"
+                + "Push \"C\"\n"
+                + "Trace\n"
+                + "Jump loc00a5\n"
+                + "loc006e:Push \"B\"\n"
+                + "Trace\n"
+                + "loc0075:Jump loc0081\n"
+                + "loc007a:Push \"E\"\n"
+                + "Trace\n"
+                + "loc0081:Push register1, 4\n"
+                + "Equals\n"
+                + "Not\n"
+                + "If loc009e\n"
+                + "Push \"A\"\n"
+                + "Trace\n"
+                + "Jump loc00a5\n"
+                + "loc009e:Push \"D\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "loc00a5:Push \"end\"\n"
+                + "Trace\n");
+        res = cleanPCode(res);
+        assertEquals(res, "function test(param1)\n"
+                + "{\n"
+                + "var _loc1_ = param1;\n"
+                + "trace(\"Start\");\n"
+                + "if(_loc1_ == 1)\n"
+                + "{\n"
+                + "if(_loc1_ == 2)\n"
+                + "{\n"
+                + "if(_loc1_ == 3)\n"
+                + "{\n"
+                + "trace(\"C\");\n"
+                + "return;\n"
+                + "}\n"
+                + "trace(\"B\");\n"
+                + "}\n"
+                + "}\n"
+                + "else\n"
+                + "{\n"
+                + "trace(\"E\");\n"
+                + "}\n"
+                + "if(_loc1_ == 4)\n"
+                + "{\n"
+                + "trace(\"A\");\n"
+                + "}\n"
+                + "else\n"
+                + "{\n"
+                + "trace(\"D\");\n"
+                + "}\n"
+                + "}\n"
+                + "trace(\"end\");");
+    }
+
+    @Test
+    public void testReturnAsJumpAfterFunction() {
+        String res = decompilePcode("DefineFunction \"test\", 0 {\n"
+                + "Push register1\n"
+                + "Push \"A\"\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc002d\n"
+                + "Push \"in A\"\n"
+                + "Trace\n"
+                + "Jump loc0053\n"
+                + "loc002d:Push register1\n"
+                + "Push \"B\"\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc004e\n"
+                + "Push \"in B\"\n"
+                + "Trace\n"
+                + "Jump loc0053\n"
+                + "loc004e:Jump loc005f\n"
+                + "loc0053:Jump loc0058\n"
+                + "loc0058:Push \"C\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "loc005f:\n");
+        res = cleanPCode(res);
+        assertEquals(res, "function test()\n"
+                + "{\n"
+                + "if(_loc1_ == \"A\")\n"
+                + "{\n"
+                + "trace(\"in A\");\n"
+                + "}\n"
+                + "else if(_loc1_ == \"B\")\n"
+                + "{\n"
+                + "trace(\"in B\");\n"
+                + "}\n"
+                + "else\n"
+                + "{\n"
+                + "return;\n"
+                + "}\n"
+                + "trace(\"C\");\n"
+                + "}");
+    }
+
+    @Test
+    public void testBreakReturnAsJumpAfterFunction2() {
+        String res = decompilePcode("ConstantPool \"a\", \"v\", \"b\", \"ret\"\n"
+                + "DefineFunction \"f\", 0 {\n"
+                + "Push \"a\"\n"
+                + "Push 3\n"
+                + "Push 2\n"
+                + "Push 1\n"
+                + "Push 3\n"
+                + "InitArray\n"
+                + "DefineLocal\n"
+                + "Push \"a\"\n"
+                + "GetVariable\n"
+                + "Enumerate2\n"
+                + "loc0046:StoreRegister 0\n"
+                + "Push null\n"
+                + "Equals2\n"
+                + "If loc00cb\n"
+                + "Push \"v\"\n"
+                + "Push register0\n"
+                + "SetVariable\n"
+                + "Push \"v\"\n"
+                + "GetVariable\n"
+                + "Trace\n"
+                + "Push \"b\"\n"
+                + "Push 0\n"
+                + "DefineLocal\n"
+                + "loc0074:Push \"b\"\n"
+                + "GetVariable\n"
+                + "Push 10\n"
+                + "Less2\n"
+                + "Not\n"
+                + "If loc00c6\n"
+                + "Push \"b\"\n"
+                + "GetVariable\n"
+                + "Push 4\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc00b4\n"
+                + "Push \"ret\"\n"
+                + "Trace\n"
+                + "loc00a4:Push null\n"
+                + "Equals2\n"
+                + "Not\n"
+                + "If loc00a4\n"
+                + "Jump loc00cb\n"
+                + "loc00b4:Push \"b\"\n"
+                + "Push \"b\"\n"
+                + "GetVariable\n"
+                + "Increment\n"
+                + "SetVariable\n"
+                + "Jump loc0074\n"
+                + "loc00c6:Jump loc0046\n"
+                + "}\n"
+                + "loc00cb:");
+        res = cleanPCode(res);
+        assertEquals(res, "function f()\n"
+                + "{\n"
+                + "var a = [1,2,3];\n"
+                + "for(v in a)\n"
+                + "{\n"
+                + "trace(v);\n"
+                + "var b = 0;\n"
+                + "while(b < 10)\n"
+                + "{\n"
+                + "if(b == 4)\n"
+                + "{\n"
+                + "trace(\"ret\");\n"
+                + "return;\n" //critical - no level2 break, but return
+                + "}\n"
+                + "b++;\n"
+                + "}\n"
+                + "}\n"
+                + "}");
     }
 }

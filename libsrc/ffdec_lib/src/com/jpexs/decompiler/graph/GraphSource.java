@@ -33,6 +33,11 @@ import java.util.Set;
 public abstract class GraphSource implements Serializable {
 
     /**
+     * Start IP
+     */
+    protected int startIp = 0;
+    
+    /**
      * Gets the size of the graph source
      *
      * @return The size of the graph source
@@ -57,6 +62,7 @@ public abstract class GraphSource implements Serializable {
     /**
      * Translates the part of the graph source
      *
+     * @param output Output
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -65,11 +71,10 @@ public abstract class GraphSource implements Serializable {
      * @param end End position
      * @param staticOperation Unused
      * @param path Path
-     * @return List of graph target items
      * @throws InterruptedException On interrupt
      * @throws GraphPartChangeException On graph part change
      */
-    public abstract List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
+    public abstract void translatePart(List<GraphTargetItem> output, Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
 
     /**
      * Gets the important addresses
@@ -84,7 +89,7 @@ public abstract class GraphSource implements Serializable {
      * @param pos Position of the instruction
      * @return Instruction as string
      */
-    public abstract String insToString(int pos);
+    public abstract String insToString(int pos);        
 
     /**
      * Visits the code
@@ -162,7 +167,7 @@ public abstract class GraphSource implements Serializable {
         for (int i = 0; i < siz; i++) {
             refs.put(i, new ArrayList<>());
         }
-        visitCode(0, 0, refs, -1);
+        visitCode(startIp, 0, refs, -1);
         int pos = 0;
         for (int e : alternateEntries) {
             pos++;

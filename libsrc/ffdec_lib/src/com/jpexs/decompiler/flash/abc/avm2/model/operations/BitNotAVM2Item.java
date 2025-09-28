@@ -79,6 +79,6 @@ public class BitNotAVM2Item extends UnaryOpItem {
                 return;
             }
         }
-        operand.toString(writer, localData, "");
+        operand.toString(writer, localData, "", false);
     }
 }

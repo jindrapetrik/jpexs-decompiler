@@ -73,7 +73,7 @@ public class DecLocalIIns extends InstructionDefinition {
             }
         }
         if (!isPostDec) {
-            output.add(new DecLocalAVM2Item(ins, localData.lineStartInstruction, regId));
+            stack.addToOutput(new DecLocalAVM2Item(ins, localData.lineStartInstruction, regId));
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new SubtractAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));

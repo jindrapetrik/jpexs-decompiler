@@ -151,6 +151,16 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
+    public void setGlyphAdvance(int glyphIndex, double advanceValue) {
+        
+    }
+
+    @Override
+    public void updateBounds() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }            
+    
+    @Override
     public synchronized int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable.get(glyphIndex).getBounds(1).getWidth();
     }

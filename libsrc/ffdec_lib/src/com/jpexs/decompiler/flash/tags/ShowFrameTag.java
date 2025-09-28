@@ -43,6 +43,7 @@ public class ShowFrameTag extends Tag {
             add(PlaceObject2Tag.ID);
             add(PlaceObject3Tag.ID);
             add(PlaceObject4Tag.ID);
+            add(PlaceImagePrivateTag.ID);
             add(RemoveObjectTag.ID);
             add(RemoveObject2Tag.ID);
             add(FrameLabelTag.ID);
@@ -50,6 +51,10 @@ public class ShowFrameTag extends Tag {
             add(StartSound2Tag.ID);
             add(VideoFrameTag.ID);
             add(SoundStreamBlockTag.ID);
+            add(SetTabIndexTag.ID);
+            add(GenCommandTag.ID);
+            add(FreeCharacterTag.ID);
+            add(SyncFrameTag.ID);
             /*add(SoundStreamHeadTag.ID);
              add(SoundStreamHead2Tag.ID);*/
         }

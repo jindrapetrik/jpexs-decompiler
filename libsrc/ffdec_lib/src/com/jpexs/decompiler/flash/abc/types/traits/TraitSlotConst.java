@@ -44,7 +44,9 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Slot or const trait in ABC file.
@@ -99,14 +101,16 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     /**
      * Gets type as string.
      *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return Type as string
      */
-    public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public String getType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false, true);
+            typeStr = constants.getMultiname(type_index).getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, false, true);
         }
         return typeStr;
     }
@@ -117,10 +121,11 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param writer Writer
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
+     * @param usedDeobfuscations Used deobfuscations
      * @return Writer
      */
-    public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
-        String typeStr = getType(abc.constants, fullyQualifiedNames);
+    public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, Set<String> usedDeobfuscations) {
+        String typeStr = getType(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames);
         ValueKind val = null;
         if (value_kind != 0) {
             val = new ValueKind(value_index, value_kind);
@@ -137,7 +142,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             typeStr = "";
         }
         writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
         writer.hilightSpecial(typeStr, HighlightSpecialType.TRAIT_TYPE_NAME);
         return writer;
     }
@@ -164,6 +169,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     /**
      * Gets value as string.
      *
+     * @param usedDeobfuscations Used deobfuscations
      * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param exportMode Export mode
@@ -173,7 +179,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param fullyQualifiedNames Fully qualified names
      * @throws InterruptedException On interrupt
      */
-    public void getValueStr(int swfVersion, AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -189,7 +195,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion));
+                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations));
             }
             writer.endMethod();
             writer.endTrait();
@@ -232,8 +238,8 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        getMetaData(this, convertData, abc, writer);
+    public GraphTextWriter toString(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        getMetaData(usedDeobfuscations, this, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
         if ((classIndex == -1) && (n != null)) {
@@ -245,7 +251,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             }
         }
         if (showModifier) {
-            getModifiers(abc, isStatic, insideInterface, writer, classIndex);
+            getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex);
         }
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;
@@ -253,22 +259,22 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 List<MethodBody> callStack = new ArrayList<>();
                 AssignedValue assignment = convertData.assignedValues.get(this);
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion));
+                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations));
             }
         }
-        getNameStr(writer, abc, fullyQualifiedNames);
+        getNameStr(writer, abc, fullyQualifiedNames, usedDeobfuscations);
         if (hasValueStr(abc, convertData)) {
             writer.appendNoHilight(" = ");
-            getValueStr(swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";").newLine();
     }
 
     @Override
-    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
-        getNameStr(writer, abc, fullyQualifiedNames);
+    public void convert(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+        getNameStr(writer, abc, fullyQualifiedNames, usedDeobfuscations);
         if (hasValueStr(abc, convertData)) {
-            getValueStr(swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 
@@ -316,29 +322,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         TraitSlotConst ret = (TraitSlotConst) super.clone();
         return ret;
     }
-
-    /**
-     * Gets dependencies.
-     *
-     * @param abcIndex ABC indexing
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param isStatic Is static
-     * @param customNamespace Custom namespace
-     * @param abc ABC
-     * @param dependencies Dependencies
-     * @param ignorePackage Ignore package
-     * @param fullyQualifiedNames Fully qualified names
-     * @param uses Uses
-     * @throws InterruptedException On interrupt
-     */
+ 
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
-        DependencyParser.parseDependenciesFromMultiname(abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+        super.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
+        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
     }
 
     /**
@@ -356,9 +347,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
              Hide: private static var _skinParts
              (part of [SkinPart] compilations)
              */
-            if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+            if (isStatic && "_skinParts".equals(getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == Trait.TRAIT_SLOT) {
-                    if ("_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
+                    if ("_skinParts".equals(getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>(), true, true))) {
                         if (getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                             return false;
                         }

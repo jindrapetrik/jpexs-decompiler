@@ -324,7 +324,7 @@ public class ColorMatrixConvertor {
         double h;
         double s;
 
-        //Magic formulas calculated long time ago with Wolphram Alpha.
+        //Magic formulas calculated long time ago with Wolfram Alpha.
         b = (24872168661075.0 * a11 * a11 - 151430415740925.0 * a12 + 341095051289483.0 * a12 * a12 - 15302094789450.0 * a13 + 82428663495404.0 * a12 * a13
                 - 4592294873812.0 * a13 * a13 + 43556251470.0 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13
                         - 930 * a11 * (287 * a12 + 178 * a13)) + 2384730956550.0 * a12 * a41 + 240977870700.0 * a13 * a41

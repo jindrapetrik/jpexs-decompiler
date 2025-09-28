@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,6 +54,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image.
+     *
      * @param it Image tag
      * @param newData New data
      * @return Imported tag
@@ -64,6 +66,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image.
+     *
      * @param it Image tag
      * @param newData New data
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
@@ -73,6 +76,20 @@ public class ImageImporter extends TagImporter {
     public Tag importImage(ImageTag it, byte[] newData, int tagType) throws IOException {
         if (newData.length >= 2 && newData[0] == 'B' && newData[1] == 'M') {
             BufferedImage b = ImageHelper.read(newData);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageHelper.write(b, ImageFormat.PNG, baos);
+            newData = baos.toByteArray();
+        }
+        if (newData.length >= 4
+                && newData[0] == 'R'
+                && newData[1] == 'I'
+                && newData[2] == 'F'
+                && newData[3] == 'F'
+            ) {
+            if (!ImageFormat.WEBP.available()) {
+                throw new RuntimeException("WEBP format is not supported on your platform");
+            }
+            BufferedImage b = WebPCodec.decodeImage(newData);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageHelper.write(b, ImageFormat.PNG, baos);
             newData = baos.toByteArray();
@@ -94,7 +111,7 @@ public class ImageImporter extends TagImporter {
                     && newData[3] == (byte) 0xe0) {
                 tagType = DefineBitsJPEG2Tag.ID;
             } else {
-                tagType = DefineBitsLosslessTag.ID;
+                tagType = DefineBitsLossless2Tag.ID;
             }
         }
 
@@ -147,6 +164,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Imports image alpha.
+     *
      * @param it Image tag
      * @param newData New data
      * @return Imported tag
@@ -182,6 +200,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Converts image.
+     *
      * @param it Image tag
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
      * @throws IOException On I/O error
@@ -192,6 +211,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Gets image tag type.
+     *
      * @param format Format
      * @return Image tag type
      */
@@ -220,6 +240,7 @@ public class ImageImporter extends TagImporter {
 
     /**
      * Bulk import images.
+     *
      * @param imagesDir Images directory
      * @param swf SWF
      * @param printOut Print out

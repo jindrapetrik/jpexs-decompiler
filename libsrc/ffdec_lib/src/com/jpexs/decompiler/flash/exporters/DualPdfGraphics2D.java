@@ -51,6 +51,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.AttributedCharacterIterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,13 +63,16 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, GraphicsGroupable, GraphicsTextDrawable {
+public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, GraphicsGroupable, GraphicsTextDrawable, RequiresNormalizedFonts {
 
     private final Graphics2D imageGraphics;
 
     private final PDFGraphics pdfGraphics;
     private final Map<Integer, Font> existingFonts;
 
+    private Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
+    private Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+    
     public DualPdfGraphics2D(Graphics2D first, PDFGraphics second, Map<Integer, Font> existingFonts) {
         this.imageGraphics = first;
         this.pdfGraphics = second;
@@ -563,6 +567,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         Matrix mat0 = mat.concatenate(textMatrix);
         Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
         FontTag font = null;
+        int fontId = -1;
         int textHeight = 12;
         int x = 0;
         int y = 0;
@@ -582,7 +587,11 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
             }
 
             if (rec.styleFlagsHasFont) {
-                font = rec.getFont(swf);
+                font = rec.getFont(swf);                
+                fontId = swf.getCharacterId(font);
+                if (normalizedFonts.containsKey(fontId)) {
+                    font = normalizedFonts.get(fontId);
+                }
                 textHeight = rec.textHeight;
             }
             if (rec.styleFlagsHasXOffset) {
@@ -612,7 +621,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                     char ch = font.glyphToChar(entry.glyphIndex);
                     if (spacing != 0) {
                         text.append(currentChar);
-                        drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
+                        drawText(swf, x, y, trans, textColor, existingFonts, fontId, font, text.toString(), textHeight, pdfGraphics);
                         text = new StringBuilder();
                         x = x + deltaX + entry.glyphAdvance;
                         deltaX = 0;
@@ -628,14 +637,13 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                 }
             }
             if (text.length() > 0) {
-                drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
+                drawText(swf, x, y, trans, textColor, existingFonts, fontId, font, text.toString(), textHeight, pdfGraphics);
             }
             x = x + deltaX;
         }
     }
 
-    private static void drawText(SWF swf, float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, PDFGraphics g) {
-        int fontId = swf.getCharacterId(font);
+    private static void drawText(SWF swf, float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, int fontId, FontTag font, String text, int textHeight, PDFGraphics g) {
         if (existingFonts.containsKey(fontId)) {
             g.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));
         } else {
@@ -679,6 +687,25 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         g.setTransform(trans.toTransform());
         Color textColor2 = new Color(textColor, true);
         g.setColor(textColor2);
+        
+        text = text.replaceAll("\\p{Cc}", " "); //Replace control characters with space
+        
         g.drawString(text, (float) x, (float) y);
+    }
+
+    @Override
+    public void setNormalizedFonts(Map<Integer, FontTag> normalizedFonts, Map<Integer, StaticTextTag> normalizedTexts) {
+        this.normalizedFonts = normalizedFonts;
+        this.normalizedTexts = normalizedTexts;
+    }
+
+    @Override
+    public Map<Integer, FontTag> getNormalizedFonts() {
+        return normalizedFonts;
+    }
+
+    @Override
+    public Map<Integer, StaticTextTag> getNormalizedTexts() {
+        return normalizedTexts;
     }
 }

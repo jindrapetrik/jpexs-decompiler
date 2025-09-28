@@ -16,14 +16,19 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.csv.CsvLexer;
+import com.jpexs.csv.CsvRow;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * SymbolClass importer.
@@ -34,18 +39,31 @@ public class SymbolClassImporter {
 
     /**
      * Imports SymbolClasses from a file.
+     *
      * @param importFile File to import from
      * @param swf SWF to import to
      */
     public void importSymbolClasses(File importFile, SWF swf) {
         String texts = Helper.readTextFile(importFile.getPath());
-        String[] lines = texts.split(Helper.newLine);
+
+        CsvLexer lexer = new CsvLexer(texts);
         Map<Integer, String> nameMap = new HashMap<>();
-        for (String line : lines) {
-            String[] pair = line.split(";");
-            int characterId = Integer.parseInt(pair[0]);
-            String name = pair[1];
-            nameMap.put(characterId, name);
+        try {
+            while (true) {
+                CsvRow row = lexer.yylex();
+                if (row == null) {
+                    break;
+                }
+                if (row.values.size() >= 2) {
+                    try {
+                        nameMap.put(Integer.parseInt(row.values.get(0)), row.values.get(1));
+                    } catch (NumberFormatException nfe) {
+                        //ignore
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            //ignore
         }
 
         for (Tag tag : swf.getTags()) {

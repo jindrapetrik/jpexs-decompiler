@@ -130,7 +130,8 @@ Constant= constant{NumberLiteral}
   /* numeric literals */
 
   {NumberLiteral}            { return token(TokenType.NUMBER);  }
-  {FloatLiteral}                 { return token(TokenType.NUMBER);  }
+  {FloatLiteral} "f"         { return token(TokenType.NUMBER);  }
+  {FloatLiteral}             { return token(TokenType.NUMBER);  }
   {LineTerminator}      {yybegin(YYINITIAL); return token(TokenType.NEWLINE);}
   {Comment}             {return token(TokenType.COMMENT);}
   {StartOfBlock}        {return token(TokenType.WHITESPACE);}

@@ -167,7 +167,8 @@ Constant= constant{PositiveNumberLiteral}
   /* numeric literals */
 
   {NumberLiteral}            { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));  }
-  {FloatLiteral}                 { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
+  {FloatLiteral} "f"         { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_FLOAT, Float.parseFloat(yytext().substring(0, yytext().length() - 1))); }
+  {FloatLiteral}             { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_DOUBLE, Double.parseDouble((yytext())));  }
   {LineTerminator}      {yybegin(YYINITIAL); return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_EOL); }
   {Comment}             {return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
   {StartOfBlock}                        {  yybegin(YYINITIAL); return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_BLOCK_START); }

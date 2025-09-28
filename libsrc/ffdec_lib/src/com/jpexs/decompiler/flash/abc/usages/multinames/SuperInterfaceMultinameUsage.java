@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import java.util.LinkedHashSet;
 
 /**
  * Super interface multiname usage.
@@ -52,7 +53,7 @@ public class SuperInterfaceMultinameUsage extends MultinameUsage implements Insi
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true) + " " + (ii.isInterface() ? "extends" : "implements");
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true) + " " + (ii.isInterface() ? "extends" : "implements");
     }
 
     @Override

@@ -309,7 +309,13 @@ public class As3PCodeDocs extends AbstractDocs {
             jsData += "flags_set[\"" + makeIdent(f.toString()) + "\"] = false;" + NEWLINE;
         }
 
-        AVM2InstructionFlag[] hideFlags = new AVM2InstructionFlag[]{AVM2InstructionFlag.NO_FLASH_PLAYER};
+        AVM2InstructionFlag[] hideFlags = new AVM2InstructionFlag[]{
+            AVM2InstructionFlag.UNDOCUMENTED,
+            AVM2InstructionFlag.UNKNOWN_STACK,
+            AVM2InstructionFlag.ES4_NUMERICS_MINOR,
+            AVM2InstructionFlag.FLOAT4_SUPPORT,
+            AVM2InstructionFlag.UNKNOWN_OPERANDS           
+        };
         for (AVM2InstructionFlag f : hideFlags) {
             jsData += "flags_set[\"" + makeIdent(f.toString()) + "\"] = true;" + NEWLINE;
         }

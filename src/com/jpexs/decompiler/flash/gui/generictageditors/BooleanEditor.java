@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;

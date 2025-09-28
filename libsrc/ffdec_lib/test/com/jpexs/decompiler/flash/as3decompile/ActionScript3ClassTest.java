@@ -726,7 +726,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testHaxeStaticVars() {
         /*
         Static vars in Haxe are initialized in script initializer (normal flash uses class initializer)
-        */
+         */
         decompileScriptPack("haxe", "tests_classes.TestStaticVars", "package tests_classes\n"
                 + "{\n"
                 + "   public class TestStaticVars\n"
@@ -747,5 +747,26 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}\n"
         );
+    }
+
+    @Test
+    public void testConstructDynamically() {
+        decompileScriptPack("assembled", "tests.TestConstructDynamically", "package tests\n"
+                + "{\n"
+                + "import flash.display.*;\n"
+                + "import flash.utils.getDefinitionByName;\n"
+                + "public class TestConstructDynamically\n"
+                + "{\n"
+                + "public function TestConstructDynamically()\n"
+                + "{\n"
+                + "super();\n"
+                + "}\n"
+                + "public function test() : void\n"
+                + "{\n"
+                + "var _loc1_:* = new (getDefinitionByName(\"flash.display\"+\".\"+\"Sprite\"))();\n"
+                + "_loc1_ = new (getDefinitionByName(\"Object\"))();\n"
+                + "}\n"
+                + "}\n"
+                + "}");
     }
 }

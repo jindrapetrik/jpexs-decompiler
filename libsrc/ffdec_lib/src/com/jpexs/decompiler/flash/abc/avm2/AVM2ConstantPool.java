@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCVersionRequirements;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
@@ -33,6 +34,7 @@ import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -949,14 +951,16 @@ public class AVM2ConstantPool implements Cloneable {
      * Finds multiname index based on multiname in other constant pool.
      *
      * @param val Value
+     * @param thisAbc This ABC
+     * @param origAbc Original ABC
      * @param origConst Original constant pool
      * @return List of multiname indexes
      */
-    public List<Integer> getMultinameIds(Multiname val, AVM2ConstantPool origConst) {
+    public List<Integer> getMultinameIds(Multiname val, ABC thisAbc, ABC origAbc, AVM2ConstantPool origConst) {
 
         List<Integer> ret = new ArrayList<>();
         for (int i = 1; i < getMultinameCount(); i++) {
-            if (getMultiname(i).qnameEquals(this, val, origConst)) {
+            if (getMultiname(i).qnameEquals(thisAbc, this, val, origAbc, origConst)) {
                 ret.add(i);
             }
         }
@@ -1196,9 +1200,10 @@ public class AVM2ConstantPool implements Cloneable {
     /**
      * Dumps the constant pool.
      *
+     * @param abc ABC
      * @param writer Writer
      */
-    public void dump(Utf8PrintWriter writer) {
+    public void dump(ABC abc, Utf8PrintWriter writer) {
         for (int i = 1; i < constant_int.size(); i++) {
             writer.println("INT[" + i + "]=" + constant_int.get(i));
         }
@@ -1212,7 +1217,7 @@ public class AVM2ConstantPool implements Cloneable {
             writer.println("String[" + i + "]=" + constant_string.get(i));
         }
         for (int i = 1; i < constant_namespace.size(); i++) {
-            writer.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(this));
+            writer.println("Namespace[" + i + "]=" + constant_namespace.get(i).toString(new LinkedHashSet<>(), abc, this));
         }
         for (int i = 1; i < constant_namespace_set.size(); i++) {
             writer.println("NamespaceSet[" + i + "]=" + constant_namespace_set.get(i).toString(this));
@@ -1239,14 +1244,15 @@ public class AVM2ConstantPool implements Cloneable {
     /**
      * Converts namespace to string.
      *
+     * @param abc ABC
      * @param index Namespace index
      * @return String
      */
-    public String namespaceToString(int index) {
+    public String namespaceToString(ABC abc, int index) {
         if (index == 0) {
             return "null";
         }
-        return constant_namespace.get(index).toString(this);
+        return constant_namespace.get(index).toString(new LinkedHashSet<>(), abc, this);
     }
 
     /**

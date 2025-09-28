@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
+import java.util.Set;
 
 /**
  * Namespace in ABC file.
@@ -180,11 +182,13 @@ public class Namespace {
     /**
      * To string.
      *
+     * @param usedDeobfuscations Used deobuscations
+     * @param abc ABC
      * @param constants Constant pool
      * @return String representation
      */
-    public String toString(AVM2ConstantPool constants) {
-        return getName(constants).toPrintableString(true);
+    public String toString(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants) {
+        return getName(constants).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
     }
 
     /**

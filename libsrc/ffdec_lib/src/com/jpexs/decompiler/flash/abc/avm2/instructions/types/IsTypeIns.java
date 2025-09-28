@@ -46,7 +46,7 @@ public class IsTypeIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
-        stack.push(new IsTypeAVM2Item(ins, localData.lineStartInstruction, value, new FullMultinameAVM2Item(false, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.getConstants(), new ArrayList<>(), true, true))));
+        stack.push(new IsTypeAVM2Item(ins, localData.lineStartInstruction, value, new FullMultinameAVM2Item(false, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.getConstants(), new ArrayList<>(), true, true))));
     }
 
     @Override

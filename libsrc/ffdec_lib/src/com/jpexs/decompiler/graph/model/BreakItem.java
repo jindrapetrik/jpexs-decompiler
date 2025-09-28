@@ -45,6 +45,11 @@ public class BreakItem extends GraphTargetItem {
     private boolean labelRequired;
 
     /**
+     * Is placed at end of the script (or function)
+     */
+    public boolean isScriptEnd = false;
+
+    /**
      * Constructor.
      *
      * @param dialect Dialect
@@ -59,14 +64,24 @@ public class BreakItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append("break");
         if (writer instanceof NulWriter) {
             NulWriter nulWriter = (NulWriter) writer;
             labelRequired = loopId != nulWriter.getLoop();
             if (labelRequired) {
+                if (!dialect.doesAllowMultilevelBreaks() && isScriptEnd) {
+                    writer.append("return");
+                    return writer;
+                }
                 nulWriter.setLoopUsed(loopId);
             }
         }
+        if (labelRequired) {
+            if (!dialect.doesAllowMultilevelBreaks() && isScriptEnd) {
+                writer.append("return");
+                return writer;
+            }
+        }
+        writer.append("break");
         if (labelRequired) {
             writer.append(" loop").append(loopId);
         }

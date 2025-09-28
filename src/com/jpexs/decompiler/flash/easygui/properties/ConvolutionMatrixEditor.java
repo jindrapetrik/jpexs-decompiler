@@ -341,7 +341,7 @@ public class ConvolutionMatrixEditor extends JPanel implements PropertyEditor {
             dialog.setLocation(loc);
         }
 
-        private void enlargeVerticalActionPerformed(ActionEvent aev) {
+        private void enlargeVerticalActionPerformed(ActionEvent actionEvent) {
             DefaultTableModel model = (DefaultTableModel) matrixTable.getModel();
             int columnCount = model.getColumnCount();
             int rowCount = model.getRowCount();

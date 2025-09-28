@@ -153,7 +153,7 @@ public enum SymbolType {
     RANDOM(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     REMOVEMOVIECLIP(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     STARTDRAG(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    SUBSTR(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    SUBSTRING(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     LENGTH(GraphTargetItem.PRECEDENCE_PRIMARY, false), //string.length
     INT(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     TARGETPATH(GraphTargetItem.PRECEDENCE_PRIMARY, false),

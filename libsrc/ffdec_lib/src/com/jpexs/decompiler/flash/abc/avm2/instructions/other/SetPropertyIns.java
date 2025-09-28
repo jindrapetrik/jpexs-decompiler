@@ -28,10 +28,14 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +58,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         handleSetProperty(false, localData, stack, ins, output, path);
     }
 
-    public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {
+    public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, TranslateStack stack, SetTypeAVM2Item result) {
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
             if (multiname.name instanceof LocalRegAVM2Item) {
@@ -92,16 +96,34 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
                 if (binaryOp.getLeftSide() instanceof GetLexAVM2Item) {
                     GetLexAVM2Item getLex = (GetLexAVM2Item) binaryOp.getLeftSide();
-                    if ((obj instanceof FindPropertyAVM2Item) && localData.abc.constants.getMultiname(multiname.multinameIndex).equals(getLex.propertyName)) {
+                    if ((obj.getThroughDuplicate() instanceof FindPropertyAVM2Item) && localData.abc.constants.getMultiname(multiname.multinameIndex).equals(getLex.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
                     }
                 } else if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
-                    if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
+                    if (Objects.equals(obj.getThroughDuplicate(), propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
-                    }
+                        
+                        if (propItem.object instanceof DuplicateItem) {
+                            DuplicateItem d = (DuplicateItem) propItem.object;
+                            if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                                if (st.tempIndex == d.tempIndex) {
+                                    output.remove(output.size() - 1);          
+                                    stack.moveToStack(output);
+                                }
+                            }
+                        }
+                        
+                        if (result instanceof SetPropertyAVM2Item) {
+                            SetPropertyAVM2Item sp = (SetPropertyAVM2Item) result;
+                            if (sp.object instanceof DuplicateSourceItem) {
+                                sp.object = sp.object.value;
+                            }
+                        }
+                    }                    
                 }
             }
         }

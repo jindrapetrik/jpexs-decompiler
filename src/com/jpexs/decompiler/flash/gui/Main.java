@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.ABCOpenException;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
@@ -146,7 +147,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -229,6 +229,8 @@ public class Main {
     private static SWF runningSWF = null;
 
     private static SwfPreparation runningPreparation = null;
+    
+    private static boolean loggingFileLoaded = false;
 
     public static SWF getRunningSWF() {
         return runningSWF;
@@ -1028,7 +1030,7 @@ public class Main {
             return;
         }
         lastTimeStartWork = nowTime;
-        View.execInEventDispatch(() -> {
+        View.execInEventDispatchLater(() -> {
             if (mainFrame != null) {
                 mainFrame.getPanel().setWorkStatus(name, worker);
                 if (percent == -1) {
@@ -1040,11 +1042,11 @@ public class Main {
             if (loadingDialog != null) {
                 loadingDialog.setDetail(name);
                 loadingDialog.setPercent(percent);
-            }
-            if (CommandLineArgumentParser.isCommandLineMode()) {
-                System.out.println(name);
-            }
+            }            
         });
+        if (CommandLineArgumentParser.isCommandLineMode()) {
+            System.out.println(name);
+        }
     }
 
     public static void stopWork() {
@@ -1344,7 +1346,7 @@ public class Main {
                                             JFileChooser fc = new JFileChooser();
                                             fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                                             FileFilter allSupportedFilter = new FileFilter() {
-                                                private final String[] supportedExtensions = new String[]{".swf", ".spl", ".gfx"};
+                                                private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx"};
 
                                                 @Override
                                                 public boolean accept(File f) {
@@ -1369,16 +1371,31 @@ public class Main {
                                                 public boolean accept(File f) {
                                                     return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
                                                             || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))
+                                                            || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swt"))
                                                             || (f.isDirectory());
                                                 }
 
                                                 @Override
                                                 public String getDescription() {
-                                                    return AppStrings.translate("filter.swf_spl");
+                                                    return AppStrings.translate("filter.swf_spl_swt");
                                                 }
                                             };
                                             fc.addChoosableFileFilter(swfFilter);
 
+                                            FileFilter swtFilter = new FileFilter() {
+                                                @Override
+                                                public boolean accept(File f) {
+                                                    return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swt"))
+                                                            || f.isDirectory();
+                                                }
+
+                                                @Override
+                                                public String getDescription() {
+                                                    return AppStrings.translate("filter.swt");
+                                                }
+                                            };
+                                            fc.addChoosableFileFilter(swtFilter);
+                                            
                                             FileFilter gfxFilter = new FileFilter() {
                                                 @Override
                                                 public boolean accept(File f) {
@@ -1527,6 +1544,9 @@ public class Main {
                         }
                         if (event.equals("importing_as")) {
                             startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);
+                        }
+                        if (event.equals("uninitializedClassFields")) {
+                            continueWork(AppStrings.translate("work.decompiling") + "..." + (String) data);
                         }
                     }
                 });
@@ -2230,6 +2250,18 @@ public class Main {
             }
         };
 
+        FileFilter swtFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swt")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swt");
+            }
+        };
+        
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2332,8 +2364,16 @@ public class Main {
             fc.addChoosableFileFilter(swfFilter);
             fc.setFileFilter(gfxFilter);
         } else if (openable instanceof SWF) {
-            fc.setFileFilter(swfFilter);
+            SWF swf = (SWF) openable;
+            if (swf.getFile() != null && swf.getFile().toLowerCase(Locale.ENGLISH).endsWith(".swt")) {
+                fc.setFileFilter(swtFilter);   
+                fc.addChoosableFileFilter(swfFilter);
+            } else {
+                fc.setFileFilter(swfFilter);   
+                fc.addChoosableFileFilter(swtFilter);
+            }
             fc.addChoosableFileFilter(gfxFilter);
+            
         } else if (openable instanceof ABC) {
             fc.setFileFilter(abcFilter);
         }
@@ -2356,6 +2396,12 @@ public class Main {
                         fileName += ".gfx";
                     }
                     ((SWF) openable).gfx = true;
+                }
+                
+                if (selFilter == swtFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".swt")) {
+                        fileName += ".swt";
+                    }
                 }
 
                 if (selFilter == abcFilter) {
@@ -2441,7 +2487,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".gfx", ".swc", ".zip", ".iggy", ".abc"};
+            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".swc", ".zip", ".iggy", ".abc"};
 
             @Override
             public boolean accept(File f) {
@@ -2466,16 +2512,31 @@ public class Main {
             public boolean accept(File f) {
                 return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf"))
                         || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".spl"))
+                        || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swt"))
                         || (f.isDirectory());
             }
 
             @Override
             public String getDescription() {
-                return AppStrings.translate("filter.swf_spl");
+                return AppStrings.translate("filter.swf_spl_swt");
             }
         };
         fc.addChoosableFileFilter(swfFilter);
 
+        FileFilter swtFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swt")
+                        || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swt");
+            }
+        };
+        fc.addChoosableFileFilter(swtFilter);
+        
         FileFilter swcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -3097,10 +3158,10 @@ public class Main {
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
         
         ResourceBundle advancedSettingsBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
-        Set<String> confirationNames = Configuration.getConfigurationFields(false, true).keySet();
+        Set<String> configurationNames = Configuration.getConfigurationFields(false, true).keySet();
         Map<String, String> titles = new LinkedHashMap<>();
         Map<String, String> descriptions = new LinkedHashMap<>();
-        for (String name : confirationNames) {
+        for (String name : configurationNames) {
             if (advancedSettingsBundle.containsKey("config.name." + name)) {
                 titles.put(name, advancedSettingsBundle.getString("config.name." + name));
             }
@@ -3165,10 +3226,11 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         decodeLaunch5jArgs(args);
+        preInitLogging();        
         setSessionLoaded(false);
 
-        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");
-
+        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");       
+        
         clearTemp();
 
         try {
@@ -3291,9 +3353,9 @@ public class Main {
     }
 
     public static String tempFile(String url) throws IOException {
-        File f = new File(Configuration.getFFDecHome() + "saved" + File.separator);
+        File f = new File(AppDirectoryProvider.getFFDecHome() + "saved" + File.separator);
         Path.createDirectorySafe(f);
-        return Configuration.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return AppDirectoryProvider.getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
     }
 
     public static void removeTrayIcon() {
@@ -3532,7 +3594,7 @@ public class Main {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
 
         try {
-            fileName = Configuration.getFFDecHome() + "logs" + File.separator;
+            fileName = AppDirectoryProvider.getFFDecHome() + "logs" + File.separator;
             if (Configuration.useDetailedLogging.get()) {
                 fileName += "log-" + sdf.format(new Date()) + ".txt";
             } else {
@@ -3592,16 +3654,23 @@ public class Main {
             System.getProperty("java.version"), System.getProperty("java.vendor"), System.getProperty("os.arch")});
     }
 
-    public static void initLogging(boolean debug) {
-        File loggingFile = new File(Configuration.getFFDecHome() + "/logging.properties");
+    public static void preInitLogging() {
+        File loggingFile = new File(AppDirectoryProvider.getFFDecHome() + "/logging.properties");
         if (loggingFile.exists()) { //use manual configuration file
             final LogManager logManager = LogManager.getLogManager();
             try {
                 logManager.readConfiguration(new FileInputStream(loggingFile));
+                loggingFileLoaded = true;
                 return;
             } catch (IOException ex) {
                 //ignore
             }
+        }
+    }
+    
+    public static void initLogging(boolean debug) {
+        if (loggingFileLoaded) {
+            return;
         }
         try {
             Logger logger = Logger.getLogger("");

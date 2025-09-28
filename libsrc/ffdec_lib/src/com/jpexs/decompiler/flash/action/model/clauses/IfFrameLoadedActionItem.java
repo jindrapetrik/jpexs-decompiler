@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -97,6 +98,11 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
+    public List<BreakItem> getBreaks() {
+        return new ArrayList<>();
+    }
+        
+    @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
         if (actions != null) {
@@ -110,6 +116,9 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         List<GraphSourceItem> body = generator.generate(localData, actions);
         ActionSourceGenerator actionGenerator = (ActionSourceGenerator) generator;
         String charset = actionGenerator.getCharset();
+        if (body.size() > 0xFF) {
+            throw new CompilationException("ifFrameLoaded body exceeds limit of 255 actions", line);
+        }
         return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size(), charset), body);
     }
 

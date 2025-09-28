@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -161,11 +163,14 @@ public class Frame implements TreeItem, Exportable {
         List<String> labels = new ArrayList<>();
         for (Tag t : innerTags) {
             if (t instanceof FrameLabelTag) {
-                labels.add(((FrameLabelTag) t).name);
+                labels.add("\"" + Helper.escapePCodeString(((FrameLabelTag) t).name) + "\"");
             }
         }
         if (!labels.isEmpty()) {
             name += " (name: " + String.join(", ", labels) + ")";
+        }
+        if (allInnerTags.isEmpty() || !(allInnerTags.get(allInnerTags.size() - 1) instanceof ShowFrameTag)) {
+            name += " - " + AppResources.translate("frame.withoutShowFrame");
         }
         return name;
     }

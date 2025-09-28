@@ -82,7 +82,7 @@ public class GetMemberActionItem extends ActionItem {
             StringBuilder sb = new StringBuilder();
             StringBuilderTextWriter sbw = new StringBuilderTextWriter(new CodeFormatting(), sb);
             stripQuotes(memberName, localData, sbw);
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, sb.toString()));
+            writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, sb.toString()));
             return writer;
         }
         if (((!(memberName instanceof DirectValueActionItem)) || (!((DirectValueActionItem) memberName).isString()) || (!printObfuscatedMemberName && !IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) memberName).toStringNoQuotes(localData))))) {

@@ -80,10 +80,10 @@
 					<li>"Starting Flash content debugger" in status bar when debugging starts</li>
 					<li>Simple editor - edit parameters of items inside buttons</li>
 					<li>Simple editor - add/remove frames in buttons, button timeline header</li>
-					<li>Configuration is now stored in easily readable/editable textual format (TOML) (saved also to older binary format, but loading is preffered from the new TOML file, when exists)</li>
+					<li>Configuration is now stored in easily readable/editable textual format (TOML) (saved also to older binary format, but loading is preferred from the new TOML file, when exists)</li>
 					<li>`-configFile` and `-storeConfigFile` commandline parameters for loading/storing configuration file</li>
 					<li>Option to .bat and .sh file to enable J2D_D3D_NO_HWCHECK</li>
-					<li>#2404 Quick find in text/script editors - show number of occurences</li>
+					<li>#2404 Quick find in text/script editors - show number of occurrences</li>
 					<li>#1418 Option to make main window Always on top</li>
 					<li>#289 Support for Aero Snap on Windows</li>
 					<li>#2412 Show coordinates on stage mouse move for up to 2 decimal places</li>
@@ -183,7 +183,7 @@
 					<li>Simple editor - change background color</li>
 					<li>Simple editor - filters</li>
 					<li>Simple editor - convolution filter presets</li>
-					<li>Simple editor - ratio (shapetweens, video)</li>
+					<li>Simple editor - ratio (shape tweens, video)</li>
 				</ul>
 				<p>Fixed</p>
 				<ul>

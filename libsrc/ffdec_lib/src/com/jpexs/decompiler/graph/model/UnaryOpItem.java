@@ -178,6 +178,6 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
      * @throws InterruptedException On interrupt
      */
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        operand.toString(writer, localData, "");
+        operand.toString(writer, localData, "", false);
     }
 }

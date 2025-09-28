@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.exporters.modes;
 
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+
 /**
  * Shape export mode.
  *
@@ -39,7 +41,18 @@ public enum ShapeExportMode {
      */
     BMP,
     /**
+     * WEBP
+     */
+    WEBP,
+    /**
      * SWF - Shockwave Flash
      */
-    SWF,
+    SWF;
+    
+    public boolean available() {
+        if (this == WEBP) {
+            return ImageFormat.WEBP.available();
+        }
+        return true;
+    }
 }

@@ -98,13 +98,18 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     }
 
     @Override
-    public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        //Skip explicit conversion to boolean, it is not needed, it is done implicitly
-        if (value instanceof NotItem) {
-            return value.value.toStringBoolean(writer, localData);
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce, boolean noParenthesis) throws InterruptedException {
+        if ("Boolean".equals(implicitCoerce)) {
+            //Skip explicit conversion to boolean, it is not needed, it is done implicitly
+            if (value instanceof NotItem) {
+                return value.value.toStringBoolean(writer, localData);
+            }
         }
-        return super.toStringBoolean(writer, localData);
+        
+        return super.toString(writer, localData, implicitCoerce, noParenthesis);
     }
+    
+    
 
     @Override
     public GraphTargetItem invert(GraphSourceItem src) {

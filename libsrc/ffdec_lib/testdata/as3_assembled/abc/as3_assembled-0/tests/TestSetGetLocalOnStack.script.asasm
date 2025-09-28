@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestSetGetLocalOnStack/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestSetGetLocalOnStack", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestSetGetLocalOnStack"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestSetGetLocalOnStack"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestSetGetLocalOnStack")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestSetGetLocalOnStack")
+  #include "TestSetGetLocalOnStack.class.asasm"
+ end ; trait
+end ; script

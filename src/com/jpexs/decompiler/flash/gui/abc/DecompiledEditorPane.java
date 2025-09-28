@@ -53,6 +53,7 @@ import com.jpexs.helpers.Reference;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -314,7 +315,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 Highlighting ch = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
-                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
+                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true));
                 linkTypeRef.setVal(LinkType.LINK_THIS_SCRIPT);
                 return ch.startPos;
             }
@@ -599,7 +600,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     for (int i = 1; i < abc.constants.getMultinameCount(); i++) {
                         Multiname m = abc.constants.getMultiname(i);
                         if (m != null) {
-                            if (typeName.equals(m.getNameWithNamespace(abc.constants, true).toRawString())) {
+                            if (typeName.equals(m.getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toRawString())) {
                                 return i;
                             }
                         }
@@ -660,7 +661,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             if (tm != null) {
                 String name = "";
                 if (classIndex > -1) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
                 }
 
                 Trait currentTrait = null;
@@ -671,7 +672,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     currentTrait = getCurrentTrait();
                     isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                     if (currentTrait != null) {
-                        name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
+                        name += ":" + currentTrait.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
                     }
 
                     if (currentTrait instanceof TraitSlotConst) {
@@ -729,14 +730,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 //currentTrait = null;
-                String name = classIndex == -1 ? "" : abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+                String name = classIndex == -1 ? "" : abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(new LinkedHashSet<>(), abc, abc.constants, true).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
                     if (!name.isEmpty()) {
                         name += ":";
                     }
-                    name += currentTrait.getName(abc).getName(abc.constants, null, false, true);
+                    name += currentTrait.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
                 }
 
                 int methodId;

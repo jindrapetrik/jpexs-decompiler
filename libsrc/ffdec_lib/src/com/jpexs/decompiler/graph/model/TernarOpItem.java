@@ -79,7 +79,7 @@ public class TernarOpItem extends GraphTargetItem {
         if (expression.getPrecedence() >= precedence) {
             writer.append("(");
         }
-        expression.toStringBoolean(writer, localData);
+        expression.toString(writer, localData, "Boolean", true);
         if (expression.getPrecedence() >= precedence) {
             writer.append(")");
         }
@@ -88,7 +88,7 @@ public class TernarOpItem extends GraphTargetItem {
         if (onTrue.getPrecedence() >= precedence && onTrue.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {  // >= ternar in ternar better in parenthesis
             writer.append("(");
         }
-        onTrue.toString(writer, localData);
+        onTrue.toString(writer, localData, "", true);
         if (onTrue.getPrecedence() >= precedence && onTrue.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append(")");
         }
@@ -96,7 +96,7 @@ public class TernarOpItem extends GraphTargetItem {
         if (onFalse.getPrecedence() >= precedence && onFalse.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
         }
-        onFalse.toString(writer, localData);
+        onFalse.toString(writer, localData, "", true);
         if (onFalse.getPrecedence() >= precedence && onFalse.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append(")");
         }

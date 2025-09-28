@@ -35,7 +35,7 @@ public class Sf32x4Ins extends InstructionDefinition {
      * Constructor
      */
     public Sf32x4Ins() {
-        super(0x0B, "sf32x4", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.DOMAIN_MEMORY, AVM2InstructionFlag.FLOAT_MAJOR);
+        super(0x0B, "sf32x4", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.DOMAIN_MEMORY, AVM2InstructionFlag.FLOAT4_SUPPORT);
     }
 
     @Override

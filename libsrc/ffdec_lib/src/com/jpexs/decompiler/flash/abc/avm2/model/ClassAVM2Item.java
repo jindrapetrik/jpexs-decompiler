@@ -65,11 +65,11 @@ public class ClassAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (classNameAsStr != null) {
             if (localData.fullyQualifiedNames != null && localData.fullyQualifiedNames.contains(classNameAsStr)) {
-                return writer.append(classNameAsStr.toPrintableString(true));
+                return writer.append(classNameAsStr.toPrintableString(localData.usedDeobfuscations, localData.swf, true));
             }
-            return writer.append(IdentifiersDeobfuscation.printIdentifier(true, classNameAsStr.getLast()));
+            return writer.append(IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, classNameAsStr.getLast()));
         }
-        return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
+        return writer.append(className.getName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

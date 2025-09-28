@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -82,6 +83,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param offset Offset
      * @param charset Charset
      */
@@ -92,6 +94,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @throws IOException On I/O error
@@ -108,6 +111,7 @@ public class ActionIf extends Action {
 
     /**
      * Gets the target address
+     *
      * @return Address
      */
     public long getTargetAddress() {
@@ -138,6 +142,7 @@ public class ActionIf extends Action {
 
     /**
      * Constructor
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -179,7 +184,7 @@ public class ActionIf extends Action {
         int jmp = code.adr2pos(targetAddress);
         int after = code.adr2pos(getAddress() + length);
         if (jmp == -1) {
-            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs{0}", Helper.formatAddress(targetAddress));
+            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs{0} from ofs{1} in {2}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress()), ((ActionGraphSource) code).getPath()});
             ret.add(after);
         } else {
             ret.add(jmp);

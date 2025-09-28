@@ -16,23 +16,47 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.model.LocalData;
+
 /**
  * Dialect - high level language type.
+ *
  * @author JPEXS
  */
 public abstract class GraphTargetDialect {
 
     /**
      * Identifier of the dialect.
+     *
      * @return Name
      */
     public abstract String getName();
-    
+
     /**
-     * Conversion of ECMA value (that's used in simplifications)
-     * back to GraphTarget item.
+     * Conversion of ECMA value (that's used in simplifications) back to
+     * GraphTarget item.
+     *
      * @param value Ecma value
      * @return GraphTarget item
      */
     public abstract GraphTargetItem valToItem(Object value);
+
+    /**
+     * Checks whether this dialect allows multi level breaks
+     *
+     * @return True when allows
+     */
+    public abstract boolean doesAllowMultilevelBreaks();
+    
+    /**
+     * Prints temporary declaration
+     * @param writer Writer
+     * @param localData Local data
+     * @param suffix Suffix
+     * @param tempIndex Temporary index
+     * @param value Value
+     * @return Writer
+     */
+    public abstract GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException;
 }

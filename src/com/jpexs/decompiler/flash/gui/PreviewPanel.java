@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.importers.amf.amf0.Amf0Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.math.BezierUtils;
+import com.jpexs.decompiler.flash.shapes.ShapeTransformer;
 import com.jpexs.decompiler.flash.sol.SolFile;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -386,7 +387,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void createParametersPanel() {
         displayWithPreview = new JPanel(new CardLayout());
 
-        textPanel = new TextPanel(mainPanel);
+        textPanel = new TextPanel(mainPanel, null);
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
 
         fontPanel = new FontPanel(mainPanel);
@@ -590,6 +591,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
 
+        imagePanel.addTextChangedListener(new Runnable() {
+            @Override
+            public void run() {
+                textPanel.refresh();
+            }            
+        });
+        
         imagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -2292,147 +2300,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mainPanel.clearEditingStatus();
     }
 
-    private void transformStyles(Matrix matrix, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, int shapeNum) {
-        List<FILLSTYLE> fillStyleToTransform = new ArrayList<>();
-        for (FILLSTYLE fs : fillStyles.fillStyles) {
-            fillStyleToTransform.add(fs);
-        }
-        if (shapeNum >= 4) {
-            for (LINESTYLE2 ls : lineStyles.lineStyles2) {
-                if (ls.hasFillFlag) {
-                    fillStyleToTransform.add(ls.fillType);
-                }
-            }
-        }
-
-        for (FILLSTYLE fs : fillStyleToTransform) {
-            switch (fs.fillStyleType) {
-                case FILLSTYLE.CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
-                case FILLSTYLE.REPEATING_BITMAP:
-                    fs.bitmapMatrix = new Matrix(fs.bitmapMatrix).preConcatenate(matrix).toMATRIX();
-                    break;
-                case FILLSTYLE.LINEAR_GRADIENT:
-                case FILLSTYLE.RADIAL_GRADIENT:
-                case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
-                    fs.gradientMatrix = new Matrix(fs.gradientMatrix).preConcatenate(matrix).toMATRIX();
-                    break;
-            }
-        }
-    }
-
-    private void transformMorphStyles(Matrix matrix, MORPHFILLSTYLEARRAY fillStyles, MORPHLINESTYLEARRAY lineStyles, int morphShapeNum, boolean doStart, boolean doEnd) {
-        List<MORPHFILLSTYLE> fillStyleToTransform = new ArrayList<>();
-        for (MORPHFILLSTYLE fs : fillStyles.fillStyles) {
-            fillStyleToTransform.add(fs);
-        }
-
-        if (morphShapeNum == 2) {
-            for (MORPHLINESTYLE2 ls : lineStyles.lineStyles2) {
-                if (ls.hasFillFlag) {
-                    fillStyleToTransform.add(ls.fillType);
-                }
-            }
-        }
-
-        for (MORPHFILLSTYLE fs : fillStyleToTransform) {
-            switch (fs.fillStyleType) {
-                case FILLSTYLE.CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
-                case FILLSTYLE.REPEATING_BITMAP:
-                    if (doStart) {
-                        fs.startBitmapMatrix = new Matrix(fs.startBitmapMatrix).preConcatenate(matrix).toMATRIX();
-                    }
-                    if (doEnd) {
-                        fs.endBitmapMatrix = new Matrix(fs.endBitmapMatrix).preConcatenate(matrix).toMATRIX();
-                    }
-                    break;
-                case FILLSTYLE.LINEAR_GRADIENT:
-                case FILLSTYLE.RADIAL_GRADIENT:
-                case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
-                    if (doStart) {
-                        fs.startGradientMatrix = new Matrix(fs.startGradientMatrix).preConcatenate(matrix).toMATRIX();
-                    }
-                    if (doEnd) {
-                        fs.endGradientMatrix = new Matrix(fs.endGradientMatrix).preConcatenate(matrix).toMATRIX();
-                    }
-                    break;
-            }
-        }
-    }
-
-    private void transformSHAPE(Matrix matrix, SHAPE shape, int shapeNum) {
-        int x = 0;
-        int y = 0;
-        StyleChangeRecord lastStyleChangeRecord = null;
-        boolean wasMoveTo = false;
-        for (SHAPERECORD rec : shape.shapeRecords) {
-            if (rec instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) rec;
-                lastStyleChangeRecord = scr;
-                if (scr.stateNewStyles) {
-                    transformStyles(matrix, scr.fillStyles, scr.lineStyles, shapeNum);
-                }
-                if (scr.stateMoveTo) {
-                    Point nextPoint = new Point(scr.moveDeltaX, scr.moveDeltaY);
-                    x = scr.changeX(x);
-                    y = scr.changeY(y);
-                    Point nextPoint2 = matrix.transform(nextPoint);
-                    scr.moveDeltaX = nextPoint2.x;
-                    scr.moveDeltaY = nextPoint2.y;
-                    scr.calculateBits();
-                    wasMoveTo = true;
-                }
-            }
-
-            if (((rec instanceof StraightEdgeRecord) || (rec instanceof CurvedEdgeRecord)) && !wasMoveTo) {
-                if (lastStyleChangeRecord != null) {
-                    Point nextPoint2 = matrix.transform(new Point(x, y));
-                    if (nextPoint2.x != 0 || nextPoint2.y != 0) {
-                        lastStyleChangeRecord.stateMoveTo = true;
-                        lastStyleChangeRecord.moveDeltaX = nextPoint2.x;
-                        lastStyleChangeRecord.moveDeltaY = nextPoint2.y;
-                        lastStyleChangeRecord.calculateBits();
-                        wasMoveTo = true;
-                    }
-                }
-            }
-            if (rec instanceof StraightEdgeRecord) {
-                StraightEdgeRecord ser = (StraightEdgeRecord) rec;
-                ser.generalLineFlag = true;
-                ser.vertLineFlag = false;
-                Point currentPoint = new Point(x, y);
-                Point nextPoint = new Point(x + ser.deltaX, y + ser.deltaY);
-                x = ser.changeX(x);
-                y = ser.changeY(y);
-                Point currentPoint2 = matrix.transform(currentPoint);
-                Point nextPoint2 = matrix.transform(nextPoint);
-                ser.deltaX = nextPoint2.x - currentPoint2.x;
-                ser.deltaY = nextPoint2.y - currentPoint2.y;
-                ser.simplify();
-            }
-            if (rec instanceof CurvedEdgeRecord) {
-                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
-                Point currentPoint = new Point(x, y);
-                Point controlPoint = new Point(x + cer.controlDeltaX, y + cer.controlDeltaY);
-                Point anchorPoint = new Point(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
-                x = cer.changeX(x);
-                y = cer.changeY(y);
-
-                Point currentPoint2 = matrix.transform(currentPoint);
-                Point controlPoint2 = matrix.transform(controlPoint);
-                Point anchorPoint2 = matrix.transform(anchorPoint);
-
-                cer.controlDeltaX = controlPoint2.x - currentPoint2.x;
-                cer.controlDeltaY = controlPoint2.y - currentPoint2.y;
-                cer.anchorDeltaX = anchorPoint2.x - controlPoint2.x;
-                cer.anchorDeltaY = anchorPoint2.y - controlPoint2.y;
-                cer.calculateBits();
-            }
-        }
-    }
+    
 
     private RECT transformRECT(Matrix matrix, RECT rect) {
         ExportRectangle shapeRect = matrix.transform(new ExportRectangle(rect));
@@ -2487,14 +2355,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     }
                 }
 
+                ShapeTransformer shapeTransformer = new ShapeTransformer();
+                
                 oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
-                transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
+                shapeTransformer.transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
                 if (checkShapeLarge(shape.shapes.shapeRecords)) {
                     shape.shapes.shapeRecords = oldShapeRecords;
                     return;
                 }
                 oldShapeRecords = null;
-                transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
+                shapeTransformer.transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
 
                 shape.shapeBounds = newShapeBounds;
                 if (shape instanceof DefineShape4Tag) {
@@ -2519,8 +2389,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         newEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
                     }
 
+                    ShapeTransformer shapeTransformer = new ShapeTransformer();
+                    
                     oldShapeRecords = Helper.deepCopy(morphShape.startEdges.shapeRecords);
-                    transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    shapeTransformer.transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
                     if (checkShapeLarge(morphShape.startEdges.shapeRecords)) {
                         morphShape.startEdges.shapeRecords = oldShapeRecords;
                         return;
@@ -2531,7 +2403,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
                         morphShape2.startEdgeBounds = newEdgeBounds;
                     }
-                    transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
+                    shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
                 }
 
                 if (morphDisplayMode == MORPH_END) {
@@ -2544,9 +2416,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
                         newEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
                     }
+                    
+                    ShapeTransformer shapeTransformer = new ShapeTransformer();
 
                     oldShapeRecords = Helper.deepCopy(morphShape.endEdges.shapeRecords);
-                    transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    shapeTransformer.transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
                     if (checkShapeLarge(morphShape.endEdges.shapeRecords)) {
                         morphShape.endEdges.shapeRecords = oldShapeRecords;
                         return;
@@ -2557,7 +2431,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
                         morphShape2.endEdgeBounds = newEdgeBounds;
                     }
-                    transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
+                    shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
                 }
                 morphShape.getSwf().clearShapeCache();
             }

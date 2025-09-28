@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
@@ -49,30 +50,36 @@ import org.tomlj.TomlParseResult;
 import org.tomlj.TomlTable;
 
 /**
- * TOML file confiraration storage.
+ * TOML file configuration storage.
  * @author JPEXS
  */
 public class TomlConfigurationStorage implements ConfigurationStorage {
 
+    @Override
     public String getConfigName() {
         return "config.toml";
     }
 
     @Override
     public Map<String, Object> loadFromFile(String file) {
+        Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.FINE, "Loading TOML file {0}", file);
+            
         Map<String, Object> result = new LinkedHashMap<>();
         TomlParseResult tomlResult;
         try {
             tomlResult = Toml.parse(Paths.get(file));
         } catch (IOException ex) {
+            Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.SEVERE, "Error reading TOML file", ex);
             return result;
         }
 
         if (!tomlResult.errors().isEmpty()) {
-            System.err.println("Error parsing configuration file:");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Error parsing configuration file:\r\n");
             for (TomlParseError error : tomlResult.errors()) {
-                System.err.println("- " + error);
+                sb.append("- ").append(error).append("\r\n");
             }
+            Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.SEVERE, sb.toString());
         }
 
         TomlTable configurationTable = tomlResult.getTable("configuration");
@@ -200,11 +207,13 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
                     result.put(name, value);
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot load TOML configuration", ex);
+            } catch (Exception ex) {
+                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during loading TOML configuration", ex);
             }
         }
+        Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.FINE, "TOML file loaded.");
         return result;
-
     }
 
     private static List<String> wordWrap(String text, int maxLineLength) {
@@ -260,7 +269,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
                 }
 
             } catch (IOException ex) {
-                //ignore
+                Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.WARNING, "Cannot load showComments/modifiedOnly flags from previous TOML file", ex);                
             }
         }
         if (showComments == null) {
@@ -269,8 +278,7 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
         if (modifiedOnly == null) {
             modifiedOnly = true;
         }
-        try (
-                Writer w = new FileWriter(file); PrintWriter pw = new PrintWriter(w)) {
+        try (PrintWriter pw = new PrintWriter(file, "UTF-8")) {
             String header = AppResources.translate("configurationFile").replace("%app%", ApplicationInfo.APPLICATION_NAME);
             String splitter = stringOfChar('-', header.length());
             pw.println("# " + splitter);
@@ -558,11 +566,13 @@ public class TomlConfigurationStorage implements ConfigurationStorage {
                         pw.println();
                     }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot get configuration field to save", ex);
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.SEVERE, "Cannot write TOML configuration", ex);
+        } catch (Exception ex) {
+            Logger.getLogger(TomlConfigurationStorage.class.getName()).log(Level.SEVERE, "Exception during saving configuration", ex);
         }
     }
 }

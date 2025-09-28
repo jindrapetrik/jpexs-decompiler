@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * GotoFrame2 action - Goes to a frame, stack-based.
@@ -66,6 +67,7 @@ public class ActionGotoFrame2 extends Action {
 
     /**
      * Constructor.
+     *
      * @param playFlag Play flag
      * @param sceneBiasFlag Scene bias flag
      * @param sceneBias Scene bias
@@ -80,6 +82,7 @@ public class ActionGotoFrame2 extends Action {
 
     /**
      * Constructor.
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @throws IOException On I/O error
@@ -126,6 +129,7 @@ public class ActionGotoFrame2 extends Action {
 
     /**
      * Constructor.
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -179,7 +183,7 @@ public class ActionGotoFrame2 extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem frame = stack.pop();
         output.add(new GotoFrame2ActionItem(this, lineStartAction, frame, sceneBiasFlag, playFlag, sceneBias));
     }

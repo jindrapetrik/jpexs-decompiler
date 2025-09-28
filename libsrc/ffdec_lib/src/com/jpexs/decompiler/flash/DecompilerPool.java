@@ -243,6 +243,9 @@ public class DecompilerPool {
             future.cancel(true);
             throw ex;
         } catch (ExecutionException ex) {
+            if (ex.getCause() instanceof InterruptedException) {
+                throw (InterruptedException) ex.getCause();
+            }
             Logger.getLogger(DecompilerPool.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             List<Future<HighlightedText>> futures = openableToFutures.get(swf);

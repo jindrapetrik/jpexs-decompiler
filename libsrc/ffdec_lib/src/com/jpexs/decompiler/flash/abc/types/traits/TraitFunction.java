@@ -34,6 +34,7 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Function trait in ABC file.
@@ -77,23 +78,23 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
    
     @Override
-    public GraphTextWriter toStringHeader(int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
+    public GraphTextWriter toStringHeader(Set<String> usedDeobfuscations, int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
             writer.appendNoHilight("native ");
         }
-        getModifiers(abc, isStatic, insideInterface, writer, classIndex);
+        getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
-        abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
+        abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames, usedDeobfuscations);
         writer.appendNoHilight(") : ");
-        abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(method_info).getReturnTypeStr(writer, abc, abc.constants, fullyQualifiedNames, usedDeobfuscations);
         return writer;
     }
    
     @Override
-    public void convertHeader(int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Set<String> usedDeobfuscations, int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
     /**
@@ -109,10 +110,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
    
     @Override
-    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        getMetaData(this, convertData, abc, writer);
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
-        toStringHeader(swfVersion, parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+    public GraphTextWriter toString(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        getMetaData(usedDeobfuscations, this, convertData, abc, writer);
+        writer.startMethod(method_info, getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, false));
+        toStringHeader(usedDeobfuscations, swfVersion, parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
 
         writer.startBlock();
         int bodyIndex = abc.findBodyIndex(method_info);
@@ -120,7 +121,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
         }
         writer.endBlock();
 
@@ -131,15 +132,15 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
    
     @Override
-    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convert(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
-        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
-        convertHeader(swfVersion, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        writer.startMethod(method_info, getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), true, false));
+        convertHeader(usedDeobfuscations, swfVersion, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>(), new ArrayList<>());
+            abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>(), new ArrayList<>(), usedDeobfuscations);
         }
         writer.endMethod();
     }
@@ -174,29 +175,14 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         TraitFunction ret = (TraitFunction) super.clone();
         return ret;
     }
-
-    /**
-     * Gets dependencies.
-     *
-     * @param abcIndex ABC indexing
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param isStatic Is static
-     * @param customNamespace Custom namespace
-     * @param abc ABC
-     * @param dependencies Dependencies
-     * @param ignorePackage Ignore package
-     * @param fullyQualifiedNames Fully qualified names
-     * @param uses Uses
-     * @throws InterruptedException On interrupt
-     */
+    
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+        super.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, false, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
+        DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, this, scriptIndex, classIndex, false, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
 
     /**

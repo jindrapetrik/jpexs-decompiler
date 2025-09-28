@@ -60,6 +60,8 @@ public class MorphShapeExportSettings {
                 return ".png";
             case BMP_START_END:
                 return ".bmp";
+            case WEBP_START_END:
+                return ".webp";
             case SVG:
             case SVG_START_END:
                 return ".svg";

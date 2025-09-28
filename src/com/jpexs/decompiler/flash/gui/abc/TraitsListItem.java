@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,9 +81,9 @@ public class TraitsListItem {
             return "__" + STR_SCRIPT_INITIALIZER;
         }
         if (isStatic) {
-            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
+            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
         } else {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, null, false, true);
         }
     }
 
@@ -105,13 +106,13 @@ public class TraitsListItem {
                     return "";
                 }
                 Trait trait = traits.get(index);
-                trait.convertHeader(-1, null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                trait.convertHeader(new LinkedHashSet<>(), -1, null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 boolean insideInterface = false;
                 if (classIndex > -1) {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
-                trait.toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                trait.toStringHeader(new LinkedHashSet<>(), -1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 writer.finishHilights();
                 s = writer.toString();
             } else {
@@ -121,13 +122,13 @@ public class TraitsListItem {
                     return "";
                 }
                 Trait trait = traits.get(index);
-                trait.convertHeader(-1, null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                trait.convertHeader(new LinkedHashSet<>(), -1, null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 boolean insideInterface = false;
                 if (classIndex > -1) {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
-                trait.toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                trait.toStringHeader(new LinkedHashSet<>(), -1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 writer.finishHilights();
                 s = writer.toString();
             }

@@ -26,6 +26,8 @@ public class ActionScriptTestBase {
         pCode = pCode.replaceAll("\t", "   ").trim();
         pCode = pCode.replaceAll("( *[\r\n]+ *)+", "\n").trim();
         pCode = pCode.replaceAll("  +", " ").trim();
+        //replace ns suffixes, so testCollidingPublicTraits will work even when ns indices change
+        pCode = pCode.replaceAll("#[0-9]+", "#_");
         return pCode;
     }
 }

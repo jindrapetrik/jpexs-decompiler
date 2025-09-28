@@ -132,7 +132,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
     public void remove() {
         item = list.removeItem(item.prev);
     }
-
+    
     /**
      * Adds an action after the current item.
      *

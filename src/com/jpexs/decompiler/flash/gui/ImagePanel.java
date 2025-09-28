@@ -36,15 +36,18 @@ import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -52,9 +55,11 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
@@ -84,6 +89,8 @@ import java.awt.Stroke;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.Transparency;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -124,7 +131,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -147,6 +156,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final Logger logger = Logger.getLogger(ImagePanel.class.getName());
 
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
+
+    private final List<Runnable> textChangedListeners = new ArrayList<>();
 
     private Timelined timelined;
 
@@ -263,6 +274,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor addPointCursor;
     private static Cursor guideXCursor;
     private static Cursor guideYCursor;
+    private static Cursor textCursor;
 
     private Point2D offsetPoint = new Point2D.Double(0, 0);
 
@@ -283,6 +295,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean mutable = false;
 
     private boolean alwaysDisplay = false;
+
+    private boolean allowSelectAllTextTypes = false;
 
     private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
@@ -389,6 +403,78 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
+
+    private Rectangle2D textSelectionStartGlyphRect = null;
+    private Double textSelectionStartGlyphXPosition = null;
+    private Double textSelectionStartPrecise = null;
+    private Double textSelectionEndPrecise = null;
+    private TextTag lastMouseOverText = null;
+    private TextTag textSelectionText = null;
+    private boolean selectingText = false;
+
+    private boolean textCursorBlinkOn = false;
+    
+    /**
+     * This was a test to edit texts inline, but it failed horribly.
+     * You can try to enable it, but the results are bad, very bad.
+     */
+    private boolean editTexts = false;
+
+    private Timer textCursorBlinkTimer;
+    
+    private void setTextSelection(int value) {
+        int selStart = getSelectionStartInt();
+        int delta = value - selStart;
+        changeTextSelection(delta);
+    }
+    
+    private void changeTextSelection(int delta) {
+        TextTag text = textSelectionText;
+        if (text == null) {
+            return;                        
+        }
+        int selStart = getSelectionStartInt();
+        List<TEXTRECORD> textRecords = new ArrayList<>();
+        if (text instanceof StaticTextTag) {
+            textRecords = ((StaticTextTag) text).textRecords;
+        }
+        if (text instanceof DefineEditTextTag) {
+            textRecords = ((DefineEditTextTag) text).getTextRecords(text.getSwf());
+        }
+
+        List<RECT> glyphPositions = TextTag.getGlyphEntriesPositions(textRecords, text.getSwf());
+        
+        selStart += delta;
+
+        if (selStart < 0) {
+            selStart = 0;
+        }
+        if (selStart > glyphPositions.size()) {
+            selStart = glyphPositions.size();
+        }                
+        
+        if (glyphPositions.size() == 0) {
+            textSelectionStartPrecise = (double) selStart;
+            textSelectionEndPrecise = (double) selStart;
+            return;
+        }
+        
+        RECT gp = glyphPositions.get(selStart == glyphPositions.size() ? selStart - 1 : selStart);
+        Rectangle2D r = new Rectangle2D.Double(
+                gp.Xmin,
+                gp.Ymin,
+                gp.Xmax - gp.Xmin,
+                gp.Ymax - gp.Ymin
+        );
+        textSelectionStartGlyphRect = r;
+        textSelectionStartGlyphXPosition = r.getX();
+        if (selStart == glyphPositions.size()) {
+            textSelectionStartGlyphXPosition = r.getMaxX();
+        }
+
+        textSelectionStartPrecise = (double) selStart;
+        textSelectionEndPrecise = (double) selStart;
+    }
 
     private static int getSnapGuidesDistance() {
         return Configuration.guidesSnapAccuracy.get().getDistance();
@@ -691,6 +777,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             addPointCursor = loadCursor("add_point", 0, 0);
             guideXCursor = loadCursor("guide_x", 0, 0);
             guideYCursor = loadCursor("guide_y", 0, 0);
+            textCursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -886,6 +973,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         listeners.remove(listener);
     }
 
+    public void addTextChangedListener(Runnable listener) {
+        textChangedListeners.add(listener);
+    }
+
+    public void removeTextChangedListener(Runnable listener) {
+        textChangedListeners.remove(listener);
+    }
+
+    private void fireTextChanged() {
+        for (Runnable r : textChangedListeners) {
+            r.run();
+        }
+    }
+
     @Override
     public Color getBackgroundColor() {
         if (swf != null && swf.getBackgroundColor() != null) {
@@ -983,6 +1084,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private SerializableImage _img;
 
         private ButtonTag mouseOverButton = null;
+
+        private TextTag mouseOverText = null;
+
+        private Matrix selectionAbsMatrix = null;
+
+        private int glyphPosUnderCursor = -1;
+
+        private Rectangle2D glyphUnderCursorRect = null;
+
+        private double glyphUnderCursorXPosition = 0;
 
         private boolean autoFit = false;
 
@@ -1323,6 +1434,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         g2.draw(gp);
                         g2.setComposite(AlphaComposite.SrcOver);
+
+                        Rectangle2D curRect = textSelectionStartGlyphRect;
+                        Matrix mat = iconPanel.selectionAbsMatrix;
+                        Double xPos = textSelectionStartGlyphXPosition;
+                        if (textCursorBlinkOn && curRect != null && mat != null && textSelectionStartPrecise != null && xPos != null) {
+                            double rectPos = (xPos - curRect.getX()) / curRect.getWidth();
+                            if (rectPos < 0.7) {
+                                curRect = new Rectangle2D.Double(curRect.getX(), curRect.getY(), 1 * SWF.unitDivisor, curRect.getHeight());
+                            } else {
+                                curRect = new Rectangle2D.Double(curRect.getMaxX(), curRect.getY(), 1 * SWF.unitDivisor, curRect.getHeight());
+                            }
+
+                            Matrix matScale = Matrix.getScaleInstance(1 / SWF.unitDivisor);
+                            Shape shape = mat.preConcatenate(matScale).toTransform().createTransformedShape(curRect);
+                            g2.setColor(Color.black);
+                            g2.fill(shape);
+                            /*g2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+                            g2.draw(shape);*/
+                        }
                     }
                 } catch (InternalError ie) {
                     //On some devices like Linux X11 - BlendComposite.Invert is not available
@@ -1422,7 +1552,57 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 @Override
+                public void keyTyped(KeyEvent e) {                                            
+                    
+                    if (!editTexts) {
+                        return;
+                    }
+                    
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE) {
+                        if (textSelectionText != null) {
+                            TextTag text = textSelectionText;
+                            int selStart = getSelectionStartInt();
+                            if (text != null && selStart > -1) {
+                                text.removeCharacterGlyph(selStart);
+                                fireTextChanged();
+                            }
+                        }
+                        return;
+                    }
+
+                    if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        if (textSelectionText != null) {
+                            TextTag text = textSelectionText;
+                            int selStart = getSelectionStartInt();
+                            if (text != null && selStart > 0) {
+                                changeTextSelection(-1);
+                                text.removeCharacterGlyph(selStart - 1);
+                                fireTextChanged();                                
+                            }
+                        }
+                        return;
+                    }
+                    char c = e.getKeyChar();
+                    TextTag text = textSelectionText;
+                    int selStart = getSelectionStartInt();
+                    if (text != null && selStart > -1) {
+                        text.insertCharacterGlyph(selStart, c);
+                        fireTextChanged();
+                        changeTextSelection(+1);
+                    }
+                }
+
+                @Override
                 public void keyPressed(KeyEvent e) {
+                    if (textSelectionText != null) {
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            changeTextSelection(+1);
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            changeTextSelection(-1);
+                        }
+                    }
+                    
                     if (hilightedPoints != null) {
                         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             List<Integer> selectedPointsDesc = new ArrayList<>(selectedPoints);
@@ -1478,6 +1658,78 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
+                    if (SwingUtilities.isRightMouseButton(e) && !selectionMode && !doFreeTransform) {
+                        TextTag text = mouseOverText;
+                        if (text != null) {
+                            if (text instanceof DefineEditTextTag) {
+                                DefineEditTextTag defineEditText = (DefineEditTextTag) text;
+                                List<TEXTRECORD> recs = defineEditText.getTextRecords(defineEditText.getSwf());
+                                FontTag font = null;
+                                int pos = 0;
+                                int selStart = getSelectionStartInt();
+                                int selEnd = getSelectionEndInt();
+                                StringBuilder sb = new StringBuilder();
+                                int y = 0;
+                                for (TEXTRECORD r : recs) {
+                                    if (r.styleFlagsHasFont) {
+                                        font = r.getFont(defineEditText.getSwf());                                        
+                                    }
+                                    if (r.styleFlagsHasYOffset) {
+                                        int oldY = y;
+                                        y = r.yOffset;
+                                        if (text == textSelectionText && pos >= selStart && pos < selEnd) {
+                                            if (y > oldY && sb.length() > 0) {
+                                                sb.append("\n");
+                                            }
+                                        }
+                                    }
+                                    if (font == null) {
+                                        continue;
+                                    }
+                                    for (GLYPHENTRY g : r.glyphEntries) {
+                                        if (text == textSelectionText && pos >= selStart && pos < selEnd) {
+                                            sb.append(font.glyphToChar(g.glyphIndex));
+                                        }
+                                        pos++;
+                                    }
+                                }
+                                String textToCopy = sb.toString();
+                                int fullLength = pos;
+                                
+                                JPopupMenu pm = new JPopupMenu();
+                                JMenuItem copyMenuItem = new JMenuItem(AppStrings.translate("text.copy"), View.getIcon("copy16"));
+                                copyMenuItem.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        StringSelection stringSelection = new StringSelection(textToCopy);
+                                        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                        clipboard.setContents(stringSelection, null);
+                                    }                                    
+                                });
+                                JMenuItem selectAllMenuItem = new JMenuItem(AppStrings.translate("text.selectAll"), View.getIcon("selectall16"));
+                                selectAllMenuItem.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        textSelectionText = text;
+                                        textSelectionStartPrecise = 0.0;
+                                        textSelectionEndPrecise = (double) fullLength;
+                                        textSelectionStartGlyphRect = new Rectangle2D.Double(); //??
+                                        textSelectionStartGlyphXPosition = 0.0; //??                                
+                                
+                                        repaint();
+                                    }                                    
+                                });
+                                
+                                if (!textToCopy.isEmpty()) {
+                                    pm.add(copyMenuItem);                                    
+                                }
+                                pm.add(selectAllMenuItem);
+                                pm.show(iconPanel, e.getX(), e.getY());
+                                
+                            }
+                        }
+                    }
+                    
                     if (e.getClickCount() == 2) {
                         if (Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
                             Point mousePoint = e.getPoint();
@@ -1524,19 +1776,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
 
                         DepthState ds = depthStateUnderCursor;
-                        if (ds != null) {
-                            CharacterTag cht = ds.getCharacter();
-                            if (cht instanceof Timelined) {
-                                synchronized (lock) {
-                                    parentTimelineds.add(timelined);
-                                    parentDepths.add(ds.depth);
-                                    parentFrames.add(ds.frame.frame);
-                                    timelined = (Timelined) cht;
-                                    selectedDepths.clear();
-                                    frame = 0;
-                                }
-                                fireMediaDisplayStateChanged();
-                            }
+                        if (ds != null) {                            
+                            openDepth(frame, ds.depth);
+                            //gotoFrame(1);
                         }
 
                         return;
@@ -2468,7 +2710,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
                     }
-                    if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
+                    if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR && !selectingText) {
                         Point2D dragEnd = e.getPoint();
                         Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
                         Point2D regPointImage = registrationPoint == null ? null : toImagePoint(registrationPoint);
@@ -3232,17 +3474,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Integer newMode = null;
                         if (nearGuideX) {
                             newMode = MODE_GUIDE_X;
-                            cursor = guideXCursor;
+                            //cursor = guideXCursor;
                         } else if (nearGuideY) {
                             newMode = MODE_GUIDE_Y;
-                            cursor = guideYCursor;
+                            //cursor = guideYCursor;
                         } else {
                             newMode = Cursor.DEFAULT_CURSOR;
-                            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                            //cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                         }
-                        if (getCursor() != cursor) {
+                        /*if (getCursor() != cursor) {
                             setCursor(cursor);
-                        }
+                        }*/
                         mode = newMode;
                     }
                 }
@@ -4044,6 +4286,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
                     redraw();
+
+                    TextTag text = iconPanel.mouseOverText;
+                    if (text == null || (!allowSelectAllTextTypes && (!(text instanceof DefineEditTextTag) || ((DefineEditTextTag) text).noSelect))) {
+                        text = null;
+                    }
+                    if (text != null && !doFreeTransform && !selectionMode) {
+                        Rectangle2D glyphRect = iconPanel.glyphUnderCursorRect;
+                        if (iconPanel.glyphPosUnderCursor > -1 && glyphRect != null) {
+                            if (mouseButton == 1) {
+                                textSelectionText = text;
+                                textSelectionStartPrecise = iconPanel.glyphPosUnderCursor + (glyphRect.getWidth() == 0 ? 0 : (iconPanel.glyphUnderCursorXPosition - glyphRect.getX()) / glyphRect.getWidth());
+                                textSelectionEndPrecise = null;
+                                selectingText = true;
+                                textSelectionStartGlyphRect = iconPanel.glyphUnderCursorRect;
+                                textSelectionStartGlyphXPosition = iconPanel.glyphUnderCursorXPosition;
+                            }
+                        } else {
+                            textSelectionStartPrecise = null;
+                        }
+                    } else {
+                        textSelectionStartPrecise = null;
+                    }
+
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null && !doFreeTransform && !frozenButtons) {
                         DefineButtonSoundTag sounds = button.getSounds();
@@ -4089,6 +4354,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     mouseButton = 0;
                     lastMouseEvent = e;
                     redraw();
+
+                    TextTag text = iconPanel.mouseOverText;
+                    if (text == null || (!allowSelectAllTextTypes && (!(text instanceof DefineEditTextTag) || ((DefineEditTextTag) text).noSelect))) {
+                        text = null;
+                    }
+                    if (selectingText && textSelectionStartPrecise != null && text != null && !doFreeTransform && SwingUtilities.isLeftMouseButton(e)) {
+                        Rectangle2D glyphRect = iconPanel.glyphUnderCursorRect;
+                        if (iconPanel.glyphPosUnderCursor > -1 && glyphRect != null) {
+                            textSelectionEndPrecise = iconPanel.glyphPosUnderCursor + (glyphRect.getWidth() == 0 ? 0 : (iconPanel.glyphUnderCursorXPosition - glyphRect.getX()) / glyphRect.getWidth());
+                        }
+                    }
+
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (!muted && button != null && !doFreeTransform && !frozenButtons) {
                         DefineButtonSoundTag sounds = button.getSounds();
@@ -4099,6 +4376,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
                     }
+                    selectingText = false;
                 }
             }
         });
@@ -4116,9 +4394,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
+
+                    TextTag text = iconPanel.mouseOverText;
+                    if (text == null || (!allowSelectAllTextTypes && (!(text instanceof DefineEditTextTag) || ((DefineEditTextTag) text).noSelect))) {
+                        text = null;
+                    }
+                    if (selectingText && textSelectionStartPrecise != null && text != null && !doFreeTransform && SwingUtilities.isLeftMouseButton(e)) {
+                        Rectangle2D glyphRect = iconPanel.glyphUnderCursorRect;
+                        if (iconPanel.glyphPosUnderCursor > -1 && glyphRect != null) {
+                            textSelectionEndPrecise = iconPanel.glyphPosUnderCursor + (glyphRect.getWidth() == 0 ? 0 : (iconPanel.glyphUnderCursorXPosition - glyphRect.getX()) / glyphRect.getWidth());
+                        }
+                    }
                 }
             }
         });
+        textCursorBlinkTimer = new Timer();
+        textCursorBlinkTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (textSelectionStartPrecise != null && editTexts) {
+                    textCursorBlinkOn = !textCursorBlinkOn;
+                    repaint();
+                }
+            }
+        }, 500, 500);
         //*/
     }
 
@@ -4448,7 +4747,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
-            this.parentDepths.clear();
+            this.parentDepths.clear();            
             centerImage();
             this.swf = swf;
             zoomAvailable = allowZoom;
@@ -4489,15 +4788,36 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.frozen = frozen;
             this.frozenButtons = frozenButtons;
             this.muted = muted;
-            this.resample = Configuration.previewResampleSound.get();
+            this.resample = false; //Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;
             hilightedPoints = null;
+            selectedDepths = new ArrayList<>();
+            selectedPoints = new ArrayList<>();
+            textSelectionEndPrecise = null;
+            textSelectionStartPrecise = null;
+            textSelectionStartGlyphRect = null;
+            textSelectionStartGlyphXPosition = null;
+            textSelectionText = null;
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             iconPanel.calcRect();
+            
+            if (selectionMode) {                
+                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
+                int chid = -1;
+                if (timelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) timelined).getCharacterId();
+                }
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "" + chid);
+                
+                
+                loadOpenedDepths();                                
+            }
+            
+            
 
             clearGuidesInternal();
             setNoGuidesCharacter();
@@ -5206,6 +5526,52 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return viewRect;
     }
 
+    private int getSelectionStartInt() {
+        Double selStart = textSelectionStartPrecise;
+        Double selEnd = textSelectionEndPrecise;
+
+        if (selStart == null) {
+            return -1;
+        }
+
+        if (selStart != null && selEnd != null) {
+            if (selStart > selEnd) {
+                double tmp = selStart;
+                selStart = selEnd;
+                selEnd = tmp;
+            }
+        }
+        int selStartInt = (int) Math.floor(selStart);
+        double startFract = selStart - selStartInt;
+        if (startFract > 0.7) {
+            selStartInt++;
+        }
+        return selStartInt;
+    }
+    
+    private int getSelectionEndInt() {
+        Double selStart = textSelectionStartPrecise;
+        Double selEnd = textSelectionEndPrecise;
+
+        if (selStart == null) {
+            return -1;
+        }
+
+        if (selStart != null && selEnd != null) {
+            if (selStart > selEnd) {
+                double tmp = selStart;
+                selStart = selEnd;
+                selEnd = tmp;
+            }
+        }
+        int selEndInt = (int) Math.floor(selEnd);
+        double endFract = selEnd - selEndInt;
+        if (endFract > 0.7) {
+            selEndInt++;
+        }
+        return selEndInt;
+    }
+
     private void drawFrame(Timer thisTimer, boolean display) {
         Timelined timelined;
         MouseEvent lastMouseEvent;
@@ -5267,6 +5633,31 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         renderContext.mouseButton = mouseButton;
         renderContext.stateUnderCursor = new ArrayList<>();
         renderContext.enableButtons = !frozenButtons;
+
+        Double selStart = textSelectionStartPrecise;
+        Double selEnd = textSelectionEndPrecise;
+        if (selStart != null && selEnd != null) {
+            if (selStart > selEnd) {
+                double tmp = selStart;
+                selStart = selEnd;
+                selEnd = tmp;
+            }
+            int selStartInt = (int) Math.floor(selStart);
+            double startFract = selStart - selStartInt;
+            int selEndInt = (int) Math.floor(selEnd);
+            double endFract = selEnd - selEndInt;
+
+            if (endFract > 0.7) {
+                selEndInt++;
+            }
+            if (startFract > 0.7) {
+                selStartInt++;
+            }
+
+            renderContext.selectionStart = selStartInt;
+            renderContext.selectionEnd = selEndInt;
+            renderContext.selectionText = textSelectionText;
+        }
 
         SerializableImage img;
         try {
@@ -5458,7 +5849,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (timer == thisTimer) {
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
+                    lastMouseOverText = iconPanel.mouseOverText;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
+                    iconPanel.mouseOverText = renderContext.mouseOverText;
+                    iconPanel.selectionAbsMatrix = renderContext.selectionAbsMatrix;
+                    iconPanel.glyphUnderCursorRect = renderContext.glyphUnderCursorRect;
+                    iconPanel.glyphUnderCursorXPosition = renderContext.glyphUnderCursorXPosition;
+                    iconPanel.glyphPosUnderCursor = renderContext.glyphPosUnderCursor;
                     View.execInEventDispatchLater(new Runnable() {
                         @Override
                         public void run() {
@@ -5498,6 +5895,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 } else if (handCursor) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+                                } else if (!selectionMode && !doFreeTransform && (selectingText || (iconPanel.mouseOverText != null && (allowSelectAllTextTypes || (iconPanel.mouseOverText instanceof DefineEditTextTag && !((DefineEditTextTag) iconPanel.mouseOverText).noSelect))))) {
+                                    newCursor = textCursor;
                                 } else if (zoomAvailable && iconPanel.hasAllowMove()) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
                                 } else {
@@ -5510,6 +5909,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
                     );
+
+                    if (lastMouseOverText != renderContext.mouseOverText) {
+                        /*textSelectionStart = 0;
+                        textSelectionEnd = 0;
+                        textSelectionStartPrecise = null;
+                        textSelectionEndPrecise = null;*/
+                    }
 
                     if (!muted) {
                         if (lastMouseOverButton != renderContext.mouseOverButton) {
@@ -5856,11 +6262,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (frame < 1) {
             frame = 1;
         }
-
+               
         this.autoPlayed = true;
         this.frame = frame - 1;
         this.prevFrame = -1;
+        
+        if (selectionMode) {
+            SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "" + frame);
+        }
+        
         stopInternal();
+        
+        
         redraw();
         fireMediaDisplayStateChanged();
     }
@@ -6140,6 +6554,92 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 return parentTimelineds.get(0);
             }
             return timelined;
+        }
+    }
+    
+    public void loadOpenedDepths() {
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
+        if (conf != null) {
+            int chid = -1;
+            if (!parentTimelineds.isEmpty()) {
+                Timelined firstTimelined = parentTimelineds.get(0);
+                if (firstTimelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) firstTimelined).getCharacterId();
+                }
+            } else {
+                if (timelined instanceof CharacterTag) {
+                    chid = ((CharacterTag) timelined).getCharacterId();
+                }
+            }
+            int lastChid = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "-1"));
+            if (lastChid != chid) {
+                return;
+            }            
+            List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
+            List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
+            while (parentFrames.size() < parentDepths.size()) {
+                parentFrames.add("0");
+            }
+            
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
+            conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
+            
+            int frame = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "1"));
+            
+            for (int i = 0; i < parentDepths.size(); i++) {                
+                openDepth(Integer.parseInt(parentFrames.get(i)), Integer.parseInt(parentDepths.get(i)));
+            }
+
+            gotoFrame(frame);            
+        } else {
+            gotoFrame(1);
+        }
+    }
+    
+    public void openDepth(int frame, int depth) {
+        Timelined tim = timelined;
+        if (tim == null) {
+            return;
+        }
+        if (tim.getTimeline().getFrame(frame) == null) {
+            return;
+        }
+        DepthState ds = tim.getTimeline().getFrame(frame).layers.get(depth);
+        if (ds != null) {                            
+            CharacterTag cht = ds.getCharacter();
+            if (cht instanceof Timelined) {
+                int newFrame = 0;
+                synchronized (lock) {
+                    parentTimelineds.add(timelined);
+                    parentDepths.add(ds.depth);
+                    parentFrames.add(ds.frame.frame);
+                    timelined = (Timelined) cht;
+                    selectedDepths.clear();
+                    
+                    int time = ds.time;
+                    newFrame = time % timelined.getFrameCount();
+                    if (timelined instanceof ButtonTag) {
+                        newFrame = ButtonTag.FRAME_UP;
+                    }
+                    frame = newFrame;
+
+                    SWF swf = parentTimelineds.get(0).getSwf();
+                    SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
+                    if (parentTimelineds.size() == 1) {
+                        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "" + (ds.frame.frame + 1));
+                    }
+                    
+                    List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
+                    parentDepths.add("" + ds.depth);
+                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, parentDepths);
+                    
+                    List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
+                    parentFrames.add("" + ds.frame.frame);
+                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);                
+                }
+                gotoFrame(newFrame + 1);
+                fireMediaDisplayStateChanged();
+            }
         }
     }
 }

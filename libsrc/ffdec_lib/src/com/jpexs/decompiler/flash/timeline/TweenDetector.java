@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

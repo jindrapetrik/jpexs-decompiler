@@ -297,12 +297,12 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         resampleButton.setToolTipText(AppStrings.translate("preview.resample"));
         resampleButton.setMargin(new Insets(4, 2, 2, 2));
         resampleButton.addActionListener(this::resampleButtonActionPerformed);
-        resampleButton.setSelected(Configuration.previewResampleSound.get());
+        resampleButton.setSelected(false); //Configuration.previewResampleSound.get());
 
         buttonsPanel.add(pauseButton);
         buttonsPanel.add(stopButton);
         buttonsPanel.add(loopButton);
-        buttonsPanel.add(resampleButton);
+        //buttonsPanel.add(resampleButton);
         controlPanel.add(buttonsPanel, BorderLayout.CENTER);
 
         progress = new JProgressBar();

@@ -58,17 +58,17 @@ public class GetLexIns extends InstructionDefinition {
             Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
         type.setVal(TypeItem.UNKNOWN);
         callType.setVal(TypeItem.UNKNOWN);
-        String multinameStr = localData.abc.constants.getMultiname(multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
+        String multinameStr = localData.abc.constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true);
         for (int b = localData.callStack.size() - 1; b >= 0; b--) {
             MethodBody body = localData.callStack.get(b);
             for (Trait t : body.traits.traits) {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst) t;
                     if (Objects.equals(
-                            tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                            tsc.getName(localData.abc).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, new ArrayList<>(), true, true),
                             multinameStr
                     )) {
-                        GraphTargetItem ty = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
+                        GraphTargetItem ty = AbcIndexing.multinameToType(localData.usedDeobfuscations, tsc.type_index, localData.abc, localData.abc.constants);
                         type.setVal(ty);
                         callType.setVal(ty);
                         return;
@@ -78,7 +78,7 @@ public class GetLexIns extends InstructionDefinition {
         }
 
         if (localData.abcIndex != null) {
-            String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
+            String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.abc.constants, true).toRawString();
             if (currentClassName != null) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
                 localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true, type, callType, foundStatic);
@@ -86,7 +86,7 @@ public class GetLexIns extends InstructionDefinition {
 
             if (type.getVal().equals(TypeItem.UNKNOWN)) {
                 //TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
-                GraphTargetItem ti = AbcIndexing.multinameToType(multinameIndex, localData.abc.constants);
+                GraphTargetItem ti = AbcIndexing.multinameToType(localData.usedDeobfuscations, multinameIndex, localData.abc, localData.abc.constants);
                 if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                     type.setVal(ti);
                     callType.setVal(TypeItem.UNBOUNDED);
@@ -116,7 +116,7 @@ public class GetLexIns extends InstructionDefinition {
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetLexIns.resolveLexType(localData, null, multinameIndex, isStatic, type, callType);
-        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), type.getVal(), callType.getVal(), isStatic.getVal()));
+        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.abc, localData.getConstants(), type.getVal(), callType.getVal(), isStatic.getVal(), localData.usedDeobfuscations));
     }
 
     @Override

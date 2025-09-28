@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.DeobfuscationListener;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -639,6 +640,141 @@ public class ABC implements Openable {
         }
     }
 
+    private void getObfuscatedIdentifier(int strIndex, Map<String, String> map, String prefix) {
+        if (strIndex >= constants.getStringCount()) {
+            return;
+        }
+        if (strIndex <= 0) {
+            return;
+        }
+        String s = constants.getString(strIndex);
+        if (map.containsKey(s)) {
+            return;
+        }
+        AVM2Deobfuscation deobfuscation = getDeobfuscation();
+        if (deobfuscation.isValidName(strIndex)) {
+            return;
+        }
+
+        if (s.matches("^" + IdentifiersDeobfuscation.SAFE_STRING_PREFIX + "[0-9]+$")
+                || s.matches("^" + IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + "[0-9]+$")
+                || s.matches("^" + IdentifiersDeobfuscation.SAFE_CLASS_PREFIX + "[0-9]+$")) {
+            String foundKey = null;
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (entry.getValue().equals(s)) {
+                    foundKey = entry.getKey();
+                    break;
+                }
+            }
+            if (foundKey == null) {
+                map.put(s, s);
+                return;
+            } else {
+                if (foundKey.equals(s)) {
+                    return;
+                }
+                String foundPrefix = IdentifiersDeobfuscation.SAFE_STRING_PREFIX;
+                if (s.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)) {
+                    foundPrefix = IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
+                } else if (s.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX)) {
+                    foundPrefix = IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
+                }
+                map.put(foundKey, foundPrefix + map.size());
+                map.put(s, s);
+                return;
+            }
+        }
+
+        map.put(s, prefix + map.size());
+    }
+
+    private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> map) {
+        if (strIndex >= constants.getStringCount()) {
+            return;
+        }
+        if (strIndex <= 0) {
+            return;
+        }
+        String s = constants.getString(strIndex);
+        if (map.containsKey(s)) {
+            return;
+        }
+        AVM2Deobfuscation deobfuscation = getDeobfuscation();
+        if (deobfuscation.isValidPackageName(strIndex)) {
+            return;
+        }
+        String[] parts = s.split("\\.", -1);
+        List<String> deobfuscatedList = new ArrayList<>();
+        for (String part : parts) {
+            if (!deobfuscation.isValidNSPart(part)) {
+                if (part.matches("^" + IdentifiersDeobfuscation.SAFE_STRING_PREFIX + "[0-9]+$")
+                        || part.matches("^" + IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + "[0-9]+$")
+                        || part.matches("^" + IdentifiersDeobfuscation.SAFE_CLASS_PREFIX + "[0-9]+$")) {
+                    String foundKey = null;
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        if (entry.getValue().equals(part)) {
+                            foundKey = entry.getKey();
+                            break;
+                        }
+                    }
+                    if (foundKey == null) {
+                        map.put(part, part);
+                    } else {
+                        if (!foundKey.equals(part)) {
+                            String foundPrefix = IdentifiersDeobfuscation.SAFE_STRING_PREFIX;
+                            if (part.startsWith(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX)) {
+                                foundPrefix = IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX;
+                            } else if (part.startsWith(IdentifiersDeobfuscation.SAFE_CLASS_PREFIX)) {
+                                foundPrefix = IdentifiersDeobfuscation.SAFE_CLASS_PREFIX;
+                            }
+                            map.put(foundKey, foundPrefix + map.size());
+                            map.put(part, part);
+                        }
+                    }
+                } else {
+                    deobfuscatedList.add(IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + map.size());
+                    map.put(part, IdentifiersDeobfuscation.SAFE_PACKAGE_PREFIX + map.size());
+                }
+            } else {
+                deobfuscatedList.add(part);
+            }
+        }
+        map.put(s, String.join(".", deobfuscatedList));
+    }
+
+    public void getObfuscatedIdentifiers(Map<String, String> ret) {
+        for (int i = 0; i < instance_info.size(); i++) {
+            InstanceInfo insti = instance_info.get(i);
+            if (insti.name_index != 0) {
+                getObfuscatedIdentifier(constants.getMultiname(insti.name_index).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX);
+                if (constants.getMultiname(insti.name_index).namespace_index != 0) {
+                    getObfuscatedPackageIdentifier(constants.getNamespace(constants.getMultiname(insti.name_index).namespace_index).name_index, ret);
+                }
+            }
+            if (insti.super_index != 0) {
+                getObfuscatedIdentifier(constants.getMultiname(insti.super_index).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX);
+            }
+            for (int iface : insti.interfaces) {
+                getObfuscatedIdentifier(constants.getMultiname(iface).name_index, ret, IdentifiersDeobfuscation.SAFE_CLASS_PREFIX);
+            }
+        }
+
+        for (int i = 1; i < constants.getMultinameCount(); i++) {
+            Multiname m = constants.getMultiname(i);
+            int strIndex = m.name_index;
+            if (m.kind == Multiname.MULTINAME && strIndex > 0 && "*".equals(constants.getString(strIndex))) {
+                continue;
+            }
+            getObfuscatedIdentifier(constants.getMultiname(i).name_index, ret, IdentifiersDeobfuscation.SAFE_STRING_PREFIX);
+        }
+        for (int i = 1; i < constants.getNamespaceCount(); i++) {
+            if (constants.getNamespace(i).kind != Namespace.KIND_PACKAGE) { // only packages
+                continue;
+            }
+            getObfuscatedPackageIdentifier(constants.getNamespace(i).name_index, ret);
+        }
+    }
+
     /**
      * Deobfuscates identifiers.
      *
@@ -699,7 +835,7 @@ public class ABC implements Openable {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0 && mIndex < constants.getMultinameCount()) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(new LinkedHashSet<>(), this, constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.getCode().code.get(ip - 1).operands[0];
@@ -784,9 +920,10 @@ public class ABC implements Openable {
     public boolean hasFloatSupport() {
         return minVersionCheck(47, 16);
     }
-    
+
     /**
      * Checks whether the ABC has float4 support
+     *
      * @return Whether the ABC has float4 support
      */
     public boolean hasFloat4Support() {
@@ -1269,7 +1406,7 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyClassInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 MethodBody body = findBody(class_info.get(i).cinit_index);
                 if (body != null) {
                     return body;
@@ -1288,7 +1425,7 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyInstanceInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 MethodBody body = findBody(instance_info.get(i).iinit_index);
                 if (body != null) {
                     return body;
@@ -1308,11 +1445,11 @@ public class ABC implements Openable {
      */
     public MethodBody findBodyByClassAndName(String classNameWithSuffix, String methodNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodNameWithSuffix.equals(t2.getName(this).getName(constants, null, true, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -1324,7 +1461,7 @@ public class ABC implements Openable {
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodNameWithSuffix.equals(t2.getName(this).getName(constants, null, true, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -1437,7 +1574,7 @@ public class ABC implements Openable {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
                             String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
-                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
+                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
                             map.put(key, val);
                         }
                     }
@@ -1530,7 +1667,7 @@ public class ABC implements Openable {
     public void dump(OutputStream os) {
         Utf8PrintWriter output;
         output = new Utf8PrintWriter(os);
-        constants.dump(output);
+        constants.dump(this, output);
         for (int i = 0; i < method_info.size(); i++) {
             output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(this, new ArrayList<>()));
         }
@@ -1618,7 +1755,7 @@ public class ABC implements Openable {
         for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
             Multiname m = constants.getMultiname(multinameIndex);
             if (m.kind == Multiname.QNAME || m.kind == Multiname.QNAMEA) {
-                String name = m.getName(constants, new ArrayList<>(), true, false);
+                String name = m.getName(new LinkedHashSet<>(), this, constants, new ArrayList<>(), true, false);
                 List<Integer> indices = nameToQNameIndices.get(name);
                 if (indices == null) {
                     indices = new ArrayList<>();
@@ -1689,7 +1826,7 @@ public class ABC implements Openable {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, null, true, true).equals(methodNameWithSuffix)) {
+                    if (t.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true).equals(methodNameWithSuffix)) {
                         return ((TraitMethodGetterSetter) t).method_info;
                     }
                 }
@@ -1709,7 +1846,7 @@ public class ABC implements Openable {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, null, true, true).equals(methodNameWithSuffix)) {
+                    if (t.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true).equals(methodNameWithSuffix)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
                     }
                 }
@@ -1752,7 +1889,7 @@ public class ABC implements Openable {
             if (instance_info.get(c).deleted) {
                 continue;
             }
-            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants, true);
+            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
             if (nameWithSuffix.equals(s.toRawString())) {
                 return c;
             }
@@ -2983,6 +3120,7 @@ public class ABC implements Openable {
      * Clears all caches.
      */
     public void clearAllCaches() {
+        deobfuscation = null;
         resetMethodIndexing();
         getSwf().clearAbcListCache();
         getSwf().clearScriptCache();

@@ -292,7 +292,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private static volatile Integer[] knownTagIds;
 
-    private static volatile Map<Integer, TagTypeInfo> knownTagInfosById;
+    private static volatile Map<Integer, List<TagTypeInfo>> knownTagInfosById;
 
     private static volatile Map<String, TagTypeInfo> knownTagInfosByName;
 
@@ -319,13 +319,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * Gets known classes.
      * @return Known classes
      */
-    public static Map<Integer, TagTypeInfo> getKnownClasses() {
+    public static Map<Integer, List<TagTypeInfo>> getKnownClasses() {
         if (knownTagInfosById == null) {
             synchronized (lockObject) {
                 if (knownTagInfosById == null) {
-                    Map<Integer, TagTypeInfo> map = new HashMap<>();
+                    Map<Integer, List<TagTypeInfo>> map = new HashMap<>();
                     Map<String, TagTypeInfo> map2 = new HashMap<>();
-                    addTagInfo(map, map2, CSMTextSettingsTag.ID, CSMTextSettingsTag.class, CSMTextSettingsTag.NAME);
+                    addTagInfo(map, map2, CSMSettingsTag.ID, CSMSettingsTag.class, CSMSettingsTag.NAME);
                     addTagInfo(map, map2, DebugIDTag.ID, DebugIDTag.class, DebugIDTag.NAME);
                     addTagInfo(map, map2, DefineBinaryDataTag.ID, DefineBinaryDataTag.class, DefineBinaryDataTag.NAME);
                     addTagInfo(map, map2, DefineBitsJPEG2Tag.ID, DefineBitsJPEG2Tag.class, DefineBitsJPEG2Tag.NAME);
@@ -379,6 +379,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, PlaceObject3Tag.ID, PlaceObject3Tag.class, PlaceObject3Tag.NAME);
                     addTagInfo(map, map2, PlaceObject4Tag.ID, PlaceObject4Tag.class, PlaceObject4Tag.NAME);
                     addTagInfo(map, map2, PlaceObjectTag.ID, PlaceObjectTag.class, PlaceObjectTag.NAME);
+                    addTagInfo(map, map2, PlaceImagePrivateTag.ID, PlaceImagePrivateTag.class, PlaceImagePrivateTag.NAME);
                     addTagInfo(map, map2, ProductInfoTag.ID, ProductInfoTag.class, ProductInfoTag.NAME);
                     addTagInfo(map, map2, ProtectTag.ID, ProtectTag.class, ProtectTag.NAME);
                     addTagInfo(map, map2, RemoveObject2Tag.ID, RemoveObject2Tag.class, RemoveObject2Tag.NAME);
@@ -404,6 +405,18 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, DefineSubImage.ID, DefineSubImage.class, DefineSubImage.NAME);
                     addTagInfo(map, map2, ExporterInfo.ID, ExporterInfo.class, ExporterInfo.NAME);
                     addTagInfo(map, map2, FontTextureInfo.ID, FontTextureInfo.class, FontTextureInfo.NAME);
+                    
+                    addTagInfo(map, map2, DefineVideoTag.ID, DefineVideoTag.class, DefineVideoTag.NAME);
+                    addTagInfo(map, map2, GenCommandTag.ID, GenCommandTag.class, GenCommandTag.NAME);
+                    addTagInfo(map, map2, FontRefTag.ID, FontRefTag.class, FontRefTag.NAME);
+                    addTagInfo(map, map2, DefineTextFormatTag.ID, DefineTextFormatTag.class, DefineTextFormatTag.NAME);
+                    addTagInfo(map, map2, NameCharacterTag.ID, NameCharacterTag.class, NameCharacterTag.NAME);
+                    addTagInfo(map, map2, CharacterSetTag.ID, CharacterSetTag.class, CharacterSetTag.NAME);
+                    addTagInfo(map, map2, SerialNumberTag.ID, SerialNumberTag.class, SerialNumberTag.NAME);
+                    
+                    addTagInfo(map, map2, FreeCharacterTag.ID, FreeCharacterTag.class, FreeCharacterTag.NAME);
+                    addTagInfo(map, map2, SyncFrameTag.ID, SyncFrameTag.class, SyncFrameTag.NAME);
+                    
                     knownTagInfosById = map;
                     knownTagInfosByName = map2;
                 }
@@ -425,8 +438,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagInfosByName;
     }
 
-    private static void addTagInfo(Map<Integer, TagTypeInfo> map, Map<String, TagTypeInfo> map2, int id, Class cls, String name) {
-        map.put(id, new TagTypeInfo(id, cls, name));
+    private static void addTagInfo(Map<Integer, List<TagTypeInfo>> map, Map<String, TagTypeInfo> map2, int id, Class cls, String name) {
+        if (!map.containsKey(id)) {
+            map.put(id, new ArrayList<>());
+        }
+        map.get(id).add(new TagTypeInfo(id, cls, name));
         map2.put(name, new TagTypeInfo(id, cls, name));
     }
 

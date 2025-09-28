@@ -460,6 +460,9 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     @SuppressWarnings("unchecked")
     private void gotoElement() {
+        if (Main.getMainFrame().getPanel().checkEdited()) {
+            return;
+        }
         if (openableToResults.size() > 1) {
             BasicTreeNode selection = (BasicTreeNode) resultsTree.getLastSelectedPathComponent();
             if (selection.getData() instanceof SearchResult) {

@@ -283,6 +283,11 @@ public final class DefineCompactedFont extends FontTag {
     public double getGlyphAdvance(int glyphIndex) {
         return resize(fonts.get(0).glyphInfo.get(glyphIndex).advanceX);
     }
+    
+    @Override
+    public synchronized void setGlyphAdvance(int glyphIndex, double advanceValue) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     @Override
     public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
@@ -401,6 +406,11 @@ public final class DefineCompactedFont extends FontTag {
         GlyphType gt = fonts.get(0).glyphs.get(glyphIndex);
         return new RECT(resize(gt.boundingBox[0]), resize(gt.boundingBox[1]), resize(gt.boundingBox[2]), resize(gt.boundingBox[3]));
     }
+    
+    @Override
+    public void updateBounds() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    } 
 
     public SHAPE resizeShape(SHAPE shp) {
         SHAPE ret = new SHAPE();

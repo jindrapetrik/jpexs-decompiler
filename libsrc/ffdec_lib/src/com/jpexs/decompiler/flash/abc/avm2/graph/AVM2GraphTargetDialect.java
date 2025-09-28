@@ -28,29 +28,32 @@ import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * AVM2 dialect.
+ *
  * @author JPEXS
  */
 public class AVM2GraphTargetDialect extends GraphTargetDialect {
 
     public static final GraphTargetDialect INSTANCE = new AVM2GraphTargetDialect();
-    
+
     private AVM2GraphTargetDialect() {
-        
+
     }
-    
+
     @Override
     public String getName() {
         return "AVM2";
-    }        
+    }
 
     @Override
     public GraphTargetItem valToItem(Object r) {
@@ -100,5 +103,23 @@ public class AVM2GraphTargetDialect extends GraphTargetDialect {
             return new NewObjectAVM2Item(null, null, props);
         }
         return null;
+    }
+
+    @Override
+    public boolean doesAllowMultilevelBreaks() {
+        return true;
+    }
+    
+    @Override
+    public GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException {
+        writer.append("var ");
+        writer.append("_temp");        
+        writer.append(suffix);
+        writer.append("_").append(tempIndex).append(":*");
+        if (value != null) {
+            writer.append(" = ");
+            value.appendTry(writer, localData);
+        }
+        return writer;
     }
 }

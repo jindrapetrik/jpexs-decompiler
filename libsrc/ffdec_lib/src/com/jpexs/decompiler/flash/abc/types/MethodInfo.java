@@ -27,8 +27,10 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Method info in ABC file.
@@ -332,7 +334,7 @@ public class MethodInfo {
         return param_types.length + (flagNeed_rest() ? 1 : 0) + (flagNeed_arguments() ? 1 : 0);
     }
 
-    public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<DottedChain> fullyQualifiedNames) {
+    public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<DottedChain> fullyQualifiedNames, Set<String> usedDeobfuscations) {
         Map<Integer, String> localRegNames = new HashMap<>();
         if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc, body.max_regs);
@@ -344,7 +346,7 @@ public class MethodInfo {
             }
             DottedChain ptype = DottedChain.ALL;
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants, true);
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(usedDeobfuscations, abc, constants, true);
             }
 
             HighlightData pdata = new HighlightData();
@@ -353,10 +355,10 @@ public class MethodInfo {
             pdata.regIndex = i + 1;
             if (!localRegNames.isEmpty()) {
                 pdata.localName = localRegNames.get(i + 1); //assuming it is a slot
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 pdata.localName = constants.getString(paramNames[i]);
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(abc.getSwf(), usedDeobfuscations, true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else {
                 pdata.localName = "param" + (i + 1);
                 writer.hilightSpecial(pdata.localName, HighlightSpecialType.PARAM_NAME, i, pdata);
@@ -365,7 +367,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", HighlightSpecialType.PARAM, i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
             }
             if (optional != null && flagHas_optional()) {
                 if (i >= param_types.length - optional.length) {
@@ -399,27 +401,27 @@ public class MethodInfo {
         return writer;
     }
 
-    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, Set<String> usedDeobfuscations) {
         String rname = "*";
         if (ret_type > 0) {
             Multiname multiname = constants.getMultiname(ret_type);
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
+                rname = multiname.getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, false, true);
             }
         }
         return writer.hilightSpecial(rname, HighlightSpecialType.RETURNS);
     }
 
-    public String getReturnTypeRaw(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public String getReturnTypeRaw(ABC abc, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String rname = "*";
         if (ret_type > 0) {
             Multiname multiname = constants.getMultiname(ret_type);
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
+                rname = multiname.getName(new LinkedHashSet<>(), abc, constants, fullyQualifiedNames, false, true);
             }
         }
         return rname;

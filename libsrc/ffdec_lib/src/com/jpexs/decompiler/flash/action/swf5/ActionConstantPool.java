@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ConstantPool action - Sets the current constant pool.
@@ -50,9 +51,9 @@ public class ActionConstantPool extends Action {
      */
     public List<String> constantPool = new ArrayList<>();
 
-
     /**
      * Constructor.
+     *
      * @param constantPool Constant pool
      * @param charset Charset
      */
@@ -63,6 +64,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Constructor.
+     *
      * @param actionLength Action length
      * @param sis SWF input stream
      * @param version SWF version
@@ -79,6 +81,7 @@ public class ActionConstantPool extends Action {
 
     /**
      * Constructor.
+     *
      * @param lexer Lexer
      * @param charset Charset
      * @throws IOException On I/O error
@@ -122,27 +125,31 @@ public class ActionConstantPool extends Action {
      */
     @Override
     protected int getContentBytesLength() {
-        return calculateSize(constantPool);
+        return calculateSize(constantPool, charset);
     }
 
     /**
      * Calculates size of string converted to bytes
+     *
      * @param str String
+     * @param charset Charset
      * @return Size
      */
-    public static int calculateSize(String str) {
-        return Utf8Helper.getBytesLength(str) + 1;
+    public static int calculateSize(String str, String charset) {
+        return Utf8Helper.getBytesLength(str, charset) + 1;
     }
 
     /**
      * Calculates the size of the action converted to bytes
+     *
      * @param strings Strings
+     * @param charset Charset
      * @return Size
      */
-    public static int calculateSize(List<String> strings) {
+    public static int calculateSize(List<String> strings, String charset) {
         int res = 2;
         for (String s : strings) {
-            res += Utf8Helper.getBytesLength(s) + 1;
+            res += Utf8Helper.getBytesLength(s, charset) + 1;
         }
 
         return res;
@@ -168,6 +175,6 @@ public class ActionConstantPool extends Action {
     }
 
     @Override
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 }

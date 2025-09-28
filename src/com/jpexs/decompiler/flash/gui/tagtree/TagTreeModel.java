@@ -57,7 +57,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +102,11 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
     public static final String FOLDER_SCENES = "scenes";
 
+    public static final String FOLDER_UNKNOWN = "unknown";
+
+    public static final String FOLDER_ERRORED = "errored";
+
+    
     public static final List<String> FOLDERS_ORDER = Arrays.asList(
             "header",
             "cookies",
@@ -119,6 +123,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             "frames",
             "scenes",
             "others",
+            "unknown",
+            "errored",
             "scripts"
     );
 
@@ -203,7 +209,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             List<TreeItem> movies,
             List<TreeItem> sounds,
             List<TreeItem> binaryData,
-            List<TreeItem> others
+            List<TreeItem> others,
+            List<TreeItem> unknown,
+            List<TreeItem> errored
     ) {
         for (Tag t : timelined.getTags()) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
@@ -216,7 +224,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
                 case SPRITE:
                     sprites.add(t);
-                    walkTimelinedTagList((DefineSpriteTag) t, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others);
+                    walkTimelinedTagList((DefineSpriteTag) t, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others, unknown, errored);
                     break;
                 case BUTTON:
                     buttons.add(t);
@@ -241,6 +249,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
                 case AS:
                 case AS_FRAME:
+                    break;
+                case UNKNOWN:
+                    unknown.add(t);
+                    break;
+                case ERRORED:
+                    errored.add(t);
                     break;
                 default:
                     if (t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {
@@ -284,9 +298,11 @@ public class TagTreeModel extends AbstractTagTreeModel {
         List<TreeItem> sounds = new ArrayList<>();
         List<TreeItem> binaryData = new ArrayList<>();
         List<TreeItem> others = new ArrayList<>();
+        List<TreeItem> unknown = new ArrayList<>();
+        List<TreeItem> errored = new ArrayList<>();
         List<FolderItem> emptyFolders = new ArrayList<>();
         Map<Integer, List<TreeItem>> mappedTags = new HashMap<>();
-        walkTimelinedTagList(swf, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others);
+        walkTimelinedTagList(swf, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others, unknown, errored);
 
         Timeline timeline = swf.getTimeline();
         int frameCount = timeline.getFrameCount();
@@ -364,6 +380,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
                 case "others":
                     addFolderItem(nodeList, emptyFolders, true /*always add*/, translate("node.others"), FOLDER_OTHERS, swf, others);
+                    break;
+                case "unknown":
+                    addFolderItem(nodeList, emptyFolders, false, translate("node.unknown"), FOLDER_UNKNOWN, swf, unknown);
+                    break;
+                case "errored":
+                    addFolderItem(nodeList, emptyFolders, false, translate("node.errored"), FOLDER_ERRORED, swf, errored);
                     break;
                 case "scripts":
                     if (swf.isAS3()) {

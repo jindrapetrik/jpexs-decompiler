@@ -19,8 +19,14 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
+import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
+import com.jpexs.decompiler.graph.model.TemporaryItem;
 import java.util.List;
 
 /**
@@ -67,7 +73,41 @@ public class DeobfuscatePopIns extends PopIns {
      */
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.pop(); //Just ignore the value
+        GraphTargetItem item = stack.pop();
+        AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem subItem) {
+                if ((subItem instanceof DuplicateSourceItem) || (subItem instanceof DuplicateItem)) {
+                    int tempIndex = ((HasTempIndex) subItem).getTempIndex();
+                    if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+                        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                        if (st.tempIndex == tempIndex) {                                                        
+                            st.refCount--;
+                            if (st.refCount <= 0) {
+                                output.remove(output.size() - 1);
+                                stack.moveToStack(output);
+                            } else if (st.refCount == 1) {
+                                for (int i = 0; i < stack.size(); i++) {
+                                    if (stack.get(i) instanceof HasTempIndex) {
+                                        HasTempIndex ht = (HasTempIndex) stack.get(i);
+                                        if (ht.getTempIndex() == tempIndex) {
+                                            stack.set(i, st.value);
+                                            st.refCount--;
+                                            output.remove(output.size() - 1);
+                                            stack.moveToStack(output);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
+                return true;
+            }            
+        };
+        visitor.visit(item);
+        item.visitRecursively(visitor);
     }
 
     /**

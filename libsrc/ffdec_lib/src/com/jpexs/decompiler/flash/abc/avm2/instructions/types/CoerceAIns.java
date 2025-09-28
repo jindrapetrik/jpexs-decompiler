@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
+import java.util.Set;
 
 /**
  * coerce_a instruction - Coerce any type.
@@ -50,7 +51,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.getConstants(), ins)));
+        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.usedDeobfuscations, localData.abc, localData.getConstants(), ins)));
 
     }
 
@@ -73,7 +74,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
     }
 
     @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+    public GraphTargetItem getTargetType(Set<String> usedDeobfuscations, ABC abc, AVM2ConstantPool constants, AVM2Instruction ins) {
         return TypeItem.UNBOUNDED;
     }
 }

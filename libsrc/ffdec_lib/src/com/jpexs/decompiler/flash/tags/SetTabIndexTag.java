@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * SetTabIndex tag - sets the index of an object within the tab order.
@@ -87,4 +88,12 @@ public class SetTabIndexTag extends Tag {
         sos.writeUI16(depth);
         sos.writeUI16(tabIndex);
     }
+
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("dpt", "" + depth);
+        ret.put("ti", "" + tabIndex);
+        return ret;
+    }            
 }

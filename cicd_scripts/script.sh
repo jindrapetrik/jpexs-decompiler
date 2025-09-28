@@ -151,7 +151,7 @@ if [ "$DO_DEPLOY" == 1 ]; then
   ESC_VERSION_NAME=`echo $DEPLOY_VERSION_NAME|jq --raw-input --ascii-output '.'`
   ESC_VERSION_DESCRIPTION=`echo "$DEPLOY_DESCRIPTION"|jq --raw-input --slurp --ascii-output '.'`
             
-  echo '{"tag_name":"'$DEPLOY_TAG_NAME'","target_commitish":"'$DEPLOY_COMMITISH'","name":'$ESC_VERSION_NAME',"body":'$ESC_VERSION_DESCRIPTION',"draft":false,"prerelease":'$DEPLOY_PRERELEASE'}'>json.bin
+  echo '{"tag_name":"'$DEPLOY_TAG_NAME'","target_commitish":"'$DEPLOY_COMMITISH'","name":'$ESC_VERSION_NAME',"body":'"$ESC_VERSION_DESCRIPTION"',"draft":false,"prerelease":'$DEPLOY_PRERELEASE'}'>json.bin
   json=`curl --silent --request POST --data-binary @json.bin --header "Content-Type: application/json" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases`
   RELEASE_ID=`echo "$json"|jq '.id'`
   

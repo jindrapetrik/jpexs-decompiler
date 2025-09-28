@@ -79,6 +79,9 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.flash.types.text.format.ControlTextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextFormatRecord;
+import com.jpexs.decompiler.flash.types.text.format.TextTextFormatRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
@@ -2150,5 +2153,74 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeAmf3Object(Amf3Value value) throws IOException, NoSerializerExistsException {
         writeAmf3Object(value, new HashMap<>());
+    }
+    
+    /**
+     * Writes List of TextFormatRecord values to the stream. Terminates with zero.
+     * @param records List of records
+     * @throws IOException On I/O error
+     */
+    public void writeTextFormatRecords(List<TextFormatRecord> records) throws IOException {
+        for (TextFormatRecord record : records) {
+            writeTextFormatRecord(record);
+        }
+        writeUI8(0);
+    }
+    
+    /**
+     * Writes TextFormatRecord value to the stream.
+     *
+     * @param value TextFormatRecord value
+     * @throws IOException On I/O error
+     */
+    public void writeTextFormatRecord(TextFormatRecord value) throws IOException {
+        if (value instanceof TextTextFormatRecord) {
+            TextTextFormatRecord textRecord = (TextTextFormatRecord) value;
+            byte[] halfBytes = textRecord.text.getBytes(charset);
+            writeUI8(halfBytes.length);
+            for (int i = 0; i < halfBytes.length; i++) {
+                writeUI8(halfBytes[i]);
+                writeUI8(0);
+            }
+        }
+        if (value instanceof ControlTextFormatRecord) {
+            ControlTextFormatRecord controlRecord = (ControlTextFormatRecord) value;
+            writeUI8(0x80 | controlRecord.type);
+            switch (controlRecord.type) {
+                case ControlTextFormatRecord.TYPE_STYLE:
+                    writeUI8(controlRecord.style);
+                    break;
+                case ControlTextFormatRecord.TYPE_FONT_ID:
+                    writeUI16(controlRecord.fontId);
+                    break;
+                case ControlTextFormatRecord.TYPE_FONT_HEIGHT:
+                    writeUI16(controlRecord.fontHeight);
+                    break;
+                case ControlTextFormatRecord.TYPE_COLOR:
+                    writeRGBA(controlRecord.color);
+                    break;
+                case ControlTextFormatRecord.TYPE_SCRIPT:
+                    writeUI8(controlRecord.script);
+                    break;
+                case ControlTextFormatRecord.TYPE_KERNING:
+                    writeSI16(controlRecord.kerning);
+                    break;
+                case ControlTextFormatRecord.TYPE_ALIGN:
+                    writeUI8(controlRecord.align);
+                    break;
+                case ControlTextFormatRecord.TYPE_INDENT:
+                    writeSI16(controlRecord.indent);
+                    break;
+                case ControlTextFormatRecord.TYPE_LEFT_MARGIN:
+                    writeSI16(controlRecord.leftMargin);
+                    break;
+                case ControlTextFormatRecord.TYPE_RIGHT_MARGIN:
+                    writeSI16(controlRecord.rightMargin);
+                    break;
+                case ControlTextFormatRecord.TYPE_LINE_SPACE:
+                    writeSI16(controlRecord.lineSpace);
+                    break;                                                                                                                       
+            }
+        }
     }
 }

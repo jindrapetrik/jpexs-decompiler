@@ -118,7 +118,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
     private List<FunctionActionItem> innerFunctions;
     
     /**
-     * Parameter positions in the codde
+     * Parameter positions in the code
      */
     public List<Integer> paramPositions;
 
@@ -248,7 +248,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
 
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, fname, writer);
             } else {
                 writer.append(fname);
                 //calculatedFunctionName.appendToNoQuotes(writer, localData);
@@ -265,7 +265,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
             writer.append(" ");
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, fname, writer);
             } else {
                 writer.append(fname);
             }
@@ -298,7 +298,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             d.declaration = true;
 
             if (!IdentifiersDeobfuscation.isValidName(false, pname)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(pname, writer);
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, pname, writer);
             } else {
                 writer.append(pname);
             }
@@ -548,6 +548,9 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
         }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
+        if (len > 0xFFFF) {
+            throw new CompilationException("Function body is too large to fit into UI16.", line);
+        }
         if (!needsFun2 && paramNames.isEmpty()) {
             ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION, charset));
         } else {

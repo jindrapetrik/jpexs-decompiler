@@ -39,6 +39,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,7 +160,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset());
+        return Action.actionsToSource(requiresUninitializedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), this, actions, getScriptName(), writer, getCharset());
     }
 
     @Override
@@ -167,7 +169,11 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
+        return Action.actionsToSource(requiresUninitializedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
+    }
+
+    private boolean requiresUninitializedClassTraitsDetection() {
+        return swf.needsCalculatingAS2UninitializeClassTraits(this);
     }
 
     @Override
@@ -240,17 +246,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Override
     public Map<String, String> getNameProperties() {
-        String expName = swf == null ? "" : swf.getExportName(spriteId);
+        String exportName = swf == null ? "" : swf.getExportName(spriteId);
 
         Map<String, String> ret = super.getNameProperties();
         ret.put("sid", "" + spriteId);
 
-        if (expName == null || expName.isEmpty()) {
+        if (exportName == null || exportName.isEmpty()) {
             return ret;
         }
-        //String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-        //ret.put("exp", pathParts[pathParts.length - 1]);   
-        ret.put("exp", expName);
+        ret.put("exp", Helper.escapeExportname(getSwf(), exportName, true));
         return ret;
     }
 
@@ -297,7 +301,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(swf.getUninitializedAs2ClassTraits(), true, false, getActions(), swf.version, 0, "", swf.getCharset());
+            return Action.actionsToTree(new LinkedHashSet<>(), requiresUninitializedClassTraitsDetection(), requiresUninitializedClassTraitsDetection() ? swf.getUninitializedAs2ClassTraits() : new HashMap<>(), true, false, getActions(), swf.version, 0, getScriptName(), swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

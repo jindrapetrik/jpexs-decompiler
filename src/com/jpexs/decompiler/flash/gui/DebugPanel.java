@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -501,15 +502,27 @@ public class DebugPanel extends JPanel {
                     boolean as3 = swf.isAS3();
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
-                        Variable root = null;
-                        if (!as3) {
-                            root = Main.getDebugHandler().getVariable(0, "_root", false, false).parent;
-                        }
-                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers));
+                        
+                        
                         List<Variable> locals = new ArrayList<>();
-                        if (root != null) {
-                            locals.add(root);
+                        
+                        
+                        Map<String, Long> placedObjects = Main.getDebugHandler().getPlacedObjects();
+                        for (String poName : placedObjects.keySet()) {
+                            String realName = poName;
+                            if ("/".equals(realName)) {
+                                realName = "_root";
+                            } else if (realName.startsWith("/")) {
+                                continue;
+                            }
+                            Variable placedVar = Main.getDebugHandler().getVariable(0, realName, false, false).parent;
+                            if (placedVar != null) {
+                                locals.add(placedVar);
+                            }
                         }
+                        
+                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers));
+                        
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
 
