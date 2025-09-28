@@ -252,7 +252,7 @@ public class XFLConverter {
      */
     private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 
-    private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     private static final double SMALL_DIVISOR = 20;
 
@@ -308,12 +308,12 @@ public class XFLConverter {
     }
 
     private static String formatEdgeDouble(double value) {
-        if (value % 1 == 0) {
+        /*if (value % 1 == 0) {
             return "" + (int) value;
-        }
+        }*/
         //value = Math.round(value * 2.0) / 2.0;
-        return EDGE_DECIMAL_FORMAT.format(value);
-        //return numEdgeToString(value);
+        //return EDGE_DECIMAL_FORMAT.format(value);
+        return numEdgeToString(value);
     }
 
     private static String convertShapeEdge(MATRIX mat, ShapeRecordAdvanced record, double x, double y) {
@@ -715,7 +715,7 @@ public class XFLConverter {
             shapeTransformer.transformStyles(scale, fillStyles, lineStyles, shapeNum);
         }
 
-        shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles);
+        shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles, small);
 
         List<ShapeRecordAdvanced> edges = new ArrayList<>();
         int lineStyleCount = 0;

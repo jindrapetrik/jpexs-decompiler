@@ -253,7 +253,7 @@ public class ShapeFixer {
         }
     }
 
-    private void handleBewList(List<BezierEdgeWrapper> bewList, List<List<BezierEdge>> shapes) {
+    private void handleBewList(List<BezierEdgeWrapper> bewList, List<List<BezierEdge>> shapes, boolean wasSmall) {
         Map<Integer, List<BezierEdgeWrapper>> bewMap = bewList.stream()
                 .collect(Collectors.groupingBy(b -> b.layer));
 
@@ -368,7 +368,11 @@ public class ShapeFixer {
                 shapes.get(bew.shapeIndex).remove(bew.edgeIndex);
                 int pos = 0;
                 for (BezierEdge bes : splitted) {
-                    bes.roundX();
+                    if (wasSmall) {
+                        bes.roundN(2); //this value works best for #1011, why? Also for #2532 it is okay.
+                    } else {
+                        bes.roundN(100); //this value works best for #2165, it's not multiplied by 20 like not small :-(
+                    }
                     if (bes.isEmpty()) {
                         continue;
                     }
@@ -384,7 +388,8 @@ public class ShapeFixer {
             List<Integer> fillStyles0,
             List<Integer> fillStyles1,
             List<Integer> lineStyles,
-            List<Integer> layers
+            List<Integer> layers,
+            boolean wasSmall
     ) {
         
         /*if (true) {
@@ -412,8 +417,8 @@ public class ShapeFixer {
             }
         }
 
-        handleBewList(strokesBewList, shapes);
-        handleBewList(fillsBewList, shapes);
+        handleBewList(strokesBewList, shapes, wasSmall);
+        handleBewList(fillsBewList, shapes, wasSmall);
 
         for (int i1 = 0; i1 < shapes.size(); i1++) {
             for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
@@ -848,7 +853,8 @@ public class ShapeFixer {
             List<SHAPERECORD> records,
             int shapeNum,
             FILLSTYLEARRAY baseFillStyles,
-            LINESTYLEARRAY baseLineStyles
+            LINESTYLEARRAY baseLineStyles,
+            boolean wasSmall
     ) {
         List<List<BezierEdge>> shapes = new ArrayList<>();
         List<Integer> fillStyles0 = new ArrayList<>();
@@ -865,7 +871,7 @@ public class ShapeFixer {
         if (Configuration.flaExportFixShapes.get()) {
             SwitchedFillSidesFixer switchedFillSidesFixer = new SwitchedFillSidesFixer();
             switchedFillSidesFixer.fixSwitchedFills(shapeNum, records, baseFillStyles, baseLineStyles, shapes, fillStyles0, fillStyles1, layers);
-            detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+            detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers, wasSmall);
         }
 
         return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);
@@ -919,6 +925,6 @@ public class ShapeFixer {
         beList.add(new BezierEdge(10000.0, 4980.0, 10040.0, 5060.0));
         beList.add(new BezierEdge(10040.0, 5040.0, 9900.0, 4900.0, 9900.0, 4860.0));
         shapes.add(beList);
-        f.detectOverlappingEdges(shapes, Arrays.asList(1), Arrays.asList(2), Arrays.asList(0), Arrays.asList(0));
+        f.detectOverlappingEdges(shapes, Arrays.asList(1), Arrays.asList(2), Arrays.asList(0), Arrays.asList(0), false);
     }
 }

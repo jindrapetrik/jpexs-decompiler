@@ -578,7 +578,7 @@ public class BezierEdge implements Serializable {
             ));
         }
         calcParams();
-    }
+    }        
 
     public static final double ROUND_VALUE = 2;
 
@@ -587,6 +587,16 @@ public class BezierEdge implements Serializable {
             this.points.set(i, new Point2D.Double(
                     Math.round(this.points.get(i).getX() * ROUND_VALUE) / ROUND_VALUE,
                     Math.round(this.points.get(i).getY() * ROUND_VALUE) / ROUND_VALUE
+            ));
+        }
+        calcParams();
+    }
+    
+    public void roundN(double n) {
+        for (int i = 0; i < this.points.size(); i++) {
+            this.points.set(i, new Point2D.Double(
+                    Math.round(this.points.get(i).getX() * n) / n,
+                    Math.round(this.points.get(i).getY() * n) / n
             ));
         }
         calcParams();
