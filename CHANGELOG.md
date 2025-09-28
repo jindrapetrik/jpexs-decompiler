@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [24.1.0] - 2025-09-28
 ### Added
 - [#2477] Option to disable AS2 detection of uninitialized class fields
@@ -3835,7 +3837,8 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-,[24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
+,[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...dev
+[24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
 [24.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...version24.0.0
 [23.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.0...version23.0.1
