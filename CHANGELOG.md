@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2536] AS3 switches detection incorrectly replaces basic ifs with strict equals
 - [#2536] AS3 switches detection not handling loops
+- [#2536] AS3 regexp highlighting / compilation
 
 ## [24.1.0] - 2025-09-28
 ### Added

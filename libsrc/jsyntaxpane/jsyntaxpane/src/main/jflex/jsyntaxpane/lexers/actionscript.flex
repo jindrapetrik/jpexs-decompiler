@@ -135,7 +135,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
 
 NamespaceSuffix = "#" {DecIntegerLiteral}
 
-RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
+RegExp = \/([^\r\n/\\]|\\.)+\/[a-z]*
 
 %state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, ADOC, ADOC_TAG
 
