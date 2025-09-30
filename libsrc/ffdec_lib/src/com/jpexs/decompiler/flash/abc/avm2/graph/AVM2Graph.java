@@ -1871,10 +1871,27 @@ public class AVM2Graph extends Graph {
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
             
-            //Only handle switches with more than 2 branches
-            if (caseValuesMap.size() <= 2) {
-                stack.push(set);
-                return ret;
+            //It's not switch, it's an If            
+            if (caseBodyParts.size() == 2) {
+                boolean isIf = false;
+                for (GraphPart r : part.refs) {                    
+                    if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                        isIf = true;
+                        break;
+                    }
+                }
+                if (!isIf) {
+                    for (GraphPart r : caseBodyParts.get(1).refs) {                    
+                        if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                            isIf = true;
+                            break;
+                        }
+                    }
+                }
+                if (isIf) {
+                    stack.push(firstSet);
+                    return ret;
+                }
             }
 
             //determine whether local register are on left or on right side of === operator

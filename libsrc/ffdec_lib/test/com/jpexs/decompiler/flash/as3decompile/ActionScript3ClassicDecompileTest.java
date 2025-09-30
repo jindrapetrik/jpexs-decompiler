@@ -1246,6 +1246,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testIfInsteadSwitch() {
+        decompileMethod("classic", "testIfInsteadSwitch", "var a:int = 5;\r\n"
+                + "if(a > 5)\r\n"
+                + "{\r\n"
+                + "if(a === 0)\r\n"
+                + "{\r\n"
+                + "trace(\"X\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "if(a === 1)\r\n"
+                + "{\r\n"
+                + "return \"A\";\r\n"
+                + "}\r\n"
+                + "return \"B\";\r\n",
+                 false);
+    }
+
+    @Test
     public void testIfTry() {
         decompileMethod("classic", "testIfTry", "var c:int = 0;\r\n"
                 + "var i:int = 0;\r\n"
