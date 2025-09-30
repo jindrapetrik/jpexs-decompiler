@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#2536] AS3 switches detection incorrectly replaces basic ifs with strict equals
 - [#2536] AS3 switches detection not handling loops
 - [#2536] AS3 regexp highlighting / compilation
+- [#2537] AS1/2/3 direct editation - partial object literal causing lag
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4015,6 +4016,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
+[#2537]: https://www.free-decompiler.com/flash/issues/2537
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485

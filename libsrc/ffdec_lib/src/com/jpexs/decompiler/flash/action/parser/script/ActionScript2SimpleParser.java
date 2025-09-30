@@ -179,6 +179,8 @@ public class ActionScript2SimpleParser implements SimpleParser {
             if (expectedIdentifier(errors, s, lexer.yyline())) {
                 paramNames.add(new Path(s.value.toString()));
                 paramPositions.add(s.position);
+            } else {
+                break;
             }
             s = lex();
             if (s.type == SymbolType.COLON) {
@@ -1409,12 +1411,18 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expectedIdentifier(errors, s, lexer.yyline());
-                    expectedType(errors, SymbolType.COLON);
+                    if (!expectedIdentifier(errors, s, lexer.yyline())) {
+                        break;
+                    }
+                    if (expectedType(errors, SymbolType.COLON) == null) {
+                        break;
+                    }
                     expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
-                        expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
+                        if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
+                            break;
+                        }
                     }
                 }
                 ret = true;
@@ -1556,12 +1564,16 @@ public class ActionScript2SimpleParser implements SimpleParser {
             }
             if (op.type == SymbolType.BRACKET_OPEN) {
                 expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
-                expectedType(errors, SymbolType.BRACKET_CLOSE);
+                if (expectedType(errors, SymbolType.BRACKET_CLOSE) == null) {
+                    break;
+                }
                 ret = true;
             }
             if (op.type == SymbolType.DOT) {
                 ParsedSymbol s = lex();
-                expectedIdentifier(errors, s, lexer.yyline(), SymbolType.THIS, SymbolType.SUPER);
+                if (!expectedIdentifier(errors, s, lexer.yyline(), SymbolType.THIS, SymbolType.SUPER)) {
+                    break;
+                }
 
                 ret = true;
             }
