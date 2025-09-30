@@ -1805,8 +1805,17 @@ public class AVM2Graph extends Graph {
             int cnt = 1;
             int branchCount = 2;
             try {
+                Set<GraphPart> ignoredParts = new LinkedHashSet<>();
+                for (Loop el : loops) {
+                    ignoredParts.add(el.loopContinue);
+                } 
                 while (true) {
                     List<GraphTargetItem> out = new ArrayList<>();
+                    
+                    if (ignoredParts.contains(part)) {
+                        break;
+                    }
+                    
                     //Special: In Flex (not air) there are these blocks sometimes:
                     // if(false) {
                     //    §§push(5);
@@ -1815,7 +1824,7 @@ public class AVM2Graph extends Graph {
                     //AVM2DeobfuscatorPushFalseIfFalse changes it to
                     // nop
                     // jump
-                    // (to first case to work)
+                    // (to first case to work)                    
                     if (part.nextParts.size() == branchCount
                             && part.nextParts.get(branchNum).getHeight() == 2
                             && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).start >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).start)).definition instanceof NopIns
@@ -1861,6 +1870,12 @@ public class AVM2Graph extends Graph {
                 //ignore
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
+            
+            //Only handle switches with more than 2 branches
+            if (caseValuesMap.size() <= 2) {
+                stack.push(set);
+                return ret;
+            }
 
             //determine whether local register are on left or on right side of === operator
             // -1 = there's no register, 
