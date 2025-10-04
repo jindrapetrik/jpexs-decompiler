@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -280,14 +281,90 @@ public class SwitchedFillSidesFixer {
             }
         }
     }
+    
+    private static class ExistingEdge {
+        int fillStyle0;
+        int fillStyle1;
+        int lineStyle;
+        
+        BezierEdge be;
+
+        public ExistingEdge(int fillStyle0, int fillStyle1, int lineStyle, BezierEdge be) {
+            this.fillStyle0 = fillStyle0;
+            this.fillStyle1 = fillStyle1;
+            this.lineStyle = lineStyle;
+            this.be = be;
+        }
+                        
+        @Override
+        public int hashCode() {
+            int hash = 7;        
+            hash = lineStyle == 0 ? 0 : 1;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ExistingEdge other = (ExistingEdge) obj;            
+            
+            if ((this.fillStyle0 == 0 && this.fillStyle1 == 0)
+                        != (other.fillStyle0 == 0 && other.fillStyle1 == 0)) {
+                    return false;
+            }
+            
+            if (this.be.equals(other.be)) {
+                /*if (this.fillStyle0 != other.fillStyle0) {
+                    return false;
+                }
+                if (this.fillStyle1 != other.fillStyle1) {
+                    return false;
+                }
+                if (this.lineStyle != other.lineStyle) {
+                    return false;
+                }*/
+                
+                return true;
+            }
+            if (this.be.equalsReverse(other.be)) {
+                /*if (this.fillStyle0 != other.fillStyle1) {
+                    return false;
+                }
+                if (this.fillStyle1 != other.fillStyle0) {
+                    return false;
+                }
+                if (this.lineStyle != other.lineStyle) {
+                    return false;
+                }*/
+                
+                
+                return true;
+            }
+            
+            return false;
+        }
+        
+        
+        
+    }
 
     private void fixSidesInLayer(
             List<List<IEdge>> fillList,
             List<List<BezierEdge>> shapes,
             List<Integer> fillStyles0,
             List<Integer> fillStyles1,
+            List<Integer> lineStyles,
             int layer,
-            int startIndex, int endIndex,
+            List<Integer> layers,
+            int startIndex, Reference<Integer> endIndex,
             Map<Integer, Integer> globalToLocalFillStyleMap
     ) {
 
@@ -427,6 +504,8 @@ public class SwitchedFillSidesFixer {
             }
 
         }
+        
+        Set<ExistingEdge> existingEdges = new HashSet<>();
 
         for (BezierEdge be : beToFillStyle0List.keySet()) {
             /*for (int i = beToFillStyle0List.get(be).size() - 1; i >= 0; i--) {
@@ -461,20 +540,39 @@ public class SwitchedFillSidesFixer {
             }
         }
 
-        for (int i = startIndex; i < endIndex; i++) {
+        for (int i = startIndex; i < endIndex.getVal(); i++) {
             List<BezierEdge> shape = shapes.get(i);
+            
+            int lastFs0 = -1;
+            int lastFs1 = -1;
+            int lastLs = -1;
+            List<Integer> newFillStyles0 = new ArrayList<>();
+            List<Integer> newFillStyles1 = new ArrayList<>();
+            List<Integer> newLineStyles = new ArrayList<>();
+            List<List<BezierEdge>> newShapes = new ArrayList<>();
+            List<BezierEdge> currentShape = new ArrayList<>();
+            List<Integer> newLayers = new ArrayList<>();
+            
+            Integer fs0before = fillStyles0.get(i);
+            Integer fs1before = fillStyles1.get(i);
+            int ls = lineStyles.get(i);
+            
+            shapes.remove(i);
+            fillStyles0.remove(i);
+            fillStyles1.remove(i);
+            lineStyles.remove(i);
+            layers.remove(i);
+    
             for (int j = 0; j < shape.size(); j++) {
                 BezierEdge be = shape.get(j);
                 if (be.isEmpty()) {
                     continue;
-                }
-
-                Integer fs0before = fillStyles0.get(i);
-                Integer fs1before = fillStyles1.get(i);
-
-                if (fs0before == 0 && fs1before == 0) { //only strokes
+                }               
+                
+            
+                /*if (fs0before == 0 && fs1before == 0) { //only strokes
                     break;
-                }
+                }*/
 
                 Integer fs0after = beToFillStyle0.get(be);
                 Integer fs1after = beToFillStyle1.get(be);
@@ -487,7 +585,11 @@ public class SwitchedFillSidesFixer {
                 }
 
                 if (fs0after == -1 || fs1after == -1) {
-                    break;
+                    //??
+                    fs0after = fs0before;
+                    fs1after = fs1before;
+                    //break;
+                    Logger.getLogger(SwitchedFillSidesFixer.class.getName()).log(Level.FINE, "More than 2 fillstyles for {0} - old: {1}, {2} new: {3}, {4}", new Object[]{be, fs0before, fs1before, fs0after, fs1after});
                 }
 
                 if (fs0after == 0 && Objects.equals(fs1after, fs1before)) {
@@ -495,33 +597,75 @@ public class SwitchedFillSidesFixer {
                 } else if (fs1after == 0 && Objects.equals(fs0after, fs0before)) {
                     fs1after = fs1before;
                 }
-
-                fillStyles0.set(i, fs0after);
-                fillStyles1.set(i, fs1after);
+                
+                ExistingEdge ee = new ExistingEdge(fs0after, fs1after, ls, be);
+                if (existingEdges.contains(ee)) {
+                    Logger.getLogger(SwitchedFillSidesFixer.class.getName()).log(Level.FINE, "Duplicated edge {0} - old: {1}, {2} new: {3}, {4}", new Object[]{be, fs0before, fs1before, fs0after, fs1after});
+                    continue;
+                }
+                existingEdges.add(ee);
+                
+                if (lastFs0 != fs0after || lastFs1 != fs1after || lastLs != ls) {
+                    if (!currentShape.isEmpty()) {
+                        newShapes.add(currentShape);
+                        currentShape = new ArrayList<>();
+                        newFillStyles0.add(lastFs0);
+                        newFillStyles1.add(lastFs1);
+                        newLineStyles.add(lastLs);
+                        newLayers.add(layer - 1);
+                    }
+                    lastFs0 = fs0after;
+                    lastFs1 = fs1after;
+                    lastLs = ls;
+                }
+                
+                currentShape.add(be);
+                
+                /*fillStyles0.set(i, fs0after);
+                fillStyles1.set(i, fs1after);*/
 
                 if (!Objects.equals(fs0before, fs0after) || !Objects.equals(fs1before, fs1after)) {
                     Logger.getLogger(SwitchedFillSidesFixer.class.getName()).log(Level.FINE, "Changed edge {0} - old: {1}, {2} new: {3}, {4}", new Object[]{be, fs0before, fs1before, fs0after, fs1after});
                 }
-                break;
+                //break;
             }
+            if (!currentShape.isEmpty()) {
+                newShapes.add(currentShape);
+                newFillStyles0.add(lastFs0);
+                newFillStyles1.add(lastFs1);
+                newLineStyles.add(lastLs);
+                newLayers.add(layer - 1);
+            }
+
+            /*if (newShapes.size() > 1) {
+                Logger.getLogger(SwitchedFillSidesFixer.class.getName()).log(Level.FINE, "Multi shape - size = {0}", new Object[]{newShapes.size()});
+            }*/
+            endIndex.setVal(endIndex.getVal() - 1 + newShapes.size());
+            shapes.addAll(i, newShapes);
+            fillStyles0.addAll(i, newFillStyles0);
+            fillStyles1.addAll(i, newFillStyles1);
+            lineStyles.addAll(i, newLineStyles);
+            layers.addAll(i, newLayers);
+            i += newShapes.size() - 1;
         }
     }
 
     public void fixSwitchedFills(
             int shapeNum,
             List<SHAPERECORD> records,
-            FILLSTYLEARRAY fillStyles,
-            LINESTYLEARRAY lineStyles,
+            FILLSTYLEARRAY baseFillStyles,
+            LINESTYLEARRAY baseLineStyles,
             List<List<BezierEdge>> shapes,
             List<Integer> fillStyles0,
             List<Integer> fillStyles1,
+            List<Integer> lineStyles,
             List<Integer> layers
     ) {
 
         SHAPEWITHSTYLE shp = new SHAPEWITHSTYLE();
         shp.shapeRecords = records;
-        shp.fillStyles = fillStyles;
-        shp.lineStyles = lineStyles;
+        shp.fillStyles = baseFillStyles;
+        shp.lineStyles = baseLineStyles;
 
         List<List<IEdge>> fillList = new ArrayList<>();
 
@@ -600,7 +744,7 @@ public class SwitchedFillSidesFixer {
         Map<Integer, Integer> globalToLocalFillStyleMap = new LinkedHashMap<>();
         int lastFs = 0;
         globalToLocalFillStyleMap.put(0, 0);
-        for (int i = 0; i < fillStyles.fillStyles.length; i++) {
+        for (int i = 0; i < baseFillStyles.fillStyles.length; i++) {
             lastFs++;
             globalToLocalFillStyleMap.put(lastFs, lastFs);
         }
@@ -619,12 +763,15 @@ public class SwitchedFillSidesFixer {
         int from = 0;
         for (int i = 1; i < layers.size(); i++) {
             if (!layers.get(i).equals(layers.get(i - 1))) {
-                fixSidesInLayer(fillList, shapes, fillStyles0, fillStyles1, layers.get(i - 1), from, i, globalToLocalFillStyleMap);
+                Reference<Integer> endIndexRef = new Reference<>(i);
+                fixSidesInLayer(fillList, shapes, fillStyles0, fillStyles1, lineStyles,  layers.get(i - 1), layers, from, endIndexRef, globalToLocalFillStyleMap);
+                i = endIndexRef.getVal();
                 from = i;
             }
         }
         if (!layers.isEmpty()) {
-            fixSidesInLayer(fillList, shapes, fillStyles0, fillStyles1, layers.get(layers.size() - 1), from, layers.size(), globalToLocalFillStyleMap);
+            Reference<Integer> endIndexRef = new Reference<>(layers.size());
+            fixSidesInLayer(fillList, shapes, fillStyles0, fillStyles1, lineStyles, layers.get(layers.size() - 1), layers, from, endIndexRef, globalToLocalFillStyleMap);
         }
     }
 }

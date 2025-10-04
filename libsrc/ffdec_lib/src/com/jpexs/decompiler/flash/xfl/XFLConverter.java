@@ -154,6 +154,7 @@ import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
 import com.jpexs.decompiler.flash.xfl.shapefixer.MorphShapeFixer;
 import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer2;
 import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
 import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
 import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
@@ -409,10 +410,10 @@ public class XFLConverter {
             y = rec.changeY(y);
         }
         //hack for morphshapes. TODO: make this better
-        if (close && (Double.compare(lastMoveToX, x) != 0 || Double.compare(lastMoveToY, y) != 0)) {
+        /*if (close && (Double.compare(lastMoveToX, x) != 0 || Double.compare(lastMoveToY, y) != 0)) {
             StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced(lastMoveToX - x, lastMoveToY - y);
             ret.append(convertShapeEdge(mat, ser, x, y));
-        }
+        */
     }
 
     private static String getScaleMode(ILINESTYLE lineStyle) {
@@ -702,8 +703,8 @@ public class XFLConverter {
 
         List<ShapeRecordAdvanced> shapeRecordsAdvanced;
 
-        ShapeFixer fixer = morphshape ? new MorphShapeFixer() : new ShapeFixer();
-        Logger.getLogger(ShapeFixer.class.getName()).log(Level.FINE, "Fixing character {0}...", characterId);
+        ShapeFixer2 fixer = new ShapeFixer2(); //morphshape ? new MorphShapeFixer() : new ShapeFixer();
+        Logger.getLogger(ShapeFixer2.class.getName()).log(Level.FINE, "Fixing character {0}...", characterId);
 
         if (small) {
             shapeRecords = Helper.deepCopy(shapeRecords);
@@ -779,6 +780,27 @@ public class XFLConverter {
                 int lastFillStyle1 = fillStyle1;
                 int lastFillStyle0 = fillStyle0;
                 int lastStrokeStyle = strokeStyle;
+                
+                if (scr.stateFillStyle0) {
+                    int fillStyle0_new = scr.fillStyle0;
+                    /*if (morphshape) { //???
+                        fillStyle1 = fillStyle0_new;
+                    } else {*/
+                        fillStyle0 = fillStyle0_new;
+                    //}
+                }
+                if (scr.stateFillStyle1) {
+                    int fillStyle1_new = scr.fillStyle1;
+                    /*if (morphshape) {
+                        fillStyle0 = fillStyle1_new;
+                    } else {*/
+                        fillStyle1 = fillStyle1_new;
+                    //}
+                }
+                if (scr.stateLineStyle) {
+                    strokeStyle = scr.lineStyle;
+                }
+                
                 if (scr.stateNewStyles) {
                     XFLXmlWriter fillsNewStr = new XFLXmlWriter();
                     XFLXmlWriter strokesNewStr = new XFLXmlWriter();
@@ -844,26 +866,7 @@ public class XFLConverter {
                     currentLayer.writeCharactersRaw(fillsNewStr.toString());
                     currentLayer.writeCharactersRaw(strokesNewStr.toString());
                     currentLayer.writeStartElement("edges");
-                }
-                if (scr.stateFillStyle0) {
-                    int fillStyle0_new = scr.fillStyle0;
-                    if (morphshape) { //???
-                        fillStyle1 = fillStyle0_new;
-                    } else {
-                        fillStyle0 = fillStyle0_new;
-                    }
-                }
-                if (scr.stateFillStyle1) {
-                    int fillStyle1_new = scr.fillStyle1;
-                    if (morphshape) {
-                        fillStyle0 = fillStyle1_new;
-                    } else {
-                        fillStyle1 = fillStyle1_new;
-                    }
-                }
-                if (scr.stateLineStyle) {
-                    strokeStyle = scr.lineStyle;
-                }
+                }                
                 if (!edges.isEmpty()) {
                     if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
                         currentLayer.writeStartElement("Edge");
@@ -888,7 +891,11 @@ public class XFLConverter {
                     edges.clear();
                 }
             }
-            edges.add(edge);
+            if (edge instanceof StyleChangeRecordAdvanced && !((StyleChangeRecordAdvanced) edge).stateMoveTo) {
+                //ignore
+            } else {
+                edges.add(edge);
+            }
             x = edge.changeX(x);
             y = edge.changeY(y);
         }

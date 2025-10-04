@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -157,6 +158,15 @@ public class BezierEdge implements Serializable {
         points.set(points.size() - 1, p);
         calcParams();
     }
+    
+    public void setControlPoint(Point2D p) {
+        if(points.size() == 2) {
+            points.add(1, p);
+        } else {
+            points.set(1, p);
+        }
+        calcParams();
+    }
 
     /**
      * Gets the point at specified position.
@@ -222,6 +232,10 @@ public class BezierEdge implements Serializable {
                 break;
             }
         }
+        
+        if (points.size() == 3 && Double.isNaN(points.get(1).getX())) {
+            System.err.println("xxx");
+        }
     }
 
     /**
@@ -279,9 +293,9 @@ public class BezierEdge implements Serializable {
      * @return List of intersections
      */
     public List<Point2D> getIntersections(BezierEdge b2) {
-        if (!Intersections.rectIntersection(bbox, b2.bbox)) {
+        /*if (!Intersections.rectIntersection(bbox, b2.bbox)) {
             return new ArrayList<>();
-        }
+        }*/
         if (points.size() == 2) {
             if (b2.points.size() == 2) {
                 return Intersections.intersectLineLine(points.get(0), points.get(1), b2.points.get(0), b2.points.get(1), true);
@@ -578,7 +592,7 @@ public class BezierEdge implements Serializable {
             ));
         }
         calcParams();
-    }        
+    }
 
     public static final double ROUND_VALUE = 2;
 
@@ -591,7 +605,7 @@ public class BezierEdge implements Serializable {
         }
         calcParams();
     }
-    
+
     public void roundN(double n) {
         for (int i = 0; i < this.points.size(); i++) {
             this.points.set(i, new Point2D.Double(
@@ -831,5 +845,78 @@ public class BezierEdge implements Serializable {
         }
 
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    public boolean isQuad() {
+        return points.size() == 3;
+    }
+
+    public Point2D midPoint() {
+        if (!isQuad()) {
+            return new Point2D.Double((points.get(0).getX() + points.get(1).getX()) * 0.5, (points.get(0).getY() + points.get(1).getY()) * 0.5);
+        } else {
+            double t = 0.5;
+            double mt = 1 - t;
+            double mx = mt * mt * points.get(0).getX() + 2 * mt * t * points.get(1).getX() + t * t * points.get(2).getX();
+            double my = mt * mt * points.get(0).getY() + 2 * mt * t * points.get(1).getY() + t * t * points.get(2).getY();
+            return new Point2D.Double(mx, my);
+        }
+    }
+
+    public Point2D unitNormal() {
+        double dx;
+        double dy;
+        if (!isQuad()) {
+            dx = points.get(1).getX() - points.get(0).getX();
+            dy = points.get(1).getY() - points.get(0).getY();
+        } else {
+            // derivative at t=0.5
+            double t = 0.5;
+            double mt = 1 - t;
+            dx = 2 * mt * (points.get(1).getX() - points.get(0).getX()) + 2 * t * (points.get(2).getX() - points.get(1).getX());
+            dy = 2 * mt * (points.get(1).getY() - points.get(0).getY()) + 2 * t * (points.get(2).getY() - points.get(1).getY());
+        }
+        // left-hand normal = (-dy, dx)
+        double nx = -dy, ny = dx;
+        double len = Math.hypot(nx, ny);
+        if (len == 0) {
+            return new Point2D.Double(0, 0);
+        }
+        return new Point2D.Double(nx / len, ny / len);
+    }
+    
+    public BezierEdge toQuad() {
+        if (!isQuad()) {
+            return new BezierEdge(Arrays.asList(getBeginPoint(), midPoint() ,getEndPoint()));
+        }
+        return this;
+    }
+    
+    public Point2D getControlPoint() {
+        if (isQuad()) {
+            return points.get(1);
+        }
+        return midPoint();
+    }
+    
+    public List<OverlapInterval> overlap(BezierEdge other) {
+        BezierEdge q1 = this.toQuad();
+        BezierEdge q2 = other.toQuad();
+        return QuadOverlap.findQuadraticOverlaps(
+                (Point2D.Double) q1.getBeginPoint(), (Point2D.Double) q1.getControlPoint(), (Point2D.Double) q1.getEndPoint(),
+                (Point2D.Double) q2.getBeginPoint(), (Point2D.Double) q2.getControlPoint(), (Point2D.Double) q2.getEndPoint(), 10
+        );
+    }
+    
+    public static void main(String[] args) {
+        BezierEdge be1 = new BezierEdge(1000,0,1000,1000);
+        BezierEdge be2 = new BezierEdge(1000.25, -500, 1000.25, 2000);
+        
+        List<OverlapInterval> intervals = be1.overlap(be2);
+        for (OverlapInterval i : intervals) {
+            System.err.println("" + be1.pointAt(i.t0)+" to " + be1.pointAt(i.t1)+" on BE1 AND " 
+                    + be2.pointAt(i.u0)+" to " + be2.pointAt(i.u1)+" on BE2" 
+            );
+        }
     }
 }

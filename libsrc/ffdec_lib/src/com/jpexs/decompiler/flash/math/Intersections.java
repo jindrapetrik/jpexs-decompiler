@@ -500,6 +500,12 @@ public class Intersections {
                 //No Intersection
             }
         } else if (ua_t == 0 || ub_t == 0) {
+                       
+            if (true) {
+                //no overlapping
+                return result;
+            }
+            
             if (!addCoincident) {
                 return result;
             }

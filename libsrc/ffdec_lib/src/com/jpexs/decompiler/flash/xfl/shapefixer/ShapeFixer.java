@@ -870,7 +870,7 @@ public class ShapeFixer {
 
         if (Configuration.flaExportFixShapes.get()) {
             SwitchedFillSidesFixer switchedFillSidesFixer = new SwitchedFillSidesFixer();
-            switchedFillSidesFixer.fixSwitchedFills(shapeNum, records, baseFillStyles, baseLineStyles, shapes, fillStyles0, fillStyles1, layers);
+            switchedFillSidesFixer.fixSwitchedFills(shapeNum, records, baseFillStyles, baseLineStyles, shapes, fillStyles0, fillStyles1, lineStyles, layers);
             detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers, wasSmall);
         }
 
