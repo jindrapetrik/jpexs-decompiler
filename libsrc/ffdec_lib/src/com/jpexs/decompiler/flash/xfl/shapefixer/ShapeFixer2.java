@@ -226,14 +226,16 @@ public class ShapeFixer2 {
         removeEmpty(layers);*/
 
         OverlappingEdgesSplitter splitter = new OverlappingEdgesSplitter();
-        splitter.splitOverlappingEdges(layers);       
+        splitter.splitOverlappingEdges(layers);
 
-        for (Layer layer : layers) {
-            detectEdgeFills(layer);
-        }
+        
         
         for (Layer layer : layers) {
             layer.round(wasSmall);
+        }
+        
+        for (Layer layer : layers) {
+            detectEdgeFills(layer);
         }
         
         removeEmpty(layers);
@@ -278,7 +280,7 @@ public class ShapeFixer2 {
         }
     }
     
-    private void detectEdgeFills(Layer layer) {
+    public void detectEdgeFills(Layer layer) {
         
         double epsBase = 1e-4;
         

@@ -26,7 +26,7 @@ public final class QuadOverlap {
         // Tolerances: tune as needed
         final double flatTol = tol * 0.5;   // Hausdorff bound for flattening
         final double distTol = tol;         // max allowed normal offset between near-collinear segments
-        final double angleTol = 0.01;       // radians; ~0.057° — treat as parallel if below
+        final double angleTol = Math.toRadians(1);//0.01;       // radians; ~0.057° — treat as parallel if below
 
         ParamPoly polyA = flattenQuad(A0, A1, A2, flatTol);
         ParamPoly polyB = flattenQuad(B0, B1, B2, flatTol);

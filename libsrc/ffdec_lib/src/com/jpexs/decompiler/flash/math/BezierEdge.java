@@ -904,7 +904,7 @@ public class BezierEdge implements Serializable {
         BezierEdge q2 = other.toQuad();
         return QuadOverlap.findQuadraticOverlaps(
                 (Point2D.Double) q1.getBeginPoint(), (Point2D.Double) q1.getControlPoint(), (Point2D.Double) q1.getEndPoint(),
-                (Point2D.Double) q2.getBeginPoint(), (Point2D.Double) q2.getControlPoint(), (Point2D.Double) q2.getEndPoint(), 10
+                (Point2D.Double) q2.getBeginPoint(), (Point2D.Double) q2.getControlPoint(), (Point2D.Double) q2.getEndPoint(), 1
         );
     }
     
@@ -918,5 +918,15 @@ public class BezierEdge implements Serializable {
                     + be2.pointAt(i.u0)+" to " + be2.pointAt(i.u1)+" on BE2" 
             );
         }
+    }
+    
+    public double closestTForPoint(Point2D point) {
+        return new BezierUtils().closestPointToBezier(point, getBeginPoint(), getControlPoint(), getEndPoint());
+    } 
+    
+    public double distanceFromPoint(Point2D point) {
+        double t = closestTForPoint(point);
+        Point2D p = pointAt(t);
+        return p.distance(point);
     }
 }
