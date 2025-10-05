@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- AS3 Document class is underlined and has different icon
+
 ### Fixed
 - [#2536] AS3 switches detection incorrectly replaces basic ifs with strict equals
 - [#2536] AS3 switches detection not handling loops

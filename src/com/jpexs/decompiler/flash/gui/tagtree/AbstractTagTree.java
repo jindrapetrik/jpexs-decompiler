@@ -229,6 +229,13 @@ public abstract class AbstractTagTree extends JTree {
             type = TreeNodeType.FOLDER_OPEN;
         }
 
+        if (val instanceof ScriptPack) {
+            ScriptPack sp = (ScriptPack) val;            
+            if (sp.isDocumentClass()) {
+                return View.getIcon("asclassmain16");
+            }
+        }
+        
         if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
             FolderItem si = (FolderItem) val;
             if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {

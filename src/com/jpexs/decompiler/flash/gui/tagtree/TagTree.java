@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -243,9 +244,20 @@ public class TagTree extends AbstractTagTree {
                 semiTransparent = true;
             }
             int itemIndex = aTree.getFullModel().getItemIndex(val);
+                   
+            String txt = val.toString();
             if (itemIndex > 1) {
-                setText(val.toString() + " [" + itemIndex + "]");
+                txt = txt + " [" + itemIndex + "]";
             }
+            
+            if (val instanceof ScriptPack) {
+                ScriptPack sp = (ScriptPack) val;
+                if (sp.isDocumentClass()) {
+                    txt = "<html><u>" + txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + "</u></html>";
+                }
+            }
+            
+            setText(txt);
 
             return this;
         }
