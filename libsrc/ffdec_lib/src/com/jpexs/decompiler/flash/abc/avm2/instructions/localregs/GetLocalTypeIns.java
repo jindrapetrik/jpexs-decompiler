@@ -145,17 +145,23 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         //TestIncDec7 AIR
         if (!output.isEmpty()) {
             GraphTargetItem lastOutput = output.get(output.size() - 1);
-            if (lastOutput instanceof IncLocalAVM2Item) {
-                output.remove(output.size() - 1);
-                stack.moveToStack(output);
-                stack.push(new PreIncrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
-                return;
+            if (lastOutput instanceof IncLocalAVM2Item) {                
+                IncLocalAVM2Item inc = (IncLocalAVM2Item) lastOutput;
+                if (inc.regIndex == regId) {
+                    output.remove(output.size() - 1);
+                    stack.moveToStack(output);
+                    stack.push(new PreIncrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                    return;
+                }
             }
-            if (output.get(output.size() - 1) instanceof DecLocalAVM2Item) {
-                output.remove(output.size() - 1);
-                stack.moveToStack(output);   
-                stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
-                return;
+            if (lastOutput instanceof DecLocalAVM2Item) {
+                DecLocalAVM2Item dec = (DecLocalAVM2Item) lastOutput;
+                if (dec.regIndex == regId) {
+                    output.remove(output.size() - 1);
+                    stack.moveToStack(output);   
+                    stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                    return;
+                }
             }
         }
         
