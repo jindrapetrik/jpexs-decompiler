@@ -3109,7 +3109,9 @@ public class CommandLineArgumentParser {
                             Set<Character> selChars = new HashSet<>();
                             Font font;
                             try {
-                                font = Font.createFont(Font.TRUETYPE_FONT, new File(repFile));
+                                File fontFile = new File(repFile);
+                                font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                                FontTag.addCustomFont(font, fontFile);
                                 List<Character> required = Arrays.asList((char) 0x01, (char) 0x00, (char) 0x0D, (char) 0x20);
                                 for (char c = 0; c < Character.MAX_VALUE; c++) {
                                     if (required.contains(c)) {
