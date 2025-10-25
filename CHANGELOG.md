@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2536] AS3 regexp highlighting / compilation
 - [#2537] AS1/2/3 direct editation - partial object literal causing lag
 - [#2540] AS3 getlocal after inclocal with different registers incorrectly merged
+- [PR224] Font CLI replace throwing NullPointer
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -5248,6 +5249,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR224]: https://github.com/jindrapetrik/jpexs-decompiler/pull/224
 [PR222]: https://github.com/jindrapetrik/jpexs-decompiler/pull/222
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
 [PR216]: https://github.com/jindrapetrik/jpexs-decompiler/pull/216
