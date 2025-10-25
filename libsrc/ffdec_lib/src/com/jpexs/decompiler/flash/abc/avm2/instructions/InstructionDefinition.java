@@ -1373,6 +1373,23 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
 
+        if (obj instanceof TemporaryItem) {
+            TemporaryItem temporaryItemObj = (TemporaryItem) obj;
+            if (temporaryItemObj.value instanceof FindPropertyAVM2Item) {
+                for (int i = output.size() - 1; i >= 0; i--) {
+                    if (output.get(i) instanceof SetTemporaryItem) {
+                        SetTemporaryItem setTemp = (SetTemporaryItem) output.get(i);
+                        if (setTemp.getTempIndex() == temporaryItemObj.getTempIndex()) {
+                            output.remove(i);
+                            obj = temporaryItemObj.value;
+                            break;
+                        }
+                    }
+                }
+            } 
+        }
+        
+        
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
