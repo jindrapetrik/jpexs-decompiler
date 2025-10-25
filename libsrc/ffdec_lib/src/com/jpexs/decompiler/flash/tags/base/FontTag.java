@@ -339,6 +339,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return Font file
      */
     public static File fontNameToFile(String fontName) {
+        ensureLoaded();
         if (installedFontFilesByName.containsKey(fontName)) {
             return installedFontFilesByName.get(fontName);
         }
@@ -422,6 +423,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return System font name
      */
     public String getSystemFontName() {
+        FontTag.ensureLoaded();
         int fontId = getCharacterId();
         String selectedFont = swf.sourceFontNamesMap.get(fontId);
         if (selectedFont == null) {
@@ -449,6 +451,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return System font
      */
     public Font getSystemFont() {
+        FontTag.ensureLoaded();
         return FontTag.installedFontsByName.get(getSystemFontName());
     }
 
@@ -538,6 +541,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return Font kerning pairs
      */
     protected static List<FontHelper.KerningPair> getFontKerningPairs(Font font, int size) {
+        ensureLoaded();
         if (customFontToFile.containsKey(font)) {
             if (!customFontKerningPairs.containsKey(font) || !customFontKerningPairs.get(font).containsKey(size)) {
                 if (!customFontKerningPairs.containsKey(font)) {
@@ -573,11 +577,12 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     /**
-     * Adds custom font.
+     * Adds custom font. Useful to properly load kerning pairs from it.
      * @param font Font
      * @param file File
      */
     public static void addCustomFont(Font font, File file) {
+        ensureLoaded();
         customFontToFile.put(font, file);
     }
 
