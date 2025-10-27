@@ -423,6 +423,18 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return System font name
      */
     public String getSystemFontName() {
+        String ret = getSystemFontNameNoDefault();
+        if (ret == null) {
+            return defaultFontName;
+        }
+        return ret;
+    }
+    
+    /**
+     * Gets system font name without backup to default font
+     * @return System font name
+     */
+    public String getSystemFontNameNoDefault() {
         FontTag.ensureLoaded();
         int fontId = getCharacterId();
         String selectedFont = swf.sourceFontNamesMap.get(fontId);
@@ -443,7 +455,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
 
         // findInstalledFontName always returns an available font name
-        return FontTag.findInstalledFontName(getFontName());
+        return FontTag.findInstalledFontNameNoDefault(getFontName());
     }
 
     /**
@@ -664,11 +676,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     /**
-     * Finds installed font name.
+     * Finds installed font name without backup to default font name
      * @param fontName Font name
      * @return Installed font name
      */
-    public static String findInstalledFontName(String fontName) {
+    public static String findInstalledFontNameNoDefault(String fontName) {
         ensureLoaded();
         if (installedFontsByName.containsKey(fontName)) {
             return fontName;
@@ -679,7 +691,20 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
                 return beforeUnderscore;
             }
         }
-        return defaultFontName;
+        return null;
+    }
+    
+    /**
+     * Finds installed font name.
+     * @param fontName Font name
+     * @return Installed font name
+     */
+    public static String findInstalledFontName(String fontName) {
+        String ret = findInstalledFontNameNoDefault(fontName);
+        if (ret == null) {
+            return defaultFontName;
+        }
+        return ret;
     }
 
     @Override

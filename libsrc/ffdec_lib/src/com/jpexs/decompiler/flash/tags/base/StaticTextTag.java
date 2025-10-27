@@ -1030,10 +1030,10 @@ public abstract class StaticTextTag extends TextTag {
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         if (image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
-            Map<Integer, StaticTextTag> normalizedTexts = g.getNormalizedTexts();
+            Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
             int realTextId = getSwf().getCharacterId(this);
-            if (normalizedTexts.containsKey(realTextId)) {
-                StaticTextTag normalizedText = normalizedTexts.get(realTextId);
+            if (normalizedTexts.containsKey(realTextId) && normalizedTexts.get(realTextId) instanceof StaticTextTag) {
+                StaticTextTag normalizedText = (StaticTextTag) normalizedTexts.get(realTextId);
                 staticTextToImage(swf, normalizedText.textRecords, getTextNum(), image, normalizedText.textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
                 return;
             }
@@ -1053,8 +1053,8 @@ public abstract class StaticTextTag extends TextTag {
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
         int realTextId = getSwf().getCharacterId(this);
-        if (exporter.getNormalizedTexts().containsKey(realTextId)) {
-            StaticTextTag normalizedText = exporter.getNormalizedTexts().get(realTextId);
+        if (exporter.getNormalizedTexts().containsKey(realTextId) && exporter.getNormalizedTexts().get(realTextId) instanceof StaticTextTag) {
+            StaticTextTag normalizedText = (StaticTextTag) exporter.getNormalizedTexts().get(realTextId);
             staticTextToSVG(swf, normalizedText.textRecords, getTextNum(), exporter, getRect(), normalizedText.textMatrix, colorTransform, exporter.getZoom(), transformation);
             return;
         }

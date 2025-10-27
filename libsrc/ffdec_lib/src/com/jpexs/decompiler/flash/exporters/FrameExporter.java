@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -324,7 +325,7 @@ public class FrameExporter {
             
             FontNormalizer normalizer = new FontNormalizer();
             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
-            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+            Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
 
             
@@ -608,7 +609,7 @@ public class FrameExporter {
                             
                             FontNormalizer normalizer = new FontNormalizer();
                             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
-                            Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+                            Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
                             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
                             
                             File f = new File(foutdir + File.separator + "frames.pdf");
