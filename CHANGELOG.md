@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2540] AS3 getlocal after inclocal with different registers incorrectly merged
 - [PR224] Font CLI replace throwing NullPointer
 - [#2546] AS3 findProperty vs temporary registers
+- [#2547] SVG import - improper linearGradient with userSpaceOnUse gradient units
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4025,6 +4026,7 @@ Major version of SWF to XML export changed to 2.
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
 [#2540]: https://www.free-decompiler.com/flash/issues/2540
 [#2546]: https://www.free-decompiler.com/flash/issues/2546
+[#2547]: https://www.free-decompiler.com/flash/issues/2547
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485

@@ -1465,11 +1465,11 @@ public class SvgImporter {
     private static void svgTest(String name) throws IOException, InterruptedException {
         System.err.println("running test " + name);
         if (!new File(name + ".original.svg").exists()) {
-            URL svgUrl = URI.create("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg").toURL();
+            URL svgUrl = URI.create("https://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg").toURL();
             byte[] svgData = Helper.readStream(svgUrl.openStream());
             Helper.writeFile(name + ".orig.svg", svgData);
 
-            URL pngUrl = URI.create("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png").toURL();
+            URL pngUrl = URI.create("https://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png").toURL();
             byte[] pngData = Helper.readStream(pngUrl.openStream());
             Helper.writeFile(name + ".orig.png", pngData);
         }
@@ -1806,7 +1806,7 @@ public class SvgImporter {
                 double y2 = parseCoordinate(lgfill.y2, 1);
 
                 Matrix tMatrix = new Matrix();
-                if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
+                if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {                                                                                
                     Matrix xyMatrix = new Matrix();
                     xyMatrix.scaleX = (x2 - x1) * SWF.unitDivisor;
                     xyMatrix.rotateSkew0 = (y2 - y1) * SWF.unitDivisor;
@@ -1834,38 +1834,37 @@ public class SvgImporter {
                             .concatenate(zeroStartMatrix)
                             .concatenate(scaleMatrix);
                 } else {
-
+                    //SvgGradientUnits.USER_SPACE_ON_USE
+                    
                     x1 *= SWF.unitDivisor;
                     y1 *= SWF.unitDivisor;
                     x2 *= SWF.unitDivisor;
-                    y2 *= SWF.unitDivisor;
+                    y2 *= SWF.unitDivisor;                                        
+                    
+                    double L = 16384.0;
+                    
+                    double ux = x2 - x1;
+                    double uy = y2 - y1;
+                    double du = Math.hypot(x2 - x1, y2 - y1);
+                    double mx = (x1 + x2) / 2.0;
+                    double my = (y1 + y2) / 2.0;
+                    double ax = ux / du;
+                    double ay = uy / du;
+                    
+                    double k = du / (2 * L);
+                    
+                    double nx = -ay;
+                    double ny = ax;
+                                        
+                    double newScaleX = k * (gradientMatrix.scaleX * ax + gradientMatrix.rotateSkew1 * ay);
+                    double newRotateSkew1 = k * (gradientMatrix.scaleX * nx + gradientMatrix.rotateSkew1 * ny);
+                    double newTranslateX = gradientMatrix.scaleX * mx + gradientMatrix.rotateSkew1 * my + gradientMatrix.translateX;
 
-                    Point a = new Point(-16384.0, 0.0);
-                    Point b = new Point(16384.0, 0.0);
-                    Point c = new Point(x1, y1);
-                    Point d = new Point(x2, y2);
-
-                    if (!(a.equals(c) && b.equals(d))) {
-                        double AdeltaX = b.x - a.x;
-                        double AdeltaY = b.y - a.y;
-
-                        double BdeltaX = d.x - c.x;
-                        double BdeltaY = d.y - c.y;
-
-                        double lenAB = Math.sqrt(AdeltaX * AdeltaX + AdeltaY * AdeltaY);
-                        double lenCD = Math.sqrt(BdeltaX * BdeltaX + BdeltaY * BdeltaY);
-
-                        double rotation = angle(c.x, c.y, d.x, d.y) - angle(a.x, a.y, b.x, b.y);
-
-                        double scale = lenCD / lenAB;
-
-                        tMatrix = tMatrix
-                                .concatenate(gradientMatrix)
-                                .concatenate(Matrix.getTranslateInstance(c.x, c.y))
-                                .concatenate(Matrix.getRotateInstance(rotation * 180 / Math.PI))
-                                .concatenate(Matrix.getScaleInstance(scale))
-                                .concatenate(Matrix.getTranslateInstance(-a.x, -a.y));
-                    }
+                    double newRotateSkew0 = k * (gradientMatrix.rotateSkew0 * ax + gradientMatrix.scaleY * ay);
+                    double newScaleY = k * (gradientMatrix.rotateSkew0 * nx + gradientMatrix.scaleY * ny);
+                    double newTranslateY  = gradientMatrix.rotateSkew0 * mx + gradientMatrix.scaleY * my + gradientMatrix.translateY;
+                                        
+                    tMatrix = new Matrix(newScaleX, newScaleY, newRotateSkew0, newRotateSkew1, newTranslateX, newTranslateY);
                 }
                 fillStyle.gradientMatrix = tMatrix.toMATRIX();
             } else if (fill instanceof SvgRadialGradient) {
