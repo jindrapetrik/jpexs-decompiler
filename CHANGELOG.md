@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - AS3 Document class is underlined and has different icon
 - [#2556] CLI subsprite animation export (`-sublength <length>` option for export)
-- [#2556] Option to select arbitrary frames of sprites export via `-select`.
+- [#2556] CLI option to select arbitrary frames of sprites export via `-select`.
   Check `--help -select` for details.
 
 ### Fixed
@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2546] AS3 findProperty vs temporary registers
 - [#2547] SVG import - improper linearGradient with userSpaceOnUse gradient units
 - [#2545] FLA export - normalize font em square
+- [#2552] Open with FFDec explorer menu shrinking sidebar
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4033,6 +4034,7 @@ Major version of SWF to XML export changed to 2.
 [#2546]: https://www.free-decompiler.com/flash/issues/2546
 [#2547]: https://www.free-decompiler.com/flash/issues/2547
 [#2545]: https://www.free-decompiler.com/flash/issues/2545
+[#2552]: https://www.free-decompiler.com/flash/issues/2552
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
