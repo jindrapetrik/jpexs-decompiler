@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - AS3 Document class is underlined and has different icon
+- [#2556] CLI subsprite animation export (`-sublength <length>` option for export)
+- [#2556] Option to select arbitrary frames of sprites export via `-select`.
+  Check `--help -select` for details.
 
 ### Fixed
 - [#2536] AS3 switches detection incorrectly replaces basic ifs with strict equals
@@ -4023,6 +4026,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
 [#2540]: https://www.free-decompiler.com/flash/issues/2540

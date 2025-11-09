@@ -1,0 +1,33 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <symbols>
+          <Include href="Circle.xml" loadImmediate="false" itemID="69107181-000001da" lastModified="1762685391"/>
+          <Include href="Square.xml" loadImmediate="false" itemID="6910715a-000001d5" lastModified="1762685274"/>
+          <Include href="Symbol 1.xml" loadImmediate="false" itemID="691071b7-000001de" lastModified="1762685367"/>
+          <Include href="Tween 1.xml" itemIcon="1" loadImmediate="false" itemID="691071cf-000001e4" lastModified="1762685391"/>
+          <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="691071cf-000001e6" lastModified="1762685391"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="31">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="60" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" centerPoint3DX="242.2" centerPoint3DY="156.75">
+                                             <matrix>
+                                                  <Matrix tx="133" ty="89"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="109.2" y="67.75"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory/>
+</DOMDocument>
