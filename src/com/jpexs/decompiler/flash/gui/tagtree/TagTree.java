@@ -117,6 +117,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -173,7 +174,7 @@ public class TagTree extends AbstractTagTree {
                 value = null;
             }
 
-            super.getTreeCellRendererComponent(
+            JLabel origLabel = (JLabel) super.getTreeCellRendererComponent(
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
@@ -245,7 +246,7 @@ public class TagTree extends AbstractTagTree {
             }
             int itemIndex = aTree.getFullModel().getItemIndex(val);
                    
-            String txt = val.toString();
+            String txt = origLabel.getText();
             if (itemIndex > 1) {
                 txt = txt + " [" + itemIndex + "]";
             }
@@ -405,7 +406,7 @@ public class TagTree extends AbstractTagTree {
             }
         }
         if (value != null) {
-            String sValue = value.toString();
+            String sValue = value.toString();            
             if (sValue != null) {
                 return sValue;
             }
