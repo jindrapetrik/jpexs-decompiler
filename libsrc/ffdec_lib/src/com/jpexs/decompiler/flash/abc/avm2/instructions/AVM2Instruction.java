@@ -748,15 +748,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return ret;
     }
 
-    /**
-     * Checks whether the loops are ignored.
-     *
-     * @return True if the loops are ignored, false otherwise
-     */
-    @Override
-    public boolean ignoredLoops() {
-        return false;
-    }
 
     /**
      * Sets whether this item is ignored.

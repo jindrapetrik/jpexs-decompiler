@@ -192,9 +192,4 @@ public class ActionIf extends Action {
         ret.add(after);
         return ret;
     }
-
-    @Override
-    public boolean ignoredLoops() {
-        return false; //compileTime;
-    }
 }

@@ -180,9 +180,6 @@ public class GraphPart implements Serializable {
                 continue;
             }
             visited.add(thisPart);
-            if (thisPart.end < code.size() && code.get(thisPart.end).isBranch() && (code.get(thisPart.end).ignoredLoops())) {
-                continue;
-            }
             for (GraphPart p : thisPart.nextParts) {
                 if (p == part) {
                     return true;
