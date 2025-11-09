@@ -140,11 +140,10 @@ public class GraphPart implements Serializable {
      * @param visited Visited parts
      * @param loops Loops
      * @param throwStates Throw states
-     * @param useThrow Use throw
      * @return True if this part leads to the other part
      * @throws InterruptedException On interrupt
      */
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
@@ -222,15 +221,14 @@ public class GraphPart implements Serializable {
      * @param part Part to check
      * @param loops Loops
      * @param throwStates Throw states
-     * @param useThrow Use throw
      * @return True if this part leads to the other part
      * @throws InterruptedException On interrupt
      */
-    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
+    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, throwStates, useThrow);
+        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, throwStates);
     }
 
     /**

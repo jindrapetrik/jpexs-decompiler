@@ -1875,14 +1875,14 @@ public class AVM2Graph extends Graph {
             if (caseBodyParts.size() == 2) {
                 boolean isIf = false;
                 for (GraphPart r : part.refs) {                    
-                    if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                    if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates)) {
                         isIf = true;
                         break;
                     }
                 }
                 if (!isIf) {
                     for (GraphPart r : caseBodyParts.get(1).refs) {                    
-                        if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                        if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates)) {
                             isIf = true;
                             break;
                         }
