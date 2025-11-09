@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#2552] Open with FFDec explorer menu shrinking sidebar
 - [#2551] Showing too wide video tags in Flash player producing ValueTooLarge
   exception. Also truncated video length.
+- [#2550] FLV video import - incorrect frame position caused by wrong FLV tag sort
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4038,6 +4039,7 @@ Major version of SWF to XML export changed to 2.
 [#2545]: https://www.free-decompiler.com/flash/issues/2545
 [#2552]: https://www.free-decompiler.com/flash/issues/2552
 [#2551]: https://www.free-decompiler.com/flash/issues/2551
+[#2550]: https://www.free-decompiler.com/flash/issues/2550
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
