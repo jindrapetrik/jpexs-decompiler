@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#2551] Showing too wide video tags in Flash player producing ValueTooLarge
   exception. Also truncated video length.
 - [#2550] FLV video import - incorrect frame position caused by wrong FLV tag sort
+- Mac package problems related to BOM file (updated jbomutils library)
 
 ## [24.1.0] - 2025-09-28
 ### Added
