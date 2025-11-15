@@ -5167,22 +5167,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
+        int aaScale = 4;
 
-        int width = (int) (viewRect.getWidth() * zoom);
-        int height = (int) (viewRect.getHeight() * zoom);
+        int width = aaScale * (int) (viewRect.getWidth() * zoom);
+        int height = aaScale * (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
             width = 1;
         }
         if (height == 0) {
             height = 1;
         }
+        
+        Rectangle realRectAA = new Rectangle(realRect);
+        realRectAA.x *= aaScale;
+        realRectAA.y *= aaScale;
+        realRectAA.width *= aaScale;
+        realRectAA.height *= aaScale;
+        
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
 
         Matrix m = new Matrix();
-        m.translate(-viewRect.xMin * zoom, -viewRect.yMin * zoom);
-        m.scale(zoom);
+        m.translate(-viewRect.xMin * zoom * aaScale, -viewRect.yMin * zoom * aaScale);
+        m.scale(zoom * aaScale);
 
         Matrix fullM = m.clone();
 
@@ -5214,12 +5222,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (backgroundColor != null) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(backgroundColor.toColor());
-            g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+            g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
         if (Configuration.showGrid.get() && (drawable instanceof SWF) && !Configuration.gridOverObjects.get()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
-            drawGridSwf(g, realRect, zoom);
+            drawGridSwf(g, realRectAA, zoom * aaScale);
         }
 
         parentMatrix = new Matrix();
@@ -5231,7 +5239,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             ignoreDepths.add(parentDepthState.depth);
             if (Configuration.halfTransparentParentLayersEasy.get()) {
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
-                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
+                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
                         ignoreDepths);
             }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
@@ -5241,11 +5249,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (!parentTimelineds.isEmpty()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(new Color(255, 255, 255, 128));
-            g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+            g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
-        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
+        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
 
+        SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
+        img2.fillTransparent();
+        Graphics2D g2 = (Graphics2D) img2.getGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
+        image = img2;
+        
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
