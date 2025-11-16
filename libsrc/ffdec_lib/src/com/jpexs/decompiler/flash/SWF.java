@@ -4493,11 +4493,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param soundInfo Sound info
      * @param soundTag Sound tag
-     * @param resample Resample to 44kHz?
      * @param data Byte data
      */
-    public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample, byte[] data) {
-        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
+    public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, byte[] data) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
         soundCache.put(key, data);
     }
 
@@ -4720,11 +4719,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param soundInfo Sound info
      * @param soundTag Sound tag
-     * @param resample Resample to 44kHz
      * @return Byte data
      */
-    public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample) {
-        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
+    public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
         if (soundCache.contains(key)) {
             return soundCache.get(key);
         }

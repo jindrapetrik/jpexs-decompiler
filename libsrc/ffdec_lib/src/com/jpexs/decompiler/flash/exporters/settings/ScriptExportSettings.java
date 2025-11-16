@@ -95,10 +95,9 @@ public class ScriptExportSettings implements Cloneable {
             boolean singleFile,
             boolean ignoreFrameScripts,
             boolean exportEmbed,
-            boolean exportEmbedFlaMode,
-            boolean resampleWav
+            boolean exportEmbedFlaMode
     ) {
-        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/", false, false);
+        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, "/_assets/", false, false);
     }
 
     public ScriptExportSettings(
@@ -107,7 +106,6 @@ public class ScriptExportSettings implements Cloneable {
             boolean ignoreFrameScripts,
             boolean exportEmbed,
             boolean exportEmbedFlaMode,
-            boolean resampleWav,
             String assetsDir,
             boolean includeAllClasses,
             boolean ignoreAccessibility
@@ -117,7 +115,6 @@ public class ScriptExportSettings implements Cloneable {
         this.ignoreFrameScripts = ignoreFrameScripts;
         this.exportEmbed = exportEmbed;
         this.exportEmbedFlaMode = exportEmbedFlaMode;
-        this.resampleWav = resampleWav;
         this.assetsDir = assetsDir;
         this.includeAllClasses = includeAllClasses;
         this.ignoreAccessibility = ignoreAccessibility;

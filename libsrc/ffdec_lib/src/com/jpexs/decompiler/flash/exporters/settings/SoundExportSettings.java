@@ -35,18 +35,13 @@ public class SoundExportSettings {
      */
     public SoundExportMode mode;
 
-    /**
-     * Resample WAV
-     */
-    public boolean resampleWav;
-
+    
     /**
      * Constructor.
      * @param mode Mode
      * @param resampleWav Resample WAV
      */
-    public SoundExportSettings(SoundExportMode mode, boolean resampleWav) {
+    public SoundExportSettings(SoundExportMode mode) {
         this.mode = mode;
-        this.resampleWav = resampleWav;
     }
 }

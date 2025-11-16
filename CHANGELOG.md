@@ -30,6 +30,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Simple editor uses percent as units for filter strength
 
+### Removed
+- Removed resampling from CLI and all source code
+
 ## [24.1.0] - 2025-09-28
 ### Added
 - [#2477] Option to disable AS2 detection of uninitialized class fields

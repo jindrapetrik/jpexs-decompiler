@@ -48,6 +48,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jdk.jfr.internal.RemoveFields;
 
 /**
  * Configuration of FFDec.
@@ -1003,10 +1004,12 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> lastExportResampleWav = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
+    @ConfigurationRemoved
     public static ConfigurationItem<Boolean> previewResampleSound = null;
 
     @ConfigurationDefaultBoolean(false)

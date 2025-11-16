@@ -69,8 +69,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final JButton loopButton;
 
-    private final JToggleButton resampleButton;
-
     private MediaDisplay display;
 
     private JProgressBar progress;
@@ -90,9 +88,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private static final Icon loopIcon = View.getIcon("loopon16");
 
     private static final Icon noLoopIcon = View.getIcon("loopoff16");
-
-    private static final Icon resampleIcon = View.getIcon("resample16");
-
+    
     //private final JLabel percentLabel = new JLabel("100%");
     private final ZoomPanel zoomPanel;
 
@@ -293,16 +289,9 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         boolean loop = Configuration.loopMedia.get();
         loopButton.setIcon(loop ? loopIcon : noLoopIcon);
 
-        resampleButton = new JToggleButton(resampleIcon);
-        resampleButton.setToolTipText(AppStrings.translate("preview.resample"));
-        resampleButton.setMargin(new Insets(4, 2, 2, 2));
-        resampleButton.addActionListener(this::resampleButtonActionPerformed);
-        resampleButton.setSelected(false); //Configuration.previewResampleSound.get());
-
         buttonsPanel.add(pauseButton);
         buttonsPanel.add(stopButton);
         buttonsPanel.add(loopButton);
-        //buttonsPanel.add(resampleButton);
         controlPanel.add(buttonsPanel, BorderLayout.CENTER);
 
         progress = new JProgressBar();
@@ -443,13 +432,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         loopButton.setIcon(loop ? loopIcon : noLoopIcon);
         display.setLoop(loop);
     }
-
-    private void resampleButtonActionPerformed(ActionEvent evt) {
-        boolean resample = resampleButton.isSelected();
-        Configuration.previewResampleSound.set(resample);
-        display.setResample(resample);
-    }
-
+ 
     private void gotoFrameButtonActionPerformed(ActionEvent evt) {
         final JPanel gotoPanel = new JPanel(new BorderLayout());
         final JTextField frameField = new JTextField("" + display.getCurrentFrame());

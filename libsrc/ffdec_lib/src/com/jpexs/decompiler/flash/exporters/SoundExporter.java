@@ -118,7 +118,7 @@ public class SoundExporter {
             final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + ext);
             new RetryTask(() -> {
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                    exportSound(os, st, settings.mode, settings.resampleWav);
+                    exportSound(os, st, settings.mode);
                 }
             }, handler).run();
 
@@ -152,13 +152,13 @@ public class SoundExporter {
         return ret;
     }
 
-    public byte[] exportSound(SoundTag t, SoundExportMode mode, boolean resampleWav) throws IOException {
+    public byte[] exportSound(SoundTag t, SoundExportMode mode) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        exportSound(baos, t, mode, resampleWav);
+        exportSound(baos, t, mode);
         return baos.toByteArray();
     }
 
-    public void exportSound(OutputStream fos, SoundTag st, SoundExportMode mode, boolean resampleWav) throws IOException {
+    public void exportSound(OutputStream fos, SoundTag st, SoundExportMode mode) throws IOException {
         SoundFormat fmt = st.getSoundFormat();
         SoundExportFormat nativeFormat = fmt.getNativeExportFormat();
 
@@ -202,7 +202,7 @@ public class SoundExporter {
             }
         } else {
             List<ByteArrayRange> soundData = st.getRawSoundData();
-            fmt.createWav(null, soundData, fos, st.getInitialLatency(), resampleWav);
+            fmt.createWav(null, soundData, fos, st.getInitialLatency());
         }
     }
 }

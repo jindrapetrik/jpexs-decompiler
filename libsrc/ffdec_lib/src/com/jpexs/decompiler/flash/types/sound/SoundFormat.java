@@ -296,7 +296,7 @@ public class SoundFormat {
         return baosResampled.toByteArray();
     }
 
-    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os, int skipSamples, boolean resample) throws IOException {
+    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os, int skipSamples) throws IOException {
 
         byte[] decodedData = decode(soundInfo, dataRanges, skipSamples);
         boolean convertedStereo = stereo;
@@ -351,10 +351,9 @@ public class SoundFormat {
             convertedStereo = true;
         }
 
-        byte[] resampled = resample ? resample(baosFiltered.toByteArray()) : baosFiltered.toByteArray();
-
+        
         try {
-            createWavFromPcmData(os, resample ? 44100 : samplingRate, true, convertedStereo, resampled);
+            createWavFromPcmData(os, samplingRate, true, convertedStereo, baosFiltered.toByteArray());
             return true;
         } catch (IOException ex) {
             return false;

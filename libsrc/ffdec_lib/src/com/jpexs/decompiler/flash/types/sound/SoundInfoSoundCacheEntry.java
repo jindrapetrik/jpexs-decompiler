@@ -29,12 +29,10 @@ public class SoundInfoSoundCacheEntry {
 
     public SOUNDINFO soundInfo;
     public SoundTag soundTag;
-    public boolean resample;
-
-    public SoundInfoSoundCacheEntry(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample) {
+    
+    public SoundInfoSoundCacheEntry(SOUNDINFO soundInfo, SoundTag soundTag) {
         this.soundInfo = soundInfo;
         this.soundTag = soundTag;
-        this.resample = resample;
     }
 
     @Override
@@ -42,7 +40,6 @@ public class SoundInfoSoundCacheEntry {
         int hash = 7;
         hash = 97 * hash + Objects.hashCode(this.soundInfo);
         hash = 97 * hash + Objects.hashCode(this.soundTag);
-        hash = 97 * hash + (this.resample ? 1 : 0);
         return hash;
     }
 
@@ -58,9 +55,6 @@ public class SoundInfoSoundCacheEntry {
             return false;
         }
         final SoundInfoSoundCacheEntry other = (SoundInfoSoundCacheEntry) obj;
-        if (this.resample != other.resample) {
-            return false;
-        }
         if (!Objects.equals(this.soundInfo, other.soundInfo)) {
             return false;
         }
