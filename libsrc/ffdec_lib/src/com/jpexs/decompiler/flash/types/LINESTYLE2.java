@@ -132,7 +132,7 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     /**
      * Miter limit factor
      */
-    @SWFType(BasicType.FIXED8)
+    @SWFType(BasicType.UFIXED8)
     @Conditional(value = "joinStyle", options = {MITER_JOIN})
     public float miterLimitFactor;
 

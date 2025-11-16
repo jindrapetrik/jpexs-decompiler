@@ -340,7 +340,7 @@ public class PreviewExporter {
             int height = outrect.getHeight();
 
             sos2.writeRECT(outrect);
-            sos2.writeFIXED8(frameRate);
+            sos2.writeUFIXED8(frameRate);
             sos2.writeUI16(frameCount); //framecnt
 
             FileAttributesTag fa = swf.getFileAttributes();

@@ -53,7 +53,7 @@ public class GLOWFILTER extends FILTER {
     /**
      * Strength of the glow
      */
-    @SWFType(BasicType.FIXED8)
+    @SWFType(BasicType.UFIXED8)
     public float strength = 1;
 
     /**

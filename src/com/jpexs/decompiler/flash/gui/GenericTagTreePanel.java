@@ -353,7 +353,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         editor = new EnumEditor(field.getName(), obj, field, index, type, swfType, values);
                     } else if (type.equals(double.class) || type.equals(Double.class)
                             || type.equals(float.class) || type.equals(Float.class)) {
-                        editor = new FloatEditor(field.getName(), obj, field, index, type);
+                        editor = new FloatEditor(field.getName(), obj, field, index, type, swfType);
                     } else if (type.equals(int.class) || type.equals(Integer.class)
                             || type.equals(short.class) || type.equals(Short.class)
                             || type.equals(long.class) || type.equals(Long.class)) {

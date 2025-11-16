@@ -152,6 +152,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -159,6 +160,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.SoundInfoSoundCacheEntry;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
@@ -267,16 +269,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Movie frame rate.
      */
+    @SWFType(BasicType.UFIXED8)
     public float frameRate;
 
     /**
      * Number of frames in movie.
      */
+    @SWFType(BasicType.UI16)
     public int frameCount;
 
     /**
      * Version of SWF.
      */
+    @SWFType(BasicType.UI8)
     public int version;
 
     /**
@@ -1906,7 +1911,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.writeUI8(version);
             sos.writeUI32(0); // placeholder for file length
             sos.writeRECT(displayRect);
-            sos.writeFIXED8(frameRate);
+            sos.writeUFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
             sos.writeTags(getTags());
@@ -2276,7 +2281,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         sis.setPercentMax(fileSize);
         displayRect = sis.readRECT("displayRect");
-        frameRate = sis.readFIXED8("frameRate");
+        frameRate = sis.readUFIXED8("frameRate");
         frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, lazy);
         if (tags.size() > 0 && tags.get(tags.size() - 1).getId() == EndTag.ID) {

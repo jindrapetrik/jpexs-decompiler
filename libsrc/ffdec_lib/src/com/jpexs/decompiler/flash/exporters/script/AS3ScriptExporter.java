@@ -672,7 +672,7 @@ public class AS3ScriptExporter {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
                             sos2.writeRECT(swf.displayRect);
-                            sos2.writeFIXED8(swf.frameRate);
+                            sos2.writeUFIXED8(swf.frameRate);
                             sos2.writeUI16(1);
                             FileAttributesTag fa = swf.getFileAttributes();
                             if (fa != null) {

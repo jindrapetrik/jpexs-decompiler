@@ -561,7 +561,7 @@ public class FiltersTreeTable extends JTreeTable {
                     }                                        
                 });
             } else if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
-                editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
+                editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
                 if ("angle".equals(filterField.field.getName())) {
                     ((FloatEditor) editor).setValueNormalizer(new ValueNormalizer() {
                         @Override

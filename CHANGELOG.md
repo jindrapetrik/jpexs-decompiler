@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
   exception. Also truncated video length.
 - [#2550] FLV video import - incorrect frame position caused by wrong FLV tag sort
 - Mac package problems related to BOM file (updated jbomutils library)
+- [#2561] Cannot set filter strength to 128 or above
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4041,6 +4042,7 @@ Major version of SWF to XML export changed to 2.
 [#2552]: https://www.free-decompiler.com/flash/issues/2552
 [#2551]: https://www.free-decompiler.com/flash/issues/2551
 [#2550]: https://www.free-decompiler.com/flash/issues/2550
+[#2561]: https://www.free-decompiler.com/flash/issues/2561
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
