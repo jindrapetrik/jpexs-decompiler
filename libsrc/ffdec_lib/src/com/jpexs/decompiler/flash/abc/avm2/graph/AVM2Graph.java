@@ -712,6 +712,9 @@ public class AVM2Graph extends Graph {
                 continue;
             }
             for (int ip = p.start; ip <= p.end; ip++) {
+                if (ip >= avm2code.code.size()) {
+                    continue;
+                }
                 AVM2Instruction ins = avm2code.code.get(ip);
                 if (ins.definition instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
@@ -3304,6 +3307,9 @@ public class AVM2Graph extends Graph {
     @Override
     protected boolean partIsSwitch(GraphPart part) {
         if (part.end < 0) {
+            return false;
+        }
+        if (part.end >= avm2code.code.size()) {
             return false;
         }
         return avm2code.code.get(part.end).definition instanceof LookupSwitchIns;

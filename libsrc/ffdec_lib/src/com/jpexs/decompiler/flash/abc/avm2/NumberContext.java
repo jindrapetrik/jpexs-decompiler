@@ -87,8 +87,9 @@ public class NumberContext {
      * @param usage Usage
      */
     public void setUsage(int usage) {
-        if (usage > usageNames.length || usage < 0) {
-            throw new IllegalArgumentException("Invalid usage value :" + usage);
+        if (usage >= usageNames.length || usage < 0) {
+            this.usage = USE_NUMBER;
+            return;
         }
         this.usage = usage;
     }
@@ -118,7 +119,7 @@ public class NumberContext {
      */
     public void setPrecision(int precision) {
         if (precision > 34) {
-            throw new IllegalArgumentException("Maximum value of precision is 34");
+            precision = 34;
         }
         this.precision = precision;
     }
@@ -129,8 +130,9 @@ public class NumberContext {
      * @param rounding Rounding
      */
     public void setRounding(int rounding) {
-        if (rounding > roundingNames.length || rounding < 0) {
-            throw new IllegalArgumentException("Invalid rounding value :" + rounding);
+        if (rounding >= roundingNames.length || rounding < 0) {
+            this.rounding = ROUND_HALF_EVEN;
+            return;
         }
         this.rounding = rounding;
     }
@@ -165,8 +167,8 @@ public class NumberContext {
      * @return Name
      */
     public static String usageToName(int usage) {
-        if (usage > usageNames.length || usage < 0) {
-            throw new IllegalArgumentException("Invalid usage value :" + usage);
+        if (usage >= usageNames.length || usage < 0) {
+            return "Number";
         }
         return usageNames[usage];
     }
@@ -177,8 +179,8 @@ public class NumberContext {
      * @return Name
      */
     public static String roundingToName(int rounding) {
-        if (rounding > roundingNames.length || rounding < 0) {
-            throw new IllegalArgumentException("Invalid rounding value :" + rounding);
+        if (rounding >= roundingNames.length || rounding < 0) {
+            return "HALF_EVEN";
         }
         return roundingNames[rounding];
     }

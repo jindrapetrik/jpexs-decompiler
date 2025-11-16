@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
 - [#2550] FLV video import - incorrect frame position caused by wrong FLV tag sort
 - Mac package problems related to BOM file (updated jbomutils library)
 - [#2561] Cannot set filter strength to 128 or above
+- [#2562] ABC explorer not working in some obfuscated code
+- [#2562] P-code not showing in some obfuscated code (NumberContext related)
 
 ### Changed
 - Simple editor uses percent as units for filter strength
@@ -4046,6 +4048,7 @@ Major version of SWF to XML export changed to 2.
 [#2551]: https://www.free-decompiler.com/flash/issues/2551
 [#2550]: https://www.free-decompiler.com/flash/issues/2550
 [#2561]: https://www.free-decompiler.com/flash/issues/2561
+[#2562]: https://www.free-decompiler.com/flash/issues/2562
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485

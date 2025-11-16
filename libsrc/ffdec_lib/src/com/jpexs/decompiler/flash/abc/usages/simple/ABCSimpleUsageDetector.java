@@ -540,7 +540,7 @@ public class ABCSimpleUsageDetector {
      * @return True if it is new
      */
     private boolean handleUsage(ItemKind kind, int index, String usageDescription) {
-        if (index < 0 || index > usages.get(kind).size() - 1) {
+        if (!usages.containsKey(kind) || index < 0 || index > usages.get(kind).size() - 1) {
             Logger.getLogger(ABCSimpleUsageDetector.class.getName()).log(Level.WARNING, "{0} with index {1} not found for usage {2}", new Object[]{kind, index, usageDescription});
             return false;
         }
