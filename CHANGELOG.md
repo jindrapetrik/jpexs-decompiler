@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
 - Mac package problems related to BOM file (updated jbomutils library)
 - [#2561] Cannot set filter strength to 128 or above
 
+### Changed
+- Simple editor uses percent as units for filter strength
+
 ## [24.1.0] - 2025-09-28
 ### Added
 - [#2477] Option to disable AS2 detection of uninitialized class fields
