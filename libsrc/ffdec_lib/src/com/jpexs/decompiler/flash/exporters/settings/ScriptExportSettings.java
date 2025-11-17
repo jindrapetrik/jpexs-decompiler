@@ -88,7 +88,6 @@ public class ScriptExportSettings implements Cloneable {
      * @param ignoreFrameScripts Ignore frame scripts
      * @param exportEmbed Export embed
      * @param exportEmbedFlaMode Export embed fla mode
-     * @param resampleWav Resample WAV
      */
     public ScriptExportSettings(
             ScriptExportMode mode,
