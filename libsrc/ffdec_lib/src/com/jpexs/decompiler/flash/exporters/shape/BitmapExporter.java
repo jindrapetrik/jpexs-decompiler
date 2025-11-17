@@ -415,9 +415,11 @@ public class BitmapExporter extends ShapeExporterBase {
             thickness = 1 * SWF.unitDivisor / unzoom;
         }
         
+        /*
         if (Configuration.fixAntialiasConflation.get()) {
             thickness += 1 * SWF.unitDivisor / unzoom;
         }
+        */
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
             //lineStroke =  new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
@@ -684,10 +686,12 @@ public class BitmapExporter extends ShapeExporterBase {
             } else {
                 graphics.setPaint(fillPaint);
                 graphics.fill(shp);
+                /*
                 if (Configuration.fixAntialiasConflation.get()) {
                     Shape strokeShape = new BasicStroke((float) (1 * SWF.unitDivisor / unzoom), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
                     graphics.fill(strokeShape);                    
                 }
+                */
             }            
         }
         if (linePaint != null && lineStroke != null) {

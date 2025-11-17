@@ -31,7 +31,8 @@ All notable changes to this project will be documented in this file.
 - Simple editor uses percent as units for filter strength
 
 ### Removed
-- Removed resampling from CLI and all source code
+- Resampling from CLI and all source code
+- [#2541], [#2564] Antialias conflation fixer
 
 ## [24.1.0] - 2025-09-28
 ### Added
@@ -4052,6 +4053,8 @@ Major version of SWF to XML export changed to 2.
 [#2550]: https://www.free-decompiler.com/flash/issues/2550
 [#2561]: https://www.free-decompiler.com/flash/issues/2561
 [#2562]: https://www.free-decompiler.com/flash/issues/2562
+[#2541]: https://www.free-decompiler.com/flash/issues/2541
+[#2564]: https://www.free-decompiler.com/flash/issues/2564
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
