@@ -65,6 +65,44 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="24.1.1" date="2025-11-17">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3 Document class is underlined and has different icon</li>
+					<li>#2556 CLI subsprite animation export (`-sublength &lt;length&gt;` option for export)</li>
+					<li>#2556 CLI option to select arbitrary frames of sprites export via `-select`. Check `--help -select` for details.</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2536 AS3 switches detection incorrectly replaces basic ifs with strict equals</li>
+					<li>#2536 AS3 switches detection not handling loops</li>
+					<li>#2536 AS3 regexp highlighting / compilation</li>
+					<li>#2537 AS1/2/3 direct editation - partial object literal causing lag</li>
+					<li>#2540 AS3 getlocal after inclocal with different registers incorrectly merged</li>
+					<li>PR224 Font CLI replace throwing NullPointer</li>
+					<li>#2546 AS3 findProperty vs temporary registers</li>
+					<li>#2547 SVG import - improper linearGradient with userSpaceOnUse gradient units</li>
+					<li>#2545 FLA export - normalize font em square</li>
+					<li>#2552 Open with FFDec explorer menu shrinking sidebar</li>
+					<li>#2551 Showing too wide video tags in Flash player producing ValueTooLarge exception. Also truncated video length.</li>
+					<li>#2550 FLV video import - incorrect frame position caused by wrong FLV tag sort</li>
+					<li>Mac package problems related to BOM file (updated jbomutils library)</li>
+					<li>#2561 Cannot set filter strength to 128 or above</li>
+					<li>#2562 ABC explorer not working in some obfuscated code</li>
+					<li>#2562 P-code not showing in some obfuscated code (NumberContext related)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Simple editor uses percent as units for filter strength</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Resampling from CLI and all source code</li>
+					<li>#2541, #2564 Antialias conflation fixer</li>
+				</ul>
+			</description>
+		</release>
 		<release version="24.1.0" date="2025-09-28">
 			<description>
 				<p>Added</p>

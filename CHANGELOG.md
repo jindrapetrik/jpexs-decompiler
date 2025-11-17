@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [24.1.1] - 2025-11-17
 ### Added
 - AS3 Document class is underlined and has different icon
 - [#2556] CLI subsprite animation export (`-sublength <length>` option for export)
@@ -3868,7 +3868,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-,[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...dev
+,[24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
 [24.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...version24.0.0
