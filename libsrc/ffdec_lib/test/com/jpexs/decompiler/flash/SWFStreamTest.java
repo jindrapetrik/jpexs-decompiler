@@ -161,6 +161,18 @@ public class SWFStreamTest {
             assertEquals(ff, ff2, "Written and read value not equals. Written: " + ff + " read: " + ff2);
             sis.close();
         }
+        
+        float[] uffs = new float[]{200.25f, 0.25f, 255.75f, 50.25f};
+        for (float ff : uffs) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
+            sos.writeUFIXED8(ff);
+            sos.close();
+            sis = new SWFInputStream(null, baos.toByteArray());
+            float ff2 = sis.readUFIXED8("test");
+            assertEquals(ff, ff2, "Written and read value not equals. Written: " + ff + " read: " + ff2);
+            sis.close();
+        }
     }    
 
     @Test

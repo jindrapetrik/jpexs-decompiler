@@ -79,7 +79,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Strength of the gradient glow
      */
-    @SWFType(BasicType.FIXED8)
+    @SWFType(BasicType.UFIXED8)
     public float strength = 1;
 
     /**

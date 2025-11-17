@@ -290,8 +290,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean muted = false;
 
-    private boolean resample = false;
-
     private boolean mutable = false;
 
     private boolean alwaysDisplay = false;
@@ -1024,11 +1022,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         } else {
             prevFrame = -1; //initiate refreshing frame to play sounds again
         }
-    }
-
-    @Override
-    public void setResample(boolean resample) {
-        this.resample = resample;
     }
 
     private static void drawGridSwf(Graphics2D g, Rectangle realRect, double zoom) {
@@ -4788,7 +4781,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.frozen = frozen;
             this.frozenButtons = frozenButtons;
             this.muted = muted;
-            this.resample = false; //Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;
@@ -5986,7 +5978,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 loopCount = Math.max(1, soundInfo.loopCount);
             }
 
-            sp = new SoundTagPlayer(soundInfo, st, loopCount, false, resample);
+            sp = new SoundTagPlayer(soundInfo, st, loopCount, false);
             sp.addEventListener(new MediaDisplayListener() {
                 @Override
                 public void mediaDisplayStateChanged(MediaDisplay source) {

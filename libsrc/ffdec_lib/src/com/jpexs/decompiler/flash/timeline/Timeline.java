@@ -2197,6 +2197,11 @@ public class Timeline {
      */
     public boolean isSingleFrame(int frame) {
         Frame frameObj = getFrame(frame);
+        for (int i = 0; i < frameObj.innerTags.size(); i++) {
+            if (frameObj.innerTags.get(i) instanceof SoundStreamBlockTag) {
+                return false;
+            }
+        }
         for (int i = 0; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;
@@ -2217,7 +2222,7 @@ public class Timeline {
                 if (!drawable.isSingleFrame()) {
                     return false;
                 }
-            }
+            }            
         }
 
         return true;

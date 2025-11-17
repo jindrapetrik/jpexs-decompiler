@@ -92,8 +92,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testCollidingPublicTraits() {
-        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#89);\r\n"
-                + "trace(\"ns2 = \" + this.a#90);\r\n",
+        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#90);\r\n"
+                + "trace(\"ns2 = \" + this.a#91);\r\n",
                  false);
     }
 
@@ -164,6 +164,17 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "{\r\n"
                 + "trace(_loc2_);\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testFindPropertyTemp() {
+        decompileMethod("assembled", "testFindPropertyTemp", "var _temp_1:* = _loc1_.target;\r\n"
+                + "_temp_1.method();\r\n"
+                + "testA = _temp_1;\r\n"
+                + "var _temp_3:* = _loc9_[_loc2_];\r\n"
+                + "testB(_temp_3,new (getDefinitionByName(\"Str_\" + _temp_3))().sub);\r\n"
+                + "_loc2_++;\r\n",
                  false);
     }
 

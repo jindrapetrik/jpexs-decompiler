@@ -133,7 +133,7 @@ public class MORPHLINESTYLE2 implements Serializable {
     /**
      * Miter limit factor
      */
-    @SWFType(value = BasicType.FIXED8)
+    @SWFType(value = BasicType.UFIXED8)
     @Conditional(value = "joinStyle", options = {MITER_JOIN})
     public float miterLimitFactor;
 

@@ -315,7 +315,7 @@ public class SwfIntelliJIdeaExporter {
         }
 
         boolean parallel = Configuration.parallelSpeedUp.get();
-        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, false, "/_assets/", Configuration.linkAllClasses.get(), false);
+        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, "/_assets/", Configuration.linkAllClasses.get(), false);
         swf.exportActionScript(handler, new File(outDir, "src").getAbsolutePath(), scriptExportSettings, parallel, eventListener);
     }
 }

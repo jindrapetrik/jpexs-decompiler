@@ -386,9 +386,10 @@ public abstract class TextTag extends DrawableTag {
      * Gets text records attributes.
      * @param list Text records
      * @param swf SWF
+     * @param normalizedFonts Normalized fonts
      * @return Text records attributes
      */
-    public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, SWF swf) {
+    public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, SWF swf, Map<Integer, FontTag> normalizedFonts) {
         Map<String, Object> att = new HashMap<>();
         RECT textBounds = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         FontTag font = null;
@@ -416,8 +417,14 @@ public abstract class TextTag extends DrawableTag {
             if (rec.styleFlagsHasFont) {
                 FontTag font2 = rec.getFont(swf);
                 if (font2 != null) {
+                    
+                    int fontId = swf.getCharacterId(font2);
+                    if (normalizedFonts.containsKey(fontId)) {
+                        font2 = normalizedFonts.get(fontId);                        
+                    }
+                    
                     font = font2;
-                }
+                }                
                 textHeight = rec.textHeight;
                 if (font == null) {
                     Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id={0} was not found.", rec.fontId);

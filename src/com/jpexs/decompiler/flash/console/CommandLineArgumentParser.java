@@ -510,13 +510,13 @@ public class CommandLineArgumentParser {
         boolean cliMode = false;
         boolean air = false;
         boolean exportEmbed = false;
-        boolean resampleWav = false;
         boolean transparentBackground = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
         String nextParam = null;
         String nextParamOriginal = null;
+        int subLength = 1;
         OUTER:
         while (true) {
             nextParamOriginal = args.pop();
@@ -534,19 +534,19 @@ public class CommandLineArgumentParser {
                     cliMode = true;
                     break;
                 case "-selectid":
-                    selectionIds = parseSelect(args);
+                    selectionIds = parseSelect(args, false, "selectid");
                     break;
                 case "-select":
-                    selection = parseSelect(args);
+                    selection = parseSelect(args, true, "select");
                     break;
                 case "-selectclass":
                     selectionClasses = parseSelectClass(args);
                     break;
+                case "-sublength":
+                    subLength = parseSubLength(args);
+                    break;
                 case "-exportembed":
                     exportEmbed = true;
-                    break;
-                case "-resamplewav":
-                    resampleWav = true;
                     break;
                 case "-ignorebackground":
                     transparentBackground = true;
@@ -677,7 +677,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav, transparentBackground, urlResolver);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, transparentBackground, urlResolver, subLength);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -1584,16 +1584,29 @@ public class CommandLineArgumentParser {
 
     private static class Range {
 
+        public Integer prefix;
+
         public Integer min;
 
         public Integer max;
 
-        public Range(Integer min, Integer max) {
+        public Range(Integer prefix, Integer min, Integer max) {
+            this.prefix = prefix;
             this.min = min;
             this.max = max;
         }
 
         public boolean contains(int index) {
+            return contains(0, index);
+        }
+        
+        public boolean contains(int prefix, int index) {
+            if (this.prefix == null && prefix == 0) {
+                return false;
+            }
+            if (this.prefix != null && this.prefix != prefix) {
+                return false;
+            }
             int minimum = min == null ? Integer.MIN_VALUE : min;
             int maximum = max == null ? Integer.MAX_VALUE : max;
 
@@ -1607,7 +1620,7 @@ public class CommandLineArgumentParser {
 
         public Selection() {
             this.ranges = new ArrayList<>();
-            this.ranges.add(new Range(null, null));
+            this.ranges.add(new Range(0, null, null));
         }
 
         public Selection(List<Range> ranges) {
@@ -1615,36 +1628,76 @@ public class CommandLineArgumentParser {
         }
 
         public boolean contains(int index) {
+            return contains(0, index);
+        }
+        
+        public boolean contains(int prefix, int index) {
+            boolean prefixFound = false;
             for (Range r : ranges) {
-                if (r.contains(index)) {
+                if (r.prefix == prefix || (prefix != 0 && r.prefix == null)) {
+                    prefixFound = true;
+                }
+                if (r.contains(prefix, index)) {
                     return true;
                 }
+            }
+            if (!prefixFound) {
+                return true;
             }
             return false;
         }
     }
 
-    private static Selection parseSelect(Stack<String> args) {
+    private static Selection parseSelect(Stack<String> args, boolean allowPrefix, String command) {
         List<Range> ret = new ArrayList<>();
         if (args.isEmpty()) {
             System.err.println("range parameter expected");
-            badArguments("select");
+            badArguments(command);
         }
         String range = args.pop();
         String[] ranges;
         if (range.contains(",")) {
-            ranges = range.split(",");
+            ranges = range.split(",", -1);
         } else {
             ranges = new String[]{range};
         }
+        
+        Integer prefix = 0;
+        
         for (String r : ranges) {
             Integer min = null;
             Integer max = null;
-            if (r.contains("-")) {
-                String[] ps = r.split("\\-");
+            if (r.contains(":")) {
+                if (!allowPrefix) {
+                    System.err.println("invalid range");
+                    badArguments(command);
+                }
+                String[] ps = r.split(":", -1);
                 if (ps.length != 2) {
                     System.err.println("invalid range");
-                    badArguments("select");
+                    badArguments(command);
+                }
+                if ("all".equals(ps[0])) {
+                    prefix = null;
+                } else {
+                    try {
+                        prefix = Integer.parseInt(ps[0]);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("invalid range");
+                        badArguments(command);
+                    }
+                    if (prefix < 0) {
+                        System.err.println("invalid range");
+                        badArguments(command);
+                    }
+                }
+                r = ps[1];
+            }
+            if (r.contains("-")) {
+                String[] ps = r.split("\\-", -1);
+                if (ps.length != 2) {
+                    System.err.println("invalid range");
+                    badArguments(command);
                 }
                 try {
                     if (!"".equals(ps[0])) {
@@ -1655,7 +1708,7 @@ public class CommandLineArgumentParser {
                     }
                 } catch (NumberFormatException nfe) {
                     System.err.println("invalid range");
-                    badArguments("select");
+                    badArguments(command);
                 }
             } else {
                 try {
@@ -1663,12 +1716,32 @@ public class CommandLineArgumentParser {
                     max = min;
                 } catch (NumberFormatException nfe) {
                     System.err.println("invalid range");
-                    badArguments("select");
+                    badArguments(command);
                 }
             }
-            ret.add(new Range(min, max));
+            ret.add(new Range(prefix, min, max));
         }
         return new Selection(ret);
+    }
+    
+    private static int parseSubLength(Stack<String> args) {
+        if (args.isEmpty()) {
+            System.err.println("sub length parameter expected");
+            badArguments("sublength");
+        }
+        try {
+            int subLen = Integer.parseInt(args.pop());
+            if (subLen < 1) {
+                System.err.println("Minimum for sub length is 1");
+                badArguments("sublength");
+                subLen = 1;
+            }
+            return subLen;
+        } catch (NumberFormatException nre) {
+            System.err.println("Invalid sub length");
+            badArguments("sublength");
+        }
+        return 1;
     }
 
     private static double parseZoom(Stack<String> args) {
@@ -2033,7 +2106,20 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav, boolean transparentBackground, UrlResolver urlResolver) {
+    private static void parseExport(
+            List<String> selectionClasses, 
+            Selection selection,
+            Selection selectionIds,
+            Stack<String> args,
+            AbortRetryIgnoreHandler handler, 
+            Level traceLevel,
+            Map<String, String> formats, 
+            double zoom,
+            String charset, 
+            boolean exportEmbed, 
+            boolean transparentBackground, 
+            UrlResolver urlResolver,
+            int subFrameLength) {
         if (args.size() < 3) {
             badArguments("export");
         }
@@ -2230,7 +2316,7 @@ public class CommandLineArgumentParser {
 
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
-                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class), resampleWav), evl);
+                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("binarydata")) {
@@ -2258,20 +2344,27 @@ public class CommandLineArgumentParser {
                     System.out.println("Exporting frames...");
                     List<Integer> frames = new ArrayList<>();
                     for (int i = 0; i < swf.frameCount; i++) {
-                        if (selection.contains(i + 1)) {
+                        if (selection.contains(0, i + 1)) {
                             frames.add(i);
                         }
                     }
                     FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom, transparentBackground);
-                    frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, 1, fes, evl);
+                    frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, subFrameLength, fes, evl);
                 }
 
                 if (exportAll || exportFormats.contains("sprite")) {
                     System.out.println("Exporting sprite...");
                     SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom);
                     for (Tag t : extags) {
-                        if (t instanceof DefineSpriteTag) {
-                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, ((DefineSpriteTag) t).getCharacterId(), null, 1, ses, evl);
+                        if (t instanceof DefineSpriteTag) {                            
+                            List<Integer> frames = new ArrayList<>();
+                            int spriteId = ((DefineSpriteTag) t).getCharacterId();
+                            for (int i = 0; i < ((DefineSpriteTag) t).getFrameCount(); i++) {
+                                if (selection.contains(spriteId, i + 1)) {
+                                    frames.add(i);
+                                }
+                            }
+                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, spriteId, frames, subFrameLength, ses, evl);
                         }
                     }
                 }
@@ -2297,7 +2390,7 @@ public class CommandLineArgumentParser {
                     singleScriptFile = false;
                 }
 
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false, exportEmbed, false, resampleWav);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false, exportEmbed, false);
                 boolean exportAllScript = exportAll || exportFormats.contains("script");
                 boolean exportAs2Script = exportAllScript || exportFormats.contains("script_as2");
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
@@ -3109,7 +3202,9 @@ public class CommandLineArgumentParser {
                             Set<Character> selChars = new HashSet<>();
                             Font font;
                             try {
-                                font = Font.createFont(Font.TRUETYPE_FONT, new File(repFile));
+                                File fontFile = new File(repFile);
+                                font = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                                FontTag.addCustomFont(font, fontFile);
                                 List<Character> required = Arrays.asList((char) 0x01, (char) 0x00, (char) 0x0D, (char) 0x20);
                                 for (char c = 0; c < Character.MAX_VALUE; c++) {
                                     if (required.contains(c)) {

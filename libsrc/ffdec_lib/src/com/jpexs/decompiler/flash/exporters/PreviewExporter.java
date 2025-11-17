@@ -105,11 +105,14 @@ public class PreviewExporter {
     public static final int MORPH_SHAPE_ANIMATION_LENGTH = 2;
 
     public static final int MORPH_SHAPE_ANIMATION_FRAME_RATE = 30;
+    
+    private static final double WIDTH_DIVISOR = 1000;
+  
 
     private void updateProgressBar(int xmin, int ymin, SWF swf, SWFOutputStream sos2, int width, int height, int progressBarHeight, int currentFrame, int totalFrames) throws IOException {
         Matrix m = new Matrix();
         m.translate(xmin, ymin + height - progressBarHeight * 20);
-        m.scale(width * currentFrame / totalFrames, progressBarHeight * 20);
+        m.scale(width / WIDTH_DIVISOR * currentFrame / totalFrames, progressBarHeight * 20);
         new PlaceObject2Tag(swf, true, 2, -1, m.toMATRIX(), null, -1, null, -1, null).writeTag(sos2);
     }
 
@@ -117,10 +120,10 @@ public class PreviewExporter {
         int progressBarShapeId = swf.getNextCharacterId();
         int overVideoButtonId = progressBarShapeId + 1;
         int progressBarButtonId = overVideoButtonId + 1;
-
+                
         Color progressBarColor = Color.red;
         DefineShapeTag dsh = new DefineShapeTag(swf);
-        dsh.shapeBounds = new RECT(0, 20, 0, 20 * progressBarHeight);
+        dsh.shapeBounds = new RECT(0, (int) Math.round(WIDTH_DIVISOR * 20), 0, 20 * progressBarHeight);
         dsh.shapeId = progressBarShapeId;
         dsh.shapes.fillStyles.fillStyles = new FILLSTYLE[1];
         dsh.shapes.fillStyles.fillStyles[0] = new FILLSTYLE();
@@ -140,14 +143,14 @@ public class PreviewExporter {
         ser.deltaY = 1;
         dsh.shapes.shapeRecords.add(ser);
         ser = new StraightEdgeRecord();
-        ser.deltaX = 1;
+        ser.deltaX = (int) Math.round(WIDTH_DIVISOR * 1);
         dsh.shapes.shapeRecords.add(ser);
         ser = new StraightEdgeRecord();
         ser.vertLineFlag = true;
         ser.deltaY = -1;
         dsh.shapes.shapeRecords.add(ser);
         ser = new StraightEdgeRecord();
-        ser.deltaX = -1;
+        ser.deltaX = (int) Math.round(-1 * WIDTH_DIVISOR);
         dsh.shapes.shapeRecords.add(ser);
         dsh.shapes.shapeRecords.add(new EndShapeRecord());
 
@@ -226,13 +229,13 @@ public class PreviewExporter {
         new PlaceObject2Tag(swf, false, 2, progressBarShapeId, m.toMATRIX(), null, -1, null, -1, null).writeTag(sos2);
 
         m = new Matrix();
-        m.scale(width, height - progressBarHeight * 20);
+        m.scale(width / WIDTH_DIVISOR, height - progressBarHeight * 20);
 
         new PlaceObject2Tag(swf, false, 3, overVideoButtonId, m.toMATRIX(), null, -1, null, -1, null).writeTag(sos2);
 
         m = new Matrix();
         m.translate(xmin, ymin + height - progressBarHeight * 20);
-        m.scale(width, progressBarHeight * 20);
+        m.scale(width / WIDTH_DIVISOR, progressBarHeight * 20);
 
         new PlaceObject2Tag(swf, false, 4, progressBarButtonId, m.toMATRIX(), null, -1, null, -1, null).writeTag(sos2);
 
@@ -337,7 +340,7 @@ public class PreviewExporter {
             int height = outrect.getHeight();
 
             sos2.writeRECT(outrect);
-            sos2.writeFIXED8(frameRate);
+            sos2.writeUFIXED8(frameRate);
             sos2.writeUI16(frameCount); //framecnt
 
             FileAttributesTag fa = swf.getFileAttributes();
@@ -612,6 +615,7 @@ public class PreviewExporter {
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
                 } else if (treeItem instanceof DefineVideoStreamTag) {
+                    DefineVideoStreamTag dv = (DefineVideoStreamTag) treeItem;                    
                     List<VideoFrameTag> frs = new ArrayList<>(videoFrames.values());
                     Collections.sort(frs, new Comparator<VideoFrameTag>() {
                         @Override
@@ -627,7 +631,7 @@ public class PreviewExporter {
                     int ratio = 0;
                     for (VideoFrameTag f : frs) {
                         if (!first) {
-                            ratio++;
+                            ratio = f.frameNum;
                             new PlaceObject2Tag(swf, true, 1, -1, null, null, ratio, null, -1, null).writeTag(sos2);
                             if (showControls) {
                                 updateProgressBar(rxmin, rymin, swf, sos2, width, height, progressBarHeight, ratio, videoFrames.size());

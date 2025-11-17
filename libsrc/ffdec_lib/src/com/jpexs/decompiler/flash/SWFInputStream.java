@@ -847,6 +847,21 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(ret);
         return ret;
     }
+    
+    /**
+     * Reads one UFIXED8 (Fixed point 8.8) unsigned value from the stream.
+     *
+     * @param name Name
+     * @return UFIXED8 value
+     * @throws IOException On I/O error
+     */
+    public float readUFIXED8(String name) throws IOException {
+        newDumpLevel(name, "UFIXED8");
+        int si = readUI16Internal();
+        float ret = si / (float) (1 << 8);
+        endDumpLevel(ret);
+        return ret;
+    }
 
     /**
      * Reads long value from the stream.
@@ -2547,7 +2562,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.blurY = readFIXED("blurY");
         ret.angle = readFIXED("angle");
         ret.distance = readFIXED("distance");
-        ret.strength = readFIXED8("strength");
+        ret.strength = readUFIXED8("strength");
         ret.innerShadow = readUB(1, "innerShadow") == 1;
         ret.knockout = readUB(1, "knockout") == 1;
         ret.compositeSource = readUB(1, "compositeSource") == 1;
@@ -2569,7 +2584,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.glowColor = readRGBA("glowColor");
         ret.blurX = readFIXED("blurX");
         ret.blurY = readFIXED("blurY");
-        ret.strength = readFIXED8("strength");
+        ret.strength = readUFIXED8("strength");
         ret.innerGlow = readUB(1, "innerGlow") == 1;
         ret.knockout = readUB(1, "knockout") == 1;
         ret.compositeSource = readUB(1, "compositeSource") == 1;
@@ -2594,7 +2609,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.blurY = readFIXED("blurY");
         ret.angle = readFIXED("angle");
         ret.distance = readFIXED("distance");
-        ret.strength = readFIXED8("strength");
+        ret.strength = readUFIXED8("strength");
         ret.innerShadow = readUB(1, "innerShadow") == 1;
         ret.knockout = readUB(1, "knockout") == 1;
         ret.compositeSource = readUB(1, "compositeSource") == 1;
@@ -2627,7 +2642,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.blurY = readFIXED("blurY");
         ret.angle = readFIXED("angle");
         ret.distance = readFIXED("distance");
-        ret.strength = readFIXED8("strength");
+        ret.strength = readUFIXED8("strength");
         ret.innerShadow = readUB(1, "innerShadow") == 1;
         ret.knockout = readUB(1, "knockout") == 1;
         ret.compositeSource = readUB(1, "compositeSource") == 1;
@@ -2660,7 +2675,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.blurY = readFIXED("blurY");
         ret.angle = readFIXED("angle");
         ret.distance = readFIXED("distance");
-        ret.strength = readFIXED8("strength");
+        ret.strength = readUFIXED8("strength");
         ret.innerShadow = readUB(1, "innerShadow") == 1;
         ret.knockout = readUB(1, "knockout") == 1;
         ret.compositeSource = readUB(1, "compositeSource") == 1;
@@ -3009,7 +3024,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.noClose = (int) readUB(1, "noClose") == 1;
         ret.endCapStyle = (int) readUB(2, "endCapStyle");
         if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
-            ret.miterLimitFactor = readFIXED8("miterLimitFactor");
+            ret.miterLimitFactor = readUFIXED8("miterLimitFactor");
         }
         if (!ret.hasFillFlag) {
             ret.color = readRGBA("color");
@@ -3499,7 +3514,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.noClose = (int) readUB(1, "noClose") == 1;
         ret.endCapStyle = (int) readUB(2, "endCapStyle");
         if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
-            ret.miterLimitFactor = readFIXED8("miterLimitFactor");
+            ret.miterLimitFactor = readUFIXED8("miterLimitFactor");
         }
         if (!ret.hasFillFlag) {
             ret.startColor = readRGBA("startColor");

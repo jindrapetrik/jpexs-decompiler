@@ -651,7 +651,7 @@ public class AS3ScriptExporter {
                     return ret;
                 }
                 SoundExporter se = new SoundExporter();
-                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV, exportSettings.resampleWav), evl);
+                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
                 if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
@@ -672,7 +672,7 @@ public class AS3ScriptExporter {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
                             sos2.writeRECT(swf.displayRect);
-                            sos2.writeFIXED8(swf.frameRate);
+                            sos2.writeUFIXED8(swf.frameRate);
                             sos2.writeUI16(1);
                             FileAttributesTag fa = swf.getFileAttributes();
                             if (fa != null) {

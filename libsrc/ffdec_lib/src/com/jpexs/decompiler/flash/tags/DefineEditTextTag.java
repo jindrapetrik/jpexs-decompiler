@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.RequiresNormalizedFonts;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -326,8 +327,8 @@ public class DefineEditTextTag extends TextTag {
             case '\'':
                 str = "&apos;";
                 break;
-        */
-    
+         */
+
         int lastHtmlSourcePos = -1;
         for (TEXTRECORD r : recs) {
             if (r instanceof AdvancedTextRecord) {
@@ -616,7 +617,7 @@ public class DefineEditTextTag extends TextTag {
                         addCharacters(ret, txt, style);
                     }
                 };
-            */
+             */
 
             XmlLexer lexer = new XmlLexer(new StringReader(str));
             try {
@@ -803,7 +804,7 @@ public class DefineEditTextTag extends TextTag {
             } catch (ParserConfigurationException | SAXException | IOException ex) {
                 Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, "Error parsing text " + getCharacterId(), ex);
             }
-            */
+             */
         } else {
             addCharacters(ret, str, style, 0);
         }
@@ -1283,6 +1284,12 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
+        int realTextId = getSwf().getCharacterId(this);
+        if (exporter.getNormalizedTexts().containsKey(realTextId) && exporter.getNormalizedTexts().get(realTextId) instanceof DefineEditTextTag) {
+            DefineEditTextTag normalizedText = (DefineEditTextTag) exporter.getNormalizedTexts().get(realTextId);
+            normalizedText.render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0);
+            return;
+        }
         render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0);
     }
 
@@ -1292,6 +1299,16 @@ public class DefineEditTextTag extends TextTag {
     }
 
     private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd) {
+        if (image.getGraphics() instanceof RequiresNormalizedFonts) {
+            RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
+            Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
+            int realTextId = getSwf().getCharacterId(this);
+            if (normalizedTexts.containsKey(realTextId) && normalizedTexts.get(realTextId) instanceof DefineEditTextTag && normalizedTexts.get(realTextId) != this) {
+                DefineEditTextTag normalizedText = (DefineEditTextTag) normalizedTexts.get(realTextId);
+                normalizedText.render(renderMode, image, svgExporter, htmlCanvasBuilder, transformation, colorTransform, zoom, selectionStart, selectionEnd);
+                return;
+            }
+        }
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
@@ -1606,7 +1623,7 @@ public class DefineEditTextTag extends TextTag {
         txt = txt.replace("&apos;", "'");
         return txt;
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -1616,4 +1633,5 @@ public class DefineEditTextTag extends TextTag {
         }
         return ret;
     }
+
 }

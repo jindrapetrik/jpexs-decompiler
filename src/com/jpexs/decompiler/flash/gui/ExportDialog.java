@@ -154,9 +154,7 @@ public class ExportDialog extends AppDialog {
     private JTextField zoomTextField = new JTextField(4);
 
     private JCheckBox embedCheckBox;
-
-    private JCheckBox resampleWavCheckBox;
-
+    
     private JCheckBox transparentFrameBackgroundCheckBox;
 
     @SuppressWarnings("unchecked")
@@ -182,11 +180,7 @@ public class ExportDialog extends AppDialog {
 
     public boolean isEmbedEnabled() {
         return embedCheckBox.isSelected();
-    }
-
-    public boolean isResampleWavEnabled() {
-        return resampleWavCheckBox.isSelected();
-    }
+    }   
 
     public boolean isTransparentFrameBackgroundEnabled() {
         return transparentFrameBackgroundCheckBox.isSelected();
@@ -216,9 +210,6 @@ public class ExportDialog extends AppDialog {
         Configuration.lastSelectedExportFormats.set(cfg.toString());
         if (embedCheckBox.isVisible()) {
             Configuration.lastExportEnableEmbed.set(embedCheckBox.isSelected());
-        }
-        if (resampleWavCheckBox.isVisible()) {
-            Configuration.lastExportResampleWav.set(resampleWavCheckBox.isSelected());
         }
         if (transparentFrameBackgroundCheckBox.isVisible()) {
             Configuration.lastExportTransparentBackground.set(transparentFrameBackgroundCheckBox.isSelected());
@@ -410,20 +401,7 @@ public class ExportDialog extends AppDialog {
             if (Configuration.lastExportEnableEmbed.get()) {
                 embedCheckBox.setSelected(true);
             }
-        }
-
-        resampleWavCheckBox = new JCheckBox(translate("resampleWav"));
-        resampleWavCheckBox.setVisible(false);
-
-        if (embedCheckBox.isVisible() || visibleOptionClasses.contains(SoundExportMode.class)) {
-            /*gbc.gridy++;
-            resampleWavCheckBox.setVisible(true);
-            comboPanel.add(resampleWavCheckBox, gbc);
-            if (Configuration.lastExportResampleWav.get()) {
-                resampleWavCheckBox.setSelected(true);
-            }*/
-            resampleWavCheckBox.setSelected(false);
-        }
+        }       
 
         transparentFrameBackgroundCheckBox = new JCheckBox(translate("transparentFrameBackground"));
         transparentFrameBackgroundCheckBox.setVisible(false);

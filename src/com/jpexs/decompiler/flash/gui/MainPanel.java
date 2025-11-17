@@ -2298,7 +2298,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (export.isOptionEnabled(SoundExportMode.class)) {
                 ret.addAll(new SoundExporter().exportSounds(handler, selFile2 + File.separator + SoundExportSettings.EXPORT_FOLDER_NAME, sounds,
-                        new SoundExportSettings(export.getValue(SoundExportMode.class), export.isResampleWavEnabled()), evl));
+                        new SoundExportSettings(export.getValue(SoundExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(BinaryDataExportMode.class)) {
@@ -2362,7 +2362,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         singleScriptFile = false;
                     }
 
-                    ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false, export.isEmbedEnabled(), false, export.isResampleWavEnabled());
+                    ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false, export.isEmbedEnabled(), false);
                     String singleFileName = Path.combine(scriptsFolder, openable.getShortFileName() + scriptExportSettings.getFileExtension());
                     try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
@@ -2416,7 +2416,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(SoundExportMode.class)) {
             new SoundExporter().exportSounds(handler, Path.combine(selFile, SoundExportSettings.EXPORT_FOLDER_NAME), swf.getTags(),
-                    new SoundExportSettings(export.getValue(SoundExportMode.class), export.isResampleWavEnabled()), evl);
+                    new SoundExportSettings(export.getValue(SoundExportMode.class)), evl);
         }
 
         if (export.isOptionEnabled(BinaryDataExportMode.class)) {
@@ -2469,7 +2469,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 singleScriptFile = false;
             }
 
-            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false, export.isEmbedEnabled(), false, export.isResampleWavEnabled());
+            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false, export.isEmbedEnabled(), false);
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
             try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
@@ -2519,7 +2519,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(SoundExportMode.class)) {
             for (SoundExportMode exportMode : SoundExportMode.values()) {
                 new SoundExporter().exportSounds(handler, Path.combine(selFile, SoundExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf.getTags(),
-                        new SoundExportSettings(exportMode, export.isResampleWavEnabled()), evl);
+                        new SoundExportSettings(exportMode), evl);
             }
         }
 
@@ -2586,7 +2586,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     singleScriptFile = false;
                 }
 
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile, false, export.isEmbedEnabled(), false, export.isResampleWavEnabled());
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile, false, export.isEmbedEnabled(), false);
                 String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                 try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;
@@ -5446,7 +5446,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             File selfile = Helper.fixDialogFile(selectedFile);
             try {
                 new MovieImporter().importMovie(movie, Helper.readFile(selfile.getAbsolutePath()));
-                refreshTree();
+                refreshTree(movie.getSwf());
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Invalid movie", ex);
                 ViewMessages.showMessageDialog(MainPanel.this, translate("error.movie.invalid") + ": " + ex.getMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -6187,7 +6187,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((SoundTag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
             if (!(treeItem instanceof SoundStreamHeadTypeTag)) {
                 try {
-                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true, false); // Configuration.previewResampleSound.get());
+                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                     if (!Configuration.autoPlaySounds.get()) {
                         soundThread.pause();
                     }

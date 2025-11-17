@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -71,7 +72,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
     private final Map<Integer, Font> existingFonts;
 
     private Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
-    private Map<Integer, StaticTextTag> normalizedTexts = new LinkedHashMap<>();
+    private Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
     
     public DualPdfGraphics2D(Graphics2D first, PDFGraphics second, Map<Integer, Font> existingFonts) {
         this.imageGraphics = first;
@@ -694,7 +695,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
     }
 
     @Override
-    public void setNormalizedFonts(Map<Integer, FontTag> normalizedFonts, Map<Integer, StaticTextTag> normalizedTexts) {
+    public void setNormalizedFonts(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts) {
         this.normalizedFonts = normalizedFonts;
         this.normalizedTexts = normalizedTexts;
     }
@@ -705,7 +706,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
     }
 
     @Override
-    public Map<Integer, StaticTextTag> getNormalizedTexts() {
+    public Map<Integer, TextTag> getNormalizedTexts() {
         return normalizedTexts;
     }
 }

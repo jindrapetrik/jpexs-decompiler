@@ -264,7 +264,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (getOpenable() instanceof SWF) {
             swfVersion = ((SWF) getOpenable()).version;
         }
-        
+
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
         int sinit_bodyIndex = abc.findBodyIndex(sinit_index);
         if (sinit_bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
@@ -283,7 +283,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         ScopeStack scopeStack = new ScopeStack();
         scopeStack.push(new GlobalAVM2Item(null, null));
-        
+
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
@@ -312,12 +312,12 @@ public class ScriptPack extends AS3ClassTreeItem {
      */
     @SuppressWarnings("unchecked")
     private void appendTo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel, boolean exportAllClasses) throws InterruptedException {
-        
+
         int swfVersion = -1;
         if (getOpenable() instanceof SWF) {
             swfVersion = ((SWF) getOpenable()).version;
         }
-        
+
         boolean first = true;
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
@@ -344,7 +344,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Trait trait = traits.get(t);
             traitList.add(trait);
         }
-        
+
         List<DottedChain> fullyQualifiedNames = new ArrayList<>();
 
         for (int t = 0; t < traitList.size(); t++) {
@@ -371,7 +371,6 @@ public class ScriptPack extends AS3ClassTreeItem {
             t--;
         }
 
-        
         if (!first) {
             writer.newLine();
         }
@@ -1078,5 +1077,15 @@ public class ScriptPack extends AS3ClassTreeItem {
                 si.traits.traits.get(t).delete(abc, d);
             }
         }
+    }
+
+    public boolean isDocumentClass() {
+        String documentClass = abc.getSwf().getDocumentClass();
+        if (documentClass != null) {
+            if (documentClass.equals(getClassPath().toRawString())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

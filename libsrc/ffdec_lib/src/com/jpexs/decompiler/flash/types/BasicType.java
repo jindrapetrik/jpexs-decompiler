@@ -64,21 +64,25 @@ public enum BasicType {
      */
     FB,
     /**
-     * Single-precision (32-bit) floating-point number
+     * Signed Single-precision (32-bit) floating-point number
      */
     FLOAT,
     /**
-     * Half-precision (16-bit) floating-point number
+     * Signed Half-precision (16-bit) floating-point number
      */
     FLOAT16,
     /**
-     * 32-bit 16.16 fixed-point number
+     * Signed 32-bit 16.16 fixed-point number
      */
     FIXED,
     /**
-     * 16-bit 8.8 fixed-point number
+     * Signed 16-bit 8.8 fixed-point number
      */
     FIXED8,
+    /**
+     * Unsigned 16-bit 8.8 fixed-point number
+     */
+    UFIXED8,
     /**
      * None
      */

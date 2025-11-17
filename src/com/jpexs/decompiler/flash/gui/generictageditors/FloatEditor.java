@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.Component;
@@ -61,6 +62,7 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
 
     private JTextField textField;
     private JLabel linkLabel;
+    private SWFType swfType;
 
     @Override
     public Dimension getPreferredSize() {
@@ -79,7 +81,7 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
         return 0;
     }
 
-    public FloatEditor(String fieldName, Object obj, Field field, int index, Class<?> type) {
+    public FloatEditor(String fieldName, Object obj, Field field, int index, Class<?> type, SWFType swfType) {
         this.obj = obj;
         this.field = field;
         this.index = index;
@@ -127,6 +129,7 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
         linkLabel.setVisible(false);
 
         reset();        
+        this.swfType = swfType;
     }
 
     @Override
@@ -159,9 +162,35 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
                 val = Double.valueOf(textField.getText());
             } else {
                 val = Float.valueOf(textField.getText());
-            }
+            }            
             if (normalizer != null) {
                 val = normalizer.toFieldValue(val);
+            }
+            
+            if (swfType != null) {
+                switch (swfType.value()) {
+                    case UFIXED8:
+                        if ((float) val > 255f) {
+                            val = 255f;
+                        } else if ((float) val < 0) {
+                            val = 0f;
+                        }                        
+                        break;
+                    case FIXED8:
+                        if ((float) val > 127f) {
+                            val = 127f;
+                        } else if ((float) val < -128f) {
+                            val = -128f;
+                        }
+                        break;
+                    case FIXED:
+                        if ((double) val > 32767.0) {
+                            val = 32767.0;
+                        } else if ((double) val < -32768.0) {
+                            val = -32768.0;
+                        }
+                        break;
+                }
             }
 
             ReflectionTools.setValue(obj, field, index, val);

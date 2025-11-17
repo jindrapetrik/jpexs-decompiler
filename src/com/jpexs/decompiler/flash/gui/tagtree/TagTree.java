@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -116,6 +117,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -172,7 +174,7 @@ public class TagTree extends AbstractTagTree {
                 value = null;
             }
 
-            super.getTreeCellRendererComponent(
+            JLabel origLabel = (JLabel) super.getTreeCellRendererComponent(
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
@@ -243,9 +245,20 @@ public class TagTree extends AbstractTagTree {
                 semiTransparent = true;
             }
             int itemIndex = aTree.getFullModel().getItemIndex(val);
+                   
+            String txt = origLabel.getText();
             if (itemIndex > 1) {
-                setText(val.toString() + " [" + itemIndex + "]");
+                txt = txt + " [" + itemIndex + "]";
             }
+            
+            if (val instanceof ScriptPack) {
+                ScriptPack sp = (ScriptPack) val;
+                if (sp.isDocumentClass()) {
+                    txt = "<html><u>" + txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + "</u></html>";
+                }
+            }
+            
+            setText(txt);
 
             return this;
         }
@@ -393,7 +406,7 @@ public class TagTree extends AbstractTagTree {
             }
         }
         if (value != null) {
-            String sValue = value.toString();
+            String sValue = value.toString();            
             if (sValue != null) {
                 return sValue;
             }

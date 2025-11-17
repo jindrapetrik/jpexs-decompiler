@@ -561,7 +561,20 @@ public class FiltersTreeTable extends JTreeTable {
                     }                                        
                 });
             } else if (realValue.getClass() == Double.class || realValue.getClass() == Float.class) {
-                editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass());
+                editor = new FloatEditor(filterField.toString(), filterField.filter, filterField.field, -1, realValue.getClass(), filterField.field.getAnnotation(SWFType.class));
+                if ("strength".equals(filterField.field.getName())) {
+                    ((FloatEditor) editor).setValueNormalizer(new ValueNormalizer() {
+                        @Override
+                        public Object toFieldValue(Object viewValue) {
+                            return (float) viewValue / 100f;
+                        }
+
+                        @Override
+                        public Object toViewValue(Object fieldValue) {
+                            return (float) fieldValue * 100f;
+                        }
+                    });
+                }
                 if ("angle".equals(filterField.field.getName())) {
                     ((FloatEditor) editor).setValueNormalizer(new ValueNormalizer() {
                         @Override
@@ -721,6 +734,9 @@ public class FiltersTreeTable extends JTreeTable {
                     case "blurY":
                     case "distance":
                         units = " px";
+                        break;
+                    case "strength":
+                        units = " %";
                 }
 
                 Object fieldValue = filterValue.getValue();
@@ -934,6 +950,9 @@ public class FiltersTreeTable extends JTreeTable {
         if (fieldName.equals("angle")) {
             return "" + EcmaNumberToString.stringFor(Math.round(Math.toDegrees((double) value) * 100) / 100.0);
         }
+        if (fieldName.equals("strength")) {
+            return "" + EcmaNumberToString.stringFor((float) value * 100f);
+        }    
         if (value.getClass() == Double.class
                 || value.getClass() == Float.class
                 || value.getClass() == float.class

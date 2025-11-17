@@ -351,7 +351,7 @@ public class ABCCleaner {
     }
 
     private int handleReplace(ABCSimpleUsageDetector.ItemKind kind, int index, Map<ABCSimpleUsageDetector.ItemKind, Map<Integer, Integer>> replaceMap) {
-        if (!replaceMap.get(kind).containsKey(index)) {
+        if (!replaceMap.containsKey(kind) || !replaceMap.get(kind).containsKey(index)) {
             return index;
         }
         return replaceMap.get(kind).get(index);

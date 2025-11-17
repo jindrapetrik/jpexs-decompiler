@@ -65,7 +65,7 @@ public class DROPSHADOWFILTER extends FILTER {
     /**
      * Strength of the drop shadow
      */
-    @SWFType(BasicType.FIXED8)
+    @SWFType(BasicType.UFIXED8)
     public float strength = 1f;
 
     /**

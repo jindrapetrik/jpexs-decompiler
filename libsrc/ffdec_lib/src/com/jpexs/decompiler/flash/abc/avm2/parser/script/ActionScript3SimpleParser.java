@@ -1975,12 +1975,16 @@ public class ActionScript3SimpleParser implements SimpleParser {
                         expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, allowRemainder, variables, false, abc);
                         expectedType(errors, SymbolType.PARENT_CLOSE);
                     }
-                    expectedType(errors, SymbolType.COLON);
+                    if (expectedType(errors, SymbolType.COLON) == null) {
+                        break;
+                    }
                     expression(errors, thisType, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, allowRemainder, variables, false, abc);
 
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
-                        expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
+                        if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
+                            break;
+                        }
                     }
                 }
                 ret = true;

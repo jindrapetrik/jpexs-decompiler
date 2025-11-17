@@ -712,6 +712,9 @@ public class AVM2Graph extends Graph {
                 continue;
             }
             for (int ip = p.start; ip <= p.end; ip++) {
+                if (ip >= avm2code.code.size()) {
+                    continue;
+                }
                 AVM2Instruction ins = avm2code.code.get(ip);
                 if (ins.definition instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
@@ -1805,8 +1808,17 @@ public class AVM2Graph extends Graph {
             int cnt = 1;
             int branchCount = 2;
             try {
+                Set<GraphPart> ignoredParts = new LinkedHashSet<>();
+                for (Loop el : loops) {
+                    ignoredParts.add(el.loopContinue);
+                } 
                 while (true) {
                     List<GraphTargetItem> out = new ArrayList<>();
+                    
+                    if (ignoredParts.contains(part)) {
+                        break;
+                    }
+                    
                     //Special: In Flex (not air) there are these blocks sometimes:
                     // if(false) {
                     //    §§push(5);
@@ -1815,7 +1827,7 @@ public class AVM2Graph extends Graph {
                     //AVM2DeobfuscatorPushFalseIfFalse changes it to
                     // nop
                     // jump
-                    // (to first case to work)
+                    // (to first case to work)                    
                     if (part.nextParts.size() == branchCount
                             && part.nextParts.get(branchNum).getHeight() == 2
                             && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).start >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).start)).definition instanceof NopIns
@@ -1861,6 +1873,29 @@ public class AVM2Graph extends Graph {
                 //ignore
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
+            
+            //It's not switch, it's an If            
+            if (caseBodyParts.size() == 2) {
+                boolean isIf = false;
+                for (GraphPart r : part.refs) {                    
+                    if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates)) {
+                        isIf = true;
+                        break;
+                    }
+                }
+                if (!isIf) {
+                    for (GraphPart r : caseBodyParts.get(1).refs) {                    
+                        if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates)) {
+                            isIf = true;
+                            break;
+                        }
+                    }
+                }
+                if (isIf) {
+                    stack.push(firstSet);
+                    return ret;
+                }
+            }
 
             //determine whether local register are on left or on right side of === operator
             // -1 = there's no register, 
@@ -3272,6 +3307,9 @@ public class AVM2Graph extends Graph {
     @Override
     protected boolean partIsSwitch(GraphPart part) {
         if (part.end < 0) {
+            return false;
+        }
+        if (part.end >= avm2code.code.size()) {
             return false;
         }
         return avm2code.code.get(part.end).definition instanceof LookupSwitchIns;

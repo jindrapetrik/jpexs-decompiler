@@ -100,13 +100,6 @@ public interface GraphSourceItem extends Serializable, Cloneable {
     public long getLineOffset();
 
     /**
-     * Checks whether the loops are ignored. FIXME: What is this, how to use it?
-     *
-     * @return True if the loops are ignored, false otherwise
-     */
-    public boolean ignoredLoops();
-
-    /**
      * Gets branches
      *
      * @param code Code

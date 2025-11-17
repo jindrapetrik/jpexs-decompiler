@@ -1,6 +1,39 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- AS3 Document class is underlined and has different icon
+- [#2556] CLI subsprite animation export (`-sublength <length>` option for export)
+- [#2556] CLI option to select arbitrary frames of sprites export via `-select`.
+  Check `--help -select` for details.
+
+### Fixed
+- [#2536] AS3 switches detection incorrectly replaces basic ifs with strict equals
+- [#2536] AS3 switches detection not handling loops
+- [#2536] AS3 regexp highlighting / compilation
+- [#2537] AS1/2/3 direct editation - partial object literal causing lag
+- [#2540] AS3 getlocal after inclocal with different registers incorrectly merged
+- [PR224] Font CLI replace throwing NullPointer
+- [#2546] AS3 findProperty vs temporary registers
+- [#2547] SVG import - improper linearGradient with userSpaceOnUse gradient units
+- [#2545] FLA export - normalize font em square
+- [#2552] Open with FFDec explorer menu shrinking sidebar
+- [#2551] Showing too wide video tags in Flash player producing ValueTooLarge
+  exception. Also truncated video length.
+- [#2550] FLV video import - incorrect frame position caused by wrong FLV tag sort
+- Mac package problems related to BOM file (updated jbomutils library)
+- [#2561] Cannot set filter strength to 128 or above
+- [#2562] ABC explorer not working in some obfuscated code
+- [#2562] P-code not showing in some obfuscated code (NumberContext related)
+
+### Changed
+- Simple editor uses percent as units for filter strength
+
+### Removed
+- Resampling from CLI and all source code
+- [#2541], [#2564] Antialias conflation fixer
+
 ## [24.1.0] - 2025-09-28
 ### Added
 - [#2477] Option to disable AS2 detection of uninitialized class fields
@@ -3835,7 +3868,8 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-,[24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
+,[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...dev
+[24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
 [24.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...version24.0.0
 [23.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.0...version23.0.1
@@ -4007,6 +4041,20 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2556]: https://www.free-decompiler.com/flash/issues/2556
+[#2536]: https://www.free-decompiler.com/flash/issues/2536
+[#2537]: https://www.free-decompiler.com/flash/issues/2537
+[#2540]: https://www.free-decompiler.com/flash/issues/2540
+[#2546]: https://www.free-decompiler.com/flash/issues/2546
+[#2547]: https://www.free-decompiler.com/flash/issues/2547
+[#2545]: https://www.free-decompiler.com/flash/issues/2545
+[#2552]: https://www.free-decompiler.com/flash/issues/2552
+[#2551]: https://www.free-decompiler.com/flash/issues/2551
+[#2550]: https://www.free-decompiler.com/flash/issues/2550
+[#2561]: https://www.free-decompiler.com/flash/issues/2561
+[#2562]: https://www.free-decompiler.com/flash/issues/2562
+[#2541]: https://www.free-decompiler.com/flash/issues/2541
+[#2564]: https://www.free-decompiler.com/flash/issues/2564
 [#2477]: https://www.free-decompiler.com/flash/issues/2477
 [#2478]: https://www.free-decompiler.com/flash/issues/2478
 [#2485]: https://www.free-decompiler.com/flash/issues/2485
@@ -5233,6 +5281,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR224]: https://github.com/jindrapetrik/jpexs-decompiler/pull/224
 [PR222]: https://github.com/jindrapetrik/jpexs-decompiler/pull/222
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
 [PR216]: https://github.com/jindrapetrik/jpexs-decompiler/pull/216

@@ -1785,8 +1785,8 @@ public class Main {
                 final int findex = index;
                 try {
                     View.execInEventDispatch(() -> {
-                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                         ensureMainFrame();
+                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                         if (openables1.isEmpty()) {
                             return;
                         }
@@ -1825,8 +1825,8 @@ public class Main {
             final Openable fopenable = firstOpenable;
             View.execInEventDispatch(() -> {
                 if (mainFrame == null) {
-                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                     ensureMainFrame();
+                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);                    
                 }
                 loadingDialog.setVisible(false);
 

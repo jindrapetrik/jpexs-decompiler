@@ -342,7 +342,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes FIXED (Fixed point 16.16) value to the stream.
+     * Writes FIXED (Fixed point 16.16) igned value to the stream.
      *
      * @param value FIXED value
      * @throws IOException On I/O error
@@ -353,7 +353,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes FIXED8 (Fixed point 8.8) value to the stream.
+     * Writes FIXED8 (Fixed point 8.8) signed value to the stream.
      *
      * @param value FIXED8 value
      * @throws IOException On I/O error
@@ -361,6 +361,17 @@ public class SWFOutputStream extends OutputStream {
     public void writeFIXED8(float value) throws IOException {
         int valueInt = (int) (value * (1 << 8));
         writeSI16(valueInt);
+    }
+    
+    /**
+     * Writes UFIXED8 (Fixed point 8.8) unsigned value to the stream.
+     *
+     * @param value FIXED8 value
+     * @throws IOException On I/O error
+     */
+    public void writeUFIXED8(float value) throws IOException {
+        int valueInt = (int) (value * (1 << 8));
+        writeUI16(valueInt);
     }
 
     /**
@@ -1074,7 +1085,7 @@ public class SWFOutputStream extends OutputStream {
         writeFIXED(value.blurY);
         writeFIXED(value.angle);
         writeFIXED(value.distance);
-        writeFIXED8(value.strength);
+        writeUFIXED8(value.strength);
         writeUB(1, value.innerShadow ? 1 : 0);
         writeUB(1, value.knockout ? 1 : 0);
         writeUB(1, value.compositeSource ? 1 : 0);
@@ -1091,7 +1102,7 @@ public class SWFOutputStream extends OutputStream {
         writeRGBA(value.glowColor);
         writeFIXED(value.blurX);
         writeFIXED(value.blurY);
-        writeFIXED8(value.strength);
+        writeUFIXED8(value.strength);
         writeUB(1, value.innerGlow ? 1 : 0);
         writeUB(1, value.knockout ? 1 : 0);
         writeUB(1, value.compositeSource ? 1 : 0);
@@ -1111,7 +1122,7 @@ public class SWFOutputStream extends OutputStream {
         writeFIXED(value.blurY);
         writeFIXED(value.angle);
         writeFIXED(value.distance);
-        writeFIXED8(value.strength);
+        writeUFIXED8(value.strength);
         writeUB(1, value.innerShadow ? 1 : 0);
         writeUB(1, value.knockout ? 1 : 0);
         writeUB(1, value.compositeSource ? 1 : 0);
@@ -1137,7 +1148,7 @@ public class SWFOutputStream extends OutputStream {
         writeFIXED(value.blurY);
         writeFIXED(value.angle);
         writeFIXED(value.distance);
-        writeFIXED8(value.strength);
+        writeUFIXED8(value.strength);
         writeUB(1, value.innerShadow ? 1 : 0);
         writeUB(1, value.knockout ? 1 : 0);
         writeUB(1, value.compositeSource ? 1 : 0);
@@ -1163,7 +1174,7 @@ public class SWFOutputStream extends OutputStream {
         writeFIXED(value.blurY);
         writeFIXED(value.angle);
         writeFIXED(value.distance);
-        writeFIXED8(value.strength);
+        writeUFIXED8(value.strength);
         writeUB(1, value.innerShadow ? 1 : 0);
         writeUB(1, value.knockout ? 1 : 0);
         writeUB(1, value.compositeSource ? 1 : 0);
@@ -1449,7 +1460,7 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.noClose ? 1 : 0);
         writeUB(2, value.endCapStyle);
         if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
-            writeFIXED8(value.miterLimitFactor);
+            writeUFIXED8(value.miterLimitFactor);
         }
         if (!value.hasFillFlag) {
             writeRGBA((RGBA) value.color);
@@ -1899,7 +1910,7 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.noClose ? 1 : 0);
         writeUB(2, value.endCapStyle);
         if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
-            writeFIXED8(value.miterLimitFactor);
+            writeUFIXED8(value.miterLimitFactor);
         }
         if (!value.hasFillFlag) {
             writeRGBA(value.startColor);

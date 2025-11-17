@@ -78,6 +78,7 @@ package
         TestIfElse;
         TestIfFinally;
         TestIfInIf;
+        TestIfInsteadSwitch;
         TestIfTry;
         TestIgnoreAndOr;
         TestImplicitCoerce;

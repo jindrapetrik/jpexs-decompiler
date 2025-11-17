@@ -43,8 +43,6 @@ public interface MediaDisplay extends Closeable {
 
     public void setLoop(boolean loop);
 
-    public void setResample(boolean resample);
-
     public void gotoFrame(int frame);
 
     public void setBackground(Color color);

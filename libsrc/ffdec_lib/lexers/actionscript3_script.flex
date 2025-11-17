@@ -241,7 +241,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
 
 NamespaceSuffix = "#" {DecIntegerLiteral}
 
-RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
+RegExp = \/([^\r\n/\\]|\\.)+\/[a-z]*
 
 %state STRING, CHARLITERAL,XMLOPENTAG,XMLCLOSETAGFINISH,XMLOPENTAGATTRIB,XMLINSTR,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER,XMLCDATAALONE,XMLCOMMENTALONE
 

@@ -339,6 +339,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return Font file
      */
     public static File fontNameToFile(String fontName) {
+        ensureLoaded();
         if (installedFontFilesByName.containsKey(fontName)) {
             return installedFontFilesByName.get(fontName);
         }
@@ -422,6 +423,19 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return System font name
      */
     public String getSystemFontName() {
+        String ret = getSystemFontNameNoDefault();
+        if (ret == null) {
+            return defaultFontName;
+        }
+        return ret;
+    }
+    
+    /**
+     * Gets system font name without backup to default font
+     * @return System font name
+     */
+    public String getSystemFontNameNoDefault() {
+        FontTag.ensureLoaded();
         int fontId = getCharacterId();
         String selectedFont = swf.sourceFontNamesMap.get(fontId);
         if (selectedFont == null) {
@@ -441,7 +455,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
 
         // findInstalledFontName always returns an available font name
-        return FontTag.findInstalledFontName(getFontName());
+        return FontTag.findInstalledFontNameNoDefault(getFontName());
     }
 
     /**
@@ -449,6 +463,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return System font
      */
     public Font getSystemFont() {
+        FontTag.ensureLoaded();
         return FontTag.installedFontsByName.get(getSystemFontName());
     }
 
@@ -538,6 +553,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * @return Font kerning pairs
      */
     protected static List<FontHelper.KerningPair> getFontKerningPairs(Font font, int size) {
+        ensureLoaded();
         if (customFontToFile.containsKey(font)) {
             if (!customFontKerningPairs.containsKey(font) || !customFontKerningPairs.get(font).containsKey(size)) {
                 if (!customFontKerningPairs.containsKey(font)) {
@@ -573,11 +589,12 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     /**
-     * Adds custom font.
+     * Adds custom font. Useful to properly load kerning pairs from it.
      * @param font Font
      * @param file File
      */
     public static void addCustomFont(Font font, File file) {
+        ensureLoaded();
         customFontToFile.put(font, file);
     }
 
@@ -659,11 +676,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     /**
-     * Finds installed font name.
+     * Finds installed font name without backup to default font name
      * @param fontName Font name
      * @return Installed font name
      */
-    public static String findInstalledFontName(String fontName) {
+    public static String findInstalledFontNameNoDefault(String fontName) {
         ensureLoaded();
         if (installedFontsByName.containsKey(fontName)) {
             return fontName;
@@ -674,7 +691,20 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
                 return beforeUnderscore;
             }
         }
-        return defaultFontName;
+        return null;
+    }
+    
+    /**
+     * Finds installed font name.
+     * @param fontName Font name
+     * @return Installed font name
+     */
+    public static String findInstalledFontName(String fontName) {
+        String ret = findInstalledFontNameNoDefault(fontName);
+        if (ret == null) {
+            return defaultFontName;
+        }
+        return ret;
     }
 
     @Override

@@ -1434,16 +1434,6 @@ public abstract class Action implements GraphSourceItem {
     }
 
     /**
-     * Checks whether the loops are ignored.
-     *
-     * @return True if the loops are ignored, false otherwise
-     */
-    @Override
-    public boolean ignoredLoops() {
-        return false;
-    }
-
-    /**
      * Sets constant pool to actions.
      *
      * @param actions List of actions

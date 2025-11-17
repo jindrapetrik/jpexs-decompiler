@@ -83,7 +83,7 @@ public class AS3ScriptImporter {
                 continue;
             }
             try {
-                File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false, false, false, true));
+                File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false, false, false));
                 if (file.exists()) {
                     Openable openable = pack.getOpenable();
                     SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();

@@ -80,7 +80,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Strength of the gradient bevel
      */
-    @SWFType(BasicType.FIXED8)
+    @SWFType(BasicType.UFIXED8)
     public float strength = 1;
 
     /**
