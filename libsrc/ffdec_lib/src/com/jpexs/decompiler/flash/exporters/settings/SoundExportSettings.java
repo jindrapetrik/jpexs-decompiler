@@ -39,7 +39,6 @@ public class SoundExportSettings {
     /**
      * Constructor.
      * @param mode Mode
-     * @param resampleWav Resample WAV
      */
     public SoundExportSettings(SoundExportMode mode) {
         this.mode = mode;
