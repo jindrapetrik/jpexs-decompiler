@@ -2,8 +2,6 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-
-## [24.1.1] - 2025-11-17
 ### Added
 - AS3 Document class is underlined and has different icon
 - [#2556] CLI subsprite animation export (`-sublength <length>` option for export)
