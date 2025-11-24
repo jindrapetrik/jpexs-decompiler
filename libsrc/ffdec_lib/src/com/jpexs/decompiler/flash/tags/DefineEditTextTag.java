@@ -1299,7 +1299,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd) {
-        if (image.getGraphics() instanceof RequiresNormalizedFonts) {
+        if (image != null && image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
             Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
             int realTextId = getSwf().getCharacterId(this);

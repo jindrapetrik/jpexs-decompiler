@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#2570] Nullpointer on SVG export of DefineEditText
 
 ## [24.1.1] - 2025-11-17
 ### Added
@@ -4044,6 +4046,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2570]: https://www.free-decompiler.com/flash/issues/2570
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
