@@ -176,22 +176,24 @@ public class SoundExporter {
                     flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data.getRangeData())));
                 }
             } else if ((st instanceof SoundStreamFrameRange) || (st instanceof SoundStreamHeadTypeTag)) {
+                float frameRate;
                 List<SoundStreamBlockTag> blocks;
                 if (st instanceof SoundStreamHeadTypeTag) {
+                    frameRate = ((SoundStreamHeadTypeTag) st).getSwf().frameRate;
                     blocks = new ArrayList<>();
                     SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
                     for (SoundStreamFrameRange range : head.getRanges()) {
                         blocks.addAll(range.blocks);
                     }
                 } else {
+                    frameRate = ((SoundStreamFrameRange) st).getSwf().frameRate;
                     blocks = ((SoundStreamFrameRange) st).blocks;
                 }
 
-                SoundStreamFrameRange sh = (SoundStreamFrameRange) st;
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
 
-                int ms = (int) (1000.0 / sh.getSwf().frameRate);
+                int ms = (int) (1000.0 / frameRate);
                 for (int b = 0; b < blocks.size(); b++) {
                     byte[] data = blocks.get(b).streamSoundData.getRangeData();
                     if (st.getSoundFormatId() == 2) { //MP3

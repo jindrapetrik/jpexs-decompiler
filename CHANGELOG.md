@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixed
-- [#2570] Nullpointer on SVG export of DefineEditText
+- [#2570] NullpointerException on SVG export of DefineEditText
+- [#2570] ClassCastException on exporting sound head (export all command)
 
 ## [24.1.1] - 2025-11-17
 ### Added
