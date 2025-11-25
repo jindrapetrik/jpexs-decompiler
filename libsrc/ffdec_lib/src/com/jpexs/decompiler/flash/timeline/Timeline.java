@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
@@ -1782,7 +1783,7 @@ public class Timeline {
      * @return True if has small strokes
      */
     private boolean tagHasSmallStrokes(SVGExporter exporter, DrawableTag drawableTag, Matrix matrix) {
-        if (drawableTag instanceof Timelined) {
+        if (drawableTag instanceof Timelined && !(drawableTag instanceof DefineVideoStreamTag)) {
             Timelined tim = (Timelined) drawableTag;
             for (Frame fr : tim.getTimeline().frames) {
                 for (DepthState ds : fr.layers.values()) {
