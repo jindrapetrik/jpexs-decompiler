@@ -4510,7 +4510,7 @@ public class CommandLineArgumentParser {
         }
         Configuration.dumpTags.set(true);
         Configuration.parallelSpeedUp.set(false);
-        try(InputStream is = new FileInputStream(args.pop())) {
+        try (InputStream is = new FileInputStream(args.pop())) {
             SWF swf = new SWF(is, false, false);
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
