@@ -4508,11 +4508,10 @@ public class CommandLineArgumentParser {
         if (args.isEmpty()) {
             badArguments("dumpswf");
         }
-        try {
-            Configuration.dumpTags.set(true);
-            Configuration.parallelSpeedUp.set(false);
-            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, args.pop(), null);
-            Main.parseOpenable(sourceInfo);
+        Configuration.dumpTags.set(true);
+        Configuration.parallelSpeedUp.set(false);
+        try(InputStream is = new FileInputStream(args.pop())) {
+            SWF swf = new SWF(is, false, false);
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);

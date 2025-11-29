@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 - [#2570] NullpointerException on SVG export of DefineEditText
 - [#2570] ClassCastException on exporting sound head (export all command)
 - [#2571] SVG export - StackOverflow for DefineVideoStream
+- [#2575] dumpSWF CLI command displayed import assets GUI dialog
+
+### Changed
+- [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
 
 ## [24.1.1] - 2025-11-17
 ### Added
@@ -4050,6 +4054,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2570]: https://www.free-decompiler.com/flash/issues/2570
 [#2571]: https://www.free-decompiler.com/flash/issues/2571
+[#2575]: https://www.free-decompiler.com/flash/issues/2575
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
