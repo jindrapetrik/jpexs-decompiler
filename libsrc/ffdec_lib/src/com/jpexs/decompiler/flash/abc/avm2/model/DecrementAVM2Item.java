@@ -68,18 +68,7 @@ public class DecrementAVM2Item extends AVM2Item {
     }
 
     @Override
-    public GraphTargetItem returnType() {
-        if (value.returnType().equals(TypeItem.INT)) {
-            return TypeItem.INT;
-        }
-        if (value.returnType().equals(TypeItem.UINT)) {
-            return TypeItem.UINT;
-        }
-
-        if (value.returnType().equals(TypeItem.NUMBER)) {
-            return TypeItem.NUMBER;
-        }
-
+    public GraphTargetItem returnType() {       
         return TypeItem.NUMBER;
     }
 

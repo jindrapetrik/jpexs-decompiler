@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
@@ -122,4 +124,15 @@ public class AVM2GraphTargetDialect extends GraphTargetDialect {
         }
         return writer;
     }
+
+    @Override
+    public GraphTargetItem copyCoerce(GraphTargetItem coercedOriginal, GraphTargetItem newValue) {
+        if (coercedOriginal instanceof ConvertAVM2Item) {
+            return new ConvertAVM2Item(coercedOriginal.getSrc(), coercedOriginal.getLineStartItem(), newValue, ((ConvertAVM2Item) coercedOriginal).type);
+        }
+        if (coercedOriginal instanceof CoerceAVM2Item) {
+            return new CoerceAVM2Item(coercedOriginal.getSrc(), coercedOriginal.getLineStartItem(), newValue, ((CoerceAVM2Item) coercedOriginal).typeObj);
+        }
+        return super.copyCoerce(coercedOriginal, newValue);
+    }        
 }

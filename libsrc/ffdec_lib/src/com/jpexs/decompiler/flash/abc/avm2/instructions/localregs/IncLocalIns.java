@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 /**
@@ -68,13 +69,13 @@ public class IncLocalIns extends InstructionDefinition {
             if (stackTop instanceof LocalRegAVM2Item) {
                 if (regId == ((LocalRegAVM2Item) stackTop).regIndex) {
                     stack.pop();
-                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, stackTop));
+                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, stackTop, TypeItem.NUMBER));
                     isPostInc = true;
                 }
             }
         }
         if (!isPostInc) {
-            stack.addToOutput(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId));
+            stack.addToOutput(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId, TypeItem.NUMBER));
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new AddAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));

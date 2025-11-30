@@ -150,7 +150,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 if (inc.regIndex == regId) {
                     output.remove(output.size() - 1);
                     stack.moveToStack(output);
-                    stack.push(new PreIncrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                    stack.push(new PreIncrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result, inc.type));
                     return;
                 }
             }
@@ -159,7 +159,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 if (dec.regIndex == regId) {
                     output.remove(output.size() - 1);
                     stack.moveToStack(output);   
-                    stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result));
+                    stack.push(new PreDecrementAVM2Item(lastOutput.getSrc(), lastOutput.getLineStartItem(), result, dec.type));
                     return;
                 }
             }
@@ -193,9 +193,9 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                                         output.remove(output.size() - 1);
                                                         stack.moveToStack(output);
                                                         if (isIncrement) {
-                                                            stack.push(new PostIncrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp));
+                                                            stack.push(new PostIncrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp, setLoc.value));
                                                         } else {
-                                                            stack.push(new PostDecrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp));                                                        
+                                                            stack.push(new PostDecrementAVM2Item(setProp.value.getSrc(), setProp.value.getLineStartItem(), getProp, setLoc.value));                                                        
                                                         }
                                                         return;
                                                     }
@@ -266,9 +266,9 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                                         output.remove(output.size() - 1);
                                                         stack.moveToStack(output);
                                                         if (isIncrement) {
-                                                            stack.push(new PreIncrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp));
+                                                            stack.push(new PreIncrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                         } else {
-                                                            stack.push(new PreDecrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp));                                                        
+                                                            stack.push(new PreDecrementAVM2Item(setLocal.value.getSrc(), setLocal.value.getLineStartItem(), getProp, TypeItem.NUMBER));                                                        
                                                         }
                                                         return;
                                                     }

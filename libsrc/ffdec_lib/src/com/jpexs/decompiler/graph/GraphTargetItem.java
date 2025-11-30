@@ -188,7 +188,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         if (it2 == null) {
             return it;
         }
-        return it2;
+        
+        return it.dialect.copyCoerce(it, it2);
     }
 
     /**

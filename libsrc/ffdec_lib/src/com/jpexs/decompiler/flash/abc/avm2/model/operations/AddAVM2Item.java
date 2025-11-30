@@ -112,23 +112,7 @@ public class AddAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
         GraphTargetItem rightType = rightSide.returnType();
         if (leftType.equals(TypeItem.STRING) || rightType.equals(TypeItem.STRING)) {
             return TypeItem.STRING;
-        }
-        if (leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.INT)) {
-            return TypeItem.INT;
-        }
-
-        if ((leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.UINT))
-                || (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.INT))) {
-            return TypeItem.INT;
-        }
-
-        if (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.UINT)) {
-            return TypeItem.UINT;
-        }
-
-        if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
-            return TypeItem.NUMBER;
-        }
+        }        
         return TypeItem.NUMBER;
     }
 

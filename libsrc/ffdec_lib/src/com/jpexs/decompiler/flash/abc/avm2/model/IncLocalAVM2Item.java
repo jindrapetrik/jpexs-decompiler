@@ -33,16 +33,23 @@ public class IncLocalAVM2Item extends AVM2Item {
      * Local register index
      */
     public int regIndex;
+    
+    /**
+     * Type
+     */
+    public GraphTargetItem type;
 
     /**
      * Constructor.
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param regIndex Local register index
+     * @param type Type
      */
-    public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
+    public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.regIndex = regIndex;
+        this.type = type;
     }
 
     @Override

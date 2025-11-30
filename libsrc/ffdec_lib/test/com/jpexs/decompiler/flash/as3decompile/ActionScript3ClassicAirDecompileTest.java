@@ -491,7 +491,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testDoWhile() {
-        decompileMethod("classic_air", "testDoWhile", "var a:int = 8;\r\n"
+        decompileMethod("classic_air", "testDoWhile", "var a:* = 8;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
@@ -595,7 +595,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testFinallyZeroJump() {
-        decompileMethod("classic_air", "testFinallyZeroJump", "var str:* = param1;\r\n"
+        decompileMethod("classic_air", "testFinallyZeroJump", "var str:String = param1;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -751,7 +751,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "list[1] = \"second\";\r\n"
                 + "list[2] = \"third\";\r\n"
                 + "var _loc4_:int = 0;\r\n"
-                + "var _loc3_:* = list;\r\n"
+                + "var _loc3_:Array = list;\r\n"
                 + "for each(item in _loc3_)\r\n"
                 + "{\r\n"
                 + "return item;\r\n"
@@ -913,7 +913,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testForInReturn", "var dic:Dictionary = null;\r\n"
                 + "var item:* = null;\r\n"
                 + "var _loc4_:int = 0;\r\n"
-                + "var _loc3_:* = dic;\r\n"
+                + "var _loc3_:Dictionary = dic;\r\n"
                 + "for(item in _loc3_)\r\n"
                 + "{\r\n"
                 + "return item;\r\n"
@@ -1343,7 +1343,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIncDec1() {
-        decompileMethod("classic_air", "testIncDec1", "var a:int = 5;\r\n"
+        decompileMethod("classic_air", "testIncDec1", "var a:* = 5;\r\n"
                 + "trace(\"++a with result\");\r\n"
                 + "trace(++a);\r\n"
                 + "trace(\"--a with result\");\r\n"
@@ -1357,7 +1357,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIncDec2() {
-        decompileMethod("classic_air", "testIncDec2", "var a:int = 5;\r\n"
+        decompileMethod("classic_air", "testIncDec2", "var a:* = 5;\r\n"
                 + "trace(\"a++ with result\");\r\n"
                 + "trace(a++);\r\n"
                 + "trace(\"a-- with result\");\r\n"
@@ -1903,7 +1903,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testOptimization() {
         decompileMethod("classic_air", "testOptimization", "var f:int = 0;\r\n"
-                + "var g:* = 0;\r\n"
+                + "var g:int = 0;\r\n"
                 + "var h:int = 0;\r\n"
                 + "var a:int = 1;\r\n"
                 + "var b:int = 2;\r\n"

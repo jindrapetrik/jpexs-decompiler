@@ -41,7 +41,7 @@ public abstract class GraphTargetDialect {
      * @return GraphTarget item
      */
     public abstract GraphTargetItem valToItem(Object value);
-
+       
     /**
      * Checks whether this dialect allows multi level breaks
      *
@@ -59,4 +59,14 @@ public abstract class GraphTargetDialect {
      * @return Writer
      */
     public abstract GraphTextWriter writeTemporaryDeclaration(GraphTextWriter writer, LocalData localData, String suffix, int tempIndex, GraphTargetItem value) throws InterruptedException;
+    
+    /**
+     * Copy coerce value
+     * @param coercedOriginal
+     * @param newValue
+     * @return NewValue with copied coerce from coercedOriginal
+     */
+    public GraphTargetItem copyCoerce(GraphTargetItem coercedOriginal, GraphTargetItem newValue) {
+        return newValue;
+    }
 }

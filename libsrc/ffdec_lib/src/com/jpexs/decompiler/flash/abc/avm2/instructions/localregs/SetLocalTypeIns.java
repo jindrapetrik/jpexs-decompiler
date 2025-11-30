@@ -107,19 +107,19 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
                             //stack.pop();     
                             //TestIncDec2 with result
-                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                             
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {                            
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value);                                                        
                             //stack.pop();
                             //TestIncDec1 with result
-                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else {
-                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         }
                     } else {
                         //TestIncDec1 no result
-                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                     }
                     return;
                 }
@@ -136,18 +136,18 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoerced().value);  
                             //stack.pop();
                             //TestIncDec2 with result
-                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value);            
                             //stack.pop();
                             //TestIncDec1 with result
-                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else {
-                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         }
                     } else {
                         //TestIncDec1 no result
-                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                     }
                     return;
                 }

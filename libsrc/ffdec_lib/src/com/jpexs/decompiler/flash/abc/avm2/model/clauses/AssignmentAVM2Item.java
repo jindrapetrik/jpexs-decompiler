@@ -16,10 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
+import com.jpexs.decompiler.graph.GraphTargetItem;
+
 /**
  * Assignment.
  *
  * @author JPEXS
  */
 public interface AssignmentAVM2Item {
+    public GraphTargetItem returnType();
+
+    public GraphTargetItem getObject();
 }

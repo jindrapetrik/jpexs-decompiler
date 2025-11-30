@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
@@ -61,6 +62,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
@@ -697,9 +699,9 @@ public abstract class InstructionDefinition implements Serializable {
                                 output.remove(output.size() - 1);
                                 getProp.object = st.value;
                                 if (isIncrement) {
-                                    stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                    stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp, value.value.returnType()));
                                 } else {
-                                    stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                    stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp, value.value.returnType()));
                                 }
                                 return;
                             }
@@ -731,9 +733,9 @@ public abstract class InstructionDefinition implements Serializable {
                                     output.remove(output.size() - 1);
                                     getProp.object = st.value;
                                     if (isIncrement) {
-                                        stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                        stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.lineStartItem, getProp, TypeItem.NUMBER));
                                     } else {
-                                        stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp));
+                                        stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.lineStartItem, getProp, TypeItem.NUMBER));
                                     }
                                     return;
                                 }
@@ -784,9 +786,9 @@ public abstract class InstructionDefinition implements Serializable {
                                             fm.name = setLocName.value;
                                             stack.pop();
                                             if (isIncrement) {
-                                                stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             } else {
-                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             }
                                             return;
                                         }
@@ -824,9 +826,9 @@ public abstract class InstructionDefinition implements Serializable {
                                             fm.name = setLocName.value;
                                             output.remove(output.size() - 1);
                                             if (isIncrement) {
-                                                stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             } else {
-                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             }
                                             return;
                                         }
@@ -881,9 +883,9 @@ public abstract class InstructionDefinition implements Serializable {
                                                                     output.remove(output.size() - 1);
                                                                     stack.moveToStack(output);
                                                                     if (isIncrement) {
-                                                                        stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                        stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                     } else {
-                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                     }
                                                                     return;
                                                                 }
@@ -929,9 +931,9 @@ public abstract class InstructionDefinition implements Serializable {
                                                 output.remove(output.size() - 1);
                                                 stack.moveToStack(output);
                                                 if (isIncrement) {
-                                                    stack.addToOutput(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                    stack.addToOutput(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                 } else {
-                                                    stack.addToOutput(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                    stack.addToOutput(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                 }
                                                 return;
                                             }
@@ -969,9 +971,9 @@ public abstract class InstructionDefinition implements Serializable {
                                             getProp.object = setLocObj.value;
                                             stack.pop();
                                             if (isIncrement) {
-                                                stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.push(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             } else {
-                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.push(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             }
                                             return;
                                         }
@@ -1006,9 +1008,9 @@ public abstract class InstructionDefinition implements Serializable {
                                             output.remove(output.size() - 1);
                                             stack.moveToStack(output);
                                             if (isIncrement) {
-                                                stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.addToOutput(new PreIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             } else {
-                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                stack.addToOutput(new PreDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                             }
                                             return;
                                         }
@@ -1059,9 +1061,9 @@ public abstract class InstructionDefinition implements Serializable {
                                                                     output.remove(output.size() - 1);
                                                                     stack.moveToStack(output);
                                                                     if (isIncrement) {
-                                                                        stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                        stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                     } else {
-                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                        stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                     }
                                                                     return;
                                                                 }
@@ -1117,9 +1119,9 @@ public abstract class InstructionDefinition implements Serializable {
                                                                 output.remove(output.size() - 1);
                                                                 stack.moveToStack(output);
                                                                 if (isIncrement) {
-                                                                    stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                    stack.push(new PostIncrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                 } else {
-                                                                    stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp));
+                                                                    stack.push(new PostDecrementAVM2Item(setLocValue.value.getSrc(), setLocValue.value.getLineStartItem(), getProp, TypeItem.NUMBER));
                                                                 }
                                                                 return;
                                                             }
@@ -1196,9 +1198,9 @@ public abstract class InstructionDefinition implements Serializable {
                                     stack.pop();
                                     stack.moveToStack(output);
                                     if (isIncrement) {
-                                        stack.push(new PreIncrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value));
+                                        stack.push(new PreIncrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value, TypeItem.NUMBER));
                                     } else {
-                                        stack.push(new PreDecrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value));
+                                        stack.push(new PreDecrementAVM2Item(st.value.getSrc(), st.value.getLineStartItem(), st.value.value, TypeItem.NUMBER));
                                     }
                                     return;
                                 }
@@ -1220,9 +1222,9 @@ public abstract class InstructionDefinition implements Serializable {
                     FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                     if (fm.compareSame(multiname)) {
                         if (isIncrement) {
-                            stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                            stack.addToOutput(new PreIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp, TypeItem.NUMBER));
                         } else {
-                            stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                            stack.addToOutput(new PreDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp, TypeItem.NUMBER));
                         }
                         return;
                     }
@@ -1273,9 +1275,9 @@ public abstract class InstructionDefinition implements Serializable {
                                         output.remove(output.size() - 1);
                                         stack.moveToStack(output);
                                         if (isIncrement) {
-                                            stack.push(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value));
+                                            stack.push(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value, TypeItem.NUMBER));
                                         } else {
-                                            stack.push(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value));
+                                            stack.push(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), st.value.value, TypeItem.NUMBER));
                                         }
                                         return;
                                     }
@@ -1299,9 +1301,9 @@ public abstract class InstructionDefinition implements Serializable {
                         FullMultinameAVM2Item fm = (FullMultinameAVM2Item) getProp.propertyName;
                         if (fm.compareSame(multiname)) {
                             if (isIncrement) {
-                                stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                                stack.addToOutput(new PostIncrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp, TypeItem.NUMBER));
                             } else {
-                                stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp));
+                                stack.addToOutput(new PostDecrementAVM2Item(value.getSrc(), value.getLineStartItem(), getProp, TypeItem.NUMBER));
                             }
                             return;
                         }
@@ -1448,16 +1450,16 @@ public abstract class InstructionDefinition implements Serializable {
 
                             if (isIncrement) {
                                 if (hasConvert && standalone) {
-                                    return new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                    return new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty, TypeItem.NUMBER);
                                 }
                                 //TestIncDec3 with result
-                                return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty, TypeItem.NUMBER);
                             } else {
                                 if (hasConvert && standalone) {
-                                    return new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                    return new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty, TypeItem.NUMBER);
                                 }
                                 //TestIncDec3 with result
-                                return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty, TypeItem.NUMBER);
                             }
                         }
                     }
@@ -1465,5 +1467,20 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
         return null;
+    }
+    
+    /**
+     * Gets number type from item. (can be coerce or convert, if not, number is returned)
+     * @param item Input item
+     * @return Type
+     */
+    public static GraphTargetItem getNumberType(GraphTargetItem item) {
+        if (item instanceof ConvertAVM2Item) {
+            return ((ConvertAVM2Item) item).type;
+        }
+        if (item instanceof CoerceAVM2Item) {
+            return ((CoerceAVM2Item) item).typeObj;
+        }
+        return TypeItem.NUMBER;
     }
 }

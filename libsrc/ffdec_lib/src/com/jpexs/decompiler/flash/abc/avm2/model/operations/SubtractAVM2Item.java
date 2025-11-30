@@ -101,26 +101,6 @@ public class SubtractAVM2Item extends BinaryOpItem implements CompoundableBinary
 
     @Override
     public GraphTargetItem returnType() {
-        GraphTargetItem leftType = leftSide.returnType();
-        GraphTargetItem rightType = rightSide.returnType();
-
-        if (leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.INT)) {
-            return TypeItem.INT;
-        }
-
-        if ((leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.UINT))
-                || (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.INT))) {
-            return TypeItem.INT;
-        }
-
-        if (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.UINT)) {
-            return TypeItem.INT;
-        }
-
-        if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
-            return TypeItem.NUMBER;
-        }
-
         return TypeItem.NUMBER;
     }
 

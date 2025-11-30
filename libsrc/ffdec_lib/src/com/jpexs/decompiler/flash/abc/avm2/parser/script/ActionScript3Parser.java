@@ -233,14 +233,14 @@ public class ActionScript3Parser {
             if (!isNameOrProp(ret)) {
                 throw new AVM2ParseException("Invalid assignment", lexer.yyline());
             }
-            ret = new PostIncrementAVM2Item(null, null, ret);
+            ret = new PostIncrementAVM2Item(null, null, ret, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
             s = lex();
 
         } else if (s.type == SymbolType.DECREMENT) {
             if (!isNameOrProp(ret)) {
                 throw new AVM2ParseException("Invalid assignment", lexer.yyline());
             }
-            ret = new PostDecrementAVM2Item(null, null, ret);
+            ret = new PostDecrementAVM2Item(null, null, ret, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
             s = lex();
         }
 
@@ -2660,10 +2660,10 @@ public class ActionScript3Parser {
                     throw new AVM2ParseException("Not a property or name", lexer.yyline());
                 }
                 if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementAVM2Item(null, null, varincdec);
+                    ret = new PreIncrementAVM2Item(null, null, varincdec, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
                 }
                 if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementAVM2Item(null, null, varincdec);
+                    ret = new PreDecrementAVM2Item(null, null, varincdec, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
                 }
 
                 break;

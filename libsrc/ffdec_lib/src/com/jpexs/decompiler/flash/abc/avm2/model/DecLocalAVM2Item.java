@@ -35,14 +35,21 @@ public class DecLocalAVM2Item extends AVM2Item {
     public int regIndex;
 
     /**
+     * Type
+     */
+    public GraphTargetItem type;
+    
+    /**
      * Constructor.
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param regIndex Register index
+     * @param type Type
      */
-    public DecLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
+    public DecLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.regIndex = regIndex;
+        this.type = type;
     }
 
     @Override

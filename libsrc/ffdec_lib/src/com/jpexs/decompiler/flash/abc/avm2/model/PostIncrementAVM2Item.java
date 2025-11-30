@@ -43,14 +43,21 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     public GraphTargetItem object;
 
     /**
+     * Type
+     */
+    public GraphTargetItem type;
+    
+    /**
      * Constructor.
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param object Object
+     * @param type Type
      */
-    public PostIncrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+    public PostIncrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;
+        this.type = type;
     }
 
     @Override
@@ -71,7 +78,7 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
 
     @Override
     public GraphTargetItem returnType() {
-        return object.returnType();
+        return type;
     }
 
     @Override
@@ -120,4 +127,8 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
         return true;
     }
 
+    @Override
+    public GraphTargetItem getObject() {
+        return object;
+    }
 }
