@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
+- Save as EXE through context menu of SWF files (previously only in toolbar)
+
 ### Fixed
 - [#2570] NullpointerException on SVG export of DefineEditText
 - [#2570] ClassCastException on exporting sound head (export all command)
@@ -4054,6 +4058,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2570]: https://www.free-decompiler.com/flash/issues/2570
 [#2571]: https://www.free-decompiler.com/flash/issues/2571
 [#2575]: https://www.free-decompiler.com/flash/issues/2575
