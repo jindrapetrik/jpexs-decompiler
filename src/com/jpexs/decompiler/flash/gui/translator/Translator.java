@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.translator;
 
 import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.helpers.Helper;
@@ -770,7 +769,7 @@ public class Translator extends JFrame implements ItemListener {
                 int missingCount = 0;
                 int newCount = 0;
                 int modifiedCount = 0;
-                LinkedHashMap<String, LinkedHashMap<String,String>> map = resourceValues.get(resource);
+                LinkedHashMap<String, LinkedHashMap<String, String>> map = resourceValues.get(resource);
                 for (String key : map.get("en").keySet()) {
                     if (resourceValues.get(resource).containsKey(locale)
                             && resourceValues.get(resource).get(locale).containsKey(key)) {
