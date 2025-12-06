@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2575] dumpSWF CLI command displayed import assets GUI dialog
 - [#2573] AS3 - Incorrect uint/int/Number coercion
 - AS3 local registers type propagation
+- [#2566] Export bounds of sprites and buttons not containg filter offsets
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4063,6 +4064,7 @@ Major version of SWF to XML export changed to 2.
 [#2571]: https://www.free-decompiler.com/flash/issues/2571
 [#2575]: https://www.free-decompiler.com/flash/issues/2575
 [#2573]: https://www.free-decompiler.com/flash/issues/2573
+[#2566]: https://www.free-decompiler.com/flash/issues/2566
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537

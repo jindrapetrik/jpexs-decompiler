@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
@@ -249,12 +250,13 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         for (Tag t : getTags()) {
             MATRIX m = null;
             int characterId = -1;
+            double deltaXMax = 0;
+            double deltaYMax = 0;
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 depthMap.remove(rt.getDepth());
                 depthMatrixMap.remove(rt.getDepth());
-            }
-            if (t instanceof PlaceObjectTypeTag) {
+            } else if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
                 m = pot.getMatrix();
 
@@ -284,6 +286,26 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                         characterId = chi;
                     }
                 }
+                
+                List<FILTER> filters = pot.getFilters();    
+                
+                deltaXMax = 0;
+                deltaYMax = 0;
+
+                if (filters != null && !filters.isEmpty()) {
+                    // calculate size after applying the filters
+                    for (FILTER filter : filters) {
+                        if (!filter.enabled) {
+                            continue;
+                        }
+                        double x = filter.getDeltaX();
+                        double y = filter.getDeltaY();
+                        deltaXMax += x * SWF.unitDivisor;
+                        deltaYMax += y * SWF.unitDivisor;
+                    }
+                }
+            } else {
+                continue;
             }
             if (characterId != -1 && swf != null) {
                 //Do not handle Fonts as characters. TODO: make this better
@@ -315,6 +337,11 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                 r.Xmax = (int) Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
                 r.Ymax = (int) Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
             }
+            
+            r.Xmin -= deltaXMax;
+            r.Ymin -= deltaYMax;
+            r.Xmax += deltaXMax;
+            r.Ymax += deltaYMax;
 
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
             ret.Ymin = Math.min(r.Ymin, ret.Ymin);
