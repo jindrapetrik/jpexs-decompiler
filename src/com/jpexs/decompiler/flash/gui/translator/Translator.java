@@ -770,7 +770,8 @@ public class Translator extends JFrame implements ItemListener {
                 int missingCount = 0;
                 int newCount = 0;
                 int modifiedCount = 0;
-                for (String key : resourceValues.get(resource).get("en").keySet()) {
+                LinkedHashMap<String, LinkedHashMap<String,String>> map = resourceValues.get(resource);
+                for (String key : map.get("en").keySet()) {
                     if (resourceValues.get(resource).containsKey(locale)
                             && resourceValues.get(resource).get(locale).containsKey(key)) {
                         if (newValues.containsKey(resource)
