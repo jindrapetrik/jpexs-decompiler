@@ -156,12 +156,14 @@ public class FontNormalizer {
             List<SHAPE> shapes1 = font.getGlyphShapeTable();
             Double h = null;
             Double systemH = null;
+            double sumH = 0;
             for (int i = 0; i < shapes1.size(); i++) {
                 RECT b = shapes1.get(i).getBounds(1);
                 h = b.getHeight() / font.getDivider();
                 if (h <= 0) {
                     continue;
                 }
+                sumH += h;
                 char c = font.glyphToChar(i);
                 Font f = new Font(systemFont, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1000);
                 if (!f.canDisplay(c)) {
@@ -173,10 +175,16 @@ public class FontNormalizer {
                 break;
             }
 
-            if (h != null && systemH != null) {
-                newScale = systemH / h;
-                willModify = true;
+            if (systemH == null) {
+                h = sumH / shapes1.size();
+                Font f = new Font(Font.SERIF, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1000);               
+                FontRenderContext frc = new FontRenderContext(null, true, true);
+                GlyphVector gv = f.createGlyphVector(frc, new char[]{'H'});
+                systemH = gv.getGlyphOutline(0).getBounds2D().getHeight();
             }
+            
+            newScale = systemH / h;
+            willModify = true;
 
             final double scale = newScale;
 
@@ -342,7 +350,8 @@ public class FontNormalizer {
     }
 
     private static int round20(double val) {
-        return (int) Math.floor(val / 20.0) * 20;
+        //return (int) Math.round(val / 20.0) * 20;
+        return (int) Math.round(val);
     }
 
     private Set<Integer> getDefineEditTextFonts(DefineEditTextTag text) {
