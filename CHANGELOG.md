@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - AS3 local registers type propagation
 - [#2566] Export bounds of sprites and buttons not containg filter offsets
 - [#2582] Font normalizer setting small texts when no assigned glyph found
+- PDF export - not rendering video stream frames
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)

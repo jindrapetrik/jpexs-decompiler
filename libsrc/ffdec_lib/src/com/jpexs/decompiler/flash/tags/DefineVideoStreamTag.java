@@ -404,7 +404,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
                         return;
                     }
                     //System.out.println("drawed");
-                    Graphics2D graphics = (Graphics2D) image.getBufferedImage().getGraphics();
+                    Graphics2D graphics = (Graphics2D) image.getGraphics();
                     AffineTransform at = transformation.toTransform();
                     at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
                     graphics.setTransform(at);
