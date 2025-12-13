@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#2566] Export bounds of sprites and buttons not containg filter offsets
 - [#2582] Font normalizer setting small texts when no assigned glyph found
 - PDF export - not rendering video stream frames
+- [#2585] AS1/2 direct editation - continue and break in for..in loop
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4068,6 +4069,7 @@ Major version of SWF to XML export changed to 2.
 [#2573]: https://www.free-decompiler.com/flash/issues/2573
 [#2566]: https://www.free-decompiler.com/flash/issues/2566
 [#2582]: https://www.free-decompiler.com/flash/issues/2582
+[#2585]: https://www.free-decompiler.com/flash/issues/2585
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537

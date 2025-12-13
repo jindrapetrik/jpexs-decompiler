@@ -198,44 +198,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        List<GraphSourceItem> ret = new ArrayList<>();
-        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();
-        HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localData);
-        ret.addAll(enumVariable.toSource(localData, generator));
-        ret.add(new ActionEnumerate2());
-
-        List<Action> loopExpr = new ArrayList<>();
-        int exprReg = asGenerator.getTempRegister(localData);
-
-        loopExpr.add(new ActionStoreRegister(exprReg, charset));
-        loopExpr.add(new ActionPush(Null.INSTANCE, charset));
-        loopExpr.add(new ActionEquals2());
-        ActionIf forInEndIf = new ActionIf(0, charset);
-        loopExpr.add(forInEndIf);
-        List<Action> loopBody = new ArrayList<>();
-
-        //assuming (variableName instanceof VariableActionItem)       
-        VariableActionItem vaact = (VariableActionItem) variableName;
-        GraphTargetItem setVar = vaact.getBoxedValue();
-        setVar.value = new DirectValueActionItem(new RegisterNumber(exprReg));
-
-        loopBody.addAll(asGenerator.toActionList(setVar.toSourceIgnoreReturnValue(localData, generator)));
-        //loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        int oldForIn = asGenerator.getForInLevel(localData);
-        asGenerator.setForInLevel(localData, oldForIn + 1);
-        loopBody.addAll(asGenerator.toActionList(asGenerator.generate(localData, commands)));
-        asGenerator.setForInLevel(localData, oldForIn);
-        ActionJump forinJmpBack = new ActionJump(0, charset);
-        loopBody.add(forinJmpBack);
-        int bodyLen = Action.actionsToBytes(loopBody, false, SWF.DEFAULT_VERSION).length;
-        int exprLen = Action.actionsToBytes(loopExpr, false, SWF.DEFAULT_VERSION).length;
-        forinJmpBack.setJumpOffset(-bodyLen - exprLen);
-        forInEndIf.setJumpOffset(bodyLen);
-        ret.addAll(loopExpr);
-        ret.addAll(loopBody);
-        asGenerator.releaseTempRegister(localData, exprReg);
-        return ret;
+        return ((ActionSourceGenerator) generator).generate(localData, this);
     }
 
     @Override
