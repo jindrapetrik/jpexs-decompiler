@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
 - Save as EXE through context menu of SWF files (previously only in toolbar)
+- Slovenian translation
 
 ### Fixed
 - [#2570] NullpointerException on SVG export of DefineEditText
