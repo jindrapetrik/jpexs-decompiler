@@ -420,7 +420,7 @@ public abstract class MorphShapeTag extends DrawableTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
+    public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
 
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);

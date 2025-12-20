@@ -109,6 +109,8 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
 
     /**
      * Converts the drawable to SVG.
+     * @param frame Frame
+     * @param time Time
      * @param exporter SVG exporter
      * @param ratio Ratio
      * @param colorTransform Color transform
@@ -117,7 +119,7 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @param strokeTransformation Stroke transformation
      * @throws IOException On I/O error
      */
-    public abstract void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException;
+    public abstract void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException;
 
     /**
      * Converts the drawable to HTML canvas.

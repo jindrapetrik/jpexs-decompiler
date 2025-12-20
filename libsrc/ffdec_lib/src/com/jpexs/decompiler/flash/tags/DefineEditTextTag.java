@@ -1283,7 +1283,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
+    public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
         int realTextId = getSwf().getCharacterId(this);
         if (exporter.getNormalizedTexts().containsKey(realTextId) && exporter.getNormalizedTexts().get(realTextId) instanceof DefineEditTextTag) {
             DefineEditTextTag normalizedText = (DefineEditTextTag) exporter.getNormalizedTexts().get(realTextId);

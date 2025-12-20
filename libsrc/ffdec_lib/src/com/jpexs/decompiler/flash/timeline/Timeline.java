@@ -1963,7 +1963,7 @@ public class Timeline {
                 Tag drawableTag = (Tag) drawable;
                 RECT boundRect = drawable.getRect();
 
-                ExportRectangle rect = new ExportRectangle(boundRect);
+                //ExportRectangle rect = new ExportRectangle(boundRect);
 
                 DefineScalingGridTag scalingGrid = character.getScalingGridTag();
 
@@ -1975,8 +1975,12 @@ public class Timeline {
                     clips.add(clip);
                 } else {
                     boolean createNew = false;
+                    int mtime = time + layer.time;
 
-                    SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1);
+                    int dframe = mtime % drawable.getNumFrames();                        
+                    int dtime = mtime - dframe;
+                    
+                    SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1, dframe, dtime);
                     boolean hasSmallStroke = tagHasSmallStrokes(exporter, drawable, absMat);
 
                     if (!hasSmallStroke && exporter.exportedTags.containsKey(exportKey)) {
@@ -1989,11 +1993,12 @@ public class Timeline {
                         createNew = true;
                     }
                     if (createNew) {
-                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                        drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, transformation, absMat);
+                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);                                                
+                        
+                        drawable.toSVG(dframe, dtime, exporter, layer.ratio, clrTrans, level + 1, transformation, absMat);
                         exporter.endGroup();
                     }
-                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
+                    Matrix mat = new Matrix(layer.matrix); //Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
                     exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter, String.valueOf(drawable.getCharacterId()), String.join("___", drawable.getClassNames()), layer.blendMode, layer.filters);
                 }
             }

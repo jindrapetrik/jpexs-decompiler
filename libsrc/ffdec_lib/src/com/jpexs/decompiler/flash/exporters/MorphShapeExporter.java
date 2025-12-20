@@ -131,7 +131,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                mst.getStartShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.getStartShapeTag().toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileEnd))) {
@@ -141,7 +141,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                mst.getEndShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.getEndShapeTag().toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -153,7 +153,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "morphshape");
-                                mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;

@@ -117,7 +117,7 @@ public class ShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                st.toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
