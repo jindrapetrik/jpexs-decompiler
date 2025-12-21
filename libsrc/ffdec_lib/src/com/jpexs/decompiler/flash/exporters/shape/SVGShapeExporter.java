@@ -107,9 +107,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         this.exporter = exporter;
         this.displayZoom = displayZoom;
         
-        com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
-        com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
-        thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);        
+        thicknessScale = Math.sqrt(Math.abs(strokeTransformation.scaleX * strokeTransformation.scaleY - strokeTransformation.rotateSkew0 * strokeTransformation.rotateSkew1));
     }
 
     @Override

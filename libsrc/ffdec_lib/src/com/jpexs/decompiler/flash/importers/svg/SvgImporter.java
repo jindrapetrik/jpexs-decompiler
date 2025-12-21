@@ -2028,7 +2028,8 @@ public class SvgImporter {
 
             ILINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
             lineStyle.setColor(getRGB(shapeNum, lineColor));
-            double scale = Math.max(transform.scaleX, transform.scaleY);
+            double scale = Math.sqrt(Math.abs(transform.scaleX * transform.scaleY - transform.rotateSkew0 * transform.rotateSkew1));
+            
             lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * scale * SWF.unitDivisor));
             SvgLineCap lineCap = style.getStrokeLineCap();
             SvgLineJoin lineJoin = style.getStrokeLineJoin();
