@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
 - Save as EXE through context menu of SWF files (previously only in toolbar)
 - Slovenian translation
+- SVG export - video frames
 
 ### Fixed
 - [#2570] NullpointerException on SVG export of DefineEditText
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - PDF export - not rendering video stream frames
 - [#2585] AS1/2 direct editation - continue and break in for..in loop
 - [#2589] SVG export - subsprite animation, sprite offsets
+- [#1893] Video - incorrect frame size
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4073,6 +4075,7 @@ Major version of SWF to XML export changed to 2.
 [#2582]: https://www.free-decompiler.com/flash/issues/2582
 [#2585]: https://www.free-decompiler.com/flash/issues/2585
 [#2589]: https://www.free-decompiler.com/flash/issues/2589
+[#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
@@ -4485,7 +4488,6 @@ Major version of SWF to XML export changed to 2.
 [#1564]: https://www.free-decompiler.com/flash/issues/1564
 [#1676]: https://www.free-decompiler.com/flash/issues/1676
 [#1697]: https://www.free-decompiler.com/flash/issues/1697
-[#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
 [#1900]: https://www.free-decompiler.com/flash/issues/1900
 [#1897]: https://www.free-decompiler.com/flash/issues/1897

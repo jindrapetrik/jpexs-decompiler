@@ -1,0 +1,40 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" frameRate="1" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <media>
+          <DOMVideoItem name="frames_wide.flv" itemID="69482086-000001e5" sourceExternalFilepath="Y:/video/src/frames_wide.flv" sourceLastImported="1766323657" videoDataHRef="M 1 1766334598.dat" videoType="vp6 media" fps="1" rate="44100" bits="16" channels="2" width="600" height="400" length="5"/>
+     </media>
+     <symbols>
+          <Include href="Symbol 1.xml" loadImmediate="false" itemID="6947ef39-000001da" lastModified="1766334637"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" selected="true" centerPoint3DX="275" centerPoint3DY="250">
+                                             <matrix>
+                                                  <Matrix tx="125" ty="100"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="150" y="150"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="9575" publishTime="1766334344" publishDebug="true"/>
+          <PublishItem publishSize="25392" publishTime="1766332005"/>
+          <PublishItem publishSize="25381" publishTime="1766331360"/>
+          <PublishItem publishSize="25362" publishTime="1766323775"/>
+          <PublishItem publishSize="30254" publishTime="1766323155"/>
+          <PublishItem publishSize="30301" publishTime="1766323088" publishDebug="true"/>
+          <PublishItem publishSize="6267" publishTime="1766322018" publishDebug="true"/>
+     </publishHistory>
+</DOMDocument>

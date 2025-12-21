@@ -56,6 +56,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +67,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import org.w3c.dom.Element;
 
 /**
  * DefineVideoStream tag - defines video stream.
@@ -403,16 +406,15 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
                     if (renderingPaused) {
                         return;
                     }
-                    //System.out.println("drawed");
                     Graphics2D graphics = (Graphics2D) image.getGraphics();
-                    AffineTransform at = transformation.toTransform();
+                    AffineTransform at = AffineTransform.getScaleInstance(width / (double) activeFrame.getWidth(), height / (double) activeFrame.getHeight());
+                    at.preConcatenate(transformation.toTransform());
                     at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
                     graphics.setTransform(at);
-                    //Point p = transformation.inverse().transform(0, 0);
                     graphics.drawImage(activeFrame, 0, 0,
-                            (int) Math.round(width * SWF.unitDivisor),
-                            (int) Math.round(height * SWF.unitDivisor),
-                            0, 0, width, height,
+                            (int) Math.round(activeFrame.getWidth() * SWF.unitDivisor),
+                            (int) Math.round(activeFrame.getHeight() * SWF.unitDivisor),
+                            0, 0, activeFrame.getWidth(), activeFrame.getHeight(),
                             null);
                 }
             }
@@ -421,6 +423,73 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     @Override
     public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException {
+        if (renderingPaused || !SimpleMediaPlayer.isAvailable()) {
+            return;
+        }
+        if (ratio == -1) {
+            ratio = 0;
+        }
+
+        Set<Integer> keyFrames = getFrames().keySet();
+
+        int f = 0;
+        for (int i = 0; i <= ratio; i++) {
+            if (keyFrames.contains(i)) {
+                f = i;
+            }
+        }
+
+        synchronized (DefineVideoStreamTag.class) {
+            if (!(activeFrame != null && lastFrame == f)) {
+                initPlayer();
+
+                if (mediaPlayer == null) {
+                    return;
+                }
+
+                float oneFr = 0; //1f / (getNumFrames() + 2);
+
+                synchronized (getFrameLock) {
+                    activeFrame = null;
+                }
+                mediaPlayer.setPosition(((float) f) / (getNumFrames() + 2) - (f == 0 ? 0 : oneFr / 10f));
+
+                try {
+                    synchronized (getFrameLock) {
+                        if (activeFrame == null) {
+                            //System.out.println("waiting...");
+                            getFrameLock.wait();
+                            Thread.sleep(10); //magic, but should work
+                            mediaPlayer.pause();
+                            //System.out.println("awakened");
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    //Logger.getLogger(DefineVideoStreamTag.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            lastFrame = f;
+            synchronized (getFrameLock) {
+                if (activeFrame != null) {
+                    if (renderingPaused) {
+                        return;
+                    }
+                    Element image = exporter.createElement("image");
+                    image.setAttribute("width", "" + (activeFrame.getWidth()));
+                    image.setAttribute("height", "" + (activeFrame.getHeight()));
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(activeFrame, "PNG", baos);
+                    image.setAttribute("href", "data:image/png;base64," + Helper.byteArrayToBase64String(baos.toByteArray()));;
+
+                    Matrix mat = Matrix.getScaleInstance(width / (double) activeFrame.getWidth(), height / (double) activeFrame.getHeight());
+                    mat.preConcatenate(transformation);
+                    mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+
+                    image.setAttribute("transform", mat.getSvgTransformationString(1, 1));
+                    exporter.addToGroup(image);
+                }
+            }
+        }
     }
 
     @Override
