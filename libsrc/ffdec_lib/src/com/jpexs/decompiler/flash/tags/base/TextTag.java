@@ -610,11 +610,11 @@ public abstract class TextTag extends DrawableTag {
      * @param transformation Transformation
      * @param colorTransform Color transform
      */
-    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int aaScale) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+        BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false, aaScale);
     }
 
     /**
@@ -674,7 +674,7 @@ public abstract class TextTag extends DrawableTag {
      * @param selectionStart Selection start
      * @param selectionEnd Selection end
      */
-    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int selectionStart, int selectionEnd) {
+    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int selectionStart, int selectionEnd, int aaScale) {
         if (image.getGraphics() instanceof GraphicsTextDrawable) {
             //custom drawing
             ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
@@ -789,17 +789,17 @@ public abstract class TextTag extends DrawableTag {
                     //bounds.Ymin = (int) Math.round(-ascent);
                     //bounds.Ymax = (int) Math.round(descent + leading);
                     Matrix mat2 = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
-                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform, aaScale);
                 }
                 
                 if (shape != null) {
-                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false, aaScale);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
                         RECT bounds = shape.getBounds(1);
                         mat = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
-                        TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
+                        TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform, aaScale);
                     }
                 }
                 

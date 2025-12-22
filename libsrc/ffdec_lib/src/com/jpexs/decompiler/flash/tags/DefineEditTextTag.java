@@ -1278,8 +1278,8 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, int aaScale) {
+        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0, aaScale);
     }
 
     @Override
@@ -1287,25 +1287,25 @@ public class DefineEditTextTag extends TextTag {
         int realTextId = getSwf().getCharacterId(this);
         if (exporter.getNormalizedTexts().containsKey(realTextId) && exporter.getNormalizedTexts().get(realTextId) instanceof DefineEditTextTag) {
             DefineEditTextTag normalizedText = (DefineEditTextTag) exporter.getNormalizedTexts().get(realTextId);
-            normalizedText.render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0);
+            normalizedText.render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0, 1);
             return;
         }
-        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0);
+        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1, 0, 0, 1);
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor, 0, 0);
+        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor, 0, 0, 1);
     }
 
-    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd) {
+    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd, int aaScale) {
         if (image != null && image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
             Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
             int realTextId = getSwf().getCharacterId(this);
             if (normalizedTexts.containsKey(realTextId) && normalizedTexts.get(realTextId) instanceof DefineEditTextTag && normalizedTexts.get(realTextId) != this) {
                 DefineEditTextTag normalizedText = (DefineEditTextTag) normalizedTexts.get(realTextId);
-                normalizedText.render(renderMode, image, svgExporter, htmlCanvasBuilder, transformation, colorTransform, zoom, selectionStart, selectionEnd);
+                normalizedText.render(renderMode, image, svgExporter, htmlCanvasBuilder, transformation, colorTransform, zoom, selectionStart, selectionEnd, aaScale);
                 return;
             }
         }
@@ -1315,7 +1315,7 @@ public class DefineEditTextTag extends TextTag {
             RGB fillColor = new RGBA(Color.white);
             switch (renderMode) {
                 case BITMAP:
-                    drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
+                    drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform, aaScale);
                     break;
                 case HTML5_CANVAS:
                     drawBorderHtmlCanvas(swf, htmlCanvasBuilder, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
@@ -1329,7 +1329,7 @@ public class DefineEditTextTag extends TextTag {
             List<TEXTRECORD> allTextRecords = getTextRecords(swf);
             switch (renderMode) {
                 case BITMAP:
-                    staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform, selectionStart, selectionEnd);
+                    staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform, selectionStart, selectionEnd, aaScale);
                     break;
                 case HTML5_CANVAS:
                     staticTextToHtmlCanvas(zoom, swf, allTextRecords, 2, htmlCanvasBuilder, getBounds(), getTextMatrix(), colorTransform);

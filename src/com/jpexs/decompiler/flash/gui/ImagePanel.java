@@ -5033,10 +5033,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+        
+        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+                
+        
+        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
         }
 
         iconPanel.setImg(image);
@@ -5167,7 +5171,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-        int aaScale = 10;
+        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
         
         int width = aaScale * (int) (viewRect.getWidth() * zoom);
         int height = aaScale * (int) (viewRect.getHeight() * zoom);
@@ -5240,7 +5244,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (Configuration.halfTransparentParentLayersEasy.get()) {
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
                         parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
-                        ignoreDepths);
+                        ignoreDepths, aaScale);
             }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             ignoreDepths.clear();
@@ -5252,16 +5256,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
-        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
+        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
 
-        SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
-        img2.fillTransparent();
-        Graphics2D g2 = (Graphics2D) img2.getGraphics();
-        //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        //g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        //g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
-        g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
-        image = img2;
+        if (Configuration.reduceAntialiasConflationByScalingForDisplay.get()) {
+            SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
+            img2.fillTransparent();
+            Graphics2D g2 = (Graphics2D) img2.getGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            //g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
+            g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
+            image = img2;
+        }
         
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));

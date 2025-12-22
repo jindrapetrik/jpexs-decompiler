@@ -186,9 +186,11 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -4948,17 +4950,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param backGroundColor Background color
      * @param zoom Zoom
      * @param canUseSmoothing Can use smoothing
+     * @param aaScale Antialias conflation reducing scale coefficient
      * @return Image
      */
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom, boolean canUseSmoothing) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom, boolean canUseSmoothing, int aaScale) {
         if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB_PRE);
         }
-
-        RECT rect = displayRect;
+                
+        RECT rect = displayRect;                           
+        
         SerializableImage image = new SerializableImage(
-                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) (rect.getWidth() * zoom / SWF.unitDivisor),
-                rect.getHeight() == 0 ? 1 : (int) (rect.getHeight() * zoom / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
+                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) (rect.getWidth() * zoom * aaScale / SWF.unitDivisor),
+                rect.getHeight() == 0 ? 1 : (int) (rect.getHeight() * zoom * aaScale / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {
@@ -4969,14 +4973,27 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         Matrix m = transformation.clone();
-        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
-        m.scale(zoom);
+        m.translate(-rect.Xmin * zoom * aaScale, -rect.Ymin * zoom * aaScale);
+        m.scale(zoom * aaScale);
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
+        
         ExportRectangle viewRect = new ExportRectangle(rect);
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>());
+        
+        viewRect.xMin *= aaScale;
+        viewRect.yMin *= aaScale;
+        viewRect.xMax *= aaScale;
+        viewRect.yMax *= aaScale;
+        
+        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom * aaScale, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>(), aaScale);
 
+        SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
+        img2.fillTransparent();
+        Graphics2D g2 = (Graphics2D) img2.getGraphics();
+        g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
+        image = img2;
+        
         return image;
     }
 

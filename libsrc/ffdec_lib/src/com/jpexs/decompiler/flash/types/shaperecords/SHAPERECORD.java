@@ -283,14 +283,14 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
                 Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
-                BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
+                BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true, 1 /*??*/);
 
                 // draw bounding boxes
                 if (DRAW_BOUNDING_BOX) {
                     RGB borderColor = new RGBA(Color.black);
                     RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
                     transformation = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(transformation);
-                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), transformation, colorTransform);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), transformation, colorTransform, 1 /*??*/);
                 }
                 pos++;
             }

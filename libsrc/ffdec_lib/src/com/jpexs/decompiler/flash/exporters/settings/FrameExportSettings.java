@@ -44,16 +44,23 @@ public class FrameExportSettings {
      * Transparent background
      */
     public boolean transparentBackground;
+    
+    /**
+     * Antialias conflation reducing scale coefficient
+     */
+    public int aaScale;
 
     /**
      * Constructor.
      * @param mode Mode
      * @param zoom Zoom
      * @param transparentBackground Transparent background
+     * @param aaScale Antialias conflation reducing scale coefficient
      */
-    public FrameExportSettings(FrameExportMode mode, double zoom, boolean transparentBackground) {
+    public FrameExportSettings(FrameExportMode mode, double zoom, boolean transparentBackground, int aaScale) {
         this.mode = mode;
         this.zoom = zoom;
         this.transparentBackground = transparentBackground;
+        this.aaScale = aaScale;
     }
 }

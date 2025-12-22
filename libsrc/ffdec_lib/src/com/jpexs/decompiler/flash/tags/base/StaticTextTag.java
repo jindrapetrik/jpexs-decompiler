@@ -1027,18 +1027,18 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, int aaScale) {
         if (image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
             Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
             int realTextId = getSwf().getCharacterId(this);
             if (normalizedTexts.containsKey(realTextId) && normalizedTexts.get(realTextId) instanceof StaticTextTag) {
                 StaticTextTag normalizedText = (StaticTextTag) normalizedTexts.get(realTextId);
-                staticTextToImage(swf, normalizedText.textRecords, getTextNum(), image, normalizedText.textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
+                staticTextToImage(swf, normalizedText.textRecords, getTextNum(), image, normalizedText.textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0, aaScale);
                 return;
             }
         }
-        staticTextToImage(swf, textRecords, getTextNum(), image, textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
+        staticTextToImage(swf, textRecords, getTextNum(), image, textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0, aaScale);
         /*try {
          TextTag originalTag = (TextTag) getOriginalTag();
          if (isModified()) {

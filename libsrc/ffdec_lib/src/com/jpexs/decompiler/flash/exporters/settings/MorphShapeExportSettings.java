@@ -39,15 +39,22 @@ public class MorphShapeExportSettings {
      * Zoom
      */
     public double zoom;
+    
+    /**
+     * Antialias conflation reducing scale coefficient
+     */
+    public int aaScale;
 
     /**
      * Constructor.
      * @param mode Mode
      * @param zoom Zoom
+     * @param aaScale Antialias conflation reducing scale coefficient
      */
-    public MorphShapeExportSettings(MorphShapeExportMode mode, double zoom) {
+    public MorphShapeExportSettings(MorphShapeExportMode mode, double zoom, int aaScale) {
         this.mode = mode;
         this.zoom = zoom;
+        this.aaScale = aaScale;
     }
 
     /**

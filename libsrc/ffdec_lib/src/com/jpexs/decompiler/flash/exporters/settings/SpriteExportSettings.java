@@ -39,14 +39,21 @@ public class SpriteExportSettings {
      * Zoom
      */
     public double zoom;
+    
+    /**
+     * Antialias conflation reducing scale coefficient
+     */
+    public int aaScale;
 
     /**
      * Constructor.
      * @param mode Mode
      * @param zoom Zoom
+     * @param aaScale Antialias conflation reducing scale coefficient
      */
-    public SpriteExportSettings(SpriteExportMode mode, double zoom) {
+    public SpriteExportSettings(SpriteExportMode mode, double zoom, int aaScale) {
         this.mode = mode;
         this.zoom = zoom;
+        this.aaScale = aaScale;
     }
 }

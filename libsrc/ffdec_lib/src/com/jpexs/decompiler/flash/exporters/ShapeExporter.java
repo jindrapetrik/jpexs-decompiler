@@ -47,7 +47,10 @@ import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -71,7 +74,7 @@ import java.util.logging.Logger;
  */
 public class ShapeExporter {
 
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom) throws IOException, InterruptedException {
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom, int aaScale) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
             return ret;
@@ -124,8 +127,9 @@ public class ShapeExporter {
                         case PNG:
                         case BMP:
                         case WEBP:
-                            int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
-                            int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, aaScale);
+                            int newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            int newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == ShapeExportMode.BMP) {
@@ -135,16 +139,30 @@ public class ShapeExporter {
                                     g.setColor(backColor.toColor());
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
-                            }                            
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            }                 
+                            Matrix m2 = Matrix.getScaleInstance(settings.zoom * realAaScale);
+                            m2.translate(-rect.Xmin, -rect.Ymin);
+                            
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+                            
+                            BufferedImage bim = img.getBufferedImage();
+                            if (realAaScale > 1) {
+                                SerializableImage img2 = new SerializableImage(((newWidth - 1) / realAaScale) + 1,
+                                        ((newHeight - 1) / realAaScale) + 1, SerializableImage.TYPE_INT_ARGB_PRE);
+                                img2.fillTransparent();
+                                Graphics g2 = img2.getGraphics();
+                                g2.drawImage(img.getBufferedImage().getScaledInstance(img2.getWidth(), img2.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
+                                bim = img2.getBufferedImage();
+                            }
+                            
                             if (settings.mode == ShapeExportMode.PNG) {
-                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
+                                ImageHelper.write(bim, ImageFormat.PNG, file);
                             } else if (settings.mode == ShapeExportMode.WEBP) {
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
+                                    fos.write(WebPCodec.encodeLosslessImage(bim));
                                 }
                             } else {
-                                BMPFile.saveBitmap(img.getBufferedImage(), file);
+                                BMPFile.saveBitmap(bim, file);
                             }
                             break;
                         case CANVAS:
