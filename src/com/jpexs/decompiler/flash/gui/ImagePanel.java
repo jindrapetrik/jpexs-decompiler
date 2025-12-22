@@ -5167,8 +5167,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-        int aaScale = 4;
-
+        int aaScale = 10;
+        
         int width = aaScale * (int) (viewRect.getWidth() * zoom);
         int height = aaScale * (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
@@ -5257,9 +5257,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
         img2.fillTransparent();
         Graphics2D g2 = (Graphics2D) img2.getGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
+        //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        //g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        //g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
+        g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
         image = img2;
         
         Graphics2D gg = (Graphics2D) image.getGraphics();
