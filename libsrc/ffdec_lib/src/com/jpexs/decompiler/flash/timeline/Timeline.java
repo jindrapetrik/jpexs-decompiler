@@ -1979,7 +1979,11 @@ public class Timeline {
                     boolean createNew = false;
                     int mtime = time + layer.time;
 
-                    int dframe = mtime % drawable.getNumFrames();                        
+                    int dframe = 0;
+                    int dnumFrames = drawable.getNumFrames();
+                    if (dnumFrames > 0) { //sprites with empty timeline have zero frames
+                        dframe = mtime % dnumFrames;
+                    }                        
                     int dtime = mtime - dframe;
                     
                     SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1, dframe, dtime);
