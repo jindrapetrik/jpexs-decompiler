@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - [#2572] SVG import - incorrect stroke width when transform contains rotation/shear
 - [#2595] FLA export - incorrect handling of imported fonts
 - FLA export - incorrect handling of imported sprites
+- [#2586] AS3 direct editation + decompilation - XML escape sequences and other XML problems
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4087,6 +4088,7 @@ Major version of SWF to XML export changed to 2.
 [#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#2572]: https://www.free-decompiler.com/flash/issues/2572
 [#2595]: https://www.free-decompiler.com/flash/issues/2595
+[#2586]: https://www.free-decompiler.com/flash/issues/2586
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537

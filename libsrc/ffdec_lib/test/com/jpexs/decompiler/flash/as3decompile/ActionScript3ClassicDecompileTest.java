@@ -2850,4 +2850,34 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "m = myXML.*;\r\n",
                  false);
     }
+
+    @Test
+    public void testXml2() {
+        decompileMethod("classic", "testXml2", "var x1:XML = <elem name=\"aaa\" value=\"xxx&#10;\"/>;\r\n"
+                + "var x2:XML = <elem name=\"aaa\" value=\"xxx\"/>;\r\n"
+                + "var x3:XML = <elem name=\"aaa\" value=\"xxx\">\r\n"
+                + "<sub title=\"yyy\">\r\n"
+                + "ampersand: &amp;\r\n"
+                + "</sub>\r\n"
+                + "<sub/>\r\n"
+                + "</elem>;\r\n"
+                + "var x4:XML = <elem>\r\n"
+                + "<elem>\r\n"
+                + "A\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "B\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "<elem>\r\n"
+                + "C\r\n"
+                + "</elem>\r\n"
+                + "</elem>\r\n"
+                + "</elem>;\r\n"
+                + "var x5:XML = <elem attr=\"abc&#13;&#10;&#9;def\"></elem>;\r\n"
+                + "var x_invalid:XML = new XML(\"<aaa >> invalid \\\"\\n\");\r\n"
+                + "var a:int = 5;\r\n"
+                + "trace(\"B\");\r\n",
+                 false);
+    }
 }

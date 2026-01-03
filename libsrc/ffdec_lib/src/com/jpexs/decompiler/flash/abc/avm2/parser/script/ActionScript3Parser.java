@@ -1572,6 +1572,21 @@ public class ActionScript3Parser {
         //TODO: Order of additions as in official compiler
         return ret;
     }
+    
+    public boolean checkBasicXmlOnly(String txt) {
+        lexer = new ActionScriptLexer(txt);
+        try {
+            xml(new ArrayList<>(), null, null, new Reference<>(false), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false, false, new ArrayList<>(), null);
+            
+            ParsedSymbol s = lexer.lex();
+            if (s.type != SymbolType.EOF) {
+                return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        }        
+        return true;
+    }
 
     private GraphTargetItem command(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<AssignableAVM2Item> variables, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
         LexBufferer buf = new LexBufferer();

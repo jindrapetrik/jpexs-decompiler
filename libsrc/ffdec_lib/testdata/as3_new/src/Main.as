@@ -162,6 +162,7 @@ package
         TestWhileTry;
         TestWhileTry2;        
         TestXml;
+        TestXml2;
         
         SetupMyPackage1;
         SetupMyPackage2;
