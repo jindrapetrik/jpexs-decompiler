@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -50,6 +51,10 @@ import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,8 +77,8 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ShapeExporter {
-
+public class ShapeExporter {       
+    
     public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom, int aaScale) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
@@ -147,12 +152,8 @@ public class ShapeExporter {
                             
                             BufferedImage bim = img.getBufferedImage();
                             if (realAaScale > 1) {
-                                SerializableImage img2 = new SerializableImage(((newWidth - 1) / realAaScale) + 1,
-                                        ((newHeight - 1) / realAaScale) + 1, SerializableImage.TYPE_INT_ARGB_PRE);
-                                img2.fillTransparent();
-                                Graphics g2 = img2.getGraphics();
-                                g2.drawImage(img.getBufferedImage().getScaledInstance(img2.getWidth(), img2.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
-                                bim = img2.getBufferedImage();
+                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
+                                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                             }
                             
                             if (settings.mode == ShapeExportMode.PNG) {

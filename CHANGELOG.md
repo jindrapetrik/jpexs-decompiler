@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Save as EXE through context menu of SWF files (previously only in toolbar)
 - Slovenian translation
 - SVG export - video frames
-- [#2592], [#2154], [#2591] - Better handling of antialias conflation artifacts (by scaling),
+- [#2592], [#2154], [#2591], [#2596] - Better handling of antialias conflation artifacts (by scaling),
   can be enabled in Advanced Settings / Display and Export.
 
 ### Fixed
@@ -4075,6 +4075,7 @@ Major version of SWF to XML export changed to 2.
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
 [#2154]: https://www.free-decompiler.com/flash/issues/2154
 [#2591]: https://www.free-decompiler.com/flash/issues/2591
+[#2596]: https://www.free-decompiler.com/flash/issues/2596
 [#2570]: https://www.free-decompiler.com/flash/issues/2570
 [#2571]: https://www.free-decompiler.com/flash/issues/2571
 [#2575]: https://www.free-decompiler.com/flash/issues/2575

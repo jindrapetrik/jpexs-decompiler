@@ -177,6 +177,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
 import com.jpexs.helpers.ProgressListener;
@@ -189,6 +190,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -5025,12 +5027,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         viewRect.yMax *= aaScale;
         
         timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom * aaScale, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>(), aaScale);
-
-        SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
-        img2.fillTransparent();
-        Graphics2D g2 = (Graphics2D) img2.getGraphics();
-        g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
-        image = img2;
+        
+        if (aaScale > 1) {
+            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));        
+        }
         
         return image;
     }
