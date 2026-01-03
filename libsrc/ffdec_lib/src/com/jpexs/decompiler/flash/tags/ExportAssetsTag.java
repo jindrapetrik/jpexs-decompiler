@@ -155,7 +155,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         needed.addAll(tags);
     }
 

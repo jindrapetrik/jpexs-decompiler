@@ -42,7 +42,8 @@ public class DefineBeforeUsageFixer {
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);            
             Set<Integer> needed = new LinkedHashSet<>();
-            t.getNeededCharactersDeep(needed);            
+            Set<String> neededClasses = new LinkedHashSet<>();
+            t.getNeededCharactersDeep(needed, neededClasses);
             for (int chId : needed) {
                 if (walkedCharacters.contains(chId)) {
                     continue;
@@ -76,5 +77,5 @@ public class DefineBeforeUsageFixer {
             }
         }
         return i;
-    }
+    }        
 }

@@ -47,11 +47,11 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     public LINESTYLEARRAY lineStyles;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        fillStyles.getNeededCharacters(needed, swf);
-        lineStyles.getNeededCharacters(needed, swf);
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
+        fillStyles.getNeededCharacters(needed, neededClasses, swf);
+        lineStyles.getNeededCharacters(needed, neededClasses, swf);
         for (SHAPERECORD r : shapeRecords) {
-            r.getNeededCharacters(needed, swf);
+            r.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

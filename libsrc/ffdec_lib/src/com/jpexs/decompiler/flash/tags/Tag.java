@@ -842,41 +842,51 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-    }
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
+    }       
 
     /**
      * Gets missing needed characters.
      * @param needed Needed
-     * @return Missing needed characters
+     * @param neededClasses Needed classes
      */
-    public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
+    public void getMissingNeededCharacters(Set<Integer> needed, Set<String> neededClasses, Set<Integer> resultNeeded, Set<String> resultNeededClasses) {
         Set<Integer> needed2 = new LinkedHashSet<>(needed);
-        if (needed2.isEmpty()) {
-            return new LinkedHashSet<>();
+        Set<String> needed2Classes = new LinkedHashSet<>(neededClasses);
+        if (needed2.isEmpty() && needed2Classes.isEmpty()) {
+            resultNeeded.clear();
+            resultNeededClasses.clear();
+            return;
         }
         Timelined tim = getTimelined();
         if (tim == null) {
-            return needed2;
+            resultNeeded.addAll(needed2);
+            resultNeededClasses.addAll(needed2Classes);
+            return;
         }
         ReadOnlyTagList tags = tim.getTags();
         for (int i = tags.indexOf(this) - 1; i >= 0; i--) {
             if (tags.get(i) instanceof ImportTag) {
                 ImportTag it = (ImportTag) tags.get(i);
                 needed2.removeAll(it.getAssets().keySet());
-                if (needed2.isEmpty()) {
-                    return needed2;
+                if (needed2.isEmpty() && needed2Classes.isEmpty()) {
+                    resultNeeded.addAll(needed2);
+                    resultNeededClasses.addAll(needed2Classes);
+                    return;
                 }
             }
             if (tags.get(i) instanceof CharacterTag) {
                 int charId = ((CharacterTag) tags.get(i)).getCharacterId();
-                needed2.remove(charId);
-                if (needed2.isEmpty()) {
-                    return needed2;
+                needed2.remove(charId);                
+                needed2Classes.removeAll(((CharacterTag) tags.get(i)).getClassNames());
+                
+                if (needed2.isEmpty() && needed2Classes.isEmpty()) {
+                    resultNeeded.addAll(needed2);
+                    resultNeededClasses.addAll(needed2Classes);
+                    return;
                 }
             }
-        }
-        return needed2;
+        }        
     }
 
     @Override
@@ -888,16 +898,17 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public boolean removeCharacter(int characterId) {
         return false;
     }
-
+    
     /**
      * Gets needed characters deep.
-     * @param needed Needed
+     * @param needed Needed character ids
+     * @param neededClasses Needed classes
      */
-    public void getNeededCharactersDeep(Set<Integer> needed) {
+    public void getNeededCharactersDeep(Set<Integer> needed, Set<String> neededClasses) {
         Set<Integer> needed2 = new LinkedHashSet<>();
-        getNeededCharacters(needed2, swf);
+        getNeededCharacters(needed2, neededClasses, swf);
         List<Integer> needed3 = new ArrayList<>(needed2);
-
+        
         for (int i = 0; i < needed3.size(); i++) {
             int characterId = needed3.get(i);
             if (swf == null) {
@@ -909,7 +920,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                 if (character.isImported()) {
                     continue;
                 }
-                character.getNeededCharacters(needed4, swf);
+                character.getNeededCharacters(needed4, neededClasses, swf);
                 List<Integer> newItems = new ArrayList<>();
                 for (int n : needed4) {
                     int index = needed3.indexOf((Integer) n);
@@ -937,12 +948,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
-    private void getDependentCharactersOnTimelined(Timelined timelined, Set<Integer> dependent) {
+    private void getDependentCharactersOnTimelined(Timelined timelined, Set<Integer> dependent, Set<String> dependentClasses) {
         for (Tag tag : timelined.getTags()) {
             if (tag instanceof CharacterTag) {
                 if (((CharacterTag) tag).getCharacterId() != -1) {
                     Set<Integer> needed = new HashSet<>();
-                    tag.getNeededCharactersDeep(needed);
+                    Set<String> neededClasses = new HashSet<>();
+                    tag.getNeededCharactersDeep(needed, neededClasses);
                     for (int dep : dependent) {
                         if (needed.contains(dep)) {
                             dependent.add(((CharacterTag) tag).getCharacterId());
@@ -952,17 +964,18 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                 }
             }
             if (tag instanceof DefineSpriteTag) {
-                getDependentCharactersOnTimelined((DefineSpriteTag) tag, dependent);
+                getDependentCharactersOnTimelined((DefineSpriteTag) tag, dependent, dependentClasses);
             }
         }
     }
 
     /**
      * Gets dependent characters.
-     * @param dependent Result
+     * @param dependent Result - dependent character ids
+     * @param dependentClasses Result - dependent classes
      */
-    public void getDependentCharacters(Set<Integer> dependent) {
-        getDependentCharactersOnTimelined(swf, dependent);
+    public void getDependentCharacters(Set<Integer> dependent, Set<String> dependentClasses) {
+        getDependentCharactersOnTimelined(swf, dependent, dependentClasses);
     }
 
     /**

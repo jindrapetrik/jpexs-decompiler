@@ -173,9 +173,11 @@ public class ShapeExporter {
                                 CanvasShapeExporter cse = new CanvasShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                 cse.export();
                                 Set<Integer> needed = new HashSet<>();
+                                Set<String> neededClasses = new HashSet<>();
                                 needed.add(st.getCharacterId());
-                                st.getNeededCharactersDeep(needed);
+                                st.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }

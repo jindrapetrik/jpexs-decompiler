@@ -137,7 +137,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
     public MATRIX bitmapMatrix;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if ((fillStyleType == REPEATING_BITMAP)
                 || (fillStyleType == CLIPPED_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)

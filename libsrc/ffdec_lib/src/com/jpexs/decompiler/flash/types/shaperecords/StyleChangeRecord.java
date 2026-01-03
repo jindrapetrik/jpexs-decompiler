@@ -85,9 +85,9 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public int numLineBits;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (stateNewStyles) {
-            fillStyles.getNeededCharacters(needed, swf);
+            fillStyles.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

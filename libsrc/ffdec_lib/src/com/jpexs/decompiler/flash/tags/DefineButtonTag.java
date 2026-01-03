@@ -323,7 +323,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (BUTTONRECORD rec : characters) {
             needed.add(rec.characterId);
         }

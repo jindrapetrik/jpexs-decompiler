@@ -92,7 +92,7 @@ public class StartSound2Tag extends Tag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         int characterId = swf.getCharacterId(swf.getCharacterByClass(soundClassName));
         needed.add(characterId);
     }        

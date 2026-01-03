@@ -56,9 +56,9 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
     }
     
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (FILLSTYLE fs : fillStyles) {
-            fs.getNeededCharacters(needed, swf);
+            fs.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

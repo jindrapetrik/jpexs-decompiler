@@ -149,9 +149,9 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     public FILLSTYLE fillType;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (hasFillFlag) {
-            fillType.getNeededCharacters(needed, swf);
+            fillType.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

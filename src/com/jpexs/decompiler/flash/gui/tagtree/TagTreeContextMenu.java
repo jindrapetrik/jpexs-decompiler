@@ -168,8 +168,10 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -2609,7 +2611,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 AlterCharacterTag alterTag = new AlterCharacterTag(targetSwf, targetSameNameCharacter.getCharacterId());
 
                 Set<Integer> needed = new LinkedHashSet<>();
-                targetSameNameCharacter.getNeededCharacters(needed, targetSwf);
+                Set<String> neededClasses = new LinkedHashSet<>();
+                //TODO: handle classes?
+                targetSameNameCharacter.getNeededCharacters(needed, neededClasses, targetSwf);
                 int ind = realTargetTimelined.indexOfTag(targetSameNameCharacter);
                 realTargetTimelined.removeTag(ind);
                 realTargetTimelined.addTag(ind, alterTag);
@@ -5066,20 +5070,32 @@ public class TagTreeContextMenu extends JPopupMenu {
         Set<TreeItem> newItems = new LinkedHashSet<>();
         for (TreeItem item : items) {
             Set<Integer> needed = new LinkedHashSet<>();
+            Set<String> neededClasses = new LinkedHashSet<>();
             Tag tag = (Tag) item;
-            tag.getNeededCharactersDeep(needed);
+            tag.getNeededCharactersDeep(needed, neededClasses);
             if (tag instanceof CharacterTag) {
                 needed.add(((CharacterTag) tag).getCharacterId());
+                for (String cls : ((CharacterTag) tag).getClassNames()) {
+                    neededClasses.add(cls);
+                }
             }
+            
+            Set<CharacterTag> neededChars = Collections.newSetFromMap(new IdentityHashMap<>());
             for (Integer characterId : needed) {
                 CharacterTag neededTag = sourceSwf.getCharacter(characterId);
+                neededChars.add(neededTag);
+            }
+            for (String cls : neededClasses) {
+                neededChars.add(sourceSwf.getCharacterByClass(cls));
+            }
+            for (CharacterTag neededTag : neededChars) {
                 newItems.add(neededTag);
                 List<Integer> mappedClasses = AbstractTagTree.getMappedTagIdsForClass(neededTag.getClass());
                 ReadOnlyTagList tags = neededTag.getTimelined().getTags();
                 for (int i = tags.indexOf(neededTag) + 1; i < tags.size(); i++) {
                     if (tags.get(i) instanceof CharacterIdTag) {
                         CharacterIdTag characterIdTag = (CharacterIdTag) tags.get(i);
-                        if (mappedClasses.contains(((Tag) characterIdTag).getId()) && characterIdTag.getCharacterId() == characterId) {
+                        if (mappedClasses.contains(((Tag) characterIdTag).getId()) && characterIdTag.getCharacterId() == neededTag.getCharacterId() && ((Tag) characterIdTag).getSwf() == neededTag.getSwf()) {
                             newItems.add((Tag) characterIdTag);
                         }
                     }
@@ -6065,7 +6081,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);
             if (dependentCharacters.isEmpty()) {
                 Set<Integer> needed = new LinkedHashSet<>();
-                ct.getNeededCharacters(needed, swf);
+                Set<String> neededClasses = new LinkedHashSet<>();
+                //TODO: handle classes?
+                ct.getNeededCharacters(needed, neededClasses, swf);
                 List<CharacterIdTag> attachedTags = swf.getCharacterIdTags(ch);
                 for (CharacterIdTag cit : attachedTags) {
                     if (cit instanceof Tag) {

@@ -69,7 +69,9 @@ public class SpriteImporter {
             Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);
             if (dependentCharacters.isEmpty()) {
                 Set<Integer> needed = new LinkedHashSet<>();
-                ct.getNeededCharacters(needed, swf);
+                Set<String> neededClasses = new LinkedHashSet<>();                
+                ct.getNeededCharacters(needed, neededClasses, swf);
+                //TODO: handle classes?
                 List<CharacterIdTag> attachedTags = swf.getCharacterIdTags(ch);
                 for (CharacterIdTag cit : attachedTags) {
                     if (cit instanceof Tag) {

@@ -149,10 +149,10 @@ public abstract class MorphShapeTag extends DrawableTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        morphFillStyles.getNeededCharacters(needed, swf);
-        startEdges.getNeededCharacters(needed, swf);
-        endEdges.getNeededCharacters(needed, swf);
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
+        morphFillStyles.getNeededCharacters(needed, neededClasses, swf);
+        startEdges.getNeededCharacters(needed, neededClasses, swf);
+        endEdges.getNeededCharacters(needed, neededClasses, swf);
     }
 
     @Override

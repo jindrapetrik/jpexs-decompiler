@@ -139,10 +139,10 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         SHAPEWITHSTYLE shapes = getShapes();
         if (shapes != null) {
-            getShapes().getNeededCharacters(needed, swf);
+            getShapes().getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

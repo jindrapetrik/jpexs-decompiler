@@ -426,7 +426,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
     private Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
+    private Map<TreeItem, Set<String>> neededCharacterClasses = new WeakHashMap<>();
     private Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
+    private Map<TreeItem, Set<String>> missingNeededCharacterClasses = new WeakHashMap<>();
 
     private CalculateMissingNeededThread calculateMissingNeededThread;
 
@@ -4925,21 +4927,28 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         List<TreeItem> sel = getAllSelected();
         Set<Integer> needed = new HashSet<>();
+        Set<String> neededClasses = new HashSet<>();
         for (TreeItem item : sel) {
             if (item instanceof CharacterTag) {
                 CharacterTag characterTag = (CharacterTag) item;
-                characterTag.getNeededCharactersDeep(needed);
+                characterTag.getNeededCharactersDeep(needed, neededClasses);
                 needed.add(characterTag.getCharacterId());
             }
         }
 
         List<Tag> tagsToRemove = new ArrayList<>();
-        for (Tag tag : swf.getTags()) {
+        loopt: for (Tag tag : swf.getTags()) {
             if (tag instanceof CharacterTag) {
                 CharacterTag characterTag = (CharacterTag) tag;
-                if (!needed.contains(characterTag.getCharacterId())) {
-                    tagsToRemove.add(tag);
+                for (String cls : characterTag.getClassNames()) {
+                    if (neededClasses.contains(cls)) {
+                        continue loopt;
+                    }
                 }
+                if (needed.contains(characterTag.getCharacterId())) {
+                    continue loopt;
+                }
+                tagsToRemove.add(tag);
             }
         }
 
@@ -6485,13 +6494,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             tag.getTagInfo(tagInfo);
 
             Set<Integer> needed;
+            Set<String> neededClasses;
+            
             if (neededCharacters.containsKey(treeItem)) {
                 needed = neededCharacters.get(treeItem);
+                neededClasses = neededCharacterClasses.get(treeItem);
             } else {
                 needed = new LinkedHashSet<>();
-                tag.getNeededCharactersDeep(needed);
+                neededClasses = new LinkedHashSet<>();
+                tag.getNeededCharactersDeep(needed, neededClasses);
                 neededCharacters.put(treeItem, needed);
+                neededCharacterClasses.put(treeItem, neededClasses);
             }
+            
+            
 
             if (needed.size() > 0) {
                 tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
@@ -6826,7 +6842,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> neededMap, Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
+    private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> neededMap, Map<TreeItem, Set<Integer>> missingNeededCharacters, Map<TreeItem, Set<String>> missingNeededCharacterClasses, Timelined tim) {
         List<Tag> tags = tim.getTags().toArrayList();
         Map<Integer, List<CharacterIdTag>> nestedTags = new HashMap<>();
         for (Tag t : tags) {
@@ -6844,7 +6860,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     characterId = ((CharacterIdTag) t).getCharacterId();
                 }
                 Set<Integer> needed = new LinkedHashSet<>();
-                t.getNeededCharactersDeep(needed);
+                Set<String> neededClasses = new LinkedHashSet<>();
+                t.getNeededCharactersDeep(needed, neededClasses);
                 neededMap.put(t, needed);
                 if ((t instanceof CharacterIdTag) && !(t instanceof PlaceObjectTypeTag)) {
                     needed = new HashSet<>();
@@ -6853,15 +6870,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 if ((t instanceof PlaceObjectTypeTag) && (characterId != -1) && nestedTags.containsKey(characterId)) {
                     for (CharacterIdTag n : nestedTags.get(characterId)) {
-                        ((Tag) n).getNeededCharactersDeep(needed);
+                        ((Tag) n).getNeededCharactersDeep(needed, neededClasses);
                     }
                 }
 
-                missingNeededCharacters.put(t, t.getMissingNeededCharacters(needed));
+                Set<Integer> resultNeeded = new LinkedHashSet<>();
+                Set<String> resultNeededClasses = new LinkedHashSet<>();
+                t.getMissingNeededCharacters(needed, neededClasses, resultNeeded, resultNeededClasses);
+                
+                missingNeededCharacters.put(t, resultNeeded);    
+                missingNeededCharacterClasses.put(t, resultNeededClasses);
                 if (characterId != -1 && tim.getTimeline().swf.getCharacter(characterId) == null) {
                     missingNeededCharacters.get(t).add(characterId);
                 }
-
+                
+                //FIXME: missingNeededCharacterClasses ??
             }
             /*if (t instanceof DefineSpriteTag) {
                 calculateMissingNeededCharacters(neededMap, missingNeededCharacters, (DefineSpriteTag) t);
@@ -6871,19 +6894,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void calculateMissingNeededCharacters() {
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
+        Map<TreeItem, Set<String>> missingNeededCharacterClasses = new WeakHashMap<>();
         Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
 
         List<OpenableList> swfsLists = new ArrayList<>(openables);
         for (OpenableList swfList : swfsLists) {
             for (Openable openable : swfList) {
                 if (openable instanceof SWF) {
-                    calculateMissingNeededCharacters(neededCharacters, missingNeededCharacters, (SWF) openable);
+                    calculateMissingNeededCharacters(neededCharacters, missingNeededCharacters, missingNeededCharacterClasses, (SWF) openable);
                     //TODO: how about SubSWFs???
                 }
             }
         }
         this.neededCharacters = neededCharacters;
         this.missingNeededCharacters = missingNeededCharacters;
+        
         tagTree.setMissingNeededCharacters(missingNeededCharacters);
         tagListTree.setMissingNeededCharacters(missingNeededCharacters);
     }

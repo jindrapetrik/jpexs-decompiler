@@ -1237,16 +1237,24 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (hasFont) {
-            needed.add(fontId);
+            needed.add(fontId);            
+        }
+        if (hasFontClass) {
+            neededClasses.add(fontClass);
         }
         if (html && hasText) {
             List<CharacterWithStyle> chs = getTextWithStyle();
             for (CharacterWithStyle ch : chs) {
                 if (ch.style.font != null) {
-                    needed.add(swf.getCharacterId(ch.style.font));
-                }
+                    int subFontId = swf.getCharacterId(ch.style.font);
+                    if (subFontId != -1) {
+                        needed.add(subFontId);
+                    } else {
+                        neededClasses.addAll(ch.style.font.getClassNames());
+                    }
+                }               
             }
         }
     }

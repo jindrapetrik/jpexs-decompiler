@@ -957,11 +957,12 @@ public class Timeline {
     /**
      * Gets needed characters for this timeline.
      *
-     * @param usedCharacters Result
+     * @param usedCharacters Result - used characters
+     * @param usedClasses Result - used classes
      */
-    public void getNeededCharacters(Set<Integer> usedCharacters) {
+    public void getNeededCharacters(Set<Integer> usedCharacters, Set<String> usedClasses) {
         for (int i = 0; i < getFrameCount(); i++) {
-            getNeededCharacters(i, usedCharacters);
+            getNeededCharacters(i, usedCharacters, usedClasses);
         }
     }
 
@@ -969,11 +970,12 @@ public class Timeline {
      * Gets needed characters for this timeline.
      *
      * @param frames List of frames
-     * @param usedCharacters Result
+     * @param usedCharacters Result - used character ids
+     * @param usedClasses Result - used classes
      */
-    public void getNeededCharacters(List<Integer> frames, Set<Integer> usedCharacters) {
+    public void getNeededCharacters(List<Integer> frames, Set<Integer> usedCharacters, Set<String> usedClasses) {
         for (int frame = 0; frame < getFrameCount(); frame++) {
-            getNeededCharacters(frame, usedCharacters);
+            getNeededCharacters(frame, usedCharacters, usedClasses);
         }
     }
 
@@ -981,9 +983,10 @@ public class Timeline {
      * Gets needed characters for a frame.
      *
      * @param frame Frame index
-     * @param usedCharacters Result
+     * @param usedCharacters Result - used character ids
+     * @param usedClasses Result - used classes
      */
-    public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
+    public void getNeededCharacters(int frame, Set<Integer> usedCharacters, Set<String> usedClasses) {
         Frame frameObj = getFrame(frame);
         for (int depth : frameObj.layers.keySet()) {
             DepthState layer = frameObj.layers.get(depth);
@@ -992,7 +995,8 @@ public class Timeline {
                 continue;
             }
             usedCharacters.add(ch.getCharacterId());
-            ch.getNeededCharactersDeep(usedCharacters);
+            usedClasses.addAll(ch.getClassNames());
+            ch.getNeededCharactersDeep(usedCharacters, usedClasses);
         }
     }
 

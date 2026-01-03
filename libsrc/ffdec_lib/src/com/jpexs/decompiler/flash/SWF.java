@@ -392,6 +392,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     @Internal
     private volatile Map<Integer, Set<Integer>> dependentFrames;
+    
+    /**
+     * Map of class to Set of dependent frame numbers.
+     */
+    @Internal
+    private volatile Map<String, Set<Integer>> dependentClassFrames;
 
     /**
      * List of ABC container tags.
@@ -1106,7 +1112,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 int characterId = ((CharacterTag) tag).getCharacterId();
                 if (characterId != -1) {
                     Set<Integer> needed = new HashSet<>();
-                    tag.getNeededCharacters(needed, this);
+                    Set<String> neededClasses = new HashSet<>();
+                    //TODO: compute classes
+                    tag.getNeededCharacters(needed, neededClasses, this);
                     for (Integer needed1 : needed) {
                         Set<Integer> s = dep.get(needed1);
                         if (s == null) {
@@ -1197,13 +1205,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public void computeDependentFrames() {
         Map<Integer, Set<Integer>> dep = new HashMap<>();
+        Map<String, Set<Integer>> depCls = new HashMap<>();
         Timeline tim = getTimeline();
         for (int i = 0; i < tim.getFrameCount(); i++) {
             Frame frame = tim.getFrame(i);
             Set<Integer> needed = new HashSet<>();
-            frame.getNeededCharactersDeep(needed);
+            Set<String> neededClasses = new HashSet<>();
+            frame.getNeededCharactersDeep(needed, neededClasses);
             for (Integer needed1 : needed) {
-                Set<Integer> s = dep.get(needed1);
+                Set<Integer> s = dep.get(needed1);                
                 if (s == null) {
                     s = new HashSet<>();
                     dep.put(needed1, s);
@@ -1211,9 +1221,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                 s.add(i);
             }
+            for (String needed1 : neededClasses) {
+                Set<Integer> s = depCls.get(needed1); 
+                if (s == null) {
+                    s = new HashSet<>();
+                    depCls.put(needed1, s);
+                }
+
+                s.add(i);
+            }
         }
 
         dependentFrames = dep;
+        dependentClassFrames = depCls;
     }
 
     /**
@@ -1234,6 +1254,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return dependentFrames.get(characterId);
     }
 
+    /**
+     * Gets dependent frames for specified AS3 class.
+     *
+     * @param characterClass Character id
+     * @return Set of dependent characterids
+     */
+    public Set<Integer> getDependentFramesByClass(String characterClass) {
+        if (dependentClassFrames == null) {
+            synchronized (this) {
+                if (dependentClassFrames == null) {
+                    computeDependentFrames();
+                }
+            }
+        }
+
+        return dependentClassFrames.get(characterClass);
+    }
+    
     /**
      * Gets character tag by character id
      *
@@ -6185,14 +6223,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Set<Integer> ct = new HashSet<>();
         Map<Integer, Set<Integer>> characterToNeeded = new HashMap<>();
-
+                
         for (Tag t : getTags()) {
             if (t instanceof CharacterTag) {
                 CharacterTag cht = (CharacterTag) t;
                 if (cht.getCharacterId() != -1) {
                     Set<Integer> needed = new HashSet<>();
-                    cht.getNeededCharacters(needed, this);
-                    characterToNeeded.put(cht.getCharacterId(), needed);
+                    Set<String> neededClasses = new HashSet<>();
+                    cht.getNeededCharacters(needed, neededClasses, this);                    
+                    //TODO: check cyclic classes
+                    characterToNeeded.put(cht.getCharacterId(), needed);                    
                 }
             }
         }

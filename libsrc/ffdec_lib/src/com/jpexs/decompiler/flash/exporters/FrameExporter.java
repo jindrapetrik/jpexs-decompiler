@@ -397,8 +397,9 @@ public class FrameExporter {
                         fos.write(Utf8Helper.getBytes("\r\n"));
                         fos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
                         Set<Integer> library = new HashSet<>();
-                        ftim.getNeededCharacters(fframes, library);
-
+                        Set<String> libraryClasses = new HashSet<>();
+                        ftim.getNeededCharacters(fframes, library, libraryClasses);
+                        //FIXME!!! Handle Library Classes
                         SWF.libraryToHtmlCanvas(fswf, library, fos);
 
                         String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;

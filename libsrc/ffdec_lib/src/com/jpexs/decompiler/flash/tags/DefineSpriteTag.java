@@ -419,7 +419,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (Tag t : getTags()) {           
             if (
                     (t instanceof PlaceObjectTypeTag)
@@ -427,7 +427,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                     || (t instanceof StartSound2Tag)
                     || (t instanceof VideoFrameTag)
                 ) {
-                t.getNeededCharacters(needed, swf);
+                t.getNeededCharacters(needed, neededClasses, swf);
             }            
         }
     }
@@ -538,15 +538,13 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
-        Set<Integer> ret = new LinkedHashSet<>();
+    public void getMissingNeededCharacters(Set<Integer> needed, Set<String> neededClasses, Set<Integer> resultNeeded, Set<String> resultNeededClasses) {
         for (Tag tag : getTags()) {
             Set<Integer> subNeeded = new HashSet<>();
-            tag.getNeededCharactersDeep(subNeeded);
-            Set<Integer> sub = tag.getMissingNeededCharacters(subNeeded);
-            ret.addAll(sub);
-        }
-        return ret;
+            Set<String> subNeededClasses = new HashSet<>();
+            tag.getNeededCharactersDeep(subNeeded, subNeededClasses);
+            tag.getMissingNeededCharacters(subNeeded, subNeededClasses, resultNeeded, resultNeededClasses);            
+        }       
     }
 
     @Override

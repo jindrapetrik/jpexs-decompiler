@@ -143,7 +143,7 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         needed.add(characterId);
     }
 

@@ -262,9 +262,10 @@ public class Frame implements TreeItem, Exportable {
     /**
      * Get needed characters for this frame to deepest level.
      *
-     * @param needed Result
+     * @param needed Result - needed character ids
+     * @param neededClasses Result - needed classes
      */
-    public void getNeededCharactersDeep(Set<Integer> needed) {
+    public void getNeededCharactersDeep(Set<Integer> needed, Set<String> neededClasses) {
         for (Tag t : innerTags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
@@ -272,7 +273,7 @@ public class Frame implements TreeItem, Exportable {
                 if (characterId != -1) {
                     CharacterTag character = place.getSwf().getCharacter(characterId);
                     if (character != null) {
-                        character.getNeededCharactersDeep(needed);
+                        character.getNeededCharactersDeep(needed, neededClasses);
                     }
                     needed.add(characterId);
                 }

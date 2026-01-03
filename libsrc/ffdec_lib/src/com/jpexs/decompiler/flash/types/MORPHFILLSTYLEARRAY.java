@@ -34,9 +34,9 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
     public MORPHFILLSTYLE[] fillStyles;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (MORPHFILLSTYLE fs : fillStyles) {
-            fs.getNeededCharacters(needed, swf);
+            fs.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

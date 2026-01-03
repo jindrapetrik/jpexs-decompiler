@@ -982,11 +982,11 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (TEXTRECORD tr : textRecords) {
             if (tr.styleFlagsHasFont) {
                 needed.add(tr.fontId);
-            }
+            }            
         }
     }
 

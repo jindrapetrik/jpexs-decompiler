@@ -543,7 +543,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (placeFlagHasCharacter) {
             needed.add(characterId);
         }
@@ -551,6 +551,8 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
             int chId = swf.getCharacterId(swf.getCharacterByClass(className));
             if (chId != -1) {
                 needed.add(chId);
+            } else {
+                neededClasses.add(className);
             }
         }
     }

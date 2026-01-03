@@ -46,7 +46,7 @@ public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
     public RGB color;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
     }
 
     @Override

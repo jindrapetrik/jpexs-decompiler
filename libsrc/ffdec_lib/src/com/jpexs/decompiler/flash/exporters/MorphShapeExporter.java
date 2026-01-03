@@ -254,10 +254,12 @@ public class MorphShapeExporter {
                                 CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(mst.getShapeNum(), ((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
                                 cse.export();
                                 Set<Integer> needed = new HashSet<>();
+                                Set<String> neededClasses = new HashSet<>();
                                 CharacterTag ct = ((CharacterTag) mst);
                                 needed.add(ct.getCharacterId());
-                                ct.getNeededCharactersDeep(needed);
+                                ct.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(ct.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }

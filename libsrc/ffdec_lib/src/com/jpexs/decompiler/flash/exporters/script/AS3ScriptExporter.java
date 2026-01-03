@@ -684,12 +684,16 @@ public class AS3ScriptExporter {
                             }
 
                             Set<Integer> neededCharacters = new LinkedHashSet<>();
+                            Set<String> neededCharacterClasses = new LinkedHashSet<>();
                             List<Integer> symbolClassIds = new ArrayList<>();
                             List<String> symbolClassNames = new ArrayList<>();
                             for (CharacterTag st : assetsTagList) {
-                                st.getNeededCharactersDeep(neededCharacters);
+                                st.getNeededCharactersDeep(neededCharacters, neededCharacterClasses);
                                 neededCharacters.add(swf.getCharacterId(st));
                             }
+                            
+                            //TODO: handle neededCharacterClasses?
+                            
                             for (int n : neededCharacters) {
                                 CharacterTag ct = (CharacterTag) swf.getCharacter(n);
                                 if (ct == null) {

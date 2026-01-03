@@ -81,7 +81,9 @@ public class TimelinedMaker {
                 jpegTablesTag = imageTag.getSwf().getJtt();
             }
             Set<Integer> needed = new LinkedHashSet<>();
-            imageTag.getNeededCharacters(needed, swf);
+            Set<String> neededClasses = new LinkedHashSet<>();
+            //TODO: handle classes?
+            imageTag.getNeededCharacters(needed, neededClasses, swf);
 
             List<CharacterTag> neededCopies = new ArrayList<>();
             for (int n : needed) {

@@ -144,7 +144,7 @@ public class DefineButtonSoundTag extends Tag implements CharacterModifier {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (buttonSoundChar0 != 0) {
             needed.add(buttonSoundChar0);
         }

@@ -29,10 +29,11 @@ public interface NeedsCharacters {
     /**
      * Get needed characters.
      *
-     * @param needed Result
+     * @param needed Result - needed character ids
+     * @param neededClasses Result - needed classes
      * @param swf SWF file
      */
-    public void getNeededCharacters(Set<Integer> needed, SWF swf);
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf);
 
     /**
      * Replace character.
