@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -213,7 +214,7 @@ public class TimelinedMaker {
             @Override
             public Timeline getTimeline() {
                 if (tim == null) {
-                    Timeline timeline = new Timeline(tag.getSwf(), this, fChId, getRect());
+                    Timeline timeline = new Timeline(tag.getSwf(), this, fChId, getRect(), getFilterDimensions());
                     initTimeline(timeline);
                     tim = timeline;
                 }
@@ -368,6 +369,16 @@ public class TimelinedMaker {
             public SWF getSwf() {
                 return tag.getSwf();
             }
+            
+            @Override
+            public Dimension getFilterDimensions() {
+                return new Dimension(0, 0);
+            }
+
+            @Override
+            public RECT getRectWithFilters() {
+                return getRect();
+            }                        
         };
     }
 }

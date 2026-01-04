@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2575] dumpSWF CLI command displayed import assets GUI dialog
 - [#2573] AS3 - Incorrect uint/int/Number coercion
 - AS3 local registers type propagation
-- [#2566] Export bounds of sprites and buttons not containg filter offsets
+- [#2566], [#2594] Export bounds of sprites and buttons not containg filter offsets
 - [#2582] Font normalizer setting small texts when no assigned glyph found
 - PDF export - not rendering video stream frames
 - [#2585] AS1/2 direct editation - continue and break in for..in loop
@@ -4082,6 +4082,7 @@ Major version of SWF to XML export changed to 2.
 [#2575]: https://www.free-decompiler.com/flash/issues/2575
 [#2573]: https://www.free-decompiler.com/flash/issues/2573
 [#2566]: https://www.free-decompiler.com/flash/issues/2566
+[#2594]: https://www.free-decompiler.com/flash/issues/2594
 [#2582]: https://www.free-decompiler.com/flash/issues/2582
 [#2585]: https://www.free-decompiler.com/flash/issues/2585
 [#2589]: https://www.free-decompiler.com/flash/issues/2589

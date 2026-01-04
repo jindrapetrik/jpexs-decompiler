@@ -248,15 +248,15 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
                             }
                             double x = filter.getDeltaX();
                             double y = filter.getDeltaY();
-                            deltaXMax += x * SWF.unitDivisor;
-                            deltaYMax += y * SWF.unitDivisor;
+                            deltaXMax += x;
+                            deltaYMax += y;
                         }
                     }
                     
-                    r2.Xmin -= deltaXMax;
-                    r2.Ymin -= deltaYMax;
-                    r2.Xmax += deltaXMax;
-                    r2.Ymax += deltaYMax;
+                    r2.Xmin -= Math.ceil(deltaXMax) * SWF.unitDivisor;
+                    r2.Ymin -= Math.ceil(deltaYMax) * SWF.unitDivisor;
+                    r2.Xmax += Math.ceil(deltaXMax) * SWF.unitDivisor;
+                    r2.Ymax += Math.ceil(deltaYMax) * SWF.unitDivisor;
             
                     rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
                     rect.Ymin = Math.min(r2.Ymin, rect.Ymin);

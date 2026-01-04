@@ -6245,7 +6245,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 public Timeline getTimeline() {
-                    return new Timeline(origSwf, this, Integer.MAX_VALUE, buttonRecord.getTag().getRect());
+                    return new Timeline(origSwf, this, Integer.MAX_VALUE, buttonRecord.getTag().getRect(), buttonRecord.getTag().getFilterDimensions());
                 }
 
                 @Override
@@ -6332,6 +6332,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 public RECT getRectWithStrokes() {
                     return getRect();
                 }
+
+                @Override
+                public Dimension getFilterDimensions() {
+                    return new Dimension(0, 0);
+                }            
+
+                @Override
+                public RECT getRectWithFilters() {
+                    return getRect();
+                }                                
             };
             previewPanel.showImagePanel(tim, origSwf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, true, true);
         } else if (treeItem instanceof DefineFont4Tag) {

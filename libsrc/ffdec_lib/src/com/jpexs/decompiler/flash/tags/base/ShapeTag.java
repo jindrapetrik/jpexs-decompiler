@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -315,5 +316,10 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     public void updateBounds() {
         shapes.clearCachedOutline();
         shapeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, shapes.lineStyles, getShapeNum(), false);
+    }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
     }
 }

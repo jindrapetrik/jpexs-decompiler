@@ -36,6 +36,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -857,4 +858,9 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
      * Update tables of bounds
      */
     public abstract void updateBounds();
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
+    }
 }

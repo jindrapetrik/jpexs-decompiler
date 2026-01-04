@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -1064,5 +1065,10 @@ public abstract class StaticTextTag extends TextTag {
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         staticTextToHtmlCanvas(unitDivisor, swf, textRecords, getTextNum(), result, textBounds, textMatrix, null);
+    }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
     }
 }

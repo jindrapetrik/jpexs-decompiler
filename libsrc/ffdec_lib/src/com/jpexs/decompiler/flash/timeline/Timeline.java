@@ -79,6 +79,7 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -127,6 +128,11 @@ public class Timeline {
      * Display rect.
      */
     public RECT displayRect;
+    
+    /**
+     * Filters dimension.
+     */
+    public Dimension filterDimension;
 
     /**
      * Frame rate.
@@ -465,7 +471,7 @@ public class Timeline {
      * @param swf SWF
      */
     public Timeline(SWF swf) {
-        this(swf, swf, 0, swf.displayRect);
+        this(swf, swf, 0, swf.displayRect, swf.getFilterDimensions());
     }
 
     /**
@@ -475,13 +481,15 @@ public class Timeline {
      * @param timelined Timelined
      * @param id Timeline id - usually characterId or 0 for SWF main timeline
      * @param displayRect Display rect
+     * @param filterDimension Filters dimension
      */
-    public Timeline(SWF swf, Timelined timelined, int id, RECT displayRect) {
+    public Timeline(SWF swf, Timelined timelined, int id, RECT displayRect, Dimension filterDimension) {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         this.timelined = timelined;
+        this.filterDimension = filterDimension;
         as2RootPackage = new AS2Package(null, null, swf, false, false);
     }
 
@@ -1159,14 +1167,14 @@ public class Timeline {
                 deltaXMax += x;
                 deltaYMax += y;
             }
-            rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
-            rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
-            rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
-            rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
-            viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
-            viewRect2.xMax += deltaXMax * SWF.unitDivisor;
-            viewRect2.yMin -= deltaYMax * SWF.unitDivisor;
-            viewRect2.yMax += deltaYMax * SWF.unitDivisor;
+            rect.xMin -= Math.ceil(deltaXMax * unzoom) * SWF.unitDivisor;
+            rect.xMax += Math.ceil(deltaXMax * unzoom) * SWF.unitDivisor;
+            rect.yMin -= Math.ceil(deltaYMax * unzoom) * SWF.unitDivisor;
+            rect.yMax += Math.ceil(deltaYMax * unzoom) * SWF.unitDivisor;
+            viewRect2.xMin -= Math.ceil(deltaXMax) * SWF.unitDivisor;
+            viewRect2.xMax += Math.ceil(deltaXMax) * SWF.unitDivisor;
+            viewRect2.yMin -= Math.ceil(deltaYMax) * SWF.unitDivisor;
+            viewRect2.yMax += Math.ceil(deltaYMax) * SWF.unitDivisor;
         }
 
         drawMatrix.translate(rect.xMin, rect.yMin);
@@ -2262,5 +2270,19 @@ public class Timeline {
     public List<Scene> getScenes() {
         ensureInitialized();
         return new ArrayList<>(scenes);
+    }
+    
+    /**
+     * Gets display rect including filters.
+     * 
+     * @return RECT with filters applied
+     */
+    public RECT getDisplayRectWithFilters() {
+        RECT r = new RECT(displayRect);
+        r.Xmin -= filterDimension.width;
+        r.Xmax += filterDimension.width;
+        r.Ymin -= filterDimension.height;
+        r.Ymax += filterDimension.height;
+        return r;
     }
 }

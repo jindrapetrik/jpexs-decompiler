@@ -420,4 +420,9 @@ public abstract class ImageTag extends DrawableTag {
 
         return true;
     }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
+    }       
 }

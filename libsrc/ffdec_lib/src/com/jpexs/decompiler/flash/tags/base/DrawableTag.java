@@ -21,8 +21,10 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.IOException;
 
@@ -140,4 +142,15 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @return True if single frame, false if not
      */
     public abstract boolean isSingleFrame();
+    
+    @Override
+    public RECT getRectWithFilters() {
+        RECT r = new RECT(getRect());
+        Dimension filterDimension = getFilterDimensions();
+        r.Xmin -= filterDimension.width;
+        r.Xmax += filterDimension.width;
+        r.Ymin -= filterDimension.height;
+        r.Ymax += filterDimension.height;
+        return r;
+    }
 }

@@ -161,6 +161,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.sound.SoundInfoSoundCacheEntry;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
@@ -186,6 +187,7 @@ import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -5001,8 +5003,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         RECT rect = displayRect;                           
         
         SerializableImage image = new SerializableImage(
-                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) (rect.getWidth() * zoom * aaScale / SWF.unitDivisor),
-                rect.getHeight() == 0 ? 1 : (int) (rect.getHeight() * zoom * aaScale / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
+                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) Math.ceil(rect.getWidth() * zoom * aaScale / SWF.unitDivisor),
+                rect.getHeight() == 0 ? 1 : (int) Math.ceil(rect.getHeight() * zoom * aaScale / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {
@@ -6425,4 +6427,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             //ignore
         }
     }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);
+    }
+
+    @Override
+    public RECT getRectWithFilters() {
+        return getRect();
+    }        
 }

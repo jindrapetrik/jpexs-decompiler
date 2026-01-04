@@ -50,6 +50,7 @@ import com.jpexs.video.SimpleMediaPlayer;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -541,7 +542,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         }
         this.tags = new ReadOnlyTagList(tags);
 
-        timeline = new Timeline(swf, this, characterID, getRect()) {
+        timeline = new Timeline(swf, this, characterID, getRect(), getFilterDimensions()) {
             @Override
             public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
             }
@@ -600,4 +601,8 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         return numFrames;
     }
 
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
+    }
 }

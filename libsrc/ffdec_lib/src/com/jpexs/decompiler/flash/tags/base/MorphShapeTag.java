@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -477,5 +478,10 @@ public abstract class MorphShapeTag extends DrawableTag {
     public void updateBounds() {
         updateStartBounds();
         updateEndBounds();
+    }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
     }
 }

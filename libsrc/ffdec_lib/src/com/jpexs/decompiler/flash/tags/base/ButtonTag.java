@@ -28,8 +28,10 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -173,7 +175,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
             return timeline;
         }
 
-        timeline = new Timeline(swf, this, getCharacterId(), getRect());
+        timeline = new Timeline(swf, this, getCharacterId(), getRect(), getFilterDimensions());
         initTimeline(timeline);
         return timeline;
     }
@@ -400,4 +402,45 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
         }
         selectedRecord.fromPlaceObject(placeTag);
     }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        int totalDeltaX = 0;
+        int totalDeltaY = 0;
+        for (BUTTONRECORD rec : getRecords()) {
+            
+            int chId = rec.characterId;
+            CharacterTag ch = null;
+            if (chId != -1) {
+                ch = swf.getCharacter(chId);
+            }
+            if (ch instanceof DrawableTag) {
+                Dimension filterDimension = ((DrawableTag) ch).getFilterDimensions();
+
+                totalDeltaX = Math.max(totalDeltaX, filterDimension.width);
+                totalDeltaY = Math.max(totalDeltaY, filterDimension.height);
+            }            
+            
+            double deltaXMax = 0;
+            double deltaYMax = 0;                
+            if (rec.filterList != null && !rec.filterList.isEmpty()) { 
+                // calculate size after applying the filters
+                for (FILTER filter : rec.filterList) {
+                    if (!filter.enabled) {
+                        continue;
+                    }
+                    double x = filter.getDeltaX();
+                    double y = filter.getDeltaY();
+                    deltaXMax += x;
+                    deltaYMax += y;
+                }
+                
+                totalDeltaX = Math.max(totalDeltaX, (int) (Math.ceil(deltaXMax) * SWF.unitDivisor));
+                totalDeltaY = Math.max(totalDeltaY, (int) (Math.ceil(deltaYMax) * SWF.unitDivisor));
+            }
+        }
+        return new Dimension(totalDeltaX, totalDeltaY);                
+    }
+    
+    
 }

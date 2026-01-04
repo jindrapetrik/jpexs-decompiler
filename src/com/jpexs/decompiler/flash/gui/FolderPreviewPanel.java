@@ -349,7 +349,7 @@ public class FolderPreviewPanel extends JPanel {
             oh = height * SWF.unitDivisor;
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
-            RECT rect = boundedTag.getRect();
+            RECT rect = boundedTag.getRectWithFilters();
             ow = rect.getWidth();
             oh = rect.getHeight();
             width = (int) (rect.getWidth() / SWF.unitDivisor) + 1;

@@ -41,7 +41,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -248,8 +247,9 @@ public class FrameExporter {
             int max = subFrameMode ? subframeLength : fframes.size();
 
             int fframe = subFrameMode ? fframes.get(0) : fframes.get(pos++);
-            int realAaScale = Configuration.calculateRealAaScale(tim.displayRect.getWidth(), tim.displayRect.getHeight(), settings.zoom, settings.aaScale);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
+            RECT diplayRect = tim.getDisplayRectWithFilters();
+            int realAaScale = Configuration.calculateRealAaScale(diplayRect.getWidth(), diplayRect.getHeight(), settings.zoom, settings.aaScale);
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, diplayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }

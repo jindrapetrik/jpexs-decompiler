@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.Dimension;
 import java.util.Set;
 
 /**
@@ -47,4 +48,18 @@ public interface BoundedTag {
      * @return Rectangle including strokes
      */
     public RECT getRectWithStrokes();
+    
+    /**
+     * Gets filter dimensions.
+     *
+     * @return Filter dimensions
+     */
+    public Dimension getFilterDimensions();
+    
+    /**
+     * Gets rectangle including filters.
+     * 
+     * @return RECT with filters applied
+     */
+    public RECT getRectWithFilters();
 }

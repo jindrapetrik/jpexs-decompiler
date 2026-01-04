@@ -44,13 +44,12 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -174,7 +173,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public Timeline getTimeline() {
         if (timeline == null) {
-            timeline = new Timeline(swf, this, spriteId, getRect());
+            timeline = new Timeline(swf, this, spriteId, getRect(), getFilterDimensions());
         }
         return timeline;
     }
@@ -231,6 +230,67 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
+    public Dimension getFilterDimensions() {
+        HashMap<Integer, Integer> depthMap = new HashMap<>();
+        
+        int totalDeltaX = 0;
+        int totalDeltaY = 0;
+        
+        for (Tag t : getTags()) {
+            if (t instanceof RemoveTag) {
+                RemoveTag rt = (RemoveTag) t;
+                depthMap.remove(rt.getDepth());
+            } else if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
+
+                if (pot.flagMove() != depthMap.containsKey(pot.getDepth())) {
+                    continue;
+                }
+
+                List<FILTER> filters = pot.getFilters();
+                
+                int chId = pot.getCharacterId();
+                String chClass = pot.getClassName();
+                
+                CharacterTag ch = null;
+                if (chId != -1) {
+                    ch = swf.getCharacter(chId);
+                }
+                if (chClass != null) {
+                    ch = swf.getCharacterByClass(chClass);
+                }
+                if (ch instanceof DrawableTag) {
+                    Dimension filterDimension = ((DrawableTag) ch).getFilterDimensions();
+                    
+                    totalDeltaX = Math.max(totalDeltaX, filterDimension.width);
+                    totalDeltaY = Math.max(totalDeltaY, filterDimension.height);
+                }
+
+                double deltaXMax = 0;
+                double deltaYMax = 0;
+
+                if (filters != null && !filters.isEmpty()) {
+                    // calculate size after applying the filters
+                    for (FILTER filter : filters) {
+                        if (!filter.enabled) {
+                            continue;
+                        }
+                        double x = filter.getDeltaX();
+                        double y = filter.getDeltaY();
+                        deltaXMax += x;
+                        deltaYMax += y;
+                    }
+                    
+                    totalDeltaX = Math.max(totalDeltaX, (int) (Math.ceil(deltaXMax) * SWF.unitDivisor));
+                    totalDeltaY = Math.max(totalDeltaY, (int) (Math.ceil(deltaYMax) * SWF.unitDivisor));
+                }                                
+            }
+        }
+    
+        return new Dimension(totalDeltaX, totalDeltaY);
+    }   
+    
+    @Override
     public RECT getRect() {
         return getRect(new HashSet<>());
     }
@@ -250,8 +310,6 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         for (Tag t : getTags()) {
             MATRIX m = null;
             int characterId = -1;
-            double deltaXMax = 0;
-            double deltaYMax = 0;
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 depthMap.remove(rt.getDepth());
@@ -286,24 +344,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                         characterId = chi;
                     }
                 }
-                
-                List<FILTER> filters = pot.getFilters();    
-                
-                deltaXMax = 0;
-                deltaYMax = 0;
-
-                if (filters != null && !filters.isEmpty()) {
-                    // calculate size after applying the filters
-                    for (FILTER filter : filters) {
-                        if (!filter.enabled) {
-                            continue;
-                        }
-                        double x = filter.getDeltaX();
-                        double y = filter.getDeltaY();
-                        deltaXMax += x * SWF.unitDivisor;
-                        deltaYMax += y * SWF.unitDivisor;
-                    }
-                }
+                               
             } else {
                 continue;
             }
@@ -321,7 +362,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
             RECT r = getCharacterBounds(need, added);
 
             if (m != null) {
-                AffineTransform trans = SWF.matrixToTransform(m);
+                /*AffineTransform trans = SWF.matrixToTransform(m);
 
                 java.awt.Point topleft = new java.awt.Point();
                 trans.transform(new java.awt.Point(r.Xmin, r.Ymin), topleft);
@@ -335,13 +376,17 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                 r.Xmin = (int) Math.min(Math.min(Math.min(topleft.x, topright.x), bottomleft.x), bottomright.x);
                 r.Ymin = (int) Math.min(Math.min(Math.min(topleft.y, topright.y), bottomleft.y), bottomright.y);
                 r.Xmax = (int) Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
-                r.Ymax = (int) Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
+                r.Ymax = (int) Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);*/
+                Matrix mat = new Matrix(m);
+                ExportRectangle r2 = mat.transform(new ExportRectangle(r));
+                r.Xmin = (int) r2.xMin;
+                r.Xmax = (int) r2.xMax;
+                r.Ymin = (int) r2.yMin;
+                r.Ymax = (int) r2.yMax;   
+                
+                //System.err.println("xmin = " + (r.Xmin / 20));
             }
-            
-            r.Xmin -= deltaXMax;
-            r.Ymin -= deltaYMax;
-            r.Xmax += deltaXMax;
-            r.Ymax += deltaYMax;
+                        
 
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
             ret.Ymin = Math.min(r.Ymin, ret.Ymin);

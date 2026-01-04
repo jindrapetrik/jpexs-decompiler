@@ -68,6 +68,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.io.IOException;
 import java.io.StringReader;
@@ -1642,4 +1643,13 @@ public class DefineEditTextTag extends TextTag {
         return ret;
     }
 
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
+    }
+
+    @Override
+    public RECT getRectWithFilters() {
+        return getRect();
+    }        
 }
