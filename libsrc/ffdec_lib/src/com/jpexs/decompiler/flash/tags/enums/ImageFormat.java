@@ -59,17 +59,18 @@ public enum ImageFormat {
 
     /**
      * Get extension of the image format.
+     *
      * @return Extension of the image format.
      */
     public String getExtension() {
         return extension;
     }
-    
+
     public boolean available() {
         if (this == WEBP) {
             //WEBP may be unavailable on some platforms, we're gonna test sample call
-            try {               
-                WebPCodec.encodeLosslessImage(new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
+            try {
+                WebPCodec.encodeLosslessImage(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
             } catch (Throwable t) {
                 return false;
             }
