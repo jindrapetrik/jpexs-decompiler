@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.tags.enums;
 
-import dev.matrixlab.webp4j.NativeWebP;
 import dev.matrixlab.webp4j.WebPCodec;
+import java.awt.image.BufferedImage;
 
 /**
  * Image format.
@@ -67,8 +67,9 @@ public enum ImageFormat {
     
     public boolean available() {
         if (this == WEBP) {
-            try {
-                new NativeWebP();
+            //WEBP may be unavailable on some platforms, we're gonna test sample call
+            try {               
+                WebPCodec.encodeLosslessImage(new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
             } catch (Throwable t) {
                 return false;
             }
