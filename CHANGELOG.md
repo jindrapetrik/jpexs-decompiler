@@ -3899,7 +3899,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-,[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...dev
 [24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
