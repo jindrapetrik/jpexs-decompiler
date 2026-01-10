@@ -128,7 +128,7 @@ public class Timeline {
      * Display rect.
      */
     public RECT displayRect;
-    
+
     /**
      * Filters dimension.
      */
@@ -1196,8 +1196,6 @@ public class Timeline {
 
             Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
 
-            
-            
             if (drawable instanceof ButtonTag) {
                 dtime = time;
                 dframe = ButtonTag.FRAME_UP;
@@ -1241,9 +1239,9 @@ public class Timeline {
                 img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                 img.fillTransparent();
             }
-            
+
             if (drawable instanceof TextTag) {
-                TextTag textTag = (TextTag) drawable;                    
+                TextTag textTag = (TextTag) drawable;
                 Matrix textMatrix = new Matrix(textTag.getTextMatrix());
                 if (drawable == renderContext.selectionText) {
                     renderContext.selectionAbsMatrix = absMat.concatenate(textMatrix);
@@ -1254,31 +1252,29 @@ public class Timeline {
                     Point cursorPositionInView = renderContext.cursorPosition == null ? new Point(0, 0) : new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
                     Shape textShape = ((TextTag) drawable).getOutline(true, 0, 0, 0, renderContext, absMat, true, viewRect, unzoom);
-                    
-                    
-                            
+
                     if (textShape.contains(cursorPositionInView)) {
-                        renderContext.mouseOverText = textTag;                        
+                        renderContext.mouseOverText = textTag;
                         renderContext.mouseOverTextAbsMatrix = absMat;
                     }
-                    
-                    if (textShape.contains(cursorPositionInView) || (drawable == renderContext.selectionText && renderContext.mouseButton == 1)) {  
+
+                    if (textShape.contains(cursorPositionInView) || (drawable == renderContext.selectionText && renderContext.mouseButton == 1)) {
                         Rectangle textBounds = textShape.getBounds();
                         List<TEXTRECORD> textRecords = new ArrayList<>();
                         if (textTag instanceof StaticTextTag) {
-                            textRecords = ((StaticTextTag) textTag).textRecords;                        
+                            textRecords = ((StaticTextTag) textTag).textRecords;
                         }
                         if (textTag instanceof DefineEditTextTag) {
                             textRecords = ((DefineEditTextTag) textTag).getTextRecords(textTag.getSwf());
                         }
-                        
+
                         List<RECT> glyphPositions = TextTag.getGlyphEntriesPositions(textRecords, textTag.getSwf());
                         int pos = 0;
                         renderContext.glyphPosUnderCursor = -1;
                         int closestPos = -1;
                         double closestDistance = Double.MAX_VALUE;
-                        Point cursorPosNoTrans = absMat.concatenate(textMatrix).inverse().transform(cursorPositionInView);                            
-                                                
+                        Point cursorPosNoTrans = absMat.concatenate(textMatrix).inverse().transform(cursorPositionInView);
+
                         pos = 0;
                         for (RECT gp : glyphPositions) {
                             /*Rectangle2D r = new Rectangle2D.Double(
@@ -1288,15 +1284,13 @@ public class Timeline {
                                     (gp.Ymax - gp.Ymin)* unzoom
                             );*/
                             Rectangle2D r = new Rectangle2D.Double(
-                                    gp.Xmin, 
+                                    gp.Xmin,
                                     gp.Ymin,
                                     gp.Xmax - gp.Xmin,
                                     gp.Ymax - gp.Ymin
                             );
                             //Shape ts = absMat.toTransform().createTransformedShape(r);
-                            
-                          
-                                        
+
                             /*
                             double tx = Math.max(r.getMinX() - cursorPositionInView.getX(), 0);
                             tx = Math.max(tx, cursorPositionInView.getX() - r.getMaxX());
@@ -1310,29 +1304,27 @@ public class Timeline {
                                 closestDistance = distance;
                                 closestPos = pos;
                             }*/
-                            
                             if (r.contains(cursorPosNoTrans)) {
                                 closestPos = pos;
                                 closestDistance = 0;
                                 break;
                             }
-                            
+
                             /*if (drawable == renderContext.selectionText && pos == renderContext.selectionStart) {
                                 closestPos = pos;
                                 closestDistance = 0;
                                 break;
                             }*/
-                            
                             if (cursorPosNoTrans.y >= r.getY() && cursorPosNoTrans.y <= r.getMaxY()) {
                                 double tx = Math.max(r.getMinX() - cursorPosNoTrans.getX(), 0);
                                 tx = Math.max(tx, cursorPosNoTrans.getX() - r.getMaxX());
-                                
+
                                 if (tx < closestDistance) {
                                     closestDistance = tx;
                                     closestPos = pos;
                                 }
                             }
-                            
+
                             /*if (pos >= renderContext.selectionStart && pos < renderContext.selectionEnd) {
                                 Rectangle rPx = new Rectangle(
                                     (int) Math.round(r.getX() / SWF.unitDivisor), 
@@ -1349,44 +1341,43 @@ public class Timeline {
                                         rPx.height
                                 );
                             }*/
-                            
                             pos++;
                         }
-                        
+
                         if (closestPos == -1 && renderContext.mouseButton == 1) {
                             if (!glyphPositions.isEmpty()) {
                                 RECT gp = glyphPositions.get(0);
                                 Rectangle2D r = new Rectangle2D.Double(
-                                    gp.Xmin, 
-                                    gp.Ymin,
-                                    gp.Xmax - gp.Xmin,
-                                    gp.Ymax - gp.Ymin
+                                        gp.Xmin,
+                                        gp.Ymin,
+                                        gp.Xmax - gp.Xmin,
+                                        gp.Ymax - gp.Ymin
                                 );
                                 if (cursorPosNoTrans.y < r.getY()) {
                                     closestPos = 0;
                                 }
-                                
+
                                 gp = glyphPositions.get(glyphPositions.size() - 1);
                                 r = new Rectangle2D.Double(
-                                    gp.Xmin, 
-                                    gp.Ymin,
-                                    gp.Xmax - gp.Xmin,
-                                    gp.Ymax - gp.Ymin
+                                        gp.Xmin,
+                                        gp.Ymin,
+                                        gp.Xmax - gp.Xmin,
+                                        gp.Ymax - gp.Ymin
                                 );
                                 if (cursorPosNoTrans.y > r.getMaxY()) {
                                     closestPos = glyphPositions.size() - 1;
                                 }
                             }
                         }
-                                                
+
                         if (closestPos > -1) {
                             RECT gp = glyphPositions.get(closestPos);
                             Rectangle2D r = new Rectangle2D.Double(
-                                        gp.Xmin, 
-                                        gp.Ymin,
-                                        gp.Xmax - gp.Xmin,
-                                        gp.Ymax - gp.Ymin
-                                );
+                                    gp.Xmin,
+                                    gp.Ymin,
+                                    gp.Xmax - gp.Xmin,
+                                    gp.Ymax - gp.Ymin
+                            );
                             renderContext.glyphUnderCursorRect = r;
                             renderContext.glyphUnderCursorXPosition = cursorPosNoTrans.x;
                             if (renderContext.glyphUnderCursorXPosition < r.getX()) {
@@ -1395,7 +1386,7 @@ public class Timeline {
                             if (renderContext.glyphUnderCursorXPosition > r.getMaxX()) {
                                 renderContext.glyphUnderCursorXPosition = r.getMaxX();
                             }
-                            
+
                             renderContext.glyphPosUnderCursor = closestPos;
                         }
                     }
@@ -1866,7 +1857,7 @@ public class Timeline {
 
         Frame frameObj = getFrame(frame);
         List<SvgClip> clips = new ArrayList<>();
-        
+
         int maxDepth = getMaxDepth();
         int clipCount = 0;
         Element clipGroup = null;
@@ -1978,7 +1969,6 @@ public class Timeline {
                 RECT boundRect = drawable.getRect();
 
                 //ExportRectangle rect = new ExportRectangle(boundRect);
-
                 DefineScalingGridTag scalingGrid = character.getScalingGridTag();
 
                 // TODO: if (layer.filters != null)
@@ -1995,9 +1985,9 @@ public class Timeline {
                     int dnumFrames = drawable.getNumFrames();
                     if (dnumFrames > 0) { //sprites with empty timeline have zero frames
                         dframe = mtime % dnumFrames;
-                    }                        
+                    }
                     int dtime = mtime - dframe;
-                    
+
                     SVGExporter.ExportKey exportKey = new SVGExporter.ExportKey(drawableTag, clrTrans, layer.ratio, layer.clipDepth > -1, dframe, dtime);
                     boolean hasSmallStroke = tagHasSmallStrokes(exporter, drawable, absMat);
 
@@ -2011,8 +2001,8 @@ public class Timeline {
                         createNew = true;
                     }
                     if (createNew) {
-                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);                                                
-                        
+                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
+
                         drawable.toSVG(dframe, dtime, exporter, layer.ratio, clrTrans, level + 1, transformation, absMat);
                         exporter.endGroup();
                     }
@@ -2130,17 +2120,41 @@ public class Timeline {
             return new Rectangle2D.Double();
         }
         Area area = new Area();
-        Stack<Clip> clips = new Stack<>();
-        for (int d = maxDepth; d >= 0; d--) {
-            Clip currentClip = null;
-            for (int i = clips.size() - 1; i >= 0; i--) {
-                Clip cl = clips.get(i);
-                if (cl.depth <= d) {
-                    clips.remove(i);
+        List<Clip> clips = new ArrayList<>();
+        int clipCount = 0;
+        Shape prevClip = null;
+        Shape currentClip = null;
+        for (int d = 0; d <= maxDepth; d++) {
+            boolean clipChanged = clipCount != clips.size();
+            for (int c = 0; c < clips.size(); c++) {
+                if (clips.get(c).depth < d) {
+                    clips.remove(c);
+                    c--;
+                    clipChanged = true;
                 }
             }
-            if (!clips.isEmpty()) {
-                currentClip = clips.peek();
+
+            if (clipChanged) {
+                if (!clips.isEmpty()) {
+                    Area clip = null;
+                    if (prevClip != null) {
+                        clip = new Area(prevClip);
+                    }
+                    for (Clip clip1 : clips) {
+                        Shape shape = clip1.shape;
+                        if (clip == null) {
+                            clip = new Area(shape);
+                        } else {
+                            clip.intersect(new Area(shape));
+                        }
+                    }
+
+                    currentClip = clip;
+                } else {
+                    currentClip = prevClip;
+                }
+
+                clipCount = clips.size();
             }
             DepthState layer = fr.layers.get(d);
             if (layer == null) {
@@ -2181,14 +2195,13 @@ public class Timeline {
                 Shape cshape = ((DrawableTag) character).getOutline(fast, dframe, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
-                    Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
-                    a.subtract(new Area(currentClip.shape));
-                    addArea.subtract(a);
+                    Area clipArea = new Area(currentClip);
+                    addArea.intersect(clipArea);
                 }
 
                 if (layer.clipDepth > -1) {
                     Clip clip = new Clip(addArea, layer.clipDepth);
-                    clips.push(clip);
+                    clips.add(clip);
                 } else {
                     area.add(addArea);
                 }
@@ -2246,7 +2259,7 @@ public class Timeline {
                 if (!drawable.isSingleFrame()) {
                     return false;
                 }
-            }            
+            }
         }
 
         return true;
@@ -2271,10 +2284,10 @@ public class Timeline {
         ensureInitialized();
         return new ArrayList<>(scenes);
     }
-    
+
     /**
      * Gets display rect including filters.
-     * 
+     *
      * @return RECT with filters applied
      */
     public RECT getDisplayRectWithFilters() {
