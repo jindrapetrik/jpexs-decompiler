@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.Stopwatch;
@@ -5173,6 +5174,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         SerializableImage img;
         int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
         
+        aaScale = Configuration.calculateRealAaScale((int) viewRect.getWidth(), (int) viewRect.getHeight(), zoom, aaScale);
+        
         int width = aaScale * (int) (viewRect.getWidth() * zoom);
         int height = aaScale * (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
@@ -5259,15 +5262,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
 
         if (Configuration.reduceAntialiasConflationByScalingForDisplay.get()) {
-            SerializableImage img2 = new SerializableImage(image.getWidth() / aaScale, image.getHeight() / aaScale, BufferedImage.TYPE_INT_ARGB_PRE);
-            img2.fillTransparent();
-            Graphics2D g2 = (Graphics2D) img2.getGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            //g2.drawImage(image.getBufferedImage(), 0, 0, img2.getWidth(), img2.getHeight(), 0, 0, image.getWidth(), image.getHeight(), null);
-            g2.drawImage(image.getBufferedImage().getScaledInstance(image.getWidth() / aaScale, image.getHeight() / aaScale, Image.SCALE_SMOOTH), 0, 0, null);
-            image = img2;
+            image  = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));                 
         }
         
         Graphics2D gg = (Graphics2D) image.getGraphics();
