@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#2592], [#2154], [#2591], [#2596] - Better handling of antialias conflation artifacts (by scaling),
   can be enabled in Advanced Settings / Display and Export.
 - [#2608] Updated WEBP image library so now it supports macOS x64
+- [PR228] Association with `.swc` extension
 
 ### Fixed
 - [#2570] NullpointerException on SVG export of DefineEditText
@@ -5333,6 +5334,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR228]: https://github.com/jindrapetrik/jpexs-decompiler/pull/228
 [PR224]: https://github.com/jindrapetrik/jpexs-decompiler/pull/224
 [PR222]: https://github.com/jindrapetrik/jpexs-decompiler/pull/222
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215
