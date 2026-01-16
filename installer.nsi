@@ -508,6 +508,10 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     Call AddToExtContextMenu
     Push "gfx"
     Call AddToExtContextMenu
+    Push "swt"
+    Call AddToExtContextMenu
+    Push "swc"
+    Call AddToExtContextMenu
     
     SetRegView 32
     Push "swf"
@@ -515,6 +519,10 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     Push "spl"
     Call AddToExtContextMenu    
     Push "gfx"
+    Call AddToExtContextMenu
+    Push "swt"
+    Call AddToExtContextMenu
+    Push "swc"
     Call AddToExtContextMenu
     
     ${NotifyShell_AssocChanged}
@@ -584,6 +592,10 @@ Section "Uninstall"
   Call un.RemoveExtContextMenu
   Push "gfx"
   Call un.RemoveExtContextMenu
+  Push "swt"
+  Call un.RemoveExtContextMenu
+  Push "swc"
+  Call un.RemoveExtContextMenu
   
   SetRegView 32
   Push "swf"
@@ -591,6 +603,10 @@ Section "Uninstall"
   Push "spl"
   Call un.RemoveExtContextMenu
   Push "gfx"
+  Call un.RemoveExtContextMenu
+  Push "swt"
+  Call un.RemoveExtContextMenu
+  Push "swc"
   Call un.RemoveExtContextMenu
 
   ${NotifyShell_AssocChanged}
