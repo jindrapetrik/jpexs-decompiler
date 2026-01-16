@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ public class LicenseUpdater {
 
          */
         int defaultStartYear = 2010;
-        int defaultFinalYear = 2025;
+        int defaultFinalYear = 2026;
         String defaultAuthor = "JPEXS";
         String defaultYearStr = Integer.toString(defaultStartYear);
         if (defaultFinalYear != defaultStartYear) {
