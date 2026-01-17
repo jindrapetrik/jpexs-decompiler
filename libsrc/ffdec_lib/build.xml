@@ -242,7 +242,9 @@
         </propertyfile>        
 
         <jar destfile="${dist.dir}/${jar.filename}.jar" basedir="${compile.dir}">
-            
+            <manifest>
+                <attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
+            </manifest>
         </jar>
     </target>
     
