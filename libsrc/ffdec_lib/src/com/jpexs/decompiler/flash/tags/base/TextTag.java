@@ -982,6 +982,30 @@ public abstract class TextTag extends DrawableTag {
         return family;
     }
     
+    private static String sanitizeUtf16(String s) {
+        if (s == null) {
+            return null;
+        }
+
+        StringBuilder out = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isHighSurrogate(c)) {
+                if (i + 1 < s.length() && Character.isLowSurrogate(s.charAt(i + 1))) {
+                    out.append(c).append(s.charAt(i + 1));
+                    i++; // validní pár
+                } else {
+                    out.append('\uFFFD'); // broken high surrogate
+                }
+            } else if (Character.isLowSurrogate(c)) {
+                out.append('\uFFFD'); // alone low surrogate
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
+    }
+    
     /**
      * Converts static text to SVG.
      * @param swf SWF
@@ -1039,16 +1063,17 @@ public abstract class TextTag extends DrawableTag {
 
             exporter.createSubGroup(new Matrix(textMatrix), null);
             if (exporter.useTextTag) {
-                StringBuilder text = new StringBuilder();
+                StringBuilder textBuilder = new StringBuilder();
                 int totalAdvance = 0;
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
-                        text.append(ch);
+                        textBuilder.append(ch);
                         totalAdvance += entry.glyphAdvance;
                     }
                 }
-
+                String text = sanitizeUtf16(textBuilder.toString());
+    
                 boolean hasOffset = x != 0 || y != 0;
                 if (hasOffset) {
                     exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
@@ -1062,7 +1087,7 @@ public abstract class TextTag extends DrawableTag {
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setAttribute("style", "white-space: pre");
-                textElement.setTextContent(text.toString());
+                textElement.setTextContent(text);
 
                 RGBA colorA = new RGBA(textColor);
                 textElement.setAttribute("fill", colorA.toHexRGB());

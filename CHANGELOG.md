@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - FLA export - incorrect handling of imported sprites
 - [#2586] AS3 direct editation + decompilation - XML escape sequences and other XML problems
 - [#2600] Sprite/button outline incorrect calculation caused by clipping
+- [#2612] SVG export - handle incorrect surrogate pairs in text
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4095,6 +4096,7 @@ Major version of SWF to XML export changed to 2.
 [#2595]: https://www.free-decompiler.com/flash/issues/2595
 [#2586]: https://www.free-decompiler.com/flash/issues/2586
 [#2600]: https://www.free-decompiler.com/flash/issues/2600
+[#2612]: https://www.free-decompiler.com/flash/issues/2612
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
