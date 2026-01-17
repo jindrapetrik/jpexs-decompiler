@@ -2001,7 +2001,7 @@ public class Timeline {
                         createNew = true;
                     }
                     if (createNew) {
-                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
+                        exporter.createDefGroup(null, assetName);
 
                         drawable.toSVG(dframe, dtime, exporter, layer.ratio, clrTrans, level + 1, transformation, absMat);
                         exporter.endGroup();

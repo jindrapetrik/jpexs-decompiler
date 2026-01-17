@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - [#2586] AS3 direct editation + decompilation - XML escape sequences and other XML problems
 - [#2600] Sprite/button outline incorrect calculation caused by clipping
 - [#2612] SVG export - handle incorrect surrogate pairs in text
+- [#2612] SVG export - problems with retain shape bounds setting
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
