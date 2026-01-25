@@ -46,6 +46,30 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testAlwaysBreak() {
+        decompileMethod("classic_air", "testAlwaysBreak", "var v:* = undefined;\r\n"
+                + "v = 5;\r\n"
+                + "trace(\"a\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(v > 4)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "if(v > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"c\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"d\");\r\n"
+                + "}\r\n"
+                + "trace(\"e\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"f\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testAndOrCoercion() {
         decompileMethod("classic_air", "testAndOrCoercion", "var x:TestInterface = ti || (ti = new TestClass()) && (ti = new TestClass());\r\n"
                 + "var y:TestInterface = ti && (ti = new TestClass());\r\n"
@@ -549,6 +573,36 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "}\r\n"
                 + "while(k < 10);\r\n"
                 + "trace(\"ss\");\r\n",
+                 false);
+    }
+
+    @Test
+    public void testDoWhileTwice() {
+        decompileMethod("classic_air", "testDoWhileTwice", "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"x\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"y\");\r\n"
+                + "}\r\n"
+                + "trace(\"z\");\r\n"
+                + "}\r\n"
+                + "trace(\"g\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"h\");\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n",
                  false);
     }
 

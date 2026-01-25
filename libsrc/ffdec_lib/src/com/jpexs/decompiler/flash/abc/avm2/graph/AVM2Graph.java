@@ -3537,18 +3537,6 @@ public class AVM2Graph extends Graph {
         super.makeAllCommands(commands, stack);
     }
 
-    /**
-     * Prepares second pass data. Can return null when no second pass will
-     * happen.
-     *
-     * @param list List of GraphTargetItems
-     * @return Second pass data or null
-     */
-    @Override
-    protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
-        return new SecondPassData();
-    }
-
     @Override
     protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
         GraphTargetItem result = stack.pop();

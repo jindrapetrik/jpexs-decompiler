@@ -64,6 +64,11 @@ public abstract class BaseLocalData {
     public Reference<Integer> maxTempIndex = new Reference<>(0);
     
     /**
+     * Wheter goto statements were used
+     */
+    public Reference<Boolean> gotosUsed = new Reference<>(false);
+    
+    /**
      * Constructor.
      */
     public BaseLocalData() {

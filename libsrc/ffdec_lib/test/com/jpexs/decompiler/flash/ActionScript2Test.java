@@ -2608,5 +2608,44 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"breakDetectionTest\");\r\n"
         );
     }
+
+    @Test
+    public void frame96_doWhileTwiceTest() {
+        compareSrc(96, "trace(\"doWhileTwiceTest\");\r\n"
+                + "var a = 1;\r\n"
+                + "var b = 2;\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"x\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"y\");\r\n"
+                + "}\r\n"
+                + "trace(\"z\");\r\n"
+                + "if(false)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"g\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"h\");\r\n"
+                + "if(false)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n"
+        );
+    }
     //--FRAMES-END--
 }

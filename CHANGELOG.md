@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#2612] SVG export - handle incorrect surrogate pairs in text
 - [#2612] SVG export - problems with retain shape bounds setting
 - [#2609] JDK 25+ warnings on console about native access
+- [#2473], [#2530] Always-break loops containing breaks (forward gotos)
 
 ### Changed
 - [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
@@ -4100,6 +4101,8 @@ Major version of SWF to XML export changed to 2.
 [#2600]: https://www.free-decompiler.com/flash/issues/2600
 [#2612]: https://www.free-decompiler.com/flash/issues/2612
 [#2609]: https://www.free-decompiler.com/flash/issues/2609
+[#2473]: https://www.free-decompiler.com/flash/issues/2473
+[#2530]: https://www.free-decompiler.com/flash/issues/2530
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537

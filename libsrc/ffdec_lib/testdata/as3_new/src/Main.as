@@ -17,6 +17,7 @@ package
     public class Main extends Sprite
     {
         TestActivationArguments;
+        TestAlwaysBreak;
         TestAndOrCoercion;
         TestArguments;
         TestBitwiseOperands;
@@ -45,6 +46,7 @@ package
         TestDoWhile2;
         TestDoWhile3;
         TestDoWhile4;
+        TestDoWhileTwice;
         TestExecutionOrder;
         TestExpressions;
         TestFinallyZeroJump;

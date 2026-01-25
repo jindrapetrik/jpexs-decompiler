@@ -66,7 +66,7 @@ public class AS3Generator {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
         s.append("/*\r\n"
-                + " *  Copyright (C) 2010-2025 JPEXS, All rights reserved.\r\n"
+                + " *  Copyright (C) 2010-2026 JPEXS, All rights reserved.\r\n"
                 + " * \r\n"
                 + " * This library is free software; you can redistribute it and/or\r\n"
                 + " * modify it under the terms of the GNU Lesser General Public\r\n"
