@@ -26,7 +26,7 @@
 !insertmacro LANG_STRING STRING_FLASH_AX_WILLINSTALL "Ta aplikacija zahteva namestitev kontrole Flash ActiveX. Ta bo prenesena in nameščena kot del namestitve."
 !insertmacro LANG_STRING STRING_FLASH_AX_ALREADYINSTALLED "Flash ActiveX je že nameščen"
 !insertmacro LANG_STRING STRING_FLASH_AX_MISSING "Rezultat: Flash ActiveX manjka."
-!insertmacro LANG_STRING STRING_FLASH_AX_WILLDOWNLOAD "O pravkar bo prenešen Flash z "
+!insertmacro LANG_STRING STRING_FLASH_AX_WILLDOWNLOAD "Pripravljam se na prenos Flasha iz "
 !insertmacro LANG_STRING STRING_FLASH_AX_DOWNRESULT "Rezultat prenosa = "
 !insertmacro LANG_STRING STRING_FLASH_AX_CANNOTDOWNLOAD "Ni mogoče prenesti Flash ActiveX. Lahko ga prenesete kasneje ročno ali uporabite naš lasten flash pregledovalnik."
 !insertmacro LANG_STRING STRING_FLASH_AX_LAUNCHSETUP "Zaganjam namestitev Flash"
