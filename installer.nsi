@@ -317,21 +317,23 @@ var SMDir
   !insertmacro LANG_LOAD "English"
   !insertmacro LANG_LOAD "Catalan"    
   !insertmacro LANG_LOAD "Czech"  
-  !insertmacro LANG_LOAD "SimpChinese"
   !insertmacro LANG_LOAD "Dutch"
   !insertmacro LANG_LOAD "French"
   !insertmacro LANG_LOAD "German"
   !insertmacro LANG_LOAD "Hungarian"
+  !insertmacro LANG_LOAD "Italian"
+  !insertmacro LANG_LOAD "Japanese"
   !insertmacro LANG_LOAD "Polish"
   !insertmacro LANG_LOAD "Portuguese"
   !insertmacro LANG_LOAD "PortugueseBR"
-  !insertmacro LANG_LOAD "Russian"
+  !insertmacro LANG_LOAD "SimpChinese"
+  !insertmacro LANG_LOAD "Slovenian"
   !insertmacro LANG_LOAD "Spanish"
   !insertmacro LANG_LOAD "Swedish"
+  !insertmacro LANG_LOAD "Russian"
   !insertmacro LANG_LOAD "Turkish"  
   !insertmacro LANG_LOAD "Ukrainian"
-  !insertmacro LANG_LOAD "Italian"
-
+  
 
 ;--------------------------------
 ;Installer Sections
