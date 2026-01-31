@@ -317,13 +317,11 @@ public class PreviewExporter {
                 outrect = new RECT(treeItemBounds);
             } else {
                 if (treeItemBounds != null) {
-                    if (outrect.getWidth() < treeItemBounds.getWidth()) {
-                        outrect.Xmax += treeItemBounds.getWidth() - outrect.getWidth();
-                    }
-
-                    if (outrect.getHeight() < treeItemBounds.getHeight()) {
-                        outrect.Ymax += treeItemBounds.getHeight() - outrect.getHeight();
-                    }
+                    outrect = new RECT(treeItemBounds);
+                    outrect.Xmax = outrect.getWidth();
+                    outrect.Xmin = 0;   
+                    outrect.Ymax = outrect.getHeight();
+                    outrect.Ymin = 0;                                                          
                 }
             }
 
