@@ -65,6 +65,49 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="24.1.2" date="2026-01-31">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2581 Save as SWC through context menu of SWF files (previously only in CLI)</li>
+					<li>Save as EXE through context menu of SWF files (previously only in toolbar)</li>
+					<li>Slovenian translation</li>
+					<li>SVG export - video frames</li>
+					<li>#2592, #2154, #2591, #2596 - Better handling of antialias conflation artifacts (by scaling), can be enabled in Advanced Settings / Display and Export.</li>
+					<li>#2608 Updated WEBP image library so now it supports macOS x64</li>
+					<li>PR228 Association with `.swc` extension</li>
+					<li>Association of file extensions in Windows setup (again)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2570 NullpointerException on SVG export of DefineEditText</li>
+					<li>#2570 ClassCastException on exporting sound head (export all command)</li>
+					<li>#2571 SVG export - StackOverflow for DefineVideoStream</li>
+					<li>#2575 dumpSWF CLI command displayed import assets GUI dialog</li>
+					<li>#2573 AS3 - Incorrect uint/int/Number coercion</li>
+					<li>AS3 local registers type propagation</li>
+					<li>#2566, #2594 Export bounds of sprites and buttons not containg filter offsets</li>
+					<li>#2582 Font normalizer setting small texts when no assigned glyph found</li>
+					<li>PDF export - not rendering video stream frames</li>
+					<li>#2585 AS1/2 direct editation - continue and break in for..in loop</li>
+					<li>#2589 SVG export - subsprite animation, sprite offsets</li>
+					<li>#1893 Video - incorrect frame size</li>
+					<li>#2572 SVG import - incorrect stroke width when transform contains rotation/shear</li>
+					<li>#2595 FLA export - incorrect handling of imported fonts</li>
+					<li>FLA export - incorrect handling of imported sprites</li>
+					<li>#2586 AS3 direct editation + decompilation - XML escape sequences and other XML problems</li>
+					<li>#2600 Sprite/button outline incorrect calculation caused by clipping</li>
+					<li>#2612 SVG export - handle incorrect surrogate pairs in text</li>
+					<li>#2612 SVG export - problems with retain shape bounds setting</li>
+					<li>#2609 JDK 25+ warnings on console about native access</li>
+					<li>#2473, #2530 Always-break loops containing breaks (forward gotos)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2575 dumpSWF CLI command only allows single SWF dump (no imports, etc.)</li>
+				</ul>
+			</description>
+		</release>
 		<release version="24.1.1" date="2025-11-17">
 			<description>
 				<p>Added</p>
