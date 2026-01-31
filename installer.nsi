@@ -25,8 +25,7 @@ Unicode true
 SetCompressor /SOLID lzma
 !include "StrFunc.nsh"
 !include x64.nsh
-; Asociation - triggers Nemesis detection in VirusTotal :-(
-;!include Integration.nsh
+!include Integration.nsh
 
 !define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
 
@@ -367,8 +366,6 @@ var SMDir
 
 !define REG_CLASSES_HKEY HKLM
 
-/* ; Asociation - triggers Nemesis detection in VirusTotal :-(
-
 var className
 !define VERB "ffdec"
 !define VERB_NAME "Open with FFDec"
@@ -423,7 +420,6 @@ Function AddToExtContextMenu
      ${EndIf}
 FunctionEnd
 
-*/
 Section "FFDec" SecDummy
                                       
   SetShellVarContext all
@@ -501,7 +497,6 @@ Function .onInit
   SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
-/* ; Asociation - triggers Nemesis detection in VirusTotal :-(
 Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     SetRegView 64
     Push "swf"
@@ -529,15 +524,14 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     
     ${NotifyShell_AssocChanged}
 SectionEnd
-*/
+
 ;--------------------------------
 ;Descriptions
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "$(STRING_SECTION_APP)"
-  ;  Asociation - triggers Nemesis detection in VirusTotal :-(
-  ;  !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
     !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut} "$(STRING_SECTION_SHORTCUT)"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -586,7 +580,6 @@ Section "Uninstall"
   RmDir /r "$SMPROGRAMS\$SMDir\*.*"
   RmDir "$SMPROGRAMS\$SMDir"   
   
-  /* ; Asociation - triggers Nemesis detection in VirusTotal :-(
   SetRegView 64
   Push "swf"
   Call un.RemoveExtContextMenu
@@ -611,9 +604,7 @@ Section "Uninstall"
   Push "swc"
   Call un.RemoveExtContextMenu
 
-  ${NotifyShell_AssocChanged}
-  
-  */
+  ${NotifyShell_AssocChanged}   
 
   StrCmp $uninstlocal 1 0 +5
     SetShellVarContext current      

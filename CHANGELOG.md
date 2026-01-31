@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
   can be enabled in Advanced Settings / Display and Export.
 - [#2608] Updated WEBP image library so now it supports macOS x64
 - [PR228] Association with `.swc` extension
+- Association of file extensions in Windows setup (again)
 
 ### Fixed
 - [#2570] NullpointerException on SVG export of DefineEditText
