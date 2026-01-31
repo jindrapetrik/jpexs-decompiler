@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [24.1.2] - 2026-01-31
 ### Added
 - [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
@@ -3906,6 +3908,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...dev
 [24.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...version24.1.2
 [24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
