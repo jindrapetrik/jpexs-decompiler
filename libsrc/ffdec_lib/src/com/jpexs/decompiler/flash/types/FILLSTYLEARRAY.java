@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,9 +56,9 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
     }
     
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (FILLSTYLE fs : fillStyles) {
-            fs.getNeededCharacters(needed, swf);
+            fs.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

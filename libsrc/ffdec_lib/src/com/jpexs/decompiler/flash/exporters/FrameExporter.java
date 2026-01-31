@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -140,7 +139,7 @@ public class FrameExporter {
             frames.add(0); // todo: export all frames
         }
 
-        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true, settings.aaScale);
         return exportFrames(handler, outdir, swf, containerId, frames, 1, fes, evl);
     }
 
@@ -178,7 +177,7 @@ public class FrameExporter {
                 throw new Error("Unsupported sprite export mode");
         }
 
-        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true, settings.aaScale);
         return exportFrames(handler, outdir, swf, containerId, frames, subframesLength, fes, evl);
     }
 
@@ -248,7 +247,9 @@ public class FrameExporter {
             int max = subFrameMode ? subframeLength : fframes.size();
 
             int fframe = subFrameMode ? fframes.get(0) : fframes.get(pos++);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true).getBufferedImage();
+            RECT diplayRect = tim.getDisplayRectWithFilters();
+            int realAaScale = Configuration.calculateRealAaScale(diplayRect.getWidth(), diplayRect.getHeight(), settings.zoom, settings.aaScale);
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, diplayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }
@@ -396,8 +397,9 @@ public class FrameExporter {
                         fos.write(Utf8Helper.getBytes("\r\n"));
                         fos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
                         Set<Integer> library = new HashSet<>();
-                        ftim.getNeededCharacters(fframes, library);
-
+                        Set<String> libraryClasses = new HashSet<>();
+                        ftim.getNeededCharacters(fframes, library, libraryClasses);
+                        //FIXME!!! Handle Library Classes
                         SWF.libraryToHtmlCanvas(fswf, library, fos);
 
                         String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
@@ -687,7 +689,7 @@ public class FrameExporter {
                                 renderContext.stateUnderCursor = new ArrayList<>();
 
                                 try {
-                                    tim.toImage(fframe, subFramesLength > 1 ? pos : 0, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>());
+                                    tim.toImage(fframe, subFramesLength > 1 ? pos : 0, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true, new ArrayList<>(), 1);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }

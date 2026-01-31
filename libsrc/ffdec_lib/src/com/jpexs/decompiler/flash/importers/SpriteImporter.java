@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,9 @@ public class SpriteImporter {
             Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);
             if (dependentCharacters.isEmpty()) {
                 Set<Integer> needed = new LinkedHashSet<>();
-                ct.getNeededCharacters(needed, swf);
+                Set<String> neededClasses = new LinkedHashSet<>();                
+                ct.getNeededCharacters(needed, neededClasses, swf);
+                //TODO: handle classes?
                 List<CharacterIdTag> attachedTags = swf.getCharacterIdTags(ch);
                 for (CharacterIdTag cit : attachedTags) {
                     if (cit instanceof Tag) {

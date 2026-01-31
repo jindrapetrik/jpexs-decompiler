@@ -139,6 +139,7 @@
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
                 <attribute name="Class-Path" value="${manifestClassPath} ${app.jar}"/>
+                <attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
             </manifest>
         </jar>
         <copy file="${dist.dir}/${jar.filename}.jar" tofile="${app.dir}/${jar.filename}.jar" />

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -101,6 +101,8 @@ public class BitmapExporter extends ShapeExporterBase {
     private double thicknessScaleY;
 
     private double unzoom;
+    
+    private int aaScale;
 
     private static boolean linearGradientColorWarningShown = false;
 
@@ -171,11 +173,12 @@ public class BitmapExporter extends ShapeExporterBase {
      * @param colorTransform Color transform
      * @param scaleStrokes Scale strokes
      * @param canUseSmoothing Can use smoothing
+     * @param aaScale Antialias conflation reducing scale coefficient
      */
-    public static void export(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing) {
+    public static void export(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing, int aaScale) {
         BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
         exporter.setCanUseSmoothing(canUseSmoothing);
-        exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes);
+        exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);
     }
 
     private BitmapExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
@@ -185,7 +188,7 @@ public class BitmapExporter extends ShapeExporterBase {
         path = new GeneralPath(windingRule == ShapeTag.WIND_NONZERO ? GeneralPath.WIND_NON_ZERO : GeneralPath.WIND_EVEN_ODD);
     }
 
-    private void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
+    private void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes, int aaScale) {
         this.image = image;
         this.scaleStrokes = scaleStrokes;
         ExportRectangle bounds = new ExportRectangle(shape.getBounds(shapeNum));
@@ -198,6 +201,7 @@ public class BitmapExporter extends ShapeExporterBase {
         graphics.setTransform(at);
         defaultStroke = graphics.getStroke();
         this.unzoom = unzoom;
+        this.aaScale = aaScale;
         super.export();
     }
 
@@ -411,8 +415,8 @@ public class BitmapExporter extends ShapeExporterBase {
         }
 
         //always display minimum stroke of 1 pixel, no matter how zoomed it is
-        if (thickness * unzoom < 1 * SWF.unitDivisor) {
-            thickness = 1 * SWF.unitDivisor / unzoom;
+        if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
+            thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
         }
         
         /*

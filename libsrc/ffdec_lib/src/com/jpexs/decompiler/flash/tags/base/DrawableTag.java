@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,10 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.IOException;
 
@@ -104,11 +106,14 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @param drawMode Draw mode
      * @param blendMode Blend mode
      * @param canUseSmoothing Can use smoothing
+     * @param aaScale Antialias conflation reducing scale coefficient
      */
-    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing);
+    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, int aaScale);
 
     /**
      * Converts the drawable to SVG.
+     * @param frame Frame
+     * @param time Time
      * @param exporter SVG exporter
      * @param ratio Ratio
      * @param colorTransform Color transform
@@ -117,7 +122,7 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @param strokeTransformation Stroke transformation
      * @throws IOException On I/O error
      */
-    public abstract void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException;
+    public abstract void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException;
 
     /**
      * Converts the drawable to HTML canvas.
@@ -137,4 +142,15 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @return True if single frame, false if not
      */
     public abstract boolean isSingleFrame();
+    
+    @Override
+    public RECT getRectWithFilters() {
+        RECT r = new RECT(getRect());
+        Dimension filterDimension = getFilterDimensions();
+        r.Xmin -= filterDimension.width;
+        r.Xmax += filterDimension.width;
+        r.Ymin -= filterDimension.height;
+        r.Ymax += filterDimension.height;
+        return r;
+    }
 }

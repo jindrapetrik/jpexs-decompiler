@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -841,7 +841,23 @@ public final class Configuration {
     @ConfigurationCategory("display")
     @ConfigurationRemoved
     public static ConfigurationItem<Boolean> fixAntialiasConflation = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> reduceAntialiasConflationByScalingForDisplay = null;
         
+    @ConfigurationDefaultInt(4)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Integer> reduceAntialiasConflationByScalingValueForDisplay = null;
+        
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> reduceAntialiasConflationByScalingForExport = null;
+        
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Integer> reduceAntialiasConflationByScalingValueForExport = null;
+    
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> autoPlaySounds = null;
@@ -1821,5 +1837,20 @@ public final class Configuration {
         }
 
         return null;
+    }
+    
+    public static int calculateRealAaScale(int imageWidth, int imageHeight, double zoom, int initialAaScale) {
+        
+        final int MAX_IMAGE_DIMENSION = 10000;
+        
+        int aaScale = initialAaScale;
+        while (
+                aaScale > 1 
+                && (((long) imageWidth * zoom * aaScale / SWF.unitDivisor) > MAX_IMAGE_DIMENSION 
+                || ((long) imageHeight * zoom * aaScale / SWF.unitDivisor) > MAX_IMAGE_DIMENSION)
+        ) {
+            aaScale--;
+        }
+        return aaScale;
     }
 }

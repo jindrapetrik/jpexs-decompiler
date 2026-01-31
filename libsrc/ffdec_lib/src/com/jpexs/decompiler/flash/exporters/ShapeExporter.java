@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,11 +43,19 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -69,9 +77,9 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ShapeExporter {
-
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom) throws IOException, InterruptedException {
+public class ShapeExporter {       
+    
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom, int aaScale) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
             return ret;
@@ -117,15 +125,16 @@ public class ShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                st.toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
                         case PNG:
                         case BMP:
                         case WEBP:
-                            int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
-                            int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, aaScale);
+                            int newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            int newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == ShapeExportMode.BMP) {
@@ -135,16 +144,26 @@ public class ShapeExporter {
                                     g.setColor(backColor.toColor());
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
-                            }                            
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            }                 
+                            Matrix m2 = Matrix.getScaleInstance(settings.zoom * realAaScale);
+                            m2.translate(-rect.Xmin, -rect.Ymin);
+                            
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+                            
+                            BufferedImage bim = img.getBufferedImage();
+                            if (realAaScale > 1) {
+                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
+                                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
+                            }
+                            
                             if (settings.mode == ShapeExportMode.PNG) {
-                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
+                                ImageHelper.write(bim, ImageFormat.PNG, file);
                             } else if (settings.mode == ShapeExportMode.WEBP) {
                                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
+                                    fos.write(WebPCodec.encodeLosslessImage(bim));
                                 }
                             } else {
-                                BMPFile.saveBitmap(img.getBufferedImage(), file);
+                                BMPFile.saveBitmap(bim, file);
                             }
                             break;
                         case CANVAS:
@@ -155,9 +174,11 @@ public class ShapeExporter {
                                 CanvasShapeExporter cse = new CanvasShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                 cse.export();
                                 Set<Integer> needed = new HashSet<>();
+                                Set<String> neededClasses = new HashSet<>();
                                 needed.add(st.getCharacterId());
-                                st.getNeededCharactersDeep(needed);
+                                st.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }

@@ -16,6 +16,7 @@
  - Portugese - Portugal
  - Portugese - Brasilian
  - Russian
+ - Slovenian
  - Spanish
  - Swedish
  - Turkish
@@ -52,5 +53,10 @@ If you would like to translate FFDec to your language, please follow these steps
 Windows NSIS installer is translated separately (No translation tool for it),
 See list of existing NSIS languages [here](https://github.com/jindrapetrik/jpexs-decompiler/tree/dev/nsis_locales)
 and create new `.nsh` file for new installer language.
+
+## Translating "Open in FFDec" context menu EXE resources
+For the ffdec.exe application there exists RC file [here](https://github.com/jindrapetrik/jpexs-decompiler/blob/dev/open_with.rc)
+where you need to add translation of the text "Open in FFDec" context menu for
+associated SWF files.
 
 [issue tracker]: https://www.free-decompiler.com/flash/

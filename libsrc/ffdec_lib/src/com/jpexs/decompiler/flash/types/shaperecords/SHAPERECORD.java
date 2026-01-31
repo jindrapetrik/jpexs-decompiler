@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     public abstract void calculateBits();
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
     }
 
     @Override
@@ -283,14 +283,14 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
                 Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
-                BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
+                BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true, 1 /*??*/);
 
                 // draw bounding boxes
                 if (DRAW_BOUNDING_BOX) {
                     RGB borderColor = new RGBA(Color.black);
                     RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
                     transformation = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(transformation);
-                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), transformation, colorTransform);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), transformation, colorTransform, 1 /*??*/);
                 }
                 pos++;
             }

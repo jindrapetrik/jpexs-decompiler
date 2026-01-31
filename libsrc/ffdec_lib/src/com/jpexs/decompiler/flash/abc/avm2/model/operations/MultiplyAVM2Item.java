@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -92,18 +92,6 @@ public class MultiplyAVM2Item extends BinaryOpItem implements CompoundableBinary
 
     @Override
     public GraphTargetItem returnType() {
-        GraphTargetItem leftType = leftSide.returnType();
-        GraphTargetItem rightType = rightSide.returnType();
-        if (leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.INT)) {
-            return TypeItem.INT;
-        }
-        if (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.UINT)) {
-            return TypeItem.UINT;
-        }
-        if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
-            return TypeItem.NUMBER;
-        }
-
         return TypeItem.NUMBER;
     }
 

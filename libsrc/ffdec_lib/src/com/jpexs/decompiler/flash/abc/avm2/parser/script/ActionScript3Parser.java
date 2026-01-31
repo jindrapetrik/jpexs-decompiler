@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -233,14 +233,14 @@ public class ActionScript3Parser {
             if (!isNameOrProp(ret)) {
                 throw new AVM2ParseException("Invalid assignment", lexer.yyline());
             }
-            ret = new PostIncrementAVM2Item(null, null, ret);
+            ret = new PostIncrementAVM2Item(null, null, ret, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
             s = lex();
 
         } else if (s.type == SymbolType.DECREMENT) {
             if (!isNameOrProp(ret)) {
                 throw new AVM2ParseException("Invalid assignment", lexer.yyline());
             }
-            ret = new PostDecrementAVM2Item(null, null, ret);
+            ret = new PostDecrementAVM2Item(null, null, ret, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
             s = lex();
         }
 
@@ -1572,6 +1572,21 @@ public class ActionScript3Parser {
         //TODO: Order of additions as in official compiler
         return ret;
     }
+    
+    public boolean checkBasicXmlOnly(String txt) {
+        lexer = new ActionScriptLexer(txt);
+        try {
+            xml(new ArrayList<>(), null, null, new Reference<>(false), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false, false, new ArrayList<>(), null);
+            
+            ParsedSymbol s = lexer.lex();
+            if (s.type != SymbolType.EOF) {
+                return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        }        
+        return true;
+    }
 
     private GraphTargetItem command(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, boolean mustBeCommand, List<AssignableAVM2Item> variables, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
         LexBufferer buf = new LexBufferer();
@@ -2660,10 +2675,10 @@ public class ActionScript3Parser {
                     throw new AVM2ParseException("Not a property or name", lexer.yyline());
                 }
                 if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementAVM2Item(null, null, varincdec);
+                    ret = new PreIncrementAVM2Item(null, null, varincdec, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
                 }
                 if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementAVM2Item(null, null, varincdec);
+                    ret = new PreDecrementAVM2Item(null, null, varincdec, TypeItem.NUMBER); //TODO: how about TypeItem.INT?
                 }
 
                 break;

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -36,12 +37,14 @@ import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
 import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
@@ -962,6 +965,76 @@ public class ActionSourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForInActionItem item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        String charset = getCharset();
+        HashMap<String, Integer> registerVars = getRegisterVars(localData);
+        ret.addAll(item.enumVariable.toSource(localData, this));
+        ret.add(new ActionEnumerate2());
+
+        List<Action> loopExpr = new ArrayList<>();
+        int exprReg = getTempRegister(localData);
+
+        loopExpr.add(new ActionStoreRegister(exprReg, charset));
+        loopExpr.add(new ActionPush(Null.INSTANCE, charset));
+        loopExpr.add(new ActionEquals2());
+        ActionIf forInEndIf = new ActionIf(0, charset);
+        loopExpr.add(forInEndIf);
+        List<Action> loopBody = new ArrayList<>();
+
+        //assuming (variableName instanceof VariableActionItem)       
+        VariableActionItem vaact = (VariableActionItem) item.variableName;
+        GraphTargetItem setVar = vaact.getBoxedValue();
+        setVar.value = new DirectValueActionItem(new RegisterNumber(exprReg));
+
+        loopBody.addAll(toActionList(setVar.toSourceIgnoreReturnValue(localData, this)));
+        //loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
+        int oldForIn = getForInLevel(localData);
+        setForInLevel(localData, oldForIn + 1);
+        loopBody.addAll(toActionList(generate(localData, item.commands)));
+        setForInLevel(localData, oldForIn);
+        ActionJump forinJmpBack = new ActionJump(0, charset);
+        loopBody.add(forinJmpBack);
+        
+        boolean hasBreak = false;
+        for (Action a : loopBody) {
+            if (a instanceof ActionJump) {
+                ActionJump aJump = (ActionJump) a;
+                if (aJump.isBreak) {
+                    hasBreak = true;
+                    break;
+                }
+            }
+        }
+        
+        List<Action> loopPop = new ArrayList<>();
+        int popLen = 0;
+        if (hasBreak) {
+            loopPop.add(new ActionPush(Null.INSTANCE, charset));
+            loopPop.add(new ActionEquals2());
+            loopPop.add(new ActionNot());        
+            ActionIf forInIfPop = new ActionIf(0, charset);
+            loopPop.add(forInIfPop);
+
+            popLen = Action.actionsToBytes(loopPop, false, SWF.DEFAULT_VERSION).length;
+            forInIfPop.setJumpOffset(-popLen);        
+        }
+        
+        
+        int bodyLen = Action.actionsToBytes(loopBody, false, SWF.DEFAULT_VERSION).length;
+        int exprLen = Action.actionsToBytes(loopExpr, false, SWF.DEFAULT_VERSION).length;
+        forinJmpBack.setJumpOffset(-bodyLen - exprLen);
+        forInEndIf.setJumpOffset(bodyLen + popLen);
+        int forinJmpBackLen = forinJmpBack.getTotalActionLength();
+        int forInEndIfLen = forInEndIf.getTotalActionLength();
+        ret.addAll(loopExpr);
+        ret.addAll(loopBody);
+        ret.addAll(loopPop);
+        fixLoop(loopBody, bodyLen, -exprLen, item);
+        releaseTempRegister(localData, exprReg);
+        return ret;
+    }
+    
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();

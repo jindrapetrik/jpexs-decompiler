@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -109,17 +109,17 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup().value);
                             //stack.pop();
                             //TestIncDec12 with result
-                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
                             //stack.pop();
                             //TestIncDec11 with result
-                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else {
-                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         }
                     } else {
-                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                     }
                     return;
                 }
@@ -139,17 +139,17 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup().value);
                             //stack.pop();
                             //TestIncDec12 with result
-                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             GraphTargetItem.checkDup(stack, output, stack.pop(), value.getNotCoercedNoDup());
                             //stack.pop();
                             //TestIncDec11 with result
-                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         } else {
-                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                            stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                         }
                     } else {
-                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
+                        stack.addToOutput(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside, getNumberType(value)));
                     }
                     return;
                 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 /**
@@ -78,13 +79,13 @@ public class IncLocalPIns extends InstructionDefinition {
             if (stackTop instanceof LocalRegAVM2Item) {
                 if (regId == ((LocalRegAVM2Item) stackTop).regIndex) {
                     stack.pop();
-                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, stackTop));
+                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, stackTop, new TypeItem("decimal")));
                     isPostInc = true;
                 }
             }
         }
         if (!isPostInc) {
-            stack.addToOutput(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId));
+            stack.addToOutput(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId, new TypeItem("decimal")));
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new AddAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));

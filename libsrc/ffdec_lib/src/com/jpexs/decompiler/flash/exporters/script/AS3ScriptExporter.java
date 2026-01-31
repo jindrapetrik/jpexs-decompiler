@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -684,12 +684,16 @@ public class AS3ScriptExporter {
                             }
 
                             Set<Integer> neededCharacters = new LinkedHashSet<>();
+                            Set<String> neededCharacterClasses = new LinkedHashSet<>();
                             List<Integer> symbolClassIds = new ArrayList<>();
                             List<String> symbolClassNames = new ArrayList<>();
                             for (CharacterTag st : assetsTagList) {
-                                st.getNeededCharactersDeep(neededCharacters);
+                                st.getNeededCharactersDeep(neededCharacters, neededCharacterClasses);
                                 neededCharacters.add(swf.getCharacterId(st));
                             }
+                            
+                            //TODO: handle neededCharacterClasses?
+                            
                             for (int n : neededCharacters) {
                                 CharacterTag ct = (CharacterTag) swf.getCharacter(n);
                                 if (ct == null) {

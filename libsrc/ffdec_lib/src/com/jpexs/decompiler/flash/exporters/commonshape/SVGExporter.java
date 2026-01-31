@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -123,21 +123,27 @@ public class SVGExporter implements RequiresNormalizedFonts {
         public final ColorTransform colorTransform;
         public final int ratio;
         public final boolean clipped;
+        public int frame;
+        public int time;
 
-        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio, boolean clipped) {
+        public ExportKey(Tag tag, ColorTransform colorTransform, int ratio, boolean clipped, int frame, int time) {
             this.tag = tag;
             this.colorTransform = colorTransform;
             this.ratio = ratio;
             this.clipped = clipped;
+            this.frame = frame;
+            this.time = time;
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 79 * hash + Objects.hashCode(this.tag);
-            hash = 79 * hash + Objects.hashCode(this.colorTransform);
-            hash = 79 * hash + this.ratio;
-            hash = 79 * hash + (this.clipped ? 1 : 0);
+            hash = 11 * hash + Objects.hashCode(this.tag);
+            hash = 11 * hash + Objects.hashCode(this.colorTransform);
+            hash = 11 * hash + this.ratio;
+            hash = 11 * hash + (this.clipped ? 1 : 0);
+            hash = 11 * hash + this.frame;
+            hash = 11 * hash + this.time;
             return hash;
         }
 
@@ -159,11 +165,17 @@ public class SVGExporter implements RequiresNormalizedFonts {
             if (this.clipped != other.clipped) {
                 return false;
             }
+            if (this.frame != other.frame) {
+                return false;
+            }
+            if (this.time != other.time) {
+                return false;
+            }
             if (!Objects.equals(this.tag, other.tag)) {
                 return false;
             }
             return Objects.equals(this.colorTransform, other.colorTransform);
-        }
+        }       
     }
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {

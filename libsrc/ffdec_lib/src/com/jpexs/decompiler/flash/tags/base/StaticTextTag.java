@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -982,11 +983,11 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         for (TEXTRECORD tr : textRecords) {
             if (tr.styleFlagsHasFont) {
                 needed.add(tr.fontId);
-            }
+            }            
         }
     }
 
@@ -1027,18 +1028,18 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, int aaScale) {
         if (image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts g = (RequiresNormalizedFonts) image.getGraphics();
             Map<Integer, TextTag> normalizedTexts = g.getNormalizedTexts();
             int realTextId = getSwf().getCharacterId(this);
             if (normalizedTexts.containsKey(realTextId) && normalizedTexts.get(realTextId) instanceof StaticTextTag) {
                 StaticTextTag normalizedText = (StaticTextTag) normalizedTexts.get(realTextId);
-                staticTextToImage(swf, normalizedText.textRecords, getTextNum(), image, normalizedText.textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
+                staticTextToImage(swf, normalizedText.textRecords, getTextNum(), image, normalizedText.textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0, aaScale);
                 return;
             }
         }
-        staticTextToImage(swf, textRecords, getTextNum(), image, textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0);
+        staticTextToImage(swf, textRecords, getTextNum(), image, textMatrix, transformation, colorTransform, renderContext.selectionText == this ? renderContext.selectionStart : 0, renderContext.selectionText == this ? renderContext.selectionEnd : 0, aaScale);
         /*try {
          TextTag originalTag = (TextTag) getOriginalTag();
          if (isModified()) {
@@ -1051,7 +1052,7 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
+    public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
         int realTextId = getSwf().getCharacterId(this);
         if (exporter.getNormalizedTexts().containsKey(realTextId) && exporter.getNormalizedTexts().get(realTextId) instanceof StaticTextTag) {
             StaticTextTag normalizedText = (StaticTextTag) exporter.getNormalizedTexts().get(realTextId);
@@ -1064,5 +1065,10 @@ public abstract class StaticTextTag extends TextTag {
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         staticTextToHtmlCanvas(unitDivisor, swf, textRecords, getTextNum(), result, textBounds, textMatrix, null);
+    }
+    
+    @Override
+    public Dimension getFilterDimensions() {
+        return new Dimension(0, 0);                
     }
 }

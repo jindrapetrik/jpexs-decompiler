@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
@@ -306,6 +307,9 @@ public class FolderPreviewPanel extends JPanel {
         if (treeItem instanceof SceneFrame) {
             treeItem = ((SceneFrame) treeItem).getFrame();
         }
+        
+        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+                
         if (treeItem instanceof Frame) {
             Frame fn = (Frame) treeItem;
             RECT rect = swf.displayRect;
@@ -328,8 +332,10 @@ public class FolderPreviewPanel extends JPanel {
             Timeline timeline = swf.getTimeline();
             String key = "frame_" + fn.frame + "_" + timeline.id + "_" + zoom;
             imgSrc = swf.getFromCache(key);
-            if (imgSrc == null) {
-                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, swf.getBackgroundColor() == null ? null : swf.getBackgroundColor().backgroundColor.toColor(), zoom, !Configuration.disableBitmapSmoothing.get());
+            if (imgSrc == null) {            
+                aaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), zoom, aaScale);
+                
+                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, swf.getBackgroundColor() == null ? null : swf.getBackgroundColor().backgroundColor.toColor(), zoom, !Configuration.disableBitmapSmoothing.get(), aaScale);
                 swf.putToCache(key, imgSrc);
             }
 
@@ -343,7 +349,7 @@ public class FolderPreviewPanel extends JPanel {
             oh = height * SWF.unitDivisor;
         } else if (treeItem instanceof BoundedTag) {
             BoundedTag boundedTag = (BoundedTag) treeItem;
-            RECT rect = boundedTag.getRect();
+            RECT rect = boundedTag.getRectWithFilters();
             ow = rect.getWidth();
             oh = rect.getHeight();
             width = (int) (rect.getWidth() / SWF.unitDivisor) + 1;
@@ -373,24 +379,39 @@ public class FolderPreviewPanel extends JPanel {
             scale = 1;
         }
 
-        m = m.preConcatenate(Matrix.getScaleInstance(scale));
         width = (int) (scale * width);
         height = (int) (scale * height);
         if (width == 0 || height == 0) {
             return null;
         }
 
-        SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
-        image.fillTransparent();
+        aaScale = Configuration.calculateRealAaScale(width, height, 1, aaScale);
+        
         if (imgSrc == null) {
+            m = m.preConcatenate(Matrix.getScaleInstance(scale * aaScale));        
             DrawableTag drawable = (DrawableTag) treeItem;
             ExportRectangle viewRectangle = new ExportRectangle(0, 0, ow, oh);
-            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get());
-        } else {
-            Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setTransform(m.toTransform());
-            g.drawImage(imgSrc.getBufferedImage(), 0, 0, null);
-        }
+            
+            SerializableImage imageLarger = new SerializableImage(width * aaScale, height * aaScale, SerializableImage.TYPE_INT_ARGB);
+            imageLarger.fillTransparent();                    
+            drawable.toImage(0, 0, 0, new RenderContext(), imageLarger, imageLarger, false, m, new Matrix(), m, m, null, scale * aaScale, false, viewRectangle, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), aaScale);
+            if (aaScale > 1) {
+                SerializableImage imageNormalSize = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
+                imageNormalSize.fillTransparent();
+            
+                imageNormalSize.getGraphics().drawImage(imageLarger.getBufferedImage().getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+                return imageNormalSize;
+            }
+            return imageLarger;
+        } 
+        
+        m = m.preConcatenate(Matrix.getScaleInstance(scale));
+        
+        SerializableImage image = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
+        image.fillTransparent();
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setTransform(m.toTransform());
+        g.drawImage(imgSrc.getBufferedImage(), 0, 0, null);        
         return image;
     }
 

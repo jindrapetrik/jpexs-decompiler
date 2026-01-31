@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,30 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "trace(arguments[0]);\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testAlwaysBreak() {
+        decompileMethod("classic_air", "testAlwaysBreak", "var v:* = undefined;\r\n"
+                + "v = 5;\r\n"
+                + "trace(\"a\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(v > 4)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "if(v > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"c\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"d\");\r\n"
+                + "}\r\n"
+                + "trace(\"e\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"f\");\r\n",
                  false);
     }
 
@@ -491,7 +515,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testDoWhile() {
-        decompileMethod("classic_air", "testDoWhile", "var a:int = 8;\r\n"
+        decompileMethod("classic_air", "testDoWhile", "var a:* = 8;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
@@ -553,6 +577,36 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testDoWhileTwice() {
+        decompileMethod("classic_air", "testDoWhileTwice", "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"x\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"y\");\r\n"
+                + "}\r\n"
+                + "trace(\"z\");\r\n"
+                + "}\r\n"
+                + "trace(\"g\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"h\");\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testDotParent() {
         decompileMethod("classic_air", "testDotParent", "var d:* = new TestClass1();\r\n"
                 + "var k:* = null;\r\n"
@@ -595,7 +649,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testFinallyZeroJump() {
-        decompileMethod("classic_air", "testFinallyZeroJump", "var str:* = param1;\r\n"
+        decompileMethod("classic_air", "testFinallyZeroJump", "var str:String = param1;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -751,7 +805,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "list[1] = \"second\";\r\n"
                 + "list[2] = \"third\";\r\n"
                 + "var _loc4_:int = 0;\r\n"
-                + "var _loc3_:* = list;\r\n"
+                + "var _loc3_:Array = list;\r\n"
                 + "for each(item in _loc3_)\r\n"
                 + "{\r\n"
                 + "return item;\r\n"
@@ -913,7 +967,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testForInReturn", "var dic:Dictionary = null;\r\n"
                 + "var item:* = null;\r\n"
                 + "var _loc4_:int = 0;\r\n"
-                + "var _loc3_:* = dic;\r\n"
+                + "var _loc3_:Dictionary = dic;\r\n"
                 + "for(item in _loc3_)\r\n"
                 + "{\r\n"
                 + "return item;\r\n"
@@ -1343,7 +1397,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIncDec1() {
-        decompileMethod("classic_air", "testIncDec1", "var a:int = 5;\r\n"
+        decompileMethod("classic_air", "testIncDec1", "var a:* = 5;\r\n"
                 + "trace(\"++a with result\");\r\n"
                 + "trace(++a);\r\n"
                 + "trace(\"--a with result\");\r\n"
@@ -1357,7 +1411,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIncDec2() {
-        decompileMethod("classic_air", "testIncDec2", "var a:int = 5;\r\n"
+        decompileMethod("classic_air", "testIncDec2", "var a:* = 5;\r\n"
                 + "trace(\"a++ with result\");\r\n"
                 + "trace(a++);\r\n"
                 + "trace(\"a-- with result\");\r\n"
@@ -1903,7 +1957,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testOptimization() {
         decompileMethod("classic_air", "testOptimization", "var f:int = 0;\r\n"
-                + "var g:* = 0;\r\n"
+                + "var g:int = 0;\r\n"
                 + "var h:int = 0;\r\n"
                 + "var a:int = 1;\r\n"
                 + "var b:int = 2;\r\n"
@@ -2845,6 +2899,40 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "</{xtaga} >\r\n"
                 + ";\r\n"
                 + "var m:XMLList = myXML.*;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testXml2() {
+        decompileMethod("classic_air", "testXml2", "var x1:XML = <elem name=\"aaa\" value=\"xxx&#10;\"/>;\r\n"
+                + "var x2:XML = <elem\r\n"
+                + "name=\"aaa\"\r\n"
+                + "value=\"xxx\"\r\n"
+                + "/>;\r\n"
+                + "var x3:XML = <elem\r\n"
+                + "name=\"aaa\" value=\"xxx\">\r\n"
+                + "<sub title=\"yyy\">\r\n"
+                + "ampersand: &amp;\r\n"
+                + "</sub>\r\n"
+                + "<sub />\r\n"
+                + "</elem>;\r\n"
+                + "var x4:XML = <elem>\r\n"
+                + "<elem>\r\n"
+                + "A\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "B\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "<elem>\r\n"
+                + "C\r\n"
+                + "</elem>\r\n"
+                + "</elem>\r\n"
+                + "</elem>;\r\n"
+                + "var x5:XML = <elem attr=\"abc\\r\\n\\tdef\"></elem>;\r\n"
+                + "var x_invalid:XML = new XML(\"<aaa >> invalid \\\"\\n\");\r\n"
+                + "var a:int = 5;\r\n"
+                + "trace(\"B\");\r\n",
                  false);
     }
 }

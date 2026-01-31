@@ -25,8 +25,7 @@ Unicode true
 SetCompressor /SOLID lzma
 !include "StrFunc.nsh"
 !include x64.nsh
-; Asociation - triggers Nemesis detection in VirusTotal :-(
-;!include Integration.nsh
+!include Integration.nsh
 
 !define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
 
@@ -317,21 +316,23 @@ var SMDir
   !insertmacro LANG_LOAD "English"
   !insertmacro LANG_LOAD "Catalan"    
   !insertmacro LANG_LOAD "Czech"  
-  !insertmacro LANG_LOAD "SimpChinese"
   !insertmacro LANG_LOAD "Dutch"
   !insertmacro LANG_LOAD "French"
   !insertmacro LANG_LOAD "German"
   !insertmacro LANG_LOAD "Hungarian"
+  !insertmacro LANG_LOAD "Italian"
+  !insertmacro LANG_LOAD "Japanese"
   !insertmacro LANG_LOAD "Polish"
   !insertmacro LANG_LOAD "Portuguese"
   !insertmacro LANG_LOAD "PortugueseBR"
-  !insertmacro LANG_LOAD "Russian"
+  !insertmacro LANG_LOAD "SimpChinese"
+  !insertmacro LANG_LOAD "Slovenian"
   !insertmacro LANG_LOAD "Spanish"
   !insertmacro LANG_LOAD "Swedish"
+  !insertmacro LANG_LOAD "Russian"
   !insertmacro LANG_LOAD "Turkish"  
   !insertmacro LANG_LOAD "Ukrainian"
-  !insertmacro LANG_LOAD "Italian"
-
+  
 
 ;--------------------------------
 ;Installer Sections
@@ -364,8 +365,6 @@ var SMDir
 !macroend
 
 !define REG_CLASSES_HKEY HKLM
-
-/* ; Asociation - triggers Nemesis detection in VirusTotal :-(
 
 var className
 !define VERB "ffdec"
@@ -421,7 +420,6 @@ Function AddToExtContextMenu
      ${EndIf}
 FunctionEnd
 
-*/
 Section "FFDec" SecDummy
                                       
   SetShellVarContext all
@@ -499,7 +497,6 @@ Function .onInit
   SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
-/* ; Asociation - triggers Nemesis detection in VirusTotal :-(
 Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     SetRegView 64
     Push "swf"
@@ -507,6 +504,10 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     Push "spl"
     Call AddToExtContextMenu
     Push "gfx"
+    Call AddToExtContextMenu
+    Push "swt"
+    Call AddToExtContextMenu
+    Push "swc"
     Call AddToExtContextMenu
     
     SetRegView 32
@@ -516,18 +517,21 @@ Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     Call AddToExtContextMenu    
     Push "gfx"
     Call AddToExtContextMenu
+    Push "swt"
+    Call AddToExtContextMenu
+    Push "swc"
+    Call AddToExtContextMenu
     
     ${NotifyShell_AssocChanged}
 SectionEnd
-*/
+
 ;--------------------------------
 ;Descriptions
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "$(STRING_SECTION_APP)"
-  ;  Asociation - triggers Nemesis detection in VirusTotal :-(
-  ;  !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
     !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut} "$(STRING_SECTION_SHORTCUT)"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -576,13 +580,16 @@ Section "Uninstall"
   RmDir /r "$SMPROGRAMS\$SMDir\*.*"
   RmDir "$SMPROGRAMS\$SMDir"   
   
-  /* ; Asociation - triggers Nemesis detection in VirusTotal :-(
   SetRegView 64
   Push "swf"
   Call un.RemoveExtContextMenu
   Push "spl"
   Call un.RemoveExtContextMenu
   Push "gfx"
+  Call un.RemoveExtContextMenu
+  Push "swt"
+  Call un.RemoveExtContextMenu
+  Push "swc"
   Call un.RemoveExtContextMenu
   
   SetRegView 32
@@ -592,10 +599,12 @@ Section "Uninstall"
   Call un.RemoveExtContextMenu
   Push "gfx"
   Call un.RemoveExtContextMenu
+  Push "swt"
+  Call un.RemoveExtContextMenu
+  Push "swc"
+  Call un.RemoveExtContextMenu
 
-  ${NotifyShell_AssocChanged}
-  
-  */
+  ${NotifyShell_AssocChanged}   
 
   StrCmp $uninstlocal 1 0 +5
     SetShellVarContext current      

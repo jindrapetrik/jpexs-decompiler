@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,8 @@ public class DefineBeforeUsageFixer {
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);            
             Set<Integer> needed = new LinkedHashSet<>();
-            t.getNeededCharactersDeep(needed);            
+            Set<String> neededClasses = new LinkedHashSet<>();
+            t.getNeededCharactersDeep(needed, neededClasses);
             for (int chId : needed) {
                 if (walkedCharacters.contains(chId)) {
                     continue;
@@ -76,5 +77,5 @@ public class DefineBeforeUsageFixer {
             }
         }
         return i;
-    }
+    }        
 }

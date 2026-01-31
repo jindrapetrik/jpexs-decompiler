@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.Dimension;
 import java.util.Set;
 
 /**
@@ -47,4 +48,18 @@ public interface BoundedTag {
      * @return Rectangle including strokes
      */
     public RECT getRectWithStrokes();
+    
+    /**
+     * Gets filter dimensions.
+     *
+     * @return Filter dimensions
+     */
+    public Dimension getFilterDimensions();
+    
+    /**
+     * Gets rectangle including filters.
+     * 
+     * @return RECT with filters applied
+     */
+    public RECT getRectWithFilters();
 }

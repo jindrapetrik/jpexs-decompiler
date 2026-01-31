@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2022-2025 JPEXS
+ *  Copyright (C) 2022-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.translator;
 
 import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.helpers.Helper;
@@ -770,7 +769,8 @@ public class Translator extends JFrame implements ItemListener {
                 int missingCount = 0;
                 int newCount = 0;
                 int modifiedCount = 0;
-                for (String key : resourceValues.get(resource).get("en").keySet()) {
+                LinkedHashMap<String, LinkedHashMap<String, String>> map = resourceValues.get(resource);
+                for (String key : map.get("en").keySet()) {
                     if (resourceValues.get(resource).containsKey(locale)
                             && resourceValues.get(resource).get(locale).containsKey(key)) {
                         if (newValues.containsKey(resource)

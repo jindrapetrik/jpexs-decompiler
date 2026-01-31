@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -2878,7 +2878,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             @Override
             public Timeline getTimeline() {
-                return new Timeline(origSwf, this, Integer.MAX_VALUE, frect);
+                return new Timeline(origSwf, this, Integer.MAX_VALUE, frect, getFilterDimensions());
             }
 
             @Override
@@ -2968,6 +2968,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             public RECT getRectWithStrokes() {
                 return getRect();
             }
+            
+            @Override
+            public Dimension getFilterDimensions() {
+                return new Dimension(0, 0);
+            }
+
+            @Override
+            public RECT getRectWithFilters() {
+                return getRect();
+            }                        
         };
 
         imagePanel.setTimelined(tim, origSwf, 0, true, true, true, true, true, false, true, true, true);

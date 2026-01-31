@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -528,7 +528,7 @@ public class XFLConverter {
 
                 ImageTag it = (ImageTag) bitmapCh;
                 writer.writeStartElement("BitmapFill");
-                writer.writeAttribute("bitmapPath", getSymbolName(lastImportedId, characterNameMap, swf, bitmapCh, "Bitmap") + it.getImageFormat().getExtension());
+                writer.writeAttribute("bitmapPath", getSymbolName(lastImportedId, characterNameMap, swf, bitmapCh, "Bitmap", true) + it.getImageFormat().getExtension());
 
                 if ((fs.fillStyleType == FILLSTYLE.CLIPPED_BITMAP) || (fs.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
                     writer.writeAttribute("bitmapIsClipped", true);
@@ -1123,6 +1123,7 @@ public class XFLConverter {
         return ret;
     }
 
+    
     private static void walkNeededClasses(Set<CharacterTag> ret, ReadOnlyTagList tags) {
         for (Tag t : tags) {
             if (t instanceof DefineSpriteTag) {
@@ -1144,10 +1145,12 @@ public class XFLConverter {
             }
         }
     }
+    
 
     private static void walkNeededCharacters(Set<CharacterTag> result, CharacterTag ct) {
         Set<Integer> needed = new HashSet<>();
-        ct.getNeededCharactersDeep(needed);
+        Set<String> neededClasses = new HashSet<>();
+        ct.getNeededCharactersDeep(needed, neededClasses);
         for (int n : needed) {
             CharacterTag nc = ct.getSwf().getCharacter(n);
             if (result.contains(nc)) {
@@ -1155,10 +1158,23 @@ public class XFLConverter {
             }
             result.add(nc);
             walkNeededCharacters(result, nc);
+            /*if (nc instanceof DefineSpriteTag) {
+                DefineSpriteTag sp = (DefineSpriteTag) nc;
+                walkNeededClasses(result, sp.getTags());
+            }*/
+        }
+        
+        for (String n : neededClasses) {
+            CharacterTag nc = ct.getSwf().getCharacterByClass(n);
+            if (result.contains(nc)) {
+                continue;
+            }
+            result.add(nc);
+            /*walkNeededCharacters(result, nc);
             if (nc instanceof DefineSpriteTag) {
                 DefineSpriteTag sp = (DefineSpriteTag) nc;
                 walkNeededClasses(result, sp.getTags());
-            }
+            }*/
         }
     }
 
@@ -1337,24 +1353,43 @@ public class XFLConverter {
     }
 
     private static String getSymbolName(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, CharacterTag tag) {
-        return getSymbolName(lastImportedId, characterNameMap, swf, tag, "Symbol");
+        return getSymbolName(lastImportedId, characterNameMap, swf, tag, true);
+    }
+
+    private static String getSymbolName(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, CharacterTag tag, boolean fullPath) {
+        return getSymbolName(lastImportedId, characterNameMap, swf, tag, "Symbol", fullPath);
     }
 
     private static String getSymbolName(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, CharacterTag tag, String kind) {
+        return getSymbolName(lastImportedId, characterNameMap, swf, tag, kind, true);
+    }
+    
+    private static String getSymbolName(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, CharacterTag tag, String kind, boolean fullPath) {
         if (tag == null) {
             return "null";
         }
-        if (characterNameMap.containsKey(tag)) {
-            return characterNameMap.get(tag);
+        if (!characterNameMap.containsKey(tag)) {
+            int characterId = swf.getCharacterId(tag);
+            if (characterId == -1) {
+                lastImportedId.setVal(lastImportedId.getVal() + 1);
+                if (tag instanceof FontTag) {
+                    //The font must have unique name (without folder)
+                    characterNameMap.put(tag, "imported/Imported Font " + lastImportedId.getVal());
+                } else {
+                    characterNameMap.put(tag, "imported/" + kind + " " + lastImportedId.getVal());
+                }                
+            } else {
+                characterNameMap.put(tag, kind + " " + characterId);
+            }            
         }
-        int characterId = swf.getCharacterId(tag);
-        if (characterId == -1) {
-            lastImportedId.setVal(lastImportedId.getVal() + 1);
-            characterNameMap.put(tag, "imported/" + kind + " " + lastImportedId.getVal());
-        } else {
-            characterNameMap.put(tag, kind + " " + characterId);
+        
+        String ret = characterNameMap.get(tag);
+        
+        if (ret.contains("/") && !fullPath) {
+            return ret.substring(ret.lastIndexOf("/") + 1);                    
         }
-        return characterNameMap.get(tag);
+        
+        return ret;
     }
 
     private String getMaskedSymbolName(int symbolId) { //FIXME: Does this work with importassets???
@@ -1628,7 +1663,7 @@ public class XFLConverter {
                 if (symbol instanceof ButtonTag) {
                     symbolStr.writeStartElement("timeline");
                     itemIcon = "0";
-                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", getSymbolName(lastImportedId, characterNameMap, swf, symbol), "currentFrame", "0"});
+                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", getSymbolName(lastImportedId, characterNameMap, swf, symbol, false), "currentFrame", "0"});
                     symbolStr.writeStartElement("layers");
 
                     ButtonTag button = (ButtonTag) symbol;
@@ -1840,7 +1875,7 @@ public class XFLConverter {
                     symbolStr.writeStartElement("timeline");
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
-                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", getSymbolName(lastImportedId, characterNameMap, swf, symbol), "currentFrame", "0"});
+                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", getSymbolName(lastImportedId, characterNameMap, swf, symbol, false), "currentFrame", "0"});
                     symbolStr.writeStartElement("layers");
                     SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
                     if (shapeWithStyle != null) {
@@ -2099,7 +2134,8 @@ public class XFLConverter {
                 for (Tag tag : swf.getTags()) {
                     if (tag instanceof ShapeTag) {
                         Set<Integer> needed = new HashSet<>();
-                        tag.getNeededCharacters(needed, swf);
+                        Set<String> neededClasses = new HashSet<>();
+                        tag.getNeededCharacters(needed, neededClasses, swf);
                         ShapeTag sht = (ShapeTag) tag;
                         if (needed.contains(imageTag.getCharacterId())) {
                             List<FILLSTYLE> fs = new ArrayList<>();
@@ -4499,7 +4535,7 @@ public class XFLConverter {
         if (classNames.size() == 1) {
             writer.writeAttribute("linkageClassName", classNames.get(0));
         }
-        if (symbolId == -1) {
+        if (sprite == null && symbolId == -1) {
             writer.writeStartElement("timelines");
         } else {
             writer.writeStartElement("timeline");
@@ -4525,7 +4561,7 @@ public class XFLConverter {
         if (!lastShowFrame) {
             fc++;
         }
-        if (symbolId == -1) {
+        if (sprite == null && symbolId == -1) {
             if (sceneLabelTag != null) {
                 for (int i = 0; i < sceneLabelTag.sceneOffsets.length; i++) {
                     scenes.add(new Scene(
@@ -4578,7 +4614,11 @@ public class XFLConverter {
                 scenes.add(scene);
             }
         } else {
-            Scene scene = new Scene(0, fc - 1, spriteName);
+            String simpleSpriteName = spriteName;
+            if (simpleSpriteName.contains("/")) {
+                simpleSpriteName = spriteName.substring(spriteName.lastIndexOf("/") + 1);                        
+            }
+            Scene scene = new Scene(0, fc - 1, simpleSpriteName);
             scene.timelineSubTags = timelineTags;
             scenes.add(scene);
         }
@@ -5211,7 +5251,7 @@ public class XFLConverter {
                     }
 
                     if (font != null && characterImportLinkageURL.containsKey(font)) {
-                        psFontName = getSymbolName(lastImportedId, characterNameMap, swf, font, "Font") + "*";
+                        psFontName = getSymbolName(lastImportedId, characterNameMap, swf, font, "Font", false) + "*";
                     }
                 }
                 newline = false;
@@ -5257,7 +5297,12 @@ public class XFLConverter {
         } else if (tag instanceof DefineEditTextTag) {
             DefineEditTextTag det = (DefineEditTextTag) tag;
             String tagName;
-            FontTag ft = det.getSwf().getFont(det.fontId);
+            FontTag ft = null;
+            if (det.hasFont) {
+                ft = det.getSwf().getFont(det.fontId);
+            } else if (det.hasFontClass) {
+                ft = det.getSwf().getFontByClass(det.fontClass);
+            }            
             
             if (normalizedFonts.containsKey(det.fontId)) {
                 ft = normalizedFonts.get(det.fontId);
@@ -5354,8 +5399,8 @@ public class XFLConverter {
                 RGBA textColor = null;
                 if (det.hasTextColor) {
                     textColor = det.textColor;
-                }
-                if (det.hasFont) {
+                }                
+                if (det.hasFont || det.hasFontClass) {
                     String fontName = null;
                     if (ft != null) {
                         DefineFontNameTag dfn = (DefineFontNameTag) ft.getSwf().getCharacterIdTag(ft.getCharacterId(), DefineFontNameTag.ID);
@@ -5379,7 +5424,7 @@ public class XFLConverter {
                             fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
                         }
                         if (characterImportLinkageURL.containsKey(ft)) {
-                            fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font") + "*";
+                            fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font", false) + "*";
                         }
                     }
                 }
@@ -5559,6 +5604,7 @@ public class XFLConverter {
 
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());
+        boolean hasImport = false;            
 
         XFLXmlWriter domDocument = new XFLXmlWriter();
         try {
@@ -5625,7 +5671,8 @@ public class XFLConverter {
                         CharacterTag cht = swf.getCharacter(chid);
                         characterImportLinkageURL.put(cht, it.getUrl());
                     }
-                }
+                    hasImport = true;
+                }                
                 if (frame == 1) {
                     if (tag instanceof ExportAssetsTag) {
                         ExportAssetsTag et = (ExportAssetsTag) tag;
@@ -5663,6 +5710,19 @@ public class XFLConverter {
                     }
                 }
             }
+            
+            
+            if (hasImport) {                
+                domDocument.writeStartElement("folders");
+                domDocument.writeStartElement("DOMFolderItem", new String[] {
+                    "name", "imported",
+                    "itemID", generateItemId(lastItemIdNumber),
+                    "isExpanded", "false"
+                });
+                domDocument.writeEndElement();
+                domDocument.writeEndElement(); //folders
+            }
+            
             convertFonts(lastItemIdNumber, lastImportedId, characterNameMap, swf, characters, domDocument, statusStack, characterVariables, characterClasses, charactersExportedInFirstFrame, characterImportLinkageURL);
 
             Set<ShapeTag> smallShapes = getSmallShapes(swf);
@@ -6114,12 +6174,17 @@ public class XFLConverter {
             }
 
             final String outfileF = zipfile;
+            final boolean fHasImport = hasImport;
             new RetryTask(() -> {
                 try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
                     out.putNextEntry(new ZipEntry("DOMDocument.xml"));
                     out.write(Utf8Helper.getBytes(domDocumentF));
                     out.putNextEntry(new ZipEntry("PublishSettings.xml"));
                     out.write(Utf8Helper.getBytes(publishSettingsF));
+                    out.putNextEntry(new ZipEntry("LIBRARY/"));
+                    if (fHasImport) {
+                        out.putNextEntry(new ZipEntry("LIBRARY/imported/"));
+                    }
                     for (String fileName : files.keySet()) {
                         out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
                         out.write(files.get(fileName));
@@ -6141,6 +6206,10 @@ public class XFLConverter {
             writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
             File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
             libraryDir.mkdir();
+            if (hasImport) {
+                File importedDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY" + File.separator + "imported");
+                importedDir.mkdir();
+            }
             File binDir = new File(xflDataDir.getAbsolutePath() + File.separator + "bin");
             binDir.mkdir();
             for (String fileName : files.keySet()) {
@@ -6302,9 +6371,15 @@ public class XFLConverter {
                 Map<CharacterTag, String> characterNameMap,
                 SWF swf
         ) {
-            if (det.hasFont) {
+            if (det.hasFont || det.hasFontClass) {
                 String fontName = null;
-                FontTag ft = (FontTag) det.getSwf().getCharacter(det.fontId);
+                FontTag ft = null;
+                if (det.hasFont) {
+                    ft = (FontTag) det.getSwf().getCharacter(det.fontId);
+                }
+                if (det.hasFontClass) {
+                    ft = det.getSwf().getFontByClass(det.fontClass);
+                }
                 if (ft != null) {
                     DefineFontNameTag fnt = ft.getFontNameTag();
                     if (fnt != null) {
@@ -6329,7 +6404,7 @@ public class XFLConverter {
                     }
 
                     if (characterImportLinkageURL.containsKey(ft)) {
-                        fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font") + "*";
+                        fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font", false) + "*";
                     }
                     fontFaceStack.push(fontFace);
                     fontSizeStack.push(size);
@@ -6459,7 +6534,7 @@ public class XFLConverter {
                                     }
 
                                     if (characterImportLinkageURL.containsKey(ft)) {
-                                        fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font") + "*";
+                                        fontFace = getSymbolName(lastImportedId, characterNameMap, swf, ft, "Font", false) + "*";
                                     }
                                     break;
                                 }

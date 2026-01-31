@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.Stopwatch;
@@ -5033,10 +5034,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+        
+        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+                
+        
+        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
         }
 
         iconPanel.setImg(image);
@@ -5167,22 +5172,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-
-        int width = (int) (viewRect.getWidth() * zoom);
-        int height = (int) (viewRect.getHeight() * zoom);
+        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+        
+        aaScale = Configuration.calculateRealAaScale((int) viewRect.getWidth(), (int) viewRect.getHeight(), zoom, aaScale);
+        
+        int width = aaScale * (int) (viewRect.getWidth() * zoom);
+        int height = aaScale * (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
             width = 1;
         }
         if (height == 0) {
             height = 1;
         }
+        
+        Rectangle realRectAA = new Rectangle(realRect);
+        realRectAA.x *= aaScale;
+        realRectAA.y *= aaScale;
+        realRectAA.width *= aaScale;
+        realRectAA.height *= aaScale;
+        
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
 
         Matrix m = new Matrix();
-        m.translate(-viewRect.xMin * zoom, -viewRect.yMin * zoom);
-        m.scale(zoom);
+        m.translate(-viewRect.xMin * zoom * aaScale, -viewRect.yMin * zoom * aaScale);
+        m.scale(zoom * aaScale);
 
         Matrix fullM = m.clone();
 
@@ -5214,12 +5229,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (backgroundColor != null) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(backgroundColor.toColor());
-            g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+            g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
         if (Configuration.showGrid.get() && (drawable instanceof SWF) && !Configuration.gridOverObjects.get()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
-            drawGridSwf(g, realRect, zoom);
+            drawGridSwf(g, realRectAA, zoom * aaScale);
         }
 
         parentMatrix = new Matrix();
@@ -5231,8 +5246,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             ignoreDepths.add(parentDepthState.depth);
             if (Configuration.halfTransparentParentLayersEasy.get()) {
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
-                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
-                        ignoreDepths);
+                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
+                        ignoreDepths, aaScale);
             }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
             ignoreDepths.clear();
@@ -5241,11 +5256,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (!parentTimelineds.isEmpty()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(new Color(255, 255, 255, 128));
-            g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+            g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
-        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
+        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
 
+        if (Configuration.reduceAntialiasConflationByScalingForDisplay.get()) {
+            image  = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));                 
+        }
+        
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);

@@ -1,6 +1,44 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
+- Save as EXE through context menu of SWF files (previously only in toolbar)
+- Slovenian translation
+- SVG export - video frames
+- [#2592], [#2154], [#2591], [#2596] - Better handling of antialias conflation artifacts (by scaling),
+  can be enabled in Advanced Settings / Display and Export.
+- [#2608] Updated WEBP image library so now it supports macOS x64
+- [PR228] Association with `.swc` extension
+- Association of file extensions in Windows setup (again)
+
+### Fixed
+- [#2570] NullpointerException on SVG export of DefineEditText
+- [#2570] ClassCastException on exporting sound head (export all command)
+- [#2571] SVG export - StackOverflow for DefineVideoStream
+- [#2575] dumpSWF CLI command displayed import assets GUI dialog
+- [#2573] AS3 - Incorrect uint/int/Number coercion
+- AS3 local registers type propagation
+- [#2566], [#2594] Export bounds of sprites and buttons not containg filter offsets
+- [#2582] Font normalizer setting small texts when no assigned glyph found
+- PDF export - not rendering video stream frames
+- [#2585] AS1/2 direct editation - continue and break in for..in loop
+- [#2589] SVG export - subsprite animation, sprite offsets
+- [#1893] Video - incorrect frame size
+- [#2572] SVG import - incorrect stroke width when transform contains rotation/shear
+- [#2595] FLA export - incorrect handling of imported fonts
+- FLA export - incorrect handling of imported sprites
+- [#2586] AS3 direct editation + decompilation - XML escape sequences and other XML problems
+- [#2600] Sprite/button outline incorrect calculation caused by clipping
+- [#2612] SVG export - handle incorrect surrogate pairs in text
+- [#2612] SVG export - problems with retain shape bounds setting
+- [#2609] JDK 25+ warnings on console about native access
+- [#2473], [#2530] Always-break loops containing breaks (forward gotos)
+
+### Changed
+- [#2575] dumpSWF CLI command only allows single SWF dump (no imports, etc.)
+
 ## [24.1.1] - 2025-11-17
 ### Added
 - AS3 Document class is underlined and has different icon
@@ -3868,7 +3906,8 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-,[24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...dev
+[24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
 [24.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.0...version24.0.1
 [24.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version23.0.1...version24.0.0
@@ -4041,6 +4080,30 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2581]: https://www.free-decompiler.com/flash/issues/2581
+[#2592]: https://www.free-decompiler.com/flash/issues/2592
+[#2154]: https://www.free-decompiler.com/flash/issues/2154
+[#2591]: https://www.free-decompiler.com/flash/issues/2591
+[#2596]: https://www.free-decompiler.com/flash/issues/2596
+[#2608]: https://www.free-decompiler.com/flash/issues/2608
+[#2570]: https://www.free-decompiler.com/flash/issues/2570
+[#2571]: https://www.free-decompiler.com/flash/issues/2571
+[#2575]: https://www.free-decompiler.com/flash/issues/2575
+[#2573]: https://www.free-decompiler.com/flash/issues/2573
+[#2566]: https://www.free-decompiler.com/flash/issues/2566
+[#2594]: https://www.free-decompiler.com/flash/issues/2594
+[#2582]: https://www.free-decompiler.com/flash/issues/2582
+[#2585]: https://www.free-decompiler.com/flash/issues/2585
+[#2589]: https://www.free-decompiler.com/flash/issues/2589
+[#1893]: https://www.free-decompiler.com/flash/issues/1893
+[#2572]: https://www.free-decompiler.com/flash/issues/2572
+[#2595]: https://www.free-decompiler.com/flash/issues/2595
+[#2586]: https://www.free-decompiler.com/flash/issues/2586
+[#2600]: https://www.free-decompiler.com/flash/issues/2600
+[#2612]: https://www.free-decompiler.com/flash/issues/2612
+[#2609]: https://www.free-decompiler.com/flash/issues/2609
+[#2473]: https://www.free-decompiler.com/flash/issues/2473
+[#2530]: https://www.free-decompiler.com/flash/issues/2530
 [#2556]: https://www.free-decompiler.com/flash/issues/2556
 [#2536]: https://www.free-decompiler.com/flash/issues/2536
 [#2537]: https://www.free-decompiler.com/flash/issues/2537
@@ -4453,7 +4516,6 @@ Major version of SWF to XML export changed to 2.
 [#1564]: https://www.free-decompiler.com/flash/issues/1564
 [#1676]: https://www.free-decompiler.com/flash/issues/1676
 [#1697]: https://www.free-decompiler.com/flash/issues/1697
-[#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
 [#1900]: https://www.free-decompiler.com/flash/issues/1900
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
@@ -5281,6 +5343,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR228]: https://github.com/jindrapetrik/jpexs-decompiler/pull/228
 [PR224]: https://github.com/jindrapetrik/jpexs-decompiler/pull/224
 [PR222]: https://github.com/jindrapetrik/jpexs-decompiler/pull/222
 [PR215]: https://github.com/jindrapetrik/jpexs-decompiler/pull/215

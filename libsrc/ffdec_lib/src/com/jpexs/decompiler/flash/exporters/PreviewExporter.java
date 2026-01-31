@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -366,6 +366,7 @@ public class PreviewExporter {
             }
 
             Set<Integer> doneCharacters = new LinkedHashSet<>();
+            Set<String> doneCharacterClasses = new LinkedHashSet<>();
             if (treeItem instanceof Frame) {
                 Frame fn = (Frame) treeItem;
                 Timelined parent = fn.timeline.timelined;
@@ -384,7 +385,7 @@ public class PreviewExporter {
                     }
 
                     Set<Integer> needed = new LinkedHashSet<>();
-                    t.getNeededCharactersDeep(needed);
+                    t.getNeededCharactersDeep(needed, new LinkedHashSet<>());
                     for (int n : needed) {
                         if (!doneCharacters.contains(n)) {
                             writeTag(swf.getCharacter(n), sos2, doneCharacters);
@@ -398,7 +399,7 @@ public class PreviewExporter {
                         int characterId = ((CharacterTag) t).getCharacterId();
                         if (characterId != -1) {
                             writeTag(t, sos2, doneCharacters);
-                        }
+                        } 
                     }
                 }
 
@@ -432,7 +433,7 @@ public class PreviewExporter {
                     //empty
                 } else {
                     Set<Integer> needed = new HashSet<>();
-                    ((Tag) treeItem).getNeededCharactersDeep(needed);
+                    ((Tag) treeItem).getNeededCharactersDeep(needed, new HashSet<>());
                     for (int n : needed) {
                         if (isSprite && chtId == n) {
                             continue;
@@ -706,7 +707,7 @@ public class PreviewExporter {
             }
             doneCharacters.add(chId);
         }
-
+        
         t.writeTagNoScripts(sos);
         if (t instanceof CharacterIdTag) {
             List<CharacterIdTag> chIdTags = t.getSwf().getCharacterIdTags(((CharacterIdTag) t).getCharacterId());
@@ -715,7 +716,7 @@ public class PreviewExporter {
                     if (!(chIdTag instanceof PlaceObjectTypeTag || chIdTag instanceof RemoveTag)) {
 
                         Set<Integer> needed = new LinkedHashSet<>();
-                        ((Tag) chIdTag).getNeededCharactersDeep(needed);
+                        ((Tag) chIdTag).getNeededCharactersDeep(needed, new HashSet<>());
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
                                 writeTag(((Tag) chIdTag).getSwf().getCharacter(n), sos, doneCharacters);

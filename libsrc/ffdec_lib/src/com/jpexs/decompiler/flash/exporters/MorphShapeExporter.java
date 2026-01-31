@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,11 +45,16 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -121,7 +126,7 @@ public class MorphShapeExporter {
                     RECT rect = st.getRect();
                     m = Matrix.getScaleInstance(settings.zoom);
                     m.translate(-rect.Xmin, -rect.Ymin);
-                    
+
                     switch (settings.mode) {
                         case SVG_START_END:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileStart))) {
@@ -131,7 +136,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                mst.getStartShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.getStartShapeTag().toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileEnd))) {
@@ -141,7 +146,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
-                                mst.getEndShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.getEndShapeTag().toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -153,7 +158,7 @@ public class MorphShapeExporter {
                                 rect2.xMin *= settings.zoom;
                                 rect2.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "morphshape");
-                                mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
+                                mst.toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -163,8 +168,11 @@ public class MorphShapeExporter {
                             double unzoom = settings.zoom;
                             st = mst.getStartShapeTag();
                             rect = st.getRect();
-                            int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
-                            int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+
+                            int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
+
+                            int newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            int newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == MorphShapeExportMode.BMP_START_END) {
@@ -175,23 +183,33 @@ public class MorphShapeExporter {
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
                             }
-                            m = Matrix.getScaleInstance(settings.zoom);
+                            m = Matrix.getScaleInstance(settings.zoom * realAaScale);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+
+                            BufferedImage bim = img.getBufferedImage();
+
+                            if (realAaScale > 1) {
+                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
+                                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);                                                            
+                            }
+
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
-                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileStart);
+                                ImageHelper.write(bim, ImageFormat.PNG, fileStart);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
                                 try (FileOutputStream fos = new FileOutputStream(fileStart)) {
-                                    fos.write(WebPCodec.encodeImage(img.getBufferedImage(), 100f));
+                                    fos.write(WebPCodec.encodeImage(bim, 100f));
                                 }
                             } else {
-                                BMPFile.saveBitmap(img.getBufferedImage(), fileStart);
+                                BMPFile.saveBitmap(bim, fileStart);
                             }
 
                             st = mst.getEndShapeTag();
                             rect = st.getRect();
-                            newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
-                            newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
+
+                            newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
                             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == MorphShapeExportMode.BMP_START_END) {
@@ -202,17 +220,25 @@ public class MorphShapeExporter {
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
                             }
-                            m = Matrix.getScaleInstance(settings.zoom);
+                            m = Matrix.getScaleInstance(settings.zoom * realAaScale);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
+
+                            bim = img.getBufferedImage();
+
+                            if (realAaScale > 1) {
+                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
+                                    ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);                                                            
+                            }
+
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
-                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
+                                ImageHelper.write(bim, ImageFormat.PNG, fileEnd);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
                                 try (FileOutputStream fos = new FileOutputStream(fileEnd)) {
-                                    fos.write(WebPCodec.encodeLosslessImage(img.getBufferedImage()));
+                                    fos.write(WebPCodec.encodeLosslessImage(bim));
                                 }
                             } else {
-                                BMPFile.saveBitmap(img.getBufferedImage(), fileEnd);
+                                BMPFile.saveBitmap(bim, fileEnd);
                             }
                             break;
                         case CANVAS:
@@ -222,10 +248,12 @@ public class MorphShapeExporter {
                                 CanvasMorphShapeExporter cse = new CanvasMorphShapeExporter(mst.getShapeNum(), ((Tag) mst).getSwf(), mst.getShapeAtRatio(0), mst.getShapeAtRatio(DefineMorphShapeTag.MAX_RATIO), new CXFORMWITHALPHA(), SWF.unitDivisor, deltaX, deltaY);
                                 cse.export();
                                 Set<Integer> needed = new HashSet<>();
+                                Set<String> neededClasses = new HashSet<>();
                                 CharacterTag ct = ((CharacterTag) mst);
                                 needed.add(ct.getCharacterId());
-                                ct.getNeededCharactersDeep(needed);
+                                ct.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(ct.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }

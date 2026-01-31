@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.enums;
 
-import dev.matrixlab.webp4j.NativeWebP;
 import dev.matrixlab.webp4j.WebPCodec;
 
 /**
@@ -59,19 +58,16 @@ public enum ImageFormat {
 
     /**
      * Get extension of the image format.
+     *
      * @return Extension of the image format.
      */
     public String getExtension() {
         return extension;
     }
-    
+
     public boolean available() {
         if (this == WEBP) {
-            try {
-                new NativeWebP();
-            } catch (Throwable t) {
-                return false;
-            }
+            return WebPCodec.isAvailable();
         }
         return true;
     }

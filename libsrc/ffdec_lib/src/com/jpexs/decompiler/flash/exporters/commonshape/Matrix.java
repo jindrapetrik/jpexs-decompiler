@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,13 +28,13 @@ import java.awt.geom.Rectangle2D;
  */
 public final class Matrix implements Cloneable {
 
-    public double scaleX = 1;
+    public double scaleX = 1;  //a
 
-    public double scaleY = 1;
+    public double scaleY = 1;  //d
 
-    public double rotateSkew0;
+    public double rotateSkew0; //b
 
-    public double rotateSkew1;
+    public double rotateSkew1; //c
 
     public double translateX;
 

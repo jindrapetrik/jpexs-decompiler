@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1015,23 +1015,18 @@ public class ActionGraph extends Graph {
         }
         return ip;
     }
-
-    /**
-     * Prepares second pass data. Can return null when no second pass will
-     * happen.
-     *
-     * @param list List of GraphTargetItems
-     * @return Second pass data or null
-     */
+   
     @Override
-    public SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
+    public SecondPassData prepareSecondPass(BaseLocalData localData, List<GraphTargetItem> list) {
         ActionSecondPassData spd = new ActionSecondPassData();
         Set<GraphPart> processedIfs = new HashSet<>();
         checkSecondPassSwitches(processedIfs, list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
 
-        if (spd.switchParts.isEmpty()) {
+        
+        if (spd.switchParts.isEmpty() && !localData.gotosUsed.getVal() && localData.allSwitchParts.isEmpty()) {
             return null; //no need to second pass
         }
+        spd.allSwitchParts.addAll(localData.allSwitchParts);
         return spd;
     }
     

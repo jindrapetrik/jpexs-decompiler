@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ public class AboutDialog extends AppDialog {
         authorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(authorLabel);
 
-        JLabel dateLabel = new JLabel("2010-2025");
+        JLabel dateLabel = new JLabel("2010-2026");
         dateLabel.setAlignmentX(0.5f);
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -188,7 +188,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         if (it2 == null) {
             return it;
         }
-        return it2;
+        
+        return it.dialect.copyCoerce(it, it2);
     }
 
     /**

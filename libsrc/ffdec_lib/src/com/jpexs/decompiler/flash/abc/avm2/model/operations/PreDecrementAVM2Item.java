@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,13 +36,20 @@ import java.util.List;
 public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2Item {
 
     /**
+     * Type
+     */
+    public GraphTargetItem type;
+    
+    /**
      * Constructor.
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param object Object
+     * @param type Type
      */
-    public PreDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+    public PreDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem type) {
         super(AVM2GraphTargetDialect.INSTANCE, instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unnecessary ++Number(xx) when xx not number*/);
+        this.type = type;
     }
 
     @Override
@@ -68,6 +75,11 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
 
     @Override
     public GraphTargetItem returnType() {
-        return value.returnType();
+        return type;
     }
+
+    @Override
+    public GraphTargetItem getObject() {
+        return value;
+    }        
 }

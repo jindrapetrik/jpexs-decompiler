@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -299,6 +299,8 @@ public class AVM2LocalData extends BaseLocalData {
         swfVersion = localData.swfVersion;
         usedDeobfuscations = localData.usedDeobfuscations;
         maxTempIndex = localData.maxTempIndex;
+        gotosUsed = localData.gotosUsed;
+        secondPassData = localData.secondPassData;
     }
 
     /**

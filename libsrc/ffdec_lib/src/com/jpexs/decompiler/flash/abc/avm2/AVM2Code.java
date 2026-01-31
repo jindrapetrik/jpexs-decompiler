@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -261,6 +261,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PackageAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
@@ -270,10 +272,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StoreNewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.TraitSlotConstAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
@@ -2174,18 +2179,30 @@ public class AVM2Code implements Cloneable {
             return assignment;
         }
         GraphTargetItem vtype = TypeItem.UNBOUNDED;
-        if (assignment.value instanceof ConvertAVM2Item) {
-            vtype = ((ConvertAVM2Item) assignment.value).type;
-        } else if (assignment.value instanceof CoerceAVM2Item) {
-            vtype = ((CoerceAVM2Item) assignment.value).typeObj;
-        } else if (assignment instanceof LocalRegAVM2Item) { //for..in
-            vtype = ((LocalRegAVM2Item) assignment).type;
-        } else if (assignment instanceof GetSlotAVM2Item) { //for..in
-            vtype = ((GetSlotAVM2Item) assignment).slotType;
-        } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
-            vtype = assignment.value.returnType();
-        } else if (assignment.value instanceof GetLexAVM2Item) {
-            vtype = assignment.value.returnType();
+        
+        if (
+            (assignment instanceof PostIncrementAVM2Item) 
+                || (assignment instanceof PostDecrementAVM2Item)
+                || (assignment instanceof PreIncrementAVM2Item)
+                || (assignment instanceof PreIncrementAVM2Item)
+        ) {
+            vtype = assignment.returnType();
+        } else {        
+            if (assignment.value instanceof ConvertAVM2Item) {
+                vtype = ((ConvertAVM2Item) assignment.value).type;
+            } else if (assignment.value instanceof CoerceAVM2Item) {
+                vtype = ((CoerceAVM2Item) assignment.value).typeObj;
+            } else if (assignment instanceof LocalRegAVM2Item) { //for..in
+                vtype = ((LocalRegAVM2Item) assignment).type;
+            } else if (assignment instanceof GetSlotAVM2Item) { //for..in
+                vtype = ((GetSlotAVM2Item) assignment).slotType;
+            } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
+                vtype = assignment.value.returnType();
+            } else if (assignment.value instanceof GetLexAVM2Item) {
+                vtype = assignment.value.returnType();
+            } else if (assignment.value instanceof LocalRegAVM2Item) {
+                vtype = assignment.value.returnType();
+            }
         }
 
         boolean isNull = false;
@@ -2408,6 +2425,21 @@ public class AVM2Code implements Cloneable {
                             items.add(i, dec);
                             i++;
                         }
+                    }
+                }
+                if ((subItem instanceof PostIncrementAVM2Item) 
+                        || (subItem instanceof PostDecrementAVM2Item)
+                        || (subItem instanceof PreIncrementAVM2Item)
+                        || (subItem instanceof PreIncrementAVM2Item)) {
+                    if (((AssignmentAVM2Item) subItem).getObject() instanceof LocalRegAVM2Item) {
+                        int reg = ((LocalRegAVM2Item) ((AssignmentAVM2Item) subItem).getObject()).regIndex;
+                        handleDeclareReg(minreg, subItem, declaredRegisters, declaredSlots, reg);
+                    }
+                }
+                if (subItem instanceof LocalRegAVM2Item) {
+                    LocalRegAVM2Item getLocal = (LocalRegAVM2Item) subItem;
+                    if (declaredRegisters[getLocal.regIndex] != null) {
+                        getLocal.type = declaredRegisters[getLocal.regIndex].type;
                     }
                 }
                 if (subItem instanceof SetPropertyAVM2Item) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
@@ -52,6 +50,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
+import com.jpexs.decompiler.flash.gui.SaveFileMode;
 import com.jpexs.decompiler.flash.gui.SelectFramePositionDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -101,7 +100,6 @@ import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -119,7 +117,6 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
@@ -147,17 +144,9 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
-import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.HasCharacterId;
 import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
@@ -167,7 +156,6 @@ import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -180,9 +168,10 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -260,6 +249,10 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem exportVsCodeMenuItem;
 
     private JMenuItem exportSwfXmlMenuItem;
+
+    private JMenuItem saveSwcMenuItem;
+    
+    private JMenuItem saveExeMenuItem;
 
     private JMenuItem importSwfXmlMenuItem;
 
@@ -579,6 +572,17 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportSwfXmlMenuItem.setIcon(View.getIcon("exportxml16"));
         add(exportSwfXmlMenuItem);
 
+        
+        saveSwcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveSwc"));
+        saveSwcMenuItem.addActionListener(this::saveSwcActionPerformed);
+        saveSwcMenuItem.setIcon(View.getIcon("bundleswc16"));
+        add(saveSwcMenuItem);
+        
+        saveExeMenuItem = new JMenuItem(mainPanel.translate("menu.file.saveasexe"));
+        saveExeMenuItem.addActionListener(this::saveExeActionPerformed);
+        saveExeMenuItem.setIcon(View.getIcon("saveasexe16"));
+        add(saveExeMenuItem);
+        
         addSeparator();
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
@@ -1386,6 +1390,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportVsCodeMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
+        saveSwcMenuItem.setVisible(allSelectedIsSwf && items.size() == 1);
+        saveExeMenuItem.setVisible(allSelectedIsSwf && items.size() == 1);
 
         importImagesMenuItem.setVisible(false);
         importShapesMenuItem.setVisible(false);
@@ -2605,7 +2611,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 AlterCharacterTag alterTag = new AlterCharacterTag(targetSwf, targetSameNameCharacter.getCharacterId());
 
                 Set<Integer> needed = new LinkedHashSet<>();
-                targetSameNameCharacter.getNeededCharacters(needed, targetSwf);
+                Set<String> neededClasses = new LinkedHashSet<>();
+                //TODO: handle classes?
+                targetSameNameCharacter.getNeededCharacters(needed, neededClasses, targetSwf);
                 int ind = realTargetTimelined.indexOfTag(targetSameNameCharacter);
                 realTargetTimelined.removeTag(ind);
                 realTargetTimelined.addTag(ind, alterTag);
@@ -3022,6 +3030,16 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
         Main.getMainFrame().getPanel().refreshTree();
+    }
+    
+    private void saveSwcActionPerformed(ActionEvent evt) {
+        SWF swf  = (SWF) getCurrentItem();
+        Main.saveSwc(swf);
+    }
+
+    private void saveExeActionPerformed(ActionEvent evt) {
+        Openable openable = (Openable) getCurrentItem();
+        Main.saveFileDialog(openable, SaveFileMode.EXE);
     }
 
     private void rawEditActionPerformed(ActionEvent evt) {
@@ -5052,20 +5070,32 @@ public class TagTreeContextMenu extends JPopupMenu {
         Set<TreeItem> newItems = new LinkedHashSet<>();
         for (TreeItem item : items) {
             Set<Integer> needed = new LinkedHashSet<>();
+            Set<String> neededClasses = new LinkedHashSet<>();
             Tag tag = (Tag) item;
-            tag.getNeededCharactersDeep(needed);
+            tag.getNeededCharactersDeep(needed, neededClasses);
             if (tag instanceof CharacterTag) {
                 needed.add(((CharacterTag) tag).getCharacterId());
+                for (String cls : ((CharacterTag) tag).getClassNames()) {
+                    neededClasses.add(cls);
+                }
             }
+            
+            Set<CharacterTag> neededChars = Collections.newSetFromMap(new IdentityHashMap<>());
             for (Integer characterId : needed) {
                 CharacterTag neededTag = sourceSwf.getCharacter(characterId);
+                neededChars.add(neededTag);
+            }
+            for (String cls : neededClasses) {
+                neededChars.add(sourceSwf.getCharacterByClass(cls));
+            }
+            for (CharacterTag neededTag : neededChars) {
                 newItems.add(neededTag);
                 List<Integer> mappedClasses = AbstractTagTree.getMappedTagIdsForClass(neededTag.getClass());
                 ReadOnlyTagList tags = neededTag.getTimelined().getTags();
                 for (int i = tags.indexOf(neededTag) + 1; i < tags.size(); i++) {
                     if (tags.get(i) instanceof CharacterIdTag) {
                         CharacterIdTag characterIdTag = (CharacterIdTag) tags.get(i);
-                        if (mappedClasses.contains(((Tag) characterIdTag).getId()) && characterIdTag.getCharacterId() == characterId) {
+                        if (mappedClasses.contains(((Tag) characterIdTag).getId()) && characterIdTag.getCharacterId() == neededTag.getCharacterId() && ((Tag) characterIdTag).getSwf() == neededTag.getSwf()) {
                             newItems.add((Tag) characterIdTag);
                         }
                     }
@@ -6051,7 +6081,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);
             if (dependentCharacters.isEmpty()) {
                 Set<Integer> needed = new LinkedHashSet<>();
-                ct.getNeededCharacters(needed, swf);
+                Set<String> neededClasses = new LinkedHashSet<>();
+                //TODO: handle classes?
+                ct.getNeededCharacters(needed, neededClasses, swf);
                 List<CharacterIdTag> attachedTags = swf.getCharacterIdTags(ch);
                 for (CharacterIdTag cit : attachedTags) {
                     if (cit instanceof Tag) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -610,11 +610,11 @@ public abstract class TextTag extends DrawableTag {
      * @param transformation Transformation
      * @param colorTransform Color transform
      */
-    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+    public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int aaScale) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+        BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false, aaScale);
     }
 
     /**
@@ -674,7 +674,7 @@ public abstract class TextTag extends DrawableTag {
      * @param selectionStart Selection start
      * @param selectionEnd Selection end
      */
-    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int selectionStart, int selectionEnd) {
+    public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, int selectionStart, int selectionEnd, int aaScale) {
         if (image.getGraphics() instanceof GraphicsTextDrawable) {
             //custom drawing
             ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
@@ -789,17 +789,17 @@ public abstract class TextTag extends DrawableTag {
                     //bounds.Ymin = (int) Math.round(-ascent);
                     //bounds.Ymax = (int) Math.round(descent + leading);
                     Matrix mat2 = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
-                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform);
+                    TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform, aaScale);
                 }
                 
                 if (shape != null) {
-                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false, aaScale);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
                         RECT bounds = shape.getBounds(1);
                         mat = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
-                        TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
+                        TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform, aaScale);
                     }
                 }
                 
@@ -982,6 +982,30 @@ public abstract class TextTag extends DrawableTag {
         return family;
     }
     
+    private static String sanitizeUtf16(String s) {
+        if (s == null) {
+            return null;
+        }
+
+        StringBuilder out = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isHighSurrogate(c)) {
+                if (i + 1 < s.length() && Character.isLowSurrogate(s.charAt(i + 1))) {
+                    out.append(c).append(s.charAt(i + 1));
+                    i++; // validní pár
+                } else {
+                    out.append('\uFFFD'); // broken high surrogate
+                }
+            } else if (Character.isLowSurrogate(c)) {
+                out.append('\uFFFD'); // alone low surrogate
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
+    }
+    
     /**
      * Converts static text to SVG.
      * @param swf SWF
@@ -1039,16 +1063,17 @@ public abstract class TextTag extends DrawableTag {
 
             exporter.createSubGroup(new Matrix(textMatrix), null);
             if (exporter.useTextTag) {
-                StringBuilder text = new StringBuilder();
+                StringBuilder textBuilder = new StringBuilder();
                 int totalAdvance = 0;
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
-                        text.append(ch);
+                        textBuilder.append(ch);
                         totalAdvance += entry.glyphAdvance;
                     }
                 }
-
+                String text = sanitizeUtf16(textBuilder.toString());
+    
                 boolean hasOffset = x != 0 || y != 0;
                 if (hasOffset) {
                     exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
@@ -1062,7 +1087,7 @@ public abstract class TextTag extends DrawableTag {
                 textElement.setAttribute("textLength", Double.toString(totalAdvance / SWF.unitDivisor));
                 textElement.setAttribute("lengthAdjust", "spacing");
                 textElement.setAttribute("style", "white-space: pre");
-                textElement.setTextContent(text.toString());
+                textElement.setTextContent(text);
 
                 RGBA colorA = new RGBA(textColor);
                 textElement.setAttribute("fill", colorA.toHexRGB());

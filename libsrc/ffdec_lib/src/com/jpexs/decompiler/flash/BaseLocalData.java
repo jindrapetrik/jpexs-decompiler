@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,6 +62,11 @@ public abstract class BaseLocalData {
      * Max temp index
      */
     public Reference<Integer> maxTempIndex = new Reference<>(0);
+    
+    /**
+     * Wheter goto statements were used
+     */
+    public Reference<Boolean> gotosUsed = new Reference<>(false);
     
     /**
      * Constructor.

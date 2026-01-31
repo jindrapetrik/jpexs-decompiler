@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -3535,18 +3535,6 @@ public class AVM2Graph extends Graph {
             }
         }
         super.makeAllCommands(commands, stack);
-    }
-
-    /**
-     * Prepares second pass data. Can return null when no second pass will
-     * happen.
-     *
-     * @param list List of GraphTargetItems
-     * @return Second pass data or null
-     */
-    @Override
-    protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
-        return new SecondPassData();
     }
 
     @Override

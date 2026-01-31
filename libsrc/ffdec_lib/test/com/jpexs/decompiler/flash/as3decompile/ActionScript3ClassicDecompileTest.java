@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,30 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "{\r\n"
                 + "trace(arguments[0]);\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testAlwaysBreak() {
+        decompileMethod("classic", "testAlwaysBreak", "var v:* = undefined;\r\n"
+                + "v = 5;\r\n"
+                + "trace(\"a\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(v > 4)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "if(v > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"c\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"d\");\r\n"
+                + "}\r\n"
+                + "trace(\"e\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"f\");\r\n",
                  false);
     }
 
@@ -550,6 +574,39 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "while(k < 10);\r\n"
                 + "trace(\"ss\");\r\n",
+                 false);
+    }
+
+    @Test
+    public void testDoWhileTwice() {
+        decompileMethod("classic", "testDoWhileTwice", "var a:* = 1;\r\n"
+                + "var b:* = 2;\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"x\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"y\");\r\n"
+                + "}\r\n"
+                + "trace(\"z\");\r\n"
+                + "}\r\n"
+                + "while(true);\r\n"
+                + "\r\n"
+                + "trace(\"g\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"h\");\r\n"
+                + "}\r\n"
+                + "while(true);\r\n"
+                + "trace(\"finish\");\r\n",
                  false);
     }
 
@@ -2243,8 +2300,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testTernarOperator2() {
         decompileMethod("classic", "testTernarOperator2", "var b:Boolean = true;\r\n"
                 + "var i:int = 1;\r\n"
-                + "var j:int = b ? i : i + 1;\r\n"
-                + "var k:int = Boolean(i) ? j : j + 1;\r\n",
+                + "var j:int = b ? i : int(i + 1);\r\n"
+                + "var k:int = Boolean(i) ? j : int(j + 1);\r\n",
                  false);
     }
 
@@ -2848,6 +2905,36 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "</{xtagb}>\r\n"
                 + "</{xtaga}>;\r\n"
                 + "m = myXML.*;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testXml2() {
+        decompileMethod("classic", "testXml2", "var x1:XML = <elem name=\"aaa\" value=\"xxx&#10;\"/>;\r\n"
+                + "var x2:XML = <elem name=\"aaa\" value=\"xxx\"/>;\r\n"
+                + "var x3:XML = <elem name=\"aaa\" value=\"xxx\">\r\n"
+                + "<sub title=\"yyy\">\r\n"
+                + "ampersand: &amp;\r\n"
+                + "</sub>\r\n"
+                + "<sub/>\r\n"
+                + "</elem>;\r\n"
+                + "var x4:XML = <elem>\r\n"
+                + "<elem>\r\n"
+                + "A\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "B\r\n"
+                + "</elem>\r\n"
+                + "<elem>\r\n"
+                + "<elem>\r\n"
+                + "C\r\n"
+                + "</elem>\r\n"
+                + "</elem>\r\n"
+                + "</elem>;\r\n"
+                + "var x5:XML = <elem attr=\"abc&#13;&#10;&#9;def\"></elem>;\r\n"
+                + "var x_invalid:XML = new XML(\"<aaa >> invalid \\\"\\n\");\r\n"
+                + "var a:int = 5;\r\n"
+                + "trace(\"B\");\r\n",
                  false);
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
+import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
@@ -2211,6 +2212,57 @@ public class Main {
         return closeResult;
     }
 
+    public static boolean saveSwc(SWF swf) {
+        JFileChooser fc = View.getFileChooserWithIcon("bundleswc");
+        fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+        String fileTitle = swf.getShortFileName();
+        if (fileTitle != null) {
+            if (fileTitle.contains(".")) {
+                fileTitle = fileTitle.substring(0, fileTitle.lastIndexOf(".")) + ".swc";
+            } else {
+                fileTitle = fileTitle + ".swc";
+            }
+            fc.setSelectedFile(fc.getCurrentDirectory().toPath().resolve(fileTitle).toFile());
+        }
+        
+        FileFilter swcFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swc"))
+                        || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swc");
+            }
+        };
+        fc.setFileFilter(swcFilter);
+        
+        if (fc.showSaveDialog(getDefaultMessagesComponent()) != JFileChooser.APPROVE_OPTION) {        
+            return false;
+        }
+        File file = Helper.fixDialogFile(fc.getSelectedFile());
+        String fileName = file.getAbsolutePath();
+        
+        if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".swc")) {
+            fileName += ".swc";
+        }               
+        
+        SwfToSwcExporter exporter = new SwfToSwcExporter();
+        try {
+            exporter.exportSwf(swf, new File(fileName), false);
+        } catch (IOException iex) {
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), iex.getMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        } catch (InterruptedException ex) {           
+            return false;
+        }
+        
+        Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
+        return true;
+    }
+    
     public static boolean saveFileDialog(Openable openable, final SaveFileMode mode) {
 
         String ext = ".swf";

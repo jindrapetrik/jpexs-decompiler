@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -85,9 +85,9 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public int numLineBits;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+    public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         if (stateNewStyles) {
-            fillStyles.getNeededCharacters(needed, swf);
+            fillStyles.getNeededCharacters(needed, neededClasses, swf);
         }
     }
 

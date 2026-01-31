@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS
+ *  Copyright (C) 2010-2026 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ public class ContextMenuTools {
     }
 
     private static boolean addToContextMenu(boolean add, boolean fromCommandLine, String exeName) {
-        final String[] extensions = new String[]{"swf", "spl", "gfx", "swt"};
+        final String[] extensions = new String[]{"swf", "spl", "gfx", "swt", "swc"};
 
         final WinReg.HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
         final String REG_CLASSES_PATH = "Software\\Classes\\";

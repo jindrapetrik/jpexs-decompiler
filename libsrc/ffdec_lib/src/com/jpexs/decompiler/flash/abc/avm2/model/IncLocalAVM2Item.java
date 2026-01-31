@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2025 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,16 +33,23 @@ public class IncLocalAVM2Item extends AVM2Item {
      * Local register index
      */
     public int regIndex;
+    
+    /**
+     * Type
+     */
+    public GraphTargetItem type;
 
     /**
      * Constructor.
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param regIndex Local register index
+     * @param type Type
      */
-    public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
+    public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.regIndex = regIndex;
+        this.type = type;
     }
 
     @Override
