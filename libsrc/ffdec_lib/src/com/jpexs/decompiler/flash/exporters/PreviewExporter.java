@@ -451,7 +451,9 @@ public class PreviewExporter {
                     }
                 }
 
-                writeTag((Tag) treeItem, sos2, doneCharacters);
+                if (!isSprite) {
+                    writeTag((Tag) treeItem, sos2, doneCharacters);
+                }
 
                 MATRIX mat = new MATRIX();
                 mat.hasRotate = false;
