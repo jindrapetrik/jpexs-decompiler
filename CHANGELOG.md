@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Animated WEBP export for frames, sprites and morphshapes
 - Export dialog - Icons per export type and arrow symbol
 - Updated German translation (AI used)
+- Slovak translation (AI used)
 
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
