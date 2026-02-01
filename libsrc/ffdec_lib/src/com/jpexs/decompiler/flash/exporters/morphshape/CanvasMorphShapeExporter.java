@@ -160,7 +160,12 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
      * Fill height
      */
     protected int fillHeight;
-
+    
+    /**
+     * Duration
+     */
+    private final double duration;
+   
     /**
      * Constructor.
      *
@@ -172,13 +177,25 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
      * @param unitDivisor Unit divisor
      * @param deltaX Delta X
      * @param deltaY Delta Y
+     * @param duration Duration
      */
-    public CanvasMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
+    public CanvasMorphShapeExporter(
+            int morphShapeNum, 
+            SWF swf, 
+            SHAPE shape, 
+            SHAPE endShape, 
+            ColorTransform colorTransform, 
+            double unitDivisor, 
+            int deltaX, 
+            int deltaY,
+            double duration
+    ) {
         super(morphShapeNum, shape, endShape, colorTransform);
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.unitDivisor = unitDivisor;
         this.swf = swf;
+        this.duration = duration;
     }
 
     private String getDrawJs(int width, int height, String id, RECT rect) {
@@ -199,22 +216,21 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     public String getHtml(String needed, String id, RECT rect) {
         int width = (int) (rect.getWidth() / unitDivisor);
         int height = (int) (rect.getHeight() / unitDivisor);
-
-        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, id, rect) + getJsSuffix(width, height) + CanvasShapeExporter.getHtmlSuffix();
+        int delayMs = 10;
+        int stepRatio = (int) Math.round(delayMs * 65535 / (duration * 1000));
+        return CanvasShapeExporter.getHtmlPrefix(width, height) + getJsPrefix() + needed + getDrawJs(width, height, id, rect) + getJsSuffix(width, height, delayMs, stepRatio) + CanvasShapeExporter.getHtmlSuffix();
     }
 
-    private static String getJsSuffix(int width, int height) {
+    private String getJsSuffix(int width, int height, int delayMs, int stepRatio) {
         StringBuilder ret = new StringBuilder();
-        int step = Math.round(65535 / 100);
-        int rate = 10;
-        ret.append("var step = ").append(step).append(";\r\n");
+        ret.append("var step = ").append(stepRatio).append(";\r\n");
         ret.append("var ratio = -1;\r\n");
         ret.append("function nextFrame(ctx){\r\n");
-        ret.append("\tctx.clearRect(0,0,").append(width).append(",").append(height).append(");\r\n");
-        ret.append("\tratio = (ratio+step)%65535;\r\n");
+        ret.append("\tctx.clearRect(0,0,canvas.width,canvas.height);");
+        ret.append("\tratio = (ratio+step)%65536;\r\n");
         ret.append("\tdrawFrame(ctx,ratio);\r\n");
         ret.append("}\r\n");
-        ret.append("window.setInterval(function(){nextFrame(ctx)},").append(rate).append(");\r\n");
+        ret.append("window.setInterval(function(){nextFrame(ctx)},").append(delayMs).append(");\r\n");
         ret.append(CanvasShapeExporter.getJsSuffix());
         return ret.toString();
     }

@@ -4772,7 +4772,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, 1/*fontPageNum ???*/, false);
+                new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, 1/*fontPageNum ???*/, false, PreviewExporter.MORPH_SHAPE_DEFAULT_DURATION);
             } catch (ActionParseException ex) {
                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
             }

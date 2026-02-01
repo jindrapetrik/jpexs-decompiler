@@ -178,6 +178,7 @@ public class ShapeExporter {
                                 needed.add(st.getCharacterId());
                                 st.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                baos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));                        
                                 //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
@@ -186,7 +187,7 @@ public class ShapeExporter {
                         case SWF:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 try {
-                                    new PreviewExporter().exportSwf(fos, st, null, 0, false);
+                                    new PreviewExporter().exportSwf(fos, st, null, 0, false, null);
                                 } catch (ActionParseException ex) {
                                     Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }

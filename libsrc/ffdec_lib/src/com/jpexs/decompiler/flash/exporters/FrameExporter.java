@@ -66,6 +66,8 @@ import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
+import dev.matrixlab.webp4j.animation.AnimatedWebPEncoder;
+import dev.matrixlab.webp4j.gif.GifToWebPConfig;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
@@ -169,6 +171,9 @@ public class FrameExporter {
                 break;
             case WEBP:
                 fem = FrameExportMode.WEBP;
+                break;
+            case WEBP_ANIMATED:
+                fem = FrameExportMode.WEBP_ANIMATED;
                 break;
             case SWF:
                 fem = FrameExportMode.SWF;
@@ -323,13 +328,12 @@ public class FrameExporter {
         }
 
         if (settings.mode == FrameExportMode.SVG) {
-            
+
             FontNormalizer normalizer = new FontNormalizer();
             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
 
-            
             int max = frames.size();
             if (subFramesLength > 1) {
                 max = subFramesLength;
@@ -501,7 +505,7 @@ public class FrameExporter {
 
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             try {
-                                new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
+                                new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false, null);
                             } catch (ActionParseException ex) {
                                 Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -519,7 +523,7 @@ public class FrameExporter {
 
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                                 try {
-                                    new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
+                                    new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false, null);
                                 } catch (ActionParseException ex) {
                                     Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }
@@ -533,8 +537,8 @@ public class FrameExporter {
         }
 
         final Color fbackgroundColor = backgroundColor;
-        final boolean usesTransparency = settings.mode == FrameExportMode.PNG 
-                || settings.mode == FrameExportMode.GIF 
+        final boolean usesTransparency = settings.mode == FrameExportMode.PNG
+                || settings.mode == FrameExportMode.GIF
                 || settings.mode == FrameExportMode.WEBP;
         final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
@@ -545,6 +549,16 @@ public class FrameExporter {
                     new RetryTask(() -> {
                         File f = new File(foutdir + File.separator + "frames.gif");
                         makeGIF(frameImages, swf.frameRate, f, evl);
+                        ret.add(f);
+                    }, handler).run();
+                }
+                break;
+            case WEBP_ANIMATED:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.webp");
+                        makeAnimatedWebP(frameImages, swf.frameRate, f, evl);
                         ret.add(f);
                     }, handler).run();
                 }
@@ -608,12 +622,12 @@ public class FrameExporter {
                 if (frameImages.hasNext()) {
                     for (File foutdir : foutdirs) {
                         new RetryTask(() -> {
-                            
+
                             FontNormalizer normalizer = new FontNormalizer();
                             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
                             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
                             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
-                            
+
                             File f = new File(foutdir + File.separator + "frames.pdf");
                             PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
                             PageFormat pf = new PageFormat();
@@ -662,7 +676,7 @@ public class FrameExporter {
                                             return compositeGraphics;
                                         }
                                         final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);                                        
+                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
                                         ((DualPdfGraphics2D) compositeGraphics).setNormalizedFonts(normalizedFonts, normalizedTexts);
                                         return compositeGraphics;
                                     }
@@ -815,6 +829,34 @@ public class FrameExporter {
         }
 
         encoder.finish();
+    }
+
+    public static void makeAnimatedWebP(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
+        GifToWebPConfig config = GifToWebPConfig.createLosslessConfig();
+        List<BufferedImage> allImages = new ArrayList<>();
+        List<Integer> delays = new ArrayList<>();
+        int lastTime = 0;
+        while (images.hasNext()) {
+            BufferedImage img = images.next();
+            if (img == null) {
+                break;
+            }
+            allImages.add(img);
+            int timeAfter = (int) Math.round(allImages.size() * frameRate);
+            int delay = timeAfter - lastTime;
+            lastTime = timeAfter;
+            delays.add(delay);
+        }
+        int[] delaysInt = new int[delays.size()];
+        for (int i = 0; i < delays.size(); i++) {
+            delaysInt[i] = delays.get(i);
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            byte[] data = WebPCodec.createAnimatedWebP(allImages, delaysInt, config);
+            fos.write(data);
+            fos.flush();
+        }
     }
 
     public static void makeGIFOld(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {

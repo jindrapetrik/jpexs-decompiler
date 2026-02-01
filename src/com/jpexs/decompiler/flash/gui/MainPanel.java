@@ -2289,7 +2289,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (export.isOptionEnabled(MorphShapeExportMode.class)) {
                 ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile2 + File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(morphshapes),
-                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom(), aaScale), evl));
+                        new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom(), aaScale, export.getMorphDuration(), export.getMorphNumberOfFrames()), evl));
             }
 
             if (export.isOptionEnabled(TextExportMode.class)) {
@@ -2409,7 +2409,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(MorphShapeExportMode.class)) {
             new MorphShapeExporter().exportMorphShapes(handler, Path.combine(selFile, MorphShapeExportSettings.EXPORT_FOLDER_NAME), swf.getTags(),
-                    new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom(), aaScale), evl);
+                    new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom(), aaScale, export.getMorphDuration(), export.getMorphNumberOfFrames()), evl);
         }
 
         if (export.isOptionEnabled(TextExportMode.class)) {
@@ -2508,7 +2508,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(MorphShapeExportMode.class)) {
             for (MorphShapeExportMode exportMode : MorphShapeExportMode.values()) {
                 new MorphShapeExporter().exportMorphShapes(handler, Path.combine(selFile, MorphShapeExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf.getTags(),
-                        new MorphShapeExportSettings(exportMode, export.getZoom(), aaScale), evl);
+                        new MorphShapeExportSettings(exportMode, export.getZoom(), aaScale, export.getMorphDuration(), export.getMorphNumberOfFrames()), evl);
             }
         }
 

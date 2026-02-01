@@ -100,11 +100,13 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class PreviewExporter {
-
-    // play morph shape in 2 second(s)
-    public static final int MORPH_SHAPE_ANIMATION_LENGTH = 2;
-
+    
+    // default: play morph shape in 2 second(s)
+    public static final double MORPH_SHAPE_DEFAULT_DURATION = 2;            
+    
     public static final int MORPH_SHAPE_ANIMATION_FRAME_RATE = 30;
+    
+    public static final int MORPH_SHAPE_ANIMATION_FRAME_NUM = (int) Math.round(MORPH_SHAPE_ANIMATION_FRAME_RATE * MORPH_SHAPE_DEFAULT_DURATION);
     
     private static final double WIDTH_DIVISOR = 1000;
   
@@ -255,7 +257,7 @@ public class PreviewExporter {
         doAction.writeTag(sos2);
     }
 
-    public SWFHeader exportSwf(OutputStream os, TreeItem treeItem, Color backgroundColor, int fontPageNum, boolean showControls) throws IOException, ActionParseException {
+    public SWFHeader exportSwf(OutputStream os, TreeItem treeItem, Color backgroundColor, int fontPageNum, boolean showControls, Double morphDuration) throws IOException, ActionParseException {
         SWF swf = (SWF) treeItem.getOpenable();
 
         if (treeItem instanceof TagScript) {
@@ -285,7 +287,7 @@ public class PreviewExporter {
 
         if ((treeItem instanceof DefineMorphShapeTag) || (treeItem instanceof DefineMorphShape2Tag)) {
             frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
-            frameCount = (int) (MORPH_SHAPE_ANIMATION_LENGTH * frameRate);
+            frameCount = (int) Math.round(frameRate * morphDuration);
         }
 
         if (treeItem instanceof DefineSoundTag) {
@@ -567,10 +569,16 @@ public class PreviewExporter {
                     }
                     new PlaceObject2Tag(swf, false, 1, chtId, mat, null, 0, null, -1, null).writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
-                    for (int ratio = 0; ratio < 65536; ratio += 65536 / frameCount) {
-                        new PlaceObject2Tag(swf, true, 1, chtId, mat, null, ratio, null, -1, null).writeTag(sos2);
-                        if (showControls) {
-                            updateProgressBar(rxmin, rymin, swf, sos2, width, height, progressBarHeight, ratio, 65536);
+                    int lastRatio = -1;
+                    for (int f = 0; f < frameCount; f++) {        
+                        int ratio = (int) Math.round(f * 65535.0 / (frameCount - 1));
+                        
+                        if (lastRatio != ratio) {                        
+                            new PlaceObject2Tag(swf, true, 1, chtId, mat, null, ratio, null, -1, null).writeTag(sos2);
+                            if (showControls) {
+                                updateProgressBar(rxmin, rymin, swf, sos2, width, height, progressBarHeight, ratio, 65536);
+                            }
+                            lastRatio = ratio;
                         }
                         new ShowFrameTag(swf).writeTag(sos2);
                     }

@@ -59,14 +59,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -156,7 +155,22 @@ public class ExportDialog extends AppDialog {
     private JCheckBox embedCheckBox;
     
     private JCheckBox transparentFrameBackgroundCheckBox;
+    
+    private JTextField durationTextField = new JTextField(4);
+    
+    private JTextField numberOfFramesTextField = new JTextField(4);
 
+    private JLabel durationLabel = new JLabel(translateTitle("morph.duration"));
+    
+    private JLabel secondsLabel = new JLabel(translate("morph.duration.seconds"));
+    
+    private JLabel numberOfFramesLabel = new JLabel(translateTitle("morph.numberOfFrames"));
+    
+    private JLabel zoomLabel = new JLabel(translateTitle("zoom"));
+    
+    private JLabel percentLabel = new JLabel(translate("zoom.percent"));
+            
+            
     @SuppressWarnings("unchecked")
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
@@ -171,6 +185,9 @@ public class ExportDialog extends AppDialog {
     public boolean isOptionEnabled(Class<?> option) {
         for (int i = 0; i < optionClasses.length; i++) {
             if (option == optionClasses[i]) {
+                if (!checkBoxes[i].isVisible()) {
+                    return false;
+                }
                 return checkBoxes[i].isSelected();
             }
         }
@@ -185,6 +202,30 @@ public class ExportDialog extends AppDialog {
     public boolean isTransparentFrameBackgroundEnabled() {
         return transparentFrameBackgroundCheckBox.isSelected();
     }
+    
+    public Double getMorphDuration() {
+        try {
+            Double val = Double.valueOf(durationTextField.getText());
+            if (val <= 0) {
+                return null;
+            }
+            return val;
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+    }
+    
+    public Integer getMorphNumberOfFrames() {
+        try {
+            int val = Integer.valueOf(numberOfFramesTextField.getText());
+            if (val < 2) {
+                return null;
+            }
+            return val;
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+    }
 
     public double getZoom() {
         try {
@@ -194,7 +235,31 @@ public class ExportDialog extends AppDialog {
         }
     }
 
-    private void saveConfig() {
+    private boolean saveConfig() {
+        
+        if (isOptionEnabled(MorphShapeExportMode.class)) {
+            MorphShapeExportMode morphMode = getValue(MorphShapeExportMode.class);
+            if (morphMode.hasDuration() && getMorphDuration() == null) {
+                JOptionPane.showMessageDialog(ExportDialog.this, translate("morph.duration.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                durationTextField.requestFocusInWindow();
+                return false;
+            }
+            if (morphMode.hasFrames() && getMorphNumberOfFrames() == null) {
+                JOptionPane.showMessageDialog(ExportDialog.this, translate("morph.numberOfFrames.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                numberOfFramesTextField.requestFocusInWindow();
+                return false;
+            }
+            
+            try {
+                Double.parseDouble(zoomTextField.getText());
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                zoomTextField.requestFocusInWindow();
+                return false;
+            }
+        }
+        
+        
         StringBuilder cfg = new StringBuilder();
         for (int i = 0; i < optionNames.length; i++) {
             Object val = ((ComboValue) combos[i].getSelectedItem()).value;
@@ -206,6 +271,17 @@ public class ExportDialog extends AppDialog {
             cfg.append(key);
         }
 
+        
+        Double morphDuration = getMorphDuration();
+        if (morphDuration != null) {
+            Configuration.lastExportMorphDuration.set(morphDuration);
+        }        
+        
+        Integer morphNumberOfFrames = getMorphNumberOfFrames();                
+        if (morphNumberOfFrames != null) {
+            Configuration.lastExportMorphNumberOfFrames.set(morphNumberOfFrames);
+        }
+        
         Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
         Configuration.lastSelectedExportFormats.set(cfg.toString());
         if (embedCheckBox.isVisible()) {
@@ -214,6 +290,7 @@ public class ExportDialog extends AppDialog {
         if (transparentFrameBackgroundCheckBox.isVisible()) {
             Configuration.lastExportTransparentBackground.set(transparentFrameBackgroundCheckBox.isSelected());
         }
+        return true;
     }
 
     private boolean optionCanHandle(int optionIndex, Object e) {
@@ -237,6 +314,36 @@ public class ExportDialog extends AppDialog {
 
     private String translateTitle(String title) {
         return translate("titleFormat").replace("%title%", translate(title));
+    }
+    
+    private void onChange() {
+        if (!isOptionEnabled(MorphShapeExportMode.class)) {
+            durationLabel.setVisible(false);
+            durationTextField.setVisible(false);
+            secondsLabel.setVisible(false);
+            numberOfFramesLabel.setVisible(false);
+            numberOfFramesTextField.setVisible(false);                 
+        } else {
+            MorphShapeExportMode mode = getValue(MorphShapeExportMode.class);
+            durationLabel.setVisible(mode.hasDuration());
+            durationTextField.setVisible(mode.hasDuration());
+            secondsLabel.setVisible(mode.hasDuration());
+            numberOfFramesLabel.setVisible(mode.hasFrames());
+            numberOfFramesTextField.setVisible(mode.hasFrames());                        
+        }
+        
+        transparentFrameBackgroundCheckBox.setVisible(isOptionEnabled(FrameExportMode.class));
+        
+        boolean hasZoom = false;
+        for (Class c : zoomClasses) {
+            if (isOptionEnabled(c)) {
+                hasZoom = true;
+                break;
+            }
+        }
+        zoomTextField.setVisible(hasZoom);
+        zoomLabel.setVisible(hasZoom);
+        percentLabel.setVisible(hasZoom);
     }
 
     @SuppressWarnings("unchecked")        
@@ -305,6 +412,7 @@ public class ExportDialog extends AppDialog {
                     checkBox.setSelected(selected);
                 }
             }
+            onChange();
         });
         gbc.gridy = 0;
         gbc.gridx = 3;
@@ -345,15 +453,24 @@ public class ExportDialog extends AppDialog {
 
             checkBoxes[i] = new JCheckBox();
             checkBoxes[i].setSelected(true);
+            
+            checkBoxes[i].addActionListener((ActionEvent e) -> {
+                onChange();
+            });
 
             if (!exportableExistsArray[i]) {
+                checkBoxes[i].setVisible(false);
                 continue;
             }
 
             if (Arrays.asList(zoomClasses).contains(c)) {
                 zoomable = true;
             }
-
+            
+            combos[i].addItemListener((ItemEvent e) -> {
+                onChange();
+            });
+                        
             visibleOptionClasses.add(c);
 
             JLabel lab = new JLabel(translateTitle(optionNames[i]));
@@ -413,24 +530,67 @@ public class ExportDialog extends AppDialog {
                 transparentFrameBackgroundCheckBox.setSelected(true);
             }
         }
-
-        if (zoomable) {
-            JLabel zlab = new JLabel(translateTitle("zoom"));
-            JLabel pctLabel = new JLabel(translate("zoom.percent"));
-            zlab.setLabelFor(zoomTextField);
+        
+        durationTextField.setVisible(false);
+        numberOfFramesTextField.setVisible(false);
+        if (visibleOptionClasses.contains(MorphShapeExportMode.class)) {
+            gbc.gridy++;
+            durationTextField.setVisible(true);
+            String durationString = "" + Configuration.lastExportMorphDuration.get();
+            if (durationString.endsWith(".0")) {
+                durationString = durationString.substring(0, durationString.length() - 2);
+            }
+            durationTextField.setText(durationString);
+            numberOfFramesTextField.setVisible(true);
+            numberOfFramesTextField.setText("" + Configuration.lastExportMorphNumberOfFrames.get());
+            
+            durationLabel.setLabelFor(durationTextField);
+            numberOfFramesLabel.setLabelFor(numberOfFramesTextField);
+            
+            gbc.gridx = 0;
+            gbc.gridwidth = 1;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            comboPanel.add(durationLabel, gbc);
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            comboPanel.add(durationTextField, gbc);      
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            comboPanel.add(secondsLabel, gbc);      
+            
+            
             gbc.gridy++;
             gbc.gridx = 0;
             gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.LINE_END;
-            comboPanel.add(zlab, gbc);
+            comboPanel.add(numberOfFramesLabel, gbc);
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;            
+            comboPanel.add(numberOfFramesTextField, gbc);
+        }
+
+        if (zoomable) {
+            zoomLabel.setLabelFor(zoomTextField);
+            gbc.gridy++;
+            gbc.gridx = 0;
+            gbc.gridwidth = 1;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            comboPanel.add(zoomLabel, gbc);
             gbc.gridx++;
             gbc.anchor = GridBagConstraints.LINE_START;
             comboPanel.add(zoomTextField, gbc);
             gbc.gridx++;
             gbc.anchor = GridBagConstraints.LINE_START;
-            comboPanel.add(pctLabel, gbc);
+            comboPanel.add(percentLabel, gbc);
         }
 
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 3;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1;      
+        comboPanel.add(new JPanel(), gbc);
+        
         cnt.add(comboPanel, BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -455,6 +615,7 @@ public class ExportDialog extends AppDialog {
         }
 
         zoomTextField.setText(pct);
+        onChange();
     }
 
     @Override
@@ -466,15 +627,11 @@ public class ExportDialog extends AppDialog {
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
-        result = OK_OPTION;
-        try {
-            saveConfig();
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(ExportDialog.this, translate("zoom.invalid"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            zoomTextField.requestFocusInWindow();
+        if (!saveConfig()) {
             return;
         }
-
+        
+        result = OK_OPTION;
         setVisible(false);
     }
 

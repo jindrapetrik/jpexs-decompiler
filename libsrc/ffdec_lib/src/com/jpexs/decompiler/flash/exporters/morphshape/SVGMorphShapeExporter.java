@@ -61,6 +61,11 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     private final SWF swf;
 
     private final SVGExporter exporter;
+    
+    /**
+     * Duration in seconds
+     */
+    private final double duration;    
 
     /**
      * Constructor.
@@ -73,13 +78,15 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
      * @param defaultColor Default color
      * @param colorTransform Color transform
      * @param zoom Zoom
+     * @param duration Duration in seconds
      */
-    public SVGMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+    public SVGMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom, double duration) {
         super(morphShapeNum, shape, endShape, colorTransform, zoom);
         this.swf = swf;
         this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
+        this.duration = duration;
     }
 
     @Override
@@ -255,7 +262,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     private Element createAnimateElement(String attributeName, Object startValue, Object endValue) {
         Element animate = exporter.createElement("animate");
-        animate.setAttribute("dur", "2s"); // todo
+        animate.setAttribute("dur", "" + duration + "s");
         animate.setAttribute("repeatCount", "indefinite");
         animate.setAttribute("attributeName", attributeName);
         animate.setAttribute("values", startValue + ";" + endValue);

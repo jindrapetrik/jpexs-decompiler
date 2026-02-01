@@ -2,8 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#2610] Export morphshapes - export individual frames, setting of morph
+  duration and/or number of morph frames
+- Animated WEBP export for frames, sprites and morphshapes
+
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
+- HTML5 Canvas morphshape export
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
