@@ -495,10 +495,13 @@ public class ExportDialog extends AppDialog {
             gbc.gridy++;
             gbc.gridx = 0;
             gbc.anchor = GridBagConstraints.LINE_END;
+            gbc.weightx = 1;
             comboPanel.add(label, gbc);
 
             gbc.gridx++;
-            gbc.anchor = GridBagConstraints.LINE_START;
+            gbc.weightx = 0;
+            gbc.anchor = GridBagConstraints.CENTER;
+            gbc.fill = GridBagConstraints.NONE;
             JLabel arrowLabel = new JLabel(translate("arrow"));
             gbc.insets = new Insets(1, 5, 1, 5);
             comboPanel.add(arrowLabel, gbc);
@@ -518,6 +521,14 @@ public class ExportDialog extends AppDialog {
             label.setLabelFor(combos[i]);
         }
 
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 5;
+        gbc.fill = GridBagConstraints.BOTH;
+        
+        comboPanel.add(new JPanel(), gbc);
+        
         gbc.insets = new Insets(2, 2, 2, 2);
 
         embedCheckBox = new JCheckBox(translate("embed"));
