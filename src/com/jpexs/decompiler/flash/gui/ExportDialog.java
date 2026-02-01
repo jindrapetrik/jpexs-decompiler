@@ -74,6 +74,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
  * @author JPEXS
@@ -98,7 +99,24 @@ public class ExportDialog extends AppDialog {
         TagTreeModel.FOLDER_MORPHSHAPES,
         "symbolclass"
     };
-
+    
+    String[] optionIcons = {
+        "shape",
+        "text",
+        "image",
+        "movie",
+        "sound",
+        "as",
+        "binarydata",
+        "frame",
+        "sprite",
+        "button",
+        "font",
+        "font",
+        "morphshape",
+        "symbolclass"
+    };
+    
     //Display options only when these classes found
     Class[][] objClasses = {
         {ShapeTag.class},
@@ -357,7 +375,7 @@ public class ExportDialog extends AppDialog {
         JPanel comboPanel = new JPanel(new GridBagLayout());
         comboPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.insets = new Insets(1, 2, 1, 2);
 
         int labWidth = 0;
         boolean[] exportableExistsArray = new boolean[optionNames.length];
@@ -415,7 +433,7 @@ public class ExportDialog extends AppDialog {
             onChange();
         });
         gbc.gridy = 0;
-        gbc.gridx = 3;
+        gbc.gridx = 4;
         comboPanel.add(selectAllCheckBox, gbc);
 
         List<Class> visibleOptionClasses = new ArrayList<>();
@@ -473,11 +491,23 @@ public class ExportDialog extends AppDialog {
                         
             visibleOptionClasses.add(c);
 
-            JLabel lab = new JLabel(translateTitle(optionNames[i]));
+            JLabel label = new JLabel(translate(optionNames[i]));
+            label.setIcon(View.getIcon(optionIcons[i].toLowerCase() + "16"));            
+            label.setLabelFor(combos[i]);
+            label.setHorizontalTextPosition(SwingConstants.LEFT);
             gbc.gridy++;
             gbc.gridx = 0;
             gbc.anchor = GridBagConstraints.LINE_END;
-            comboPanel.add(lab, gbc);
+            comboPanel.add(label, gbc);
+            
+            gbc.gridx++;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            JLabel arrowLabel = new JLabel(translate("arrow"));
+            gbc.insets = new Insets(1, 5, 1, 5);
+            comboPanel.add(arrowLabel, gbc);    
+            
+            gbc.insets = new Insets(1, 2, 1, 2);
+            
             gbc.gridx++;
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -488,9 +518,12 @@ public class ExportDialog extends AppDialog {
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.CENTER;
             comboPanel.add(checkBoxes[i], gbc);
-            lab.setLabelFor(combos[i]);
+            label.setLabelFor(combos[i]);
         }
 
+        gbc.insets = new Insets(2, 2, 2, 2);
+            
+        
         embedCheckBox = new JCheckBox(translate("embed"));
         embedCheckBox.setVisible(false);
 
@@ -507,7 +540,7 @@ public class ExportDialog extends AppDialog {
         }
 
         gbc.gridx = 0;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.LINE_START;
 
@@ -548,10 +581,11 @@ public class ExportDialog extends AppDialog {
             numberOfFramesLabel.setLabelFor(numberOfFramesTextField);
             
             gbc.gridx = 0;
-            gbc.gridwidth = 1;
+            gbc.gridwidth = 2;
             gbc.anchor = GridBagConstraints.LINE_END;
             comboPanel.add(durationLabel, gbc);
-            gbc.gridx++;
+            gbc.gridx+=2;
+            gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.LINE_START;
             comboPanel.add(durationTextField, gbc);      
             gbc.gridx++;
@@ -561,10 +595,11 @@ public class ExportDialog extends AppDialog {
             
             gbc.gridy++;
             gbc.gridx = 0;
-            gbc.gridwidth = 1;
+            gbc.gridwidth = 2;
             gbc.anchor = GridBagConstraints.LINE_END;
             comboPanel.add(numberOfFramesLabel, gbc);
-            gbc.gridx++;
+            gbc.gridx+=2;
+            gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.LINE_START;            
             comboPanel.add(numberOfFramesTextField, gbc);
         }
@@ -573,10 +608,11 @@ public class ExportDialog extends AppDialog {
             zoomLabel.setLabelFor(zoomTextField);
             gbc.gridy++;
             gbc.gridx = 0;
-            gbc.gridwidth = 1;
+            gbc.gridwidth = 2;
             gbc.anchor = GridBagConstraints.LINE_END;
-            comboPanel.add(zoomLabel, gbc);
-            gbc.gridx++;
+            comboPanel.add(zoomLabel, gbc);            
+            gbc.gridx+=2;
+            gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.LINE_START;
             comboPanel.add(zoomTextField, gbc);
             gbc.gridx++;
@@ -586,7 +622,7 @@ public class ExportDialog extends AppDialog {
 
         gbc.gridy++;
         gbc.gridx = 0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1;      
         comboPanel.add(new JPanel(), gbc);

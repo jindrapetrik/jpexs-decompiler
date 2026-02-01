@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2610] Export morphshapes - export individual frames, setting of morph
   duration and/or number of morph frames
+- Export morphshapes to GIF and AVI
 - Animated WEBP export for frames, sprites and morphshapes
+- Export dialog - Icons per export type and arrow symbol
 
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
