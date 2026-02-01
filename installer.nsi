@@ -326,6 +326,7 @@ var SMDir
   !insertmacro LANG_LOAD "Portuguese"
   !insertmacro LANG_LOAD "PortugueseBR"
   !insertmacro LANG_LOAD "SimpChinese"
+  !insertmacro LANG_LOAD "Slovak"
   !insertmacro LANG_LOAD "Slovenian"
   !insertmacro LANG_LOAD "Spanish"
   !insertmacro LANG_LOAD "Swedish"
