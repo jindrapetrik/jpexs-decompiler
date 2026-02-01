@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
 - HTML5 Canvas morphshape export
+- Slovenian translation
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
