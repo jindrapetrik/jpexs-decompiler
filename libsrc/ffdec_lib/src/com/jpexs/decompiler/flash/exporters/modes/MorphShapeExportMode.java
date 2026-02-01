@@ -57,6 +57,10 @@ public enum MorphShapeExportMode {
      */    
     BMP_FRAMES(false, true),
     /**
+     * WEBP
+     */
+    WEBP(true, false),
+    /**
      * WEBP start and end frames
      */
     WEBP_START_END(false, false),
@@ -75,12 +79,7 @@ public enum MorphShapeExportMode {
     /**
      * SWF - Shockwave Flash
      */
-    SWF(true, false),
-
-    /**
-     * WEBP
-     */
-    WEBP(true, false);
+    SWF(true, false);
     
     /**
      * Whether this mode requires total duration in seconds
