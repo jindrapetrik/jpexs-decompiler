@@ -129,7 +129,7 @@ The application was made in Czech Republic.
 * **koiru** - japanese translation
 * **J. Kramer** - dutch translation
 * **Andrew Poženel** - slovenian translation
-* **GitHub Copilot (Claude AI)** - german translation
+* **GitHub Copilot (Claude AI)** - german, slovak translation
 
 ## Contact
 If you want to report a problem or request new feature, use our issue tracker at [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
