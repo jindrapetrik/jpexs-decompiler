@@ -9,8 +9,10 @@
 	<launchable type="desktop-id">com.jpexs.decompiler.flash.desktop</launchable>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
-	<url type="homepage">https://github.com/jindrapetrik/jpexs-decompiler</url>
+	<url type="homepage">https://github.com/jindrapetrik/jpexs-decompiler/wiki</url>
 	<url type="bugtracker">https://www.free-decompiler.com/flash/issues</url>
+	<url type="vcs-browser">https://github.com/jindrapetrik/jpexs-decompiler</url>
+	<url type="contribute">https://github.com/jindrapetrik/jpexs-decompiler/blob/master/CONTRIBUTING.md</url>
 	<description>
 		<p>Open Source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Linux, Windows and macOS.</p>
 	</description>
