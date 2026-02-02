@@ -29,6 +29,10 @@ public enum SpriteExportMode {
      */
     PNG,
     /**
+     * APNG - Animated Portable Network Graphics
+     */
+    APNG,
+    /**
      * GIF - Graphics Interchange Format
      */
     GIF,

@@ -95,6 +95,7 @@ public class MorphShapeExportSettings {
         switch (mode) {
             case PNG_START_END:
             case PNG_FRAMES:
+            case APNG:
                 return ".png";
             case BMP_START_END:
             case BMP_FRAMES:

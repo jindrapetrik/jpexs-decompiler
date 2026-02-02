@@ -349,6 +349,13 @@ public class MorphShapeExporter {
                             ret.add(file);
                         }, handler).run();
                         break;
+                    case APNG:
+                        frameImages.reset();
+                        new RetryTask(() -> {
+                            FrameExporter.makeAnimatedPng(frameImages, PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE, file, evl);
+                            ret.add(file);
+                        }, handler).run();
+                        break;
                     case PNG_FRAMES:
                     case BMP_FRAMES:                        
                     case WEBP_FRAMES:                                

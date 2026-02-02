@@ -65,6 +65,10 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import com.jpexs.images.apng.AnimatedPngDecoder;
+import com.jpexs.images.apng.AnimatedPngEncoder;
+import com.jpexs.images.apng.data.AnimatedPngData;
+import com.jpexs.images.apng.data.AnimationFrameData;
 import dev.matrixlab.webp4j.WebPCodec;
 import dev.matrixlab.webp4j.animation.AnimatedWebPEncoder;
 import dev.matrixlab.webp4j.gif.GifToWebPConfig;
@@ -150,6 +154,9 @@ public class FrameExporter {
         switch (settings.mode) {
             case PNG:
                 fem = FrameExportMode.PNG;
+                break;
+            case APNG:
+                fem = FrameExportMode.APNG;
                 break;
             case GIF:
                 fem = FrameExportMode.GIF;
@@ -563,6 +570,16 @@ public class FrameExporter {
                     }, handler).run();
                 }
                 break;
+            case APNG:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.png");
+                        makeAnimatedPng(frameImages, swf.frameRate, f, evl);
+                        ret.add(f);
+                    }, handler).run();
+                }
+                break;
             case BMP:
                 for (File foutdir : foutdirs) {
                     frameImages.reset();
@@ -831,6 +848,33 @@ public class FrameExporter {
         encoder.finish();
     }
 
+    public static void makeAnimatedPng(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
+        
+        List<AnimationFrameData> frames = new ArrayList<>();
+        
+        int delayNumerator = 1000;
+        int delayDenominator = Math.round(1000 * frameRate);
+        int width = 0;
+        int height = 0;
+        BufferedImage backupImage = null;
+        while (images.hasNext()) {
+            BufferedImage img = images.next();
+            if (img == null) {
+                break;
+            }
+            if (backupImage == null) {
+                backupImage = img;
+            }
+            width = img.getWidth();
+            height = img.getHeight();
+            frames.add(new AnimationFrameData(img, delayNumerator, delayDenominator));
+        }
+        AnimatedPngData data = new AnimatedPngData(width, height, 0, backupImage, frames);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            AnimatedPngEncoder.encode(data, fos);
+        }
+    }
+    
     public static void makeAnimatedWebP(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
         GifToWebPConfig config = GifToWebPConfig.createLosslessConfig();
         List<BufferedImage> allImages = new ArrayList<>();

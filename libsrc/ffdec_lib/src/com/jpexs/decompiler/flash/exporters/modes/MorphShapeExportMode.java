@@ -49,6 +49,10 @@ public enum MorphShapeExportMode {
      */    
     PNG_FRAMES(false, true),
     /**
+     * APNG - Animated Portable Network Graphics
+     */
+    APNG(true, false),
+    /**
      * BMP start and end frames - Windows Bitmap
      */
     BMP_START_END(false, false),

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Export dialog - Icons per export type and arrow symbol
 - Updated German translation (AI used)
 - Slovak translation (AI used)
+- APNG (animated PNG) export for frames, sprites and morphshapes
 
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself

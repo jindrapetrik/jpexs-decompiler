@@ -29,6 +29,10 @@ public enum FrameExportMode {
      */
     PNG,
     /**
+     * APNG - Animated Portable Network Graphics
+     */
+    APNG,
+    /**
      * GIF - Graphics Interchange Format
      */
     GIF,

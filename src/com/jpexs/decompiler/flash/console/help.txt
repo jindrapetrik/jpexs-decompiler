@@ -333,7 +333,9 @@ Pre-options:
         morphshape:bmp_frames - BMP frames format for MorphShapes
         morphshape:webp_frames - WEBP frames format for MorphShapes
         morphshape:webp - WEBP format for MorphShapes
+        morphshape:apng - APNG format for MorphShapes
         frame:png - PNG format for Frames
+        frame:apng - APNG format for Frames
         frame:gif - GIF format for Frames
         frame:avi - AVI format for Frames
         frame:svg - SVG format for Frames
@@ -343,6 +345,7 @@ Pre-options:
         frame:webp - WEBP format for Frames
         frame:webp_animated - WEBP animated format for Frames
         sprite:png - PNG format for Sprites
+        sprite:apng - APNG format for Sprites
         sprite:gif - GIF format for Sprites
         sprite:avi - AVI format for Sprites
         sprite:svg - SVG format for Sprites
