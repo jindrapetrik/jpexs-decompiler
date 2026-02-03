@@ -60,15 +60,15 @@ jobs:
       run: |
         dpkg --add-architecture i386
         apt-get update
-        apt-get install -y --no-install-recommends wine64
+        apt install -y -qq --no-install-recommends wine64
         
-    - name: Init Wine prefix
-      env:
-        WINEPREFIX: ${{ github.workspace }}/.wine
-        WINEDEBUG: "-all"
-      run: |
-        mkdir -p "$WINEPREFIX"
-        wineboot -u
+#    - name: Init Wine prefix
+#      env:
+#        WINEPREFIX: ${{ github.workspace }}/.wine
+#        WINEDEBUG: "-all"
+#      run: |
+#        mkdir -p "$WINEPREFIX"
+#        wineboot -u
         
     - name: Install Resource Hacker
       env:
