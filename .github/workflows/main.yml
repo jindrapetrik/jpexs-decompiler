@@ -33,6 +33,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    
+    - name: Install Wine
+      run: |
+        dpkg --add-architecture i386
+        apt-get update -y -qq
+        apt-get install -y -qq winehq-stable
+        wine --version
+        
     - name: Set up JDKs
       uses: actions/setup-java@v4
       with:
@@ -55,12 +63,7 @@ jobs:
         #dpkg -i nsis_3.08-2_amd64.deb        
         apt-get -y update
         apt-get -y install nsis
-        makensis -VERSION       
-    - name: Install Wine
-      run: |
-        dpkg --add-architecture i386
-        apt-get update -y -qq
-        apt-get install -y -qq --no-install-recommends wine64
+        makensis -VERSION           
         
 #    - name: Init Wine prefix
 #      env:
@@ -90,7 +93,7 @@ jobs:
         find "$RH_DIR" -maxdepth 3 -type f -iname "ResourceHacker.exe" -print            
     - name: Set up ant
       run: |
-        apt install -y -qq ant 
+        apt-get install -y -qq ant 
     - name: Build
       run: |        
         export CICD_TEMP=${{ github.workspace }}        
