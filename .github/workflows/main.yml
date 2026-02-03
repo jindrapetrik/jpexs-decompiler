@@ -58,7 +58,7 @@ jobs:
         makensis -VERSION       
     - name: Install Wine
       run: |
-        sudo dpkg --add-architecture i386
+        dpkg --add-architecture i386
         apt-get update
         apt-get install -y --no-install-recommends wine64
         
