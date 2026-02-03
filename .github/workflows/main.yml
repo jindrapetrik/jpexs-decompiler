@@ -56,12 +56,41 @@ jobs:
         apt-get -y update
         apt-get -y install nsis
         makensis -VERSION       
+    - name: Install Wine
+      run: |
+        sudo dpkg --add-architecture i386
+        apt-get update
+        apt-get install -y --no-install-recommends wine64
+        
+    - name: Init Wine prefix
+      env:
+        WINEPREFIX: ${{ github.workspace }}/.wine
+        WINEDEBUG: "-all"
+      run: |
+        mkdir -p "$WINEPREFIX"
+        wineboot -u
+        
+    - name: Install Resource Hacker
+      env:
+        RH_DIR: ${{ github.workspace }}/tools/resourcehacker
+        RH_ZIP: ${{ github.workspace }}/tools/resourcehacker.zip
+        RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
+      run: |
+        set -euxo pipefail
+        mkdir -p "$(dirname "$RH_ZIP")"
+        mkdir -p "$RH_DIR"
+
+        wget -O "$RH_ZIP" "$RH_URL"
+        unzip -o "$RH_ZIP" -d "$RH_DIR"
+
+        # find exe (sometimes it's in subfolder)
+        find "$RH_DIR" -maxdepth 3 -type f -iname "ResourceHacker.exe" -print            
     - name: Set up ant
       run: |
         apt install -y -qq ant 
     - name: Build
       run: |        
-        export CICD_TEMP=${{ runner.temp }}
+        export CICD_TEMP=${{ github.workspace }}        
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
         ./cicd_scripts/script.sh

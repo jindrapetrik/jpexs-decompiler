@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Updated German translation (AI used)
 - Slovak translation (AI used)
 - APNG (animated PNG) export for frames, sprites and morphshapes
+- Version info in ffdec.exe and on its splashscreen
 
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself

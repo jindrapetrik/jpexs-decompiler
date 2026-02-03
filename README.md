@@ -60,6 +60,7 @@ For creating EXE Installer and ZIP version, there exist Ant tasks "installer","r
 You must configure installation path of this tool in tools.properties file, which could look like this for windows:
 ```
 nsis.path = c:\\program files (x86)\\NSIS
+reshack.path = c:\\Program Files (x86)\\Resource Hacker\\
 ```
 ### Building libraries
 

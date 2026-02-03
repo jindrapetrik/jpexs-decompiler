@@ -14,7 +14,7 @@ MAKENSIS_FULLPATH=`which makensis`
 MAKENSIS_PATH=`dirname "$MAKENSIS_FULLPATH"`
 
 echo "nsis.path = $MAKENSIS_PATH" > tools.properties
-echo "launch4j.path = -" >> tools.properties
+echo "reshack.path = $tools_dir/resourcehacker/" >> tools.properties
 
 cat tools.properties
 

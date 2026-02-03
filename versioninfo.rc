@@ -1,0 +1,28 @@
+1 VERSIONINFO
+FILEVERSION @MAJOR@,@MINOR@,@RELEASE@,@BUILD@
+PRODUCTVERSION @MAJOR@,@MINOR@,@RELEASE@,@BUILD@
+FILEOS 0x40004
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+	BLOCK "000004B0"
+	{
+		VALUE "ProductName", "JPEXS Free Flash Decompiler launcher"
+		VALUE "FileDescription", "JPEXS Free Flash Decompiler launcher"
+		VALUE "ProductVersion", "@VERSION@"
+		VALUE "FileVersion", "@VERSION@"
+		VALUE "InternalName", "Launch5j"
+		VALUE "OriginalFilename", "ffdec.exe"
+		VALUE "LegalCopyright", "JPEXS"
+		VALUE "CompanyName", "JPEXS"
+		VALUE "LegalTrademarks", "JPEXS"
+		VALUE "Comments", "-"
+	}
+}
+
+BLOCK "VarFileInfo"
+{
+	VALUE "Translation", 0x0000 0x04B0  
+}
+}

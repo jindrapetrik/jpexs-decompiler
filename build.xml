@@ -44,9 +44,7 @@
         <include name="**/?*.swf"/>
         <include name="**/?*.css"/>
     </patternset>
-    
-    
-    
+        
     <target name="-loadversion" depends="-loadversion-prop,-loadversion-private">
         
     </target>
@@ -264,7 +262,7 @@
         <delete file="${app.deb.desktop.temp}" />
     </target>         
     
-    <target name="osx-app-installer" depends="osx-app-bundle">
+    <target name="osx-app-installer" depends="osx-app-bundle" unless="is_windows">
         <mkdir dir="${app.installer.dir}/flat/base.pkg"/>
         <mkdir dir="${app.installer.dir}/flat/Resources/en.lproj"/>
         <mkdir dir="${app.installer.dir}/root/Applications"/>
@@ -405,123 +403,8 @@
             <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="777" />           
         </zip>           
     </target>
-    
-    <target name="-set-gui-type">
-        <property name="exe.type" value="gui" />
-    </target>
-    <target name="-set-console-type">
-        <property name="exe.type" value="console" />
-    </target>
-    <!--<target name="-exe-config" depends="-loadversion"> 
-        <echoxml file="${exe.config}">
-            <launch4jConfig>
-                <dontWrapJar>true</dontWrapJar>
-                <headerType>${exe.type}</headerType>
-                <jar>${jar.filename}.jar</jar>
-                <outfile>${basedir}/${dist.dir}/${exe.filename}.exe</outfile>
-                <errTitle></errTitle>
-                <cmdLine></cmdLine>
-                <chdir></chdir>
-                <priority>normal</priority>
-                <downloadUrl>http://java.com/download</downloadUrl>
-                <supportUrl></supportUrl>
-                <customProcName>false</customProcName>
-                <stayAlive>false</stayAlive>
-                <restartOnCrash>false</restartOnCrash>
-                <manifest></manifest>
-                <icon>${basedir}/${exe.icon}</icon>
-                <jre>
-                    <path></path>
-                    <minVersion>${min.java.version}</minVersion>
-                    <maxVersion></maxVersion>
-                    <jdkPreference>preferJre</jdkPreference>
-                    <runtimeBits>64/32</runtimeBits>
-                    <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
-                    <opt>-Djava.net.preferIPv4Stack=true</opt>
-                    <opt>-Djna.nosys=true</opt>
-                </jre>
-                <splash>
-                    <file>graphics/splash2.bmp</file>
-                    <waitForWindow>true</waitForWindow>
-                    <timeout>60</timeout>
-                    <timeoutErr>true</timeoutErr>
-                </splash>
-                <versionInfo>
-                    <fileVersion>${version.number}</fileVersion>
-                    <txtFileVersion>${version}${version.suffix}</txtFileVersion>
-                    <fileDescription>${product.name}</fileDescription>
-                    <copyright>${vendor}</copyright>
-                    <productVersion>${version.number}</productVersion>
-                    <txtProductVersion>${version}${version.suffix}</txtProductVersion>
-                    <productName>${product.name}</productName>
-                    <companyName></companyName>
-                    <internalName>${internal.name}</internalName>
-                    <originalFilename>${exe.filename}.exe</originalFilename>
-                </versionInfo>
-            </launch4jConfig>
-        </echoxml>
-    </target>-->
-    
-    <target name="-exe-translator-config"> 
-        <echoxml file="${translator_exe.config}">
-            <launch4jConfig>
-                <dontWrapJar>true</dontWrapJar>
-                <headerType>gui</headerType>
-                <jar>${jar.filename}.jar</jar>
-                <outfile>${basedir}/${dist.dir}/${translator_exe.filename}.exe</outfile>
-                <errTitle></errTitle>
-                <cmdLine>-translator</cmdLine>
-                <chdir></chdir>
-                <priority>normal</priority>
-                <downloadUrl>http://java.com/download</downloadUrl>
-                <supportUrl></supportUrl>
-                <customProcName>false</customProcName>
-                <stayAlive>false</stayAlive>
-                <restartOnCrash>false</restartOnCrash>
-                <manifest></manifest>
-                <icon></icon>
-                <jre>
-                    <path></path>
-                    <minVersion>${min.java.version}</minVersion>
-                    <maxVersion></maxVersion>
-                    <jdkPreference>preferJre</jdkPreference>
-                    <runtimeBits>64/32</runtimeBits>
-                    <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>                    
-                </jre>                
-                <versionInfo>
-                    <fileVersion>${version.number}</fileVersion>
-                    <txtFileVersion>${version}${version.suffix}</txtFileVersion>
-                    <fileDescription>${translator_product.name}</fileDescription>
-                    <copyright>${vendor}</copyright>
-                    <productVersion>${version.number}</productVersion>
-                    <txtProductVersion>${version}${version.suffix}</txtProductVersion>
-                    <productName>${translator_product.name}</productName>
-                    <companyName></companyName>
-                    <internalName>${translator_internal.name}</internalName>
-                    <originalFilename>${translator_exe.filename}.exe</originalFilename>
-                </versionInfo>
-            </launch4jConfig>
-        </echoxml>
-    </target>    
-    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-translator-config"> <!-- -exe-config -->
-        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
-            <arg line="${exe.config}" />
-        </java>-->
-        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
-            <arg line="${translator_exe.config}" />
-        </java>-->
-    </target>
-    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-translator-config"> <!-- -exe-config -->
-        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
-            <arg line="${exe.config}" />
-        </java>-->
-        <!-- <java jar="${launch4j.path}/launch4j.jar" fork="true">
-            <arg line="${translator_exe.config}" />
-        </java> -->
-    </target>   
-         
-    
-    <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
+                    
+    <target name="exe" depends="-load-tools,-exe-splashscreen,-exe-versioninfo">
         
     </target>
     
@@ -539,7 +422,7 @@
             tools.properties NOT found.
             Please create file named "tools.properties" and add two lines:
             nsis.path = Path to Nullsoft Install System
-            launch4j.path = Path to launch4j
+            reshack.path = Path to Resource Hacker
             
             WARNING: You must use double backslash in paths on Windows System or forward slash
         </fail>
@@ -548,11 +431,8 @@
     <target name="-load-tools" depends="-check-tools,-load-tools-ok,-load-tools-fail">
         
     </target>
-    <target name="exe-console" depends="-set-console-type,-exe-linux,-exe-windows">
-
-    </target>
-
-    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer">
+    
+    <target name="release" depends="library,exe,archive,deb,osx-app-archive,installer,osx-app-installer">
 
     </target>
          
@@ -732,7 +612,88 @@
             <arg line="${run.params}" />
         </java>
     </target>
+    
+    <target name="-exe-splashscreen-generate" depends="build">
+        <java classname="com.jpexs.build.SplashScreenGenerator" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="${compile.dir}"/>
+                <pathelement location="${lib.dir}/ffdec_lib.jar"/>
+            </classpath>
+        </java>        
+    </target>
+    <target name="-exe-splashscreen-inject-unix" depends="-exe-splashscreen-generate,-load-tools" unless="is_windows">
+        <exec executable="wine" failonerror="true">
+            <arg value="${reshack.path}ResourceHacker.exe"/>
+            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-action"/><arg value="addoverwrite"/>
+            <arg value="-res"/><arg value="build/splash.bmp"/>
+            <arg value="-mask"/><arg value="BITMAP,1"/>
+        </exec>
+    </target>
 
+    <target name="-exe-splashscreen-inject-windows" depends="-exe-splashscreen-generate,-load-tools" if="is_windows">        
+        <exec executable="${reshack.path}ResourceHacker.exe" failonerror="true">
+            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-action"/><arg value="addoverwrite"/>
+            <arg value="-res"/><arg value="build/splash.bmp"/>
+            <arg value="-mask"/><arg value="BITMAP,1"/>
+        </exec>
+    </target>
+    
+    <target name="-exe-splashscreen" depends="-exe-splashscreen-inject-unix, -exe-splashscreen-inject-windows">
+        
+    </target>
+    
+    <target name="-exe-versioninfo-generate" depends="-loadversion,git-tag,-suffix">
+        <copy file="versioninfo.rc" tofile="build/versioninfo.rc" overwrite="true">
+            <filterset>
+              <filter token="MAJOR" value="${version.major}"/>
+              <filter token="MINOR" value="${version.minor}"/>
+              <filter token="RELEASE" value="${version.release}"/>
+              <filter token="BUILD" value="${version.build}"/>
+              <filter token="VERSION" value="${version}${version.suffix}"/>
+            </filterset>
+        </copy>
+    </target>
+    
+    <target name="-exe-versioninfo-inject-unix" depends="-exe-versioninfo-generate,-load-tools" unless="is_windows">
+        <exec executable="wine" failonerror="true">
+            <arg value="${reshack.path}ResourceHacker.exe"/>
+            <arg value="-open"/><arg value="build/versioninfo.rc"/>
+            <arg value="-save"/><arg value="build/versioninfo.res"/>
+            <arg value="-action"/><arg value="compile"/>
+        </exec>
+        <exec executable="wine" failonerror="true">
+            <arg value="${reshack.path}ResourceHacker.exe"/>
+            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-action"/><arg value="addoverwrite"/>
+            <arg value="-res"/><arg value="build/versioninfo.res"/>
+            <arg value="-mask"/><arg value="Version Info,1"/>
+        </exec>
+    </target>
+
+    <target name="-exe-versioninfo-inject-windows" depends="-exe-versioninfo-generate,-load-tools" if="is_windows">
+        <exec executable="${reshack.path}ResourceHacker.exe" failonerror="true">
+            <arg value="-open"/><arg value="build/versioninfo.rc"/>
+            <arg value="-save"/><arg value="build/versioninfo.res"/>
+            <arg value="-action"/><arg value="compile"/>
+        </exec>
+        <exec executable="${reshack.path}ResourceHacker.exe" failonerror="true">
+            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-action"/><arg value="addoverwrite"/>
+            <arg value="-res"/><arg value="build/versioninfo.res"/>
+            <arg value="-mask"/><arg value="Version Info,1"/>
+        </exec>
+    </target>
+    
+    <target name="-exe-versioninfo" depends="-exe-versioninfo-inject-unix, -exe-versioninfo-inject-windows">
+        
+    </target>        
+    
 
     <target name="javadoc">
         <mkdir dir="${javadoc.dir}"/>
