@@ -47,7 +47,7 @@ jobs:
         WINEDEBUG: "-all"
         #WINEARCH: "win32"
       run: |        
-        mkdir ${{ github.workspace }}/tools
+        mkdir -p "${{ github.workspace }}/tools"
         winecfg
         #wineboot -u        
         
