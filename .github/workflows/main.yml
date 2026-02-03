@@ -41,6 +41,14 @@ jobs:
         apt-get install -y -qq wine
         wine --version
         
+    - name: Init Wine prefix
+      env:
+        WINEPREFIX: ${{ github.workspace }}/.wine
+        WINEDEBUG: "-all"
+      run: |
+        mkdir -p "$WINEPREFIX"
+        wineboot -u        
+        
     - name: Set up JDKs
       uses: actions/setup-java@v4
       with:
@@ -63,15 +71,7 @@ jobs:
         #dpkg -i nsis_3.08-2_amd64.deb        
         apt-get -y update
         apt-get -y install nsis
-        makensis -VERSION           
-        
-#    - name: Init Wine prefix
-#      env:
-#        WINEPREFIX: ${{ github.workspace }}/.wine
-#        WINEDEBUG: "-all"
-#      run: |
-#        mkdir -p "$WINEPREFIX"
-#        wineboot -u
+        makensis -VERSION                   
                         
     - name: Install Resource Hacker
       env:
