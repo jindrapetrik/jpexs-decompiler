@@ -45,7 +45,7 @@ jobs:
       env:
         WINEPREFIX: ${{ github.workspace }}/.wine
         WINEDEBUG: "-all"
-        WINEARCH: "win32"
+        #WINEARCH: "win32"
       run: |        
         winecfg
         #wineboot -u        
