@@ -45,9 +45,10 @@ jobs:
       env:
         WINEPREFIX: ${{ github.workspace }}/.wine
         WINEDEBUG: "-all"
-      run: |
-        mkdir -p "$WINEPREFIX"
-        wineboot -u        
+        WINEARCH: "win32"
+      run: |        
+        winecfg
+        #wineboot -u        
         
     - name: Set up JDKs
       uses: actions/setup-java@v4
