@@ -97,8 +97,12 @@ jobs:
       run: |
         apt-get install -y -qq ant 
     - name: Build
+      env:
+        WINEPREFIX: ${{ github.workspace }}/tools/.wine
+        WINEDEBUG: "-all"      
       run: |        
-        export CICD_TEMP=${{ github.workspace }}        
-        chmod a+x ./cicd_scripts/*.sh
-        ./cicd_scripts/before_install.sh
-        ./cicd_scripts/script.sh
+        ant exe
+        #export CICD_TEMP=${{ github.workspace }}        
+        #chmod a+x ./cicd_scripts/*.sh
+        #./cicd_scripts/before_install.sh
+        #./cicd_scripts/script.sh
