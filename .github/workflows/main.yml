@@ -38,7 +38,7 @@ jobs:
       run: |
         dpkg --add-architecture i386
         apt-get update -y -qq
-        apt-get install -y -qq winehq-stable
+        apt-get install -y -qq wine
         wine --version
         
     - name: Set up JDKs
