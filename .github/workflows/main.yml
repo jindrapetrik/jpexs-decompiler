@@ -43,10 +43,11 @@ jobs:
         
     - name: Init Wine prefix
       env:
-        WINEPREFIX: ${{ github.workspace }}/.wine
+        WINEPREFIX: ${{ github.workspace }}/tools/.wine
         WINEDEBUG: "-all"
         #WINEARCH: "win32"
       run: |        
+        mkdir ${{ github.workspace }}/tools
         winecfg
         #wineboot -u        
         
