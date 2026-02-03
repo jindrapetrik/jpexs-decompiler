@@ -101,8 +101,8 @@ jobs:
         WINEPREFIX: ${{ github.workspace }}/tools/.wine
         WINEDEBUG: "-all"      
       run: |        
-        ant exe
-        #export CICD_TEMP=${{ github.workspace }}        
-        #chmod a+x ./cicd_scripts/*.sh
-        #./cicd_scripts/before_install.sh
+        export CICD_TEMP=${{ github.workspace }}        
+        chmod a+x ./cicd_scripts/*.sh
+        ./cicd_scripts/before_install.sh
+        ant exe        
         #./cicd_scripts/script.sh
