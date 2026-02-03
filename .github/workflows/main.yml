@@ -43,8 +43,8 @@ jobs:
           21
     - name: Set up PHP
       run: |
-        apt update -y -qq
-        apt install -y -qq php
+        apt-get update -y -qq
+        apt-get install -y -qq php
     - name: Set up NSis
       run: |
         #apt install -y -qq wget
@@ -59,8 +59,8 @@ jobs:
     - name: Install Wine
       run: |
         dpkg --add-architecture i386
-        apt-get update
-        apt install -y -qq --no-install-recommends wine64
+        apt-get update -y -qq
+        apt-get install -y -qq --no-install-recommends wine64
         
 #    - name: Init Wine prefix
 #      env:
@@ -69,14 +69,17 @@ jobs:
 #      run: |
 #        mkdir -p "$WINEPREFIX"
 #        wineboot -u
-        
+                        
     - name: Install Resource Hacker
       env:
         RH_DIR: ${{ github.workspace }}/tools/resourcehacker
         RH_ZIP: ${{ github.workspace }}/tools/resourcehacker.zip
         RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
-      run: |
+      run: |              
         set -euxo pipefail
+        
+        apt-get install -y -qq unzip wget
+        
         mkdir -p "$(dirname "$RH_ZIP")"
         mkdir -p "$RH_DIR"
 
