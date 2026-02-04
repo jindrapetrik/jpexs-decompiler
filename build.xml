@@ -634,10 +634,14 @@
             <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
             <arg value="-open"/><arg value="${reshack.path}ffdec.exe"/>
-            <arg value="-save"/><arg value="${reshack.path}ffdec.exe"/>
+            <arg value="-save"/><arg value="${reshack.path}out.exe"/>
             <arg value="-action"/><arg value="addoverwrite"/>
             <arg value="-res"/><arg value="${reshack.path}splash.bmp"/>
             <arg value="-mask"/><arg value="BITMAP,1"/>
+        </exec>
+        <exec executable="ls" failonerror="false">
+            <arg value="-la"/>
+            <arg value="${reshack.path}"/>
         </exec>
         <copy todir="${dist.dir}" file="${reshack.path}ffdec.exe" overwrite="true"/>
     </target>
