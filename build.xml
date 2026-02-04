@@ -404,7 +404,7 @@
         </zip>           
     </target>
                     
-    <target name="exe" depends="-load-tools"> <!-- TODO: -exe-splashscreen,-exe-versioninfo -->
+    <target name="exe" depends="-load-tools,-exe-splashscreen,-exe-versioninfo">
         
     </target>
     
