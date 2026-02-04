@@ -14,7 +14,7 @@ MAKENSIS_FULLPATH=`which makensis`
 MAKENSIS_PATH=`dirname "$MAKENSIS_FULLPATH"`
 
 echo "nsis.path = $MAKENSIS_PATH" > tools.properties
-echo "reshack.path = $tools_dir/wine/resourcehacker/" >> tools.properties
+echo "reshack.path = tools/wine/resourcehacker/" >> tools.properties
 
 cat tools.properties
 
