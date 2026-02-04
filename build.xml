@@ -626,23 +626,19 @@
             <file file="build/splash.bmp"/>
             <file file="${dist.dir}/ffdec.exe"/>
         </copy>
-        <exec executable="ls" failonerror="false">
-            <arg value="-la"/>
-            <arg value="${reshack.path}"/>
-        </exec>
-        <exec executable="xvfb-run" failonerror="true">
+        <exec executable="xvfb-run" failonerror="false">
             <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
             <arg value="-open"/><arg value="${reshack.path}ffdec.exe"/>
-            <arg value="-save"/><arg value="${reshack.path}out.exe"/>
+            <arg value="-save"/><arg value="${reshack.path}ffdec.exe"/>
             <arg value="-action"/><arg value="addoverwrite"/>
             <arg value="-res"/><arg value="${reshack.path}splash.bmp"/>
             <arg value="-mask"/><arg value="BITMAP,1"/>
         </exec>
-        <exec executable="ls" failonerror="false">
+        <!--<exec executable="ls" failonerror="false">
             <arg value="-la"/>
             <arg value="${reshack.path}"/>
-        </exec>
+        </exec>-->
         <copy todir="${dist.dir}" file="${reshack.path}ffdec.exe" overwrite="true"/>
     </target>
 
