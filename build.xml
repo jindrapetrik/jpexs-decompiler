@@ -626,7 +626,11 @@
             <file file="build/splash.bmp"/>
             <file file="${dist.dir}/ffdec.exe"/>
         </copy>
-        <exec executable="xvfb-run" failonerror="false">
+        <exec executable="ls" failonerror="false">
+            <arg value="-la"/>
+            <arg value="${reshack.path}"/>
+        </exec>
+        <exec executable="xvfb-run" failonerror="true">
             <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
             <arg value="-open"/><arg value="${reshack.path}ffdec.exe"/>

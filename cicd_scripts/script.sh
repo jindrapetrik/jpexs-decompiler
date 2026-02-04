@@ -96,7 +96,9 @@ else
       
       JAVA_HOME=$JAVA_HOME_8_X64
       #compile, build, create files
-      ant new-version
+      ant exe
+      #new-version
+      exit 1
 
       # Javadoc generation is buggy with Java 8, lets generate it with Java 21
       JAVA_HOME=$JAVA_HOME_21_X64
