@@ -622,14 +622,20 @@
         </java>        
     </target>
     <target name="-exe-splashscreen-inject-unix" depends="-exe-splashscreen-generate,-load-tools" unless="is_windows">
-        <exec executable="wine" failonerror="true">
+        <copy todir="${reshack.path}" overwrite="true">
+            <file file="build/splash.bmp"/>
+            <file file="${dist.dir}/ffdec.exe"/>
+        </copy>
+        <exec executable="xvfb-run" failonerror="true">
+            <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
-            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
-            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-open"/><arg value="${reshack.path}ffdec.exe"/>
+            <arg value="-save"/><arg value="${reshack.path}ffdec.exe"/>
             <arg value="-action"/><arg value="addoverwrite"/>
-            <arg value="-res"/><arg value="build/splash.bmp"/>
+            <arg value="-res"/><arg value="${reshack.path}splash.bmp"/>
             <arg value="-mask"/><arg value="BITMAP,1"/>
         </exec>
+        <copy todir="${dist.dir}" file="${reshack.path}ffdec.exe" overwrite="true"/>
     </target>
 
     <target name="-exe-splashscreen-inject-windows" depends="-exe-splashscreen-generate,-load-tools" if="is_windows">        
@@ -659,18 +665,24 @@
     </target>
     
     <target name="-exe-versioninfo-inject-unix" depends="-exe-versioninfo-generate,-load-tools" unless="is_windows">
-        <exec executable="wine" failonerror="true">
+        <copy todir="${reshack.path}" overwrite="true">
+            <file file="build/versioninfo.rc"/>
+            <file file="${dist.dir}/ffdec.exe"/>
+        </copy>        
+        <exec executable="xvfb-run" failonerror="true">
+            <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
-            <arg value="-open"/><arg value="build/versioninfo.rc"/>
-            <arg value="-save"/><arg value="build/versioninfo.res"/>
+            <arg value="-open"/><arg value="${reshack.path}versioninfo.rc"/>
+            <arg value="-save"/><arg value="${reshack.path}versioninfo.res"/>
             <arg value="-action"/><arg value="compile"/>
         </exec>
-        <exec executable="wine" failonerror="true">
+        <exec executable="xvfb-run" failonerror="true">
+            <arg value="wine" />
             <arg value="${reshack.path}ResourceHacker.exe"/>
-            <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
-            <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
+            <arg value="-open"/><arg value="${reshack.path}ffdec.exe"/>
+            <arg value="-save"/><arg value="${reshack.path}ffdec.exe"/>
             <arg value="-action"/><arg value="addoverwrite"/>
-            <arg value="-res"/><arg value="build/versioninfo.res"/>
+            <arg value="-res"/><arg value="${reshack.path}versioninfo.res"/>
             <arg value="-mask"/><arg value="Version Info,1"/>
         </exec>
     </target>

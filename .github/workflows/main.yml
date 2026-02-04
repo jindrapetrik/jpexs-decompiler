@@ -57,13 +57,42 @@ jobs:
         apt-get -y update
         apt-get -y install nsis
         makensis -VERSION                   
-                        
+                 
     - name: Set up ant
       run: |
         apt-get install -y -qq ant 
+        
+    - name: Set up Wine
+      run: |
+        dpkg --add-architecture i386
+        apt-get update -y -qq
+        apt-get install -y -qq wine
+        wine --version
+        
+    - name: Set up Resource Hacker
+      env:
+        RH_DIR: tools/wine/resourcehacker
+        RH_ZIP: tools/wine/resourcehacker.zip
+        RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
+      run: |              
+        set -euxo pipefail
+        
+        apt-get install -y -qq unzip wget
+        
+        mkdir -p "$(dirname "$RH_ZIP")"
+        mkdir -p "$RH_DIR"
+
+        wget -O -q "$RH_ZIP" "$RH_URL"
+        unzip -o -qq "$RH_ZIP" -d "$RH_DIR"
+            
+    - name: Set up Xvfb
+      run: |
+           apt-get install -y -qq xorg xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic                                
+            
     - name: Build  
       run: |        
-        export CICD_TEMP=${{ github.workspace }}        
+        export WINEPREFIX=$(pwd)/tools/wine
+        export CICD_TEMP=$(pwd) 
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
         ./cicd_scripts/script.sh
