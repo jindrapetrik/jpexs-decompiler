@@ -95,4 +95,5 @@ jobs:
         export CICD_TEMP=$(pwd) 
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
-        ./cicd_scripts/script.sh
+        #./cicd_scripts/script.sh
+        ant exe
