@@ -33,24 +33,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    
-    - name: Install Wine
-      run: |
-        dpkg --add-architecture i386
-        apt-get update -y -qq
-        apt-get install -y -qq wine
-        wine --version
-        
-    - name: Init Wine prefix
-      env:
-        WINEPREFIX: ${{ github.workspace }}/tools/.wine
-        WINEDEBUG: "-all"
-        #WINEARCH: "win32"
-      run: |        
-        mkdir -p $WINEPREFIX
-        winecfg
-        #wineboot -u        
-        
+      
     - name: Set up JDKs
       uses: actions/setup-java@v4
       with:
@@ -75,34 +58,12 @@ jobs:
         apt-get -y install nsis
         makensis -VERSION                   
                         
-    - name: Install Resource Hacker
-      env:
-        RH_DIR: ${{ github.workspace }}/tools/resourcehacker
-        RH_ZIP: ${{ github.workspace }}/tools/resourcehacker.zip
-        RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
-      run: |              
-        set -euxo pipefail
-        
-        apt-get install -y -qq unzip wget
-        
-        mkdir -p "$(dirname "$RH_ZIP")"
-        mkdir -p "$RH_DIR"
-
-        wget -O "$RH_ZIP" "$RH_URL"
-        unzip -o "$RH_ZIP" -d "$RH_DIR"
-
-        # find exe (sometimes it's in subfolder)
-        find "$RH_DIR" -maxdepth 3 -type f -iname "ResourceHacker.exe" -print            
     - name: Set up ant
       run: |
         apt-get install -y -qq ant 
-    - name: Build
-      env:
-        WINEPREFIX: ${{ github.workspace }}/tools/.wine
-        WINEDEBUG: "-all"      
+    - name: Build  
       run: |        
         export CICD_TEMP=${{ github.workspace }}        
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
-        ant exe        
-        #./cicd_scripts/script.sh
+        ./cicd_scripts/script.sh
