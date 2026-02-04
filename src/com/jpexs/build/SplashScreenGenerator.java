@@ -38,7 +38,7 @@ public class SplashScreenGenerator {
         BufferedImage img = ImageIO.read(new File("graphics/splash3.png"));
         Graphics2D g = img.createGraphics();
         g.setColor(new Color(0, 100, 255, 128));
-        g.setFont(new Font("Arial", Font.BOLD, 25));
+        g.setFont(new Font("Arial", Font.BOLD, 16));
         int sw = g.getFontMetrics().stringWidth(ApplicationInfo.version);
         int x = 190;
         int y = 170;
