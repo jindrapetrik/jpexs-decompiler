@@ -82,7 +82,7 @@ jobs:
         mkdir -p "$(dirname "$RH_ZIP")"
         mkdir -p "$RH_DIR"
 
-        wget -O -q "$RH_ZIP" "$RH_URL"
+        wget -q -O "$RH_ZIP" "$RH_URL"
         unzip -o -qq "$RH_ZIP" -d "$RH_DIR"
             
     - name: Set up Xvfb
