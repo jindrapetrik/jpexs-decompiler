@@ -430,9 +430,19 @@
         <echo level="info" message="Version: ${version}"/>
     </target>
     
-    <target name="release_lib" depends="git-tag,-loadversion,-save-version-info,-suffix">
+    <target name="release_lib" depends="git-tag,-loadversion,-save-version-info,-suffix,release_lib-dist,release_lib-no-dist">
+    </target>
+    
+    <target name="release_lib-dist" depends="git-tag,-loadversion,-save-version-info,-suffix" unless="no_dist">
         <copy file="${version_info}" tofile="${core.lib.version_info}" />        
         <ant antfile="${core.lib.script}" target="release" inheritAll="false" usenativebasedir="true"/>
+        <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
+    </target>
+    
+    
+    <target name="release_lib-no-dist" depends="git-tag,-loadversion,-save-version-info,-suffix" if="no_dist">
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />        
+        <ant antfile="${core.lib.script}" target="release-no-dist" inheritAll="false" usenativebasedir="true"/>
         <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
     </target>
     

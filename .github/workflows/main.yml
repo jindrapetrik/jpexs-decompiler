@@ -266,6 +266,12 @@ jobs:
           name: dist
           path: dist/
           
+      - name: Upload lib dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: lib_dist
+          path: libsrc/ffdec_lib/dist
+          
   exe:
     name: Generate EXE
     runs-on: windows-latest
@@ -638,6 +644,13 @@ jobs:
       with:
           name: dist
           path: dist/
+    
+    - name: Download lib dist artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: lib_dist
+          path: libsrc/ffdec_lib/dist/
+          
     - name: Download signed EXE artifact
       uses: actions/download-artifact@v4
       with:
@@ -680,6 +693,7 @@ jobs:
         path: releases
     
   deploy:
+    name: Deploy to GitHub
     runs-on: ubuntu-latest
     if: needs.compute-version.outputs.doRelease == 'true'
     needs:
@@ -707,10 +721,7 @@ jobs:
           path: releases/
           
       - name: Generate release description
-        run: php cicd_scripts/format_release_info.php \
-                -filever "${{ needs.compute-version.outputs.verShort }}" \
-                Unreleased ${{ needs.compute-version.outputs.verTag }} \
-                ./CHANGELOG.md "$CICD_REPO_SLUG" > release_notes.md
+        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > release_notes.md
 
       - name: Create tag
         if: needs.compute-version.outputs.verDebug == 'true'
