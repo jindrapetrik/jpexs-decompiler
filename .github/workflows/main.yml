@@ -534,7 +534,9 @@ jobs:
         java-version: 8
     
     - name: Set up Ant
-      run: apt-get install -y -qq ant 
+      run: |
+        apt-get update -y -qq
+        apt-get install -y -qq ant 
     
     - name: Download version.properties artifact
       uses: actions/download-artifact@v4
@@ -566,7 +568,9 @@ jobs:
         java-version: 21
 
     - name: Set up Ant
-      run: apt-get install -y -qq ant 
+      run: |
+        apt-get update -y -qq
+        apt-get install -y -qq ant 
     
     - name: Download version.properties artifact
       uses: actions/download-artifact@v4
