@@ -216,6 +216,10 @@ jobs:
           architecture: x64
           java-version: |
             8
+            21
+      
+      - name: Set Java 8
+        run: JAVA_HOME=$JAVA_HOME_8_X64
       
       - name: Set up Ant
         run: choco install ant -y
@@ -236,7 +240,22 @@ jobs:
       
       - name: Test
         run: ant test
-          
+      
+      - name: Set Java 21
+        if: needs.compute-version.outputs.doRelease == 'true'
+        run: JAVA_HOME=$JAVA_HOME_21_X64
+      
+      - name: Javadoc
+        if: needs.compute-version.outputs.doRelease == 'true'
+        run: ant release_lib_javadoc
+                  
+      - name: Upload lib javadoc artifact
+        if: needs.compute-version.outputs.doRelease == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+            name: lib_javadoc
+            path: releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
+        
       - name: Upload dist
         uses: actions/upload-artifact@v4
         with:
@@ -569,56 +588,13 @@ jobs:
       with:
         name: packages
         path: releases
-
-  javadoc:
-    runs-on: ubuntu-latest
-    needs: compute-version    
-    if: needs.compute-version.outputs.doRelease == 'true'
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: adopt
-        architecture: x64
-        # we need different version than for code as java 8 javadoc generation is buggy
-        java-version: 21
-        
-    - run: |
-        java --version
-        exit 1
-
-    - name: Set up Ant
-      run: |
-        sudo apt-get update -y -qq
-        sudo apt-get install -y -qq ant 
-    
-    - name: Download version.properties artifact
-      uses: actions/download-artifact@v4
-      with:
-          name: version_properties
-    
-    - name: Copy version.properties to lib
-      run: cp version.properties libsrc/ffdec_lib/      
-            
-    - name: Generate Javadoc
-      run: ant javadoc release_lib_javadoc
-      
-    - name: Upload lib javadoc artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: lib_javadoc
-        path: releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
     
   deploy:
     runs-on: ubuntu-latest
     if: needs.compute-version.outputs.doRelease == 'true'
     needs:
       - compute-version
-      - packages   
-      - javadoc
+      - packages      
     steps:
       - name: Checkout
         uses: actions/checkout@v3
