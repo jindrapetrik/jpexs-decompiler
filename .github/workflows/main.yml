@@ -756,6 +756,8 @@ jobs:
             releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
       - name: Remove old nightly
         if: needs.compute-version.outputs.verDebug == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete ${{needs.compute-version.outputs.verOldTag}} --yes --cleanup-tag
         
