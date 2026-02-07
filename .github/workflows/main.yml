@@ -205,6 +205,9 @@ jobs:
     runs-on: windows-latest
     needs: compute-version
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -243,6 +246,8 @@ jobs:
     needs: compute-version
     if: needs.compute-version.outputs.doRelease == 'true'
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
@@ -559,6 +564,9 @@ jobs:
     needs: compute-version    
     if: needs.compute-version.outputs.doRelease == 'true'
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
