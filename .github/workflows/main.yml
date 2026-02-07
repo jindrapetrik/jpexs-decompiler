@@ -494,9 +494,9 @@ jobs:
           
       - name: Create installer
         shell: pwsh
-        working-directory: "./wix"
+        working-directory: wix
         run: |
-            Build_Release.cmd
+            .\Build_Release.cmd
             
       - name: Sign MSI with KMS key
         shell: pwsh        
