@@ -621,6 +621,7 @@ jobs:
           name: signed_msi
           path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
   packages:
+    name: Create packages
     runs-on: ubuntu-latest
     needs:
       - compute-version 
@@ -670,7 +671,7 @@ jobs:
       run: cp version.properties libsrc/ffdec_lib/
       
     - name: Create packages
-      run: ant release-no-dist
+      run: ant new-version-set release-no-dist
     
     - name: Upload packages
       uses: actions/upload-artifact@v4
