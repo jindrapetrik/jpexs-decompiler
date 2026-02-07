@@ -223,6 +223,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: version_properties
+            path:
+                -  ./
+                -  libsrc/ffdec_lib/
       
       - name: Check style
         run: ant checkstyle
@@ -272,7 +275,7 @@ jobs:
       run: |        
         mkdir build/classes
         javac -d build/classes libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/BMPFile.java
-        javac -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
+        javac -cp build/classes -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
         java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
     
     - name: Replace EXE splash screen
@@ -553,6 +556,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
+          path:
+            -  ./
+            -  libsrc/ffdec_lib/
     
     - name: Create packages
       run: ant release-no-dist
@@ -589,6 +595,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
+          path:
+            -  ./
+            -  libsrc/ffdec_lib/
             
     - name: Generate Javadoc
       run: ant release_lib_javadoc
