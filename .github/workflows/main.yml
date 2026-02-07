@@ -443,13 +443,54 @@ jobs:
           $signtool = "${{ steps.signtool.outputs.path }}"
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
 
-          & $signtool sign /v /debug `
-            /fd sha256 `
-            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
-            /f "$env:CERT_PATH" `
-            /csp "Google Cloud KMS Provider" `
-            /kc "$kc" `
+          $ErrorActionPreference = 'Stop'
+
+          $exe  = $signtool
+          $args = @(
+            "sign",
+            "/v",
+            "/debug",
+            "/fd", "sha256",
+            "/tr", "http://timestamp.sectigo.com?td=sha256",
+            "/td", "sha256",
+            "/f", "$env:CERT_PATH",
+            "/csp", "Google Cloud KMS Provider",
+            "/kc", "$kc",
             "dist/ffdec.exe"
+          )
+
+          # --- retry policy ---
+          $maxAttempts = 3
+          $delaySeconds = 5
+          $needle = "SignTool Error: An unexpected internal error has occurred"
+
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            Write-Host "Attempt $attempt/$maxAttempts: $exe $($args -join ' ')"
+
+            $output = & $exe @args 2>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+
+            if ($output) { Write-Host $output.TrimEnd() }
+
+            if ($exitCode -eq 0) {
+              Write-Host "Succeeded."
+              exit 0
+            }
+
+            $hasNeedle = $output -match [regex]::Escape($needle)
+
+            if ($hasNeedle -and $attempt -lt $maxAttempts) {
+              Write-Warning "Detected transient SignTool internal error. Retrying in $delaySeconds seconds..."
+              Start-Sleep -Seconds $delaySeconds
+              continue
+            }
+
+            if ($hasNeedle) {
+              throw "Failed after $maxAttempts attempts due to repeated SignTool internal error (exit code $exitCode)."
+            } else {
+              throw "Command failed (exit code $exitCode). Output did not match retry condition."
+            }
+          }
       
       - name: Verify EXE signature
         shell: pwsh
@@ -506,14 +547,55 @@ jobs:
         run: |      
           $signtool = "${{ steps.signtool.outputs.path }}"
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
+          
+          $ErrorActionPreference = 'Stop'
 
-          & $signtool sign /v /debug `
-            /fd sha256 `
-            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
-            /f "$env:CERT_PATH" `
-            /csp "Google Cloud KMS Provider" `
-            /kc "$kc" `
+          $exe  = $signtool
+          $args = @(
+            "sign",
+            "/v",
+            "/debug",
+            "/fd", "sha256",
+            "/tr", "http://timestamp.sectigo.com?td=sha256",
+            "/td", "sha256",
+            "/f", "$env:CERT_PATH",
+            "/csp", "Google Cloud KMS Provider",
+            "/kc", "$kc",
             "wix/bin/Release/FFDec.msi"
+          )
+
+          # --- retry policy ---
+          $maxAttempts = 3
+          $delaySeconds = 5
+          $needle = "SignTool Error: An unexpected internal error has occurred"
+
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            Write-Host "Attempt $attempt/$maxAttempts: $exe $($args -join ' ')"
+
+            $output = & $exe @args 2>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+
+            if ($output) { Write-Host $output.TrimEnd() }
+
+            if ($exitCode -eq 0) {
+              Write-Host "Succeeded."
+              exit 0
+            }
+
+            $hasNeedle = $output -match [regex]::Escape($needle)
+
+            if ($hasNeedle -and $attempt -lt $maxAttempts) {
+              Write-Warning "Detected transient SignTool internal error. Retrying in $delaySeconds seconds..."
+              Start-Sleep -Seconds $delaySeconds
+              continue
+            }
+
+            if ($hasNeedle) {
+              throw "Failed after $maxAttempts attempts due to repeated SignTool internal error (exit code $exitCode)."
+            } else {
+              throw "Command failed (exit code $exitCode). Output did not match retry condition."
+            }
+          }         
                       
       - name: Verify MSI signature
         shell: pwsh
