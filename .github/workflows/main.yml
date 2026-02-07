@@ -585,6 +585,10 @@ jobs:
         architecture: x64
         # we need different version than for code as java 8 javadoc generation is buggy
         java-version: 21
+        
+    - run: |
+        java --version
+        exit 1
 
     - name: Set up Ant
       run: |
