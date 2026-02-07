@@ -612,8 +612,8 @@ jobs:
       - name: Rename MSI
         shell: cmd
         run: |
-          mkdir releases
-          move wix/bin/Release/FFDec.msi releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+          mkdir releases               
+          move wix\bin\Release\FFDec.msi releases\ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             
       - name: Upload signed MSI artifact
         uses: actions/upload-artifact@v4
