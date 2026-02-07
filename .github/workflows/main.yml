@@ -69,7 +69,7 @@ jobs:
           $isTag     = $ref.StartsWith("refs/tags/")
           $isDev     = ($ref -eq "refs/heads/dev")
 
-          $H = (git rev-parse --short=12 HEAD).Trim()
+          $H = (git rev-parse HEAD).Trim()
 
           function Set-Var([string]$name, [string]$value) {
             # For later steps in the SAME job
