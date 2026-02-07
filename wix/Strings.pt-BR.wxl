@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="pt-BR">
+  <String Id="GuiLibs_Desc" Value="GUI do aplicativo e bibliotecas" />
+  <String Id="DesktopShortcut_Title" Value="Atalho na área de trabalho" />
+  <String Id="DesktopShortcut_Desc"  Value="Cria um atalho do aplicativo na área de trabalho." />
+  <String Id="ContextMenu_Title" Value="Adicionar ao menu de contexto" />
+  <String Id="ContextMenu_Desc" Value="Adiciona FFDec ao menu de contexto de arquivos SWF e GFX no Windows Explorer." />
+  <String Id="DowngradeErrorMessage" Value="Uma versão mais recente de [ProductName] já está instalada." />
+</WixLocalization>

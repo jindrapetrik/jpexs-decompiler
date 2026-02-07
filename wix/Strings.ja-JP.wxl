@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="ja-JP">
+  <String Id="GuiLibs_Desc" Value="GUI アプリケーションとライブラリ" />
+  <String Id="DesktopShortcut_Title" Value="デスクトップショートカット" />
+  <String Id="DesktopShortcut_Desc"  Value="デスクトップにアプリケーションのショートカットを作成します。" />
+  <String Id="ContextMenu_Title" Value="コンテキストメニューに追加" />
+  <String Id="ContextMenu_Desc" Value="Windows エクスプローラーの SWF と GFX ファイルのコンテキストメニューに、FFDec を追加します。" />
+  <String Id="DowngradeErrorMessage" Value="[ProductName] の新しいバージョンが既にインストールされています。" />
+</WixLocalization>

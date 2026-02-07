@@ -16,7 +16,6 @@
  */
 package com.jpexs.build;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import java.awt.Color;
 import java.awt.Font;
@@ -35,18 +34,22 @@ import javax.imageio.ImageIO;
 public class SplashScreenGenerator {
 
     public static void main(String[] args) throws IOException {
+        if (args.length < 1) {
+            System.err.println("Expected version parameter");
+        }
+        String ver = args[0];
         BufferedImage img = ImageIO.read(new File("graphics/splash3.png"));
         Graphics2D g = img.createGraphics();
         g.setColor(new Color(0, 100, 255, 128));
         g.setFont(new Font("Arial", Font.BOLD, 16));
-        int sw = g.getFontMetrics().stringWidth(ApplicationInfo.version);
+        int sw = g.getFontMetrics().stringWidth(ver);
         int x = 190;
         int y = 170;
         int w = 220;
         int h = 25;
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.drawString(ApplicationInfo.version, x + w / 2 - sw / 2, y + h);
+        g.drawString(ver, x + w / 2 - sw / 2, y + h);
 
         BMPFile.saveBitmap(img, new File("build/splash.bmp"));
     }

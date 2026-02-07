@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="cs-CZ">
+  <String Id="GuiLibs_Desc" Value="Grafické rozhraní a knihovny." />
+  <String Id="DesktopShortcut_Title" Value="Zástupce na ploše" />
+  <String Id="DesktopShortcut_Desc"  Value="Vytvoří zástupce na ploše windows." />
+  <String Id="ContextMenu_Title" Value="Přidat do kontextového menu" />
+  <String Id="ContextMenu_Desc" Value="Přidá FFDec do kontextového menu SWF a GFX souborů v průzkumníku." />
+  <String Id="DowngradeErrorMessage" Value="Novější verze [ProductName] je již nainstalována." />
+</WixLocalization>

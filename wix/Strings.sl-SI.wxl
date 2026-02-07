@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="sl-SI">
+  <String Id="GuiLibs_Desc" Value="Aplikacijski vmesnik in knjižnice" />
+  <String Id="DesktopShortcut_Title" Value="Bližnjica na namizju" />
+  <String Id="DesktopShortcut_Desc"  Value="Ustvari bližnjico aplikacije na namizju." />
+  <String Id="ContextMenu_Title" Value="Dodaj v kontekstni meni" />
+  <String Id="ContextMenu_Desc" Value="Doda FFDec v kontekstni meni datotek SWF in GFX v Windows Explorerju." />
+  <String Id="DowngradeErrorMessage" Value="Novejša različica [ProductName] je že nameščena." />
+</WixLocalization>

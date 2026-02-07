@@ -24,75 +24,631 @@ env:
     GITHUB_USER: jindrapetrik
     GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-jobs:
-  build:
+permissions:
+  contents: write
 
-    runs-on: ubuntu-latest
-    container: debian:sid
+jobs:
+  jobs:
+  compute-version:
+    name: Compute version
+    runs-on: windows-latest
+
+    outputs:
+      doRelease:   ${{ steps.vars.outputs.doRelease }}
+      verMajor:    ${{ steps.vars.outputs.verMajor }}
+      verMinor:    ${{ steps.vars.outputs.verMinor }}
+      verRelease:  ${{ steps.vars.outputs.verRelease }}
+      verBuild:    ${{ steps.vars.outputs.verBuild }}
+      verRevision: ${{ steps.vars.outputs.verRevision }}
+      verLong:     ${{ steps.vars.outputs.verLong }}
+      verRaw:      ${{ steps.vars.outputs.verRaw }}
+      verShort:    ${{ steps.vars.outputs.verShort }}
+      verDebug:    ${{ steps.vars.outputs.verDebug }}
+      verOldTag:      ${{ steps.vars.outputs.verOldTag }}
+      verTag:      ${{ steps.vars.outputs.verTag }}
+      verTitle:    ${{ steps.vars.outputs.verTitle }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute variables
+        id: vars
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          # Ensure tags exist locally
+          git fetch --tags --force | Out-Null
+
+          $ref       = "${env:GITHUB_REF}"       # e.g. refs/tags/version1.2.3 or refs/heads/dev
+          $refName   = "${env:GITHUB_REF_NAME}"  # e.g. version1.2.3 or dev
+          $isTag     = $ref.StartsWith("refs/tags/")
+          $isDev     = ($ref -eq "refs/heads/dev")
+
+          $H = (git rev-parse --short=12 HEAD).Trim()
+
+          function Set-Var([string]$name, [string]$value) {
+            # For later steps in the SAME job
+            "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            # For later jobs (job outputs)
+            "$name=$value" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+          # Defaults
+          Set-Var "doRelease" "false"
+          Set-Var "verMajor" ""
+          Set-Var "verMinor" ""
+          Set-Var "verRelease" ""
+          Set-Var "verBuild" ""
+          Set-Var "verRevision" ""
+          Set-Var "verLong" ""
+          Set-Var "verRaw" ""
+          Set-Var "verShort" ""
+          Set-Var "verDebug" ""
+          Set-Var "verOldTag" ""
+          Set-Var "verTag" ""
+          Set-Var "verTitle" ""
+
+
+          # Case 1: Tag versionX.Y.Z
+          if ($isTag -and ($refName -match '^version(\d+)\.(\d+)\.(\d+)$')) {
+            $X = $Matches[1]
+            $Y = $Matches[2]
+            $Z = $Matches[3]
+
+            Set-Var "verMajor"    $X
+            Set-Var "verMinor"    $Y
+            Set-Var "verRelease"  $Z
+            Set-Var "verBuild"    "0"
+            Set-Var "verRevision" $H
+
+            $raw = "$X.$Y.$Z"
+            Set-Var "verRaw"   $raw
+            Set-Var "verShort" $raw
+            Set-Var "verLong"  $raw
+            
+            Set-Var "verDebug" "false"
+            Set-Var "verOldTag" ""
+            Set-Var "verTag"   $refName
+            
+            Set-Var "doRelease" "true"
+            Set-Var "verTitle" "version $raw"
+            
+            exit 0
+          }
+
+          # Case 2: dev branch
+          if ($isDev) {
+            # Find latest nightlyN tag (max N)
+            $nightlyTags = git tag --list 'nightly*'
+            $maxN = -1
+            foreach ($t in $nightlyTags) {
+              if ($t -match '^nightly(\d+)$') {
+                $n = [int]$Matches[1]
+                if ($n -gt $maxN) { $maxN = $n }
+              }
+            }
+            if ($maxN -lt 0) { $maxN = 0 }  # if none exists, start from 0 so M becomes 1
+            $M = $maxN + 1
+
+            # Find latest versionX.Y.Z tag by numeric comparison (major,minor,release)
+            $versionTags = git tag --list 'version*'
+            $best = $null
+            foreach ($t in $versionTags) {
+              if ($t -match '^version(\d+)\.(\d+)\.(\d+)$') {
+                $maj = [int]$Matches[1]
+                $min = [int]$Matches[2]
+                $rel = [int]$Matches[3]
+                $obj = [pscustomobject]@{ Tag=$t; Major=$maj; Minor=$min; Release=$rel }
+                if (-not $best) {
+                  $best = $obj
+                } else {
+                  if ($obj.Major -gt $best.Major -or
+                     ($obj.Major -eq $best.Major -and $obj.Minor -gt $best.Minor) -or
+                     ($obj.Major -eq $best.Major -and $obj.Minor -eq $best.Minor -and $obj.Release -gt $best.Release)) {
+                    $best = $obj
+                  }
+                }
+              }
+            }
+
+            if (-not $best) {
+              throw "No versionX.Y.Z tag found. Create at least one version tag (e.g. version1.0.0)."
+            }
+
+            $X = $best.Major
+            $Y = $best.Minor
+            $Z = $best.Release
+
+            Set-Var "verMajor"    "$X"
+            Set-Var "verMinor"    "$Y"
+            Set-Var "verRelease"  "$Z"
+            Set-Var "verBuild"    "$M"
+            Set-Var "verRevision" $H
+
+            Set-Var "verLong"  "$X.$Y.$Z nightly build $M"
+            Set-Var "verRaw"   "$X.$Y.$Z"
+            Set-Var "verShort" "$X.$Y.$Z`_nightly$M"
+            Set-Var "verDebug" "true"
+            Set-Var "verOldTag"   "nightly$maxN"
+            
+            Set-Var "verTag"   "nightly$M"
+
+            Set-Var "verTitle" "(PREVIEW) version $X.$Y.$Z nightly $M"
+
+            Set-Var "doRelease" "true"
+            exit 0
+          }
+
+          # Other cases: doRelease stays false
+          exit 0           
+      - name: Prepare version info property file
+        run: |
+          $VERSION_PROP_FILE = "version.properties"
+          echo "">$VERSION_PROP_FILE
+          echo "major=${{ needs.compute-version.outputs.verMajor }}">>$VERSION_PROP_FILE
+          echo "minor=${{ needs.compute-version.outputs.verMinor }}">>$VERSION_PROP_FILE
+          echo "release=${{ needs.compute-version.outputs.verRelease }}">>$VERSION_PROP_FILE
+          echo "build=${{ needs.compute-version.outputs.verBuild }}">>$VERSION_PROP_FILE
+          echo "revision=${{ needs.compute-version.outputs.verRevision }}">>$VERSION_PROP_FILE
+          echo "debug=${{ needs.compute-version.outputs.verDebug }}">>$VERSION_PROP_FILE   
+      - name: Upload version.properties artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version_properties
+          path: version.properties 
+  build:
+    name: Build and test
+    runs-on: windows-latest
+    needs: compute-version
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          architecture: x64
+          java-version: |
+            8
       
-    - name: Set up JDKs
+      - name: Set up Ant
+        run: choco install ant -y
+      
+      - name: Download version.properties artifact
+        uses: actions/download-artifact@v4
+        with:
+            name: version_properties
+            path: version.properties       
+      
+      - name: Check style
+        run: ant checkstyle
+      
+      - name: Build
+        run: ant build
+      
+      - name: Test
+        run: ant test
+          
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          
+  exe:
+    name: Generate EXE
+    runs-on: windows-latest
+    needs: compute-version
+    if: needs.compute-version.outputs.doRelease == 'true'
+    steps:
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         distribution: adopt
         architecture: x64
-        java-version: |
-          8
-          21
-    - name: Set up PHP
-      run: |
-        apt-get update -y -qq
-        apt-get install -y -qq php
-    - name: Set up NSis
-      run: |
-        #apt install -y -qq wget
-        #we need the specific version - 3.0.8 as this version seems to not be flagged by AVs
-        #wget http://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.08-2_all.deb
-        #wget http://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.08-2_amd64.deb
-        #dpkg -i nsis-common_3.08-2_all.deb
-        #dpkg -i nsis_3.08-2_amd64.deb        
-        apt-get -y update
-        apt-get -y install nsis
-        makensis -VERSION                   
-                 
-    - name: Set up ant
-      run: |
-        apt-get install -y -qq ant 
-        
-    - name: Set up Wine
-      run: |
-        dpkg --add-architecture i386
-        apt-get update -y -qq
-        apt-get install -y -qq wine
-        wine --version
-        
-    - name: Set up Resource Hacker
-      env:
-        RH_DIR: tools/wine/resourcehacker
-        RH_ZIP: tools/wine/resourcehacker.zip
-        RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
-      run: |              
-        set -euxo pipefail
-        
-        apt-get install -y -qq unzip wget
-        
-        mkdir -p "$(dirname "$RH_ZIP")"
-        mkdir -p "$RH_DIR"
+        java-version: 8
 
-        wget -q -O "$RH_ZIP" "$RH_URL"
-        unzip -o -qq "$RH_ZIP" -d "$RH_DIR"
-            
-    - name: Set up Xvfb
+    - name: Set up ResourceHacker
+      id: resource_hacker
+      shell: pwsh
       run: |
-           apt-get install -y -qq xorg xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic                                
-            
-    - name: Build  
+        $url = "https://www.angusj.com/resourcehacker/resource_hacker.zip"
+        $zip = "resource_hacker.zip"
+        $dest = "tools/resource_hacker"
+
+        Invoke-WebRequest $url -OutFile $zip
+        Expand-Archive $zip -DestinationPath $dest -Force
+        $path = $dest + '/ResourceHacker.exe'
+        "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      
+    - name: Generate EXE splash screen
+      shell: pwsh
       run: |        
-        export WINEPREFIX=$(pwd)/tools/wine
-        export CICD_TEMP=$(pwd) 
-        chmod a+x ./cicd_scripts/*.sh
-        ./cicd_scripts/before_install.sh
-        ./cicd_scripts/script.sh
+        mkdir build/classes
+        javac -d build/classes src/com/jpexs/build/SplashScreenGenerator.java
+        java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
+    
+    - name: Replace EXE splash screen
+      shell: pwsh
+      run: |
+        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"
+        
+        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res build/splash.bmp -mask BITMAP,1
+    - name: Generate EXE version info
+      shell: pwsh
+      run: |
+        $template = Get-Content -Path 'versioninfo.rc' -Raw -Encoding UTF8
+        $t = $template
+        $t = $t -creplace '@MAJOR@', '${{ needs.compute-version.outputs.verMajor }}'
+        $t = $t -creplace '@MINOR@', '${{ needs.compute-version.outputs.verMinor }}'
+        $t = $t -creplace '@RELEASE@', '${{ needs.compute-version.outputs.verRelease }}'
+        $t = $t -creplace '@BUILD@', '${{ needs.compute-version.outputs.verBuild }}'
+        $t = $t -creplace '@VERSION@', '${{ needs.compute-version.outputs.verShort }}'
+        Set-Content -Path 'versioninfo.rc' -Value $t -Encoding UTF8
+    - name: Replace EXE version info
+      shell: pwsh
+      run: |
+        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"        
+        & $resource_hacker -open versioninfo.rc -save versioninfo.res -action compile
+        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res versioninfo.res -mask "Version Info,1"                
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: unsigned_exe
+        path: resources/ffdec.exe
+  sign_and_msi:
+    name: Generate MSI, Sign EXE+MSI
+    runs-on: windows-latest
+    needs: 
+        - compute-version
+        - build
+        - exe
+    if: needs.compute-version.outputs.doRelease == 'true'
+    env:
+      GCP_PROJECT_ID: jpexs-ffdec
+      GCP_LOCATION: europe
+      KMS_KEYRING: jpexs-ffdec-keyring
+      KMS_KEY: jpexs-ffdec-key
+      KMS_KEY_VERSION: "1"
+      
+      CERT_PATH: "cert/user.crt"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+        
+      - name: Download unsigned EXE artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: unsigned_exe
+          path: dist/ffdec.exe
+        
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+            workload_identity_provider: "projects/541721778634/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+            service_account: "gha-codesign@jpexs-ffdec.iam.gserviceaccount.com"              
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: "${{ env.GCP_PROJECT_ID }}"
+          
+      - name: Install Google Cloud KMS CNG Provider
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
+        run: |
+          $repo = "GoogleCloudPlatform/kms-integrations"
+          $tmp  = "$env:RUNNER_TEMP\kms"
+          New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+
+          $tag = gh release list `
+            --repo $repo `
+            --limit 50 `
+            --json tagName,createdAt `
+            -q '[.[] | select(.tagName | startswith("cng-"))][0].tagName'
+
+          if (-not $tag) {
+            throw "No release found with tag cng-*"
+          }
+
+          Write-Host "Using release tag: $tag"
+
+          gh release download $tag `
+            --repo $repo `
+            --pattern "*windows-amd64*.zip" `
+            --dir $tmp
+          
+          $zip = Get-ChildItem $tmp -Filter "*.zip" | Select-Object -First 1
+          if (-not $zip) { throw "ZIP asset not found (pattern *windows-amd64*.zip). Check names in releases." }
+
+          $extract = Join-Path $tmp "extract"
+          New-Item -ItemType Directory -Force -Path $extract | Out-Null
+          Expand-Archive -Path $zip.FullName -DestinationPath $extract -Force
+
+          $msi = Get-ChildItem $extract -Recurse -Filter "*.msi" | Select-Object -First 1
+          if (-not $msi) { throw "MSI not found inside ZIP. Check structure of archive in releases." }
+
+          Write-Host "Installing: $($msi.FullName)"
+
+          Start-Process msiexec.exe -Wait -ArgumentList "/i `"$($msi.FullName)`" /qn /norestart"
+
+      - name: Locate signtool
+        id: signtool
+        shell: pwsh
+        run: |
+          $candidates = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" `
+            -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue
+
+          Write-Host "All signtool candidates:"
+          $candidates | ForEach-Object {
+            Write-Host " - $($_.FullName)"
+          }
+
+          # vyber jen x64
+          $x64 = $candidates | Where-Object {
+            $_.FullName -match "\\x64\\"
+          }
+
+          if (-not $x64) {
+            throw "No x64 signtool.exe found"
+          }
+
+          $path = $x64 | Sort-Object FullName -Descending | Select-Object -First 1
+          "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          
+      - name: Sign EXE with KMS key
+        shell: pwsh
+        run: |      
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
+
+          & $signtool sign /v /debug `
+            /fd sha256 `
+            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
+            /f "$env:CERT_PATH" `
+            /csp "Google Cloud KMS Provider" `
+            /kc "$kc" `
+            "dist/ffdec.exe"
+      
+      - name: Verify EXE signature
+        shell: pwsh
+        run: |
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          & $signtool verify /pa /v "dist/ffdec.exe"   
+        
+        
+      - name: Add Msi tools to PATH
+        shell: pwsh
+        run: |
+          $candidates = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" `
+            -Recurse -Filter MsiTran.exe -ErrorAction SilentlyContinue
+
+          Write-Host "All signtool candidates:"
+          $candidates | ForEach-Object {
+            Write-Host " - $($_.FullName)"
+          }
+
+          $x86 = $candidates | Where-Object {
+            $_.FullName -match "\\x86\\"
+          }
+
+          if (-not $x86) {
+            throw "No x86 MsiTran.exe found"
+          }
+
+          $path = $x86 | Sort-Object FullName -Descending | Select-Object -First 1
+          $path = Split-Path $path -Parent
+          
+          Add-Content $env:GITHUB_PATH $path
+      
+      - name: Inject version info
+        shell: pwsh
+        run: |
+            $template = Get-Content -Path 'wix\Product.wxs' -Raw -Encoding UTF8
+            $t = $template
+            $t = $t -creplace 'Name="JPEXS Free Flash Decompiler 1.0.0"', 'Name="JPEXS Free Flash Decompiler ${{ needs.compute-version.outputs.verLong }}"'
+            $t = $t -creplace 'Version="1.0.0"', 'Version="${{ needs.compute-version.outputs.verRaw }}"' 
+            $t = $t -creplace 'Id="ARPVERSION" Value="1.0.0"', 'Id="ARPVERSION" Value="${{ needs.compute-version.outputs.verLong }}"'
+            Set-Content -Path 'wix\Product.wxs' -Value $t -Encoding UTF8                
+          
+      - name: Create installer
+        shell: pwsh
+        run: |
+            cd wix
+            .\Build_Release.cmd
+            
+      - name: Sign EXE with KMS key
+        shell: pwsh
+        run: |      
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
+
+          & $signtool sign /v /debug `
+            /fd sha256 `
+            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
+            /f "$env:CERT_PATH" `
+            /csp "Google Cloud KMS Provider" `
+            /kc "$kc" `
+            "wix/bin/Release/FFDec.msi"
+            
+      - name: Verify MSI signature
+        shell: pwsh
+        run: |
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          & $signtool verify /pa /v "wix/bin/Release/FFDec.msi"
+            
+      - name: Upload signed EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: signed_exe
+            path: dist/ffdec.exe      
+            
+      - name: Upload signed MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed_msi
+          path: wix/bin/Release/FFDec.msi
+  packages:
+    runs-on: ubuntu-latest
+    needs:
+      - compute-version 
+      - build
+      - exe
+      - sign_and_msi      
+    if: needs.compute-version.outputs.doRelease == 'true'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Download dist artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: dist
+          path: dist/
+    - name: Download signed EXE artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: signed_exe
+          path: dist/ffdec.exe
+          
+    - name: Download signed MSI artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: signed_msi
+        path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+          
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: adopt
+        architecture: x64
+        java-version: 8
+    
+    - name: Set up Ant
+      run: apt-get install -y -qq ant 
+    
+    - name: Download version.properties artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: version_properties
+          path: version.properties         
+    
+    - name: Create packages
+      run: ant release-no-dist
+    
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages
+        path: releases
+
+  javadoc:
+    runs-on: ubuntu-latest
+    needs: compute-version    
+    if: needs.compute-version.outputs.doRelease == 'true'
+    steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: adopt
+        architecture: x64
+        # we need different version than for code as java 8 javadoc generation is buggy
+        java-version: 21
+
+    - name: Set up Ant
+      run: apt-get install -y -qq ant 
+    
+    - name: Download version.properties artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: version_properties
+          path: version.properties
+            
+    - name: Generate Javadoc
+      run: ant release_lib_javadoc
+      
+    - name: Upload lib javadoc artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lib_javadoc
+        path: releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
+    
+  deploy:
+    runs-on: ubuntu-latest
+    if: needs.compute-version.outputs.doRelease == 'true'
+    needs:
+      - compute-version
+      - packages   
+      - javadoc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        run: |
+          apt-get update -y -qq
+          apt-get install -y -qq php
+          
+      - name: Download packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: releases/
+      
+      - name: Download lib javadoc artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lib_javadoc
+          path: releases/
+          
+      - name: Generate release description
+        run: php cicd_scripts/format_release_info.php \
+                -filever "${{ needs.compute-version.outputs.verShort }}" \
+                Unreleased ${{ needs.compute-version.outputs.verTag }} \
+                ./CHANGELOG.md "$CICD_REPO_SLUG" > release_notes.md
+
+      - name: Create tag
+        if: needs.compute-version.outputs.verDebug == 'true'
+        run: |
+          TAG="${{ needs.compute-version.outputs.verTag }}"
+          git fetch --tags --force
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists -> skipping tag creation."
+            exit 0
+          fi
+          
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag "$TAG"
+          git push origin "$TAG"
+          
+      - name: Create GitHub Release + upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.compute-version.outputs.verTag }}
+          name: ${{ needs.compute-version.outputs.verTitle }}
+          body_path: release-notes.md
+          files: |
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.deb
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.pkg
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}_macosx.zip
+            releases/ffdec_lib_${{ needs.compute-version.outputs.verShort }}.zip
+            releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
+      - name: Remove old nightly
+        if: needs.compute-version.outputs.verDebug == 'true'
+        run: |
+          gh release delete ${{needs.compute-version.outputs.verOldTag}} --yes --cleanup-tag
+        

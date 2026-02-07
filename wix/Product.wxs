@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix 
+    xmlns="http://wixtoolset.org/schemas/v4/wxs"
+    xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+>
+  <Package Name="JPEXS Free Flash Decompiler 1.0.0"
+           Manufacturer="JPEXS"
+           Version="1.0.0"
+           ProductCode="*"
+           UpgradeCode="E618D276-6596-41F4-8A98-447D442A77DB"
+  >
+
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" 
+             Title="FFDec" 
+             Description="!(loc.GuiLibs_Desc)"
+             Level="1" 
+             AllowAbsent="no"
+    >
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="LibComponents" />
+      <ComponentGroupRef Id="FlashlibComponents" />   
+      <ComponentRef Id="ProgramMenuDir" />         
+    </Feature>   
+    
+    <Feature Id="DesktopShortcutFeature"
+                Title="!(loc.DesktopShortcut_Title)"
+                Description="!(loc.DesktopShortcut_Desc)"
+                Level="1"
+                AllowAbsent="yes"
+      >
+         <ComponentRef Id="DesktopShortcut" />
+      </Feature>
+    
+    <Feature Id="ContextMenuAssociationFeature"
+        Title="!(loc.ContextMenu_Title)"
+        Description="!(loc.ContextMenu_Desc)"
+        Level="1"
+        AllowAbsent="yes"
+    >        
+        <ComponentGroupRef Id="ContextMenuAssociation" />
+    </Feature>
+         
+    <!-- Define the icon -->
+    <Icon Id="FFDecIcon" SourceFile="../dist/icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="FFDecIcon" />
+    
+    <Property Id="ARPVERSION" Value="1.0.0" />
+
+    <!-- Add/Remove Programs properties -->
+    <Property Id="ARPHELPLINK" Value="https://github.com/jindrapetrik/jpexs-decompiler" />
+
+    
+    
+    <!-- Set installation directory -->
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="FFDec">
+        <Directory Id="LibDir" Name="lib" />
+        <Directory Id="FlashlibDir" Name="flashlib" />
+      </Directory>
+    </StandardDirectory>
+        
+    <ui:WixUI Id="WixUI_FeatureTree" InstallDirectory="INSTALLFOLDER"/>   
+    
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+    
+    <WixVariable Id="WixUIBannerBmp" Value="installer3_493x58.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="installer3_493x312.bmp" />
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="JPEXS Free Flash Decompiler" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Start Menu Shortcut -->
+    <Component Id="ProgramMenuDir" Directory="ApplicationProgramsFolder" Guid="1A2B3C4D-5E6F-7A8B-9C0D-E1F2A3B4C5D6">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="JPEXS Free Flash Decompiler"
+                Description="JPEXS Free Flash Decompiler"
+                Target="[INSTALLFOLDER]ffdec.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="FFDecIcon" />
+      <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software/JPEXS/FFDec" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!-- Desktop Shortcut -->
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="2B3C4D5E-6F7A-8B9C-0D1E-F2A3B4C5D6E7">
+      <Shortcut Id="ApplicationDesktopShortcut"
+                Name="JPEXS Free Flash Decompiler"
+                Description="JPEXS Free Flash Decompiler"
+                Target="[INSTALLFOLDER]ffdec.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="FFDecIcon" />
+      <RegistryValue Root="HKCU" Key="Software/JPEXS/FFDec" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+    
+    <Property Id="VERB" Value="ffdec" />
+    <Property Id="VERB_NAME" Value="Open with FFDec" />
+    <Property Id="VERB_RESOURCE_ID" Value="1001" />
+    <Property Id="SWF_CLASS" Value="ShockwaveFlash.ShockwaveFlash" Secure="yes" />
+    <Property Id="APP_EXENAME" Value="ffdec.exe" />
+    <?define FFDEC_EXTENSIONS = SWF;SPL;GFX;SWT;SWC ?>
+    <!-- SWF;SPL;GFX;SWT;SWC -->
+    
+    <?foreach EXT in $(var.FFDEC_EXTENSIONS) ?>
+        <Property Id="EXT_$(var.EXT)_EXISTS">
+            <RegistrySearch
+                  Id="RegSearch_$(var.EXT)_ExtExists"
+                  Root="HKCR"
+                  Key=".$(var.EXT)"
+                  Type="raw" />
+        </Property>
+        <SetProperty Id="EXT_$(var.EXT)_CLASSNAME"
+             Value="[SWF_CLASS]"
+             Condition="SWF_CLASS" 
+             Sequence="both"
+             Before="CostFinalize"/>
+        <Property Id="EXT_$(var.EXT)_CLASSNAME">
+            <RegistrySearch
+                Id="RegSearch_$(var.EXT)_ExtClassName"                  
+                Root="HKCR"
+                Key=".$(var.EXT)"
+                Type="raw" />
+        </Property>
+        
+        <Property Id="EXT_$(var.EXT)_CLASSNAME_EXISTS">
+          <RegistrySearch
+              Id="RegSearch_$(var.EXT)_ExtClassNameExistss"                                  
+              Root="HKCR"
+              Key="[EXT_$(var.EXT)_CLASSNAME]"
+              Type="raw" />
+        </Property>               
+    <?endforeach ?>
+    
+    <Property Id="SYSTEM_FILE_ASSOCIATIONS">
+        <RegistrySearch
+            Root="HKCR"
+            Key="SystemFileAssociations"
+            Type="raw" />
+    </Property>
+    
+    <Property Id="SYSTEM_FILE_ASSOCIATIONS_EXISTS" Secure="yes"/>
+    <SetProperty Id="SYSTEM_FILE_ASSOCIATIONS_EXISTS"
+                 Value="1"
+                 Sequence="both"
+                 Before="CostFinalize"
+                 Condition="SYSTEM_FILE_ASSOCIATIONS OR SYSTEM_FILE_ASSOCIATIONS=&quot;&quot;"
+    />
+    
+    <!-- Context Menu Association -->
+    <ComponentGroup Id="ContextMenuAssociation">
+        
+        <!-- Register "Application" and its command -->
+        <Component Id="RegApplicationOpenWithList" Guid="16CDB8A3-AD22-4CC4-B361-A22959908549">        
+            <RegistryValue Root="HKCR" Key="Applications\[APP_EXENAME]\shell\open" Value="[VERB]" KeyPath="yes"/>
+            <RegistryValue Root="HKCR" Key="Applications\[APP_EXENAME]\shell\open\command" Value="&quot;[INSTALLFOLDER]\[APP_EXENAME]&quot; &quot;%1&quot;" />
+        </Component>
+
+        <!-- EXTENSION TEMPLATE HERE: -->
+      
+        <!-- Register "Open With" for .swf -->
+        <Component Id="RegSwfOpenWithList" Guid="C2FF23D5-A33C-4BDD-8915-75DA617E63A2">
+            <RegistryValue Root="HKCR" Key=".swf\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .swf file extension -->
+        <Component Id="RegSwfClassName" Guid="D3CB09F9-71DE-4C37-B0BF-F4DC865A72FF" Condition="NOT EXT_SWF_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_SWF_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegSwfExt" Guid="09E37FF0-4EEF-42B5-9127-4153EBF7FE84" Condition="NOT EXT_SWF_EXISTS">
+            <RegistryValue Root="HKCR" Key=".swf" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegSwfAssociations" Guid="7747D6D5-CF84-4423-AF4C-1091507516DB">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWF_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWF_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWF_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWF_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .swf - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegSwfSystemFileAssociations" Guid="4F69C9C0-2833-43FC-9D87-3BB6457D3BFF" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.swf\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swf\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swf\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swf\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .spl -->
+        <Component Id="RegSplOpenWithList" Guid="76639739-38D5-4016-9033-CB77E870361E">
+            <RegistryValue Root="HKCR" Key=".spl\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .spl file extension -->
+        <Component Id="RegSplClassName" Guid="2D675321-875F-44BC-AA80-4A28A55F1B60" Condition="NOT EXT_SPL_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_SPL_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegSplExt" Guid="658804A5-54D1-487B-943E-6E771B1ADCC0" Condition="NOT EXT_SPL_EXISTS">
+            <RegistryValue Root="HKCR" Key=".spl" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegSplAssociations" Guid="81D6095E-AD10-4D8E-8954-035177288706">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SPL_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SPL_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SPL_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SPL_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .spl - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegSplSystemFileAssociations" Guid="02D6F42A-AD98-46FE-AC54-16E0B6BD9A85" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.spl\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.spl\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.spl\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.spl\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .gfx -->
+        <Component Id="RegGfxOpenWithList" Guid="FE51A9C3-B416-4849-B598-80861F511701">
+            <RegistryValue Root="HKCR" Key=".gfx\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .gfx file extension -->
+        <Component Id="RegGfxClassName" Guid="BDAB6B7A-6230-4119-97B9-2EFB92F2A553" Condition="NOT EXT_GFX_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_GFX_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegGfxExt" Guid="B78BC417-842F-4E6F-BF6E-43DACEBA7E3D" Condition="NOT EXT_GFX_EXISTS">
+            <RegistryValue Root="HKCR" Key=".gfx" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegGfxAssociations" Guid="7E7EA079-EF9D-4EF1-A92C-5796234B8BFC">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_GFX_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_GFX_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_GFX_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_GFX_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .gfx - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegGfxSystemFileAssociations" Guid="3235D6D7-B18F-4FEE-83BE-576B8AB2C265" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.gfx\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.gfx\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.gfx\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.gfx\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .swt -->
+        <Component Id="RegSwtOpenWithList" Guid="5CE57415-754B-4690-9BAF-B469B968E28A">
+            <RegistryValue Root="HKCR" Key=".swt\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .swt file extension -->
+        <Component Id="RegSwtClassName" Guid="878BF3FC-6601-4DBE-A400-05EFCFDA0B29" Condition="NOT EXT_SWT_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_SWT_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegSwtExt" Guid="B013A21C-DE86-499B-BF01-544EFD585341" Condition="NOT EXT_SWT_EXISTS">
+            <RegistryValue Root="HKCR" Key=".swt" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegSwtAssociations" Guid="85A58BE3-53EF-4493-B783-D5A960D5EAF8">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWT_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWT_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWT_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWT_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .swt - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegSwtSystemFileAssociations" Guid="0E325D31-A8A1-4EFD-9510-AC3D53E5D979" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.swt\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swt\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swt\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swt\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .swc -->
+        <Component Id="RegSwcOpenWithList" Guid="9CE9498D-1F4E-4FF3-9288-ADC1C5249A37">
+            <RegistryValue Root="HKCR" Key=".swc\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .swc file extension -->
+        <Component Id="RegSwcClassName" Guid="EDC49B73-AA4A-46D7-8FA4-C499073B881C" Condition="NOT EXT_SWC_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_SWC_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegSwcExt" Guid="8EE15DD9-C779-4891-A0FD-76CA6B67642A" Condition="NOT EXT_SWC_EXISTS">
+            <RegistryValue Root="HKCR" Key=".swc" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegSwcAssociations" Guid="8A86896D-7212-4992-961F-0E845AE1B1AF">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWC_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWC_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWC_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWC_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .swc - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegSwcSystemFileAssociations" Guid="A2D67704-B8E1-4990-BD67-FE5443D32707" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.swc\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swc\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swc\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swc\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+<!-- /EXTENSION TEMPLATE HERE: -->
+    </ComponentGroup>
+
+    <!-- Main product components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="MainExecutable" Guid="3C4D5E6F-7A8B-9C0D-1E2F-A3B4C5D6E7F8">
+        <File Id="ffdec.exe" Source="../dist/ffdec.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="MainJar" Guid="4D5E6F7A-8B9C-0D1E-2F3A-B4C5D6E7F8A9">
+        <File Id="ffdec.jar" Source="../dist/ffdec.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="CliExecutable" Guid="5E6F7A8B-9C0D-1E2F-3A4B-C5D6E7F8A9B0">
+        <File Id="ffdec_cli.exe" Source="../dist/ffdec-cli.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="CliJar" Guid="6F7A8B9C-0D1E-2F3A-4B5C-D6E7F8A9B0C1">
+        <File Id="ffdec_cli.jar" Source="../dist/ffdec-cli.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="BatchFile" Guid="7A8B9C0D-1E2F-3A4B-5C6D-E7F8A9B0C1D2">
+        <File Id="ffdec.bat" Source="../dist/ffdec.bat" KeyPath="yes" />
+      </Component>
+      <Component Id="ShellScript" Guid="8B9C0D1E-2F3A-4B5C-6D7E-F8A9B0C1D2E3">
+        <File Id="ffdec.sh" Source="../dist/ffdec.sh" KeyPath="yes" />
+      </Component>
+      <Component Id="FfdecScript" Guid="9C0D1E2F-3A4B-5C6D-7E8F-A9B0C1D2E3F4">
+        <File Id="ffdec" Source="../dist/ffdec" KeyPath="yes" />
+      </Component>
+      <Component Id="SolEditorBatch" Guid="0D1E2F3A-4B5C-6D7E-8F9A-B0C1D2E3F4A5">
+        <File Id="soleditor.bat" Source="../dist/soleditor.bat" KeyPath="yes" />
+      </Component>
+      <Component Id="SolEditorShell" Guid="1E2F3A4B-5C6D-7E8F-9A0B-C1D2E3F4A5B6">
+        <File Id="soleditor.sh" Source="../dist/soleditor.sh" KeyPath="yes" />
+      </Component>
+      <Component Id="TranslatorBatch" Guid="2F3A4B5C-6D7E-8F9A-0B1C-D2E3F4A5B6C7">
+        <File Id="translator.bat" Source="../dist/translator.bat" KeyPath="yes" />
+      </Component>
+      <Component Id="TranslatorShell" Guid="3A4B5C6D-7E8F-9A0B-1C2D-E3F4A5B6C7D8">
+        <File Id="translator.sh" Source="../dist/translator.sh" KeyPath="yes" />
+      </Component>
+      <Component Id="IconFile" Guid="4B5C6D7E-8F9A-0B1C-2D3E-F4A5B6C7D8E9">
+        <File Id="icon.ico" Source="../dist/icon.ico" KeyPath="yes" />
+      </Component>
+      <Component Id="IconPng" Guid="5C6D7E8F-9A0B-1C2D-3E4F-A5B6C7D8E9F0">
+        <File Id="icon.png" Source="../dist/icon.png" KeyPath="yes" />
+      </Component>
+      <Component Id="IconIcns" Guid="6D7E8F9A-0B1C-2D3E-4F5A-B6C7D8E9F0A1">
+        <File Id="Icon.icns" Source="../dist/Icon.icns" KeyPath="yes" />
+      </Component>
+      <Component Id="LicenseFile" Guid="7E8F9A0B-1C2D-3E4F-5A6B-C7D8E9F0A1B2">
+        <File Id="license.txt" Source="../dist/license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ChangelogFile" Guid="8F9A0B1C-2D3E-4F5A-6B7C-D8E9F0A1B2C3">
+        <File Id="CHANGELOG.md" Source="../dist/CHANGELOG.md" KeyPath="yes" />
+      </Component>
+      <Component Id="MetaInfoFile" Guid="9A0B1C2D-3E4F-5A6B-7C8D-E9F0A1B2C3D4">
+        <File Id="metainfo.xml" Source="../dist/com.jpexs.decompiler.flash.metainfo.xml" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- lib folder components -->
+    <ComponentGroup Id="LibComponents" Directory="LibDir">
+      <Component Id="LZMA" Guid="A0B1C2D3-E4F5-6A7B-8C9D-0E1F2A3B4C5D">
+        <File Id="LZMA.jar" Source="../dist/lib/LZMA.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="antlr_runtime" Guid="B1C2D3E4-F5A6-7B8C-9D0E-1F2A3B4C5D6E">
+        <File Id="antlr_runtime.jar" Source="../dist/lib/antlr-runtime-4.11.1.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="avi" Guid="C2D3E4F5-A6B7-8C9D-0E1F-2A3B4C5D6E7F">
+        <File Id="avi.jar" Source="../dist/lib/avi.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="avi_license" Guid="D3E4F5A6-B7C8-9D0E-1F2A-3B4C5D6E7F8A">
+        <File Id="avi.montemedia.license.txt" Source="../dist/lib/avi.montemedia.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="cmykjpeg" Guid="E4F5A6B7-C8D9-0E1F-2A3B-4C5D6E7F8A9B">
+        <File Id="cmykjpeg.jar" Source="../dist/lib/cmykjpeg.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="ddsreader" Guid="F5A6B7C8-D9E0-1F2A-3B4C-5D6E7F8A9B0C">
+        <File Id="ddsreader.jar" Source="../dist/lib/ddsreader.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="decimal" Guid="A6B7C8D9-E0F1-2A3B-4C5D-6E7F8A9B0C1D">
+        <File Id="decimal.jar" Source="../dist/lib/decimal.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="decimal_license" Guid="B7C8D9E0-F1A2-3B4C-5D6E-7F8A9B0C1D2E">
+        <File Id="decimal.license.txt" Source="../dist/lib/decimal.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ffdec_lib" Guid="C8D9E0F1-A2B3-4C5D-6E7F-8A9B0C1D2E3F">
+        <File Id="ffdec_lib.jar" Source="../dist/lib/ffdec_lib.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="ffdec_lib_license" Guid="D9E0F1A2-B3C4-5D6E-7F8A-9B0C1D2E3F4A">
+        <File Id="ffdec_lib.license.txt" Source="../dist/lib/ffdec_lib.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="flacomdoc" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A5B">
+        <File Id="flacomdoc.jar" Source="../dist/lib/flacomdoc.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="flacomdoc_license" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B6C">
+        <File Id="flacomdoc.license.txt" Source="../dist/lib/flacomdoc.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="flamingo" Guid="A2B3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C7D">
+        <File Id="flamingo.jar" Source="../dist/lib/flamingo-6.2.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="flamingo_license" Guid="B3C4D5E6-F7A8-9B0C-1D2E-3F4A5B6C7D8E">
+        <File Id="flamingo.license.txt" Source="../dist/lib/flamingo.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="flashdebugger" Guid="C4D5E6F7-A8B9-0C1D-2E3F-4A5B6C7D8E9F">
+        <File Id="flashdebugger.jar" Source="../dist/lib/flashdebugger.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="gif" Guid="D5E6F7A8-B9C0-1D2E-3F4A-5B6C7D8E9F0A">
+        <File Id="gif.jar" Source="../dist/lib/gif.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="gif_license" Guid="E6F7A8B9-C0D1-2E3F-4A5B-6C7D8E9F0A1B">
+        <File Id="gif.license.txt" Source="../dist/lib/gif.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="gifreader" Guid="F7A8B9C0-D1E2-3F4A-5B6C-7D8E9F0A1B2C">
+        <File Id="gifreader.jar" Source="../dist/lib/gifreader.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="gifreader_license" Guid="A8B9C0D1-E2F3-4A5B-6C7D-8E9F0A1B2C3D">
+        <File Id="gifreader.license.txt" Source="../dist/lib/gifreader.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="gnujpdf" Guid="B9C0D1E2-F3A4-5B6C-7D8E-9F0A1B2C3D4E">
+        <File Id="gnujpdf.jar" Source="../dist/lib/gnujpdf.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jansi" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E5F">
+        <File Id="jansi.jar" Source="../dist/lib/jansi-2.4.0.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jargs" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
+        <File Id="jargs.jar" Source="../dist/lib/jargs.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jlayer" Guid="E2F3A4B5-C6D7-8E9F-0A1B-2C3D4E5F6A7B">
+        <File Id="jlayer.jar" Source="../dist/lib/jlayer-1.0.2.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jlayer_license" Guid="F3A4B5C6-D7E8-9F0A-1B2C-3D4E5F6A7B8C">
+        <File Id="jlayer.license.txt" Source="../dist/lib/jlayer.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="jna" Guid="A4B5C6D7-E8F9-0A1B-2C3D-4E5F6A7B8C9D">
+        <File Id="jna.jar" Source="../dist/lib/jna-3.5.1.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jna_platform" Guid="B5C6D7E8-F9A0-1B2C-3D4E-5F6A7B8C9D0E">
+        <File Id="jna_platform.jar" Source="../dist/lib/jna-platform-3.5.1.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jna_license" Guid="C6D7E8F9-A0B1-2C3D-4E5F-6A7B8C9D0E1F">
+        <File Id="jna.license.txt" Source="../dist/lib/jna.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="jpacker" Guid="D7E8F9A0-B1C2-3D4E-5F6A-7B8C9D0E1F2A">
+        <File Id="jpacker.jar" Source="../dist/lib/jpacker.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jpacker_license" Guid="E8F9A0B1-C2D3-4E5F-6A7B-8C9D0E1F2A3B">
+        <File Id="jpacker.license.txt" Source="../dist/lib/jpacker.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="jsyntaxpane" Guid="F9A0B1C2-D3E4-5F6A-7B8C-9D0E1F2A3B4C">
+        <File Id="jsyntaxpane.jar" Source="../dist/lib/jsyntaxpane-0.9.5.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jsyntaxpane_license" Guid="A0B1C2D3-E4F5-6A7B-8C9D-0E1F2A3B4C5E">
+        <File Id="jsyntaxpane.license.txt" Source="../dist/lib/jsyntaxpane.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="minimal_json" Guid="B1C2D3E4-F5A6-7B8C-9D0E-1F2A3B4C5D6F">
+        <File Id="minimal_json.jar" Source="../dist/lib/minimal-json-0.9.5.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="minimal_json_license" Guid="C2D3E4F5-A6B7-8C9D-0E1F-2A3B4C5D6E8A">
+        <File Id="minimal_json.license.txt" Source="../dist/lib/minimal-json.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="miterstroke" Guid="D3E4F5A6-B7C8-9D0E-1F2A-3B4C5D6E7F9B">
+        <File Id="miterstroke.jar" Source="../dist/lib/miterstroke.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="miterstroke_license" Guid="E4F5A6B7-C8D9-0E1F-2A3B-4C5D6E7F8A0C">
+        <File Id="miterstroke.license.txt" Source="../dist/lib/miterstroke.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="nellymoser" Guid="F5A6B7C8-D9E0-1F2A-3B4C-5D6E7F8A9B1D">
+        <File Id="nellymoser.jar" Source="../dist/lib/nellymoser.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="nellymoser_license" Guid="A6B7C8D9-E0F1-2A3B-4C5D-6E7F8A9B0C2E">
+        <File Id="nellymoser.license.txt" Source="../dist/lib/nellymoser.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="sfntly" Guid="B7C8D9E0-F1A2-3B4C-5D6E-7F8A9B0C1D3F">
+        <File Id="sfntly.jar" Source="../dist/lib/sfntly.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="sfntly_license" Guid="C8D9E0F1-A2B3-4C5D-6E7F-8A9B0C1D2E4A">
+        <File Id="sfntly.license.txt" Source="../dist/lib/sfntly.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="substance" Guid="D9E0F1A2-B3C4-5D6E-7F8A-9B0C1D2E3F5B">
+        <File Id="substance.jar" Source="../dist/lib/substance-6.2.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="substance_fix" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A6C">
+        <File Id="substance_fix.jar" Source="../dist/lib/substance-fix.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="substance_flamingo" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B7D">
+        <File Id="substance_flamingo.jar" Source="../dist/lib/substance-flamingo-6.2.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="substance_flamingo_license" Guid="A2B3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C8E">
+        <File Id="substance_flamingo.license.txt" Source="../dist/lib/substance-flamingo.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="substance_license" Guid="B3C4D5E6-F7A8-9B0C-1D2E-3F4A5B6C7D9F">
+        <File Id="substance.license.txt" Source="../dist/lib/substance.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="tablelayout" Guid="C4D5E6F7-A8B9-0C1D-2E3F-4A5B6C7D8E0A">
+        <File Id="tablelayout.jar" Source="../dist/lib/tablelayout.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="tga" Guid="D5E6F7A8-B9C0-1D2E-3F4A-5B6C7D8E9F1B">
+        <File Id="tga.jar" Source="../dist/lib/tga.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="tga_license" Guid="E6F7A8B9-C0D1-2E3F-4A5B-6C7D8E9F0A2C">
+        <File Id="tga.license.txt" Source="../dist/lib/tga.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="tomlj" Guid="F7A8B9C0-D1E2-3F4A-5B6C-7D8E9F0A1B3D">
+        <File Id="tomlj.jar" Source="../dist/lib/tomlj-1.1.1.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="treetable" Guid="A8B9C0D1-E2F3-4A5B-6C7D-8E9F0A1B2C4E">
+        <File Id="treetable.jar" Source="../dist/lib/treetable.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="trident" Guid="B9C0D1E2-F3A4-5B6C-7D8E-9F0A1B2C3D5F">
+        <File Id="trident.jar" Source="../dist/lib/trident-6.2.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="trident_license" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E6A">
+        <File Id="trident.license.txt" Source="../dist/lib/trident.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ttf_doubletype_license" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F7B">
+        <File Id="ttf.doubletype.license.txt" Source="../dist/lib/ttf.doubletype.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ttf_fontastic_license" Guid="E2F3A4B5-C6D7-8E9F-0A1B-2C3D4E5F6A8C">
+        <File Id="ttf.fontastic.license.txt" Source="../dist/lib/ttf.fontastic.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="ttf" Guid="F3A4B5C6-D7E8-9F0A-1B2C-3D4E5F6A7B9D">
+        <File Id="ttf.jar" Source="../dist/lib/ttf.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="vlcj" Guid="A4B5C6D7-E8F9-0A1B-2C3D-4E5F6A7B8C0E">
+        <File Id="vlcj.jar" Source="../dist/lib/vlcj-4.7.3.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="vlcj_natives" Guid="B5C6D7E8-F9A0-1B2C-3D4E-5F6A7B8C9D1F">
+        <File Id="vlcj_natives.jar" Source="../dist/lib/vlcj-natives-4.7.0.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="webp4j" Guid="C6D7E8F9-A0B1-2C3D-4E5F-6A7B8C9D0E2A">
+        <File Id="webp4j.jar" Source="../dist/lib/webp4j-1.4.0.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="webp4j_license" Guid="D7E8F9A0-B1C2-3D4E-5F6A-7B8C9D0E1F3B">
+        <File Id="webp4j.license.txt" Source="../dist/lib/webp4j.license.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="jpexs_apng" Guid="1318F135-DD25-4D17-BE4B-A409657E5AC8">
+          <File Id="jpexs_apng.jar" Source="../dist/lib/jpexs-apng.jar" KeyPath="yes" />
+      </Component>
+      <Component Id="jpexs_apng_license" Guid="F1C6D1B5-F963-48F7-BCD5-4CB14C693D27">
+          <File Id="jpexs_apng.license.txt" Source="../dist/lib/jpexs-apng.license.txt" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- flashlib folder components -->
+    <ComponentGroup Id="FlashlibComponents" Directory="FlashlibDir">
+      <Component Id="airglobal" Guid="E8F9A0B1-C2D3-4E5F-6A7B-8C9D0E1F2A4C">
+        <File Id="airglobal.swc" Source="../dist/flashlib/airglobal.swc" KeyPath="yes" />
+      </Component>
+      <Component Id="playerglobal" Guid="F9A0B1C2-D3E4-5F6A-7B8C-9D0E1F2A3B5D">
+        <File Id="playerglobal32_0.swc" Source="../dist/flashlib/playerglobal32_0.swc" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Package>
+</Wix>
+
+
+
+
+
+
+
+
+
+
+
+

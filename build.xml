@@ -182,39 +182,7 @@
     
     <condition property="is_windows">
         <os family="windows"/>
-    </condition>
-    
-    
-    
-    
-    
-    <target name="installer" depends="-loadversion,-load-tools,dist">       
-        <property name="exe.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_setup.exe"/>       
-        <nsis script="installer.nsi" path="${nsis.path}" verbosity="2">
-            <define name="APP_NAME" value="${product.name}"/>
-            <define name="APP_VER" value="${version}${version.suffix}"/>
-            <define name="APP_VER_MAJOR" value="${version.major}"/>
-            <define name="APP_VER_MINOR" value="${version.minor}"/>
-            <define name="APP_PUBLISHER" value="${vendor}"/>
-            <define name="APP_URL" value="${product.url}"/>
-            <define name="APP_SETUPFILE" value="${exe.file}" />
-            <define name="JRE_VERSION" value="${target.java}" />
-        </nsis>
-       
-        <!--<exec executable="${nsis.path}/makensis">
-             <arg value="-V2" />
-             <arg value="-DAPP_NAME=${product.name}" />
-             <arg value="-DAPP_VER=${version}${version.suffix}" />
-             <arg value="-DAPP_VER_MAJOR=${version.major}" />
-             <arg value="-DAPP_VER_MINOR=${version.minor}" />
-             <arg value="-DAPP_PUBLISHER=${vendor}" />
-             <arg value="-DAPP_URL=${product.url}" />
-             <arg value="-DAPP_SETUPFILE=${exe.file}" />
-             <arg value="-DJRE_VERSION=${target.java}" />
-             <arg value="/__w/jpexs-decompiler/jpexs-decompiler/installer.nsi" />
-        </exec>-->
-        <echo level="info" message="Setup created in ${exe.file}"/>
-    </target>
+    </condition>                        
     
     <target name="library" depends="-loadversion,release_lib,-copy-lib">
         <mkdir dir="${releases.dir}"/>
@@ -404,35 +372,19 @@
         </zip>           
     </target>
                     
-    <target name="exe" depends="-load-tools,-exe-splashscreen,-exe-versioninfo">
-        
+    <target name="exe">
+        <!-- depends="-exe-splashscreen,-exe-versioninfo">-->       
     </target>
     
-    
-    <target name="-check-tools">
-        <available file="tools.properties" property="tools.config.exists"/>
+    <target name="release" depends="library,exe,archive,deb,osx-app-archive,osx-app-installer">
+
     </target>
     
-    <target name="-load-tools-ok" if="tools.config.exists">
-        <loadproperties srcfile="tools.properties" />
+    <target name="-set-no-dist">
+        <property name="no_dist" value="1"/>  
     </target>
     
-    <target name="-load-tools-fail" unless="tools.config.exists">
-        <fail>
-            tools.properties NOT found.
-            Please create file named "tools.properties" and add two lines:
-            nsis.path = Path to Nullsoft Install System
-            reshack.path = Path to Resource Hacker
-            
-            WARNING: You must use double backslash in paths on Windows System or forward slash
-        </fail>
-    </target>
-    
-    <target name="-load-tools" depends="-check-tools,-load-tools-ok,-load-tools-fail">
-        
-    </target>
-    
-    <target name="release" depends="library,exe,archive,deb,osx-app-archive,installer,osx-app-installer">
+    <target name="release-no-dist" depends="-set-no-dist,library,exe,archive,deb,osx-app-archive,osx-app-installer">
 
     </target>
          
@@ -451,9 +403,9 @@
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
     </target>    
-    <target name="dist" depends="build,exe">
+    <target name="dist" depends="build,exe" unless="no_dist">
         
-    </target>    
+    </target>
     
     <target name="-nightly-suffix" if="nightly">        
         <property name="version.suffix" value="_nightly${version.build}"/>         
@@ -621,7 +573,7 @@
             </classpath>
         </java>        
     </target>
-    <target name="-exe-splashscreen-inject-unix" depends="-exe-splashscreen-generate,-load-tools" unless="is_windows">
+    <target name="-exe-splashscreen-inject-unix" depends="-exe-splashscreen-generate" unless="is_windows">
         <copy todir="${reshack.path}" overwrite="true">
             <file file="build/splash.bmp"/>
             <file file="${dist.dir}/ffdec.exe"/>
@@ -642,7 +594,7 @@
         <copy todir="${dist.dir}" file="${reshack.path}ffdec.exe" overwrite="true"/>
     </target>
 
-    <target name="-exe-splashscreen-inject-windows" depends="-exe-splashscreen-generate,-load-tools" if="is_windows">        
+    <target name="-exe-splashscreen-inject-windows" depends="-exe-splashscreen-generate" if="is_windows">        
         <exec executable="${reshack.path}ResourceHacker.exe" failonerror="true">
             <arg value="-open"/><arg value="${dist.dir}/ffdec.exe"/>
             <arg value="-save"/><arg value="${dist.dir}/ffdec.exe"/>
@@ -668,7 +620,7 @@
         </copy>
     </target>
     
-    <target name="-exe-versioninfo-inject-unix" depends="-exe-versioninfo-generate,-load-tools" unless="is_windows">
+    <target name="-exe-versioninfo-inject-unix" depends="-exe-versioninfo-generate" unless="is_windows">
         <copy todir="${reshack.path}" overwrite="true">
             <file file="build/versioninfo.rc"/>
             <file file="${dist.dir}/ffdec.exe"/>
@@ -692,7 +644,7 @@
         <copy todir="${dist.dir}" file="${reshack.path}ffdec.exe" overwrite="true"/>
     </target>
 
-    <target name="-exe-versioninfo-inject-windows" depends="-exe-versioninfo-generate,-load-tools" if="is_windows">
+    <target name="-exe-versioninfo-inject-windows" depends="-exe-versioninfo-generate" if="is_windows">
         <exec executable="${reshack.path}ResourceHacker.exe" failonerror="true">
             <arg value="-open"/><arg value="build/versioninfo.rc"/>
             <arg value="-save"/><arg value="build/versioninfo.res"/>
@@ -825,11 +777,7 @@
     <target name="new-version-osx-app-archive" depends="-new-version-set,osx-app-archive">
         
     </target>
-    
-    <target name="new-version-installer" depends="-new-version-set,installer">
         
-    </target>
-    
     <target name="new-version-osx-app-installer" depends="-new-version-set,osx-app-installer">
         
     </target>

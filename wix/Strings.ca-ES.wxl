@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="ca-ES">
+  <String Id="GuiLibs_Desc" Value="Interfície gràfica i biblioteques de l'aplicació" />
+  <String Id="DesktopShortcut_Title" Value="Drecera d'escriptori" />
+  <String Id="DesktopShortcut_Desc"  Value="Crea una drecera de l'aplicació a l'escriptori." />
+  <String Id="ContextMenu_Title" Value="Afegir al menú contextual" />
+  <String Id="ContextMenu_Desc" Value="Afegeix FFDec al menú contextual dels fitxers SWF i GFX a l'Explorador de Windows." />
+  <String Id="DowngradeErrorMessage" Value="Ja hi ha instal·lada una versió més recent de [ProductName]." />
+</WixLocalization>
