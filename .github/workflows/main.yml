@@ -600,7 +600,7 @@ jobs:
       run: cp version.properties libsrc/ffdec_lib/      
             
     - name: Generate Javadoc
-      run: ant release_lib_javadoc
+      run: ant javadoc release_lib_javadoc
       
     - name: Upload lib javadoc artifact
       uses: actions/upload-artifact@v4
