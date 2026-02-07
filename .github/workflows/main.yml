@@ -26,6 +26,7 @@ env:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   compute-version:
@@ -322,6 +323,7 @@ jobs:
       KMS_KEY_VERSION: "1"
       
       CERT_PATH: "cert/user.crt"
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
