@@ -610,10 +610,10 @@ jobs:
             path: dist/ffdec.exe      
       
       - name: Rename MSI
-        shell: pwsh
+        shell: cmd
         run: |
           mkdir releases
-          ren wix/bin/Release/FFDec.msi releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+          move wix/bin/Release/FFDec.msi releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             
       - name: Upload signed MSI artifact
         uses: actions/upload-artifact@v4
