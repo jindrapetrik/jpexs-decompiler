@@ -458,7 +458,8 @@ jobs:
           & $signtool verify /pa /v "dist/ffdec.exe"   
         
         
-      - name: Add Msi tools to PATH
+      - name: Get Msi tools path
+        id: msitools
         shell: pwsh
         run: |
           $candidates = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" `
@@ -478,9 +479,10 @@ jobs:
           }
 
           $path = $x86 | Sort-Object FullName -Descending | Select-Object -First 1
-          $path = Split-Path $path -Parent
+          #$path = Split-Path $path -Parent
           
-          Add-Content $env:GITHUB_PATH $path
+          "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          #Add-Content $env:GITHUB_PATH $path
       
       - name: Inject version info
         shell: pwsh
@@ -496,10 +498,10 @@ jobs:
         shell: pwsh
         working-directory: wix
         run: |
-            .\Build_Release.cmd
+            .\Build_Release.cmd "${{ steps.msitools.outputs.path }}"
             
       - name: Sign MSI with KMS key
-        shell: pwsh        
+        shell: pwsh
         run: |      
           $signtool = "${{ steps.signtool.outputs.path }}"
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
@@ -511,7 +513,7 @@ jobs:
             /csp "Google Cloud KMS Provider" `
             /kc "$kc" `
             "wix/bin/Release/FFDec.msi"
-            
+                      
       - name: Verify MSI signature
         shell: pwsh
         run: |

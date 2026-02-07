@@ -1,1 +1,1 @@
-call Build_Base.cmd Debug
+call Build_Base.cmd "%1" Debug
