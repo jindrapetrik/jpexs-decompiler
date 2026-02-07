@@ -550,8 +550,8 @@ jobs:
     
     - name: Set up Ant
       run: |
-        apt-get update -y -qq
-        apt-get install -y -qq ant 
+        sudo apt-get update -y -qq
+        sudo apt-get install -y -qq ant 
     
     - name: Download version.properties artifact
       uses: actions/download-artifact@v4
@@ -588,8 +588,8 @@ jobs:
 
     - name: Set up Ant
       run: |
-        apt-get update -y -qq
-        apt-get install -y -qq ant 
+        sudo apt-get update -y -qq
+        sudo apt-get install -y -qq ant 
     
     - name: Download version.properties artifact
       uses: actions/download-artifact@v4
@@ -610,7 +610,6 @@ jobs:
     
   deploy:
     runs-on: ubuntu-latest
-    container: debian:sid
     if: needs.compute-version.outputs.doRelease == 'true'
     needs:
       - compute-version
@@ -622,8 +621,8 @@ jobs:
 
       - name: Set up PHP
         run: |
-          apt-get update -y -qq
-          apt-get install -y -qq php
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq php
           
       - name: Download packages artifact
         uses: actions/download-artifact@v4
