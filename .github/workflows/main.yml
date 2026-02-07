@@ -495,10 +495,11 @@ jobs:
             Set-Content -Path 'wix\Product.wxs' -Value $t -Encoding UTF8                
           
       - name: Create installer
-        shell: pwsh
+        shell: cmd
         working-directory: wix
         run: |
-            .\Build_Release.cmd "${{ steps.msitools.outputs.path }}"
+            set MsiToolsPath=${{ steps.msitools.outputs.path }}
+            .\Build_Release.cmd
             
       - name: Sign MSI with KMS key
         shell: pwsh

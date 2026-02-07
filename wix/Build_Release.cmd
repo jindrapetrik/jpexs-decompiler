@@ -1,1 +1,1 @@
-call Build_Base.cmd "%1" Release
+call Build_Base.cmd Release
