@@ -422,7 +422,7 @@ jobs:
 
           & $signtool sign /v /debug `
             /fd sha256 `
-            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
+            /tr "http://timestamp.sectigo.com" /td sha256 `
             /f "$env:CERT_PATH" `
             /csp "Google Cloud KMS Provider" `
             /kc "$kc" `
@@ -471,19 +471,19 @@ jobs:
           
       - name: Create installer
         shell: pwsh
+        working-directory: "./wix"
         run: |
-            cd wix
-            .\Build_Release.cmd
+            Build_Release.cmd
             
-      - name: Sign EXE with KMS key
-        shell: pwsh
+      - name: Sign MSI with KMS key
+        shell: pwsh        
         run: |      
           $signtool = "${{ steps.signtool.outputs.path }}"
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
 
           & $signtool sign /v /debug `
             /fd sha256 `
-            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
+            /tr "http://timestamp.sectigo.com" /td sha256 `
             /f "$env:CERT_PATH" `
             /csp "Google Cloud KMS Provider" `
             /kc "$kc" `
