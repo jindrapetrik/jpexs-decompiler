@@ -28,7 +28,6 @@ permissions:
   contents: write
 
 jobs:
-  jobs:
   compute-version:
     name: Compute version
     runs-on: windows-latest
