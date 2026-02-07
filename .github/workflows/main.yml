@@ -465,7 +465,7 @@ jobs:
           $needle = "SignTool Error: An unexpected internal error has occurred"
 
           for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
-            Write-Host "Attempt $attempt/$maxAttempts: $exe $($args -join ' ')"
+            Write-Host "Attempt $attempt/${maxAttempts}: $exe $($args -join ' ')"
 
             $output = & $exe @args 2>&1 | Out-String
             $exitCode = $LASTEXITCODE
@@ -570,7 +570,7 @@ jobs:
           $needle = "SignTool Error: An unexpected internal error has occurred"
 
           for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
-            Write-Host "Attempt $attempt/$maxAttempts: $exe $($args -join ' ')"
+            Write-Host "Attempt $attempt/${maxAttempts}: $exe $($args -join ' ')"
 
             $output = & $exe @args 2>&1 | Out-String
             $exitCode = $LASTEXITCODE
