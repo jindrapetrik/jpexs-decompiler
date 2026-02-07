@@ -223,7 +223,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: version_properties
-            path: version.properties       
       
       - name: Check style
         run: ant checkstyle
@@ -333,7 +332,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: unsigned_exe
-          path: dist/ffdec.exe
+          path: dist/
         
       - id: auth
         uses: google-github-actions/auth@v2
@@ -495,12 +494,18 @@ jobs:
         with:
             name: signed_exe
             path: dist/ffdec.exe      
+      
+      - name: Rename MSI
+        shell: pwsh
+        run: |
+          mkdir releases
+          ren wix/bin/Release/FFDec.msi releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             
       - name: Upload signed MSI artifact
         uses: actions/upload-artifact@v4
         with:
           name: signed_msi
-          path: wix/bin/Release/FFDec.msi
+          path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
   packages:
     runs-on: ubuntu-latest
     container: debian:sid
@@ -523,13 +528,13 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: signed_exe
-          path: dist/ffdec.exe
+          path: dist/
           
     - name: Download signed MSI artifact
       uses: actions/download-artifact@v4
       with:
         name: signed_msi
-        path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+        path: releases/
           
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -547,7 +552,6 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
-          path: version.properties         
     
     - name: Create packages
       run: ant release-no-dist
@@ -584,7 +588,6 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
-          path: version.properties
             
     - name: Generate Javadoc
       run: ant release_lib_javadoc
