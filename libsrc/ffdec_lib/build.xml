@@ -252,7 +252,7 @@
                      
     </target>
     
-    <target name="release-no-dist">
+    <target name="release-no-dist" depends="-load-version,-timestamp,-suffix">
         <zip destfile="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip">
             <zipfileset file="${dist.dir}/${jar.filename}.jar" filemode="755" fullpath="${jar.filename}.jar"></zipfileset>
             <zipfileset file="${gui.changelog.file}" fullpath="${changelog.file}"></zipfileset>
