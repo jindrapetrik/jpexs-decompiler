@@ -514,7 +514,6 @@ jobs:
           path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
   packages:
     runs-on: ubuntu-latest
-    container: debian:sid
     needs:
       - compute-version 
       - build
@@ -573,7 +572,6 @@ jobs:
 
   javadoc:
     runs-on: ubuntu-latest
-    container: debian:sid
     needs: compute-version    
     if: needs.compute-version.outputs.doRelease == 'true'
     steps:
