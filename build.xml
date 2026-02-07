@@ -189,7 +189,13 @@
         <copy file="${lib.file}" todir="${releases.dir}" />        
     </target>
     
-    <target name="archive" depends="-loadversion,dist">
+    <target name="archive" depends="-loadversion,archive-dist,archive-no-dist">
+        
+    </target>
+    
+    <target name="archive-dist" depends="-loadversion,dist,archive-no-dist" unless="no_dist">
+    </target>
+    <target name="archive-no-dist" depends="-loadversion">
         <mkdir dir="${releases.dir}"/>
         <property  name="zip.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip" />
         <zip destfile="${zip.file}" basedir="${dist.dir}" excludes="${app.script}">
@@ -198,8 +204,14 @@
     </target>
     
     
+    <target name="deb" depends="deb-dist,deb-no-dist">
+        
+    </target>
     
-    <target name="deb" depends="-loadversion,dist">
+    <target name="deb-dist" depends="-loadversion,dist" unless="no_dist">
+        
+    </target>
+    <target name="deb-no-dist" depends="-loadversion,dist">
         <mkdir dir="${releases.dir}"/>
         <tempfile property="app.deb.desktop.temp" deleteonexit="true" prefix="desktop"/>
         <desktopentry
@@ -320,8 +332,13 @@
         
     </target>
     
+    <target name="osx-app-bundle" depends="osx-app-bundle-dist,osx-app-bundle-no-dist">
+        
+    </target>
     
-    <target name="osx-app-bundle" depends="-loadversion,dist">
+    <target name="osx-app-bundle-dist" depends="-loadversion,dist,osx-app-bundle-no-dist" unless="no_dist">
+    </target>
+    <target name="osx-app-bundle-no-dist" depends="-loadversion">
         <property name="app.script.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"/>
         <echo file="${app.script.temp}">#!/usr/bin/env bash&#10;$(dirname "$${BASH_SOURCE[0]}")/../Resources/${app.script} "$$&#64;"</echo>
         <property name="app.info.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/Info.plist"/>
