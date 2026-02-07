@@ -223,10 +223,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: version_properties
-            path:
-                -  ./
-                -  libsrc/ffdec_lib/
-      
+
+      - name: Copy version.properties to lib
+        run: copy version.properties libsrc/ffdec_lib/
+        
       - name: Check style
         run: ant checkstyle
       
@@ -556,10 +556,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
-          path:
-            -  ./
-            -  libsrc/ffdec_lib/
     
+    - name: Copy version.properties to lib
+      run: cp version.properties libsrc/ffdec_lib/
+      
     - name: Create packages
       run: ant release-no-dist
     
@@ -595,9 +595,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
           name: version_properties
-          path:
-            -  ./
-            -  libsrc/ffdec_lib/
+    
+    - name: Copy version.properties to lib
+      run: cp version.properties libsrc/ffdec_lib/      
             
     - name: Generate Javadoc
       run: ant release_lib_javadoc
