@@ -271,7 +271,8 @@ jobs:
       shell: pwsh
       run: |        
         mkdir build/classes
-        javac -d build/classes src/com/jpexs/build/SplashScreenGenerator.java
+        javac -d build/classes libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/BMPFile.java
+        javac -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
         java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
     
     - name: Replace EXE splash screen
