@@ -445,7 +445,7 @@ jobs:
 
           & $signtool sign /v /debug `
             /fd sha256 `
-            /tr "http://timestamp.sectigo.com" /td sha256 `
+            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
             /f "$env:CERT_PATH" `
             /csp "Google Cloud KMS Provider" `
             /kc "$kc" `
@@ -479,7 +479,7 @@ jobs:
           }
 
           $path = $x86 | Sort-Object FullName -Descending | Select-Object -First 1
-          #$path = Split-Path $path -Parent
+          $path = Split-Path $path -Parent
           
           "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           #Add-Content $env:GITHUB_PATH $path
@@ -509,7 +509,7 @@ jobs:
 
           & $signtool sign /v /debug `
             /fd sha256 `
-            /tr "http://timestamp.sectigo.com" /td sha256 `
+            /tr "http://timestamp.sectigo.com?td=sha256" /td sha256 `
             /f "$env:CERT_PATH" `
             /csp "Google Cloud KMS Provider" `
             /kc "$kc" `
