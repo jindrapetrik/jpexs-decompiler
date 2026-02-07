@@ -498,6 +498,7 @@ jobs:
           path: wix/bin/Release/FFDec.msi
   packages:
     runs-on: ubuntu-latest
+    container: debian:sid
     needs:
       - compute-version 
       - build
@@ -552,6 +553,7 @@ jobs:
 
   javadoc:
     runs-on: ubuntu-latest
+    container: debian:sid
     needs: compute-version    
     if: needs.compute-version.outputs.doRelease == 'true'
     steps:
@@ -583,6 +585,7 @@ jobs:
     
   deploy:
     runs-on: ubuntu-latest
+    container: debian:sid
     if: needs.compute-version.outputs.doRelease == 'true'
     needs:
       - compute-version
