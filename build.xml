@@ -316,7 +316,7 @@
        </xar>                 
     </target>
     
-    <target name="deb-versioned" depends="-new-version-set,deb">
+    <target name="deb-versioned" depends="new-version-set,deb">
         
     </target>
     
@@ -436,7 +436,7 @@
         <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
     </target>
     
-    <target name="release_lib_javadoc" depends="-new-version-set,git-tag,-loadversion,-save-version-info,-suffix">
+    <target name="release_lib_javadoc" depends="new-version-set,git-tag,-loadversion,-save-version-info,-suffix">
         <ant antfile="${core.lib.script}" target="release_javadoc" inheritAll="false" usenativebasedir="true"/>
         <property name="lib.javadoc.file" value="${lib.releases.dir}/${lib.prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip" />
         <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
@@ -550,7 +550,7 @@
         <antcall target="build_cli"></antcall>
     </target>
 
-    <target name="run-for-screenshots" depends="-new-version-set,run">
+    <target name="run-for-screenshots" depends="new-version-set,run">
         
     </target>
 
@@ -754,35 +754,36 @@
         
     </target>
     
-    <target name="-new-version-set">
+    <target name="new-version-set">
         <property name="new.version" value="1" />
     </target>
     
-    <target name="new-version" depends="-new-version-set,all">
-        
-    </target>          
-    
-    <target name="new-version-library" depends="-new-version-set,library">
+    <target name="new-version" depends="new-version-set,all">
         
     </target>
     
-    <target name="new-version-archive" depends="-new-version-set,archive">
+    
+    <target name="new-version-library" depends="new-version-set,library">
         
     </target>
     
-    <target name="new-version-deb" depends="-new-version-set,deb">
+    <target name="new-version-archive" depends="new-version-set,archive">
         
     </target>
     
-    <target name="new-version-osx-app-archive" depends="-new-version-set,osx-app-archive">
-        
-    </target>
-        
-    <target name="new-version-osx-app-installer" depends="-new-version-set,osx-app-installer">
+    <target name="new-version-deb" depends="new-version-set,deb">
         
     </target>
     
-    <target name="new-version-locales" depends="-new-version-set">
+    <target name="new-version-osx-app-archive" depends="new-version-set,osx-app-archive">
+        
+    </target>
+        
+    <target name="new-version-osx-app-installer" depends="new-version-set,osx-app-installer">
+        
+    </target>
+    
+    <target name="new-version-locales" depends="new-version-set">
         
     </target>
     

@@ -236,12 +236,12 @@ jobs:
       - name: Check style
         run: ant checkstyle
       
-      - name: Build and Test
+      - name: Build and Test (Release)
         if: needs.compute-version.outputs.doRelease == 'true'
-        run: ant -new-version-set build test
+        run: ant new-version-set build test
       
-      - name: Build and Test
-        if: needs.compute-version.outputs.doRelease != 'true'
+      - name: Build and Test (Private)
+        if: needs.compute-version.outputs.doRelease == 'false'
         run: ant build test
       
       - name: Set Java 21
