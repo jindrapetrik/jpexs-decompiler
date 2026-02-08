@@ -721,7 +721,13 @@ jobs:
           path: releases/
           
       - name: Generate release description
-        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > release_notes.md
+        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_notes
+          path: ./release_notes.md
 
       - name: Create tag
         if: needs.compute-version.outputs.verDebug == 'true'
@@ -745,7 +751,10 @@ jobs:
         with:
           tag_name: ${{ needs.compute-version.outputs.verTag }}
           name: ${{ needs.compute-version.outputs.verTitle }}
-          body_path: release-notes.md
+          body_path: ./release-notes.md
+          preserve_order: true
+          prerelease: ${{ needs.compute-version.outputs.verDebug == 'true'}} 
+          fail_on_unmatched_files: true
           files: |
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
