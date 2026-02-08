@@ -271,71 +271,151 @@ jobs:
         with:
           name: lib_dist
           path: libsrc/ffdec_lib/dist
-          
   exe:
-    name: Generate EXE
-    runs-on: windows-latest
-    needs: compute-version
-    if: needs.compute-version.outputs.doRelease == 'true'
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: adopt
-        architecture: x64
-        java-version: 8
+      name: Generate EXE
+      runs-on: ubuntu-latest
+      needs: compute-version
+      if: needs.compute-version.outputs.doRelease == 'true'
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          architecture: x64
+          java-version: 8
 
-    - name: Set up ResourceHacker
-      id: resource_hacker
-      shell: pwsh
-      run: |
-        $url = "https://www.angusj.com/resourcehacker/resource_hacker.zip"
-        $zip = "resource_hacker.zip"
-        $dest = "tools/resource_hacker"
+      # Wine must be used since Windows runner cannot run Resource hacker
+      - name: Install Wine
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq wine                               
 
-        Invoke-WebRequest $url -OutFile $zip
-        Expand-Archive $zip -DestinationPath $dest -Force
-        $path = $dest + '/ResourceHacker.exe'
-        "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-      
-    - name: Generate EXE splash screen
-      shell: pwsh
-      run: |        
-        mkdir build/classes
-        javac -d build/classes libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/BMPFile.java
-        javac -cp build/classes -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
-        java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
-    
-    - name: Replace EXE splash screen
-      shell: pwsh
-      run: |
-        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"
+      # We need to add fake virtual desktop as Resource Hacker is not pure commandline app
+      - name: Set up Xorg
+        run: |
+          sudo apt-get install -y -qq xorg xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic
+      - name: Install Resource Hacker
+        env:
+          RH_DIR: tools/wine/resourcehacker
+          RH_ZIP: tools/wine/resourcehacker.zip
+          RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
+        run: |              
+          set -euxo pipefail
+
+          sudo apt-get install -y -qq unzip wget
+
+          mkdir -p "$(dirname "$RH_ZIP")"
+          mkdir -p "$RH_DIR"
+
+          wget -q -O "$RH_ZIP" "$RH_URL"
+          unzip -o "$RH_ZIP" -d "$RH_DIR"
+
+      - name: Generate EXE splash screen
+        run: |     
+          mkdir -p build/classes
+          javac -d build/classes libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/BMPFile.java
+          javac -cp build/classes -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
+          java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
+
+      - name: Replace EXE splash screen
+        run: |
+          export WINEPREFIX=$(pwd)/tools/wine
+          cp resources/ffdec.exe $WINEPREFIX/ffdec.exe
+          cp build/splash.bmp $WINEPREFIX/splash.bmp
+          xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/ffdec.exe -save $WINEPREFIX/ffdec.exe -action addoverwrite -res $WINEPREFIX/splash.bmp -mask BITMAP,1
+          cp $WINEPREFIX/ffdec.exe resources/ffdec.exe
+      - name: Generate EXE version info    
+        run: |
+          sed -i \
+            -e 's/@MAJOR@/${{ needs.compute-version.outputs.verMajor }}/g' \
+            -e 's/@MINOR@/${{ needs.compute-version.outputs.verMinor }}/g' \
+            -e 's/@RELEASE@/${{ needs.compute-version.outputs.verRelease }}/g' \
+            -e 's/@BUILD@/${{ needs.compute-version.outputs.verBuild }}/g' \
+            -e 's/@VERSION@/${{ needs.compute-version.outputs.verShort }}/g' \
+            versioninfo.rc
+      - name: Replace EXE version info
+        run: |
+          export WINEPREFIX=$(pwd)/tools/wine
+          cp resources/ffdec.exe $WINEPREFIX/ffdec.exe
+          cp versioninfo.rc $WINEPREFIX/versioninfo.rc
+          xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/versioninfo.rc -save $WINEPREFIX/versioninfo.res -action compile
+          xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/ffdec.exe -save $WINEPREFIX/ffdec.exe -action addoverwrite -res $WINEPREFIX/versioninfo.res -mask "Version Info,1"
+          cp $WINEPREFIX/ffdec.exe resources/ffdec.exe
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned_exe
+          path: resources/ffdec.exe
+          
+#--- Note: Windows runner cannot run Resource Hacker for some reason
+#  exe:
+#    name: Generate EXE
+#    runs-on: windows-latest
+#    needs: compute-version
+#    if: needs.compute-version.outputs.doRelease == 'true'
+#    steps:
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#    - name: Set up JDK
+#      uses: actions/setup-java@v4
+#      with:
+#        distribution: adopt
+#        architecture: x64
+#        java-version: 8
+#
+#    - name: Set up ResourceHacker
+#      id: resource_hacker
+#      shell: pwsh
+#      run: |
+#        $url = "https://www.angusj.com/resourcehacker/resource_hacker.zip"
+#        $zip = "resource_hacker.zip"
+#        $dest = "tools/resource_hacker"
+#
+#        Invoke-WebRequest $url -OutFile $zip
+#        Expand-Archive $zip -DestinationPath $dest -Force
+#        $path = $dest + '/ResourceHacker.exe'
+#        "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+#      
+#    - name: Generate EXE splash screen
+#      shell: pwsh
+#      run: |        
+#        mkdir build/classes
+#        javac -d build/classes libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/helpers/BMPFile.java
+#        javac -cp build/classes -d build/classes src/com/jpexs/build/SplashScreenGenerator.java        
+#        java -cp build/classes com.jpexs.build.SplashScreenGenerator "${{ needs.compute-version.outputs.verLong }}"
+#    
+#    - name: Replace EXE splash screen
+#      shell: pwsh
+#      run: |
+#        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"
+#        
+#        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res build/splash.bmp -mask BITMAP,1
+#    - name: Generate EXE version info
+#      shell: pwsh
+#      run: |
+#        $template = Get-Content -Path 'versioninfo.rc' -Raw -Encoding UTF8
+#        $t = $template
+#        $t = $t -creplace '@MAJOR@', '${{ needs.compute-version.outputs.verMajor }}'
+#        $t = $t -creplace '@MINOR@', '${{ needs.compute-version.outputs.verMinor }}'
+#        $t = $t -creplace '@RELEASE@', '${{ needs.compute-version.outputs.verRelease }}'
+#        $t = $t -creplace '@BUILD@', '${{ needs.compute-version.outputs.verBuild }}'
+#        $t = $t -creplace '@VERSION@', '${{ needs.compute-version.outputs.verShort }}'
+#        Set-Content -Path 'versioninfo.rc' -Value $t -Encoding UTF8
+#    - name: Replace EXE version info
+#      shell: pwsh
+#      run: |
+#        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"        
+#        & $resource_hacker -open versioninfo.rc -save versioninfo.res -action compile
+#        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res versioninfo.res -mask "Version Info,1"                
+#    - name: Upload EXE
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: unsigned_exe
+#        path: resources/ffdec.exe
         
-        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res build/splash.bmp -mask BITMAP,1
-    - name: Generate EXE version info
-      shell: pwsh
-      run: |
-        $template = Get-Content -Path 'versioninfo.rc' -Raw -Encoding UTF8
-        $t = $template
-        $t = $t -creplace '@MAJOR@', '${{ needs.compute-version.outputs.verMajor }}'
-        $t = $t -creplace '@MINOR@', '${{ needs.compute-version.outputs.verMinor }}'
-        $t = $t -creplace '@RELEASE@', '${{ needs.compute-version.outputs.verRelease }}'
-        $t = $t -creplace '@BUILD@', '${{ needs.compute-version.outputs.verBuild }}'
-        $t = $t -creplace '@VERSION@', '${{ needs.compute-version.outputs.verShort }}'
-        Set-Content -Path 'versioninfo.rc' -Value $t -Encoding UTF8
-    - name: Replace EXE version info
-      shell: pwsh
-      run: |
-        $resource_hacker = "${{ steps.resource_hacker.outputs.path }}"        
-        & $resource_hacker -open versioninfo.rc -save versioninfo.res -action compile
-        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res versioninfo.res -mask "Version Info,1"                
-    - name: Upload EXE
-      uses: actions/upload-artifact@v4
-      with:
-        name: unsigned_exe
-        path: resources/ffdec.exe
   sign_and_msi:
     name: Generate MSI, Sign EXE+MSI
     runs-on: windows-latest
