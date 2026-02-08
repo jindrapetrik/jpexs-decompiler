@@ -219,8 +219,9 @@ jobs:
             21
       
       - name: Set Java 8
+        shell: pwsh
         run: |
-          echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $env:GITHUB_ENV
+          echo "JAVA_HOME=$env:JAVA_HOME_8_X64" >> $env:GITHUB_ENV
       
       - name: Set up Ant
         run: choco install ant -y
@@ -246,8 +247,9 @@ jobs:
       
       - name: Set Java 21
         if: needs.compute-version.outputs.doRelease == 'true'
+        shell: pwsh
         run: |
-          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> $env:GITHUB_ENV
+          echo "JAVA_HOME=$env:JAVA_HOME_21_X64" >> $env:GITHUB_ENV          
       
       - name: Javadoc
         if: needs.compute-version.outputs.doRelease == 'true'
