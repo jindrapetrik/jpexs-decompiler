@@ -54,14 +54,7 @@ To only build, execute build task:
 ```
 ant build
 ```
-For creating EXE Installer and ZIP version, there exist Ant tasks "installer","release". These tasks require additional software installed:
-* [NSIS] (Nullsoft Scriptable Install System) (3.0b3 or newer) - creates installer
 
-You must configure installation path of this tool in tools.properties file, which could look like this for windows:
-```
-nsis.path = c:\\program files (x86)\\NSIS
-reshack.path = c:\\Program Files (x86)\\Resource Hacker\\
-```
 ### Building libraries
 
 There are few libraries which need to be built too. These libraries are placed in "libsrc" directory.
