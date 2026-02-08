@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Slovak translation (AI used)
 - APNG (animated PNG) export for frames, sprites and morphshapes
 - Context menu association icon
+- Windows installer (MSI) and ffdec.exe are signed
+- ffdec.exe contains version information (+ on SplashScreen)
 
 ### Fixed
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
@@ -20,6 +22,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
+- MSI installer instead of setup.exe on Windows
 
 ## [24.1.2] - 2026-01-31
 ### Added
