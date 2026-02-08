@@ -546,8 +546,8 @@ jobs:
           )
 
           # --- retry policy ---
-          $maxAttempts = 3
-          $delaySeconds = 5
+          $maxAttempts = 5
+          $delaySeconds = 10
           $needle = "SignTool Error: An unexpected internal error has occurred"
 
           for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
@@ -651,8 +651,8 @@ jobs:
           )
 
           # --- retry policy ---
-          $maxAttempts = 3
-          $delaySeconds = 5
+          $maxAttempts = 5
+          $delaySeconds = 10
           $needle = "SignTool Error: An unexpected internal error has occurred"
 
           for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
