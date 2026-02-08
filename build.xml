@@ -87,7 +87,7 @@
         </checkstyle>
     </target>
 
-    <target name="compile" depends="build_lib,-copy-lib">
+    <target name="compile" depends="build_lib,-copy-lib" unless="no_dist">
         <!--<delete dir="${compile.dir}"/>-->        
         <mkdir dir="${compile.dir}"/>
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
@@ -401,7 +401,7 @@
         <property name="no_dist" value="1"/>  
     </target>
     
-    <target name="release-no-dist" depends="-set-no-dist,library,exe,archive,deb,osx-app-archive,osx-app-installer">
+    <target name="release-no-dist" depends="-set-no-dist,-timestamp,-suffix,library,exe,archive,deb,osx-app-archive,osx-app-installer">
 
     </target>
          
@@ -420,8 +420,9 @@
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
     </target>    
-    <target name="dist" depends="build,exe" unless="no_dist">
-        
+    <target name="dist" unless="no_dist">
+        <echo>DIST called</echo>
+        <!-- depends="build,exe" -->
     </target>
     
     <target name="-nightly-suffix" if="nightly">        
@@ -458,7 +459,7 @@
     
     
     <target name="release_lib-no-dist" depends="git-tag,-loadversion,-save-version-info,-suffix" if="no_dist">
-        <copy file="${version_info}" tofile="${core.lib.version_info}" />        
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />
         <ant antfile="${core.lib.script}" target="release-no-dist" inheritAll="false" usenativebasedir="true"/>
         <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
     </target>
@@ -469,12 +470,12 @@
         <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
     </target>
     
-    <target name="build_lib" depends="-loadversion,-save-version-info">
+    <target name="build_lib" depends="-loadversion,-save-version-info" unless="no_dist">
         <copy file="${version_info}" tofile="${core.lib.version_info}" />
         <ant antfile="${core.lib.script}" target="build" inheritAll="false" usenativebasedir="true"/>
     </target>
     
-    <target name="-copy-lib">
+    <target name="-copy-lib" unless="no_dist">
         <copy file="${core.lib.path}" todir="${lib.dir}" />    
     </target>
     
