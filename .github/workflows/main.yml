@@ -751,7 +751,7 @@ jobs:
         with:
           tag_name: ${{ needs.compute-version.outputs.verTag }}
           name: ${{ needs.compute-version.outputs.verTitle }}
-          body_path: ./release-notes.md
+          body_path: ./release_notes.md
           preserve_order: true
           prerelease: ${{ needs.compute-version.outputs.verDebug == 'true'}} 
           fail_on_unmatched_files: true
