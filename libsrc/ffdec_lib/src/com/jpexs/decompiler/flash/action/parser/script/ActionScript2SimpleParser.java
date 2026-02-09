@@ -287,7 +287,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         expression(errors, false, false, false, false, true, subVariables, false, hasEval);
                         s = lex();
                         variables.add(new TraitVarConstValueScope(scopePos, s.position, subVariables, isStatic));
-                       
+
                     }
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
@@ -359,12 +359,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
         }
 
-        
-        switch(s.type) {
+        switch (s.type) {
             case DUPLICATEMOVIECLIP:
             case GETURL:
             case GOTOANDSTOP:
-            case GOTOANDPLAY:  
+            case GOTOANDPLAY:
             case NEXTFRAME:
             case PLAY:
             case PREVFRAME:
@@ -380,7 +379,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 call(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                 return true;
         }
-        
+
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(errors, SymbolType.PARENT_OPEN);
@@ -831,7 +830,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     variables.add(new Variable(true, new Path("this"), s.position));
                     List<VariableOrScope> subVariables = new ArrayList<>();
                     traits(errors, false, className, subVariables, inTellTarget, hasEval);
-                    
+
                     s = lex();
                     ClassScope cs = new ClassScope(scopePos, s.position, subVariables);
                     variables.add(cs);
@@ -1356,7 +1355,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     case "dup":
                         expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
-                        allowMemberOrCall = true;                        
+                        allowMemberOrCall = true;
                         break;
                     case "push":
                         expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);

@@ -608,11 +608,11 @@ public class ActionScript2Parser {
             System.out.println("expressionCommands:");
         }
         if (inWith) {
-            switch(s.type) {
+            switch (s.type) {
                 case DUPLICATEMOVIECLIP:
                 case GETURL:
                 case GOTOANDSTOP:
-                case GOTOANDPLAY:  
+                case GOTOANDPLAY:
                 case NEXTFRAME:
                 case PLAY:
                 case PREVFRAME:
@@ -627,11 +627,11 @@ public class ActionScript2Parser {
                     GraphTargetItem functionName = pushConst((String) s.value);
                     expectedType(SymbolType.PARENT_OPEN);
                     List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
-                    return new CallFunctionActionItem(null, null, functionName, args);                                       
+                    return new CallFunctionActionItem(null, null, functionName, args);
             }
         }
-        
-        GraphTargetItem ret = null;        
+
+        GraphTargetItem ret = null;
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -698,16 +698,16 @@ public class ActionScript2Parser {
                             if (s2.type == SymbolType.PARENT_CLOSE) {
                                 ret = new GetURLActionItem(null, null, urlSymb.value.toString(), targetSymb.value.toString());
                                 break;
-                            } 
+                            }
                             lexer.pushback(s2);
                         }
-                        lexer.pushback(targetSymb);                                                
+                        lexer.pushback(targetSymb);
                     } else if (s.type == SymbolType.PARENT_CLOSE) {
                         ret = new GetURLActionItem(null, null, urlSymb.value.toString(), "");
-                        break;                        
+                        break;
                     }
                     lexer.pushback(s);
-                    lexer.pushback(urlSymb);                    
+                    lexer.pushback(urlSymb);
                 } else {
                     lexer.pushback(s);
                 }
@@ -1146,7 +1146,7 @@ public class ActionScript2Parser {
                 TellTargetActionItem tt = new TellTargetActionItem(null, null, tellTarget, tellcmds);
                 if (inTellTarget) {
                     tt.nested = true;
-                }                
+                }
                 ret = tt;
                 ret.line = tellTargetLine;
                 break;
@@ -2258,7 +2258,7 @@ public class ActionScript2Parser {
         int index = constantPool.indexOf(s);
         if (index == -1) {
             int newItemLen = ActionConstantPool.calculateSize(s, charset);
-            if (constantPool.size() < 0xffff 
+            if (constantPool.size() < 0xffff
                     && constantPoolLength + newItemLen <= 0xffff) {
                 // constant pool is not full
                 constantPool.add(s);
@@ -2277,9 +2277,9 @@ public class ActionScript2Parser {
     private ActionScriptLexer lexer = null;
 
     private List<String> constantPool;
-    
+
     private int constantPoolLength = 2; //ActionConstantPool starts with UI16 constant count
-    
+
     /**
      * Convert a string to a high-level model.
      *
