@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 - HTML5 Canvas morphshape export
 - Slovenian translation
 - [#2626] AS1/2 direct editation - function calls inside `with` statement
-- [#2618] AS1/2 increment/decrement using PushDuplicate
+- [#2618] AS1/2 increment/decrement/compound using PushDuplicate
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
