@@ -67,6 +67,36 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="25.0.0" date="2026-02-09">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2610 Export morphshapes - export individual frames, setting of morph duration and/or number of morph frames</li>
+					<li>Export morphshapes to GIF and AVI</li>
+					<li>Animated WEBP export for frames, sprites and morphshapes</li>
+					<li>Export dialog - Icons per export type and arrow symbol</li>
+					<li>Updated German translation (AI used)</li>
+					<li>Slovak translation (AI used)</li>
+					<li>APNG (animated PNG) export for frames, sprites and morphshapes</li>
+					<li>Context menu association icon</li>
+					<li>Windows installer (MSI) and ffdec.exe are signed</li>
+					<li>ffdec.exe contains version information (+ on SplashScreen)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2603 Export Sprite as SWF - sprite frames as timeline frames, without sprite itself</li>
+					<li>HTML5 Canvas morphshape export</li>
+					<li>Slovenian translation</li>
+					<li>#2626 AS1/2 direct editation - function calls inside `with` statement</li>
+					<li>#2618 AS1/2 increment/decrement/compound using PushDuplicate</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2610 Export as SWF - take SWF bounds from the exported item bounds</li>
+					<li>MSI installer instead of setup.exe on Windows</li>
+				</ul>
+			</description>
+		</release>
 		<release version="24.1.2" date="2026-01-31">
 			<description>
 				<p>Added</p>
