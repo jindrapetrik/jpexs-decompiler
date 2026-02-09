@@ -430,7 +430,7 @@ jobs:
       GCP_PROJECT_ID: jpexs-ffdec
       GCP_LOCATION: europe
       KMS_KEYRING: jpexs-ffdec-keyring
-      KMS_KEY: jpexs-ffdec-key
+      KMS_KEY: jpexs-ffdec-key2
       KMS_KEY_VERSION: "1"
       
       CERT_PATH: "cert/user.crt"
