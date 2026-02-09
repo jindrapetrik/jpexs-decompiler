@@ -266,6 +266,7 @@ Bdelta
 bdt
 beaninfo
 beanshell
+Beanshell
 bechtold
 belownormal
 bestbiasd
