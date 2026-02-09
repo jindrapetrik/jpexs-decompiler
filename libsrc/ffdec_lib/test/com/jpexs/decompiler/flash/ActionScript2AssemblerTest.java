@@ -572,4 +572,19 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "}\n"
                 + "}");
     }
+
+    @Test
+    public void testIncrementDup() {
+        String res = decompilePcode("Push \"this\"\n"
+                + "GetVariable\n"
+                + "PushDuplicate\n"
+                + "Push \"myVar\"\n"
+                + "GetMember\n"
+                + "Increment\n"
+                + "Push \"myVar\"\n"
+                + "StackSwap\n"
+                + "SetMember");
+        res = cleanPCode(res);
+        assertEquals(res, "this.myVar++;");
+    }
 }

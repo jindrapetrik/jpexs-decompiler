@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - HTML5 Canvas morphshape export
 - Slovenian translation
 - [#2626] AS1/2 direct editation - function calls inside `with` statement
+- [#2618] AS1/2 increment/decrement using PushDuplicate
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
@@ -4108,6 +4109,7 @@ Major version of SWF to XML export changed to 2.
 [#2610]: https://www.free-decompiler.com/flash/issues/2610
 [#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2626]: https://www.free-decompiler.com/flash/issues/2626
+[#2618]: https://www.free-decompiler.com/flash/issues/2618
 [#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
 [#2154]: https://www.free-decompiler.com/flash/issues/2154
