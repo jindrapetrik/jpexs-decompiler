@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
 - HTML5 Canvas morphshape export
 - Slovenian translation
+- [#2626] AS1/2 direct editation - function calls inside `with` statement
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
@@ -4104,8 +4105,9 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
-[#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2610]: https://www.free-decompiler.com/flash/issues/2610
+[#2603]: https://www.free-decompiler.com/flash/issues/2603
+[#2626]: https://www.free-decompiler.com/flash/issues/2626
 [#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
 [#2154]: https://www.free-decompiler.com/flash/issues/2154

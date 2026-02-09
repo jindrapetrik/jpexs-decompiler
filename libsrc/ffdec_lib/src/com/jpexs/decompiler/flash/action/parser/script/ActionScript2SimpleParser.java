@@ -64,11 +64,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
     private final boolean debugMode = false;
 
-    private void commands(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private void commands(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("commands:");
         }
-        while (command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval)) {
+        while (command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval)) {
             //empty
         }
         if (debugMode) {
@@ -146,14 +146,14 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private List<GraphTargetItem> call(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         List<GraphTargetItem> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
             }
-            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+            expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
             s = lex();
             if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE)) {
                 break;
@@ -208,7 +208,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
         if (withBody) {
             expectedType(errors, SymbolType.CURLY_OPEN);
-            commands(errors, true, isMethod, 0, inTellTarget, subvariables, subHasEval);
+            commands(errors, false, true, isMethod, 0, inTellTarget, subvariables, subHasEval);
             s = lex();
             expected(errors, s, lexer.yyline(), SymbolType.CURLY_CLOSE);
             scopeEndPos = s.position;
@@ -284,7 +284,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     if (s.type == SymbolType.ASSIGN) {
                         int scopePos = s.position;
                         List<VariableOrScope> subVariables = new ArrayList<>();
-                        expression(errors, false, false, false, true, subVariables, false, hasEval);
+                        expression(errors, false, false, false, false, true, subVariables, false, hasEval);
                         s = lex();
                         variables.add(new TraitVarConstValueScope(scopePos, s.position, subVariables, isStatic));
                        
@@ -305,7 +305,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return true;
     }
 
-    private boolean expressionCommands(List<SimpleParseException> errors, ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean expressionCommands(List<SimpleParseException> errors, ParsedSymbol s, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
@@ -359,23 +359,45 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
         }
 
+        
+        switch(s.type) {
+            case DUPLICATEMOVIECLIP:
+            case GETURL:
+            case GOTOANDSTOP:
+            case GOTOANDPLAY:  
+            case NEXTFRAME:
+            case PLAY:
+            case PREVFRAME:
+            case STOP:
+            case UNLOADMOVIE:
+            case UNLOADMOVIENUM:
+            case LOADVARIABLES:
+            case LOADMOVIE:
+            case LOADVARIABLESNUM:
+            case LOADMOVIENUM:
+            case REMOVEMOVIECLIP:
+                expectedType(errors, SymbolType.PARENT_OPEN);
+                call(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
+                return true;
+        }
+        
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case FSCOMMAND:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.isType(SymbolType.COMMA)) {
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -384,10 +406,10 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case FSCOMMAND2:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 while (s.isType(SymbolType.COMMA)) {
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                 }
                 expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE);
@@ -395,27 +417,27 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case SET:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 hasEval.setVal(true); //FlashPro does this (using definelocal for funcs) only for eval func, but we will also use set since it is generated by obfuscated identifiers
                 ret = true;
                 break;
             case TRACE:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
 
             case GETURL:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 if (s.type == SymbolType.COMMA) {
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         s = lex();
@@ -439,10 +461,10 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case GOTOANDSTOP:
             case GOTOANDPLAY:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.type == SymbolType.COMMA) { //Handle scene?
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -489,7 +511,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case UNLOADMOVIE:
             case UNLOADMOVIENUM:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -498,9 +520,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case PRINTASBITMAPNUM:
             case PRINTNUM:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -509,9 +531,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case LOADVARIABLESNUM:
             case LOADMOVIENUM:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
 
                 s = lex();
                 expected(errors, s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
@@ -533,28 +555,28 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case REMOVEMOVIECLIP:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case STARTDRAG:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                        expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
-                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                             s = lex();
                             if (s.type == SymbolType.COMMA) {
-                                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                                 s = lex();
                                 if (s.type == SymbolType.COMMA) {
-                                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                                 } else {
                                     lexer.pushback(s);
                                 }
@@ -576,7 +598,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case CALL:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -587,57 +609,57 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case MBORD:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBCHR:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBLENGTH:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case MBSUBSTRING:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case SUBSTRING:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.COMMA);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case LENGTH:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case RANDOM:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case INT:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -651,7 +673,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     ret = true;
                 } else {
                     expected(errors, s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     expectedType(errors, SymbolType.PARENT_CLOSE);
                     ret = true;
                 }
@@ -666,20 +688,20 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     ret = true;
                 } else {
                     expected(errors, s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     expectedType(errors, SymbolType.PARENT_CLOSE);
                     ret = true;
                 }
                 break;
             case ORD:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
             case CHR:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -690,7 +712,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case TARGETPATH:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -729,7 +751,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return true;
     }
 
-    private boolean command(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean command(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         if (debugMode) {
@@ -746,7 +768,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 lexer.removeListener(buf);
                 buf.pushAllBack(lexer);
 
-                ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                ret = expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
                     lexer.pushback(s);
@@ -760,33 +782,33 @@ public class ActionScript2SimpleParser implements SimpleParser {
         switch (s.type) {
             case WITH:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 expectedType(errors, SymbolType.CURLY_OPEN);
-                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                commands(errors, true, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case DELETE:
-                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 ret = true;
                 break;
             case TELLTARGET:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 expectedType(errors, SymbolType.CURLY_OPEN);
-                commands(errors, inFunction, inMethod, forinlevel, true, variables, hasEval);
+                commands(errors, inWith, inFunction, inMethod, forinlevel, true, variables, hasEval);
                 expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
 
             case IFFRAMELOADED:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 expectedType(errors, SymbolType.CURLY_OPEN);
-                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                commands(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
@@ -854,7 +876,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     }
 
                     if (s.type == SymbolType.ASSIGN) {
-                        expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                        expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                         Variable vret = new Variable(true, varIdentifier, varPosition);
                         variables.add(vret);
                     } else {
@@ -866,19 +888,19 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 }
                 break;
             case CURLY_OPEN:
-                commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                commands(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 expectedType(errors, SymbolType.CURLY_CLOSE);
                 ret = true;
                 break;
             case INCREMENT: //preincrement
             case DECREMENT: //predecrement
-                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 ret = true;
                 break;
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
-                    call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
+                    call(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                     Variable supItem = new Variable(false, new Path(s.value.toString()), s.position);
                     variables.add(supItem);
                     ret = true;
@@ -889,12 +911,12 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case IF:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
-                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 if (s.type == SymbolType.ELSE) {
-                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -902,16 +924,16 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case WHILE:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
-                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case DO:
-                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 expectedType(errors, SymbolType.WHILE);
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 ret = true;
                 break;
@@ -939,7 +961,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                             item = new Variable(define, objIdent, ssel.position);
                             variables.add(item);
 
-                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                             forin = true;
                         } else {
                             lexer.pushback(s3);
@@ -958,18 +980,18 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     lexer.pushback(s);
                 }
                 if (!forin) {
-                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     expectedType(errors, SymbolType.SEMICOLON);
-                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 }
                 expectedType(errors, SymbolType.PARENT_CLOSE);
-                command(errors, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inWith, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, variables, hasEval);
                 ret = true;
                 break;
             case SWITCH:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 expectedType(errors, SymbolType.CURLY_OPEN);
                 s = lex();
@@ -977,13 +999,13 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     //List<GraphTargetItem> caseExprs; = new ArrayList<>();
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                         if (s.type != SymbolType.DEFAULT) {
-                            expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                            expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                         }
                         expectedType(errors, SymbolType.COLON);
                         s = lex();
                     }
                     lexer.pushback(s);
-                    commands(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    commands(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     s = lex();
                 }
                 expected(errors, s, lexer.yyline(), SymbolType.CURLY_CLOSE);
@@ -996,11 +1018,11 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 ret = true;
                 break;
             case RETURN:
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 ret = true;
                 break;
             case TRY:
-                command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                 s = lex();
                 boolean found = false;
                 while (s.type == SymbolType.CATCH) {
@@ -1018,7 +1040,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
                         List<VariableOrScope> subvariables = new ArrayList<>();
 
-                        command(errors, inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
+                        command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, subvariables, hasEval);
                         s = lex();
                         variables.add(new CatchScope(catchScopePos, s.position, new Variable(true, new Path((String) si.value), si.position), subvariables));
                         lexer.pushback(s);
@@ -1027,7 +1049,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     found = true;
                 }
                 if (s.type == SymbolType.FINALLY) {
-                    command(errors, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
+                    command(errors, inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, hasEval);
                     found = true;
                     s = lex();
                 }
@@ -1038,7 +1060,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 ret = true;
                 break;
             case THROW:
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 ret = true;
                 break;
             case SEMICOLON: //empty command
@@ -1057,7 +1079,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             default:
                 lexer.pushback(s);
-                ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                ret = expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
         }
         if (debugMode) {
             System.out.println("/command");
@@ -1065,7 +1087,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         lexer.removeListener(buf);
         if (!ret) {  //can be popped expression
             buf.pushAllBack(lexer);
-            ret = expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+            ret = expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
         }
         s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
@@ -1075,17 +1097,17 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private boolean expression(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean expression(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowComma, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("expression:");
         }
         ParsedSymbol symb;
         do {
-            boolean prim = expressionPrimary(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            boolean prim = expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (!prim) {
                 return false;
             }
-            expression1(errors, prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
+            expression1(errors, prim, GraphTargetItem.NOPRECEDENCE, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
             symb = lex();
         } while (allowComma && symb != null && symb.type == SymbolType.COMMA);
         if (symb != null) {
@@ -1130,7 +1152,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return s.type.getPrecedence();
     }
 
-    private boolean expression1(List<SimpleParseException> errors, boolean lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean expression1(List<SimpleParseException> errors, boolean lhs, int min_precedence, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol op;
         boolean rhs;
         ParsedSymbol lookahead = peekLex();
@@ -1149,14 +1171,14 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 if (debugMode) {
                     System.out.println("ternar-middle:");
                 }
-                expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                 expectedType(errors, SymbolType.COLON);
                 if (debugMode) {
                     System.out.println("/ternar-middle");
                 }
             }
 
-            rhs = expressionPrimary(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
+            rhs = expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, true, hasEval);
             if (rhs == false) {
                 lexer.pushback(op);
                 errors.add(new SimpleParseException("Missing operand", lexer.yyline(), op.position));
@@ -1166,7 +1188,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             lookahead = peekLex();
             while ((isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) < /* > on wiki */ getSymbPrecedence(op))
                     || (lookahead.type.isRightAssociative() && getSymbPrecedence(lookahead) == getSymbPrecedence(op))) {
-                rhs = expression1(errors, rhs, getSymbPrecedence(lookahead), inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
+                rhs = expression1(errors, rhs, getSymbPrecedence(lookahead), inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, hasEval);
                 if (!rhs) {
                     break;
                 }
@@ -1237,7 +1259,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return lhs;
     }
 
-    private int brackets(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private int brackets(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1248,7 +1270,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     lexer.pushback(s);
                 }
                 arrCnt++;
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 s = lex();
                 if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
                     break;
@@ -1261,9 +1283,9 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return arrCnt;
     }
 
-    private boolean handleVariable(List<SimpleParseException> errors, ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean handleVariable(List<SimpleParseException> errors, ParsedSymbol s, boolean ret, List<VariableOrScope> variables, Reference<Boolean> allowMemberOrCall, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (s.value.equals("not")) {
-            expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+            expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
             ret = true;
         } else {
             Path varName = new Path(s.value.toString());
@@ -1307,7 +1329,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private boolean expressionPrimary(List<SimpleParseException> errors, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean expressionPrimary(List<SimpleParseException> errors, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1327,17 +1349,17 @@ public class ActionScript2SimpleParser implements SimpleParser {
                         ret = true;
                         break;
                     case "enumerate":
-                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     //Both ASs
                     case "dup":
-                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         allowMemberOrCall = true;                        
                         break;
                     case "push":
-                        expression(errors, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
+                        expression(errors, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, false, hasEval);
                         ret = true;
                         break;
                     case "pop":
@@ -1366,7 +1388,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case NEGATE:
                 versionRequired(errors, s, 5);
-                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case MINUS:
@@ -1379,12 +1401,12 @@ public class ActionScript2SimpleParser implements SimpleParser {
 
                 } else {
                     lexer.pushback(s);
-                    expressionPrimary(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                    expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                     ret = true;
                 }
                 break;
             case TYPEOF:
-                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1417,7 +1439,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     if (expectedType(errors, SymbolType.COLON) == null) {
                         break;
                     }
-                    expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                    expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
                         if (!expected(errors, s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
@@ -1430,7 +1452,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 break;
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
-                brackets(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
+                brackets(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
                 break;
@@ -1462,20 +1484,20 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 allowMemberOrCall = true;
                 break;
             case DELETE:
-                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case NOT:
-                expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
+                expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, true, hasEval);
                 ret = true;
                 break;
             case PARENT_OPEN:
-                boolean pexpr = expression(errors, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
+                boolean pexpr = expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, true, hasEval);
                 if (!pexpr) {
                     errors.add(new SimpleParseException("Expression expected", lexer.yyline(), s.position));
                 }
@@ -1492,21 +1514,21 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     } else {
                         lexer.pushback(s2);
                         lexer.pushback(s1);
-                        expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                        expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                     }
                 } else {
                     lexer.pushback(s1);
-                    expressionPrimary(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                    expressionPrimary(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 }
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
+                call(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
                 allowMemberOrCall = true;
 
                 break;
             case EVAL:
                 expectedType(errors, SymbolType.PARENT_OPEN);
-                expression(errors, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, true, variables, false, hasEval);
                 expectedType(errors, SymbolType.PARENT_CLOSE);
                 hasEval.setVal(true);
                 allowMemberOrCall = true;
@@ -1516,7 +1538,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
             case THIS:
             case SUPER:
                 Reference<Boolean> allowMemberOrCallRef = new Reference<>(allowMemberOrCall);
-                ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef, inFunction, inMethod, inTellTarget, hasEval);
+                ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef, inWith, inFunction, inMethod, inTellTarget, hasEval);
                 allowMemberOrCall = allowMemberOrCallRef.getVal();
                 break;
             default:
@@ -1526,14 +1548,14 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     ParsedSymbol s2 = peekLex();
                     if (s2.type != SymbolType.PARENT_OPEN) {
                         Reference<Boolean> allowMemberOrCallRef2 = new Reference<>(allowMemberOrCall);
-                        ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef2, inFunction, inMethod, inTellTarget, hasEval);
+                        ret = handleVariable(errors, s, ret, variables, allowMemberOrCallRef2, inWith, inFunction, inMethod, inTellTarget, hasEval);
                         allowMemberOrCall = allowMemberOrCallRef2.getVal();
                         isGlobalFuncVar = true;
                     }
                 }
 
                 if (!isGlobalFuncVar) {
-                    boolean excmd = expressionCommands(errors, s, inFunction, inMethod, inTellTarget, variables, hasEval);
+                    boolean excmd = expressionCommands(errors, s, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                     if (excmd) {
                         ret = excmd;
                         allowMemberOrCall = true;
@@ -1544,7 +1566,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
         }
 
         if (allowMemberOrCall && ret) {
-            ret = memberOrCall(errors, ret, inFunction, inMethod, inTellTarget, variables, allowCall, hasEval);
+            ret = memberOrCall(errors, ret, inWith, inFunction, inMethod, inTellTarget, variables, allowCall, hasEval);
         }
         if (debugMode) {
             System.out.println("/primary");
@@ -1552,18 +1574,18 @@ public class ActionScript2SimpleParser implements SimpleParser {
         return ret;
     }
 
-    private boolean memberOrCall(List<SimpleParseException> errors, boolean ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
+    private boolean memberOrCall(List<SimpleParseException> errors, boolean ret, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableOrScope> variables, boolean allowCall, Reference<Boolean> hasEval) throws IOException, InterruptedException, SimpleParseException, ActionParseException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
                 if (!allowCall) {
                     break;
                 }
-                call(errors, inFunction, inMethod, inTellTarget, variables, hasEval);
+                call(errors, inWith, inFunction, inMethod, inTellTarget, variables, hasEval);
                 ret = true;
             }
             if (op.type == SymbolType.BRACKET_OPEN) {
-                expression(errors, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
+                expression(errors, inWith, inFunction, inMethod, inTellTarget, false, variables, false, hasEval);
                 if (expectedType(errors, SymbolType.BRACKET_CLOSE) == null) {
                     break;
                 }
@@ -1695,7 +1717,7 @@ public class ActionScript2SimpleParser implements SimpleParser {
                 lexer.pushback(symb);
             }
             Reference<Boolean> hasEval = new Reference<>(false);
-            commands(errors, false, false, 0, false, vars, hasEval);
+            commands(errors, false, false, false, 0, false, vars, hasEval);
 
             if (inOnHandler) {
                 expectedType(errors, SymbolType.CURLY_CLOSE);
