@@ -1,0 +1,65 @@
+      
+        <!-- Register "Open With" for .{{ext}} -->
+        <Component Id="Reg{{Ext}}OpenWithList" Guid="{{GUID_2}}">
+            <RegistryValue Root="HKCR" Key=".{{ext}}\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .{{ext}} file extension -->
+        <Component Id="Reg{{Ext}}ClassName" Guid="{{GUID_3}}" Condition="NOT EXT_{{EXT}}_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_{{EXT}}_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="Reg{{Ext}}Ext" Guid="{{GUID_4}}" Condition="NOT EXT_{{EXT}}_EXISTS">
+            <RegistryValue Root="HKCR" Key=".{{ext}}" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="Reg{{Ext}}Associations" Guid="{{GUID_5}}">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_{{EXT}}_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_{{EXT}}_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_{{EXT}}_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_{{EXT}}_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .{{ext}} - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="Reg{{Ext}}SystemFileAssociations" Guid="{{GUID_6}}" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.{{ext}}\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.{{ext}}\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.{{ext}}\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.{{ext}}\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>

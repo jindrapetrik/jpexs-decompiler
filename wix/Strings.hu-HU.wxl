@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="hu-HU">
+  <String Id="GuiLibs_Desc" Value="Alkalmazás GUI és Könyvtárak" />
+  <String Id="DesktopShortcut_Title" Value="Asztali parancsikon" />
+  <String Id="DesktopShortcut_Desc"  Value="Parancsikont hoz létre az alkalmazáshoz az asztalon." />
+  <String Id="ContextMenu_Title" Value="Hozzáadás a helyi menühöz" />
+  <String Id="ContextMenu_Desc" Value="Hozzáadja az FFDec-et az SWF és GFX fájlok helyi menüjéhez a Windows Intézőben." />
+  <String Id="DowngradeErrorMessage" Value="A(z) [ProductName] újabb verziója már telepítve van." />
+</WixLocalization>

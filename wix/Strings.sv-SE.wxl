@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="sv-SE">
+  <String Id="GuiLibs_Desc" Value="Applikationsgränssnitt och bibliotek" />
+  <String Id="DesktopShortcut_Title" Value="Genväg på skrivbordet" />
+  <String Id="DesktopShortcut_Desc"  Value="Skapar en genväg till programmet på skrivbordet." />
+  <String Id="ContextMenu_Title" Value="Lägg till i snabbmenyn" />
+  <String Id="ContextMenu_Desc" Value="Lägger till FFDec i snabbmenyn för SWF- och GFX-filer i Windows Utforskaren." />
+  <String Id="DowngradeErrorMessage" Value="En nyare version av [ProductName] är redan installerad." />
+</WixLocalization>

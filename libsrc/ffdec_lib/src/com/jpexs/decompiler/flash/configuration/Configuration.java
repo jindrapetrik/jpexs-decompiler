@@ -1185,6 +1185,14 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> allowDragAndDropFromResourcesTree = null;
     
+    @ConfigurationDefaultDouble(2.0)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Double> lastExportMorphDuration = null;
+    
+    @ConfigurationDefaultInt(10)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Integer> lastExportMorphNumberOfFrames = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 

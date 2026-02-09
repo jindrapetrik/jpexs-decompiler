@@ -34,6 +34,7 @@ These include:
 * FLA Compound Document Tools - `flacomdoc.jar` - Exporting FLA to CS4 or lower
 * TomlJ - `tomlj-1.1.1.jar` - Storing configuration
 * ANTLR - `antlr-runtime-4.11.1.jar` - Storing configuration
+* jpexs-apng - `jpexs-apng.jar` - APNG export
 
 ## Basic library usage
 ```java
@@ -145,6 +146,7 @@ And also links to these libraries:
 * [FLA Compound Document Tools] (Exporting to FLA CS4 and below) - LGPLv2.1
 * [TomlJ] (Storing configuration) - Apache License 2.0
 * [ANTLR] (Storing configuration) - BSD 3-Clause
+* [jpexs-apng] (Exporting APNG) - MIT License
 
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
@@ -168,3 +170,4 @@ And also links to these libraries:
 [TomlJ]: https://github.com/tomlj/tomlj
 [ANTLR]: https://www.antlr.org/
 [webp4j]: https://github.com/jindrapetrik/webp4j/tree/java8
+[jpexs-apng]: https://github.com/jindrapetrik/jpexs-apng

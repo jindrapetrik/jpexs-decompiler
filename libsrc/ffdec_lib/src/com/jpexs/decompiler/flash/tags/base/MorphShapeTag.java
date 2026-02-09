@@ -420,13 +420,20 @@ public abstract class MorphShapeTag extends DrawableTag {
         BitmapExporter.export(ShapeTag.WIND_EVEN_ODD /*??? FIXME*/, getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing, aaScale);
     }
 
+    public void toSVG(SVGExporter exporter, ColorTransform colorTransform, double duration) {
+        SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
+        SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
+        SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, exporter.getZoom(), duration);
+        shapeExporter.export();
+    }
+    
     @Override
     public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) {
 
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, exporter.getZoom());
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, exporter.getZoom(), 2);
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
@@ -453,7 +460,7 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(getShapeNum(), swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), null, unitDivisor, 0, 0);
+        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(getShapeNum(), swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), null, unitDivisor, 0, 0, 2);
         cmse.export();
         result.append(cmse.getShapeData());
     }

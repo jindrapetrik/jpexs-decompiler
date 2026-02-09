@@ -233,7 +233,7 @@ public class TimelinedMaker {
             private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
                     timeline.frameRate = PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE;
-                    int framesCnt = (int) (timeline.frameRate * PreviewExporter.MORPH_SHAPE_ANIMATION_LENGTH);
+                    int framesCnt = (int) (timeline.frameRate * PreviewExporter.MORPH_SHAPE_DEFAULT_DURATION);
                     for (int i = 0; i < framesCnt; i++) {
                         Frame f = new Frame(timeline, i);
                         DepthState ds = new DepthState(tag.getSwf(), f, f);

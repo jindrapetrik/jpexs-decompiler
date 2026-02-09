@@ -126,3 +126,9 @@ ignore$
 Lexer\.java$
 \.sol$
 \.lnk$
+^wix/
+^cert/
+^versioninfo\.rc$
+\.flv$
+\.yml$
+(?:^|/)build\.xml$

@@ -329,7 +329,13 @@ Pre-options:
         morphshape:png_start_end - PNG start-end format for MorphShapes
         morphshape:bmp_start_end - BMP start-end format for MorphShapes
         morphshape:webp_start_end - WEBP start-end format for MorphShapes
+        morphshape:png_frames - PNG frames format for MorphShapes
+        morphshape:bmp_frames - BMP frames format for MorphShapes
+        morphshape:webp_frames - WEBP frames format for MorphShapes
+        morphshape:webp - WEBP format for MorphShapes
+        morphshape:apng - APNG format for MorphShapes
         frame:png - PNG format for Frames
+        frame:apng - APNG format for Frames
         frame:gif - GIF format for Frames
         frame:avi - AVI format for Frames
         frame:svg - SVG format for Frames
@@ -337,7 +343,9 @@ Pre-options:
         frame:pdf - PDF format for Frames
         frame:bmp - BMP format for Frames
         frame:webp - WEBP format for Frames
+        frame:webp_animated - WEBP animated format for Frames
         sprite:png - PNG format for Sprites
+        sprite:apng - APNG format for Sprites
         sprite:gif - GIF format for Sprites
         sprite:avi - AVI format for Sprites
         sprite:svg - SVG format for Sprites
@@ -345,6 +353,7 @@ Pre-options:
         sprite:pdf - PDF format for Sprites
         sprite:bmp - BMP format for Sprites
         sprite:webp - WEBP format for Sprites
+        sprite:webp_animated - WEBP animated format for Sprites
         button:png - PNG format for Buttons
         button:svg - SVG format for Buttons
         button:bmp - BMP format for Buttons
@@ -499,4 +508,12 @@ Pre-options:
     Applies to: -export
     Replaces <source> URL in importAssets tag with <target>
     for purposes of export. Can be used multiple times.
+
+-morphDuration <duration>
+    Applies to: -export
+    Specifies duration in seconds (float value) for morphshape exporting.
+
+-morphNumFrames <numberOfFrames>
+    Applies to: -export
+    Specifies number of frames for morphshape exporting.
 

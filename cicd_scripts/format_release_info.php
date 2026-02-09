@@ -28,9 +28,9 @@ if($load_from == "-filever")
    
    $files = [
                [
-                   "file_name" => "ffdec_${filever_tag}_setup.exe",
+                   "file_name" => "ffdec_${filever_tag}.msi",
                    "ossupport" => ["windows"],
-                   "type_name" => "Installer (Windows)",
+                   "type_name" => "MSI Installer (Windows)",
                    "type_icon" => "setup"
                ],
                [

@@ -1,6 +1,31 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- [#2610] Export morphshapes - export individual frames, setting of morph
+  duration and/or number of morph frames
+- Export morphshapes to GIF and AVI
+- Animated WEBP export for frames, sprites and morphshapes
+- Export dialog - Icons per export type and arrow symbol
+- Updated German translation (AI used)
+- Slovak translation (AI used)
+- APNG (animated PNG) export for frames, sprites and morphshapes
+- Context menu association icon
+- Windows installer (MSI) and ffdec.exe are signed
+- ffdec.exe contains version information (+ on SplashScreen)
+
+### Fixed
+- [#2603] Export Sprite as SWF - sprite frames as timeline frames, without sprite itself
+- HTML5 Canvas morphshape export
+- Slovenian translation
+- [#2626] AS1/2 direct editation - function calls inside `with` statement
+- [#2618] AS1/2 increment/decrement/compound using PushDuplicate
+
+### Changed
+- [#2610] Export as SWF - take SWF bounds from the exported item bounds
+- MSI installer instead of setup.exe on Windows
+
 ## [24.1.2] - 2026-01-31
 ### Added
 - [#2581] Save as SWC through context menu of SWF files (previously only in CLI)
@@ -20,7 +45,7 @@ All notable changes to this project will be documented in this file.
 - [#2575] dumpSWF CLI command displayed import assets GUI dialog
 - [#2573] AS3 - Incorrect uint/int/Number coercion
 - AS3 local registers type propagation
-- [#2566], [#2594] Export bounds of sprites and buttons not containg filter offsets
+- [#2566], [#2594] Export bounds of sprites and buttons not containing filter offsets
 - [#2582] Font normalizer setting small texts when no assigned glyph found
 - PDF export - not rendering video stream frames
 - [#2585] AS1/2 direct editation - continue and break in for..in loop
@@ -3906,6 +3931,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...dev
 [24.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...version24.1.2
 [24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
@@ -4080,6 +4106,10 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2610]: https://www.free-decompiler.com/flash/issues/2610
+[#2603]: https://www.free-decompiler.com/flash/issues/2603
+[#2626]: https://www.free-decompiler.com/flash/issues/2626
+[#2618]: https://www.free-decompiler.com/flash/issues/2618
 [#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
 [#2154]: https://www.free-decompiler.com/flash/issues/2154

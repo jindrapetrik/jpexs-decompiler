@@ -105,8 +105,9 @@ public class ActionSetMember extends Action {
 
         if (value instanceof IncrementActionItem) {
             if (((IncrementActionItem) value).object instanceof GetMemberActionItem) {
-                if (((GetMemberActionItem) ((IncrementActionItem) value).object).object.equals(object)) {
+                if (((GetMemberActionItem) ((IncrementActionItem) value).object).object.getThroughDuplicate().equals(object)) {
                     if (((GetMemberActionItem) ((IncrementActionItem) value).object).memberName.equals(memberName)) {
+                        ((GetMemberActionItem) ((IncrementActionItem) value).object).object = ((GetMemberActionItem) ((IncrementActionItem) value).object).object.getThroughDuplicate();
                         output.add(new PostIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object));
                         return;
                     }
@@ -115,9 +116,10 @@ public class ActionSetMember extends Action {
         }
         if (value instanceof DecrementActionItem) {
             if (((DecrementActionItem) value).object instanceof GetMemberActionItem) {
-                if (((GetMemberActionItem) ((DecrementActionItem) value).object).object.valueEquals(object)) {
+                if (((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate().valueEquals(object)) {
                     if (((GetMemberActionItem) ((DecrementActionItem) value).object).memberName.equals(memberName)) {
-                        output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
+                        ((GetMemberActionItem) ((DecrementActionItem) value).object).object = ((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate();
+                        output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object.getThroughDuplicate()));
                         return;
                     }
                 }

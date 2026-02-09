@@ -54,13 +54,7 @@ To only build, execute build task:
 ```
 ant build
 ```
-For creating EXE Installer and ZIP version, there exist Ant tasks "installer","release". These tasks require additional software installed:
-* [NSIS] (Nullsoft Scriptable Install System) (3.0b3 or newer) - creates installer
 
-You must configure installation path of this tool in tools.properties file, which could look like this for windows:
-```
-nsis.path = c:\\program files (x86)\\NSIS
-```
 ### Building libraries
 
 There are few libraries which need to be built too. These libraries are placed in "libsrc" directory.
@@ -129,6 +123,7 @@ The application was made in Czech Republic.
 * **koiru** - japanese translation
 * **J. Kramer** - dutch translation
 * **Andrew Poženel** - slovenian translation
+* **GitHub Copilot (Claude AI)** - german, slovak translation
 
 ## Contact
 If you want to report a problem or request new feature, use our issue tracker at [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)

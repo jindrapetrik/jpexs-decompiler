@@ -1982,9 +1982,9 @@ public class Timeline {
                     int mtime = time + layer.time;
 
                     int dframe = 0;
-                    int dnumFrames = drawable.getNumFrames();
-                    if (dnumFrames > 0) { //sprites with empty timeline have zero frames
-                        dframe = mtime % dnumFrames;
+                    int drawableNumFrames = drawable.getNumFrames();
+                    if (drawableNumFrames > 0) { //sprites with empty timeline have zero frames
+                        dframe = mtime % drawableNumFrames;
                     }
                     int dtime = mtime - dframe;
 

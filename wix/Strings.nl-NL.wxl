@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="nl-NL">
+  <String Id="GuiLibs_Desc" Value="Applicatie-GUI en bibliotheken" />
+  <String Id="DesktopShortcut_Title" Value="Snelkoppeling op bureaublad" />
+  <String Id="DesktopShortcut_Desc"  Value="Maakt een snelkoppeling naar de applicatie op het bureaublad." />
+  <String Id="ContextMenu_Title" Value="Toevoegen aan contextmenu" />
+  <String Id="ContextMenu_Desc" Value="Voegt FFDec toe aan het contextmenu van SWF- en GFX-bestanden in Windows Verkenner." />
+  <String Id="DowngradeErrorMessage" Value="Er is al een nieuwere versie van [ProductName] geïnstalleerd." />
+</WixLocalization>

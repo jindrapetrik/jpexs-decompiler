@@ -29,6 +29,10 @@ public enum SpriteExportMode {
      */
     PNG,
     /**
+     * APNG - Animated Portable Network Graphics
+     */
+    APNG,
+    /**
      * GIF - Graphics Interchange Format
      */
     GIF,
@@ -57,12 +61,16 @@ public enum SpriteExportMode {
      */
     WEBP,
     /**
+     * WEBP - animated
+     */
+    WEBP_ANIMATED,
+    /**
      * SWF - Shockwave Flash
      */
     SWF;
     
     public boolean available() {
-        if (this == WEBP) {
+        if (this == WEBP || this == WEBP_ANIMATED) {
             return ImageFormat.WEBP.available();
         }
         return true;

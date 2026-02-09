@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="uk-UA">
+  <String Id="GuiLibs_Desc" Value="Графічний інтерфейс і бібліотеки програми" />
+  <String Id="DesktopShortcut_Title" Value="Ярлик на робочому столі" />
+  <String Id="DesktopShortcut_Desc"  Value="Створює ярлик програми на робочому столі." />
+  <String Id="ContextMenu_Title" Value="Додати до контекстного меню" />
+  <String Id="ContextMenu_Desc" Value="Додає FFDec до контекстного меню файлів SWF та GFX у Провіднику Windows." />
+  <String Id="DowngradeErrorMessage" Value="Новіша версія [ProductName] вже встановлена." />
+</WixLocalization>

@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="pl-PL">
+  <String Id="GuiLibs_Desc" Value="Interfejs graficzny aplikacji i biblioteki" />
+  <String Id="DesktopShortcut_Title" Value="Skrót na pulpicie" />
+  <String Id="DesktopShortcut_Desc"  Value="Tworzy skrót do aplikacji na pulpicie." />
+  <String Id="ContextMenu_Title" Value="Dodaj do menu kontekstowego" />
+  <String Id="ContextMenu_Desc" Value="Dodaje FFDec do menu kontekstowego plików SWF i GFX w Eksploratorze Windows." />
+  <String Id="DowngradeErrorMessage" Value="Nowsza wersja [ProductName] jest już zainstalowana." />
+</WixLocalization>

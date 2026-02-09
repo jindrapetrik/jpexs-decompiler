@@ -248,7 +248,11 @@
         </jar>
     </target>
     
-    <target name="release" depends="build">
+    <target name="release" depends="build, release-no-dist">
+                     
+    </target>
+    
+    <target name="release-no-dist" depends="-load-version,-timestamp,-suffix">
         <zip destfile="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip">
             <zipfileset file="${dist.dir}/${jar.filename}.jar" filemode="755" fullpath="${jar.filename}.jar"></zipfileset>
             <zipfileset file="${gui.changelog.file}" fullpath="${changelog.file}"></zipfileset>
@@ -257,6 +261,7 @@
             <zipfileset dir="${liblib.dir}" fullpath=""></zipfileset>
         </zip>                
     </target>
+    
     
     <target name="release_javadoc" depends="javadoc,-load-version,-timestamp,-suffix">
         <zip destfile="${releases.dir}/${prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip">

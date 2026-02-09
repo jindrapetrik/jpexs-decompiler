@@ -114,3 +114,7 @@ exported1.all.bin
 /libsrc/substance-fix/nbproject/private/
 /libsrc/substance-fix/build/
 /libsrc/substance-fix/dist/
+wix/bin/
+wix/obj/
+*.msi
+*.wixpdb

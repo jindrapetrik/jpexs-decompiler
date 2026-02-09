@@ -342,7 +342,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes FIXED (Fixed point 16.16) igned value to the stream.
+     * Writes FIXED (Fixed point 16.16) signed value to the stream.
      *
      * @param value FIXED value
      * @throws IOException On I/O error

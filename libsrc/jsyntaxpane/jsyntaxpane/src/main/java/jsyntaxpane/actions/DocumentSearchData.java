@@ -217,6 +217,9 @@ public class DocumentSearchData {
 			return 0;
 		}
                 Matcher matcher = sDoc.getMatcher(getPattern());
+                if (matcher == null) {
+                    return 0;
+                }
                 int count = 0;
                 while (matcher.find()) {
                         count++;

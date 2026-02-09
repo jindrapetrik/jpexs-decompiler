@@ -313,13 +313,13 @@ public class ActionScript2Parser {
         return "" + uniqLast;
     }
 
-    private List<GraphTargetItem> commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private List<GraphTargetItem> commands(boolean inWith, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("commands:");
         }
         GraphTargetItem cmd;
-        while ((cmd = command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval)) != null) {
+        while ((cmd = command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval)) != null) {
             ret.add(cmd);
         }
         if (debugMode) {
@@ -346,13 +346,13 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    /*private GraphTargetItem variable(boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
+    /*private GraphTargetItem variable(boolean inWith, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
      GraphTargetItem ret = null;
      ParsedSymbol s = lex();
      expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
      ret = new VariableActionItem(s.value.toString(), null, false);
      variables.add((VariableActionItem) ret);
-     ret = (member(ret, inFunction, inMethod, variables, functions));
+     ret = (member(ret, inWith, inFunction, inMethod, variables, functions));
      return ret;
      }*/
     private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, ActionParseException {
@@ -401,7 +401,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private List<GraphTargetItem> call(boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         ParsedSymbol s = lex();
@@ -409,7 +409,7 @@ public class ActionScript2Parser {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
             }
-            ret.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+            ret.add(expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
             s = lex();
             expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
         }
@@ -447,7 +447,7 @@ public class ActionScript2Parser {
         Reference<Boolean> subHasEval = new Reference<>(false);
         if (withBody) {
             expectedType(SymbolType.CURLY_OPEN);
-            body = commands(true, isMethod, 0, inTellTarget, subvariables, subfunctions, subHasEval);
+            body = commands(false, true, isMethod, 0, inTellTarget, subvariables, subfunctions, subHasEval);
             expectedType(SymbolType.CURLY_CLOSE);
         }
 
@@ -581,7 +581,7 @@ public class ActionScript2Parser {
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
-                        traits.add(new MyEntry<>(pushConst(ident), expression(false, false, false, true, variables, functions, false, hasEval)));
+                        traits.add(new MyEntry<>(pushConst(ident), expression(false, false, false, false, true, variables, functions, false, hasEval)));
                         traitsStatic.add(isStatic);
                         s = lex();
                     }
@@ -603,29 +603,53 @@ public class ActionScript2Parser {
         }
     }
 
-    private GraphTargetItem expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, int forinlevel, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem expressionCommands(ParsedSymbol s, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, int forinlevel, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
+        if (inWith) {
+            switch (s.type) {
+                case DUPLICATEMOVIECLIP:
+                case GETURL:
+                case GOTOANDSTOP:
+                case GOTOANDPLAY:
+                case NEXTFRAME:
+                case PLAY:
+                case PREVFRAME:
+                case STOP:
+                case UNLOADMOVIE:
+                case UNLOADMOVIENUM:
+                case LOADVARIABLES:
+                case LOADMOVIE:
+                case LOADVARIABLESNUM:
+                case LOADMOVIENUM:
+                case REMOVEMOVIECLIP:
+                    GraphTargetItem functionName = pushConst((String) s.value);
+                    expectedType(SymbolType.PARENT_OPEN);
+                    List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                    return new CallFunctionActionItem(null, null, functionName, args);
+            }
+        }
+
         GraphTargetItem ret = null;
         switch (s.type) {
             case DUPLICATEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem src3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem src3 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem tar3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem tar3 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem dep3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem dep3 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new CloneSpriteActionItem(null, null, src3, tar3, dep3);
                 break;
             case FSCOMMAND:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem command = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem command = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 s = lex();
                 GraphTargetItem parameter = null;
                 if (s.isType(SymbolType.COMMA)) {
-                    parameter = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                    parameter = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -634,12 +658,12 @@ public class ActionScript2Parser {
                 break;
             case FSCOMMAND2:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem arg0 = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem arg0 = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 List<GraphTargetItem> args = new ArrayList<>();
                 args.add(arg0);
                 s = lex();
                 while (s.isType(SymbolType.COMMA)) {
-                    args.add(0, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    args.add(0, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     s = lex();
                 }
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
@@ -647,9 +671,9 @@ public class ActionScript2Parser {
                 break;
             case SET:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem name1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem name1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem value1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem value1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new SetVariableActionItem(null, null, name1, value1);
                 ((SetVariableActionItem) ret).forceUseSet = true;
@@ -657,7 +681,7 @@ public class ActionScript2Parser {
                 break;
             case TRACE:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new TraceActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                ret = new TraceActionItem(null, null, (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
@@ -674,26 +698,26 @@ public class ActionScript2Parser {
                             if (s2.type == SymbolType.PARENT_CLOSE) {
                                 ret = new GetURLActionItem(null, null, urlSymb.value.toString(), targetSymb.value.toString());
                                 break;
-                            } 
+                            }
                             lexer.pushback(s2);
                         }
-                        lexer.pushback(targetSymb);                                                
+                        lexer.pushback(targetSymb);
                     } else if (s.type == SymbolType.PARENT_CLOSE) {
                         ret = new GetURLActionItem(null, null, urlSymb.value.toString(), "");
-                        break;                        
+                        break;
                     }
                     lexer.pushback(s);
-                    lexer.pushback(urlSymb);                    
+                    lexer.pushback(urlSymb);
                 } else {
                     lexer.pushback(s);
                 }
-                GraphTargetItem url = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem url = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 int sendVarsMethod = 0;
                 GraphTargetItem target;
                 if (s.type == SymbolType.COMMA) {
-                    target = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    target = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         s = lex();
@@ -719,7 +743,7 @@ public class ActionScript2Parser {
             case GOTOANDPLAY:
                 SymbolType gtKind = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem gtsFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem gtsFrame = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 int gtsSceneBias = -1;
                 s = lex();
                 if (s.type == SymbolType.COMMA) { //Handle scene?
@@ -729,7 +753,7 @@ public class ActionScript2Parser {
                         throw new ActionParseException("Scene bias must be number", lexer.yyline());
                     }
 
-                    gtsFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                    gtsFrame = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
@@ -777,7 +801,7 @@ public class ActionScript2Parser {
             case UNLOADMOVIENUM:
                 SymbolType unloadType = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem unTargetOrNum = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem unTargetOrNum = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 if (unloadType == SymbolType.UNLOADMOVIE) {
                     ret = new UnLoadMovieActionItem(null, null, unTargetOrNum);
@@ -792,9 +816,9 @@ public class ActionScript2Parser {
             case PRINTNUM:
                 SymbolType printType = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem printTarget = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem printTarget = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem printBBox = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem printBBox = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
 
                 switch (printType) {
@@ -818,9 +842,9 @@ public class ActionScript2Parser {
             case LOADMOVIENUM:
                 SymbolType loadType = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem url2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem url2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem targetOrNum = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem targetOrNum = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
 
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
@@ -856,12 +880,12 @@ public class ActionScript2Parser {
                 break;
             case REMOVEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new RemoveSpriteActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                ret = new RemoveSpriteActionItem(null, null, (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case STARTDRAG:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem dragTarget = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem dragTarget = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 GraphTargetItem lockCenter;
                 GraphTargetItem constrain;
                 GraphTargetItem x1 = null;
@@ -870,20 +894,20 @@ public class ActionScript2Parser {
                 GraphTargetItem y2 = null;
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
-                    lockCenter = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    lockCenter = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         constrain = new DirectValueActionItem(null, null, 0, 1L, new ArrayList<>());
-                        x1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                        x1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
-                            y1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                            y1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                             s = lex();
                             if (s.type == SymbolType.COMMA) {
-                                x2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                                x2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                                 s = lex();
                                 if (s.type == SymbolType.COMMA) {
-                                    y2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                                    y2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                                 } else {
                                     lexer.pushback(s);
                                     y2 = new DirectValueActionItem(null, null, 0, 0L, new ArrayList<>());
@@ -915,7 +939,7 @@ public class ActionScript2Parser {
                 break;
             case CALL:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new CallActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                ret = new CallActionItem(null, null, (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case GETVERSION:
@@ -925,52 +949,52 @@ public class ActionScript2Parser {
                 break;
             case MBORD:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBCharToAsciiActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new MBCharToAsciiActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBCHR:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBAsciiToCharActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new MBAsciiToCharActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBLENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBStringLengthActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new MBStringLengthActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBSUBSTRING:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem val1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem val1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem index1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem index1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem len1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem len1 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new MBStringExtractActionItem(null, null, val1, index1, len1);
                 break;
             case SUBSTRING:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem val2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem val2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem index2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem index2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.COMMA);
-                GraphTargetItem len2 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem len2 = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new StringExtractActionItem(null, null, val2, index2, len2);
                 break;
             case LENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new StringLengthActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new StringLengthActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case RANDOM:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new RandomNumberActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new RandomNumberActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case INT:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ToIntegerActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new ToIntegerActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case NUMBER_OP:
@@ -980,10 +1004,10 @@ public class ActionScript2Parser {
                     lexer.pushback(s);
                     VariableActionItem vi = new VariableActionItem(sopn.value.toString(), null, false);
                     variables.add(vi);
-                    ret = vi; //memberOrCall(vi, inFunction, inMethod, variables, functions);
+                    ret = vi; //memberOrCall(vi, inWith, inFunction, inMethod, variables, functions);
                 } else {
                     expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    ret = new ToNumberActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    ret = new ToNumberActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     expectedType(SymbolType.PARENT_CLOSE);
                 }
                 break;
@@ -994,22 +1018,22 @@ public class ActionScript2Parser {
                     lexer.pushback(s);
                     VariableActionItem vi2 = new VariableActionItem(sop.value.toString(), null, false);
                     variables.add(vi2);
-                    ret = vi2; //memberOrCall(vi2, inFunction, inMethod, variables, functions);
+                    ret = vi2; //memberOrCall(vi2, inWith, inFunction, inMethod, variables, functions);
                 } else {
                     expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    ret = new ToStringActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    ret = new ToStringActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     expectedType(SymbolType.PARENT_CLOSE);
-                    //ret = memberOrCall(ret, inFunction, inMethod, variables, functions);
+                    //ret = memberOrCall(ret, inWith, inFunction, inMethod, variables, functions);
                 }
                 break;
             case ORD:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new CharToAsciiActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new CharToAsciiActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case CHR:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new AsciiToCharActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new AsciiToCharActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case GETTIMER:
@@ -1019,7 +1043,7 @@ public class ActionScript2Parser {
                 break;
             case TARGETPATH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new TargetPathActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                ret = new TargetPathActionItem(null, null, (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             default:
@@ -1055,7 +1079,7 @@ public class ActionScript2Parser {
         }
     }
 
-    private GraphTargetItem command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem command(boolean inWith, boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         GraphTargetItem ret = null;
@@ -1072,7 +1096,7 @@ public class ActionScript2Parser {
                 lexer.removeListener(buf);
                 buf.pushAllBack(lexer);
 
-                ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                ret = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 s = lex();
                 if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
                     lexer.pushback(s);
@@ -1087,16 +1111,16 @@ public class ActionScript2Parser {
             case WITH:
                 int withLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem wvar = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
+                GraphTargetItem wvar = expression(inWith, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
-                List<GraphTargetItem> wcmd = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
+                List<GraphTargetItem> wcmd = commands(true, inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new WithActionItem(null, null, wvar, wcmd);
                 ret.line = withLine;
                 break;
             case DELETE:
-                GraphTargetItem varDel = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
+                GraphTargetItem varDel = expression(inWith, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, null, gm.object, gm.memberName);
@@ -1114,15 +1138,15 @@ public class ActionScript2Parser {
             case TELLTARGET:
                 int tellTargetLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem tellTarget = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem tellTarget = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
-                List<GraphTargetItem> tellcmds = commands(inFunction, inMethod, forinlevel, true, variables, functions, hasEval);
+                List<GraphTargetItem> tellcmds = commands(inWith, inFunction, inMethod, forinlevel, true, variables, functions, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 TellTargetActionItem tt = new TellTargetActionItem(null, null, tellTarget, tellcmds);
                 if (inTellTarget) {
                     tt.nested = true;
-                }                
+                }
                 ret = tt;
                 ret.line = tellTargetLine;
                 break;
@@ -1130,10 +1154,10 @@ public class ActionScript2Parser {
             case IFFRAMELOADED:
                 int ifFrameLoadedLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem iflExpr = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem iflExpr = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
-                List<GraphTargetItem> iflComs = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
+                List<GraphTargetItem> iflComs = commands(inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
                 expectedType(SymbolType.CURLY_CLOSE);
                 ret = new IfFrameLoadedActionItem(iflExpr, iflComs, null, null);
                 ret.line = ifFrameLoadedLine;
@@ -1193,7 +1217,7 @@ public class ActionScript2Parser {
                 }
 
                 if (s.type == SymbolType.ASSIGN) {
-                    GraphTargetItem varval = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    GraphTargetItem varval = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     ret = new VariableActionItem(varIdentifier, varval, true);
                     variables.add((VariableActionItem) ret);
                 } else {
@@ -1203,12 +1227,12 @@ public class ActionScript2Parser {
                 }
                 break;
             case CURLY_OPEN:
-                ret = new BlockItem(DIALECT, null, null, commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval));
+                ret = new BlockItem(DIALECT, null, null, commands(inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval));
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
             case INCREMENT: //preincrement
             case DECREMENT: //predecrement
-                GraphTargetItem varincdec = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
+                GraphTargetItem varincdec = expression(inWith, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 if (s.type == SymbolType.INCREMENT) {
                     ret = new PreIncrementActionItem(null, null, varincdec);
                 } else if (s.type == SymbolType.DECREMENT) {
@@ -1218,7 +1242,7 @@ public class ActionScript2Parser {
             case SUPER: //constructor call
                 ParsedSymbol ss2 = lex();
                 if (ss2.type == SymbolType.PARENT_OPEN) {
-                    List<GraphTargetItem> args = call(inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                    List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
                     VariableActionItem supItem = new VariableActionItem(s.value.toString(), null, false);
                     variables.add(supItem);
                     ret = new CallMethodActionItem(null, null, supItem, new DirectValueActionItem(null, null, 0, Undefined.INSTANCE, constantPool), args);
@@ -1230,16 +1254,16 @@ public class ActionScript2Parser {
             case IF:
                 int ifLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem ifExpr = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem ifExpr = (expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
-                GraphTargetItem onTrue = command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
+                GraphTargetItem onTrue = command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
                 List<GraphTargetItem> onTrueList = new ArrayList<>();
                 onTrueList.add(onTrue);
                 s = lex();
                 List<GraphTargetItem> onFalseList = null;
                 if (s.type == SymbolType.ELSE) {
                     onFalseList = new ArrayList<>();
-                    onFalseList.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                    onFalseList.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 } else {
                     lexer.pushback(s);
                 }
@@ -1250,21 +1274,21 @@ public class ActionScript2Parser {
                 int whileLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
                 List<GraphTargetItem> whileExpr = new ArrayList<>();
-                whileExpr.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
+                whileExpr.add(expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> whileBody = new ArrayList<>();
-                whileBody.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                whileBody.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 ret = new WhileItem(DIALECT, null, null, null, whileExpr, whileBody);
                 ret.line = whileLine;
                 break;
             case DO:
                 int doLine = lexer.yyline();
                 List<GraphTargetItem> doBody = new ArrayList<>();
-                doBody.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                doBody.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 expectedType(SymbolType.WHILE);
                 expectedType(SymbolType.PARENT_OPEN);
                 List<GraphTargetItem> doExpr = new ArrayList<>();
-                doExpr.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
+                doExpr.add(expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new DoWhileItem(DIALECT, null, null, null, doBody, doExpr);
                 ret.line = doLine;
@@ -1327,7 +1351,7 @@ public class ActionScript2Parser {
 
                             variables.add(item);
 
-                            collection = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                            collection = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                             forin = true;
                         } else {
                             lexer.pushback(s3);
@@ -1349,23 +1373,23 @@ public class ActionScript2Parser {
                 GraphTargetItem forExpr = null;
                 List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                 if (!forin) {
-                    GraphTargetItem fc = command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
+                    GraphTargetItem fc = command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
                     if (fc != null) { //can be empty command
                         forFirstCommands.add(fc);
                     }
-                    forExpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                    forExpr = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                     if (forExpr == null) {
                         forExpr = new TrueItem(DIALECT, null, null);
                     }
                     expectedType(SymbolType.SEMICOLON);
-                    GraphTargetItem fcom = command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
+                    GraphTargetItem fcom = command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval);
                     if (fcom != null) {
                         forFinalCommands.add(fcom);
                     }
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> forBody = new ArrayList<>();
-                forBody.add(command(inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, true, variables, functions, hasEval));
+                forBody.add(command(inWith, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, inTellTarget, true, variables, functions, hasEval));
                 if (forin) {
                     ret = new ForInActionItem(null, null, null, item, collection, forBody);
                 } else {
@@ -1376,7 +1400,7 @@ public class ActionScript2Parser {
             case SWITCH:
                 int switchLine = lexer.yyline();
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem switchExpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem switchExpr = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
                 s = lex();
@@ -1397,7 +1421,7 @@ public class ActionScript2Parser {
                 while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                     //List<GraphTargetItem> caseExprs; = new ArrayList<>();
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
-                        GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem(DIALECT) : expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                        GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem(DIALECT) : expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                         //caseExprs.add(curCaseExpr);
                         expectedType(SymbolType.COLON);
                         s = lex();
@@ -1406,7 +1430,7 @@ public class ActionScript2Parser {
                     }
                     pos++;
                     lexer.pushback(s);
-                    List<GraphTargetItem> caseCmd = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
+                    List<GraphTargetItem> caseCmd = commands(inWith, inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
                     caseCmds.add(caseCmd);
                     s = lex();
                 }
@@ -1421,7 +1445,7 @@ public class ActionScript2Parser {
                 ret = new ContinueItem(DIALECT, null, null, 0); //? There is no more than 1 level continue/break in AS1/2
                 break;
             case RETURN:
-                GraphTargetItem retexpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                GraphTargetItem retexpr = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 if (retexpr == null) {
                     retexpr = new DirectValueActionItem(null, null, 0, Undefined.INSTANCE, new ArrayList<>());
                 }
@@ -1430,7 +1454,7 @@ public class ActionScript2Parser {
             case TRY:
                 int tryLine = lexer.yyline();
                 List<GraphTargetItem> tryCommands = new ArrayList<>();
-                tryCommands.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                tryCommands.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 s = lex();
                 boolean found = false;
                 List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
@@ -1451,7 +1475,7 @@ public class ActionScript2Parser {
                     }
                     expectedType(SymbolType.PARENT_CLOSE);
                     List<GraphTargetItem> cc = new ArrayList<>();
-                    cc.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                    cc.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                     catchCommands.add(cc);
                     s = lex();
                     found = true;
@@ -1459,7 +1483,7 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> finallyCommands = null;
                 if (s.type == SymbolType.FINALLY) {
                     finallyCommands = new ArrayList<>();
-                    finallyCommands.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
+                    finallyCommands.add(command(inWith, inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                     found = true;
                     s = lex();
                 }
@@ -1471,7 +1495,7 @@ public class ActionScript2Parser {
                 ret.line = tryLine;
                 break;
             case THROW:
-                ret = new ThrowActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret = new ThrowActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 break;
             case SEMICOLON: //empty command
                 if (debugMode) {
@@ -1489,7 +1513,7 @@ public class ActionScript2Parser {
                 break;
             default:
                 lexer.pushback(s);
-                ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
+                ret = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
         }
         if (debugMode) {
             System.out.println("/command");
@@ -1497,7 +1521,7 @@ public class ActionScript2Parser {
         lexer.removeListener(buf);
         if (ret == null) {  //can be popped expression
             buf.pushAllBack(lexer);
-            ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+            ret = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
         }
         s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
@@ -1508,18 +1532,18 @@ public class ActionScript2Parser {
 
     }
 
-    private GraphTargetItem expression(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowComma, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem expression(boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowComma, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("expression:");
         }
         List<GraphTargetItem> commaItems = new ArrayList<>();
         ParsedSymbol symb;
         do {
-            GraphTargetItem prim = expressionPrimary(false, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, true, hasEval);
+            GraphTargetItem prim = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, true, hasEval);
             if (prim == null) {
                 return null;
             }
-            GraphTargetItem expr = expression1(prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, hasEval);
+            GraphTargetItem expr = expression1(prim, GraphTargetItem.NOPRECEDENCE, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, hasEval);
             commaItems.add(expr);
             symb = lex();
         } while (allowComma && symb != null && symb.type == SymbolType.COMMA);
@@ -1568,7 +1592,7 @@ public class ActionScript2Parser {
         return s.type.getPrecedence();
     }
 
-    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op;
         GraphTargetItem rhs;
         GraphTargetItem mhs = null;
@@ -1588,14 +1612,14 @@ public class ActionScript2Parser {
                 if (debugMode) {
                     System.out.println("ternar-middle:");
                 }
-                mhs = expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval);
+                mhs = expression(inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval);
                 expectedType(SymbolType.COLON);
                 if (debugMode) {
                     System.out.println("/ternar-middle");
                 }
             }
 
-            rhs = expressionPrimary(allowRemainder, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, true, hasEval);
+            rhs = expressionPrimary(allowRemainder, inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, true, hasEval);
             if (rhs == null) {
                 throw new ActionParseException("Missing operand", lexer.yyline());
                 //lexer.pushback(op);
@@ -1605,7 +1629,7 @@ public class ActionScript2Parser {
             lookahead = peekLex();
             while ((isBinaryOperator(lookahead) && getSymbPrecedence(lookahead) < /* > on wiki */ getSymbPrecedence(op))
                     || (lookahead.type.isRightAssociative() && getSymbPrecedence(lookahead) == getSymbPrecedence(op))) {
-                rhs = expression1(rhs, getSymbPrecedence(lookahead), inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, hasEval);
+                rhs = expression1(rhs, getSymbPrecedence(lookahead), inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, hasEval);
                 lookahead = peekLex();
             }
 
@@ -1798,7 +1822,7 @@ public class ActionScript2Parser {
         return (item instanceof VariableActionItem);
     }
 
-    private int brackets(List<GraphTargetItem> ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private int brackets(List<GraphTargetItem> ret, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1809,7 +1833,7 @@ public class ActionScript2Parser {
                     lexer.pushback(s);
                 }
                 arrCnt++;
-                ret.add(expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                ret.add(expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 s = lex();
                 if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
                     expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
@@ -1822,9 +1846,9 @@ public class ActionScript2Parser {
         return arrCnt;
     }
 
-    private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (s.value.equals("not")) {
-            ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+            ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
         } else {
             String varName = s.value.toString();
             /*if (s.type == SymbolType.PATH) { //only with slash syntax
@@ -1845,7 +1869,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1865,15 +1889,15 @@ public class ActionScript2Parser {
                         ret = new UnresolvedConstantActionItem((int) (long) (Long) s.value);
                         break;
                     case "enumerate":
-                        ret = new EnumerateActionItem(null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
+                        ret = new EnumerateActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
                         break;
                     //Both ASs
                     case "dup":
-                        ret = new DuplicateItem(DIALECT, null, null, expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval), 0);
+                        ret = new DuplicateItem(DIALECT, null, null, expression(inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval), 0);
                         allowMemberOrCall = true;
                         break;
                     case "push":
-                        ret = new PushItem(expression(inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
+                        ret = new PushItem(expression(inWith, inFunction, inMethod, inTellTarget, allowRemainder, variables, functions, false, hasEval));
                         break;
                     case "pop":
                         ret = new PopItem(DIALECT, null, null);
@@ -1897,7 +1921,7 @@ public class ActionScript2Parser {
                 break;
             case NEGATE:
                 versionRequired(s, 5);
-                ret = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
+                ret = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
                 ret = new BitXorActionItem(null, null, ret, new DirectValueActionItem(4.294967295E9));
 
                 break;
@@ -1911,7 +1935,7 @@ public class ActionScript2Parser {
 
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem num = expressionPrimary(false, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
+                    GraphTargetItem num = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
                     if ((num instanceof DirectValueActionItem)
                             && (((DirectValueActionItem) num).value instanceof Long)) {
                         ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
@@ -1935,7 +1959,7 @@ public class ActionScript2Parser {
                 }
                 break;
             case TYPEOF:
-                ret = new TypeOfActionItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+                ret = new TypeOfActionItem(null, null, expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
                 allowMemberOrCall = true;
                 break;
             case TRUE:
@@ -1966,7 +1990,7 @@ public class ActionScript2Parser {
                     expectedIdentifier(s, lexer.yyline());
                     objectNames.add(0, pushConst((String) s.value));
                     expectedType(SymbolType.COLON);
-                    objectValues.add(0, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    objectValues.add(0, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                     s = lex();
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
                         expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
@@ -1978,7 +2002,7 @@ public class ActionScript2Parser {
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
                 List<GraphTargetItem> inBrackets = new ArrayList<>();
-                int arrCnt = brackets(inBrackets, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                int arrCnt = brackets(inBrackets, inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
                 ret = new InitArrayActionItem(null, null, inBrackets);
                 allowMemberOrCall = true;
                 break;
@@ -2007,7 +2031,7 @@ public class ActionScript2Parser {
                 allowMemberOrCall = true;
                 break;
             case DELETE:
-                GraphTargetItem varDel = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
+                GraphTargetItem varDel = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, null, gm.object, gm.memberName);
@@ -2020,7 +2044,7 @@ public class ActionScript2Parser {
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                GraphTargetItem prevar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
+                GraphTargetItem prevar = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
                 if (s.type == SymbolType.INCREMENT) {
                     ret = new PreIncrementActionItem(null, null, prevar);
                 }
@@ -2030,11 +2054,11 @@ public class ActionScript2Parser {
 
                 break;
             case NOT:
-                ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+                ret = new NotItem(DIALECT, null, null, expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
 
                 break;
             case PARENT_OPEN:
-                GraphTargetItem pexpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
+                GraphTargetItem pexpr = expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
                 if (pexpr == null) {
                     throw new ActionParseException("Expression expected", lexer.yyline());
                 }
@@ -2043,7 +2067,7 @@ public class ActionScript2Parser {
                 allowMemberOrCall = true;
                 break;
             case NEW:
-                GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
+                GraphTargetItem newvar = expressionPrimary(false, inWith, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 if (newvar instanceof ToNumberActionItem) {
                     List<GraphTargetItem> args = new ArrayList<>();
                     if (((ToNumberActionItem) newvar).value != null) {
@@ -2060,12 +2084,12 @@ public class ActionScript2Parser {
 
                     GetMemberActionItem ca = (GetMemberActionItem) newvar;
                     expectedType(SymbolType.PARENT_OPEN);
-                    List<GraphTargetItem> args = call(inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                    List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
                     ret = new NewMethodActionItem(null, null, ca.object, ca.memberName, args);
                 } else if (newvar instanceof VariableActionItem) {
                     VariableActionItem cf = (VariableActionItem) newvar;
                     expectedType(SymbolType.PARENT_OPEN);
-                    List<GraphTargetItem> args = call(inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                    List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
                     ret = new NewObjectActionItem(null, null, pushConst(cf.getVariableName()), args);
                 } else {
                     throw new ActionParseException("Invalid new item", lexer.yyline());
@@ -2075,10 +2099,10 @@ public class ActionScript2Parser {
                 break;
             case EVAL:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem evar = new EvalActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem evar = new EvalActionItem(null, null, expression(inWith, inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 hasEval.setVal(true);
-                //evar = memberOrCall(evar, inFunction, inMethod, variables, functions);
+                //evar = memberOrCall(evar, inWith, inFunction, inMethod, variables, functions);
                 ret = evar;
                 allowMemberOrCall = true;
 
@@ -2087,7 +2111,7 @@ public class ActionScript2Parser {
             case THIS:
             case SUPER:
                 Reference<Boolean> allowMemberOrCallRef = new Reference<>(allowMemberOrCall);
-                ret = handleVariable(s, ret, variables, allowMemberOrCallRef, inFunction, inMethod, inTellTarget, functions, hasEval);
+                ret = handleVariable(s, ret, variables, allowMemberOrCallRef, inWith, inFunction, inMethod, inTellTarget, functions, hasEval);
                 allowMemberOrCall = allowMemberOrCallRef.getVal();
 
                 break;
@@ -2098,14 +2122,14 @@ public class ActionScript2Parser {
                     ParsedSymbol s2 = peekLex();
                     if (s2.type != SymbolType.PARENT_OPEN) {
                         Reference<Boolean> allowMemberOrCallRef2 = new Reference<>(allowMemberOrCall);
-                        ret = handleVariable(s, ret, variables, allowMemberOrCallRef2, inFunction, inMethod, inTellTarget, functions, hasEval);
+                        ret = handleVariable(s, ret, variables, allowMemberOrCallRef2, inWith, inFunction, inMethod, inTellTarget, functions, hasEval);
                         allowMemberOrCall = allowMemberOrCallRef2.getVal();
                         isGlobalFuncVar = true;
                     }
                 }
 
                 if (!isGlobalFuncVar) {
-                    GraphTargetItem excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, -1, variables, functions, hasEval);
+                    GraphTargetItem excmd = expressionCommands(s, inWith, inFunction, inMethod, inTellTarget, -1, variables, functions, hasEval);
                     if (excmd != null) {
                         //?
                         ret = excmd;
@@ -2117,7 +2141,7 @@ public class ActionScript2Parser {
         }
 
         if (allowMemberOrCall && ret != null) {
-            ret = memberOrCall(ret, inFunction, inMethod, inTellTarget, variables, functions, allowCall, hasEval);
+            ret = memberOrCall(ret, inWith, inFunction, inMethod, inTellTarget, variables, functions, allowCall, hasEval);
         }
         if (debugMode) {
             System.out.println("/primary");
@@ -2153,14 +2177,14 @@ public class ActionScript2Parser {
         return false;
     }
 
-    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
+    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inWith, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
                 if (!allowCall) {
                     break;
                 }
-                List<GraphTargetItem> args = call(inFunction, inMethod, inTellTarget, variables, functions, hasEval);
+                List<GraphTargetItem> args = call(inWith, inFunction, inMethod, inTellTarget, variables, functions, hasEval);
                 if (isCastOp(ret) && args.size() == 1) {
                     ret = new CastOpActionItem(null, null, ret, args.get(0));
                 } else if (ret instanceof GetMemberActionItem) {
@@ -2190,7 +2214,7 @@ public class ActionScript2Parser {
                 }
             }
             if (op.type == SymbolType.BRACKET_OPEN) {
-                GraphTargetItem rhs = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
+                GraphTargetItem rhs = expression(inWith, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 ret = new GetMemberActionItem(null, null, ret, rhs);
                 expectedType(SymbolType.BRACKET_CLOSE);
             }
@@ -2234,7 +2258,7 @@ public class ActionScript2Parser {
         int index = constantPool.indexOf(s);
         if (index == -1) {
             int newItemLen = ActionConstantPool.calculateSize(s, charset);
-            if (constantPool.size() < 0xffff 
+            if (constantPool.size() < 0xffff
                     && constantPoolLength + newItemLen <= 0xffff) {
                 // constant pool is not full
                 constantPool.add(s);
@@ -2253,9 +2277,9 @@ public class ActionScript2Parser {
     private ActionScriptLexer lexer = null;
 
     private List<String> constantPool;
-    
+
     private int constantPoolLength = 2; //ActionConstantPool starts with UI16 constant count
-    
+
     /**
      * Convert a string to a high-level model.
      *
@@ -2451,7 +2475,7 @@ public class ActionScript2Parser {
         List<VariableActionItem> vars = new ArrayList<>();
         List<FunctionActionItem> functions = new ArrayList<>();
         Reference<Boolean> hasEval = new Reference<>(false);
-        retTree.addAll(commands(false, false, 0, false, vars, functions, hasEval));
+        retTree.addAll(commands(false, false, false, 0, false, vars, functions, hasEval));
         for (VariableActionItem v : vars) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();

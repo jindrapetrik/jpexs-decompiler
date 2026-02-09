@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
@@ -125,6 +127,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     return;
                 }
             }
+            if (((IncrementActionItem) value).object instanceof EvalActionItem) {
+                if (((IncrementActionItem) value).object.value instanceof DuplicateItem) {
+                    if (((IncrementActionItem) value).object.value.value == name) {                        
+                        output.add(new PostIncrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
+                        return;
+                    }
+                }
+            }
         }
         if (value instanceof DecrementActionItem) {
             if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
@@ -134,6 +144,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     }
                     output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
                     return;
+                }
+            }
+            if (((DecrementActionItem) value).object instanceof EvalActionItem) {
+                if (((DecrementActionItem) value).object.value instanceof DuplicateItem) {
+                    if (((DecrementActionItem) value).object.value.value == name) {                        
+                        output.add(new PostDecrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
+                        return;
+                    }
                 }
             }
         }
@@ -154,6 +172,13 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                         setVar.setCompoundValue(binaryOp.getRightSide());
                         setVar.setCompoundOperator(binaryOp.getOperator());
                     }
+                } else if (
+                        binaryOp.getLeftSide() instanceof EvalActionItem
+                        && binaryOp.getLeftSide().value instanceof DuplicateItem
+                        && binaryOp.getLeftSide().value.value == name
+                ) {
+                    setVar.setCompoundValue(binaryOp.getRightSide());
+                    setVar.setCompoundOperator(binaryOp.getOperator());
                 }
             }
         }

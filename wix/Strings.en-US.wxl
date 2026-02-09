@@ -1,0 +1,8 @@
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
+  <String Id="GuiLibs_Desc" Value="Application GUI and Libraries." />
+  <String Id="DesktopShortcut_Title" Value="Desktop shortcut" />
+  <String Id="DesktopShortcut_Desc" Value="Creates shortcut of the application on the desktop." />
+  <String Id="ContextMenu_Title" Value="Add to context menu" />
+  <String Id="ContextMenu_Desc" Value="Adds FFDec to context menu of SWF and GFX files in Windows Explorer." />
+  <String Id="DowngradeErrorMessage" Value="A newer version of [ProductName] is already installed." />
+</WixLocalization>

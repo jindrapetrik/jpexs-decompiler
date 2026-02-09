@@ -65,7 +65,13 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import com.jpexs.images.apng.AnimatedPngDecoder;
+import com.jpexs.images.apng.AnimatedPngEncoder;
+import com.jpexs.images.apng.data.AnimatedPngData;
+import com.jpexs.images.apng.data.AnimationFrameData;
 import dev.matrixlab.webp4j.WebPCodec;
+import dev.matrixlab.webp4j.animation.AnimatedWebPEncoder;
+import dev.matrixlab.webp4j.gif.GifToWebPConfig;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
@@ -149,6 +155,9 @@ public class FrameExporter {
             case PNG:
                 fem = FrameExportMode.PNG;
                 break;
+            case APNG:
+                fem = FrameExportMode.APNG;
+                break;
             case GIF:
                 fem = FrameExportMode.GIF;
                 break;
@@ -169,6 +178,9 @@ public class FrameExporter {
                 break;
             case WEBP:
                 fem = FrameExportMode.WEBP;
+                break;
+            case WEBP_ANIMATED:
+                fem = FrameExportMode.WEBP_ANIMATED;
                 break;
             case SWF:
                 fem = FrameExportMode.SWF;
@@ -247,9 +259,9 @@ public class FrameExporter {
             int max = subFrameMode ? subframeLength : fframes.size();
 
             int fframe = subFrameMode ? fframes.get(0) : fframes.get(pos++);
-            RECT diplayRect = tim.getDisplayRectWithFilters();
-            int realAaScale = Configuration.calculateRealAaScale(diplayRect.getWidth(), diplayRect.getHeight(), settings.zoom, settings.aaScale);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, diplayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
+            RECT displayRect = tim.getDisplayRectWithFilters();
+            int realAaScale = Configuration.calculateRealAaScale(displayRect.getWidth(), displayRect.getHeight(), settings.zoom, settings.aaScale);
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }
@@ -323,13 +335,12 @@ public class FrameExporter {
         }
 
         if (settings.mode == FrameExportMode.SVG) {
-            
+
             FontNormalizer normalizer = new FontNormalizer();
             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
 
-            
             int max = frames.size();
             if (subFramesLength > 1) {
                 max = subFramesLength;
@@ -501,7 +512,7 @@ public class FrameExporter {
 
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             try {
-                                new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
+                                new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false, null);
                             } catch (ActionParseException ex) {
                                 Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -519,7 +530,7 @@ public class FrameExporter {
 
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                                 try {
-                                    new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
+                                    new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false, null);
                                 } catch (ActionParseException ex) {
                                     Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }
@@ -533,8 +544,8 @@ public class FrameExporter {
         }
 
         final Color fbackgroundColor = backgroundColor;
-        final boolean usesTransparency = settings.mode == FrameExportMode.PNG 
-                || settings.mode == FrameExportMode.GIF 
+        final boolean usesTransparency = settings.mode == FrameExportMode.PNG
+                || settings.mode == FrameExportMode.GIF
                 || settings.mode == FrameExportMode.WEBP;
         final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
@@ -545,6 +556,26 @@ public class FrameExporter {
                     new RetryTask(() -> {
                         File f = new File(foutdir + File.separator + "frames.gif");
                         makeGIF(frameImages, swf.frameRate, f, evl);
+                        ret.add(f);
+                    }, handler).run();
+                }
+                break;
+            case WEBP_ANIMATED:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.webp");
+                        makeAnimatedWebP(frameImages, swf.frameRate, f, evl);
+                        ret.add(f);
+                    }, handler).run();
+                }
+                break;
+            case APNG:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.png");
+                        makeAnimatedPng(frameImages, swf.frameRate, f, evl);
                         ret.add(f);
                     }, handler).run();
                 }
@@ -608,12 +639,12 @@ public class FrameExporter {
                 if (frameImages.hasNext()) {
                     for (File foutdir : foutdirs) {
                         new RetryTask(() -> {
-                            
+
                             FontNormalizer normalizer = new FontNormalizer();
                             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
                             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
                             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
-                            
+
                             File f = new File(foutdir + File.separator + "frames.pdf");
                             PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
                             PageFormat pf = new PageFormat();
@@ -662,7 +693,7 @@ public class FrameExporter {
                                             return compositeGraphics;
                                         }
                                         final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);                                        
+                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
                                         ((DualPdfGraphics2D) compositeGraphics).setNormalizedFonts(normalizedFonts, normalizedTexts);
                                         return compositeGraphics;
                                     }
@@ -815,6 +846,61 @@ public class FrameExporter {
         }
 
         encoder.finish();
+    }
+
+    public static void makeAnimatedPng(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
+        
+        List<AnimationFrameData> frames = new ArrayList<>();
+        
+        int delayNumerator = 1000;
+        int delayDenominator = Math.round(1000 * frameRate);
+        int width = 0;
+        int height = 0;
+        BufferedImage backupImage = null;
+        while (images.hasNext()) {
+            BufferedImage img = images.next();
+            if (img == null) {
+                break;
+            }
+            if (backupImage == null) {
+                backupImage = img;
+            }
+            width = img.getWidth();
+            height = img.getHeight();
+            frames.add(new AnimationFrameData(img, delayNumerator, delayDenominator));
+        }
+        AnimatedPngData data = new AnimatedPngData(width, height, 0, backupImage, frames);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            AnimatedPngEncoder.encode(data, fos);
+        }
+    }
+    
+    public static void makeAnimatedWebP(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
+        GifToWebPConfig config = GifToWebPConfig.createLosslessConfig();
+        List<BufferedImage> allImages = new ArrayList<>();
+        List<Integer> delays = new ArrayList<>();
+        int lastTime = 0;
+        while (images.hasNext()) {
+            BufferedImage img = images.next();
+            if (img == null) {
+                break;
+            }
+            allImages.add(img);
+            int timeAfter = (int) Math.round(allImages.size() * frameRate);
+            int delay = timeAfter - lastTime;
+            lastTime = timeAfter;
+            delays.add(delay);
+        }
+        int[] delaysInt = new int[delays.size()];
+        for (int i = 0; i < delays.size(); i++) {
+            delaysInt[i] = delays.get(i);
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            byte[] data = WebPCodec.createAnimatedWebP(allImages, delaysInt, config);
+            fos.write(data);
+            fos.flush();
+        }
     }
 
     public static void makeGIFOld(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
