@@ -86,7 +86,7 @@
 					<li>#2575 dumpSWF CLI command displayed import assets GUI dialog</li>
 					<li>#2573 AS3 - Incorrect uint/int/Number coercion</li>
 					<li>AS3 local registers type propagation</li>
-					<li>#2566, #2594 Export bounds of sprites and buttons not containg filter offsets</li>
+					<li>#2566, #2594 Export bounds of sprites and buttons not containing filter offsets</li>
 					<li>#2582 Font normalizer setting small texts when no assigned glyph found</li>
 					<li>PDF export - not rendering video stream frames</li>
 					<li>#2585 AS1/2 direct editation - continue and break in for..in loop</li>

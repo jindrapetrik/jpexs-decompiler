@@ -1746,7 +1746,7 @@ public class CommandLineArgumentParser {
                 subLen = 1;
             }
             return subLen;
-        } catch (NumberFormatException nre) {
+        } catch (NumberFormatException nfe) {
             System.err.println("Invalid sub length");
             badArguments("sublength");
         }

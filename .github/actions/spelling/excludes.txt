@@ -129,3 +129,6 @@ Lexer\.java$
 ^wix/
 ^cert/
 ^versioninfo\.rc$
+\.flv$
+\.yml$
+(?:^|/)build\.xml$

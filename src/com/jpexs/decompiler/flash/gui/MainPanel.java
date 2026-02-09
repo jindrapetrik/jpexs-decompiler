@@ -4937,16 +4937,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         List<Tag> tagsToRemove = new ArrayList<>();
-        loopt: for (Tag tag : swf.getTags()) {
+        loopTags: for (Tag tag : swf.getTags()) {
             if (tag instanceof CharacterTag) {
                 CharacterTag characterTag = (CharacterTag) tag;
                 for (String cls : characterTag.getClassNames()) {
                     if (neededClasses.contains(cls)) {
-                        continue loopt;
+                        continue loopTags;
                     }
                 }
                 if (needed.contains(characterTag.getCharacterId())) {
-                    continue loopt;
+                    continue loopTags;
                 }
                 tagsToRemove.add(tag);
             }

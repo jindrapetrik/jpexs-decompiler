@@ -138,6 +138,7 @@ apgeneratedsrcdir
 APICOM
 apiprivate
 apiversioning
+apng
 appdata
 apperr
 applytype
@@ -161,6 +162,7 @@ asasm
 ascentdescentleading
 asciitochar
 asclass
+asclassmain
 asconfig
 asdec
 asdoc
@@ -373,6 +375,7 @@ buildlog
 BUILDNUMBER
 buildtime
 BUILTAT
+bundleswc
 buttoncondaction
 buttonicon
 BUTTONRECORD
@@ -875,6 +878,7 @@ downmix
 downmixing
 DOWNRESULT
 downsampling
+downscaling
 DOYOU
 dpd
 DPLAY
@@ -2236,6 +2240,8 @@ mohlo
 MONIKERALREADYREGISTERED
 montemedia
 Morphed
+morphduration
+morphnumframes
 MORPHFILLSTYLE
 MORPHFILLSTYLEARRAY
 MORPHFOCALGRADIENT
@@ -2717,6 +2723,7 @@ pcnt
 pcode
 PCodec
 pcodehex
+PConfig
 pcr
 pctzoom
 pdata
@@ -3462,6 +3469,7 @@ subdata
 subdiv
 subframes
 subkeys
+sublength
 sublimiter
 subloader
 submethod
@@ -3555,6 +3563,7 @@ TControl
 TCPDF
 tcr
 TCurrent
+tdef
 TDN
 techno
 techsmith
@@ -3761,6 +3770,7 @@ typevalue
 ubits
 ucf
 udata
+UFIXED
 uin
 uinteger
 UIPI

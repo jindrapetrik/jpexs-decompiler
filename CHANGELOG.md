@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file.
 - [#2575] dumpSWF CLI command displayed import assets GUI dialog
 - [#2573] AS3 - Incorrect uint/int/Number coercion
 - AS3 local registers type propagation
-- [#2566], [#2594] Export bounds of sprites and buttons not containg filter offsets
+- [#2566], [#2594] Export bounds of sprites and buttons not containing filter offsets
 - [#2582] Font normalizer setting small texts when no assigned glyph found
 - PDF export - not rendering video stream frames
 - [#2585] AS1/2 direct editation - continue and break in for..in loop

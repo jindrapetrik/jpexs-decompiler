@@ -21,9 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.helpers.Reference;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -64,7 +62,7 @@ public abstract class BaseLocalData {
     public Reference<Integer> maxTempIndex = new Reference<>(0);
     
     /**
-     * Wheter goto statements were used
+     * Whether goto statements were used
      */
     public Reference<Boolean> gotosUsed = new Reference<>(false);
     

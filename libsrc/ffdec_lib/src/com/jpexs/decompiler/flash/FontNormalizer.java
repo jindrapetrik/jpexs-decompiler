@@ -106,19 +106,19 @@ public class FontNormalizer {
 
         for (TextTag text : texts.values()) {
             if (text instanceof DefineEditTextTag) {
-                DefineEditTextTag detext = (DefineEditTextTag) text;
-                fontIds.addAll(getDefineEditTextFonts(detext));
+                DefineEditTextTag defineEditText = (DefineEditTextTag) text;
+                fontIds.addAll(getDefineEditTextFonts(defineEditText));
             }
 
             if (text instanceof StaticTextTag) {
-                StaticTextTag stext = (StaticTextTag) text;
+                StaticTextTag staticText = (StaticTextTag) text;
                 boolean inverted = false;
-                if (stext.textMatrix != null) {
-                    if (stext.textMatrix.scaleY < 0) {
+                if (staticText.textMatrix != null) {
+                    if (staticText.textMatrix.scaleY < 0) {
                         inverted = true;
                     }
                 }
-                for (TEXTRECORD rec : stext.textRecords) {
+                for (TEXTRECORD rec : staticText.textRecords) {
                     if (rec.styleFlagsHasFont) {
                         if (inverted) {
                             invertedFontIds.add(rec.fontId);
