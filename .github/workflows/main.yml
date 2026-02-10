@@ -527,7 +527,7 @@ jobs:
           
       - name: Verify ffdec.jar signature
         shell: pwsh
-        run: jarsigner.exe -verify -strict dist/ffdec-signed.jar
+        run: jarsigner.exe -verify -strict dist/ffdec.jar
           
       - name: Upload signed JAR artifact
         uses: actions/upload-artifact@v4
