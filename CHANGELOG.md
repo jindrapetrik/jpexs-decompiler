@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - Slovak translation (AI used)
 - APNG (animated PNG) export for frames, sprites and morphshapes
 - Context menu association icon
-- Windows installer (MSI) and ffdec.exe are signed
+- Windows installer (MSI), ffdec.exe, ffdec.jar and ffdec_lib.jar are signed
 - ffdec.exe contains version information (+ on SplashScreen)
 
 ### Fixed
