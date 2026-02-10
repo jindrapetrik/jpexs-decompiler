@@ -523,7 +523,7 @@ jobs:
         run: |
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
           java -cp altsigner\target\kms-jarsigner-1.0.jar com.jpexs.kmsjarsigner.SignJar dist/ffdec.jar dist/ffdec-signed.jar cert/cert-chain.pem $kc http://timestamp.sectigo.com 
-          move dist/ffdec-signed.jar dist/ffdec.jar
+          move dist/ffdec-signed.jar dist/ffdec.jar -Force
           
       - name: Verify ffdec.jar signature
         shell: pwsh
@@ -540,7 +540,7 @@ jobs:
         run: |
           $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
           java -cp altsigner\target\kms-jarsigner-1.0.jar com.jpexs.kmsjarsigner.SignJar libsrc/ffdec_lib/dist/ffdec_lib.jar libsrc/ffdec_lib/dist/ffdec_lib-signed.jar cert/cert-chain.pem $kc http://timestamp.sectigo.com 
-          move libsrc/ffdec_lib/dist/ffdec_lib-signed.jar libsrc/ffdec_lib/dist/ffdec_lib.jar
+          move libsrc/ffdec_lib/dist/ffdec_lib-signed.jar libsrc/ffdec_lib/dist/ffdec_lib.jar -Force
       
       - name: Verify ffdec_lib.jar signature
         shell: pwsh
