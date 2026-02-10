@@ -448,7 +448,7 @@ jobs:
       - name: Download lib_dist artifact
         uses: actions/download-artifact@v4
         with:
-          name: dist_lib
+          name: lib_dist
           path: libsrc/ffdec_lib/dist/
         
       - name: Download unsigned EXE artifact
