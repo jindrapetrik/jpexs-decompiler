@@ -118,3 +118,4 @@ wix/bin/
 wix/obj/
 *.msi
 *.wixpdb
+/altsigner/target/

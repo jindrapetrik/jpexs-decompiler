@@ -256,6 +256,9 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                 if (chId != -1) {
                     ch = swf.getCharacter(chId);
                 }
+                if (swf.getCyclicCharacters().contains(chId)) {
+                    continue;
+                }
                 if (chClass != null) {
                     ch = swf.getCharacterByClass(chClass);
                 }

@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - Slovak translation (AI used)
 - APNG (animated PNG) export for frames, sprites and morphshapes
 - Context menu association icon
-- Windows installer (MSI) and ffdec.exe are signed
+- Windows installer (MSI), ffdec.exe, ffdec.jar and ffdec_lib.jar are signed
 - ffdec.exe contains version information (+ on SplashScreen)
 
 ### Fixed
@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Slovenian translation
 - [#2626] AS1/2 direct editation - function calls inside `with` statement
 - [#2618] AS1/2 increment/decrement/compound using PushDuplicate
+- [#2611], [#2627] StackOverFlow on opening SWF containing cyclic sprites
 
 ### Changed
 - [#2610] Export as SWF - take SWF bounds from the exported item bounds
@@ -3931,8 +3932,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.0.0...dev
-[25.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...version25.0.0
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...dev
 [24.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.1...version24.1.2
 [24.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.0...version24.1.1
 [24.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.0.1...version24.1.0
@@ -4111,6 +4111,8 @@ Major version of SWF to XML export changed to 2.
 [#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2626]: https://www.free-decompiler.com/flash/issues/2626
 [#2618]: https://www.free-decompiler.com/flash/issues/2618
+[#2611]: https://www.free-decompiler.com/flash/issues/2611
+[#2627]: https://www.free-decompiler.com/flash/issues/2627
 [#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
 [#2154]: https://www.free-decompiler.com/flash/issues/2154
