@@ -797,8 +797,8 @@ jobs:
           name: signed_lib_jar
           path: libsrc/ffdec_lib/dist/
           
-    - name: Copy signed ffdec_lib.jar to lib main dir
-      run: cp libsrc/ffdec_lib/dist/ffdec_lib.jar lib/ffdec_lib.jar        
+    - name: Copy signed ffdec_lib.jar to dist/lib dir
+      run: cp libsrc/ffdec_lib/dist/ffdec_lib.jar dist/lib/ffdec_lib.jar
           
     - name: Download signed EXE artifact
       uses: actions/download-artifact@v4
