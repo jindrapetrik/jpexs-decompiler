@@ -31,7 +31,9 @@ import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InContinue;
 import com.jpexs.debugger.flash.messages.in.InErrorException;
+import com.jpexs.debugger.flash.messages.in.InExit;
 import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.debugger.flash.messages.in.InGetSwf;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InPlaceObject;
@@ -43,6 +45,7 @@ import com.jpexs.debugger.flash.messages.in.InTrace;
 import com.jpexs.debugger.flash.messages.in.InVersion;
 import com.jpexs.debugger.flash.messages.out.OutAddWatch2;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
+import com.jpexs.debugger.flash.messages.out.OutGetSwf;
 import com.jpexs.debugger.flash.messages.out.OutPlay;
 import com.jpexs.debugger.flash.messages.out.OutProcessedTag;
 import com.jpexs.debugger.flash.messages.out.OutRewind;
@@ -51,7 +54,11 @@ import com.jpexs.debugger.flash.messages.out.OutSwfInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Helper;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +79,7 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public class DebuggerHandler implements DebugConnectionListener {
-
+    
     private boolean connected = false;
 
     private DebuggerCommands commands = null;
@@ -586,15 +593,13 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
     }
 
-    public void disconnect() {
+    
+    private void disconnected() {
         frame = null;
         pool = null;
         breakInfo = null;
         breakReason = null;
         connected = false;
-        if (commands != null) {
-            commands.disconnect();
-        }
         commands = null;
         synchronized (this) {
             for (SWF debuggedSwf : debuggedSwfs) {
@@ -630,6 +635,18 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         debuggedSwfs.clear();
     }
+    
+    public void disconnect() {
+        frame = null;
+        pool = null;
+        breakInfo = null;
+        breakReason = null;
+        connected = false;
+        if (commands != null) {
+            commands.disconnect();
+        }
+        disconnected();        
+    }
 
     public synchronized boolean isConnected() {
         return connected;
@@ -659,10 +676,6 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     @Override
     public void connected(DebuggerConnection con) {
-        /*for (SWF debuggedSwf : debuggedSwfs) {
-            makeBreakPointsUnconfirmed(debuggedSwf);
-        }*/
-
         Main.startWork(AppStrings.translate("work.debugging"), null);
 
         synchronized (this) {
@@ -701,7 +714,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         final Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$");
         final Pattern patAS3PCode = Pattern.compile("^(?<hash>[0-9a-z_]+):#PCODE abc:(?<abc>[0-9]+),script:(?<script>[0-9]+),class:(?<class>-?[0-9]+),trait:(?<trait>-?[0-9]+),method:(?<method>[0-9]+),body:(?<body>[0-9]+);(.*)$");
 
-        boolean isAS3 = Main.getRunningSWF().isAS3();
+        //boolean isAS3 = Main.getRunningSWF().isAS3();
         try {
 
             con.addMessageListener(new DebugMessageListener<InErrorException>() {
@@ -811,16 +824,26 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setGetterTimeout(1500);
             commands.setSetterTimeout(5000);
 
-            con.isAS3 = isAS3;
-
             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines
-            if (isAS3) {
-                con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
-                if (con.wideLines) {
-                    commands.setOption("wide_line_debugger", "on");
-                }
-            }
+            /*if (isAS3) {
+                
+            }*/
             commands.squelch(true);
+            
+            con.addMessageListener(new DebugMessageListener<InExit>() {
+                @Override
+                public void message(InExit t) {   
+                    Logger.getLogger(DebuggerHandler.class.getName()).fine("Handling inExit");
+                    //con.dropMessage(t);
+                    synchronized (DebuggerHandler.this) {
+                        paused = false;
+                        connected = false;
+                    }
+                    Logger.getLogger(DebuggerHandler.class.getName()).fine("Calling disconnected");
+                    disconnected();
+                    Logger.getLogger(DebuggerHandler.class.getName()).fine("Disconnected called");                    
+                }                
+            });
 
             con.writeMessage(new OutSwfInfo(con, 0));
             con.addMessageListener(new DebugMessageListener<InSwfInfo>() {
@@ -840,6 +863,57 @@ public class DebuggerHandler implements DebugConnectionListener {
                         });
                     }*/
                     con.dropMessage(t);
+                    View.execInEventDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (InSwfInfo.SwfInfo s : t.swfInfos) {
+                                try {
+                                    /*try {
+                                    con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
+                                    con.sendMessageWithTimeout(new OutGetSwd(con, (int) s.index), InGetSwd.class);
+                                    } catch (IOException ex) {
+                                    //ignore
+                                    }*/
+                                    InGetSwf inGetSwf = con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
+                                    System.err.println("Received SWF");
+                                    String sha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(inGetSwf.swfData));
+                                    Main.findDebuggedSwf(sha256);
+                                    
+                                    SWF debuggedSwf = Main.getDebuggedSWF();
+                                    if (debuggedSwf == null) {
+                                        con.disconnect();
+                                        synchronized (DebuggerHandler.this) {
+                                            paused = false;
+                                            connected = false;
+                                        }
+                                        disconnected();
+                                    } else {
+                                        con.isAS3 = debuggedSwf.isAS3();
+                                        if (debuggedSwf.isAS3()) {
+                                            con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
+                                            if (con.wideLines) {
+                                                commands.setOption("wide_line_debugger", "on");
+                                            }
+                                        } else {
+                                            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINER, "End of connect - sending continue");
+                                            con.writeMessage(new OutRewind(con));
+                                            con.writeMessage(new OutPlay(con));
+                                            commands.sendContinue();
+                                        }
+                                    }                                            
+                                } catch (IOException | NoSuchAlgorithmException ex) {
+                                    //ignore
+                                    
+                                    con.disconnect();
+                                    synchronized (DebuggerHandler.this) {
+                                        paused = false;
+                                        connected = false;
+                                    }
+                                    disconnected();
+                                }     
+                            }
+                        }
+                    });
                 }
             });
             
@@ -998,17 +1072,16 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
             });
 
-            if (!isAS3) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINER, "End of connect - sending continue");
-                con.writeMessage(new OutRewind(con));
-                con.writeMessage(new OutPlay(con));
-                commands.sendContinue();
-            }
+/*            if (!isAS3) {
+                
+            }*/
 
         } catch (IOException ex) {
             synchronized (this) {
+                paused = false;
                 connected = false;
             }
+            disconnected();
         }
     }
 
@@ -1026,7 +1099,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                 SWF debuggedSwf = debuggedSwfs.get(swfIndex);
                 String hash = Main.getSwfHash(debuggedSwf);
 
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "sending breakpoints of ", hash);
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "sending breakpoints of {0}", hash);
 
                 if (toRemoveBPointMap.containsKey(debuggedSwf)) {
                     for (String scriptName : toRemoveBPointMap.get(debuggedSwf).keySet()) {

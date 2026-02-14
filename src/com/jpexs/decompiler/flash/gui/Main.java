@@ -120,6 +120,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,6 +141,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -228,13 +231,49 @@ public class Main {
     public static String currentDebuggerPackage = null;
 
     private static SWF runningSWF = null;
+    
+    private static SWF debuggedSWF = null;
 
+    private static String preparedHashSha256 = null;
+    
     private static SwfPreparation runningPreparation = null;
     
     private static boolean loggingFileLoaded = false;
+    
+    private static boolean debugListening = false;
 
+    public static SWF getDebuggedSWF() {
+        return debuggedSWF;
+    }
+    
+    
+    public static void findDebuggedSwf(String hashSha256) {
+        
+        System.err.println("Searching for hash " + hashSha256 + "...");
+        
+        for (SWF swf : mainFrame.getPanel().getAllSwfs()) {
+            System.err.println("Checking " + swf +" with hash " + swf.getHashSha256());
+            if (Objects.equals(hashSha256, swf.getHashSha256())) {
+                Main.debuggedSWF = swf;
+                System.err.println("RECEIVED SWF FOUND");
+                return;
+            }
+        }
+                
+        if (preparedHashSha256 != null && hashSha256.equals(preparedHashSha256)) {
+            System.err.println("RECEIVED SWF IS ONE THAT WAS PREPARED FOR RUN...");
+            Main.debuggedSWF = runningSWF;
+            return;
+        }
+        
+        System.err.println("RECEIVED SWF IS NOT ANY OF OURS");
+        Main.debuggedSWF = null;
+    }
+    
     public static SWF getRunningSWF() {
-        return runningSWF;
+        //System.err.println("debuggedSWF: " + (debuggedSWF == null ? "NOT SET" : debuggedSWF));
+        //return runningSWF;
+        return debuggedSWF;
     }
 
     public static WatchService getWatcher() {
@@ -276,6 +315,7 @@ public class Main {
             if (runTempFile != null) {
                 deleteCookiesAfterRun(runTempFile);
                 runTempFile.delete();
+                System.err.println("deleted " + runTempFile);
                 runTempFile = null;
             }
             for (File f : runTempFiles) {
@@ -296,11 +336,11 @@ public class Main {
     }
 
     public static synchronized boolean isDebugPaused() {
-        return runProcess != null && runProcessDebug && getDebugHandler().isPaused();
+        return (runProcess != null && runProcessDebug || !flashDebugger.isStopped()) && getDebugHandler().isPaused();
     }
 
     public static synchronized boolean isDebugRunning() {
-        return runProcess != null && runProcessDebug;
+        return (runProcess != null && runProcessDebug) || !flashDebugger.isStopped();
     }
 
     public static synchronized boolean isDebugPCode() {
@@ -401,7 +441,7 @@ public class Main {
                 } catch (InterruptedException ex) {
                     if (proc != null) {
                         try {
-                            proc.destroy();
+                            proc.destroyForcibly();
                         } catch (Exception ex2) {
                             //ignore
                         }
@@ -425,6 +465,9 @@ public class Main {
                     if (runProcess != null) {
                         try {
                             runProcess.destroy();
+                            if (!runProcess.waitFor(5, TimeUnit.SECONDS)) {
+                                runProcess.destroyForcibly();
+                            }
                         } catch (Exception ex) {
                             //ignored
                         }
@@ -445,10 +488,18 @@ public class Main {
         synchronized (Main.class) {
             if (runProcess != null) {
                 runProcess.destroy();
+                try {
+                    if (!runProcess.waitFor(5, TimeUnit.SECONDS)) {
+                        runProcess.destroyForcibly();
+                    }
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
             }
         }
         freeRun();
         stopDebugger();
+        stopWork();
         mainFrame.getMenu().updateComponents();
     }
 
@@ -596,9 +647,23 @@ public class Main {
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
             }
-        }
+            if ("main".equals(swfHash)) {            
+                preparedHashSha256 = instrSWF.getHashSha256();
+            }  
+        }                  
     }
-
+    
+    public static void prepareForDebug(SWF swf, File fTempFile, File tempRunDir, List<File> tempFiles, boolean doPCode) throws IOException, InterruptedException {
+        SWF swfToSave = swf;
+        if (swf.gfx) {
+            swfToSave = new GfxConvertor().convertSwf(swf);
+        }
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
+            swfToSave.saveTo(fos, false, swf.gfx);
+        }
+        prepareSwf("main", new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);                    
+    }
+    
     private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {
         if (tempFilesDir == null || !tempFilesDir.isDirectory()) {
             return File.createTempFile(prefix, suffix);
@@ -776,7 +841,16 @@ public class Main {
         SharedObjectsStorage.addChangedListener(tempFile, runCookieListener);
     }
 
-    public static void runDebug(SWF swf, final boolean doPCode) {
+    public static void startDebugListening() {
+        debugListening = true;
+        Main.stopWork();
+        Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
+        Main.startDebugger();
+        Main.startWork(AppStrings.translate("work.debugging.listening"), null);
+        mainFrame.getMenu().hilightPath("/debugging");        
+    }
+    
+    public static void runDebug(SWF swf, final boolean doPCode) {        
         String flashVars = ""; //key=val&key2=val2
         String playerLocation = Configuration.playerDebugLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
@@ -2932,8 +3006,14 @@ public class Main {
 
                     @Override
                     public void disconnected() {
+                        if (Main.mainFrame != null) {
+                            Main.mainFrame.getMenu().updateComponents();
+                        }
                         if (Main.mainFrame != null && Main.mainFrame.getPanel() != null) {
                             Main.mainFrame.getPanel().refreshBreakPoints();
+                        }
+                        if (debugListening) {
+                            Main.startWork(AppStrings.translate("work.debugging.listening"), null, true);
                         }
                     }
                 });
@@ -2948,7 +3028,7 @@ public class Main {
     }
 
     public static void startDebugger() {
-        flashDebugger.startDebugger();
+        flashDebugger.startDebugger();        
     }
 
     public static void stopDebugger() {
@@ -3759,6 +3839,9 @@ public class Main {
 
     public static void showBreakpointsList() {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        if (swf == null) {
+            return;
+        }
         getMainFrame().getPanel().showBreakpointlistDialog(swf);
     }
 

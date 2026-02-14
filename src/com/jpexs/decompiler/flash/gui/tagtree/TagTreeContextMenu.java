@@ -381,7 +381,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem convertPlaceObjectTypeMenuItem;
     
     private JMenuItem normalizeFontsMenuItem;
-
+    
+    private JMenuItem prepareDebugInject;
+    
+    private JMenuItem prepareDebugSwd;
+    
     private List<TreeItem> items = new ArrayList<>();
 
     private static final int KIND_TAG_MOVETO = 0;
@@ -653,6 +657,17 @@ public class TagTreeContextMenu extends JPopupMenu {
               
         addSeparator();
 
+        prepareDebugInject = new JMenuItem(mainPanel.translate("contextmenu.prepareDebug.injectDebug"));
+        prepareDebugInject.addActionListener(this::prepareDebugActionPerformed);
+        prepareDebugInject.setIcon(View.getIcon("debug16"));
+        add(prepareDebugInject);
+        
+        prepareDebugSwd = new JMenuItem(mainPanel.translate("contextmenu.prepareDebug.generateSwd"));
+        prepareDebugSwd.addActionListener(this::prepareDebugActionPerformed);
+        prepareDebugSwd.setIcon(View.getIcon("debug16"));
+        add(prepareDebugSwd);
+
+        
         gotoDocumentClassMenuItem = new JMenuItem(mainPanel.translate("menu.tools.gotoDocumentClass"));
         gotoDocumentClassMenuItem.addActionListener(this::gotoDocumentClassActionPerformed);
         gotoDocumentClassMenuItem.setIcon(View.getIcon("gotomainclass16"));
@@ -1354,6 +1369,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
+        prepareDebugInject.setVisible(false);
+        prepareDebugSwd.setVisible(false);
         gotoDocumentClassMenuItem.setVisible(false);
         setAsLinkageMenuItem.setVisible(false);
         setAs3ClassLinkageMenuItem.setVisible(false);
@@ -1549,7 +1566,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if ("__Packages".equals(firstPkg)) {
                     addAs12ClassMenuItem.setVisible(true);
                 }
-            }
+            }                                    
             if (firstItem instanceof ClassesListTreeModel) {
                 addAs3ClassMenuItem.setVisible(true);
                 if (firstItem.getOpenable() instanceof SWF) {
@@ -1586,6 +1603,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof SWF) {
                 if (((SWF) firstItem).isAS3()) {
                     gotoDocumentClassMenuItem.setVisible(true);
+                    prepareDebugInject.setVisible(true);
+                } else {
+                    prepareDebugSwd.setVisible(true);
                 }
             }
 
@@ -3055,6 +3075,45 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.showGenericTag((Tag) itemr);
     }
 
+    private void prepareDebugActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        SWF swf = (SWF) item.getOpenable();
+        File dir = null;
+        String newName = "debug.swf";
+        if (swf.getFile() != null) {
+            dir = new File(swf.getFile()).getParentFile();
+            String name = new File(swf.getFile()).getName();
+            newName = name.substring(0, name.lastIndexOf(".")) + "_debug" + name.substring(name.lastIndexOf("."));
+        }
+        JFileChooser chooser = View.getFileChooserWithIcon("debug");
+        chooser.setCurrentDirectory(dir);
+        chooser.setSelectedFile(new File(dir, newName));
+        chooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getAbsolutePath().toLowerCase().endsWith(".swf") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swf");
+            }
+        });
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        File selFile = Helper.fixDialogFile(chooser.getSelectedFile());
+        
+        boolean doPCode = false;
+        List<File> tempFiles = new ArrayList<>();
+        try {
+            Main.prepareForDebug(swf, selFile, selFile.getParentFile(), tempFiles, doPCode);
+        } catch (IOException | InterruptedException ex) {
+            ViewMessages.showMessageDialog(mainPanel, ex.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);            
+        }
+        Main.stopWork();
+    }
+    
     private void gotoDocumentClassActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         item.getOpenable();

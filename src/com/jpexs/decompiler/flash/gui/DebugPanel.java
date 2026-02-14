@@ -495,7 +495,7 @@ public class DebugPanel extends JPanel {
 
                     SelectedTab oldSel = selectedTab;
                     localsTable = null;
-                    SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+                    SWF swf = Main.getDebuggedSWF();
                     if (swf == null) {
                         return;
                     }
