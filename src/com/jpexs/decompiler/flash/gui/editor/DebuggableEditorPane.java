@@ -126,7 +126,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             return;
         }
 
-        Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName, false);
+        Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName);
 
         for (int line : bkptLines) {
             if (Main.isBreakPointValid(breakPointScriptName, line)) {

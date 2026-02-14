@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -89,6 +90,8 @@ public class DebugPanel extends JPanel {
     private boolean loading = false;
 
     public ABCPanel.VariablesTableModel localsTable;
+    
+    private WeakReference<DebuggerSession> currentSessionRef = null;
 
     public static enum SelectedTab {
 
@@ -140,7 +143,7 @@ public class DebugPanel extends JPanel {
 
     }
 
-    private void logAdd(String message) {
+    private void logAdd(DebuggerSession session, String message) {
         boolean wasEmpty = logLength == 0;
         String add = message + "\r\n";
         logLength += add.length();
@@ -151,7 +154,7 @@ public class DebugPanel extends JPanel {
             //ignore
         }
         if (wasEmpty) {
-            refresh();
+            refresh(session);
         }
     }
 
@@ -177,6 +180,15 @@ public class DebugPanel extends JPanel {
             }
 
             private void dopop(MouseEvent e) {
+                
+                if (currentSessionRef == null) {
+                    return;
+                }
+                DebuggerSession session = currentSessionRef.get();
+                if (session == null) {
+                    return;
+                }
+                
                 if (debugLocalsTable.getSelectedRow() == -1) {
                     return;
                 }
@@ -241,8 +253,8 @@ public class DebugPanel extends JPanel {
                             }*/
                             //Variant using comma separated bytes, pretty fast
                             try {
-                                Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
-                                String dataStr = (String) Main.getDebugHandler().callMethod(debugConnectionClass, "readCommaSeparatedFromByteArray", Arrays.asList(v)).variables.get(0).value;
+                                Variable debugConnectionClass = session.getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                                String dataStr = (String) session.callMethod(debugConnectionClass, "readCommaSeparatedFromByteArray", Arrays.asList(v)).variables.get(0).value;
                                 String[] parts = dataStr.split(",");
                                 byte[] data = new byte[parts.length];
                                 for (int i = 0; i < parts.length; i++) {
@@ -313,9 +325,9 @@ public class DebugPanel extends JPanel {
                                     splitter = ",";
                                 }
                                 String dataStr = sb.toString();
-                                Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                                Variable debugConnectionClass = session.getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
                                 try {
-                                    Main.getDebugHandler().callMethod(debugConnectionClass, "writeCommaSeparatedToByteArray", Arrays.asList(dataStr, v));
+                                    session.callMethod(debugConnectionClass, "writeCommaSeparatedToByteArray", Arrays.asList(dataStr, v));
                                 } catch (DebuggerHandler.ActionScriptException ex) {
                                     Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, "Error exporting ByteArray", ex);
                                 }
@@ -334,19 +346,19 @@ public class DebugPanel extends JPanel {
                 JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
                 JMenuItem watchReadMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.read"));
                 watchReadMenuItem.addActionListener((ActionEvent e1) -> {
-                    if (!Main.addWatch(v, watchParentId, true, false)) {
+                    if (!Main.addWatch(session, v, watchParentId, true, false)) {
                         ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
                 JMenuItem watchWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.write"));
                 watchWriteMenuItem.addActionListener((ActionEvent e1) -> {
-                    if (!Main.addWatch(v, watchParentId, false, true)) {
+                    if (!Main.addWatch(session, v, watchParentId, false, true)) {
                         ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
                 JMenuItem watchReadWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.readwrite"));
                 watchReadWriteMenuItem.addActionListener((ActionEvent e1) -> {
-                    if (!Main.addWatch(v, watchParentId, true, true)) {
+                    if (!Main.addWatch(session, v, watchParentId, true, true)) {
                         ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
@@ -376,41 +388,41 @@ public class DebugPanel extends JPanel {
         Main.getDebugHandler().addTraceListener(new DebuggerHandler.TraceListener() {
 
             @Override
-            public void trace(String... val) {
+            public void trace(DebuggerSession session, String... val) {
                 for (String s : val) {
-                    logAdd("trace: " + s);
+                    logAdd(session, "trace: " + s);
                 }
             }
         });
 
         Main.getDebugHandler().addErrorListener(new DebuggerHandler.ErrorListener() {
             @Override
-            public void errorException(String message, Variable thrownVar) {
-                logAdd("unhandled exception: " + message);
+            public void errorException(DebuggerSession session, String message, Variable thrownVar) {
+                logAdd(session, "unhandled exception: " + message);
                 selectedTab = tabTypes.get(tabTypes.size() - 1);
-                refresh();
+                refresh(session);
             }
         });
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
 
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
             }
 
             @Override
-            public void disconnected() {
-                refresh();
+            public void disconnected(DebuggerSession session) {
+                refresh(session);
             }
         });
 
         Main.getDebugHandler().addFrameChangeListener(frameChangeListener = new DebuggerHandler.FrameChangeListener() {
             @Override
-            public void frameChanged() {
+            public void frameChanged(DebuggerSession session) {
                 View.execInEventDispatchLater(new Runnable() {
                     @Override
                     public void run() {
-                        refresh();
+                        refresh(session);
                     }
                 });
             }
@@ -419,17 +431,17 @@ public class DebugPanel extends JPanel {
         Main.getDebugHandler().addBreakListener(breakListener = new DebuggerHandler.BreakListener() {
 
             @Override
-            public void doContinue() {
+            public void doContinue(DebuggerSession session) {
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        refresh();
+                        refresh(session);
                     }
                 });
             }
 
             @Override
-            public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
+            public void breakAt(DebuggerSession session, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
 
             }
         });
@@ -484,8 +496,9 @@ public class DebugPanel extends JPanel {
         }
         return v.getMembers(this);
     }*/
-    public void refresh() {
-
+    public void refresh(DebuggerSession session) {       
+        
+        currentSessionRef = session == null ? null : new WeakReference<>(session);
         View.execInEventDispatch(new Runnable() {
 
             @Override
@@ -495,19 +508,14 @@ public class DebugPanel extends JPanel {
 
                     SelectedTab oldSel = selectedTab;
                     localsTable = null;
-                    SWF swf = Main.getDebuggedSWF();
-                    if (swf == null) {
-                        return;
-                    }
-                    boolean as3 = swf.isAS3();
-                    InFrame f = Main.getDebugHandler().getFrame();
+                    InFrame f = session == null ? null : session.getFrame();
                     if (f != null) {
                         
                         
                         List<Variable> locals = new ArrayList<>();
                         
                         
-                        Map<String, Long> placedObjects = Main.getDebugHandler().getPlacedObjects();
+                        Map<String, Long> placedObjects = session.getPlacedObjects();
                         for (String poName : placedObjects.keySet()) {
                             String realName = poName;
                             if ("/".equals(realName)) {
@@ -515,7 +523,7 @@ public class DebugPanel extends JPanel {
                             } else if (realName.startsWith("/")) {
                                 continue;
                             }
-                            Variable placedVar = Main.getDebugHandler().getVariable(0, realName, false, false).parent;
+                            Variable placedVar = session.getVariable(0, realName, false, false).parent;
                             if (placedVar != null) {
                                 locals.add(placedVar);
                             }
@@ -540,26 +548,26 @@ public class DebugPanel extends JPanel {
                         TreeModelListener refreshListener = new TreeModelListener() {
                             @Override
                             public void treeNodesChanged(TreeModelEvent e) {
-                                Main.getDebugHandler().refreshFrame();
-                                refresh();
+                                session.refreshFrame();
+                                refresh(session);
                             }
 
                             @Override
                             public void treeNodesInserted(TreeModelEvent e) {
-                                Main.getDebugHandler().refreshFrame();
-                                refresh();
+                                session.refreshFrame();
+                                refresh(session);
                             }
 
                             @Override
                             public void treeNodesRemoved(TreeModelEvent e) {
-                                Main.getDebugHandler().refreshFrame();
-                                refresh();
+                                session.refreshFrame();
+                                refresh(session);
                             }
 
                             @Override
                             public void treeStructureChanged(TreeModelEvent e) {
-                                Main.getDebugHandler().refreshFrame();
-                                refresh();
+                                session.refreshFrame();
+                                refresh(session);
                             }
                         };
                         debugLocalsTable.getTreeTableModel().addTreeModelListener(refreshListener);
@@ -569,7 +577,7 @@ public class DebugPanel extends JPanel {
                         debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>()));
                         debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>()));
                     }
-                    InConstantPool cpool = Main.getDebugHandler().getConstantPool();
+                    InConstantPool cpool = session == null ? null : session.getConstantPool();
                     if (cpool != null) {
                         Object[][] data2 = new Object[cpool.vars.size()][2];
                         for (int i = 0; i < cpool.vars.size(); i++) {
@@ -635,7 +643,7 @@ public class DebugPanel extends JPanel {
                             public void actionPerformed(ActionEvent e) {
                                 traceLogTextarea.setText("");
                                 logLength = 0;
-                                refresh();
+                                refresh(session);
                             }
                         });
                         JPanel butPanel = new JPanel(new FlowLayout());

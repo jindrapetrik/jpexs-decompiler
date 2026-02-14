@@ -105,6 +105,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -231,49 +232,60 @@ public class Main {
     public static String currentDebuggerPackage = null;
 
     private static SWF runningSWF = null;
-    
+
     private static SWF debuggedSWF = null;
 
     private static String preparedHashSha256 = null;
-    
+
     private static SwfPreparation runningPreparation = null;
-    
+
     private static boolean loggingFileLoaded = false;
-    
+
     private static boolean debugListening = false;
 
     public static SWF getDebuggedSWF() {
         return debuggedSWF;
     }
-    
-    
-    public static void findDebuggedSwf(String hashSha256) {
-        
-        System.err.println("Searching for hash " + hashSha256 + "...");
-        
+
+    public static void setDebuggedSWF(SWF swf) {
+        debuggedSWF = swf;
+    }
+
+    /**
+     * Searches opened swfs for swf with sha256 hash of its decompressed form
+     *
+     * @param hashSha256 Hex sha 256
+     * @return SWF or null if not found
+     */
+    public static SWF findOpenedSwfByHash(String hashSha256) {
+        Logger.getLogger(Main.class.getName()).log(Level.FINE, "Searching for hash {0}...", hashSha256);
+
         for (SWF swf : mainFrame.getPanel().getAllSwfs()) {
-            System.err.println("Checking " + swf +" with hash " + swf.getHashSha256());
+            Logger.getLogger(Main.class.getName()).log(Level.FINE, "Checking {0} with hash {1}", new Object[]{swf.toString(), swf.getHashSha256()});
             if (Objects.equals(hashSha256, swf.getHashSha256())) {
-                Main.debuggedSWF = swf;
-                System.err.println("RECEIVED SWF FOUND");
-                return;
+                Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF FOUND");
+                return swf;
             }
         }
-                
+
         if (preparedHashSha256 != null && hashSha256.equals(preparedHashSha256)) {
-            System.err.println("RECEIVED SWF IS ONE THAT WAS PREPARED FOR RUN...");
-            Main.debuggedSWF = runningSWF;
-            return;
+            Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF IS ONE THAT WAS PREPARED FOR RUN...");
+            return runningSWF;
         }
-        
-        System.err.println("RECEIVED SWF IS NOT ANY OF OURS");
-        Main.debuggedSWF = null;
+
+        Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF IS NOT ANY OF OURS");
+        return null;
     }
-    
+
     public static SWF getRunningSWF() {
         //System.err.println("debuggedSWF: " + (debuggedSWF == null ? "NOT SET" : debuggedSWF));
         //return runningSWF;
-        return debuggedSWF;
+        //return debuggedSWF;
+        DebuggerSession session = getCurrentDebugSession();
+        if (session != null) {
+            return session.getDebuggedSwfs().get(0);
+        }
+        return null;
     }
 
     public static WatchService getWatcher() {
@@ -331,12 +343,16 @@ public class Main {
             mainFrame.getPanel().clearDebuggerColors();
         }
         if (runProcessDebug) {
-            Main.getDebugHandler().disconnect();
+            Main.getDebugHandler().terminateAllSessions();
         }
     }
 
     public static synchronized boolean isDebugPaused() {
-        return (runProcess != null && runProcessDebug || !flashDebugger.isStopped()) && getDebugHandler().isPaused();
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return false;
+        }
+        return (runProcess != null && runProcessDebug || !flashDebugger.isStopped()) && session.isPaused();
     }
 
     public static synchronized boolean isDebugRunning() {
@@ -348,60 +364,60 @@ public class Main {
     }
 
     public static synchronized boolean isDebugConnected() {
-        return getDebugHandler().isConnected();
+        return getDebugHandler().isAnySessionConnected();
     }
 
     public static synchronized boolean isRunning() {
         return runProcess != null && !runProcessDebug;
     }
 
-    public static synchronized void debugExportByteArray(Variable v, OutputStream os) throws IOException {
+    public static synchronized void debugExportByteArray(DebuggerSession session, Variable v, OutputStream os) throws IOException {
         try {
             long objectId = 0L;
             if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
                 objectId = (Long) v.value;
             }
-            Object oldPos = getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
-            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
-            int length = (int) (double) (Double) getDebugHandler().getVariable(objectId, "length", false, true).parent.value;
+            Object oldPos = session.getVariable(objectId, "position", false, true).parent.value;
+            session.setVariable(objectId, "position", VariableType.NUMBER, 0);
+            int length = (int) (double) (Double) session.getVariable(objectId, "length", false, true).parent.value;
 
             for (int i = 0; i < length; i++) {
-                int b = (int) (double) (Double) getDebugHandler().callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
+                int b = (int) (double) (Double) session.callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
                 os.write(b);
             }
-            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
+            session.setVariable(objectId, "position", VariableType.NUMBER, oldPos);
         } catch (DebuggerHandler.ActionScriptException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static synchronized void debugImportByteArray(Variable v, InputStream is) throws IOException {
+    public static synchronized void debugImportByteArray(DebuggerSession session, Variable v, InputStream is) throws IOException {
         try {
             long objectId = 0L;
             if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
                 objectId = (Long) v.value;
             }
-            Double oldPos = (Double) getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
-            getDebugHandler().setVariable(objectId, "length", VariableType.NUMBER, 0);
-            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
+            Double oldPos = (Double) session.getVariable(objectId, "position", false, true).parent.value;
+            session.setVariable(objectId, "length", VariableType.NUMBER, 0);
+            session.setVariable(objectId, "position", VariableType.NUMBER, 0);
 
             int length = 0;
             int b;
             while ((b = is.read()) > -1) {
-                getDebugHandler().callFunction(false, "writeByte", v, Arrays.asList((Double) (double) b));
+                session.callFunction(false, "writeByte", v, Arrays.asList((Double) (double) b));
                 length++;
             }
             if (oldPos > length) {
                 oldPos = (Double) (double) length;
             }
-            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
+            session.setVariable(objectId, "position", VariableType.NUMBER, oldPos);
         } catch (DebuggerHandler.ActionScriptException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static synchronized boolean addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {
-        DebuggerCommands.Watch w = getDebugHandler().addWatch(v, v_id, watchRead, watchWrite);
+    public static synchronized boolean addWatch(DebuggerSession session, Variable v, long v_id, boolean watchRead, boolean watchWrite) {
+        DebuggerCommands.Watch w = session.addWatch(v, v_id, watchRead, watchWrite);
         return w != null;
     }
 
@@ -591,9 +607,9 @@ public class Main {
                         });
                         startWork(AppStrings.translate("work.generating_swd"), swfPrepareWorker, true);
                         if (doPCode) {
-                            instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
+                            instrSWF.generatePCodeSwdFile(swdFile, getAllSessionPackBreakPoints(swfHash), swfHash);
                         } else {
-                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
+                            instrSWF.generateSwdFile(swdFile, getAllSessionPackBreakPoints(swfHash), swfHash);
                         }
                         tempFiles.add(swdFile);
                     }
@@ -647,12 +663,12 @@ public class Main {
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
             }
-            if ("main".equals(swfHash)) {            
+            if ("main".equals(swfHash)) {
                 preparedHashSha256 = instrSWF.getHashSha256();
-            }  
-        }                  
+            }
+        }
     }
-    
+
     public static void prepareForDebug(SWF swf, File fTempFile, File tempRunDir, List<File> tempFiles, boolean doPCode) throws IOException, InterruptedException {
         SWF swfToSave = swf;
         if (swf.gfx) {
@@ -661,9 +677,9 @@ public class Main {
         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
             swfToSave.saveTo(fos, false, swf.gfx);
         }
-        prepareSwf("main", new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);                    
+        prepareSwf("main", new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
     }
-    
+
     private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {
         if (tempFilesDir == null || !tempFilesDir.isDirectory()) {
             return File.createTempFile(prefix, suffix);
@@ -847,10 +863,10 @@ public class Main {
         Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
         Main.startDebugger();
         Main.startWork(AppStrings.translate("work.debugging.listening"), null);
-        mainFrame.getMenu().hilightPath("/debugging");        
+        mainFrame.getMenu().hilightPath("/debugging");
     }
-    
-    public static void runDebug(SWF swf, final boolean doPCode) {        
+
+    public static void runDebug(SWF swf, final boolean doPCode) {
         String flashVars = ""; //key=val&key2=val2
         String playerLocation = Configuration.playerDebugLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
@@ -861,7 +877,7 @@ public class Main {
         if (swf == null) {
             return;
         }
-        debugHandler.setMainDebuggedSwf(swf);
+        //debugHandler.setMainDebuggedSwf(swf); ???
         File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
         File tempFile = null;
 
@@ -930,59 +946,119 @@ public class Main {
     }
 
     public static synchronized int getIp(Object pack) {
-        return getDebugHandler().getBreakIp();
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return -1;
+        }
+        return session.getBreakIp();
     }
 
     public static synchronized String getIpClass() {
-        return getDebugHandler().getBreakScriptName();
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return null;
+        }
+        return session.getBreakScriptName();
     }
 
     public static synchronized List<Integer> getStackLines() {
-        return getDebugHandler().getStackLines();
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return new ArrayList<>();
+        }
+        return session.getStackLines();
     }
 
     public static synchronized List<String> getStackClasses() {
-        return getDebugHandler().getStackScripts();
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return new ArrayList<>();
+        }
+        return session.getStackScripts();
     }
 
     public static synchronized boolean isBreakPointValid(String scriptName, int line) {
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return true;
+        }
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
-        return !getDebugHandler().isBreakpointInvalid(swf, scriptName, line);
+        return !session.isBreakpointInvalid(swf, scriptName, line);
     }
 
-    public static synchronized void addBreakPoint(String scriptName, int line) {
+    public static synchronized void addBreakPoint(DebuggerSession session, String scriptName, int line) {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
-        getDebugHandler().addBreakPoint(swf, scriptName, line);
+        session.addBreakPoint(swf, scriptName, line);
     }
 
-    public static synchronized void removeBreakPoint(String scriptName, int line) {
+    public static synchronized void removeBreakPoint(DebuggerSession session, String scriptName, int line) {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
-        getDebugHandler().removeBreakPoint(swf, scriptName, line);
+        session.removeBreakPoint(swf, scriptName, line);
     }
 
     public static synchronized boolean toggleBreakPoint(String scriptName, int line) {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
-        if (getDebugHandler().isBreakpointToAdd(swf, scriptName, line) || getDebugHandler().isBreakpointConfirmed(swf, scriptName, line) || getDebugHandler().isBreakpointInvalid(swf, scriptName, line)) {
+        Map<String, Set<Integer>> breakPoints = getDebugHandler().getAllSessionsBreakPoints(swf);
+
+        if (breakPoints.containsKey(scriptName) && breakPoints.get(scriptName).contains(line)) {
             getDebugHandler().removeBreakPoint(swf, scriptName, line);
             return false;
-        } else {
-            getDebugHandler().addBreakPoint(swf, scriptName, line);
-            return true;
         }
+
+        getDebugHandler().addBreakPoint(swf, scriptName, line);
+        return true;
+
+        /*if (session.isBreakpointToAdd(swf, scriptName, line) || session.isBreakpointConfirmed(swf, scriptName, line) || session.isBreakpointInvalid(swf, scriptName, line)) {
+            session.removeBreakPoint(swf, scriptName, line);
+            return false;
+        } else {
+            session.addBreakPoint(swf, scriptName, line);
+            return true;
+        }*/
     }
 
-    public static synchronized Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly, String swfHash) {
+    public static synchronized Map<String, Set<Integer>> getAllSessionPackBreakPoints(String swfHash) {
         SWF swf = Main.getSwfByHash(swfHash);
-        return getDebugHandler().getAllBreakPoints(swf, validOnly);
+        return getDebugHandler().getAllSessionsBreakPoints(swf);
     }
 
-    public static synchronized Set<Integer> getScriptBreakPoints(String pack, boolean onlyValid) {
+    public static synchronized Map<String, Set<Integer>> getPackBreakPoints(DebuggerSession session, boolean validOnly, String swfHash) {
+        SWF swf = Main.getSwfByHash(swfHash);
+        return session.getAllBreakPoints(swf, validOnly);
+    }
+
+    public static synchronized Set<Integer> getScriptBreakPoints(String pack) {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
-        return getDebugHandler().getBreakPoints(swf, pack, onlyValid);
+        return getDebugHandler().getAllSessionsScriptBreakPoints(swf, pack);
     }
 
     public static DebuggerHandler getDebugHandler() {
         return debugHandler;
+    }
+
+    public static DebuggerSession getCurrentDebugSession() {
+        if (mainFrame == null) {
+            return null;
+        }
+        if (mainFrame.getPanel() == null) {
+            return null;
+        }
+        SWF currentSwf = mainFrame.getPanel().getCurrentSwf();
+        if (currentSwf == null) {
+            return null;
+        }
+        return getDebugHandler().getSessionContainingSwf(currentSwf);
+    }
+    
+    public static void updateSession() {
+        DebuggerSession session = getCurrentDebugSession();
+        for (DebuggerHandler.FrameChangeListener l : getDebugHandler().getFrameChangeListeners()) {
+            l.frameChanged(session);
+        }
+        
+        if (getDebugHandler().getNumberOfPausedSessions() > 0) {
+            mainFrame.getPanel().showDebugStackFrame();
+        }
     }
 
     public static void ensureMainFrame() {
@@ -1027,8 +1103,8 @@ public class Main {
         loadFromMemoryFrame.setVisible(true);
     }
 
-    public static void setVariable(long parentId, String varName, int valueType, Object value) {
-        getDebugHandler().setVariable(parentId, varName, valueType, value);
+    public static void setVariable(DebuggerSession session, long parentId, String varName, int valueType, Object value) {
+        session.setVariable(parentId, varName, valueType, value);
     }
 
     public static void setSubLimiter(boolean value) {
@@ -1100,7 +1176,7 @@ public class Main {
     public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean force) {
         working = true;
         long nowTime = System.currentTimeMillis();
-        if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {
+        if (!force && mainFrame != null && nowTime < lastTimeStartWork + 1000) {
             mainFrame.getPanel().setWorkStatusHidden(name, worker);
             return;
         }
@@ -1117,7 +1193,7 @@ public class Main {
             if (loadingDialog != null) {
                 loadingDialog.setDetail(name);
                 loadingDialog.setPercent(percent);
-            }            
+            }
         });
         if (CommandLineArgumentParser.isCommandLineMode()) {
             System.out.println(name);
@@ -1470,7 +1546,7 @@ public class Main {
                                                 }
                                             };
                                             fc.addChoosableFileFilter(swtFilter);
-                                            
+
                                             FileFilter gfxFilter = new FileFilter() {
                                                 @Override
                                                 public boolean accept(File f) {
@@ -1767,7 +1843,7 @@ public class Main {
         private final OpenableOpened executeAfterOpen;
 
         private final int[] reloadIndices;
-        
+
         private final boolean loadSession;
 
         public OpenFileWorker(OpenableSourceInfo sourceInfo, boolean loadSession) {
@@ -1891,6 +1967,14 @@ public class Main {
                                     }
                                 }
                             }
+                            List<String> breakpointsList = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_BREAKPOINTS);
+                            for (String breakpoint : breakpointsList) {
+                                if (breakpoint.matches("^.*:[0-9]+$")) {
+                                    int line = Integer.parseInt(breakpoint.substring(breakpoint.lastIndexOf(":") + 1));
+                                    String scriptName = breakpoint.substring(0, breakpoint.lastIndexOf(":"));
+                                    getDebugHandler().addBreakPoint(swf, scriptName, line);
+                                }
+                            }
                         }
                     }
                 }
@@ -1901,7 +1985,7 @@ public class Main {
             View.execInEventDispatch(() -> {
                 if (mainFrame == null) {
                     ensureMainFrame();
-                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);                    
+                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                 }
                 loadingDialog.setVisible(false);
 
@@ -1926,14 +2010,6 @@ public class Main {
                     if (swfCustomConf != null) {
                         resourcesPathStr = swfCustomConf.getCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
                         tagListPathStr = swfCustomConf.getCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_TAGLIST, null);
-                        List<String> breakpointsList = swfCustomConf.getCustomDataAsList(CustomConfigurationKeys.KEY_BREAKPOINTS);
-                        for (String breakpoint : breakpointsList) {
-                            if (breakpoint.matches("^.*:[0-9]+$")) {
-                                int line = Integer.parseInt(breakpoint.substring(breakpoint.lastIndexOf(":") + 1));
-                                String scriptName = breakpoint.substring(0, breakpoint.lastIndexOf(":"));
-                                getDebugHandler().addBreakPoint(fswf, scriptName, line);
-                            }
-                        }
                     }
 
                     if (loadSession) {
@@ -1954,7 +2030,7 @@ public class Main {
                                     mainFrame.getPanel().tagListTree.setSelectionPath(tp);
                                 }
                             } else {
-                                mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);                        
+                                mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
                             }
                         } else {
                             mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
@@ -2108,7 +2184,7 @@ public class Main {
                         executeAfterOpen.run();
                     }
                 }
-            }, loadSession  
+            }, loadSession
             );
             return openResult;
         } catch (IOException ex) {
@@ -2139,7 +2215,7 @@ public class Main {
 
         return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex}, loadSession);
     }
-    
+
     public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos) {
         View.checkAccess();
 
@@ -2298,7 +2374,7 @@ public class Main {
             }
             fc.setSelectedFile(fc.getCurrentDirectory().toPath().resolve(fileTitle).toFile());
         }
-        
+
         FileFilter swcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2312,31 +2388,31 @@ public class Main {
             }
         };
         fc.setFileFilter(swcFilter);
-        
-        if (fc.showSaveDialog(getDefaultMessagesComponent()) != JFileChooser.APPROVE_OPTION) {        
+
+        if (fc.showSaveDialog(getDefaultMessagesComponent()) != JFileChooser.APPROVE_OPTION) {
             return false;
         }
         File file = Helper.fixDialogFile(fc.getSelectedFile());
         String fileName = file.getAbsolutePath();
-        
+
         if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".swc")) {
             fileName += ".swc";
-        }               
-        
+        }
+
         SwfToSwcExporter exporter = new SwfToSwcExporter();
         try {
             exporter.exportSwf(swf, new File(fileName), false);
         } catch (IOException iex) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), iex.getMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             return false;
-        } catch (InterruptedException ex) {           
+        } catch (InterruptedException ex) {
             return false;
         }
-        
+
         Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
         return true;
     }
-    
+
     public static boolean saveFileDialog(Openable openable, final SaveFileMode mode) {
 
         String ext = ".swf";
@@ -2387,7 +2463,7 @@ public class Main {
                 return AppStrings.translate("filter.swt");
             }
         };
-        
+
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2492,14 +2568,14 @@ public class Main {
         } else if (openable instanceof SWF) {
             SWF swf = (SWF) openable;
             if (swf.getFile() != null && swf.getFile().toLowerCase(Locale.ENGLISH).endsWith(".swt")) {
-                fc.setFileFilter(swtFilter);   
+                fc.setFileFilter(swtFilter);
                 fc.addChoosableFileFilter(swfFilter);
             } else {
-                fc.setFileFilter(swfFilter);   
+                fc.setFileFilter(swfFilter);
                 fc.addChoosableFileFilter(swtFilter);
             }
             fc.addChoosableFileFilter(gfxFilter);
-            
+
         } else if (openable instanceof ABC) {
             fc.setFileFilter(abcFilter);
         }
@@ -2523,7 +2599,7 @@ public class Main {
                     }
                     ((SWF) openable).gfx = true;
                 }
-                
+
                 if (selFilter == swtFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".swt")) {
                         fileName += ".swt";
@@ -2662,7 +2738,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(swtFilter);
-        
+
         FileFilter swcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2805,7 +2881,7 @@ public class Main {
         initUiLang();
 
         initLookAndFeel();
-                
+
         View.execInEventDispatch(() -> {
             ErrorLogFrame.createNewInstance();
 
@@ -2976,13 +3052,15 @@ public class Main {
                 flashDebugger = new Debugger();
                 debugHandler = new DebuggerHandler();
                 debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
+                    
                     @Override
-                    public void doContinue() {
+                    public void doContinue(DebuggerSession session) {
                         mainFrame.getPanel().clearDebuggerColors();
+                        mainFrame.getMenu().updateComponents();
                     }
 
                     @Override
-                    public void breakAt(String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
+                    public void breakAt(DebuggerSession session, String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
@@ -2992,7 +3070,17 @@ public class Main {
                                     hash = scriptName.substring(0, scriptName.indexOf(":"));
                                     scriptNameNoHash = scriptName.substring(scriptName.indexOf(":") + 1);
                                 }
-                                SWF swf = Main.getSwfByHash(hash);
+                                SWF swf = "main".equals(hash) ? session.getDebuggedSwfs().get(0) : Main.getSwfByHash(hash);
+                                Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break. Current session: {0}, New break session: {1}", new Object[]{Main.getCurrentDebugSession(), session});
+                                    
+                                if (
+                                        Main.getDebugHandler().getNumberOfPausedSessions() > 1
+                                        && Main.getCurrentDebugSession() != session
+                                    ) {
+                                    Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf.toString());
+                                    mainFrame.getPanel().refreshBreakPoints();
+                                    return;
+                                }
                                 mainFrame.getPanel().gotoScriptLine(swf, scriptNameNoHash, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
                             }
                         });
@@ -3000,12 +3088,12 @@ public class Main {
                 });
                 debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
                     @Override
-                    public void connected() {
+                    public void connected(DebuggerSession session) {
                         Main.mainFrame.getMenu().updateComponents();
                     }
 
                     @Override
-                    public void disconnected() {
+                    public void disconnected(DebuggerSession session) {
                         if (Main.mainFrame != null) {
                             Main.mainFrame.getMenu().updateComponents();
                         }
@@ -3028,10 +3116,11 @@ public class Main {
     }
 
     public static void startDebugger() {
-        flashDebugger.startDebugger();        
+        flashDebugger.startDebugger();
     }
 
     public static void stopDebugger() {
+        getDebugHandler().terminateAllSessions();
         flashDebugger.stopDebugger();
     }
 
@@ -3288,7 +3377,7 @@ public class Main {
         AppStrings.updateLanguage();
 
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
-        
+
         ResourceBundle advancedSettingsBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
         Set<String> configurationNames = Configuration.getConfigurationFields(false, true).keySet();
         Map<String, String> titles = new LinkedHashMap<>();
@@ -3298,7 +3387,7 @@ public class Main {
                 titles.put(name, advancedSettingsBundle.getString("config.name." + name));
             }
             if (advancedSettingsBundle.containsKey("config.description." + name)) {
-                descriptions.put(name, advancedSettingsBundle.getString("config.description." + name));            
+                descriptions.put(name, advancedSettingsBundle.getString("config.description." + name));
             }
         }
         Configuration.setConfigurationDescriptions(descriptions);
@@ -3358,11 +3447,11 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         decodeLaunch5jArgs(args);
-        preInitLogging();        
+        preInitLogging();
         setSessionLoaded(false);
 
-        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");       
-        
+        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");
+
         clearTemp();
 
         try {
@@ -3638,17 +3727,17 @@ public class Main {
         if (!showStable && !showNightly) {
             return false;
         }
-                
+
         String stableTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
         String ignoreVersion = "-";
-        
+
         String currentTagName;
         if (ApplicationInfo.nightly) {
             currentTagName = "nightly" + ApplicationInfo.version_build;
         } else {
             currentTagName = stableTagName;
         }
-        
+
         if (!showNightly) {
             //prereleases are not shown as latest, when checking latest nightly, this is useless
             JsonValue latestVersionInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_LATEST_URL);
@@ -3799,7 +3888,7 @@ public class Main {
             }
         }
     }
-    
+
     public static void initLogging(boolean debug) {
         if (loggingFileLoaded) {
             return;

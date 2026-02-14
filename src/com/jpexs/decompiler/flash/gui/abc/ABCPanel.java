@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.DebuggerSession;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -388,9 +389,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
             if (parentObjectId == 0 && objectId != 0L && isAS3) {
-                igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
+                igv = Main.getCurrentDebugSession().getVariable(objectId, "", true, useGetter);
             } else {
-                igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
+                igv = Main.getCurrentDebugSession().getVariable(parentObjectId, var.name, true, useGetter);
             }
 
             //current var is getter function - set it to value really got
@@ -782,7 +783,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 default:
                     return;
             }
-            Main.getDebugHandler().setVariable(((VariableNode) node).parentObjectId, ((VariableNode) node).var.name, valType, symb.value);
+            Main.getCurrentDebugSession().setVariable(((VariableNode) node).parentObjectId, ((VariableNode) node).var.name, valType, symb.value);
             //((VariableNode) node).refresh();
             Object[] path = new Object[((VariableNode) node).path.size()];
             for (int i = 0; i < path.length; i++) {
@@ -1422,13 +1423,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
                 decButtonsPan.setVisible(false);
             }
 
             @Override
-            public void disconnected() {
-                decButtonsPan.setVisible(true);
+            public void disconnected(DebuggerSession session) {
+                if (!Main.getDebugHandler().isAnySessionConnected()) {
+                    decButtonsPan.setVisible(true);
+                }
             }
         });
 
