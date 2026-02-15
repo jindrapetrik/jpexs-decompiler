@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.Main;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -142,7 +143,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             ipHash = ipPath.substring(0, ipPath.indexOf(":"));
             ipPath = ipPath.substring(ipPath.indexOf(":") + 1);
         }
-        String myhash = Main.getSwfHash(Main.getMainFrame().getPanel().getCurrentSwf());
+        SWF currentSwf = Main.getMainFrame().getPanel().getCurrentSwf();
+        String myhash = currentSwf == null ? "myunknown" : Main.getSwfHash(currentSwf);
         if (ip > 0 && ipPath != null && ipHash.equals(myhash) && ipPath.equals(breakPointScriptName)) {
             addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }

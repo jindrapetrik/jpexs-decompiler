@@ -2878,7 +2878,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (asms.containsKey(rawScriptName)) {
                 oldItem = null;
                 getCurrentTree().setSelectionPath(null);
-                setTagTreeSelectedNode(getCurrentTree(), asms.get(rawScriptName));
+                setTagTreeSelectedNode(getCurrentTree(), asms.get(rawScriptName));                
             }
             /*if (actionPanel != null && asms.containsKey(rawScriptName)) {
                 actionPanel.setSource(asms.get(rawScriptName), true);                
@@ -5776,12 +5776,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private void valueChanged(Object source, TreePath selectedPath) {
         TreeItem treeItem = selectedPath == null ? null : (TreeItem) selectedPath.getLastPathComponent();
         
-        Main.updateSession();
-        if (treeItem == null) {
+        if (treeItem == null) {            
             updateUi(null);
             reload(false);
             return;
         }
+        
+        Main.updateSession();
 
         if (!(treeItem instanceof OpenableList)) {
             Openable openable = treeItem.getOpenable();

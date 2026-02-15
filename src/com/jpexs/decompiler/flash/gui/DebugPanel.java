@@ -466,7 +466,7 @@ public class DebugPanel extends JPanel {
         });
 
         add(new HeaderLabel(AppStrings.translate("debugpanel.header")), BorderLayout.NORTH);
-        add(varTabs, BorderLayout.CENTER);
+        add(varTabs, BorderLayout.CENTER);                
     }
 
     /*    private void getVariableList() {

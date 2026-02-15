@@ -1120,9 +1120,9 @@ public class Main {
             return null;
         }
         SWF currentSwf = mainFrame.getPanel().getCurrentSwf();
-        if (currentSwf == null) {
+        if (currentSwf == null) {            
             return null;
-        }
+        }                
         return getDebugHandler().getSessionContainingSwf(currentSwf);
     }
 

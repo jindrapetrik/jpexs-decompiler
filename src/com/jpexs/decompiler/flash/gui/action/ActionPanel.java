@@ -1158,6 +1158,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         editor.addTextChangedListener(this::editorTextChanged);
         decompiledEditor.addTextChangedListener(this::decompiledEditorTextChanged);
+        debugPanel.refresh(Main.getCurrentDebugSession());
     }
 
     private void deobfuscateButtonActionPerformed(ActionEvent evt) {

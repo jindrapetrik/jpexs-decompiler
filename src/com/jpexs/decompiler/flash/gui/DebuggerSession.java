@@ -323,6 +323,7 @@ public class DebuggerSession {
                     Runnable r = new Runnable() {
                         @Override
                         public void run() {
+                            boolean modulesEmptyBefore = debuggedSwfs.isEmpty();
                             try {
                                 for (InSwfInfo.SwfInfo s : t.swfInfos) {
                                     try {
@@ -350,11 +351,12 @@ public class DebuggerSession {
                                                 connected = false;
                                             }
                                             disconnected();
+                                            return;
                                         } else {
                                             debuggedSwfs.put((int) s.index, debuggedSwf);
                                             if (debuggedSwfs.size() == 1) { //it's the first one
                                                 con.isAS3 = debuggedSwf.isAS3();
-                                            }
+                                            }                                            
                                         }
                                     } catch (IOException | NoSuchAlgorithmException ex) {
                                         //ignore
@@ -370,7 +372,26 @@ public class DebuggerSession {
                                 }
 
                                 try {
-                                    if (!debuggedSwfs.isEmpty()) {
+                                    
+                                    Set<String> hashes = new LinkedHashSet<>();
+                                    
+                                    for (int file : modulePaths.keySet()) {
+                                        String path = modulePaths.get(file);
+                                        if (!path.contains(":")) {
+                                            //This is probably SWF file instrumented by another software                                            
+                                            throw new IOException("Missing hash");
+                                        }
+                                        String hash = path.substring(0, path.indexOf(":"));
+                                        hashes.add(hash);
+                                    }
+                                    for (String hash : hashes) {                                        
+                                        if (Main.findOpenedSwfByHash(hash) == null) {
+                                            //This is probably SWF file instrumented by another software
+                                            throw new IOException("SWF with hash " + hash + " not found");
+                                        }
+                                    }                                                                       
+                                    
+                                    if (!debuggedSwfs.isEmpty() && modulesEmptyBefore) {
                                         if (con.isAS3) {
                                             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
                                             con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
@@ -457,6 +478,11 @@ public class DebuggerSession {
                         @Override
                         public void run() {
                             synchronized (DebuggerSession.this) {
+                                if (!connected) {
+                                    return;
+                                }
+                                
+                                
                                 paused = true;
                                 Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "paused");
                             }
