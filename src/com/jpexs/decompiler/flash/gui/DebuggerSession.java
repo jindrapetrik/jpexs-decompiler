@@ -560,9 +560,9 @@ public class DebuggerSession {
                                         }
                                         return;
                                     }
-                                    Main.startWork(AppStrings.translate("work.halted.with").replace("%file%", userSwfName), null, true);
+                                    Main.startWork(AppStrings.translate("debug.session").replace("%id%", "" + id) + " - " + AppStrings.translate("work.halted.with").replace("%file%", userSwfName), null, true);
                                 } else {
-                                    Main.startWork(AppStrings.translate("work.breakat") + userBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null, true);
+                                    Main.startWork(AppStrings.translate("debug.session").replace("%id%", "" + id) + " - " + AppStrings.translate("work.breakat") + userBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null, true);
                                 }
                                 depth = 0;
                                 refreshFrame();
@@ -976,15 +976,17 @@ public class DebuggerSession {
         return breakReason;
     }
 
-    public synchronized void refreshFrame() {
-        if (!paused) {
-            return;
-        }
-        try {
-            frame = commands.getFrame(depth);
-            pool = commands.getConstantPool(0);
-        } catch (IOException ex) {
-            //ignore
+    public void refreshFrame() {
+        synchronized (this) {                    
+            if (!paused) {
+                return;
+            }
+            try {
+                frame = commands.getFrame(depth);
+                pool = commands.getConstantPool(0);
+            } catch (IOException ex) {
+                //ignore
+            }
         }
         for (DebuggerHandler.FrameChangeListener l : handler.getFrameChangeListeners()) {
             l.frameChanged(DebuggerSession.this);

@@ -249,6 +249,8 @@ public class Main {
 
     private static Map<String, Set<String>> hash2PreparedHash = new HashMap<>();
 
+    private static final int HASH_LENGTH = 10;
+
     public static SWF getDebuggedSWF() {
         return debuggedSWF;
     }
@@ -363,12 +365,19 @@ public class Main {
         }
     }
 
-    public static synchronized boolean isDebugPaused() {
+    public static boolean isDebugPaused() {
+        boolean cond1;
+        synchronized (Main.class) {
+            cond1 = runProcess != null && runProcessDebug || !flashDebugger.isStopped();
+        }
+        if (!cond1) {
+            return false;
+        }
         DebuggerSession session = getCurrentDebugSession();
         if (session == null) {
             return false;
         }
-        return (runProcess != null && runProcessDebug || !flashDebugger.isStopped()) && session.isPaused();
+        return cond1 && session.isPaused();
     }
 
     public static synchronized boolean isDebugRunning() {
@@ -736,7 +745,7 @@ public class Main {
             if (!hash2PreparedHash.containsKey(origHash)) {
                 hash2PreparedHash.put(origHash, new LinkedHashSet<>());
             }
-            String preparedHash = instrSWF.getHashSha256();
+            String preparedHash = instrSWF.getHashSha256().substring(0, HASH_LENGTH);
             hash2PreparedHash.get(origHash).add(preparedHash);
             Logger.getLogger(Main.class.getName()).log(Level.FINE, "Prepared {0} as {1}", new Object[]{origHash, preparedHash});
             /*if ("main".equals(swfHash)) {
@@ -1113,7 +1122,7 @@ public class Main {
     }
 
     public static DebuggerSession getCurrentDebugSession() {
-        if (mainFrame == null) {
+        /*if (mainFrame == null) {
             return null;
         }
         if (mainFrame.getPanel() == null) {
@@ -1123,7 +1132,9 @@ public class Main {
         if (currentSwf == null) {            
             return null;
         }                
-        return getDebugHandler().getSessionContainingSwf(currentSwf);
+        return getDebugHandler().getSessionContainingSwf(currentSwf);*/
+        DebuggerSession session = getDebugHandler().getSelectedSession();
+        return session;
     }
 
     public static void updateSession() {
@@ -2921,7 +2932,7 @@ public class Main {
             for (int i = 0; i < array.length; ++i) {
                 sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
             }
-            return sb.toString();
+            return sb.toString().substring(0, HASH_LENGTH);
         } catch (java.security.NoSuchAlgorithmException e) {
             //ignore
         }
@@ -3182,6 +3193,7 @@ public class Main {
 
                     @Override
                     public void disconnected(DebuggerSession session) {
+                        Main.updateSession();
                         if (Main.mainFrame != null) {
                             Main.mainFrame.getMenu().updateComponents();
                         }
@@ -4099,7 +4111,7 @@ public class Main {
         if (tit != null && tit.contains(":")) {
             return tit.substring(tit.lastIndexOf(":") + 1);
         }
-        return swf.getHashSha256();
+        return swf.getHashSha256().substring(0, HASH_LENGTH);
     }
 
     public static void openSolEditor() {

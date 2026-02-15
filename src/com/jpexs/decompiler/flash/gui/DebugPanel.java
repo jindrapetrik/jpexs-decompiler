@@ -93,6 +93,8 @@ public class DebugPanel extends JPanel {
     
     private WeakReference<DebuggerSession> currentSessionRef = null;
 
+    private boolean as3;
+    
     public static enum SelectedTab {
 
         LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK, CONSTANTPOOL
@@ -158,10 +160,11 @@ public class DebugPanel extends JPanel {
         }
     }
 
-    public DebugPanel() {
+    public DebugPanel(boolean as3) {
         super(new BorderLayout());
-        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>()), false);
-        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>()), false);
+        this.as3 = as3;
+        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(as3, debugRegistersTable, new ArrayList<>()), false);
+        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(as3, debugLocalsTable, new ArrayList<>()), false);
 
         MouseAdapter watchHandler = new MouseAdapter() {
 
@@ -374,7 +377,7 @@ public class DebugPanel extends JPanel {
         debugLocalsTable.addMouseListener(watchHandler);
 
         //debugScopeTable.addMouseListener(watchHandler);                           
-        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>()), false);
+        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(as3, debugScopeTable, new ArrayList<>()), false);
 
         constantPoolTable = new JTable();
         traceLogTextarea = new JTextArea();
@@ -529,14 +532,14 @@ public class DebugPanel extends JPanel {
                             }
                         }
                         
-                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers));
+                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(as3, debugRegistersTable, f.registers));
                         
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
 
-                        localsTable = new ABCPanel.VariablesTableModel(debugLocalsTable, locals);
+                        localsTable = new ABCPanel.VariablesTableModel(as3, debugLocalsTable, locals);
                         safeSetTreeModel(debugLocalsTable, localsTable);
-                        safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain));
+                        safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(as3, debugScopeTable, f.scopeChain));
 
                         /*TableModelListener refreshListener = new TableModelListener() {
                          @Override
@@ -573,9 +576,9 @@ public class DebugPanel extends JPanel {
                         debugLocalsTable.getTreeTableModel().addTreeModelListener(refreshListener);
                         debugScopeTable.getTreeTableModel().addTreeModelListener(refreshListener);
                     } else {
-                        debugRegistersTable.setTreeModel(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>()));
-                        debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>()));
-                        debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>()));
+                        debugRegistersTable.setTreeModel(new ABCPanel.VariablesTableModel(as3, debugRegistersTable, new ArrayList<>()));
+                        debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(as3, debugLocalsTable, new ArrayList<>()));
+                        debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(as3, debugScopeTable, new ArrayList<>()));
                     }
                     InConstantPool cpool = session == null ? null : session.getConstantPool();
                     if (cpool != null) {

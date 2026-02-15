@@ -317,6 +317,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         private List<VariableNode> childs;
 
         public List<Variable> traits = new ArrayList<>();
+        private boolean as3;
 
         @Override
         public int hashCode() {
@@ -386,12 +387,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
 
-            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+            //boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
             if (Main.getCurrentDebugSession() == null) {
                 return;
             }
-            if (parentObjectId == 0 && objectId != 0L && isAS3) {
+            if (parentObjectId == 0 && objectId != 0L && as3) {
                 igv = Main.getCurrentDebugSession().getVariable(objectId, "", true, useGetter);
             } else {
                 igv = Main.getCurrentDebugSession().getVariable(parentObjectId, var.name, true, useGetter);
@@ -410,7 +411,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(varInsideGetter);
-                    childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
+                    childs.add(new VariableNode(as3, path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
                 } else {
                     curTrait = igv.childs.get(i);
                     traits.add(curTrait);
@@ -435,7 +436,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return childs.size();
         }
 
-        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
+        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -444,9 +445,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             this.path.addAll(parentPath);
             this.path.add(this);
             loaded = false;
+            this.as3 = as3;
         }
 
-        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
+        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -462,6 +464,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 vn.path.add(vn);
             }
             loaded = true;
+            this.as3 = as3;
         }
     }
 
@@ -498,15 +501,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         private final MyTreeTable ttable;
 
-        public VariablesTableModel(MyTreeTable ttable, List<Variable> vars) {
+        public VariablesTableModel(boolean as3, MyTreeTable ttable, List<Variable> vars) {
             this.ttable = ttable;
 
             List<VariableNode> childs = new ArrayList<>();
 
             for (int i = 0; i < vars.size(); i++) {
-                childs.add(new VariableNode(new ArrayList<>(), 1, vars.get(i), 0L, null));
+                childs.add(new VariableNode(as3, new ArrayList<>(), 1, vars.get(i), 0L, null));
             }
-            root = new VariableNode(new ArrayList<>(), 0, null, 0L, null, childs);
+            root = new VariableNode(as3, new ArrayList<>(), 0, null, 0L, null, childs);
         }
 
         @Override
@@ -1438,7 +1441,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         });
 
-        debugPanel = new DebugPanel();
+        debugPanel = new DebugPanel(true);
 
         JPersistentSplitPane sp2;
 

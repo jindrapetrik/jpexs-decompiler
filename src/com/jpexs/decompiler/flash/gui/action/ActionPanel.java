@@ -976,7 +976,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         panA.add(decLabel, BorderLayout.NORTH);
 
-        DebugPanel debugPanel = new DebugPanel();
+        DebugPanel debugPanel = new DebugPanel(false);
 
         JPanel panelWithHint = new JPanel(new BorderLayout());
         brokenHintPanel = new JPanel(new BorderLayout(10, 10));

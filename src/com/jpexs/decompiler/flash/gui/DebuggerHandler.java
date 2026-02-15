@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author JPEXS
@@ -39,6 +40,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DebuggerHandler implements DebugConnectionListener {
 
     private List<DebuggerSession> sessions = Collections.synchronizedList(new ArrayList<>());
+
+    private int selectedSessionId = -1;
+
+    private final Object selectionLock = new Object();
 
     private boolean terminating = false;
 
@@ -91,7 +96,14 @@ public class DebuggerHandler implements DebugConnectionListener {
         public void doContinue(DebuggerSession session);
     }
 
-    private final List<DebuggerHandler.BreakListener> breakListeners = new CopyOnWriteArrayList<>();
+    public static interface SessionSelectionListener {
+
+        public void sessionSelected(DebuggerSession newSession, int oldSessionId);
+    }
+
+    private final List<DebuggerHandler.SessionSelectionListener> selectionListeners = new ArrayList<>();
+
+    private final List<DebuggerHandler.BreakListener> breakListeners = new ArrayList<>();
 
     private final List<DebuggerHandler.TraceListener> traceListeners = new ArrayList<>();
 
@@ -101,8 +113,20 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private final List<DebuggerHandler.ConnectionListener> connectionListeners = new ArrayList<>();
 
+    public void addSelectionListener(DebuggerHandler.SessionSelectionListener l) {
+        selectionListeners.add(l);
+    }
+
+    public void removeSelectionListener(DebuggerHandler.SessionSelectionListener l) {
+        selectionListeners.remove(l);
+    }
+
     public void addBreakListener(DebuggerHandler.BreakListener l) {
         breakListeners.add(l);
+    }
+
+    public void removeBreakListener(DebuggerHandler.BreakListener l) {
+        breakListeners.remove(l);
     }
 
     public void addFrameChangeListener(DebuggerHandler.FrameChangeListener l) {
@@ -127,10 +151,6 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public void removeErrorListener(DebuggerHandler.ErrorListener l) {
         errorListeners.remove(l);
-    }
-
-    public void removeBreakListener(DebuggerHandler.BreakListener l) {
-        breakListeners.remove(l);
     }
 
     public void addConnectionListener(DebuggerHandler.ConnectionListener l) {
@@ -192,12 +212,12 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
             }
         }
-        
+
         DebuggerSession session = new DebuggerSession(this, con, breakpoints);
         sessions.add(session);
     }
 
-    public void sessionInited(DebuggerSession session) {       
+    public void sessionInited(DebuggerSession session) {
 
     }
 
@@ -226,8 +246,8 @@ public class DebuggerHandler implements DebugConnectionListener {
         synchronized (this) {
             if (terminating) {
                 return;
-            }        
-            terminating = true;       
+            }
+            terminating = true;
         }
         for (DebuggerSession session : sessions) {
             if (session.isConnected()) {
@@ -306,7 +326,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return null;
     }
-    
+
     public SWF getAnyDebuggedSwf() {
         List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
         for (DebuggerSession session : currentSessions) {
@@ -316,7 +336,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return null;
     }
-    
+
     public Map<Integer, DebuggerSession> getActiveSessions() {
         Map<Integer, DebuggerSession> ret = new LinkedHashMap<>();
         List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
@@ -327,7 +347,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return ret;
     }
-    
+
     public DebuggerSession getSessionById(int id) {
         List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
         for (DebuggerSession session : currentSessions) {
@@ -336,5 +356,63 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
         }
         return null;
+    }
+
+    public DebuggerSession getSelectedSession() {
+        int oldSelection;
+        int newSelection;
+        DebuggerSession ret = null;
+        synchronized (selectionLock) {
+            oldSelection = selectedSessionId;
+            newSelection = oldSelection;
+            Map<Integer, DebuggerSession> activeSessions = getActiveSessions();
+            if (activeSessions.isEmpty()) {
+                selectedSessionId = -1;
+                newSelection = -1;
+            } else {
+
+                if (selectedSessionId == -1) {
+                    DebuggerSession session = activeSessions.values().iterator().next();
+                    selectedSessionId = newSelection = session.getId();                   
+                }
+
+                ret = getSessionById(selectedSessionId);
+                if (ret == null) {
+                    ret = activeSessions.values().iterator().next();
+                    selectedSessionId = ret.getId();
+                    newSelection = selectedSessionId;
+                }
+            }
+        }
+        
+        if (oldSelection != newSelection) {
+            for (SessionSelectionListener l : selectionListeners) {
+                l.sessionSelected(ret, oldSelection);                
+            }
+        }
+        
+        return ret;
+
+    }
+
+    public boolean setSelectedSessionId(int id) {
+        DebuggerSession session = getSessionById(id);
+        if (session == null) {
+            return false;
+        }
+        int oldSelection;
+        int newSelection;
+        synchronized (selectionLock) {
+            oldSelection = selectedSessionId;
+            selectedSessionId = id;          
+            newSelection = id;
+        }
+        
+        if (oldSelection != newSelection) {
+            for (SessionSelectionListener l : selectionListeners) {
+                l.sessionSelected(session, oldSelection);                
+            }
+        }
+        return true;
     }
 }
