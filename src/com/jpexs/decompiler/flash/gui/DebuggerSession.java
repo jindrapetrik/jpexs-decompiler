@@ -52,7 +52,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -84,7 +83,6 @@ public class DebuggerSession {
 
     private DebuggerCommands commands = null;
 
-    //private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
     private boolean paused = true;
 
     private Map<Integer, String> modulePaths = new HashMap<>();
@@ -260,22 +258,6 @@ public class DebuggerSession {
                         modulePaths.put(file, name);
                         scriptToModule.put(name, file);
                         moduleToSwfIndex.put(file, swfIndex);
-                        /*if (!"main".equals(swfHash)) {
-                            SWF swf = Main.getSwfByHash(swfHash);
-                            debuggedSwfs.put(swfIndex, swf);
-                        }*/
- /*if (swfIndex > debuggedSwfs.size() - 1) {
-                            SWF swf = Main.getSwfByHash(swfHash);
-                            if (swf == null) {
-                                Logger.getLogger(DebuggerSession.class.getName()).log(Level.WARNING, "SWF with hash {0} not found", swfHash);
-                            } else {
-                                Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "adding {0} to debugSwfs", swfIndex);
-                                swfIndicesCommitted.add(swfIndex);
-                                debuggedSwfs.add(swf);
-                            }
-                        } else {
-                            Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Swf index already committed");
-                        }*/
                         swfIndicesCommitted.add(swfIndex);
                     }
                     con.dropMessage(sc);
@@ -344,16 +326,6 @@ public class DebuggerSession {
                             try {
                                 for (InSwfInfo.SwfInfo s : t.swfInfos) {
                                     try {
-                                        /*try {
-                                    con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
-                                    con.sendMessageWithTimeout(new OutGetSwd(con, (int) s.index), InGetSwd.class);
-                                    } catch (IOException ex) {
-                                    //ignore
-                                    }*/
- /*if (s.scriptCount == 0) {
-                                        continue;
-                                    }*/
-
                                         InGetSwf inGetSwf = con.sendMessage(new OutGetSwf(con, (int) s.index), InGetSwf.class);
                                         Logger.getLogger(DebuggerSession.class.getName()).fine("Received SWF");
                                         Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF.URL = {0}", s.url);
@@ -499,14 +471,14 @@ public class DebuggerSession {
                                 if (moduleToSwfIndex.containsKey(message.file)) {
                                     SWF swf = debuggedSwfs.get(moduleToSwfIndex.get(message.file));
                                     userSwfName = swf.toString();
-                                } else if(!debuggedSwfs.isEmpty()) {
+                                } else if (!debuggedSwfs.isEmpty()) {
                                     userSwfName = debuggedSwfs.get(debuggedSwfs.size() - 1).toString();
                                 }
-                                
+
                                 if (modulePaths.containsKey(message.file)) {
                                     newBreakScriptName = modulePaths.get(message.file);
                                     userBreakScriptName = newBreakScriptName;
-                                    if (newBreakScriptName.contains(":")) {                                        
+                                    if (newBreakScriptName.contains(":")) {
                                         userBreakScriptName = userSwfName + ": " + newBreakScriptName.substring(newBreakScriptName.indexOf(":") + 1);
                                     }
                                 } else if (reasonInt != InBreakReason.REASON_SCRIPT_LOADED) {

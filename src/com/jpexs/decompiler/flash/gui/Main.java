@@ -270,14 +270,7 @@ public class Main {
                 hashSha256 = origKey;
                 break;                
             }
-        }
-        
-        if (hashSha256.startsWith("loaded_")) {
-            hashSha256 = hashSha256.substring("loaded_".length());                    
-        }
-        if (hashSha256.startsWith("imported_")) {
-            hashSha256 = hashSha256.substring("loaded_".length());                    
-        }
+        }      
         
         for (SWF swf : mainFrame.getPanel().getAllSwfs()) {
             Logger.getLogger(Main.class.getName()).log(Level.FINE, "Checking {0} with hash {1}", new Object[]{swf.toString(), swf.getHashSha256()});
@@ -681,7 +674,7 @@ public class Main {
                             SWF.decompress(new ByteArrayInputStream(impData), baos);
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                             tempFiles.add(newTempFile);
-                            prepareSwf("imported_" + sha256(baos.toByteArray()), prep, newTempFile, importedFile, tempFilesDir, tempFiles);
+                            prepareSwf(sha256(baos.toByteArray()), prep, newTempFile, importedFile, tempFilesDir, tempFiles);
                         }
                     }
                 }
@@ -3047,7 +3040,7 @@ public class Main {
                                     fos.write(inputData);
                                 }
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "preparing for load: {0}", hash);
-                                prepareSwf("loaded_" + hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
+                                prepareSwf(hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
                                 byte[] outputData = Helper.readFileEx(tempFile.getAbsolutePath());
                                 tempFile.delete();
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "calling datamodified");
@@ -3991,7 +3984,7 @@ public class Main {
         }*/
         String tit = swf.getTitleOrShortFileName();
         if (tit != null && tit.contains(":")) {
-            return "loaded_" + tit.substring(tit.lastIndexOf(":") + 1);
+            return tit.substring(tit.lastIndexOf(":") + 1);
         }
         return swf.getHashSha256();
     }
@@ -4011,13 +4004,6 @@ public class Main {
                 hashSha256 = origKey;
                 break;
             }
-        }
-        
-        if (hashSha256.startsWith("loaded_")) {
-            hashSha256 = hashSha256.substring("loaded_".length());
-        }
-        if (hashSha256.startsWith("imported_")) {
-            hashSha256 = hashSha256.substring("imported_".length());
         }
         
         for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
