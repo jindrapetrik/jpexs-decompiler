@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1209], [#1850], [#2619] Debugging SWF in the web browser
+  (Debug listening capability - only for SWFs previously prepared by FFDec)
 
 ### Fixed
 - Metadata formatting
