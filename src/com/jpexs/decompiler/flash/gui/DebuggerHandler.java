@@ -316,4 +316,25 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return null;
     }
+    
+    public Map<Integer, DebuggerSession> getActiveSessions() {
+        Map<Integer, DebuggerSession> ret = new LinkedHashMap<>();
+        List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
+        for (DebuggerSession session : currentSessions) {
+            if (session.isConnected()) {
+                ret.put(session.getId(), session);
+            }
+        }
+        return ret;
+    }
+    
+    public DebuggerSession getSessionById(int id) {
+        List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
+        for (DebuggerSession session : currentSessions) {
+            if (session.isConnected() && session.getId() == id) {
+                return session;
+            }
+        }
+        return null;
+    }
 }

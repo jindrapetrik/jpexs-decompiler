@@ -2718,7 +2718,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void gotoScriptMethod(SWF swf, String scriptName, int methodIndex) {
+    public boolean gotoScriptMethod(SWF swf, String scriptName, int methodIndex) {
         abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
             @Override
             public void run() {
@@ -2728,10 +2728,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
         });
-        gotoScriptName(swf, scriptName);
+        return gotoScriptName(swf, scriptName);
     }
 
-    public void gotoScriptTrait(SWF swf, String scriptName, int classIndex, int traitIndex) {
+    public boolean gotoScriptTrait(SWF swf, String scriptName, int classIndex, int traitIndex) {
         abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
             @Override
             public void run() {
@@ -2746,7 +2746,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
         });
-        gotoScriptName(swf, scriptName);
+        return gotoScriptName(swf, scriptName);
     }
 
     public void findOrLoadOpenableListByFilePath(String filePath, OpenableListLoaded executeAfterOpen, boolean loadSession) {
@@ -2768,7 +2768,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }, loadSession);
     }
 
-    public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex, boolean pcode) {
+    public boolean gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex, boolean pcode) {
         View.checkAccess();
 
         if (abcPanel != null && swf.isAS3()) {
@@ -2822,7 +2822,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             });
         }
-        gotoScriptName(swf, scriptName);
+        return gotoScriptName(swf, scriptName);
     }
 
     public void refreshBreakPoints() {
@@ -2850,11 +2850,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
      });
 
      }*/
-    public void gotoScriptName(SWF mainSwf, String scriptNameWithSwfHash) {
+    public boolean gotoScriptName(SWF mainSwf, String scriptNameWithSwfHash) {
         View.checkAccess();
 
         if (mainSwf == null) {
-            return;
+            return false;
         }
         if (mainSwf.isAS3()) {
             String rawScriptName = scriptNameWithSwfHash;
@@ -2867,7 +2867,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             //if (!abcList.isEmpty()) {
             ABCPanel abcPanel = getABCPanel();
 
-            abcPanel.hilightScript(mainSwf, rawScriptName);
+            return abcPanel.hilightScript(mainSwf, rawScriptName);
             //}
         } else {
             String rawScriptName = scriptNameWithSwfHash;
@@ -2879,11 +2879,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 oldItem = null;
                 getCurrentTree().setSelectionPath(null);
                 setTagTreeSelectedNode(getCurrentTree(), asms.get(rawScriptName));                
+                return true;
             }
             /*if (actionPanel != null && asms.containsKey(rawScriptName)) {
                 actionPanel.setSource(asms.get(rawScriptName), true);                
             }*/
         }
+        return false;
     }
 
     public void gotoDocumentClass(SWF swf) {

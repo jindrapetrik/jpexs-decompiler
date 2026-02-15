@@ -1767,7 +1767,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             hilightScript(openable, name);
         }
     }
-
+    
     /**
      * Hilights specific script.
      *
@@ -1775,7 +1775,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
      * @param name Full name of the script. It must be printable - deobfuscated,
      * not raw!
      */
-    public void hilightScript(Openable openable, String name) {
+    public boolean hilightScript(Openable openable, String name) {
 
         TreeItem scriptNode = null;
         if (openable instanceof SWF) {
@@ -1799,10 +1799,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
                 mainPanel.findOrLoadOpenableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
-                return;
+                return true;
             } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
                 mainPanel.findOrLoadOpenableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
-                return;
+                return true;
             }
 
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
@@ -1829,11 +1829,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         if (scriptNode != null) {
-            hilightScript(openable, name, scriptNode);
+            return hilightScript(openable, name, scriptNode);
         }
+        return false;
     }
 
-    public void hilightScript(Openable openable, String name, TreeItem scriptNode) {
+    public boolean hilightScript(Openable openable, String name, TreeItem scriptNode) {
         View.checkAccess();
 
         Object item;
@@ -1907,10 +1908,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         }
         if (!found) {
-            return;
+            return false;
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
         mainPanel.reload(true);
+        return true;
     }
 
     public void hilightScript(ScriptPack pack) {

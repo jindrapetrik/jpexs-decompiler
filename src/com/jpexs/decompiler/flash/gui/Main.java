@@ -3161,7 +3161,7 @@ public class Main {
 
                                 if (Main.getDebugHandler().getNumberOfPausedSessions() > 1
                                         && Main.getCurrentDebugSession() != session) {
-                                    Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf.toString());
+                                    Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf == null ? "unknown" : swf.toString());
                                     mainFrame.getPanel().refreshBreakPoints();
                                     return;
                                 }

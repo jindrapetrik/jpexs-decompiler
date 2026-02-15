@@ -18,12 +18,22 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -37,6 +47,8 @@ import javax.swing.table.TableCellRenderer;
  */
 public class DebugStackPanel extends JPanel {
 
+    private JComboBox<SessionItem> sessionComboBox = new JComboBox<>();
+    
     private JTable stackTable;
 
     private boolean active = false;
@@ -89,6 +101,7 @@ public class DebugStackPanel extends JPanel {
         setLayout(new BorderLayout());
         //add(titleLabel, BorderLayout.NORTH);
         add(new FasterScrollPane(stackTable), BorderLayout.CENTER);
+        add(sessionComboBox, BorderLayout.NORTH);
 
         stackTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -96,23 +109,77 @@ public class DebugStackPanel extends JPanel {
                 if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
                     int row = stackTable.rowAtPoint(e.getPoint());
                     if (row >= 0) {
-                        String swfHash = swfHashes[row];
-                        String scriptName = (String) stackTable.getModel().getValueAt(row, 1);
-                        int line = (int) (Integer) stackTable.getModel().getValueAt(row, 2);
-                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.findOpenedSwfByHash(swfHash);
-                        Main.getMainFrame().getPanel().gotoScriptLine(swf,
-                                scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
-                        DebuggerSession session = null;
-                        if (currentSessionRef != null) {
-                            session = currentSessionRef.get();
-                        }
-                        if (session != null) {
-                            session.setDepth(row);
-                        }
+                        gotoRow(row);
                     }
                 }
             }
         });
+        
+        sessionComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SessionItem selection = (SessionItem) sessionComboBox.getSelectedItem();
+                if (selection != null) {
+                    DebuggerSession session = Main.getDebugHandler().getSessionById(selection.id);
+                    if (session != null && session != Main.getCurrentDebugSession()) {                        
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                refresh(session);
+                            }                            
+                        });                        
+                        View.execInEventDispatchLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                gotoRow(0);
+                            }                            
+                        });
+                    }
+                }
+            }                     
+        });
+    }
+    
+    private void gotoRow(int row) {
+        String swfHash = swfHashes[row];
+        String scriptName = (String) stackTable.getModel().getValueAt(row, 1);
+        int line = (int) (Integer) stackTable.getModel().getValueAt(row, 2);
+        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.findOpenedSwfByHash(swfHash);
+        boolean scriptFound = Main.getMainFrame().getPanel().gotoScriptLine(swf,
+                scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
+        
+        if (!scriptFound) {
+            if (Main.getMainFrame().getPanel().getCurrentView() == MainPanel.VIEW_RESOURCES) {
+                TreeItem scriptNode = Main.getMainFrame().getPanel().tagTree.getFullModel().getScriptsNode(swf);
+                if (scriptNode != null) {
+                    scriptFound = true;
+                    Main.getMainFrame().getPanel().setTagTreeSelectedNode(Main.getMainFrame().getPanel().getCurrentTree(), scriptNode);
+                }                
+            }
+            if (!scriptFound) {
+                Main.getMainFrame().getPanel().setTagTreeSelectedNode(Main.getMainFrame().getPanel().getCurrentTree(), swf);
+            }
+        }
+        DebuggerSession session = null;
+        if (currentSessionRef != null) {
+            session = currentSessionRef.get();
+        }
+        if (session != null) {
+            session.setDepth(row);
+        }
+    }
+    
+    private class SessionItem {
+        private int id;
+
+        public SessionItem(int id) {
+            this.id = id;
+        }       
+        
+        @Override
+        public String toString() {
+            return AppStrings.translate("debug.session").replace("%id%", "" + id);
+        }                
     }
 
     public void clear() {
@@ -123,8 +190,34 @@ public class DebugStackPanel extends JPanel {
     public boolean isActive() {
         return active;
     }
+        
 
     public void refresh(DebuggerSession session) {
+        
+        Map<Integer, DebuggerSession> allSessions = Main.getDebugHandler().getActiveSessions();
+        DefaultComboBoxModel<SessionItem> model = new DefaultComboBoxModel<>();
+        int itemIndex = -1;
+        int j = 0;
+        for (int id : allSessions.keySet()) {
+            DebuggerSession s = allSessions.get(id);
+            if (s == session) {
+                itemIndex = j;
+            }
+            model.addElement(new SessionItem(id));
+            j++;
+        }
+        sessionComboBox.setModel(model);
+        if (itemIndex > -1) {
+            final int fItemIndex = itemIndex;
+            View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    sessionComboBox.setSelectedIndex(fItemIndex);
+                }               
+            });            
+        }
+        
+        
         if (session == null) {
             clear();
             return;
@@ -147,7 +240,11 @@ public class DebugStackPanel extends JPanel {
             if (moduleName.contains(":")) {
                 swfHash = moduleName.substring(0, moduleName.indexOf(":"));
                 moduleName = moduleName.substring(moduleName.indexOf(":") + 1);
-            }
+            } else {
+                List<SWF> debuggedSwfs = new ArrayList<>(session.getDebuggedSwfs().values());
+                SWF lastSwf = debuggedSwfs.get(debuggedSwfs.size() - 1);
+                swfHash = Main.getSwfHash(lastSwf);
+            }            
             newSwfHashes[i] = swfHash;
             data[i][0] = swfHash == null ? "unknown" : Main.findOpenedSwfByHash(swfHash).toString();
             data[i][1] = moduleName;
@@ -157,8 +254,7 @@ public class DebugStackPanel extends JPanel {
             newClassIndices[i] = newClassIndex == null ? -1 : newClassIndex;
             Integer newMethodIndex = session.moduleToMethodIndex(f);
             newMethodIndices[i] = newMethodIndex == null ? -1 : newMethodIndex;
-            Integer newTraitIndex = session.moduleToTraitIndex(f);
-            ;
+            Integer newTraitIndex = session.moduleToTraitIndex(f);            
             newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
 

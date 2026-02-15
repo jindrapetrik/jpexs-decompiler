@@ -153,7 +153,14 @@ public class DebuggerSession {
             paused = false;
         }
 
-        Main.getMainFrame().getPanel().updateMenu();
+        View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                Main.getMainFrame().getPanel().updateMenu();
+            }            
+        });
+        
+        
 
         //enlog(DebuggerConnection.class);
         //enlog(DebuggerCommands.class);
@@ -634,6 +641,12 @@ public class DebuggerSession {
             disconnected();
         }
     }
+
+    public int getId() {
+        return id;
+    }
+    
+    
 
     public boolean containsSwf(SWF swf) {
         return debuggedSwfs.containsValue(swf);
