@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.ref.WeakReference;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -46,35 +47,40 @@ public class DebugStackPanel extends JPanel {
     private int[] classIndices = new int[0];
     private int[] methodIndices = new int[0];
     private int[] traitIndices = new int[0];
-
+    private WeakReference<DebuggerSession> currentSessionRef = null;
+    
     public DebugStackPanel() {
         stackTable = new JTable();
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
             @Override
-            public void frameChanged() {
-                depth = Main.getDebugHandler().getDepth();
-                refresh();
+            public void frameChanged(DebuggerSession session) {
+                if (session == null) {
+                    refresh(null);
+                    return;
+                }
+                depth = session.getDepth();
+                refresh(session);
             }
         });
         Main.getDebugHandler().addBreakListener(new DebuggerHandler.BreakListener() {
             @Override
-            public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
+            public void breakAt(DebuggerSession session, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
 
             }
 
             @Override
-            public void doContinue() {
+            public void doContinue(DebuggerSession session) {
                 clear();
             }
         });
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
             }
 
             @Override
-            public void disconnected() {
+            public void disconnected(DebuggerSession session) {
                 clear();
             }
         });
@@ -93,10 +99,16 @@ public class DebugStackPanel extends JPanel {
                         String swfHash = swfHashes[row];
                         String scriptName = (String) stackTable.getModel().getValueAt(row, 1);
                         int line = (int) (Integer) stackTable.getModel().getValueAt(row, 2);
-                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.getSwfByHash(swfHash);
+                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.findOpenedSwfByHash(swfHash);
                         Main.getMainFrame().getPanel().gotoScriptLine(swf,
                                 scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
-                        Main.getDebugHandler().setDepth(row);
+                        DebuggerSession session = null;
+                        if (currentSessionRef != null) {
+                            session = currentSessionRef.get();
+                        }
+                        if (session != null) {
+                            session.setDepth(row);
+                        }
                     }
                 }
             }
@@ -112,8 +124,12 @@ public class DebugStackPanel extends JPanel {
         return active;
     }
 
-    public void refresh() {
-        InBreakAtExt info = Main.getDebugHandler().getBreakInfo();
+    public void refresh(DebuggerSession session) {
+        if (session == null) {
+            clear();
+            return;
+        }
+        InBreakAtExt info = session.getBreakInfo();
         if (info == null) {
             clear();
             return;
@@ -126,22 +142,22 @@ public class DebugStackPanel extends JPanel {
         int[] newTraitIndices = new int[info.files.size()];
         for (int i = 0; i < info.files.size(); i++) {
             int f = info.files.get(i);
-            String moduleName = Main.getDebugHandler().moduleToString(f);
+            String moduleName = session.moduleToString(f);
             String swfHash = null;
             if (moduleName.contains(":")) {
                 swfHash = moduleName.substring(0, moduleName.indexOf(":"));
                 moduleName = moduleName.substring(moduleName.indexOf(":") + 1);
             }
             newSwfHashes[i] = swfHash;
-            data[i][0] = swfHash == null ? "unknown" : Main.getSwfByHash(swfHash).toString();
+            data[i][0] = swfHash == null ? "unknown" : Main.findOpenedSwfByHash(swfHash).toString();
             data[i][1] = moduleName;
             data[i][2] = info.lines.get(i);
             data[i][3] = info.stacks.get(i);
-            Integer newClassIndex = Main.getDebugHandler().moduleToClassIndex(f);
+            Integer newClassIndex = session.moduleToClassIndex(f);
             newClassIndices[i] = newClassIndex == null ? -1 : newClassIndex;
-            Integer newMethodIndex = Main.getDebugHandler().moduleToMethodIndex(f);
+            Integer newMethodIndex = session.moduleToMethodIndex(f);
             newMethodIndices[i] = newMethodIndex == null ? -1 : newMethodIndex;
-            Integer newTraitIndex = Main.getDebugHandler().moduleToTraitIndex(f);
+            Integer newTraitIndex = session.moduleToTraitIndex(f);
             ;
             newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
@@ -178,12 +194,15 @@ public class DebugStackPanel extends JPanel {
                     }
 
                 };
-                stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-                stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-                stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+                if (stackTable.getColumnModel().getColumnCount() >= 3) {
+                    stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
+                    stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+                    stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+                }
                 repaint();
             }
         });
+        currentSessionRef = new WeakReference<>(session);        
     }
 
     public int getDepth() {

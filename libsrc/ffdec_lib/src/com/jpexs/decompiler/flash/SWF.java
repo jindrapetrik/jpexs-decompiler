@@ -181,6 +181,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
+import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
@@ -204,6 +205,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -695,6 +697,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Lock for characters synchronization
      */
     private final Object charactersLock = new Object();
+    
+    /**
+     * SHA 256 hash of original data
+     */
+    private String hashSha256 = null;
+
+    public String getHashSha256() {
+        return hashSha256;
+    }                
 
     public UninitializedClassFieldsDetector getUninitializedClassFieldsDetector() {
         return uninitializedClassFieldsDetector;
@@ -1818,9 +1829,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param includeImported Include imported characters
      * @throws IOException On I/O error
      */
-    public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
+    public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {        
         checkCharset();
         byte[] newUncompressedData = saveToByteArray(gfx, includeImported);
+        
+        try {
+            hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(newUncompressedData));
+        } catch (NoSuchAlgorithmException ex) {
+            //ignore
+        }
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         compress(new ByteArrayInputStream(newUncompressedData), baos, compression, lzmaProperties);
         byte[] newCompressedData = baos.toByteArray();
@@ -1828,7 +1846,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             encrypt(new ByteArrayInputStream(newCompressedData), os);
         } else {
             os.write(newCompressedData);
-        }
+        }    
     }
 
     /**
@@ -2298,7 +2316,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, boolean allowRenameIdentifiers) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
-        this.charset = charset;
+        this.charset = charset;                
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
@@ -2307,6 +2325,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
+        
+        try {
+            hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(uncompressedData));
+        } catch (NoSuchAlgorithmException ex) {
+            //ignore
+        }
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
@@ -6445,5 +6469,5 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public RECT getRectWithFilters() {
         return getRect();
-    }
+    }        
 }

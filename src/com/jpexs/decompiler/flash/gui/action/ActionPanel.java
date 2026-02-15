@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.DebuggerSession;
 import com.jpexs.decompiler.flash.gui.DocsPanel;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
@@ -1065,12 +1066,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         //decPanel.add(searchPanel, BorderLayout.NORTH);
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
                 decButtonsPan.setVisible(false);
             }
 
             @Override
-            public void disconnected() {
+            public void disconnected(DebuggerSession session) {
+                if (Main.getDebugHandler().isAnySessionConnected()) {
+                    return;
+                }
                 decButtonsPan.setVisible(true);
             }
         });
