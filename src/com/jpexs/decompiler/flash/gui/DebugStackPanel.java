@@ -194,9 +194,11 @@ public class DebugStackPanel extends JPanel {
                     }
 
                 };
-                stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-                stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-                stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+                if (stackTable.getColumnModel().getColumnCount() >= 3) {
+                    stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
+                    stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+                    stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+                }
                 repaint();
             }
         });

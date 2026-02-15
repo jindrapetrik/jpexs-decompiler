@@ -583,7 +583,8 @@ public final class AbcIndexing {
      */
     public void rebuildPkgToObjectsNameMap() {
         pkgToObjectsName.clear();
-        for (ClassDef cd : classes.keySet()) {
+        Set<ClassDef> cs = new LinkedHashSet<>(classes.keySet());
+        for (ClassDef cd : cs) {
             if (!(cd.type instanceof TypeItem)) {
                 continue;
             }
@@ -592,7 +593,8 @@ public final class AbcIndexing {
             }
             pkgToObjectsName.get(cd.pkg).add(((TypeItem) cd.type).fullTypeName.getLast());
         }
-        for (PropertyNsDef nsdef : scriptProperties.keySet()) {
+        Set<PropertyNsDef> nss = new LinkedHashSet<>(scriptProperties.keySet());
+        for (PropertyNsDef nsdef : nss) {
             if (!pkgToObjectsName.containsKey(nsdef.ns)) {
                 pkgToObjectsName.put(nsdef.ns, new LinkedHashSet<>());
             }

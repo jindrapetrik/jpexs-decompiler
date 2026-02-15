@@ -52,10 +52,12 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -63,6 +65,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -77,8 +81,6 @@ import java.util.regex.Pattern;
 public class DebuggerSession {
 
     private boolean connected = false;
-    
-    private boolean inited = false;
 
     private DebuggerCommands commands = null;
 
@@ -117,7 +119,7 @@ public class DebuggerSession {
 
     private List<Integer> stackLines = new ArrayList<>();
 
-    private List<SWF> debuggedSwfs = new ArrayList<>();
+    private Map<Integer, SWF> debuggedSwfs = new LinkedHashMap<>();
 
     private Map<String, Long> placedObjects = new LinkedHashMap<>();
 
@@ -132,17 +134,19 @@ public class DebuggerSession {
     private InBreakReason breakReason;
 
     private DebuggerHandler handler;
-    
+
     private InSetBreakpoint inSetBreakpoint;
-    
+
     private int id;
-    
+
     private static int lastId = 0;
+
+    private List<Thread> getSwfThreadList = Collections.synchronizedList(new ArrayList<>());
 
     public DebuggerSession(DebuggerHandler handler, DebuggerConnection con, Map<SWF, Map<String, Set<Integer>>> breakpoints) {
         lastId++;
         id = lastId;
-        
+
         toAddBPointMap = breakpoints;
         this.handler = handler;
         Main.startWork(AppStrings.translate("work.debugging"), null);
@@ -226,7 +230,7 @@ public class DebuggerSession {
 
                         Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received script added - index {0} name: {1}", new Object[]{file, name});
 
-                        String swfHash = "main";
+                        String swfHash = "unknown";
                         Matcher m;
                         if ((m = patAS3.matcher(name)).matches()) {
                             String clsNameWithSuffix = m.group(3).replace("{{semicolon}}", ";");
@@ -256,7 +260,11 @@ public class DebuggerSession {
                         modulePaths.put(file, name);
                         scriptToModule.put(name, file);
                         moduleToSwfIndex.put(file, swfIndex);
-                        /*if (swfIndex > debuggedSwfs.size() - 1) {
+                        /*if (!"main".equals(swfHash)) {
+                            SWF swf = Main.getSwfByHash(swfHash);
+                            debuggedSwfs.put(swfIndex, swf);
+                        }*/
+ /*if (swfIndex > debuggedSwfs.size() - 1) {
                             SWF swf = Main.getSwfByHash(swfHash);
                             if (swf == null) {
                                 Logger.getLogger(DebuggerSession.class.getName()).log(Level.WARNING, "SWF with hash {0} not found", swfHash);
@@ -329,101 +337,116 @@ public class DebuggerSession {
                         });
                     }*/
                     con.dropMessage(t);
-                    View.execInEventDispatch(new Runnable() {
+                    //View.execInEventDispatch(
+                    Runnable r = new Runnable() {
                         @Override
                         public void run() {
-                            for (InSwfInfo.SwfInfo s : t.swfInfos) {
-                                try {
-                                    /*try {
+                            try {
+                                for (InSwfInfo.SwfInfo s : t.swfInfos) {
+                                    try {
+                                        /*try {
                                     con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
                                     con.sendMessageWithTimeout(new OutGetSwd(con, (int) s.index), InGetSwd.class);
                                     } catch (IOException ex) {
                                     //ignore
-                                    }*/                                    
-                                    InGetSwf inGetSwf = con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
-                                    Logger.getLogger(DebuggerSession.class.getName()).fine("Received SWF");
-                                    Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF.URL = {0}", s.url);
-                                    
-                                    String sha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(inGetSwf.swfData));
+                                    }*/
+ /*if (s.scriptCount == 0) {
+                                        continue;
+                                    }*/
 
-                                    SWF debuggedSwf = Main.findOpenedSwfByHash(sha256);
-                                    if (debuggedSwf == null) {
+                                        InGetSwf inGetSwf = con.sendMessage(new OutGetSwf(con, (int) s.index), InGetSwf.class);
+                                        Logger.getLogger(DebuggerSession.class.getName()).fine("Received SWF");
+                                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF.URL = {0}", s.url);
+                                        if (inGetSwf == null) {
+                                            Logger.getLogger(DebuggerSession.class.getName()).fine("Cannot read SWF");
+                                            continue;
+                                        }
+                                        String sha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(inGetSwf.swfData));
+
+                                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF hash = {0}", sha256);
+                                        SWF debuggedSwf = Main.findOpenedSwfByHash(sha256);
+                                        if (debuggedSwf == null) {
+                                            con.disconnect();
+                                            synchronized (DebuggerSession.this) {
+                                                paused = false;
+                                                connected = false;
+                                            }
+                                            disconnected();
+                                        } else {
+                                            debuggedSwfs.put((int) s.index, debuggedSwf);
+                                            if (debuggedSwfs.size() == 1) { //it's the first one
+                                                con.isAS3 = debuggedSwf.isAS3();
+                                            }
+                                        }
+                                    } catch (IOException | NoSuchAlgorithmException ex) {
+                                        //ignore
+
                                         con.disconnect();
                                         synchronized (DebuggerSession.this) {
                                             paused = false;
                                             connected = false;
                                         }
                                         disconnected();
-                                    } else {
-                                        debuggedSwfs.add(debuggedSwf);
-                                        if (debuggedSwfs.size() == 1) { //it's the first one
-                                            con.isAS3 = debuggedSwf.isAS3();
-                                        }
-                                    }                                    
-                                } catch (IOException | NoSuchAlgorithmException ex) {
-                                    //ignore
+                                        return;
+                                    }
+                                }
 
+                                try {
+
+                                    if (con.isAS3) {
+                                        //FIXME
+                                        //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
+                                        /*con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
+                                    if (con.wideLines) {
+                                        commands.setOption("wide_line_debugger", "on");
+                                    }*/
+                                    }
+                                    if (!con.isAS3) {
+                                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINER, "End of connect - sending continue");
+                                        con.writeMessage(new OutRewind(con));
+                                        con.writeMessage(new OutPlay(con));
+                                        commands.sendContinue();
+                                    }
+
+                                    synchronized (DebuggerSession.this) {
+                                        for (int i = 0; i < inSetBreakpoint.files.size(); i++) {
+                                            String sname = moduleNames.get(inSetBreakpoint.files.get(i));
+                                            int swfIndex = moduleToSwfIndex.get(inSetBreakpoint.files.get(i));
+                                            SWF debuggedSwf = debuggedSwfs.get(swfIndex);
+                                            if (!confirmedPointMap.containsKey(debuggedSwf)) {
+                                                confirmedPointMap.put(debuggedSwf, new HashMap<>());
+                                            }
+                                            if (!confirmedPointMap.get(debuggedSwf).containsKey(sname)) {
+                                                confirmedPointMap.get(debuggedSwf).put(sname, new TreeSet<>());
+                                            }
+                                            if (toAddBPointMap.containsKey(debuggedSwf)) {
+                                                if (toAddBPointMap.get(debuggedSwf).containsKey(sname)) {
+                                                    toAddBPointMap.get(debuggedSwf).get(sname).remove(inSetBreakpoint.lines.get(i));
+                                                    if (toAddBPointMap.get(debuggedSwf).get(sname).isEmpty()) {
+                                                        toAddBPointMap.get(debuggedSwf).remove(sname);
+                                                    }
+                                                }
+                                            }
+                                            confirmedPointMap.get(debuggedSwf).get(sname).add(inSetBreakpoint.lines.get(i));
+                                            Logger.getLogger(DebuggerSession.class.getName()).log(Level.INFO, "Breakpoint {0}:{1} submitted successfully", new Object[]{sname, inSetBreakpoint.lines.get(i)});
+                                        }
+                                    }
+                                } catch (IOException ex) {
                                     con.disconnect();
                                     synchronized (DebuggerSession.this) {
                                         paused = false;
                                         connected = false;
                                     }
                                     disconnected();
-                                    return;
                                 }
-                            }
-
-                            try {
-                                
-                                if (con.isAS3) {
-                                    //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
-                                    con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
-                                    if (con.wideLines) {
-                                        commands.setOption("wide_line_debugger", "on");
-                                    }
-                                } else {
-                                    Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINER, "End of connect - sending continue");
-                                    con.writeMessage(new OutRewind(con));
-                                    con.writeMessage(new OutPlay(con));
-                                    commands.sendContinue();
-                                }
-                                
-                                synchronized (DebuggerSession.this) {
-                                    for (int i = 0; i < inSetBreakpoint.files.size(); i++) {
-                                        String sname = moduleNames.get(inSetBreakpoint.files.get(i));
-                                        int swfIndex = moduleToSwfIndex.get(inSetBreakpoint.files.get(i));
-                                        SWF debuggedSwf = debuggedSwfs.get(swfIndex);
-                                        if (!confirmedPointMap.containsKey(debuggedSwf)) {
-                                            confirmedPointMap.put(debuggedSwf, new HashMap<>());
-                                        }
-                                        if (!confirmedPointMap.get(debuggedSwf).containsKey(sname)) {
-                                            confirmedPointMap.get(debuggedSwf).put(sname, new TreeSet<>());
-                                        }
-                                        if (toAddBPointMap.containsKey(debuggedSwf)) {
-                                            if (toAddBPointMap.get(debuggedSwf).containsKey(sname)) {
-                                                toAddBPointMap.get(debuggedSwf).get(sname).remove(inSetBreakpoint.lines.get(i));
-                                                if (toAddBPointMap.get(debuggedSwf).get(sname).isEmpty()) {
-                                                    toAddBPointMap.get(debuggedSwf).remove(sname);
-                                                }
-                                            }
-                                        }
-                                        confirmedPointMap.get(debuggedSwf).get(sname).add(inSetBreakpoint.lines.get(i));
-                                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.INFO, "Breakpoint {0}:{1} submitted successfully", new Object[]{sname, inSetBreakpoint.lines.get(i)});
-                                    }
-                                }
-                                
-                                inited = true;
-                                handler.sessionInited(DebuggerSession.this);
-                            } catch (IOException ex) {
-                                con.disconnect();
-                                synchronized (DebuggerSession.this) {
-                                    paused = false;
-                                    connected = false;
-                                }
-                                disconnected();
+                            } finally {
+                                getSwfThreadList.remove(Thread.currentThread());
                             }
                         }
-                    });
+                    };
+                    Thread thread = new Thread(r, "Debugger session " + this.toString() + " - Get SWF");
+                    thread.start();
+                    getSwfThreadList.add(thread);
                 }
             });
 
@@ -435,7 +458,7 @@ public class DebuggerSession {
                 }
             });
 
-            inSetBreakpoint = con.getMessage(InSetBreakpoint.class);            
+            inSetBreakpoint = con.getMessage(InSetBreakpoint.class);
 
             con.addMessageListener(new DebugMessageListener<InContinue>() {
                 @Override
@@ -453,88 +476,123 @@ public class DebuggerSession {
             con.addMessageListener(new DebugMessageListener<InBreakAt>() {
                 @Override
                 public void message(InBreakAt message) {
-                    synchronized (DebuggerSession.this) {
-                        paused = true;
-                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "paused");
-
-                    }
-
-                    try {
-                        //ignore single InSetBreakpoint, otherwise setting breakpoints later won't work
-                        con.getMessage(InSetBreakpoint.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
-
-                        breakInfo = con.getMessage(InBreakAtExt.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
-                        breakReason = con.sendMessageWithTimeout(new OutGetBreakReason(con), InBreakReason.class);
-
-                        int reasonInt = breakReason == null ? 0 : breakReason.reason;
-
-                        String newBreakScriptName = "unknown";
-                        String userBreakScriptName = "unknown";
-                        if (modulePaths.containsKey(message.file)) {                                      
-                            newBreakScriptName = modulePaths.get(message.file);
-                            userBreakScriptName = newBreakScriptName;
-                            if (newBreakScriptName.contains(":")) {
-                                //String swfHash = newBreakScriptName.substring(0, newBreakScriptName.indexOf(":"));
-                                //SWF swf = Main.getSwfByHash(swfHash);
-                                SWF swf = debuggedSwfs.get(moduleToSwfIndex.get(message.file));
-                                
-                                userBreakScriptName = swf.toString() + ": " + newBreakScriptName.substring(newBreakScriptName.indexOf(":") + 1);
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (DebuggerSession.this) {
+                                paused = true;
+                                Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "paused");
                             }
-                        } else if (reasonInt != InBreakReason.REASON_SCRIPT_LOADED) {
-                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
-                            //return;
-                        }
 
-                        final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};
-                        String reason = reasonInt < reasonNames.length ? reasonNames[reasonInt] : reasonNames[0];
+                            try {
+                                //ignore single InSetBreakpoint, otherwise setting breakpoints later won't work
+                                con.getMessage(InSetBreakpoint.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
 
-                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "break at {0}:{1}, reason: {2}", new Object[]{newBreakScriptName, message.line, reason});
+                                breakInfo = con.getMessage(InBreakAtExt.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
+                                breakReason = con.sendMessageWithTimeout(new OutGetBreakReason(con), InBreakReason.class);
 
-                        try {
-                            sendBreakPoints();
-                        } catch (IOException ex) {
-                            //ignore
-                            Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "send breakpoints exception: " + ex.getMessage());
-                        }
+                                int reasonInt = breakReason == null ? 0 : breakReason.reason;
 
-                        synchronized (DebuggerSession.this) {
-                            breakScriptName = newBreakScriptName;
-                            breakIp = message.line;
-
-                            if (breakInfo != null) {
-                                List<String> files = new ArrayList<>();
-                                for (int i = 0; i < breakInfo.files.size(); i++) {
-                                    files.add(DebuggerSession.this.moduleToString(breakInfo.files.get(i)));
+                                String newBreakScriptName = "unknown";
+                                String userBreakScriptName = "unknown";
+                                String userSwfName = "unknown";
+                                if (moduleToSwfIndex.containsKey(message.file)) {
+                                    SWF swf = debuggedSwfs.get(moduleToSwfIndex.get(message.file));
+                                    userSwfName = swf.toString();
+                                } else if(!debuggedSwfs.isEmpty()) {
+                                    userSwfName = debuggedSwfs.get(debuggedSwfs.size() - 1).toString();
                                 }
-                                stackScriptNames = files;
-                                List<Integer> lines = new ArrayList<>(breakInfo.lines);
-                                stackLines = lines;
+                                
+                                if (modulePaths.containsKey(message.file)) {
+                                    newBreakScriptName = modulePaths.get(message.file);
+                                    userBreakScriptName = newBreakScriptName;
+                                    if (newBreakScriptName.contains(":")) {                                        
+                                        userBreakScriptName = userSwfName + ": " + newBreakScriptName.substring(newBreakScriptName.indexOf(":") + 1);
+                                    }
+                                } else if (reasonInt != InBreakReason.REASON_SCRIPT_LOADED) {
+                                    Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
+                                    //return;
+                                }
+
+                                final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};
+                                String reason = reasonInt < reasonNames.length ? reasonNames[reasonInt] : reasonNames[0];
+
+                                Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "break at {0}:{1}, reason: {2}", new Object[]{newBreakScriptName, message.line, reason});
+
+                                try {
+                                    sendBreakPoints();
+                                } catch (IOException ex) {
+                                    //ignore
+                                    Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "send breakpoints exception: " + ex.getMessage());
+                                }
+
+                                synchronized (DebuggerSession.this) {
+                                    breakScriptName = newBreakScriptName;
+                                    breakIp = message.line;
+
+                                    if (breakInfo != null) {
+                                        List<String> files = new ArrayList<>();
+                                        for (int i = 0; i < breakInfo.files.size(); i++) {
+                                            files.add(DebuggerSession.this.moduleToString(breakInfo.files.get(i)));
+                                        }
+                                        stackScriptNames = files;
+                                        List<Integer> lines = new ArrayList<>(breakInfo.lines);
+                                        stackLines = lines;
+                                    }
+                                }
+
+                                if (reasonInt == InBreakReason.REASON_SCRIPT_LOADED) {
+                                    if (!Configuration.debugHalt.get()) {
+                                        try {
+                                            commands.sendContinue();
+                                        } catch (IOException iex) {
+                                            //ignore
+                                        }
+                                        return;
+                                    }
+                                    Main.startWork(AppStrings.translate("work.halted.with").replace("%file%", userSwfName), null, true);
+                                } else {
+                                    Main.startWork(AppStrings.translate("work.breakat") + userBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null, true);
+                                }
+                                depth = 0;
+                                refreshFrame();
+                                for (DebuggerHandler.BreakListener l : handler.getBreakListeners()) {
+                                    l.breakAt(DebuggerSession.this, newBreakScriptName, message.line,
+                                            moduleToClassIndex.containsKey(message.file) ? moduleToClassIndex.get(message.file) : -1,
+                                            moduleToTraitIndex.containsKey(message.file) ? moduleToTraitIndex.get(message.file) : -1,
+                                            moduleToMethodIndex.containsKey(message.file) ? moduleToMethodIndex.get(message.file) : -1
+                                    );
+                                }
+                            } catch (IOException iex) {
+                                //ignore ??
                             }
                         }
+                    };
 
-                        if (reasonInt == InBreakReason.REASON_SCRIPT_LOADED) {
-                            if (!Configuration.debugHalt.get()) {
-                                commands.sendContinue();
-                                return;
+                    if (getSwfThreadList.isEmpty()) {
+                        r.run();
+                    } else {
+                        //Wait till all SWFs are loaded
+                        int delay = 500; //check each 500ms
+                        Timer tim = new Timer();
+                        tim.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                TimerTask that = this;
+                                if (getSwfThreadList.isEmpty()) {
+                                    r.run();
+                                } else {
+                                    Timer tim = new Timer();
+                                    tim.schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            that.run();
+                                        }
+                                    }, delay);
+                                }
                             }
-                            Main.startWork(AppStrings.translate("work.halted"), null, true);
-                        } else {
-                            Main.startWork(AppStrings.translate("work.breakat") + userBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null, true);
-                        }
-                        depth = 0;
-                        refreshFrame();
-                        for (DebuggerHandler.BreakListener l : handler.getBreakListeners()) {
-                            l.breakAt(DebuggerSession.this, newBreakScriptName, message.line,
-                                    moduleToClassIndex.containsKey(message.file) ? moduleToClassIndex.get(message.file) : -1,
-                                    moduleToTraitIndex.containsKey(message.file) ? moduleToTraitIndex.get(message.file) : -1,
-                                    moduleToMethodIndex.containsKey(message.file) ? moduleToMethodIndex.get(message.file) : -1
-                            );
-                        }
-
-                    } catch (IOException ex) {
-                        //ignore
+                        }, delay);
                     }
-
                 }
             });
 
@@ -573,9 +631,9 @@ public class DebuggerSession {
             disconnected();
         }
     }
-    
+
     public boolean containsSwf(SWF swf) {
-        return debuggedSwfs.contains(swf);
+        return debuggedSwfs.containsValue(swf);
     }
 
     public void setMainDebuggedSwf(SWF debuggedSwf) {
@@ -583,7 +641,7 @@ public class DebuggerSession {
         //debuggedSwfs.add(debuggedSwf);
     }
 
-    public List<SWF> getDebuggedSwfs() {
+    public Map<Integer, SWF> getDebuggedSwfs() {
         return debuggedSwfs;
     }
 
@@ -948,7 +1006,7 @@ public class DebuggerSession {
         connected = false;
         commands = null;
         synchronized (this) {
-            for (SWF debuggedSwf : debuggedSwfs) {
+            for (SWF debuggedSwf : debuggedSwfs.values()) {
                 if (confirmedPointMap.containsKey(debuggedSwf)) {
                     for (String scriptName : confirmedPointMap.get(debuggedSwf).keySet()) {
                         if (!toAddBPointMap.containsKey(debuggedSwf)) {
@@ -991,6 +1049,11 @@ public class DebuggerSession {
         if (commands != null) {
             commands.disconnect();
         }
+
+        List<Thread> threads = new ArrayList<>(getSwfThreadList);
+        for (Thread t : threads) {
+            t.interrupt();
+        }
         disconnected();
     }
 
@@ -1017,7 +1080,7 @@ public class DebuggerSession {
                     continue;
                 }
                 SWF debuggedSwf = debuggedSwfs.get(swfIndex);
-                String hash = swfIndex == 0 ? "main" : Main.getSwfHash(debuggedSwf); //??
+                String hash = Main.getSwfHash(debuggedSwf); //??
 
                 Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINEST, "sending breakpoints of {0}", hash);
 
@@ -1172,5 +1235,5 @@ public class DebuggerSession {
     @Override
     public String toString() {
         return "[s:" + id + "]";
-    }        
+    }
 }

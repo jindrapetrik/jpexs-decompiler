@@ -388,6 +388,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
+            if (Main.getCurrentDebugSession() == null) {
+                return;
+            }
             if (parentObjectId == 0 && objectId != 0L && isAS3) {
                 igv = Main.getCurrentDebugSession().getVariable(objectId, "", true, useGetter);
             } else {
@@ -1758,27 +1761,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
         String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
         String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
-        Openable openable = null;
-        if (swfHash.equals("main")) {
-            openable = Main.getRunningSWF();
-        } else if (swfHash.startsWith("loaded_")) {
-            String hashToSearch = swfHash.substring("loaded_".length());
-            loop:
-            for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
-                for (int s = 0; s < sl.size(); s++) {
-                    Openable op = sl.get(s);
-                    String t = op.getTitleOrShortFileName();
-                    if (t == null) {
-                        t = "";
-                    }
-                    if (t.endsWith(":" + hashToSearch)) { //this one is already opened
-                        openable = op;
-                        break loop;
-                    }
-                }
-            }
-        }
-
+        Openable openable = Main.getSwfByHash(swfHash);
+        
         if (openable != null) {
             hilightScript(openable, name);
         }

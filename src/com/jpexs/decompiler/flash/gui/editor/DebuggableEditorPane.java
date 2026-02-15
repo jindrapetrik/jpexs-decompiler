@@ -137,7 +137,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         }
         int ip = Main.getIp(breakPointScriptName);
         String ipPath = Main.getIpClass();
-        String ipHash = "main";
+        String ipHash = "unknown";
         if (ipPath != null && ipPath.contains(":")) {
             ipHash = ipPath.substring(0, ipPath.indexOf(":"));
             ipPath = ipPath.substring(ipPath.indexOf(":") + 1);
@@ -150,7 +150,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         List<String> stackClasses = Main.getStackClasses();
         for (int i = 1; i < stackClasses.size(); i++) {
             String cls = stackClasses.get(i);
-            String clsHash = "main";
+            String clsHash = "unknown";
             if (cls.contains(":")) {
                 clsHash = cls.substring(0, cls.indexOf(":"));
                 cls = cls.substring(cls.indexOf(":") + 1);

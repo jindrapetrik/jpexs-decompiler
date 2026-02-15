@@ -222,14 +222,21 @@ public class DebuggerHandler implements DebugConnectionListener {
         return count;
     }
 
-    public synchronized void terminateAllSessions() {
-        terminating = true;
+    public void terminateAllSessions() {
+        synchronized (this) {
+            if (terminating) {
+                return;
+            }        
+            terminating = true;       
+        }
         for (DebuggerSession session : sessions) {
             if (session.isConnected()) {
                 session.disconnect();
             }
         }
-        terminating = false;
+        synchronized (this) {
+            terminating = false;
+        }
     }
 
     public synchronized Map<String, Set<Integer>> getAllSessionsBreakPoints(SWF swf) {

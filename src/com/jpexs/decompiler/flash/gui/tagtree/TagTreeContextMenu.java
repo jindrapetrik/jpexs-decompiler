@@ -3077,17 +3077,14 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void prepareDebugActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
-        SWF swf = (SWF) item.getOpenable();
-        File dir = null;
-        String newName = "debug.swf";
+        SWF swf = (SWF) item.getOpenable();        
+        JFileChooser chooser = View.getFileChooserWithIcon("debug");        
         if (swf.getFile() != null) {
-            dir = new File(swf.getFile()).getParentFile();
-            String name = new File(swf.getFile()).getName();
-            newName = name.substring(0, name.lastIndexOf(".")) + "_debug" + name.substring(name.lastIndexOf("."));
+            File dir = new File(swf.getFile()).getParentFile();
+            chooser.setCurrentDirectory(dir);
+            chooser.setSelectedFile(new File(swf.getFile()));
+            chooser.setDialogTitle(AppStrings.translate("prepareDebug.title"));
         }
-        JFileChooser chooser = View.getFileChooserWithIcon("debug");
-        chooser.setCurrentDirectory(dir);
-        chooser.setSelectedFile(new File(dir, newName));
         chooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
