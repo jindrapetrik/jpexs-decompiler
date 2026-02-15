@@ -306,4 +306,14 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return null;
     }
+    
+    public SWF getAnyDebuggedSwf() {
+        List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
+        for (DebuggerSession session : currentSessions) {
+            if (session.isConnected() && !session.getDebuggedSwfs().isEmpty()) {
+                return session.getDebuggedSwfs().values().iterator().next();
+            }
+        }
+        return null;
+    }
 }

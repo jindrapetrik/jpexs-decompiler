@@ -332,10 +332,16 @@ public class DebuggerSession {
                                         if (inGetSwf == null) {
                                             Logger.getLogger(DebuggerSession.class.getName()).fine("Cannot read SWF");
                                             continue;
-                                        }
+                                        }                                        
                                         String sha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(inGetSwf.swfData));
-
                                         Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF hash = {0}", sha256);
+                                            
+                                        String originalHash = Main.getHashFromMetadataFromSwfBytes(inGetSwf.swfData);
+                                        if (originalHash != null) {
+                                            Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINE, "Received SWF original hash = {0}", originalHash);
+                                            sha256 = originalHash;
+                                        }
+                                        
                                         SWF debuggedSwf = Main.findOpenedSwfByHash(sha256);
                                         if (debuggedSwf == null) {
                                             con.disconnect();
@@ -364,20 +370,19 @@ public class DebuggerSession {
                                 }
 
                                 try {
-
-                                    if (con.isAS3) {
-                                        //FIXME
-                                        //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
-                                        /*con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
-                                    if (con.wideLines) {
-                                        commands.setOption("wide_line_debugger", "on");
-                                    }*/
-                                    }
-                                    if (!con.isAS3) {
-                                        Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINER, "End of connect - sending continue");
-                                        con.writeMessage(new OutRewind(con));
-                                        con.writeMessage(new OutPlay(con));
-                                        commands.sendContinue();
+                                    if (!debuggedSwfs.isEmpty()) {
+                                        if (con.isAS3) {
+                                            //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
+                                            con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
+                                            if (con.wideLines) {
+                                                commands.setOption("wide_line_debugger", "on");
+                                            }
+                                        } else {
+                                            Logger.getLogger(DebuggerSession.class.getName()).log(Level.FINER, "End of connect - sending continue");
+                                            con.writeMessage(new OutRewind(con));
+                                            con.writeMessage(new OutPlay(con));
+                                            commands.sendContinue();
+                                        }
                                     }
 
                                     synchronized (DebuggerSession.this) {

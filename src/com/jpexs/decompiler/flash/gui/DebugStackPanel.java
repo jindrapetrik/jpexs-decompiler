@@ -99,7 +99,7 @@ public class DebugStackPanel extends JPanel {
                         String swfHash = swfHashes[row];
                         String scriptName = (String) stackTable.getModel().getValueAt(row, 1);
                         int line = (int) (Integer) stackTable.getModel().getValueAt(row, 2);
-                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.getSwfByHash(swfHash);
+                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.findOpenedSwfByHash(swfHash);
                         Main.getMainFrame().getPanel().gotoScriptLine(swf,
                                 scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
                         DebuggerSession session = null;
@@ -149,7 +149,7 @@ public class DebugStackPanel extends JPanel {
                 moduleName = moduleName.substring(moduleName.indexOf(":") + 1);
             }
             newSwfHashes[i] = swfHash;
-            data[i][0] = swfHash == null ? "unknown" : Main.getSwfByHash(swfHash).toString();
+            data[i][0] = swfHash == null ? "unknown" : Main.findOpenedSwfByHash(swfHash).toString();
             data[i][1] = moduleName;
             data[i][2] = info.lines.get(i);
             data[i][3] = info.stacks.get(i);

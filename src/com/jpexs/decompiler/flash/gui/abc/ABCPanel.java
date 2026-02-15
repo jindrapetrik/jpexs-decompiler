@@ -1761,7 +1761,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
         String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
         String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
-        Openable openable = Main.getSwfByHash(swfHash);
+        Openable openable = Main.findOpenedSwfByHash(swfHash);
         
         if (openable != null) {
             hilightScript(openable, name);

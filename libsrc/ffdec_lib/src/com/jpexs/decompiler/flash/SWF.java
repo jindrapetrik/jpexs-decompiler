@@ -6469,5 +6469,5 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public RECT getRectWithFilters() {
         return getRect();
-    }
+    }        
 }

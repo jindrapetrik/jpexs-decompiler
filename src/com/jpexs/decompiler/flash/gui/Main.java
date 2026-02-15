@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.OpenableSourceKind;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.UrlResolver;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -239,13 +241,12 @@ public class Main {
     private static SWF debuggedSWF = null;
 
     //private static String preparedHashSha256 = null;
-
     private static SwfPreparation runningPreparation = null;
 
     private static boolean loggingFileLoaded = false;
 
     private static boolean debugListening = false;
-    
+
     private static Map<String, Set<String>> hash2PreparedHash = new HashMap<>();
 
     public static SWF getDebuggedSWF() {
@@ -268,30 +269,19 @@ public class Main {
         for (String origKey : hash2PreparedHash.keySet()) {
             if (hash2PreparedHash.get(origKey).contains(hashSha256)) {
                 hashSha256 = origKey;
-                break;                
+                break;
             }
-        }      
-        
+        }
+
         for (SWF swf : mainFrame.getPanel().getAllSwfs()) {
-            Logger.getLogger(Main.class.getName()).log(Level.FINE, "Checking {0} with hash {1}", new Object[]{swf.toString(), swf.getHashSha256()});
-            if (Objects.equals(hashSha256, swf.getHashSha256())) {
+            String swfHash = getSwfHash(swf);
+            Logger.getLogger(Main.class.getName()).log(Level.FINE, "Checking {0} with hash {1}", new Object[]{swf.toString(), swfHash});
+
+            if (Objects.equals(hashSha256, swfHash)) {
                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF FOUND");
                 return swf;
             }
-            String t = swf.getTitleOrShortFileName();
-            if (t == null) {
-                t = "";
-            }
-            if (t.endsWith(":" + hashSha256)) {
-                Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SUB SWF FOUND");
-                return swf;
-            }            
         }
-
-        /*if (preparedHashSha256 != null && hashSha256.equals(preparedHashSha256)) {
-            Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF IS ONE THAT WAS PREPARED FOR RUN...");
-            return runningSWF;
-        }*/
 
         Logger.getLogger(Main.class.getName()).log(Level.FINE, "RECEIVED SWF IS NOT ANY OF OURS");
         return null;
@@ -305,6 +295,11 @@ public class Main {
         if (session != null) {
             return session.getDebuggedSwfs().get(0);
         }
+
+        /*SWF anyDebugged = getDebugHandler().getAnyDebuggedSwf();
+        if (anyDebugged != null) {
+            return anyDebugged;
+        }*/
         return runningSWF;
         //return null;
     }
@@ -590,6 +585,52 @@ public class Main {
                 File fTempFile = new File(instrSWF.getFile());
                 startWork(AppStrings.translate("work.injecting_debuginfo"), swfPrepareWorker, true);
                 instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
+                MetadataTag metaDataTag = null;
+                int fileAttributesIndex = 0;
+                int i = 0;
+                for (Tag t : instrSWF.getTags()) {
+                    if (t instanceof MetadataTag) {
+                        metaDataTag = (MetadataTag) t;
+                        break;
+                    }
+                    if (t instanceof FileAttributesTag) {
+                        fileAttributesIndex = i;
+                    }
+                    i++;
+                }
+                if (metaDataTag == null) {
+                    metaDataTag = new MetadataTag(instrSWF);
+                    instrSWF.addTag(fileAttributesIndex + 1, metaDataTag);
+                }
+                if (metaDataTag.xmlMetadata.isEmpty() || !metaDataTag.xmlMetadata.contains("</rdf:RDF>")) {
+                    metaDataTag.xmlMetadata = "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\r\n"
+                            + "</rdf:RDF>\r\n";
+                }
+
+                String ffdecHdr = "<rdf:Description xmlns:ffdec=\"https://www.free-decompiler.com/flash\" rdf:about=\"\">";
+
+                if (!metaDataTag.xmlMetadata.contains("<ffdec:originalSwfHash>")) {
+                    //remove previous FFDec description if it alreadyy exists
+                    if (metaDataTag.xmlMetadata.contains(ffdecHdr)) {
+                        int pos = metaDataTag.xmlMetadata.indexOf(ffdecHdr);
+                        int pos2 = metaDataTag.xmlMetadata.indexOf("</rdf:Description>", pos);
+                        if (pos2 != -1) {
+                            pos2 += "</rdf:Description>".length();
+                            metaDataTag.xmlMetadata = metaDataTag.xmlMetadata.substring(0, pos) + metaDataTag.xmlMetadata.substring(pos2);
+                        }
+                    }
+
+                    //Inject new FFDec description
+                    String ffdecMetadata = ffdecHdr + "\r\n"
+                            + "        <ffdec:version>" + ApplicationInfo.version + "</ffdec:version>\r\n"
+                            + "        <ffdec:fileStatus>instrumented</ffdec:fileStatus>\r\n"
+                            + "        <ffdec:originalSwfHash>" + swfHash + "</ffdec:originalSwfHash>\r\n"
+                            + "    </rdf:Description>\r\n";
+
+                    metaDataTag.xmlMetadata = metaDataTag.xmlMetadata.replace("</rdf:RDF>", ffdecMetadata + "</rdf:RDF>");
+                    metaDataTag.setModified(true);
+                }
+
                 try (FileOutputStream fos = new FileOutputStream(fTempFile)) {
                     instrSWF.saveTo(fos);
                 }
@@ -655,7 +696,7 @@ public class Main {
         SWF instrSWF = null;
         String origHash = swfHash;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
-            instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);                        
+            instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -674,7 +715,12 @@ public class Main {
                             SWF.decompress(new ByteArrayInputStream(impData), baos);
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                             tempFiles.add(newTempFile);
-                            prepareSwf(sha256(baos.toByteArray()), prep, newTempFile, importedFile, tempFilesDir, tempFiles);
+                            byte[] uncompressedData = baos.toByteArray();
+                            String hash = Main.getHashFromMetadataFromSwfBytes(uncompressedData);
+                            if (hash == null) {
+                                hash = sha256(uncompressedData);
+                            }
+                            prepareSwf(hash, prep, newTempFile, importedFile, tempFilesDir, tempFiles);
                         }
                     }
                 }
@@ -707,7 +753,7 @@ public class Main {
         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
             swfToSave.saveTo(fos, false, swf.gfx);
         }
-        prepareSwf(swf.getHashSha256(), new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+        prepareSwf(getSwfHash(swf), new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
     }
 
     private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {
@@ -771,7 +817,7 @@ public class Main {
                 swfToSave.saveTo(fos, false, swf.gfx);
             }
 
-            prepareSwf(swf.getHashSha256(), new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+            prepareSwf(getSwfHash(swf), new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -931,7 +977,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swfToSave.saveTo(fos, false, swf.gfx);
                     }
-                    prepareSwf(swf.getHashSha256(), new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+                    prepareSwf(getSwfHash(swf), new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
                     return null;
                 }
 
@@ -1048,12 +1094,12 @@ public class Main {
     }
 
     public static synchronized Map<String, Set<Integer>> getAllSessionPackBreakPoints(String swfHash) {
-        SWF swf = Main.getSwfByHash(swfHash);
+        SWF swf = Main.findOpenedSwfByHash(swfHash);
         return getDebugHandler().getAllSessionsBreakPoints(swf);
     }
 
     public static synchronized Map<String, Set<Integer>> getPackBreakPoints(DebuggerSession session, boolean validOnly, String swfHash) {
-        SWF swf = Main.getSwfByHash(swfHash);
+        SWF swf = Main.findOpenedSwfByHash(swfHash);
         return session.getAllBreakPoints(swf, validOnly);
     }
 
@@ -1079,13 +1125,13 @@ public class Main {
         }
         return getDebugHandler().getSessionContainingSwf(currentSwf);
     }
-    
+
     public static void updateSession() {
         DebuggerSession session = getCurrentDebugSession();
         for (DebuggerHandler.FrameChangeListener l : getDebugHandler().getFrameChangeListeners()) {
             l.frameChanged(session);
         }
-        
+
         if (getDebugHandler().getNumberOfPausedSessions() > 0) {
             mainFrame.getPanel().showDebugStackFrame();
         }
@@ -1923,7 +1969,7 @@ public class Main {
             for (int index = 0; index < sourceInfos.length; index++) {
                 OpenableSourceInfo sourceInfo = sourceInfos[index];
                 //Logger.getLogger(Main.class.getName()).log(Level.FINE, "Loading source info {0}", sourceInfo.getFile());
-                OpenableList openables = null;                
+                OpenableList openables = null;
                 try {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...", null);
                     try {
@@ -2005,7 +2051,7 @@ public class Main {
                                         getDebugHandler().addBreakPoint(swf, scriptName, line);
                                     }
                                 }
-                            }                            
+                            }
                         }
                     }
                 }
@@ -3026,21 +3072,35 @@ public class Main {
                         modifiedListener.dataModified(inputData);
                         return;
                     }
+
+                    Logger.getLogger(Main.class.getName()).log(Level.FINE, "Executing onLoaderModifyBytes");
+
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     SWF.decompress(new ByteArrayInputStream(inputData), baos);
-                    final String hash = sha256(baos.toByteArray());
+                    byte[] uncompressedData = baos.toByteArray();
+                    String hash = sha256(uncompressedData);
+                    Logger.getLogger(Main.class.getName()).log(Level.FINE, "Calculated hash: {0}", hash);
+
+                    String originalHash = getHashFromMetadataFromSwfBytes(uncompressedData);
+                    if (originalHash != null) {
+                        Logger.getLogger(Main.class.getName()).log(Level.FINE, "Found original hash: {0}", originalHash);
+                        hash = originalHash;
+                    }
+
+                    final String fHash = hash;
+
                     OpenableOpened afterLoad = new OpenableOpened() {
                         @Override
                         public void opened(Openable openable) {
                             try {
                                 SWF mainSWF = getRunningSWF();
-                                File tempRunDir = mainSWF.getFile() == null ? null : new File(mainSWF.getFile()).getParentFile();
+                                File tempRunDir = mainSWF == null || mainSWF.getFile() == null ? null : new File(mainSWF.getFile()).getParentFile();
                                 File tempFile = createTempFileInDir(tempRunDir, "~ffdec_loader_", ".swf");
                                 try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                                     fos.write(inputData);
                                 }
-                                Logger.getLogger(Main.class.getName()).log(Level.FINE, "preparing for load: {0}", hash);
-                                prepareSwf(hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
+                                Logger.getLogger(Main.class.getName()).log(Level.FINE, "preparing for load: {0}", fHash);
+                                prepareSwf(fHash, runningPreparation, tempFile, mainSWF == null || mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
                                 byte[] outputData = Helper.readFileEx(tempFile.getAbsolutePath());
                                 tempFile.delete();
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "calling datamodified");
@@ -3054,28 +3114,14 @@ public class Main {
                         }
                     };
 
-                    for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
-                        for (int s = 0; s < sl.size(); s++) {
-                            Openable op = sl.get(s);
-                            if (op instanceof SWF) {
-                                SWF swf = (SWF) op;
-                                if (hash.equals(swf.getHashSha256())) {
-                                    afterLoad.opened(op);
-                                    return;
-                                }
-                            }
-                            String t = op.getTitleOrShortFileName();
-                            if (t == null) {
-                                t = "";
-                            }
-                            if (t.endsWith(":" + hash)) { //this one is already opened
-                                afterLoad.opened(op);
-                                return;
-                            }
-                        }
+                    SWF swf = Main.findOpenedSwfByHash(hash);
+                    if (swf != null) {
+                        afterLoad.opened(swf);
+                        return;
                     }
-                    SWF swf = Main.getRunningSWF();
 
+                    //SWF not yet opened in FFDEC, open it under current running SWF...                    
+                    swf = Main.getRunningSWF();
                     String title = swf == null ? "?" : swf.getTitleOrShortFileName();
                     final String titleWithHash = title + ":" + hash;
                     View.execInEventDispatch(new Runnable() {
@@ -3092,7 +3138,7 @@ public class Main {
                 flashDebugger = new Debugger();
                 debugHandler = new DebuggerHandler();
                 debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
-                    
+
                     @Override
                     public void doContinue(DebuggerSession session) {
                         mainFrame.getPanel().clearDebuggerColors();
@@ -3110,13 +3156,11 @@ public class Main {
                                     hash = scriptName.substring(0, scriptName.indexOf(":"));
                                     scriptNameNoHash = scriptName.substring(scriptName.indexOf(":") + 1);
                                 }
-                                SWF swf = Main.getSwfByHash(hash);
+                                SWF swf = Main.findOpenedSwfByHash(hash);
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break. Current session: {0}, New break session: {1}", new Object[]{Main.getCurrentDebugSession(), session});
-                                    
-                                if (
-                                        Main.getDebugHandler().getNumberOfPausedSessions() > 1
-                                        && Main.getCurrentDebugSession() != session
-                                    ) {
+
+                                if (Main.getDebugHandler().getNumberOfPausedSessions() > 1
+                                        && Main.getCurrentDebugSession() != session) {
                                     Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf.toString());
                                     mainFrame.getPanel().refreshBreakPoints();
                                     return;
@@ -3978,54 +4022,84 @@ public class Main {
         getMainFrame().getPanel().showBreakpointlistDialog(swf);
     }
 
+    public static String getHashFromMetadataFromSwf(SWF swf) {
+        String metaData = "";
+        for (Tag t : swf.getTags()) {
+            if (t instanceof MetadataTag) {
+                metaData = ((MetadataTag) t).xmlMetadata;
+                break;
+            }
+        }
+        String str1 = "<ffdec:originalSwfHash>";
+        String str2 = "</ffdec:originalSwfHash>";
+        if (metaData.contains(str1)) {
+            String originalSwfHash = metaData.substring(metaData.indexOf(str1) + str1.length(), metaData.indexOf(str2));
+            return originalSwfHash;
+        }
+        return null;
+    }
+
+    public static String getHashFromMetadataFromSwfBytes(byte[] uncompressedData) {
+        String metaData = "";
+        try {
+            SWFInputStream sis = new SWFInputStream(null, uncompressedData);
+            sis.skipBytesEx(3, "signature");
+            sis.readUI8("version");
+            sis.readUI32("fileSize");
+            sis.readRECT("displayRect");
+            sis.readUFIXED8("frameRate");
+            sis.readUI16("frameCount");
+
+            int tagID = -1;
+            do {
+                int tagIDTagLength = sis.readUI16("tagIDTagLength");
+                tagID = (tagIDTagLength) >> 6;
+
+                long tagLength = (tagIDTagLength & 0x003F);
+                boolean readLong = false;
+                if (tagLength == 0x3f) {
+                    tagLength = sis.readUI32("tagLength");
+                    readLong = true;
+                }
+                if (tagID == MetadataTag.ID) {
+                    metaData = new String(sis.readBytes((int) tagLength, "metadata"), "UTF-8");
+                    break;
+                }
+                if (tagLength > 0) {
+                    sis.skipBytes(tagLength);
+                }
+            } while (tagID > 0);
+
+        } catch (IOException iex) {
+            return null;
+        }
+        String str1 = "<ffdec:originalSwfHash>";
+        String str2 = "</ffdec:originalSwfHash>";
+        if (metaData.contains(str1)) {
+            String originalSwfHash = metaData.substring(metaData.indexOf(str1) + str1.length(), metaData.indexOf(str2));
+            return originalSwfHash;
+        }
+        return null;
+    }
+
     public static String getSwfHash(SWF swf) {
-        /*if (swf == getRunningSWF()) {
-            return "main";
-        }*/
+        for (Tag t : swf.getTags()) {
+            if (t instanceof MetadataTag) {
+                MetadataTag metaData = (MetadataTag) t;
+                //<ffdec:originalSwfHash>" + originalHash + "</ffdec:originalSwfHash>
+                String str1 = "<ffdec:originalSwfHash>";
+                String str2 = "</ffdec:originalSwfHash>";
+                if (metaData.xmlMetadata.contains(str1)) {
+                    String originalSwfHash = metaData.xmlMetadata.substring(metaData.xmlMetadata.indexOf(str1) + str1.length(), metaData.xmlMetadata.indexOf(str2));
+                    return originalSwfHash;
+                }
+            }
+        }
         String tit = swf.getTitleOrShortFileName();
         if (tit != null && tit.contains(":")) {
             return tit.substring(tit.lastIndexOf(":") + 1);
         }
         return swf.getHashSha256();
-    }
-
-    public static SWF getSwfByHash(String hashSha256) {
-        /*if ("main".equals(hash)) {
-            SWF runningSwf = getRunningSWF();
-            if (runningSwf == null) {
-                return mainFrame.getPanel().getCurrentSwf();
-            }
-            return runningSwf;
-        }*/
-        
-        
-        for (String origKey : hash2PreparedHash.keySet()) {
-            if (hash2PreparedHash.get(origKey).contains(hashSha256)) {
-                hashSha256 = origKey;
-                break;
-            }
-        }
-        
-        for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
-            for (int s = 0; s < sl.size(); s++) {
-                Openable op = sl.get(s);
-                if (!(op instanceof SWF)) {
-                    continue;
-                }
-                SWF swf = (SWF) op;
-                if (hashSha256.equals(swf.getHashSha256())) {
-                    return swf;
-                }
-                String t = op.getTitleOrShortFileName();
-                if (t == null) {
-                    t = "";
-                }
-                if (t.endsWith(":" + hashSha256)) { //this one is already opened
-                    return swf;
-                }
-            }
-        }
-        return null;
     }
 
     public static void openSolEditor() {
