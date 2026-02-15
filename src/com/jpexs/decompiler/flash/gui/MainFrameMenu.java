@@ -1739,9 +1739,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return true;
     }
     
-    public boolean debugListenActionPerformed(ActionEvent evt) {
-        Main.startDebugListening();
-        return true;
+    public void debugListenActionPerformed(ActionEvent evt) {
+        if (ViewMessages.showConfirmDialog(mainFrame.getPanel(), "<div align=\"center\">" + translate("message.info.debugListen").replace("\n", "<br>") + "</div>", translate("message.info"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.showDebugListenInfo, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+            return;
+        }
+        
+        Main.startDebugListening();        
     }
 
     public boolean debugPCodeActionPerformed(ActionEvent evt) {
