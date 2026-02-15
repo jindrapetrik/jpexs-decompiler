@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1209], [#1850], [#2619] Debugging SWF in the web browser
 
 ## [25.0.0] - 2026-02-10
 ### Added
@@ -4110,6 +4112,9 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1209]: https://www.free-decompiler.com/flash/issues/1209
+[#1850]: https://www.free-decompiler.com/flash/issues/1850
+[#2619]: https://www.free-decompiler.com/flash/issues/2619
 [#2610]: https://www.free-decompiler.com/flash/issues/2610
 [#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2626]: https://www.free-decompiler.com/flash/issues/2626
