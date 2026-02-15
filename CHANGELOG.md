@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1209], [#1850], [#2619] Debugging SWF in the web browser
 
+### Fixed
+- Metadata formatting
+
 ## [25.0.0] - 2026-02-10
 ### Added
 - [#2610] Export morphshapes - export individual frames, setting of morph

@@ -1826,7 +1826,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public static String formatMetadata(String input, int indent) {
-        input = input.replace("> <", "><");
+        input = input.replaceAll("\r?\n", "");
+        input = input.replaceAll("> +<", "><");
         try {
             Source xmlInput = new StreamSource(new StringReader(input));
             StringWriter stringWriter = new StringWriter();
