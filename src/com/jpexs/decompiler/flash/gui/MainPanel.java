@@ -2888,11 +2888,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return false;
     }
 
-    public void gotoDocumentClass(SWF swf) {
+    public boolean gotoDocumentClass(SWF swf) {
         View.checkAccess();
 
         if (swf == null) {
-            return;
+            return false;
         }
 
         String documentClass = swf.getDocumentClass();
@@ -2905,11 +2905,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (c.getABC().findClassByName(documentClass) > -1) {
                         abcPanel.setAbc(c.getABC());
                         abcPanel.hilightScript(swf, documentClassPrintable);
-                        break;
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     public void disableDecompilationChanged() {

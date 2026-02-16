@@ -154,7 +154,7 @@ public class DebugStackPanel extends JPanel {
                             public void run() {                                
                                 if (!session.isPaused()) {
                                     List<SWF> debuggedSwfs = new ArrayList<>(session.getDebuggedSwfs().values());
-                                    gotoScriptNodeOrSwf(debuggedSwfs.get(debuggedSwfs.size() - 1));
+                                    gotoDocumentClassOrScriptNodeOrSwf(debuggedSwfs.get(debuggedSwfs.size() - 1));
                                 } else {
                                     gotoRow(0);
                                 }
@@ -192,7 +192,12 @@ public class DebugStackPanel extends JPanel {
         });
     }
     
-    private void gotoScriptNodeOrSwf(SWF swf) {
+    private void gotoDocumentClassOrScriptNodeOrSwf(SWF swf) {
+        if (swf.isAS3()) {
+            if (Main.getMainFrame().getPanel().gotoDocumentClass(swf)) {
+                return;
+            }
+        }
         if (Main.getMainFrame().getPanel().getCurrentView() == MainPanel.VIEW_RESOURCES) {
             TreeItem scriptNode = Main.getMainFrame().getPanel().tagTree.getFullModel().getScriptsNode(swf);
             if (scriptNode != null) {
@@ -215,7 +220,7 @@ public class DebugStackPanel extends JPanel {
                 scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
         
         if (!scriptFound) {
-            gotoScriptNodeOrSwf(swf);
+            gotoDocumentClassOrScriptNodeOrSwf(swf);
         }
         DebuggerSession session = null;
         if (currentSessionRef != null) {
