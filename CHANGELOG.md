@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1209], [#1850], [#2619] Debugging SWF in the web browser
   (Debug listening capability - only for SWFs previously prepared by FFDec)
 - TTF export - setting italic / bold flags in the font
+- ffdec-cli.exe is signed
 
 ### Fixed
 - Metadata formatting
