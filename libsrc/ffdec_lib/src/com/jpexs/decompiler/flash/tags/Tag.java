@@ -917,6 +917,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if (swf.getCharacters(true).containsKey(characterId) && !swf.getCyclicCharacters().contains(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
                 CharacterTag character = swf.getCharacter(characterId);
+                if (character == null) {
+                    continue;
+                }
                 if (character.isImported()) {
                     continue;
                 }
