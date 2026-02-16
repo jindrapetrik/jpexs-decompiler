@@ -1,0 +1,104 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+    
+permissions:
+  contents: write   
+  
+env:
+  CICD_REPO_SLUG: jindrapetrik/jpexs-decompiler
+  GITHUB_USER: jindrapetrik
+  GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+jobs:
+  compute-version:
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+  deploy:
+    name: Deploy to GitHub
+    runs-on: ubuntu-latest
+    if: needs.compute-version.outputs.doRelease == 'true'
+    needs:
+      - compute-version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq php
+          
+      - name: Download packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: releases/
+      
+      - name: Download lib javadoc artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lib_javadoc
+          path: releases/
+          
+      - name: Generate nightly release description
+        if: needs.compute-version.outputs.verDebug == 'true'
+        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
+
+      - name: Generate release description
+        if: needs.compute-version.outputs.verDebug == 'false'
+        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" "${{ needs.compute-version.outputs.verShort }}" ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_notes
+          path: ./release_notes.md
+
+      - name: Create tag
+        if: needs.compute-version.outputs.verDebug == 'true'
+        run: |
+          TAG="${{ needs.compute-version.outputs.verTag }}"
+          git fetch --tags --force
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists -> skipping tag creation."
+            exit 0
+          fi
+          
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag "$TAG"
+          git push origin "$TAG"
+          
+      - name: Create GitHub Release + upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.compute-version.outputs.verTag }}
+          name: ${{ needs.compute-version.outputs.verTitle }}
+          body_path: ./release_notes.md
+          preserve_order: true
+          prerelease: ${{ needs.compute-version.outputs.verDebug == 'true'}} 
+          fail_on_unmatched_files: true
+          files: |
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.deb
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.pkg
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}_macosx.zip
+            releases/ffdec_lib_${{ needs.compute-version.outputs.verShort }}.zip
+            releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
+      - name: Remove old nightly
+        if: needs.compute-version.outputs.verDebug == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete ${{needs.compute-version.outputs.verOldTag}} --yes --cleanup-tag

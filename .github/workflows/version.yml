@@ -1,0 +1,174 @@
+name: Compute version
+on:
+  workflow_call:
+    outputs:
+      doRelease:   ${{ jobs.compute-version.outputs.doRelease }}
+      verMajor:    ${{ jobs.compute-version.outputs.verMajor }}
+      verMinor:    ${{ jobs.compute-version.outputs.verMinor }}
+      verRelease:  ${{ jobs.compute-version.outputs.verRelease }}
+      verBuild:    ${{ jobs.compute-version.outputs.verBuild }}
+      verRevision: ${{ jobs.compute-version.outputs.verRevision }}
+      verLong:     ${{ jobs.compute-version.outputs.verLong }}
+      verRaw:      ${{ jobs.compute-version.outputs.verRaw }}
+      verShort:    ${{ jobs.compute-version.outputs.verShort }}
+      verDebug:    ${{ jobs.compute-version.outputs.verDebug }}
+      verOldTag:      ${{ jobs.compute-version.outputs.verOldTag }}
+      verTag:      ${{ jobs.compute-version.outputs.verTag }}
+      verTitle:    ${{ jobs.compute-version.outputs.verTitle }}
+jobs:
+  compute-version:
+    name: Compute version
+    runs-on: windows-latest
+    outputs:
+      doRelease:   ${{ steps.vars.outputs.doRelease }}
+      verMajor:    ${{ steps.vars.outputs.verMajor }}
+      verMinor:    ${{ steps.vars.outputs.verMinor }}
+      verRelease:  ${{ steps.vars.outputs.verRelease }}
+      verBuild:    ${{ steps.vars.outputs.verBuild }}
+      verRevision: ${{ steps.vars.outputs.verRevision }}
+      verLong:     ${{ steps.vars.outputs.verLong }}
+      verRaw:      ${{ steps.vars.outputs.verRaw }}
+      verShort:    ${{ steps.vars.outputs.verShort }}
+      verDebug:    ${{ steps.vars.outputs.verDebug }}
+      verOldTag:      ${{ steps.vars.outputs.verOldTag }}
+      verTag:      ${{ steps.vars.outputs.verTag }}
+      verTitle:    ${{ steps.vars.outputs.verTitle }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute variables
+        id: vars
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          # Ensure tags exist locally
+          git fetch --tags --force | Out-Null
+
+          $ref       = "${env:GITHUB_REF}"       # e.g. refs/tags/version1.2.3 or refs/heads/dev
+          $refName   = "${env:GITHUB_REF_NAME}"  # e.g. version1.2.3 or dev
+          $isTag     = $ref.StartsWith("refs/tags/")
+          $isDev     = ($ref -eq "refs/heads/dev")
+
+          $H = (git rev-parse HEAD).Trim()
+
+          function Set-Var([string]$name, [string]$value) {
+            # For later steps in the SAME job
+            "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            # For later jobs (job outputs)
+            "$name=$value" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+          # Defaults
+          Set-Var "doRelease" "false"
+          Set-Var "verMajor" ""
+          Set-Var "verMinor" ""
+          Set-Var "verRelease" ""
+          Set-Var "verBuild" ""
+          Set-Var "verRevision" ""
+          Set-Var "verLong" ""
+          Set-Var "verRaw" ""
+          Set-Var "verShort" ""
+          Set-Var "verDebug" ""
+          Set-Var "verOldTag" ""
+          Set-Var "verTag" ""
+          Set-Var "verTitle" ""
+
+
+          # Case 1: Tag versionX.Y.Z
+          if ($isTag -and ($refName -match '^version(\d+)\.(\d+)\.(\d+)$')) {
+            $X = $Matches[1]
+            $Y = $Matches[2]
+            $Z = $Matches[3]
+
+            Set-Var "verMajor"    $X
+            Set-Var "verMinor"    $Y
+            Set-Var "verRelease"  $Z
+            Set-Var "verBuild"    "0"
+            Set-Var "verRevision" $H
+
+            $raw = "$X.$Y.$Z"
+            Set-Var "verRaw"   $raw
+            Set-Var "verShort" $raw
+            Set-Var "verLong"  $raw
+            
+            Set-Var "verDebug" "false"
+            Set-Var "verOldTag" ""
+            Set-Var "verTag"   $refName
+            
+            Set-Var "doRelease" "true"
+            Set-Var "verTitle" "version $raw"
+            
+            exit 0
+          }
+
+          # Case 2: dev branch
+          if ($isDev) {
+            # Find latest nightlyN tag (max N)
+            $nightlyTags = git tag --list 'nightly*'
+            $maxN = -1
+            foreach ($t in $nightlyTags) {
+              if ($t -match '^nightly(\d+)$') {
+                $n = [int]$Matches[1]
+                if ($n -gt $maxN) { $maxN = $n }
+              }
+            }
+            if ($maxN -lt 0) { $maxN = 0 }  # if none exists, start from 0 so M becomes 1
+            $M = $maxN + 1
+
+            # Find latest versionX.Y.Z tag by numeric comparison (major,minor,release)
+            $versionTags = git tag --list 'version*'
+            $best = $null
+            foreach ($t in $versionTags) {
+              if ($t -match '^version(\d+)\.(\d+)\.(\d+)$') {
+                $maj = [int]$Matches[1]
+                $min = [int]$Matches[2]
+                $rel = [int]$Matches[3]
+                $obj = [pscustomobject]@{ Tag=$t; Major=$maj; Minor=$min; Release=$rel }
+                if (-not $best) {
+                  $best = $obj
+                } else {
+                  if ($obj.Major -gt $best.Major -or
+                     ($obj.Major -eq $best.Major -and $obj.Minor -gt $best.Minor) -or
+                     ($obj.Major -eq $best.Major -and $obj.Minor -eq $best.Minor -and $obj.Release -gt $best.Release)) {
+                    $best = $obj
+                  }
+                }
+              }
+            }
+
+            if (-not $best) {
+              throw "No versionX.Y.Z tag found. Create at least one version tag (e.g. version1.0.0)."
+            }
+
+            $X = $best.Major
+            $Y = $best.Minor
+            $Z = $best.Release
+
+            Set-Var "verMajor"    "$X"
+            Set-Var "verMinor"    "$Y"
+            Set-Var "verRelease"  "$Z"
+            Set-Var "verBuild"    "$M"
+            Set-Var "verRevision" $H
+
+            Set-Var "verLong"  "$X.$Y.$Z nightly build $M"
+            Set-Var "verRaw"   "$X.$Y.$Z"
+            Set-Var "verShort" "$X.$Y.$Z`_nightly$M"
+            Set-Var "verDebug" "true"
+            Set-Var "verOldTag"   "nightly$maxN"
+            
+            Set-Var "verTag"   "nightly$M"
+
+            Set-Var "verTitle" "(PREVIEW) version $X.$Y.$Z nightly $M"
+
+            Set-Var "doRelease" "true"
+            exit 0
+          }
+
+          # Other cases: doRelease stays false
+          exit 0    
