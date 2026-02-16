@@ -291,6 +291,16 @@ public class Fontastic {
             e.printStackTrace();
         }
     }
+    
+    //JPEXS
+    public void setBold(boolean bold) {
+        m_engine.getTypeface().setBold(bold);
+    }
+    
+    //JPEXS
+    public void setItalic(boolean italic) {
+        m_engine.getTypeface().setItalic(italic);
+    }
 
     public void setAscender(float ascender) {
         try {

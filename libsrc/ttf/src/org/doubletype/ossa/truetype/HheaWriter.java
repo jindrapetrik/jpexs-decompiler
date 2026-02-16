@@ -88,10 +88,9 @@ public class HheaWriter extends FontFormatWriter {
         int xMaxExtent = m_head.getMax().x - m_head.getMin().x;
         writeFWord(xMaxExtent);
 
-        // caratSlopeRise
-        writeInt16(1);
-        writeInt16(0);
-
+        writeInt16(1); // caretSlopeRise                
+        writeInt16(0); //caretSlopeRun
+        
         // reserved
         for (int i = 0; i < 5; i++) {
             writeInt16(0);

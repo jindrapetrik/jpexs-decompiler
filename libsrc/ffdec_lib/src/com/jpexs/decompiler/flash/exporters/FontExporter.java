@@ -209,6 +209,13 @@ public class FontExporter {
             value = Math.min(value, 1024);
             f.setDescender(value);
         }
+        
+        if (ft.isBold()) {
+            f.setBold(true);
+        }
+        if (ft.isItalic()) {
+            f.setItalic(true);
+        }
 
         List<Integer> reallyExportedGlyphs = new ArrayList<>();
         Set<Character> processedCharacters = new HashSet<>();

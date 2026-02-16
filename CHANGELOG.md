@@ -5,9 +5,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1209], [#1850], [#2619] Debugging SWF in the web browser
   (Debug listening capability - only for SWFs previously prepared by FFDec)
+- TTF export - setting italic / bold flags in the font
 
 ### Fixed
 - Metadata formatting
+- [#2632] TTF export - non-zero italic angle
 
 ## [25.0.0] - 2026-02-10
 ### Added
@@ -4119,6 +4121,7 @@ Major version of SWF to XML export changed to 2.
 [#1209]: https://www.free-decompiler.com/flash/issues/1209
 [#1850]: https://www.free-decompiler.com/flash/issues/1850
 [#2619]: https://www.free-decompiler.com/flash/issues/2619
+[#2632]: https://www.free-decompiler.com/flash/issues/2632
 [#2610]: https://www.free-decompiler.com/flash/issues/2610
 [#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2626]: https://www.free-decompiler.com/flash/issues/2626

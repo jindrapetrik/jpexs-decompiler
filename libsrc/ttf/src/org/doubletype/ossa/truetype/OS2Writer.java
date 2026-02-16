@@ -70,6 +70,10 @@ public class OS2Writer extends FontFormatWriter {
 
     final int k_latin1Supplement = 0x0002;
 
+    final int k_italic = 0x01;
+    
+    final int k_bold = 0x20;
+    
     final int k_regular = 0x40;
 
     final int k_basicLatinStart = 0x0020;
@@ -220,6 +224,16 @@ public class OS2Writer extends FontFormatWriter {
         } // switch
     }
 
+    //JPEXS
+    public void setFsSelection(int fsSelection) {
+        this.m_fsSelection = fsSelection;
+    }
+
+    //JPEXS
+    public void setUsWeightClass(int usWeightClass) {
+        this.m_usWeightClass = usWeightClass;
+    }        
+        
     public void write() throws IOException {
         m_usWinAscent = m_head.getMax().y;
         m_usWinDescent = 0;
