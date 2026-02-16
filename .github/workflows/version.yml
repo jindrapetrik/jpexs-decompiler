@@ -2,21 +2,22 @@ name: Compute version
 on:
   workflow_call:
     outputs:
-      doRelease:   ${{ jobs.compute-version.outputs.doRelease }}
-      verMajor:    ${{ jobs.compute-version.outputs.verMajor }}
-      verMinor:    ${{ jobs.compute-version.outputs.verMinor }}
-      verRelease:  ${{ jobs.compute-version.outputs.verRelease }}
-      verBuild:    ${{ jobs.compute-version.outputs.verBuild }}
-      verRevision: ${{ jobs.compute-version.outputs.verRevision }}
-      verLong:     ${{ jobs.compute-version.outputs.verLong }}
-      verRaw:      ${{ jobs.compute-version.outputs.verRaw }}
-      verShort:    ${{ jobs.compute-version.outputs.verShort }}
-      verDebug:    ${{ jobs.compute-version.outputs.verDebug }}
-      verOldTag:      ${{ jobs.compute-version.outputs.verOldTag }}
-      verTag:      ${{ jobs.compute-version.outputs.verTag }}
-      verTitle:    ${{ jobs.compute-version.outputs.verTitle }}
+      doRelease:   ${{ jobs.compute_version.outputs.doRelease }}
+      verMajor:    ${{ jobs.compute_version.outputs.verMajor }}
+      verMinor:    ${{ jobs.compute_version.outputs.verMinor }}
+      verRelease:  ${{ jobs.compute_version.outputs.verRelease }}
+      verBuild:    ${{ jobs.compute_version.outputs.verBuild }}
+      verRevision: ${{ jobs.compute_version.outputs.verRevision }}
+      verLong:     ${{ jobs.compute_version.outputs.verLong }}
+      verRaw:      ${{ jobs.compute_version.outputs.verRaw }}
+      verShort:    ${{ jobs.compute_version.outputs.verShort }}
+      verDebug:    ${{ jobs.compute_version.outputs.verDebug }}
+      verOldTag:      ${{ jobs.compute_version.outputs.verOldTag }}
+      verTag:      ${{ jobs.compute_version.outputs.verTag }}
+      verTitle:    ${{ jobs.compute_version.outputs.verTitle }}
+
 jobs:
-  compute-version:
+  compute_version:
     name: Compute version
     runs-on: windows-latest
     outputs:
