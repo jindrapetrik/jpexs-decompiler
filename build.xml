@@ -1006,5 +1006,4 @@
             <arg value="--force"/>
         </exec> 
     </target>
-    <!-- test -->
 </project>
