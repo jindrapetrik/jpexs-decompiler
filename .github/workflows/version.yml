@@ -1,3 +1,4 @@
+name: Compute version
 on:
   workflow_call:
     outputs:
@@ -30,7 +31,7 @@ on:
 
 jobs:
   compute-version:
-    name: Compute version
+    name: Main
     runs-on: windows-latest
     outputs:
       doRelease:   ${{ steps.vars.outputs.doRelease }}
