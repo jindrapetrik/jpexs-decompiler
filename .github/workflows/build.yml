@@ -59,11 +59,13 @@ jobs:
           # Ensure tags exist locally
           git fetch --tags --force | Out-Null
 
-          $ref       = "${env:GITHUB_REF}"       # e.g. refs/tags/version1.2.3 or refs/heads/dev
-          $refName   = "${env:GITHUB_REF_NAME}"  # e.g. version1.2.3 or dev
+          $ref       = "${env:GITHUB_REF}"        # e.g. refs/tags/version1.2.3 or refs/heads/dev
+          $refName   = "${env:GITHUB_REF_NAME}"   # e.g. version1.2.3 or dev
+          $eventType = "${env:GITHUB_EVENT_NAME}" # e.g. "push" or "pull_request"
           $isTag     = $ref.StartsWith("refs/tags/")
           $isDev     = ($ref -eq "refs/heads/dev")
-
+          $isPush    = ($eventType -eq "push")
+                              
           $H = (git rev-parse HEAD).Trim()
 
           function Set-Var([string]$name, [string]$value) {
@@ -116,8 +118,8 @@ jobs:
             exit 0
           }
 
-          # Case 2: dev branch
-          if ($isDev) {
+          # Case 2: dev branch and push
+          if ($isDev -and $isPush) {
             # Find latest nightlyN tag (max N)
             $nightlyTags = git tag --list 'nightly*'
             $maxN = -1
