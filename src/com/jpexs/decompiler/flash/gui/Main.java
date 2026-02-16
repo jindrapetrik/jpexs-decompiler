@@ -345,7 +345,6 @@ public class Main {
             if (runTempFile != null) {
                 deleteCookiesAfterRun(runTempFile);
                 runTempFile.delete();
-                System.err.println("deleted " + runTempFile);
                 runTempFile = null;
             }
             for (File f : runTempFiles) {
