@@ -186,12 +186,12 @@ jobs:
         run: |
           $VERSION_PROP_FILE = "version.properties"
           echo "">$VERSION_PROP_FILE
-          echo "major=${{ needs.compute-version.outputs.verMajor }}">>$VERSION_PROP_FILE
-          echo "minor=${{ needs.compute-version.outputs.verMinor }}">>$VERSION_PROP_FILE
-          echo "release=${{ needs.compute-version.outputs.verRelease }}">>$VERSION_PROP_FILE
-          echo "build=${{ needs.compute-version.outputs.verBuild }}">>$VERSION_PROP_FILE
-          echo "revision=${{ needs.compute-version.outputs.verRevision }}">>$VERSION_PROP_FILE
-          echo "debug=${{ needs.compute-version.outputs.verDebug }}">>$VERSION_PROP_FILE   
+          echo "major=${{ steps.vars.outputs.verMajor }}">>$VERSION_PROP_FILE
+          echo "minor=${{ steps.vars.outputs.verMinor }}">>$VERSION_PROP_FILE
+          echo "release=${{ steps.vars.outputs.verRelease }}">>$VERSION_PROP_FILE
+          echo "build=${{ steps.vars.outputs.verBuild }}">>$VERSION_PROP_FILE
+          echo "revision=${{ steps.vars.outputs.verRevision }}">>$VERSION_PROP_FILE
+          echo "debug=${{ steps.vars.outputs.verDebug }}">>$VERSION_PROP_FILE
 
       - name: Upload version.properties artifact
         uses: actions/upload-artifact@v4
