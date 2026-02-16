@@ -858,6 +858,7 @@ jobs:
       cancel-in-progress: false
     needs:
       - compute-version
+      - packages
     steps:
       - name: Checkout
         uses: actions/checkout@v3
