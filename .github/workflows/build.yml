@@ -1,5 +1,9 @@
 name: Build
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     tags:
@@ -13,194 +17,18 @@ on:
         - master  
 
 env:
-    CICD_REPO_SLUG: jindrapetrik/jpexs-decompiler
-    CICD_REFTYPE: ${{ github.ref_type }}
-    CICD_REFNAME: ${{ github.ref_name }}
-    CICD_COMMIT: ${{ github.sha }}
-    CICD_NAME: GitHub Actions
-    CICD_EMAIL: GitHub
-    CICD_EVENTNAME: ${{ github.event_name }}
-    NIGHTLY_BRANCH: dev
     GITHUB_USER: jindrapetrik
     GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 permissions:
-  contents: write
   id-token: write
 
 jobs:
   compute-version:
     name: Compute version
-    runs-on: windows-latest
-
-    outputs:
-      doRelease:   ${{ steps.vars.outputs.doRelease }}
-      verMajor:    ${{ steps.vars.outputs.verMajor }}
-      verMinor:    ${{ steps.vars.outputs.verMinor }}
-      verRelease:  ${{ steps.vars.outputs.verRelease }}
-      verBuild:    ${{ steps.vars.outputs.verBuild }}
-      verRevision: ${{ steps.vars.outputs.verRevision }}
-      verLong:     ${{ steps.vars.outputs.verLong }}
-      verRaw:      ${{ steps.vars.outputs.verRaw }}
-      verShort:    ${{ steps.vars.outputs.verShort }}
-      verDebug:    ${{ steps.vars.outputs.verDebug }}
-      verOldTag:      ${{ steps.vars.outputs.verOldTag }}
-      verTag:      ${{ steps.vars.outputs.verTag }}
-      verTitle:    ${{ steps.vars.outputs.verTitle }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Compute variables
-        id: vars
-        shell: pwsh
-        run: |
-          Set-StrictMode -Version Latest
-          $ErrorActionPreference = 'Stop'
-
-          # Ensure tags exist locally
-          git fetch --tags --force | Out-Null
-
-          $ref       = "${env:GITHUB_REF}"       # e.g. refs/tags/version1.2.3 or refs/heads/dev
-          $refName   = "${env:GITHUB_REF_NAME}"  # e.g. version1.2.3 or dev
-          $isTag     = $ref.StartsWith("refs/tags/")
-          $isDev     = ($ref -eq "refs/heads/dev")
-
-          $H = (git rev-parse HEAD).Trim()
-
-          function Set-Var([string]$name, [string]$value) {
-            # For later steps in the SAME job
-            "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            # For later jobs (job outputs)
-            "$name=$value" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
-
-          # Defaults
-          Set-Var "doRelease" "false"
-          Set-Var "verMajor" ""
-          Set-Var "verMinor" ""
-          Set-Var "verRelease" ""
-          Set-Var "verBuild" ""
-          Set-Var "verRevision" ""
-          Set-Var "verLong" ""
-          Set-Var "verRaw" ""
-          Set-Var "verShort" ""
-          Set-Var "verDebug" ""
-          Set-Var "verOldTag" ""
-          Set-Var "verTag" ""
-          Set-Var "verTitle" ""
-
-
-          # Case 1: Tag versionX.Y.Z
-          if ($isTag -and ($refName -match '^version(\d+)\.(\d+)\.(\d+)$')) {
-            $X = $Matches[1]
-            $Y = $Matches[2]
-            $Z = $Matches[3]
-
-            Set-Var "verMajor"    $X
-            Set-Var "verMinor"    $Y
-            Set-Var "verRelease"  $Z
-            Set-Var "verBuild"    "0"
-            Set-Var "verRevision" $H
-
-            $raw = "$X.$Y.$Z"
-            Set-Var "verRaw"   $raw
-            Set-Var "verShort" $raw
-            Set-Var "verLong"  $raw
-            
-            Set-Var "verDebug" "false"
-            Set-Var "verOldTag" ""
-            Set-Var "verTag"   $refName
-            
-            Set-Var "doRelease" "true"
-            Set-Var "verTitle" "version $raw"
-            
-            exit 0
-          }
-
-          # Case 2: dev branch
-          if ($isDev) {
-            # Find latest nightlyN tag (max N)
-            $nightlyTags = git tag --list 'nightly*'
-            $maxN = -1
-            foreach ($t in $nightlyTags) {
-              if ($t -match '^nightly(\d+)$') {
-                $n = [int]$Matches[1]
-                if ($n -gt $maxN) { $maxN = $n }
-              }
-            }
-            if ($maxN -lt 0) { $maxN = 0 }  # if none exists, start from 0 so M becomes 1
-            $M = $maxN + 1
-
-            # Find latest versionX.Y.Z tag by numeric comparison (major,minor,release)
-            $versionTags = git tag --list 'version*'
-            $best = $null
-            foreach ($t in $versionTags) {
-              if ($t -match '^version(\d+)\.(\d+)\.(\d+)$') {
-                $maj = [int]$Matches[1]
-                $min = [int]$Matches[2]
-                $rel = [int]$Matches[3]
-                $obj = [pscustomobject]@{ Tag=$t; Major=$maj; Minor=$min; Release=$rel }
-                if (-not $best) {
-                  $best = $obj
-                } else {
-                  if ($obj.Major -gt $best.Major -or
-                     ($obj.Major -eq $best.Major -and $obj.Minor -gt $best.Minor) -or
-                     ($obj.Major -eq $best.Major -and $obj.Minor -eq $best.Minor -and $obj.Release -gt $best.Release)) {
-                    $best = $obj
-                  }
-                }
-              }
-            }
-
-            if (-not $best) {
-              throw "No versionX.Y.Z tag found. Create at least one version tag (e.g. version1.0.0)."
-            }
-
-            $X = $best.Major
-            $Y = $best.Minor
-            $Z = $best.Release
-
-            Set-Var "verMajor"    "$X"
-            Set-Var "verMinor"    "$Y"
-            Set-Var "verRelease"  "$Z"
-            Set-Var "verBuild"    "$M"
-            Set-Var "verRevision" $H
-
-            Set-Var "verLong"  "$X.$Y.$Z nightly build $M"
-            Set-Var "verRaw"   "$X.$Y.$Z"
-            Set-Var "verShort" "$X.$Y.$Z`_nightly$M"
-            Set-Var "verDebug" "true"
-            Set-Var "verOldTag"   "nightly$maxN"
-            
-            Set-Var "verTag"   "nightly$M"
-
-            Set-Var "verTitle" "(PREVIEW) version $X.$Y.$Z nightly $M"
-
-            Set-Var "doRelease" "true"
-            exit 0
-          }
-
-          # Other cases: doRelease stays false
-          exit 0           
-      - name: Prepare version info property file
-        run: |
-          $VERSION_PROP_FILE = "version.properties"
-          echo "">$VERSION_PROP_FILE
-          echo "major=${{ steps.vars.outputs.verMajor }}">>$VERSION_PROP_FILE
-          echo "minor=${{ steps.vars.outputs.verMinor }}">>$VERSION_PROP_FILE
-          echo "release=${{ steps.vars.outputs.verRelease }}">>$VERSION_PROP_FILE
-          echo "build=${{ steps.vars.outputs.verBuild }}">>$VERSION_PROP_FILE
-          echo "revision=${{ steps.vars.outputs.verRevision }}">>$VERSION_PROP_FILE
-          echo "debug=${{ steps.vars.outputs.verDebug }}">>$VERSION_PROP_FILE   
-      - name: Upload version.properties artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: version_properties
-          path: version.properties 
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+       
   build:
     name: Build and test
     runs-on: windows-latest
@@ -208,6 +36,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: Prepare version info property file
+        shell: pwsh
+        run: |
+          $VERSION_PROP_FILE = "version.properties"
+          echo "">$VERSION_PROP_FILE
+          echo "major=${{ needs.compute-version.outputs.verMajor }}">>$VERSION_PROP_FILE
+          echo "minor=${{ needs.compute-version.outputs.verMinor }}">>$VERSION_PROP_FILE
+          echo "release=${{ needs.compute-version.outputs.verRelease }}">>$VERSION_PROP_FILE
+          echo "build=${{ needs.compute-version.outputs.verBuild }}">>$VERSION_PROP_FILE
+          echo "revision=${{ needs.compute-version.outputs.verRevision }}">>$VERSION_PROP_FILE
+          echo "debug=${{ needs.compute-version.outputs.verDebug }}">>$VERSION_PROP_FILE   
+
+      - name: Upload version.properties artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version_properties
+          path: version.properties  
         
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -839,83 +685,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: packages
-        path: releases
-    
-  deploy:
-    name: Deploy to GitHub
-    runs-on: ubuntu-latest
-    if: needs.compute-version.outputs.doRelease == 'true'
-    needs:
-      - compute-version
-      - packages      
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up PHP
-        run: |
-          sudo apt-get update -y -qq
-          sudo apt-get install -y -qq php
-          
-      - name: Download packages artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: packages
-          path: releases/
-      
-      - name: Download lib javadoc artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: lib_javadoc
-          path: releases/
-          
-      - name: Generate release description
-        run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
-
-      - name: Upload release notes artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release_notes
-          path: ./release_notes.md
-
-      - name: Create tag
-        if: needs.compute-version.outputs.verDebug == 'true'
-        run: |
-          TAG="${{ needs.compute-version.outputs.verTag }}"
-          git fetch --tags --force
-
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists -> skipping tag creation."
-            exit 0
-          fi
-          
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git tag "$TAG"
-          git push origin "$TAG"
-          
-      - name: Create GitHub Release + upload assets
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.compute-version.outputs.verTag }}
-          name: ${{ needs.compute-version.outputs.verTitle }}
-          body_path: ./release_notes.md
-          preserve_order: true
-          prerelease: ${{ needs.compute-version.outputs.verDebug == 'true'}} 
-          fail_on_unmatched_files: true
-          files: |
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.deb
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.pkg
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}_macosx.zip
-            releases/ffdec_lib_${{ needs.compute-version.outputs.verShort }}.zip
-            releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
-      - name: Remove old nightly
-        if: needs.compute-version.outputs.verDebug == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release delete ${{needs.compute-version.outputs.verOldTag}} --yes --cleanup-tag
+        path: releases      
         
