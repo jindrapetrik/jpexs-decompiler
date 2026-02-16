@@ -2,8 +2,13 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Build"]
-    types: [completed]
+    workflows:
+      - Build
+    types:
+      - completed
+    branches:
+      - dev
+      - master
     
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
