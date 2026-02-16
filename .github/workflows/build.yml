@@ -277,7 +277,9 @@ jobs:
       concurrency:
         group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
         cancel-in-progress: true
-      needs: compute-version
+      needs: 
+        - compute-version
+        - build
       if: needs.compute-version.outputs.doRelease == 'true'
       steps:
       - name: Checkout
