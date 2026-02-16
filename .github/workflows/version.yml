@@ -2,22 +2,35 @@ name: Compute version
 on:
   workflow_call:
     outputs:
-      doRelease:   ${{ jobs.compute_version.outputs.doRelease }}
-      verMajor:    ${{ jobs.compute_version.outputs.verMajor }}
-      verMinor:    ${{ jobs.compute_version.outputs.verMinor }}
-      verRelease:  ${{ jobs.compute_version.outputs.verRelease }}
-      verBuild:    ${{ jobs.compute_version.outputs.verBuild }}
-      verRevision: ${{ jobs.compute_version.outputs.verRevision }}
-      verLong:     ${{ jobs.compute_version.outputs.verLong }}
-      verRaw:      ${{ jobs.compute_version.outputs.verRaw }}
-      verShort:    ${{ jobs.compute_version.outputs.verShort }}
-      verDebug:    ${{ jobs.compute_version.outputs.verDebug }}
-      verOldTag:      ${{ jobs.compute_version.outputs.verOldTag }}
-      verTag:      ${{ jobs.compute_version.outputs.verTag }}
-      verTitle:    ${{ jobs.compute_version.outputs.verTitle }}
+      doRelease:   
+        value: ${{ jobs.compute-version.outputs.doRelease }}
+      verMajor:
+        value: ${{ jobs.compute-version.outputs.verMajor }}
+      verMinor:
+        value: ${{ jobs.compute-version.outputs.verMinor }}
+      verRelease: 
+        value: ${{ jobs.compute-version.outputs.verRelease }}
+      verBuild:
+        value: ${{ jobs.compute-version.outputs.verBuild }}
+      verRevision:
+        value: ${{ jobs.compute-version.outputs.verRevision }}
+      verLong: 
+        value: ${{ jobs.compute-version.outputs.verLong }}
+      verRaw:  
+        value: ${{ jobs.compute-version.outputs.verRaw }}
+      verShort:
+        value: ${{ jobs.compute-version.outputs.verShort }}
+      verDebug:
+        value: ${{ jobs.compute-version.outputs.verDebug }}
+      verOldTag:
+        value: ${{ jobs.compute-version.outputs.verOldTag }}
+      verTag:  
+        value: ${{ jobs.compute-version.outputs.verTag }}
+      verTitle:
+        value: ${{ jobs.compute-version.outputs.verTitle }}
 
 jobs:
-  compute_version:
+  compute-version:
     name: Compute version
     runs-on: windows-latest
     outputs:
