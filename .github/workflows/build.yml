@@ -25,6 +25,7 @@ permissions:
 
 jobs:
   compute-version:
+    name: Compute version
     uses: ./.github/workflows/version.yml
     secrets: inherit
        
