@@ -207,7 +207,11 @@ public abstract class AVM2Item extends GraphTargetItem {
                 }                
             } else {
                 isValidName = true;
-            }                                
+            }                      
+            
+            if (!Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
+                isValidName = true;
+            }
             
             if (isValidName) {
                 if (((FullMultinameAVM2Item) propertyName).name != null) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -216,7 +217,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     String localName;
                     boolean isAttribute = constants.getMultiname(multinameIndex).isAttribute();
                     String namespaceSuffix = constants.getMultiname(multinameIndex).getNamespaceSuffix();
-                    if (!isAttribute && afterDot && namespaceSuffix.isEmpty()) {
+                    if (!isAttribute && afterDot && namespaceSuffix.isEmpty() && Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
                         //do not deobfuscate
                         localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, fullyQualifiedNames, true, true, customNsRef);
                     } else {
@@ -230,7 +231,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                         writer.appendNoHilight("::");
                     }
         
-                    if (!isAttribute && afterDot && namespaceSuffix.isEmpty()) {
+                    if (!isAttribute && afterDot && namespaceSuffix.isEmpty() && Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
                         if (IdentifiersDeobfuscation.isValidName(true, localName)) {
                             writer.append(localName);
                         } else {
