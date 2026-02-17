@@ -697,7 +697,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Lock for characters synchronization
      */
     private final Object charactersLock = new Object();
-    
+
     /**
      * SHA 256 hash of original data
      */
@@ -705,7 +705,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public String getHashSha256() {
         return hashSha256;
-    }                
+    }
 
     public UninitializedClassFieldsDetector getUninitializedClassFieldsDetector() {
         return uninitializedClassFieldsDetector;
@@ -1829,16 +1829,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param includeImported Include imported characters
      * @throws IOException On I/O error
      */
-    public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {        
+    public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
         checkCharset();
         byte[] newUncompressedData = saveToByteArray(gfx, includeImported);
-        
+
         try {
             hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(newUncompressedData));
         } catch (NoSuchAlgorithmException ex) {
             //ignore
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         compress(new ByteArrayInputStream(newUncompressedData), baos, compression, lzmaProperties);
         byte[] newCompressedData = baos.toByteArray();
@@ -1846,7 +1846,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             encrypt(new ByteArrayInputStream(newCompressedData), os);
         } else {
             os.write(newCompressedData);
-        }    
+        }
     }
 
     /**
@@ -2316,7 +2316,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, boolean allowRenameIdentifiers) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
-        this.charset = charset;                
+        this.charset = charset;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
@@ -2325,7 +2325,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
-        
+
         try {
             hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(uncompressedData));
         } catch (NoSuchAlgorithmException ex) {
@@ -6247,6 +6247,25 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return getRect();
     }
 
+    private void getCyclicInTags(ReadOnlyTagList tags, Map<Integer, Set<Integer>> characterToNeeded) {
+        for (Tag t : tags) {
+            if (t instanceof CharacterTag) {
+                CharacterTag cht = (CharacterTag) t;
+                if (cht.getCharacterId() != -1) {
+                    Set<Integer> needed = new HashSet<>();
+                    Set<String> neededClasses = new HashSet<>();
+                    cht.getNeededCharacters(needed, neededClasses, this);
+                    //TODO: check cyclic classes
+                    characterToNeeded.put(cht.getCharacterId(), needed);
+                }
+            }
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
+                getCyclicInTags(sprite.getTags(), characterToNeeded);
+            }
+        }
+    }
+
     /**
      * Gets cyclic character ids.
      *
@@ -6258,19 +6277,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Set<Integer> ct = new HashSet<>();
         Map<Integer, Set<Integer>> characterToNeeded = new HashMap<>();
-
-        for (Tag t : getTags()) {
-            if (t instanceof CharacterTag) {
-                CharacterTag cht = (CharacterTag) t;
-                if (cht.getCharacterId() != -1) {
-                    Set<Integer> needed = new HashSet<>();
-                    Set<String> neededClasses = new HashSet<>();
-                    cht.getNeededCharacters(needed, neededClasses, this);
-                    //TODO: check cyclic classes
-                    characterToNeeded.put(cht.getCharacterId(), needed);
-                }
-            }
-        }
+        getCyclicInTags(readOnlyTags, characterToNeeded);
 
         for (int chid : characterToNeeded.keySet()) {
             for (int n : characterToNeeded.get(chid)) {
@@ -6469,5 +6476,5 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public RECT getRectWithFilters() {
         return getRect();
-    }        
+    }
 }

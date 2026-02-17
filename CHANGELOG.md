@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Improper standalone layer termination, not cleaning temp files
 - [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
 - ActionScript - newline after do..while
+- StackOverflow on cyclic buttons
 
 ## [25.0.0] - 2026-02-10
 ### Added
