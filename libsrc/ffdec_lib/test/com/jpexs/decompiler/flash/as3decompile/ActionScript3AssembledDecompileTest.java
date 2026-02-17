@@ -86,8 +86,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testCollidingPublicTraits() {
-        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#90);\r\n"
-                + "trace(\"ns2 = \" + this.a#91);\r\n",
+        decompileMethod("assembled", "testCollidingPublicTraits", "trace(\"ns1 = \" + this.a#91);\r\n"
+                + "trace(\"ns2 = \" + this.a#92);\r\n",
                  false);
     }
 
@@ -332,6 +332,15 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "default:\r\n"
                 + "return;\r\n"
                 + "}\r\n",
+                 false);
+    }
+
+    @Test
+    public void testObfusProperty() {
+        decompileMethod("assembled", "testObfusProperty", "var a:* = new Array();\r\n"
+                + "a[0] = 5;\r\n"
+                + "§Hello world§ = 1;\r\n"
+                + "a[\"one two\"][\"three four\"] = 2;\r\n",
                  false);
     }
 
@@ -595,7 +604,6 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "trace(\"second\");\r\n"
                 + "}\r\n"
                 + "while(_loc5_ <= 100);\r\n"
-                + "\r\n"
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"

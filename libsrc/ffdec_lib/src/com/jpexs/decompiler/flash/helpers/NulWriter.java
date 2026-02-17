@@ -32,6 +32,8 @@ public class NulWriter extends GraphTextWriter {
     private final Stack<Boolean> stringAddedStack = new Stack<>();
 
     private boolean stringAdded = false;
+    
+    private int length = 0;
 
     public NulWriter() {
         super(new CodeFormatting());
@@ -120,54 +122,63 @@ public class NulWriter extends GraphTextWriter {
     @Override
     public NulWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         stringAdded = true;
+        length += text.length();
         return this;
     }
 
     @Override
     public GraphTextWriter appendWithData(String str, HighlightData data) {
         stringAdded = true;
+        length += str.length();
         return this;
     }
 
     @Override
     public GraphTextWriter append(char value) {
         stringAdded = true;
+        length++;
         return this;
     }
 
     @Override
     public GraphTextWriter append(int value) {
         stringAdded = true;
+        length += ("" + value).length();
         return this;
     }
 
     @Override
     public GraphTextWriter append(long value) {
         stringAdded = true;
+        length += ("" + value).length();
         return this;
     }
 
     @Override
     public NulWriter append(String str) {
         stringAdded = true;
+        length += str.length();
         return this;
     }
 
     @Override
     public NulWriter append(String str, long offset, long fileOffset) {
         stringAdded = true;
+        length += str.length();
         return this;
     }
 
     @Override
     public NulWriter appendNoHilight(int i) {
         stringAdded = true;
+        length += ("" + i).length();
         return this;
     }
 
     @Override
     public NulWriter appendNoHilight(String str) {
         stringAdded = true;
+        length += str.length();
         return this;
     }
 
@@ -188,4 +199,9 @@ public class NulWriter extends GraphTextWriter {
         stringAdded = stringAddedStack.pop() || result;
         return result;
     }
+
+    @Override
+    public int getLength() {
+        return length;                
+    }       
 }

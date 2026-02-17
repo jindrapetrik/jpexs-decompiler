@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
   (Debug listening capability - only for SWFs previously prepared by FFDec)
 - TTF export - setting italic / bold flags in the font
 - ffdec-cli.exe is signed
+- [#2636] AS3 QName properties with nonvalid identifiers handled as square brackets
 
 ### Fixed
 - Metadata formatting

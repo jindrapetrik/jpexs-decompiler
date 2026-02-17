@@ -2660,7 +2660,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "while(i < 5);\r\n"
-                + "\r\n"
                 + "}\r\n"
                 + "trace(\"E\");\r\n",
                  false);
