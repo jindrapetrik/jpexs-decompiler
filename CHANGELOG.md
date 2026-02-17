@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Metadata formatting
 - [#2632] TTF export - non-zero italic angle
-- Improper standalone layer termination, not cleaning temp files
+- Improper standalone player termination, not cleaning temp files
 - [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
 - ActionScript - newline after do..while
 - StackOverflow on cyclic characters
