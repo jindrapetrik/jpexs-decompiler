@@ -16,6 +16,7 @@
  - Portugese - Portugal
  - Portugese - Brasilian
  - Russian
+ - Slovak
  - Slovenian
  - Spanish
  - Swedish
