@@ -62,6 +62,10 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
         Configuration.registerNameFormat.set("_loc%d_");
         Configuration.showMethodBodyId.set(false);
         Configuration.displayDupInstructions.set(true);
+        
+        Configuration.as3QNameObfuscatedPropsInSquareBrackets.set(true);
+        Configuration.autoDeobfuscateIdentifiers.set(false);
+
     }
 
     protected void addSwf(String identifier, String path) throws FileNotFoundException, IOException, InterruptedException {

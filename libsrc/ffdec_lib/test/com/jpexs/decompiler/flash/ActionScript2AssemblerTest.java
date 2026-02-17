@@ -556,19 +556,26 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         assertEquals(res, "function f()\n"
                 + "{\n"
                 + "var a = [1,2,3];\n"
+                + "loop0:\n"
                 + "for(v in a)\n"
                 + "{\n"
                 + "trace(v);\n"
                 + "var b = 0;\n"
-                + "while(b < 10)\n"
+                + "while(true)\n"
+                + "{\n"
+                + "if(b < 10)\n"
                 + "{\n"
                 + "if(b == 4)\n"
                 + "{\n"
-                + "trace(\"ret\");\n"
-                + "return;\n" //critical - no level2 break, but return
+                + "break;\n"
                 + "}\n"
                 + "b++;\n"
+                + "continue;\n"
                 + "}\n"
+                + "continue loop0;\n"
+                + "}\n"
+                + "trace(\"ret\");\n"
+                + "break;\n"
                 + "}\n"
                 + "}");
     }
@@ -587,7 +594,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         res = cleanPCode(res);
         assertEquals(res, "this.myVar++;");
     }
-    
+
     @Test
     public void testMemberCompoundDup() {
         String res = decompilePcode("Push \"this\"\n"
@@ -604,7 +611,6 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         assertEquals(res, "this.myVar += 1;");
     }
 
-    
     @Test
     public void testVariableIncrementDup() {
         String res = decompilePcode("Push \"c\"\n"
@@ -615,7 +621,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         res = cleanPCode(res);
         assertEquals(res, "c++;");
     }
-    
+
     @Test
     public void testVariableCompoundDup() {
         String res = decompilePcode("Push \"c\"\n"

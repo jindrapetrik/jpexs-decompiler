@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.DebuggerSession;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -146,7 +147,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
         conListener = new DebuggerHandler.ConnectionListener() {
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
                 synchronized (DetailPanel.this) {
                     debugRunning = true;
                     if (buttonsPanel != null) {
@@ -156,7 +157,10 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             }
 
             @Override
-            public void disconnected() {
+            public void disconnected(DebuggerSession session) {
+                if (Main.getDebugHandler().isAnySessionConnected()) {
+                    return;
+                }
                 synchronized (DetailPanel.this) {
                     debugRunning = false;
 

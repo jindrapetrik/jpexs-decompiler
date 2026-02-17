@@ -1193,6 +1193,14 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Integer> lastExportMorphNumberOfFrames = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showDebugListenInfo = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> as3QNameObfuscatedPropsInSquareBrackets = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 

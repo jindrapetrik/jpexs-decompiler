@@ -1896,6 +1896,11 @@ public class AVM2Graph extends Graph {
                     return ret;
                 }
             }
+            
+            if (caseBodyParts.size() < 2) {
+                stack.push(firstSet);
+                return ret;
+            }
 
             //determine whether local register are on left or on right side of === operator
             // -1 = there's no register, 

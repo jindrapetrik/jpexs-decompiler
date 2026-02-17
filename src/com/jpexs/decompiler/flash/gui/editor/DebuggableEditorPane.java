@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.Main;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -126,7 +127,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             return;
         }
 
-        Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName, false);
+        Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName);
 
         for (int line : bkptLines) {
             if (Main.isBreakPointValid(breakPointScriptName, line)) {
@@ -137,12 +138,13 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         }
         int ip = Main.getIp(breakPointScriptName);
         String ipPath = Main.getIpClass();
-        String ipHash = "main";
+        String ipHash = "unknown";
         if (ipPath != null && ipPath.contains(":")) {
             ipHash = ipPath.substring(0, ipPath.indexOf(":"));
             ipPath = ipPath.substring(ipPath.indexOf(":") + 1);
         }
-        String myhash = Main.getSwfHash(Main.getMainFrame().getPanel().getCurrentSwf());
+        SWF currentSwf = Main.getMainFrame().getPanel().getCurrentSwf();
+        String myhash = currentSwf == null ? "myunknown" : Main.getSwfHash(currentSwf);
         if (ip > 0 && ipPath != null && ipHash.equals(myhash) && ipPath.equals(breakPointScriptName)) {
             addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }
@@ -150,7 +152,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         List<String> stackClasses = Main.getStackClasses();
         for (int i = 1; i < stackClasses.size(); i++) {
             String cls = stackClasses.get(i);
-            String clsHash = "main";
+            String clsHash = "unknown";
             if (cls.contains(":")) {
                 clsHash = cls.substring(0, cls.indexOf(":"));
                 cls = cls.substring(cls.indexOf(":") + 1);

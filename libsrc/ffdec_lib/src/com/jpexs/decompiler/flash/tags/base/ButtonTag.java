@@ -413,6 +413,9 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
             CharacterTag ch = null;
             if (chId != -1) {
                 ch = swf.getCharacter(chId);
+                if (swf.getCyclicCharacters().contains(chId)) {
+                    continue;
+                }                
             }
             if (ch instanceof DrawableTag) {
                 Dimension filterDimension = ((DrawableTag) ch).getFilterDimensions();

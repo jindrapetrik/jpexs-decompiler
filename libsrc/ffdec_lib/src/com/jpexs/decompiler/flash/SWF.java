@@ -181,6 +181,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
+import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
@@ -204,6 +205,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -695,6 +697,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Lock for characters synchronization
      */
     private final Object charactersLock = new Object();
+
+    /**
+     * SHA 256 hash of original data
+     */
+    private String hashSha256 = "0000000000000000000000000000000000000000000000000000000000000000";
+
+    public String getHashSha256() {
+        return hashSha256;
+    }
 
     public UninitializedClassFieldsDetector getUninitializedClassFieldsDetector() {
         return uninitializedClassFieldsDetector;
@@ -1821,6 +1832,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
         checkCharset();
         byte[] newUncompressedData = saveToByteArray(gfx, includeImported);
+
+        try {
+            hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(newUncompressedData));
+        } catch (NoSuchAlgorithmException ex) {
+            //ignore
+        }
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         compress(new ByteArrayInputStream(newUncompressedData), baos, compression, lzmaProperties);
         byte[] newCompressedData = baos.toByteArray();
@@ -2307,6 +2325,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
+
+        try {
+            hashSha256 = Helper.byteArrayToHex(MessageDigest.getInstance("SHA-256").digest(uncompressedData));
+        } catch (NoSuchAlgorithmException ex) {
+            //ignore
+        }
 
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
@@ -6223,6 +6247,25 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return getRect();
     }
 
+    private void getCyclicInTags(ReadOnlyTagList tags, Map<Integer, Set<Integer>> characterToNeeded) {
+        for (Tag t : tags) {
+            if (t instanceof CharacterTag) {
+                CharacterTag cht = (CharacterTag) t;
+                if (cht.getCharacterId() != -1) {
+                    Set<Integer> needed = new HashSet<>();
+                    Set<String> neededClasses = new HashSet<>();
+                    cht.getNeededCharacters(needed, neededClasses, this);
+                    //TODO: check cyclic classes
+                    characterToNeeded.put(cht.getCharacterId(), needed);
+                }
+            }
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
+                getCyclicInTags(sprite.getTags(), characterToNeeded);
+            }
+        }
+    }
+
     /**
      * Gets cyclic character ids.
      *
@@ -6234,19 +6277,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Set<Integer> ct = new HashSet<>();
         Map<Integer, Set<Integer>> characterToNeeded = new HashMap<>();
-
-        for (Tag t : getTags()) {
-            if (t instanceof CharacterTag) {
-                CharacterTag cht = (CharacterTag) t;
-                if (cht.getCharacterId() != -1) {
-                    Set<Integer> needed = new HashSet<>();
-                    Set<String> neededClasses = new HashSet<>();
-                    cht.getNeededCharacters(needed, neededClasses, this);
-                    //TODO: check cyclic classes
-                    characterToNeeded.put(cht.getCharacterId(), needed);
-                }
-            }
-        }
+        getCyclicInTags(readOnlyTags, characterToNeeded);
 
         for (int chid : characterToNeeded.keySet()) {
             for (int n : characterToNeeded.get(chid)) {

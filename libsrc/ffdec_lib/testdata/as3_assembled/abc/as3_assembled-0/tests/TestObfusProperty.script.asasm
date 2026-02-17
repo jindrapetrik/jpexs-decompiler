@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestObfusProperty/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestObfusProperty", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestObfusProperty"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestObfusProperty"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestObfusProperty")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestObfusProperty")
+  #include "TestObfusProperty.class.asasm"
+ end ; trait
+end ; script

@@ -59,11 +59,13 @@ jobs:
           # Ensure tags exist locally
           git fetch --tags --force | Out-Null
 
-          $ref       = "${env:GITHUB_REF}"       # e.g. refs/tags/version1.2.3 or refs/heads/dev
-          $refName   = "${env:GITHUB_REF_NAME}"  # e.g. version1.2.3 or dev
+          $ref       = "${env:GITHUB_REF}"        # e.g. refs/tags/version1.2.3 or refs/heads/dev
+          $refName   = "${env:GITHUB_REF_NAME}"   # e.g. version1.2.3 or dev
+          $eventType = "${env:GITHUB_EVENT_NAME}" # e.g. "push" or "pull_request"
           $isTag     = $ref.StartsWith("refs/tags/")
           $isDev     = ($ref -eq "refs/heads/dev")
-
+          $isPush    = ($eventType -eq "push")
+                              
           $H = (git rev-parse HEAD).Trim()
 
           function Set-Var([string]$name, [string]$value) {
@@ -116,8 +118,8 @@ jobs:
             exit 0
           }
 
-          # Case 2: dev branch
-          if ($isDev) {
+          # Case 2: dev branch and push
+          if ($isDev -and $isPush) {
             # Find latest nightlyN tag (max N)
             $nightlyTags = git tag --list 'nightly*'
             $maxN = -1
@@ -274,7 +276,7 @@ jobs:
           name: lib_dist
           path: libsrc/ffdec_lib/dist
   exe:
-      name: Generate EXE
+      name: Generate EXEs
       runs-on: ubuntu-latest
       concurrency:
         group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -351,11 +353,36 @@ jobs:
           xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/versioninfo.rc -save $WINEPREFIX/versioninfo.res -action compile
           xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/ffdec.exe -save $WINEPREFIX/ffdec.exe -action addoverwrite -res $WINEPREFIX/versioninfo.res -mask "Version Info,1"
           cp $WINEPREFIX/ffdec.exe resources/ffdec.exe
+      
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: unsigned_exe
           path: resources/ffdec.exe
+          
+      - name: Generate CLI EXE version info    
+        run: |
+          sed -i \
+            -e 's/@MAJOR@/${{ needs.compute-version.outputs.verMajor }}/g' \
+            -e 's/@MINOR@/${{ needs.compute-version.outputs.verMinor }}/g' \
+            -e 's/@RELEASE@/${{ needs.compute-version.outputs.verRelease }}/g' \
+            -e 's/@BUILD@/${{ needs.compute-version.outputs.verBuild }}/g' \
+            -e 's/@VERSION@/${{ needs.compute-version.outputs.verShort }}/g' \
+            versioninfo-cli.rc
+      - name: Replace CLI EXE version info
+        run: |
+          export WINEPREFIX=$(pwd)/tools/wine
+          cp resources/ffdec-cli.exe $WINEPREFIX/ffdec-cli.exe
+          cp versioninfo-cli.rc $WINEPREFIX/versioninfo-cli.rc
+          xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/versioninfo-cli.rc -save $WINEPREFIX/versioninfo-cli.res -action compile
+          xvfb-run wine $WINEPREFIX/resourcehacker/ResourceHacker.exe -open $WINEPREFIX/ffdec-cli.exe -save $WINEPREFIX/ffdec-cli.exe -action addoverwrite -res $WINEPREFIX/versioninfo-cli.res -mask "Version Info,1"
+          cp $WINEPREFIX/ffdec-cli.exe resources/ffdec-cli.exe
+      
+      - name: Upload CLI EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned_cli_exe
+          path: resources/ffdec-cli.exe
           
 #--- Note: Windows runner cannot run Resource Hacker for some reason
 #  exe:
@@ -464,6 +491,12 @@ jobs:
         with:
           name: unsigned_exe
           path: dist/
+      
+      - name: Download unsigned CLI EXE artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: unsigned_cli_exe
+          path: dist/          
           
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -644,7 +677,68 @@ jobs:
         shell: pwsh
         run: |
           $signtool = "${{ steps.signtool.outputs.path }}"
-          & $signtool verify /pa /v "dist/ffdec.exe"   
+          & $signtool verify /pa /v "dist/ffdec.exe" 
+          
+      - name: Sign CLI EXE with KMS key
+        shell: pwsh
+        run: |      
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          $kc = "projects/$env:GCP_PROJECT_ID/locations/$env:GCP_LOCATION/keyRings/$env:KMS_KEYRING/cryptoKeys/$env:KMS_KEY/cryptoKeyVersions/$env:KMS_KEY_VERSION"
+
+          $ErrorActionPreference = 'Stop'
+
+          $exe  = $signtool
+          $args = @(
+            "sign",
+            "/v",
+            "/debug",
+            "/fd", "sha256",
+            "/tr", "http://timestamp.sectigo.com?td=sha256",
+            "/td", "sha256",
+            "/f", "$env:CERT_PATH",
+            "/csp", "Google Cloud KMS Provider",
+            "/kc", "$kc",
+            "dist/ffdec-cli.exe"
+          )
+
+          # --- retry policy ---
+          $maxAttempts = 5
+          $delaySeconds = 10
+          $needle = "SignTool Error: An unexpected internal error has occurred"
+
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            Write-Host "Attempt $attempt/${maxAttempts}: $exe $($args -join ' ')"
+
+            $output = & $exe @args 2>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+
+            if ($output) { Write-Host $output.TrimEnd() }
+
+            if ($exitCode -eq 0) {
+              Write-Host "Succeeded."
+              exit 0
+            }
+
+            $hasNeedle = $output -match [regex]::Escape($needle)
+
+            if ($hasNeedle -and $attempt -lt $maxAttempts) {
+              Write-Warning "Detected transient SignTool internal error. Retrying in $delaySeconds seconds..."
+              Start-Sleep -Seconds $delaySeconds
+              continue
+            }
+
+            if ($hasNeedle) {
+              throw "Failed after $maxAttempts attempts due to repeated SignTool internal error (exit code $exitCode)."
+            } else {
+              throw "Command failed (exit code $exitCode). Output did not match retry condition."
+            }
+          }
+      
+      - name: Verify CLI EXE signature
+        shell: pwsh
+        run: |
+          $signtool = "${{ steps.signtool.outputs.path }}"
+          & $signtool verify /pa /v "dist/ffdec-cli.exe" 
         
         
       - name: Get Msi tools path
@@ -755,8 +849,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: signed_exe
-            path: dist/ffdec.exe      
+            path: dist/ffdec.exe
       
+      - name: Upload signed CLI EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: signed_cli_exe
+            path: dist/ffdec-cli.exe
+            
       - name: Rename MSI
         shell: cmd
         run: |
@@ -816,7 +916,13 @@ jobs:
       with:
           name: signed_exe
           path: dist/
-          
+    
+    - name: Download signed CLI EXE artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: signed_cli_exe
+          path: dist/
+    
     - name: Download signed MSI artifact
       uses: actions/download-artifact@v4
       with:

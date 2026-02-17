@@ -581,9 +581,10 @@ public final class AbcIndexing {
     /**
      * Rebuilds package to objects name map.
      */
-    public void rebuildPkgToObjectsNameMap() {
+    public synchronized void rebuildPkgToObjectsNameMap() {
         pkgToObjectsName.clear();
-        for (ClassDef cd : classes.keySet()) {
+        Set<ClassDef> cs = new LinkedHashSet<>(classes.keySet());
+        for (ClassDef cd : cs) {
             if (!(cd.type instanceof TypeItem)) {
                 continue;
             }
@@ -592,7 +593,8 @@ public final class AbcIndexing {
             }
             pkgToObjectsName.get(cd.pkg).add(((TypeItem) cd.type).fullTypeName.getLast());
         }
-        for (PropertyNsDef nsdef : scriptProperties.keySet()) {
+        Set<PropertyNsDef> nss = new LinkedHashSet<>(scriptProperties.keySet());
+        for (PropertyNsDef nsdef : nss) {
             if (!pkgToObjectsName.containsKey(nsdef.ns)) {
                 pkgToObjectsName.put(nsdef.ns, new LinkedHashSet<>());
             }
@@ -1117,7 +1119,7 @@ public final class AbcIndexing {
      *
      * @param abc ABC to add
      */
-    public void addAbc(ABC abc) {
+    public synchronized void addAbc(ABC abc) {
         if (abc == null) {
             return;
         }

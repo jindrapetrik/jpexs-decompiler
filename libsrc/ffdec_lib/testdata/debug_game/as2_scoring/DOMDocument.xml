@@ -1,0 +1,143 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <fonts>
+          <DOMFontItem name="Font 1" itemID="699366a0-000001e1" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1771267744" embedRanges="3"/>
+     </fonts>
+     <symbols>
+          <Include href="Button1.xml" itemIcon="0" loadImmediate="false" itemID="699362e3-000001d5" lastModified="1771267090"/>
+          <Include href="Button2.xml" itemIcon="0" loadImmediate="false" itemID="6993636a-000001dc" lastModified="1771267096"/>
+          <Include href="Button3.xml" itemIcon="0" loadImmediate="false" itemID="699367b4-000001e5" lastModified="1771268063"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[var delay = 1000;
+
+function decreaseScore() {
+	var score = parseInt(_root.inpScore.text);
+	score--;
+	if (score < 0) {
+		score = 0;
+	}
+	_root.inpScore.text = score;
+	
+	setTimeout(decreaseScore, delay);
+}
+
+setTimeout(decreaseScore, delay);
+stop();]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Button1" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="92" ty="189"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="60" y="37.5"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press) {
+	var score = parseInt(_root.inpScore.text);
+	score = score + 5;
+	_root.inpScore.text = score;
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Button2" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="327.95" ty="190.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press) {
+	var score = parseInt(_root.inpScore.text);
+	score = score * 2;
+	_root.inpScore.text = score;
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText fontRenderingMode="standard" width="57" height="22.15" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="204.95" ty="107"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Score:</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="20" bitmapSize="400" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMDynamicText name="inpScore" fontRenderingMode="standard" width="102" height="31" lineType="multiline">
+                                             <matrix>
+                                                  <Matrix tx="266.95" ty="103"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>0</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs alignment="center" aliasText="false" size="25" bitmapSize="500" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMDynamicText>
+                                        <DOMDynamicText fontRenderingMode="standard" width="125" height="34" lineType="multiline">
+                                             <matrix>
+                                                  <Matrix tx="10" ty="24"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>AS1/2 test</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs alignment="center" aliasText="false" size="25" bitmapSize="500" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMDynamicText>
+                                        <DOMSymbolInstance libraryItemName="Button3" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="216.95" ty="294.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press) {
+	_root.inpScore.text = 0;
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="8792" publishTime="1771271352"/>
+          <PublishItem publishSize="8784" publishTime="1771269741"/>
+          <PublishItem publishSize="8774" publishTime="1771269515"/>
+          <PublishItem publishSize="8794" publishTime="1771269377" publishDebug="true"/>
+          <PublishItem publishSize="8847" publishTime="1771268543" publishDebug="true"/>
+          <PublishItem publishSize="8848" publishTime="1771268523" publishDebug="true"/>
+          <PublishItem publishSize="8848" publishTime="1771268493" publishDebug="true"/>
+          <PublishItem publishSize="8845" publishTime="1771268460" publishDebug="true"/>
+          <PublishItem publishSize="8757" publishTime="1771268093" publishDebug="true"/>
+          <PublishItem publishSize="8231" publishTime="1771267749" publishDebug="true"/>
+          <PublishItem publishSize="7175" publishTime="1771267717" publishDebug="true"/>
+          <PublishItem publishSize="7221" publishTime="1771267633" publishDebug="true"/>
+          <PublishItem publishSize="7221" publishTime="1771267610" publishDebug="true"/>
+          <PublishItem publishSize="7223" publishTime="1771267567" publishDebug="true"/>
+          <PublishItem publishSize="7203" publishTime="1771267511" publishDebug="true"/>
+          <PublishItem publishSize="7172" publishTime="1771267431" publishDebug="true"/>
+          <PublishItem publishSize="7170" publishTime="1771267362" publishDebug="true"/>
+     </publishHistory>
+</DOMDocument>

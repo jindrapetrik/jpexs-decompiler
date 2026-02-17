@@ -246,7 +246,7 @@ public class FontFileWriter extends FontFormatWriter {
     }
 
     public long getCharacterMapping(long a_unicode) {
-        return m_cmap.getGlyfIndex(new Long(a_unicode));
+        return m_cmap.getGlyfIndex(a_unicode);
     }
 
     /**
@@ -307,5 +307,37 @@ public class FontFileWriter extends FontFormatWriter {
         int retval
                 = (int) Math.floor(Math.log(a_value) / Math.log(2));
         return retval;
+    }
+    
+    //JPEXS
+    public void setFontStyle(boolean bold, boolean italic) {
+        int fsSelection = 0;
+        if (!bold && !italic) {
+            fsSelection = m_os2.k_regular;
+        } else {
+            if (bold) {
+                fsSelection |= m_os2.k_bold;
+            }
+            if (italic) {
+                fsSelection |= m_os2.k_italic;
+            }
+        }
+        m_os2.setFsSelection(fsSelection);
+        
+        if (bold) {
+            m_os2.setUsWeightClass(m_os2.FW_BOLD);
+        } else {
+            m_os2.setUsWeightClass(m_os2.FW_NORMAL);
+        }
+        
+        int macStyle = 0;
+        if (bold) {
+            macStyle |= HeadWriter.k_bold;
+        }
+        if (italic) {
+            macStyle |= HeadWriter.k_italic;
+        }
+        
+        m_head.setMacStyle(macStyle);        
     }
 }

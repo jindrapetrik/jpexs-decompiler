@@ -66,6 +66,11 @@ public class HeadWriter extends FontFormatWriter {
 
     static public final int k_indicRearrangement = 0x400;
 
+    //JPEXS
+    static public final int k_bold = 0x01;
+    //JPEXS
+    static public final int k_italic = 0x02;
+    
     private final long k_magicNumber = 0x5f0f3cf5;
 
     private long m_checkSumAdjustment = 0;
@@ -77,6 +82,8 @@ public class HeadWriter extends FontFormatWriter {
     private Date m_creationDate = new Date();
 
     private Date m_modificationDate = m_creationDate;
+        
+    private int m_macStyle = 0; //JPEXS
 
     public HeadWriter() {
         super();
@@ -122,6 +129,11 @@ public class HeadWriter extends FontFormatWriter {
         m_modificationDate = a_date;
     }
 
+    //JPEXS
+    public void setMacStyle(int macStyle) {
+        this.m_macStyle = macStyle;
+    }
+        
     public void write() throws IOException {
         // table version number
         writeFixed32(1.0);
@@ -151,7 +163,7 @@ public class HeadWriter extends FontFormatWriter {
         writeFWord(m_max.y);
 
         // macStyle
-        writeUInt16(0);
+        writeUInt16(m_macStyle);
 
         // lowestRecPPEM
         writeUInt16(11);

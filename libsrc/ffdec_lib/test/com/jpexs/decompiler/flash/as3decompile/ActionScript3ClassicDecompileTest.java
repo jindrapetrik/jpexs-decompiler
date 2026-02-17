@@ -597,7 +597,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"z\");\r\n"
                 + "}\r\n"
                 + "while(true);\r\n"
-                + "\r\n"
                 + "trace(\"g\");\r\n"
                 + "if(b)\r\n"
                 + "{\r\n"
@@ -2657,7 +2656,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "while(i < 5);\r\n"
-                + "\r\n"
                 + "}\r\n"
                 + "trace(\"E\");\r\n",
                  false);

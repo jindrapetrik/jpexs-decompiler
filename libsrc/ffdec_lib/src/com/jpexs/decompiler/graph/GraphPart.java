@@ -150,6 +150,7 @@ public class GraphPart implements Serializable {
 
         Stack<GraphPart> todo = new Stack<>();
         todo.push(this);
+        boolean first = true;
 
         looptodo:
         while (!todo.isEmpty()) {
@@ -164,18 +165,23 @@ public class GraphPart implements Serializable {
                 continue;
             }
             for (Loop l : loops) {
-                if (l.phase == 1) {
+                if (l.phase == 1) {                    
                     if (l.loopContinue == thisPart) {
-                        continue looptodo;
+                        if (!first) {
+                            continue looptodo;
+                        }
                     }
                     if (l.loopPreContinue == thisPart) {
-                        continue looptodo;
+                        if (!first) {
+                            continue looptodo;
+                        }
                     }
                     if (l.loopBreak == thisPart) {
                         //return false;    //?
                     }
                 }
             }
+            first = false;
             if (visited.contains(thisPart)) {
                 continue;
             }

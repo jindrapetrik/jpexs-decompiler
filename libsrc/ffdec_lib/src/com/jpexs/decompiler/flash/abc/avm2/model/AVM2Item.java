@@ -28,15 +28,19 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -156,7 +160,8 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
 
         if (empty) {
-            return propertyName.toString(writer, localData);
+            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, false);
+            return writer;
         }
 
         if (propertyName instanceof FullMultinameAVM2Item) {
@@ -177,15 +182,49 @@ public abstract class AVM2Item extends GraphTargetItem {
             
             String operator = nullCondition ? "?." : ".";
             
-            if (((FullMultinameAVM2Item) propertyName).name != null) {
-                if (((FullMultinameAVM2Item) propertyName).namespace != null) {
-                    writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
+            String localName = "";   
+            boolean isAttribute = false;
+            boolean isValidName = false;
+            String namespaceSuffix = "";
+            
+            if (multinameIndex >= 0  && multinameIndex < localData.constantsAvm2.getMultinameCount()) {
+                Reference<DottedChain> customNsRef = new Reference<>(null);
+                isAttribute = localData.constantsAvm2.getMultiname(multinameIndex).isAttribute();
+                localName = localData.constantsAvm2.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, new ArrayList<>(), true, true, customNsRef);
+                namespaceSuffix = localData.constantsAvm2.getMultiname(multinameIndex).getNamespaceSuffix();
+                
+                if ("*".equals(localName)) {
+                    isValidName = true;
                 }
-                return propertyName.toString(writer, localData);
+                if (isAttribute) {
+                    isValidName = true;
+                }
+                if (!"".equals(namespaceSuffix)) {
+                    isValidName = true;
+                }
+                if (IdentifiersDeobfuscation.isValidName(true, localName)) {
+                    isValidName = true;
+                }                
             } else {
-                writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
-                return propertyName.toString(writer, localData);
+                isValidName = true;
+            }                      
+            
+            if (!Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
+                isValidName = true;
             }
+            
+            if (isValidName) {
+                if (((FullMultinameAVM2Item) propertyName).name != null) {
+                    if (((FullMultinameAVM2Item) propertyName).namespace != null) {
+                        writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
+                    }                
+                } else {
+                    writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);                                
+                }
+            }
+            
+            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, true);
+            return writer;
         } else {
             writer.append("[").allowWrapHere();
             propertyName.toString(writer, localData);

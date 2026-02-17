@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.DebuggerSession;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -316,6 +317,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         private List<VariableNode> childs;
 
         public List<Variable> traits = new ArrayList<>();
+        private boolean as3;
 
         @Override
         public int hashCode() {
@@ -385,12 +387,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
 
-            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+            //boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
-            if (parentObjectId == 0 && objectId != 0L && isAS3) {
-                igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
+            if (Main.getCurrentDebugSession() == null) {
+                return;
+            }
+            if (parentObjectId == 0 && objectId != 0L && as3) {
+                igv = Main.getCurrentDebugSession().getVariable(objectId, "", true, useGetter);
             } else {
-                igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
+                igv = Main.getCurrentDebugSession().getVariable(parentObjectId, var.name, true, useGetter);
             }
 
             //current var is getter function - set it to value really got
@@ -406,7 +411,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(varInsideGetter);
-                    childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
+                    childs.add(new VariableNode(as3, path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
                 } else {
                     curTrait = igv.childs.get(i);
                     traits.add(curTrait);
@@ -431,7 +436,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return childs.size();
         }
 
-        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
+        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -440,9 +445,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             this.path.addAll(parentPath);
             this.path.add(this);
             loaded = false;
+            this.as3 = as3;
         }
 
-        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
+        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -458,6 +464,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 vn.path.add(vn);
             }
             loaded = true;
+            this.as3 = as3;
         }
     }
 
@@ -494,15 +501,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         private final MyTreeTable ttable;
 
-        public VariablesTableModel(MyTreeTable ttable, List<Variable> vars) {
+        public VariablesTableModel(boolean as3, MyTreeTable ttable, List<Variable> vars) {
             this.ttable = ttable;
 
             List<VariableNode> childs = new ArrayList<>();
 
             for (int i = 0; i < vars.size(); i++) {
-                childs.add(new VariableNode(new ArrayList<>(), 1, vars.get(i), 0L, null));
+                childs.add(new VariableNode(as3, new ArrayList<>(), 1, vars.get(i), 0L, null));
             }
-            root = new VariableNode(new ArrayList<>(), 0, null, 0L, null, childs);
+            root = new VariableNode(as3, new ArrayList<>(), 0, null, 0L, null, childs);
         }
 
         @Override
@@ -782,7 +789,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 default:
                     return;
             }
-            Main.getDebugHandler().setVariable(((VariableNode) node).parentObjectId, ((VariableNode) node).var.name, valType, symb.value);
+            Main.getCurrentDebugSession().setVariable(((VariableNode) node).parentObjectId, ((VariableNode) node).var.name, valType, symb.value);
             //((VariableNode) node).refresh();
             Object[] path = new Object[((VariableNode) node).path.size()];
             for (int i = 0; i < path.length; i++) {
@@ -1422,17 +1429,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
-            public void connected() {
+            public void connected(DebuggerSession session) {
                 decButtonsPan.setVisible(false);
             }
 
             @Override
-            public void disconnected() {
-                decButtonsPan.setVisible(true);
+            public void disconnected(DebuggerSession session) {
+                if (!Main.getDebugHandler().isAnySessionConnected()) {
+                    decButtonsPan.setVisible(true);
+                }
             }
         });
 
-        debugPanel = new DebugPanel();
+        debugPanel = new DebugPanel(true);
 
         JPersistentSplitPane sp2;
 
@@ -1755,32 +1764,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
         String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
         String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
-        Openable openable = null;
-        if (swfHash.equals("main")) {
-            openable = Main.getRunningSWF();
-        } else if (swfHash.startsWith("loaded_")) {
-            String hashToSearch = swfHash.substring("loaded_".length());
-            loop:
-            for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
-                for (int s = 0; s < sl.size(); s++) {
-                    Openable op = sl.get(s);
-                    String t = op.getTitleOrShortFileName();
-                    if (t == null) {
-                        t = "";
-                    }
-                    if (t.endsWith(":" + hashToSearch)) { //this one is already opened
-                        openable = op;
-                        break loop;
-                    }
-                }
-            }
-        }
-
+        Openable openable = Main.findOpenedSwfByHash(swfHash);
+        
         if (openable != null) {
             hilightScript(openable, name);
         }
     }
-
+    
     /**
      * Hilights specific script.
      *
@@ -1788,7 +1778,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
      * @param name Full name of the script. It must be printable - deobfuscated,
      * not raw!
      */
-    public void hilightScript(Openable openable, String name) {
+    public boolean hilightScript(Openable openable, String name) {
 
         TreeItem scriptNode = null;
         if (openable instanceof SWF) {
@@ -1812,10 +1802,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             if (swf.getFile() == null && "__playerglobal".equals(swf.getFileTitle())) {
                 mainPanel.findOrLoadOpenableListByFilePath(Configuration.getPlayerSWC().getAbsolutePath(), afterOpen, false);
-                return;
+                return true;
             } else if (swf.getFile() == null && "__airglobal".equals(swf.getFileTitle())) {
                 mainPanel.findOrLoadOpenableListByFilePath(Configuration.getAirSWC().getAbsolutePath(), afterOpen, false);
-                return;
+                return true;
             }
 
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
@@ -1842,11 +1832,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         if (scriptNode != null) {
-            hilightScript(openable, name, scriptNode);
+            return hilightScript(openable, name, scriptNode);
         }
+        return false;
     }
 
-    public void hilightScript(Openable openable, String name, TreeItem scriptNode) {
+    public boolean hilightScript(Openable openable, String name, TreeItem scriptNode) {
         View.checkAccess();
 
         Object item;
@@ -1920,10 +1911,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         }
         if (!found) {
-            return;
+            return false;
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
         mainPanel.reload(true);
+        return true;
     }
 
     public void hilightScript(ScriptPack pack) {

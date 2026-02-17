@@ -2,9 +2,7 @@
   <PropertyGroup>
     <OutputType>Package</OutputType>
     <OutputName>FFDec</OutputName>
-    <!--<Cultures>en-US;ca-ES;cs-CZ;de-DE;es-ES;fr-FR;hu-HU;it-IT;ja-JP;nl-NL;pl-PL;pt-BR;pt-PT;ru-RU;sk-SK;sl-SI;sv-SE;tr-TR;uk-UA;zh-CN</Cultures>
--->
-    <Cultures>en-US;cs-CZ</Cultures>
+    <Cultures>en-US;ca-ES;cs-CZ;de-DE;es-ES;fr-FR;hu-HU;it-IT;ja-JP;nl-NL;pl-PL;pt-BR;pt-PT;ru-RU;sk-SK;sl-SI;sv-SE;tr-TR;uk-UA;zh-CN</Cultures>
   </PropertyGroup>
   <ItemGroup>
     <Localization Include="Strings.en-US.wxl" />
