@@ -581,7 +581,7 @@ public final class AbcIndexing {
     /**
      * Rebuilds package to objects name map.
      */
-    public void rebuildPkgToObjectsNameMap() {
+    public synchronized void rebuildPkgToObjectsNameMap() {
         pkgToObjectsName.clear();
         Set<ClassDef> cs = new LinkedHashSet<>(classes.keySet());
         for (ClassDef cd : cs) {
@@ -1119,7 +1119,7 @@ public final class AbcIndexing {
      *
      * @param abc ABC to add
      */
-    public void addAbc(ABC abc) {
+    public synchronized void addAbc(ABC abc) {
         if (abc == null) {
             return;
         }
