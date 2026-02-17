@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Metadata formatting
 - [#2632] TTF export - non-zero italic angle
 - Improper standalone layer termination, not cleaning temp files
+- [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
+- ActionScript - newline after do..while
 
 ## [25.0.0] - 2026-02-10
 ### Added
@@ -4124,6 +4126,7 @@ Major version of SWF to XML export changed to 2.
 [#1850]: https://www.free-decompiler.com/flash/issues/1850
 [#2619]: https://www.free-decompiler.com/flash/issues/2619
 [#2632]: https://www.free-decompiler.com/flash/issues/2632
+[#2636]: https://www.free-decompiler.com/flash/issues/2636
 [#2610]: https://www.free-decompiler.com/flash/issues/2610
 [#2603]: https://www.free-decompiler.com/flash/issues/2603
 [#2626]: https://www.free-decompiler.com/flash/issues/2626

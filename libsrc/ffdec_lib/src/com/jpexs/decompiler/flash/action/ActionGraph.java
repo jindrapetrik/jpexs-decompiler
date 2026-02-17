@@ -304,7 +304,7 @@ public class ActionGraph extends Graph {
     
     @Override
     protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
-                               
+                           
         if (level == 0) {
             List<GraphTargetItem> removed = new ArrayList<>();
             for (int i = list.size() - 1; i >= 0; i--) {

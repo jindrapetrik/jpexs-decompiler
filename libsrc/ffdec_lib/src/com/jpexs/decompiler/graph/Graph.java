@@ -1305,6 +1305,41 @@ public class Graph {
                                 LoopItem innerLoop = (LoopItem) lastCommand;
                                 Block blk = (Block) lastCommand;
                                 changeContinueToBreak(blk, li.loop.id, innerLoop.loop.id);
+                                
+                                if (innerLoop instanceof UniversalLoopItem) {
+                                    UniversalLoopItem loopItem = (UniversalLoopItem) innerLoop;
+                                    if (!loopItem.commands.isEmpty() && loopItem.commands.get(loopItem.commands.size() - 1) instanceof IfItem) {
+                                        IfItem ifi = (IfItem) loopItem.commands.get(loopItem.commands.size() - 1);
+                                        boolean inverted = false;
+                                        boolean found = false;
+                                        if (ifi.onFalse.isEmpty() && (ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof BreakItem)) {
+                                            BreakItem bi = (BreakItem) ifi.onTrue.get(0);
+                                            if (bi.loopId == loopItem.loop.id) {
+                                                found = true;
+                                                inverted = true;
+                                            }
+                                        } else if (ifi.onTrue.isEmpty() && (ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof BreakItem)) {
+                                            BreakItem bi = (BreakItem) ifi.onFalse.get(0);
+                                            if (bi.loopId == loopItem.loop.id) {
+                                                found = true;
+                                            }
+                                        }
+
+                                        if (found) {         
+                                            loopItem.commands.remove(loopItem.commands.size() - 1);
+                                            GraphTargetItem expressionSingle = ifi.expression;
+                                            if (inverted) {
+                                                expressionSingle = expressionSingle.invert(null);
+                                            }
+                                            List<GraphTargetItem> expression = new ArrayList<>();
+                                            expression.add(expressionSingle);
+                                            DoWhileItem doWhile = new DoWhileItem(dialect, loopItem.getSrc(), loopItem.getLineStartItem(), loopItem.loop, loopItem.commands, expression);
+                                            currentList.set(currentList.size() - 1, doWhile);
+                                        }
+                                    }
+                                }
+                                
+                                
                             } else if (lastCommand instanceof Block) {
                                 Block blk = (Block) lastCommand;
                                 List<List<GraphTargetItem>> newTodos = new ArrayList<>(blk.getSubs());
@@ -1316,7 +1351,7 @@ public class Graph {
                                 todos.addAll(newTodos);
                             }
                         }
-                    }
+                    }                    
                     if (li instanceof ForItem) {
                         ForItem fi = (ForItem) li;
                         List<ContinueItem> continues = fi.getContinues();
@@ -1823,7 +1858,7 @@ public class Graph {
     /**
      * Final process. Override this method to provide custom behavior.
      *
-     * @param parent Paren item
+     * @param parent Parent item
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -2083,6 +2118,10 @@ public class Graph {
             if (ret.get(ret.size() - 1) instanceof Block) {
                 Block blk = (Block) ret.get(ret.size() - 1);
                 if (blk instanceof SwitchItem) {
+                    return;
+                }
+                
+                if (blk instanceof LoopItem) {
                     return;
                 }
 
@@ -3312,7 +3351,7 @@ public class Graph {
             }
             if (debugPrintGraph) {
                 System.err.println("loopsize:" + loops.size());
-            }
+            }                                    
             for (int l = loops.size() - 1; l >= 0; l--) {
                 Loop el = loops.get(l);
                 if (el == ignoredLoop) {
@@ -3338,7 +3377,7 @@ public class Graph {
                     }
                     continue;
                 }
-                if (el.loopBreak == part) {
+                if (el.loopBreak == part) {                                                                                            
                     if (currentLoop != null) {
                         currentLoop.phase = 0;
                     }
@@ -3354,8 +3393,8 @@ public class Graph {
                     ret.add(br);
 
                     return originalRet;
-                }
-                if (el.loopPreContinue == part) {
+                }                                
+                if (el.loopPreContinue == part) {                                        
                     if (currentLoop != null) {
                         currentLoop.phase = 0;
                     }
@@ -3382,7 +3421,7 @@ public class Graph {
             if (debugPrintGraph) {
                 System.err.println("stopParts: " + pathToString(stopPart));
             }
-
+                       
             if (stopPart.contains(part)) {
 
                 boolean isRealStopPart = false;
@@ -3433,7 +3472,7 @@ public class Graph {
                 }
                 return originalRet;
             }
-
+            
             boolean vCanHandleVisited = canHandleVisited(localData, part);
 
             if (vCanHandleVisited) {
@@ -3826,6 +3865,7 @@ public class Graph {
 
                         /*
                         Detect forward jumps (breaks) in always-break loops.                                                
+                        FIXME!!!
                          */
                         if (localData.secondPassData != null) {
                             if (next != null) {
@@ -3848,7 +3888,15 @@ public class Graph {
                                 while (!s.isEmpty()) {
                                     GraphPart p = s.poll();
                                     v.add(p);
+                                    if (p == part) {
+                                        continue;
+                                    }
                                     for (GraphPart r : p.refs) {
+                                        // #2636, it has no test
+                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates)) {
+                                            //System.err.println("Part " + part + " do not lead");
+                                            continue;
+                                        }
                                         if (r == part) {
                                             continue;
                                         }
@@ -3867,8 +3915,9 @@ public class Graph {
                                             if (!n.leadsTo(localData, this, code, next, loops, throwStates)) {
                                                 GraphPart n2 = getCommonPart(localData, r, Arrays.asList(next, n), loops, throwStates);
                                                 if (n2 != null) {
-                                                    //System.err.println("Found block: start = " + part + ", break = " + n2+", exit = " + r);
+                                                    //System.err.println("Found block: start = " + part + ", break = " + n2 + ", exit = " + r);
                                                     //System.err.println("next = " + next);
+                                                    //System.err.println("n = " + n + " does not lead to next");
 
                                                     Loop el = new Loop(loops.size(), part, n2);
                                                     el.phase = 1;
@@ -4177,7 +4226,11 @@ public class Graph {
                     if (bi.loopId == currentLoop.id) {
                         bodyBranch = ifi.onTrue;
                     }
-                } else if (loopItem.commands.size() == 2 && (loopItem.commands.get(1) instanceof BreakItem)) {
+                } else if (loopItem.commands.size() == 2 
+                        && (loopItem.commands.get(1) instanceof BreakItem)
+                        && ifi.onFalse.isEmpty() 
+                        && !ifi.onTrue.isEmpty()   
+                ) {
                     BreakItem bi = (BreakItem) loopItem.commands.get(1);
                     if (ifi.onTrue.isEmpty()) {
                         inverted = true;
@@ -4186,8 +4239,16 @@ public class Graph {
                     breakpos2 = true;
                     if (bi.loopId != currentLoop.id) { //it's break of another parent loop
                         addBreakItem = bi; //we must add it after the loop
+                    } else {
+                        if (
+                                !(bodyBranch.get(bodyBranch.size() - 1) instanceof ContinueItem)
+                                && !(bodyBranch.get(bodyBranch.size() - 1) instanceof BreakItem)
+                                && !(bodyBranch.get(bodyBranch.size() - 1) instanceof ExitItem)
+                            ) {
+                            bodyBranch.add(loopItem.commands.get(1));
+                        }
                     }
-                } else if ((ifi.onTrue.size() == 1)
+                } /*else if ((ifi.onTrue.size() == 1)
                         && (ifi.onTrue.get(0) instanceof ContinueItem)
                         && (((ContinueItem) ifi.onTrue.get(0)).loopId != currentLoop.id)) {
                     addContinueItem = (ContinueItem) ifi.onTrue.get(0);
@@ -4207,8 +4268,8 @@ public class Graph {
                     }
                     bodyBranch = inverted ? ifi.onFalse : ifi.onTrue;
                     breakpos2 = true;
-                }
-                if (bodyBranch != null) {
+                }*/
+                if (bodyBranch != null) { //FIXME
                     int index = ret.indexOf(loopItem);
                     ret.remove(index);
                     List<GraphTargetItem> exprList = new ArrayList<>();

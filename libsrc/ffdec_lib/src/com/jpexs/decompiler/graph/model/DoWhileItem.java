@@ -53,12 +53,7 @@ public class DoWhileItem extends LoopItem implements Block {
      * Label used
      */
     private boolean labelUsed;
-
-    @Override
-    public boolean needsSemicolon() {
-        return false;
-    }
-
+        
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
@@ -137,7 +132,7 @@ public class DoWhileItem extends LoopItem implements Block {
 
         }
 
-        writer.append(");").newLine();
+        writer.append(")");
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

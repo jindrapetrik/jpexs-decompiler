@@ -701,7 +701,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * SHA 256 hash of original data
      */
-    private String hashSha256 = null;
+    private String hashSha256 = "0000000000000000000000000000000000000000000000000000000000000000";
 
     public String getHashSha256() {
         return hashSha256;
