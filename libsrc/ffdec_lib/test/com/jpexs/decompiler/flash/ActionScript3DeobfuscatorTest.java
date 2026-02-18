@@ -558,7 +558,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "   ofs0030:\n"
                 + "            jump ofs002d\n"
                 + "   ofs0034:\n"
-                + "            ", "         param1 = Math.floor(Math.random() * 6);\n"
+                + "            ", "         param1 = int(Math.floor(Math.random() * 6));\n"
                 + "         if(param1 <= 4)\n"
                 + "         {\n"
                 + "            return;\n"
