@@ -1905,38 +1905,39 @@ public class AVM2Graph extends Graph {
             //determine whether local register are on left or on right side of === operator
             // -1 = there's no register, 
             // -2 = there are mixed registers, 
+            // -3 = there is missing register in some cases
             // N = there is always register number N
             int leftReg = -1;
             int rightReg = -1;
             for (int cv = 0; cv < caseValuesMapLeft.size(); cv++) {
-                if (caseValuesMapLeft.get(cv) instanceof LocalRegAVM2Item) {
+                if (leftReg != -3 && caseValuesMapLeft.get(cv) instanceof LocalRegAVM2Item) {
                     int reg = ((LocalRegAVM2Item) caseValuesMapLeft.get(cv)).regIndex;
                     if (leftReg == -1) {
                         leftReg = reg;
-                    } else {
-                        if (leftReg != reg) {
-                            leftReg = -2;
-                        }
+                    } else if (leftReg != reg) {
+                        leftReg = -2;
                     }
+                } else {
+                    leftReg = -3;
                 }
-                if (caseValuesMapRight.get(cv) instanceof LocalRegAVM2Item) {
+                if (rightReg != -3 && caseValuesMapRight.get(cv) instanceof LocalRegAVM2Item) {
                     int reg = ((LocalRegAVM2Item) caseValuesMapRight.get(cv)).regIndex;
                     if (rightReg == -1) {
                         rightReg = reg;
-                    } else {
-                        if (rightReg != reg) {
-                            rightReg = -2;
-                        }
+                    } else if (rightReg != reg) {
+                        rightReg = -2;
                     }
+                } else {
+                    rightReg = -3;
                 }
             }
 
             List<GraphTargetItem> otherSide = new ArrayList<>();
-            if (leftReg > 0) {
+            if (leftReg >= 0) {
                 switchedObject = new LocalRegAVM2Item(null, null, leftReg, null, TypeItem.UNBOUNDED /*?*/);
                 caseValuesMap = caseValuesMapRight;
                 otherSide = caseValuesMapLeft;
-            } else if (rightReg > 0) {
+            } else if (rightReg >= 0) {
                 switchedObject = new LocalRegAVM2Item(null, null, rightReg, null, TypeItem.UNBOUNDED /*?*/);
                 otherSide = caseValuesMapRight;
             }

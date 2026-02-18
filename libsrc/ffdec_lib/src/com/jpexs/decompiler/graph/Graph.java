@@ -3865,12 +3865,15 @@ public class Graph {
 
                         /*
                         Detect forward jumps (breaks) in always-break loops.                                                
-                        FIXME!!!
                          */
                         if (localData.secondPassData != null) {
                             if (next != null) {
                                 Set<GraphPart> ig = new HashSet<>();
+                                Set<GraphPartEdge> backEdges = new HashSet<>();
                                 for (Loop el : loops) {
+                                    for (GraphPart be : el.backEdges) {
+                                        backEdges.add(new GraphPartEdge(be, el.loopContinue));
+                                    }
                                     if (el.phase == 1) {
                                         if (el.loopContinue != null) {
                                             ig.add(el.loopContinue);
@@ -3891,12 +3894,17 @@ public class Graph {
                                     if (p == part) {
                                         continue;
                                     }
-                                    for (GraphPart r : p.refs) {
-                                        // #2636, it has no test
-                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates)) {
-                                            //System.err.println("Part " + part + " do not lead");
+                                    for (GraphPart r : p.refs) {                     
+                                        // #2636                                                                                
+                                        GraphPartEdge edge = new GraphPartEdge(r, p);                                        
+                                        if (backEdges.contains(edge)) {
                                             continue;
                                         }
+                                        // also #2636
+                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates)) {
+                                            continue;
+                                        }
+                                        
                                         if (r == part) {
                                             continue;
                                         }

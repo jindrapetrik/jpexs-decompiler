@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
+- [#2636] ActionScript 3 - Incorrect switch detection
 
 ## [25.1.0] - 2026-02-17
 ### Added
