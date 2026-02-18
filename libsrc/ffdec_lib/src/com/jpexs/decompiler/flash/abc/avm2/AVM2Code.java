@@ -2201,6 +2201,11 @@ public class AVM2Code implements Cloneable {
                 vtype = assignment.value.returnType();
             } else if (assignment.value instanceof LocalRegAVM2Item) {
                 vtype = assignment.value.returnType();
+            } else {
+                vtype = assignment.value.returnType();
+                if (vtype == TypeItem.UNKNOWN) {
+                    vtype = TypeItem.UNBOUNDED;
+                }
             }
         }
 
@@ -2435,12 +2440,21 @@ public class AVM2Code implements Cloneable {
                         handleDeclareReg(minreg, subItem, declaredRegisters, declaredSlots, reg);
                     }
                 }
+                /*
                 if (subItem instanceof LocalRegAVM2Item) {
                     LocalRegAVM2Item getLocal = (LocalRegAVM2Item) subItem;
                     if (declaredRegisters[getLocal.regIndex] != null) {
                         getLocal.type = declaredRegisters[getLocal.regIndex].type;
                     }
                 }
+                
+                if (subItem instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) subItem;
+                    if (declaredRegisters[setLocal.regIndex] != null) {
+                        setLocal.type = declaredRegisters[setLocal.regIndex].type;
+                    }
+                }
+                */
                 if (subItem instanceof SetPropertyAVM2Item) {
                     SetPropertyAVM2Item sp = (SetPropertyAVM2Item) subItem;
                     if (sp.object instanceof FindPropertyAVM2Item) {
@@ -2952,8 +2966,43 @@ public class AVM2Code implements Cloneable {
             paramNamesList.add(AVM2Item.localRegName(abc.getSwf(), localRegNames, ir, usedDeobfuscations));
         }
         injectDeclarations(usedDeobfuscations, 0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
-
+        uniteLocalsDeclarationTypes(d, list);
         return list;
+    }
+    
+    private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {
+        for (int i = 0; i < items.size(); i++) {
+            GraphTargetItem currentItem = items.get(i);
+            List<GraphTargetItem> itemsOnLine = new ArrayList<>();
+            itemsOnLine.add(currentItem);
+            currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                @Override
+                public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                    itemsOnLine.add(item);
+                }
+            });
+            
+            for (GraphTargetItem item : itemsOnLine) {
+                if (item instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) item;
+                    if (declaredRegs[setLocal.regIndex] != null) {                    
+                        setLocal.type = declaredRegs[setLocal.regIndex].type;
+                    }
+                }
+                if (item instanceof LocalRegAVM2Item) {
+                    LocalRegAVM2Item getLocal = (LocalRegAVM2Item) item;
+                    if (declaredRegs[getLocal.regIndex] != null) {
+                        getLocal.type = declaredRegs[getLocal.regIndex].type;
+                    }
+                }
+            }
+            if (currentItem instanceof Block) {
+                Block block = (Block) currentItem;
+                for (List<GraphTargetItem> sub : block.getSubs()) {
+                    uniteLocalsDeclarationTypes(declaredRegs, sub);
+                }
+            }
+        }
     }
 
     /**

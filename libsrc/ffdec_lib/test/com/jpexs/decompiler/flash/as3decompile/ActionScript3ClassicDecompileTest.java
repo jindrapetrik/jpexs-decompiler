@@ -47,7 +47,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testAlwaysBreak() {
-        decompileMethod("classic", "testAlwaysBreak", "var v:* = undefined;\r\n"
+        decompileMethod("classic", "testAlwaysBreak", "var v:int = 0;\r\n"
                 + "v = 5;\r\n"
                 + "trace(\"a\");\r\n"
                 + "while(true)\r\n"
@@ -416,7 +416,11 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "super.prot = 1.5;\r\n"
                 + "super.prot = int(s);\r\n"
                 + "i = super.prot;\r\n"
-                + "s = String(super.prot);\r\n",
+                + "s = String(super.prot);\r\n"
+                + "var a2:* = \"5\";\r\n"
+                + "var s2:String = \"s\";\r\n"
+                + "var i2:int = a2;\r\n"
+                + "a2 = Number(a2);\r\n",
                  false);
     }
 
@@ -579,16 +583,16 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testDoWhileTwice() {
-        decompileMethod("classic", "testDoWhileTwice", "var a:* = 1;\r\n"
-                + "var b:* = 2;\r\n"
+        decompileMethod("classic", "testDoWhileTwice", "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "do\r\n"
                 + "{\r\n"
-                + "if(a)\r\n"
+                + "if(Boolean(a))\r\n"
                 + "{\r\n"
                 + "trace(\"x\");\r\n"
-                + "if(b)\r\n"
+                + "if(Boolean(b))\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
@@ -598,7 +602,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "while(true);\r\n"
                 + "trace(\"g\");\r\n"
-                + "if(b)\r\n"
+                + "if(Boolean(b))\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
@@ -1825,7 +1829,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
         decompileMethod("classic", "testNames", "var ns:* = this.getNamespace();\r\n"
                 + "var name:* = this.getName();\r\n"
                 + "var a:* = ns::unnamespacedFunc();\r\n"
-                + "var b:* = ns::[name];\r\n"
+                + "var b:* = ns::[String(name)];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n"
                 + "var d:* = this.myInternal2::neco;\r\n",

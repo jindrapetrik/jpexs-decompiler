@@ -120,7 +120,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
         }*/
-        return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
+        return SetTypeIns.handleSetCoerce(value, type).toString(writer, localData);
     }
 
     @Override

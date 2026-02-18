@@ -140,7 +140,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
         }*/
-        return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
+        return SetTypeIns.handleSetCoerce(value, type).toString(writer, localData);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem returnType() {
-        return value.returnType();
+        return type;
         //return TypeItem.UNBOUNDED;
     }
 

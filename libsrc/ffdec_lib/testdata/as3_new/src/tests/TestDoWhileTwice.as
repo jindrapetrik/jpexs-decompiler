@@ -5,8 +5,8 @@ package tests
 	{
 		public function run():*
 		{
-			var a = 1;
-            var b = 2;
+			var a:int = 1;
+            var b:int = 2;
             do {
             	do {
             		if (a) {

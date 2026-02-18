@@ -109,6 +109,11 @@ package tests
             i = super.prot;
             s = String(super.prot);      
             			
+                        
+            var a2:* = "5";
+            var s2:String = "s";
+            var i2:int = a2;
+            a2 = Number(a2);                 
 		}
 	}
 }

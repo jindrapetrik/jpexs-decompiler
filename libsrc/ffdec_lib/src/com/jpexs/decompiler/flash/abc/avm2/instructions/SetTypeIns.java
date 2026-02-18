@@ -43,20 +43,33 @@ import java.util.List;
 public interface SetTypeIns {
 
     /**
-     * Handles number to int conversion.
+     * Handles setting value with coerce
      *
      * @param value Value to convert
      * @param type Type to convert to
      * @return Value
      */
-    public static GraphTargetItem handleNumberToInt(GraphTargetItem value, GraphTargetItem type) {
-        if ((value instanceof ConvertAVM2Item) || (value instanceof CoerceAVM2Item)) {
-            if (type != null && (type.equals(TypeItem.INT) || type.equals(TypeItem.UINT))) {
-                if (value.value.returnType().equals(TypeItem.NUMBER)) {
-                    return value.value;
-                }
+    public static GraphTargetItem handleSetCoerce(GraphTargetItem value, GraphTargetItem type) {
+        if (type == null) {
+            return value;
+        }
+        if (!(value instanceof ConvertAVM2Item) && !(value instanceof CoerceAVM2Item)) {            
+            return value;
+        }
+        
+        GraphTargetItem convertType = value.returnType();
+        GraphTargetItem insideConvertType = value.value.returnType();
+        
+        if (type.equals(convertType)) {
+            if (insideConvertType.equals(TypeItem.UNBOUNDED) && !type.equals(TypeItem.UNBOUNDED)) {
+                return value.value;
             }
         }
+        
+        if ((type.equals(TypeItem.INT) || type.equals(TypeItem.UINT)) && insideConvertType.equals(TypeItem.NUMBER)) {
+            return value.value;
+        }
+        
         return value;
     }
 

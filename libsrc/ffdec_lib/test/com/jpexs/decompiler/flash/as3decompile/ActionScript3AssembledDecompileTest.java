@@ -105,7 +105,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     public void testDecrementPrecedence() {
         decompileMethod("assembled", "testDecrementPrecedence", "var _loc2_:int = 10;\r\n"
                 + "var _loc1_:int = 5;\r\n"
-                + "var _loc3_:* = _loc2_ & (1 << _loc1_) - 1;\r\n",
+                + "var _loc3_:int = _loc2_ & (1 << _loc1_) - 1;\r\n",
                  false);
     }
 
