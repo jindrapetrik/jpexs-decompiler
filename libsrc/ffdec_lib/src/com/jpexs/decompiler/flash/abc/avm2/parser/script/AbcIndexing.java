@@ -108,21 +108,16 @@ public final class AbcIndexing {
      * Property key
      */
     public static class PropertyDef {
-
-        private static final String BUILT_IN_NS = "http://adobe.com/AS3/2006/builtin";
-
-        private static Map<ABC, Integer> builtInNsPerAbc = new WeakHashMap<>();
-
         private final String propName;
+       
+        private final GraphTargetItem parent;
 
         private String propNsString = null;
-
-        private final GraphTargetItem parent;
 
         private int propNsIndex = 0;
 
         private ABC abc = null;
-
+        
         /**
          * To string
          * @return String
@@ -131,17 +126,7 @@ public final class AbcIndexing {
         public String toString() {
             return parent.toString() + ":" + propName + (propNsIndex > 0 ? "[ns:" + propNsIndex + "]" : "") + (propNsString != null ? "[ns: " + propNsString + "]" : "");
         }
-
-        private void setPrivate(ABC abc, int propNsIndex) {
-            this.propNsIndex = propNsIndex;
-            this.abc = abc;
-        }
-
-        private void setProtected(ABC abc, int propNsIndex) {
-            this.abc = null;
-            this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
-        }
-
+        
         /**
          * Gets property name
          * @return Property name
@@ -163,39 +148,30 @@ public final class AbcIndexing {
          *
          * @param propName Name of the property
          * @param parent Parent type (usually TypeItem)
-         * @param abc ABC for private/protected namespace resolving
+         * @param abc ABC for private/protected/namespace namespace resolving
          * @param propNsIndex Index of property(trait) namespace for
-         * private/protected namespace resolving
+         * private/protected/namespace namespace resolving
          */
-        public PropertyDef(String propName, GraphTargetItem parent, ABC abc, int propNsIndex) {
-
-            int builtInIndex = -1;
-            if (abc != null) {
-                Integer builtInNs = builtInNsPerAbc.get(abc);
-
-                if (builtInNs == null) {
-                    //we need to avoid modifying the ABC
-                    /*    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
-                    builtInNsPerAbc.put(abc, builtInIndex);*/
-                    builtInIndex = Integer.MIN_VALUE; //??
-                } else {
-                    builtInIndex = builtInNs;
-                }
-            }
+        public PropertyDef(String propName, GraphTargetItem parent, ABC abc, int propNsIndex) {           
 
             this.propName = propName;
             this.parent = parent;
             if (abc == null || propNsIndex <= 0) {
                 return;
             }
-            int k = abc.constants.getNamespace(propNsIndex).kind;
-            if (k != Namespace.KIND_PACKAGE && propNsIndex != builtInIndex) {
-                if (k == Namespace.KIND_PROTECTED || k == Namespace.KIND_STATIC_PROTECTED) {
-                    setProtected(abc, propNsIndex);
-                } else {
-                    setPrivate(abc, propNsIndex);
-                }
-            }
+            Namespace ns = abc.constants.getNamespace(propNsIndex);
+            switch (ns.kind) {
+                case Namespace.KIND_PACKAGE:
+                case Namespace.KIND_NAMESPACE:
+                case Namespace.KIND_PROTECTED:
+                case Namespace.KIND_STATIC_PROTECTED:
+                    this.abc = null;
+                    this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
+                    break;
+                default:
+                    this.abc = abc;
+                    this.propNsIndex = propNsIndex;                     
+            }            
         }
 
         /**
@@ -910,6 +886,15 @@ public final class AbcIndexing {
             }
         }
         if (parent != null) {
+            if (prop.propNsIndex != 0) {
+                /*Namespace ns = getSelectedAbc().constants.getNamespace(prop.propNsIndex);
+                if (ns.kind == Namespace.KIND_NAMESPACE) {
+                    ABC parentAbc = parent.getSelectedAbc();
+                    AVM2ConstantPool parentConstants = parentAbc.constants;
+                    int parentNsId = parentConstants.getNamespaceId(Namespace.KIND_NAMESPACE, parentConstants.getStringId(ns.getName(getSelectedAbc().constants), false), 0, false);
+                    prop = new PropertyDef(prop.propName, prop.parent, parentAbc, parentNsId);
+                }*/                
+            }
             TraitIndex pti = parent.findProperty(prop, findStatic, findInstance, findProtected, foundStatic);
             if (pti != null) {
                 return pti;

@@ -2071,6 +2071,12 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testResolvingBuildIn() {
+        decompileMethod("classic_air", "testResolvingBuildIn", "var i:int = \"Hello world\".indexOf(\"world\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testRest() {
         decompileMethod("classic_air", "testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
                 + "return firstp;\r\n",

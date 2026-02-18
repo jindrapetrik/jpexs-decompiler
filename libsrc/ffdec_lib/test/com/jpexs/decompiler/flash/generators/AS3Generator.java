@@ -195,6 +195,8 @@ public class AS3Generator {
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
         Configuration.showMethodBodyId.set(false);
+        Configuration.autoDeobfuscateIdentifiers.set(false);
+        Configuration.as3QNameObfuscatedPropsInSquareBrackets.set(true);
         Configuration.simplifyExpressions.set(false);
         Configuration.displayDupInstructions.set(true);
 
