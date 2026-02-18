@@ -128,6 +128,7 @@ package
         TestPrecedenceX;
         TestProperty;
         TestRegExp;
+        TestResolvingBuildIn;
         TestRest;
         TestSlots;
         TestSlots2;
