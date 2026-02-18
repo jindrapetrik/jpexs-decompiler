@@ -79,30 +79,30 @@ public class CoerceAVM2Item extends AVM2Item {
                 break;
             case "Boolean":
                 displayCoerce = !valueReturnType.equals(TypeItem.BOOLEAN)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "Number":
                 displayCoerce = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(TypeItem.NUMBER)
                         && !valueReturnType.equals(TypeItem.UINT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "float":
                 displayCoerce = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(new TypeItem("float"))
                         && !valueReturnType.equals(TypeItem.UINT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "int":
                 displayCoerce = !valueReturnType.equals(TypeItem.INT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "uint":
                 if (valueReturnType.equals(TypeItem.INT) && (value instanceof IntegerValueAVM2Item)) {
                     displayCoerce = (((IntegerValueAVM2Item) value).value < 0);
                 } else {
                     displayCoerce = !valueReturnType.equals(TypeItem.UINT)
-                           ;// && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                           ; // && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 }
                 break;
             case "String":

@@ -67,30 +67,30 @@ public class ConvertAVM2Item extends AVM2Item {
         switch (type.toString()) {
             case "Boolean":
                 displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "Number":
                 displayConvert = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(TypeItem.NUMBER)
                         && !valueReturnType.equals(TypeItem.UINT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "float":
                 displayConvert = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(new TypeItem("float"))
                         && !valueReturnType.equals(TypeItem.UINT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "int":
                 displayConvert = !valueReturnType.equals(TypeItem.INT)
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "uint":
                 if (valueReturnType.equals(TypeItem.INT) && (value instanceof IntegerValueAVM2Item)) {
                     displayConvert = (((IntegerValueAVM2Item) value).value < 0);
                 } else {
                     displayConvert = !valueReturnType.equals(TypeItem.UINT)
-                        ;//    && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //    && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 }
                 break;
             case "String":
@@ -98,7 +98,7 @@ public class ConvertAVM2Item extends AVM2Item {
                         //&& !valueReturnType.equals(new TypeItem("XML"))
                         //&& !valueReturnType.equals(new TypeItem("XMLList"))
                         && !valueReturnType.equals(new TypeItem("null"))
-                        ;//&& !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        ; //&& !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
         }
         if (displayConvert) {
