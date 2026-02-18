@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
 - [#2636] ActionScript 3 - Incorrect switch detection
 - AS3 property resolving for KIND_NAMESPACE (like builtin for Strings, etc.)
+- [#2636] ActionScript - switches vs loop breaks
 
 ## [25.1.0] - 2026-02-17
 ### Added
