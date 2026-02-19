@@ -130,7 +130,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
+                SetTypeIns.handleSetCoerce(val, type).toString(writer, localData);
             }
             return writer;
         }
@@ -149,7 +149,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
+                SetTypeIns.handleSetCoerce(val, type).toString(writer, localData);
             }
             return writer;
         }
@@ -169,7 +169,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
+                SetTypeIns.handleSetCoerce(val, type).toString(writer, localData);
             }
             return writer;
         }

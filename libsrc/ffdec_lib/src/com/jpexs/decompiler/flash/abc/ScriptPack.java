@@ -440,7 +440,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (!first) {
                         writer.newLine();
                     }
-                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>(), -1);
                 } else {
                     writer.append("");
                 }

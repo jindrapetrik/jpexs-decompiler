@@ -3727,7 +3727,7 @@ public class XFLConverter {
                         }
 
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
-                        frameBody.toString(new LinkedHashSet<>(), swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
+                        frameBody.toString(new LinkedHashSet<>(), swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>(), classIndex);
 
                         String script = scriptBuilder.toString();
                         ret.put(frame, script);

@@ -1157,7 +1157,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             public List<com.jpexs.decompiler.flash.simpleparser.Variable> getClassTraits(Path className, boolean getStatic, boolean getInstance, boolean getInheritance) {
                 List<AbcIndexing.PropertyDef> propertyDefList = new ArrayList<>();
                 List<Boolean> isStaticList = new ArrayList<>();
-                abc.getSwf().getAbcIndex().getClassTraits(new LinkedHashSet<>(), new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, propertyDefList, isStaticList);
+                abc.getSwf().getAbcIndex().getClassTraits(new LinkedHashSet<>(), new TypeItem(className.toString()), abc, decompiledTextArea.getScriptIndex(), getStatic, getInstance, getInheritance, true, true, propertyDefList, isStaticList);
                 List<com.jpexs.decompiler.flash.simpleparser.Variable> ret = new ArrayList<>();
                 for (int i = 0; i < propertyDefList.size(); i++) {
                     AbcIndexing.PropertyDef def = propertyDefList.get(i);

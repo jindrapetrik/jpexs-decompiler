@@ -102,7 +102,6 @@ public class ActionLocalData extends BaseLocalData {
     /**
      * Constructs new ActionLocalData
      *
-     * @param switchParts Switch parts
      * @param secondPassData Second pass data
      * @param insideDoInitAction Is inside doInitAction
      * @param regNames Register names
@@ -110,8 +109,7 @@ public class ActionLocalData extends BaseLocalData {
      * @param functions Functions
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
-        this.allSwitchParts = switchParts;
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
         this.regNames = regNames;
         this.variables = variables;
         this.functions = functions;

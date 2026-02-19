@@ -1834,7 +1834,6 @@ public class AVM2Code implements Cloneable {
      * @param maxTempIndex Max temp index
      * @param output Output
      * @param swfVersion SWF version
-     * @param switchParts Switch parts
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param setLocalPosToGetLocalPos Set local position to get local position
@@ -1863,7 +1862,7 @@ public class AVM2Code implements Cloneable {
      * @throws ConvertException On convert error
      * @throws InterruptedException On interrupt
      */
-    public void toSourceOutput(Reference<Integer> maxTempIndex, List<GraphTargetItem> output, int swfVersion, Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssignmentIps, LinkedIdentityHashSet<SetLocalAVM2Item> bottomStackSetLocals, Set<String> usedDeobfuscations) throws ConvertException, InterruptedException {
+    public void toSourceOutput(Reference<Integer> maxTempIndex, List<GraphTargetItem> output, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssignmentIps, LinkedIdentityHashSet<SetLocalAVM2Item> bottomStackSetLocals, Set<String> usedDeobfuscations) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.err.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1982,7 +1981,7 @@ public class AVM2Code implements Cloneable {
             } else
              */
             if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 //ip = end + 1;
                 break;
             } else if (ins.definition instanceof NewFunctionIns) {
@@ -2018,13 +2017,13 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 // What to do when hasDup is false?
-                ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                 nft.functionName = functionName;
                 ip++;
             } else {
                 try {
-                    ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                    ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
 
                     if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
                         bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
@@ -2202,6 +2201,11 @@ public class AVM2Code implements Cloneable {
                 vtype = assignment.value.returnType();
             } else if (assignment.value instanceof LocalRegAVM2Item) {
                 vtype = assignment.value.returnType();
+            } else {
+                vtype = assignment.value.returnType();
+                if (vtype == TypeItem.UNKNOWN) {
+                    vtype = TypeItem.UNBOUNDED;
+                }
             }
         }
 
@@ -2436,12 +2440,21 @@ public class AVM2Code implements Cloneable {
                         handleDeclareReg(minreg, subItem, declaredRegisters, declaredSlots, reg);
                     }
                 }
+                /*
                 if (subItem instanceof LocalRegAVM2Item) {
                     LocalRegAVM2Item getLocal = (LocalRegAVM2Item) subItem;
                     if (declaredRegisters[getLocal.regIndex] != null) {
                         getLocal.type = declaredRegisters[getLocal.regIndex].type;
                     }
                 }
+                
+                if (subItem instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) subItem;
+                    if (declaredRegisters[setLocal.regIndex] != null) {
+                        setLocal.type = declaredRegisters[setLocal.regIndex].type;
+                    }
+                }
+                */
                 if (subItem instanceof SetPropertyAVM2Item) {
                     SetPropertyAVM2Item sp = (SetPropertyAVM2Item) subItem;
                     if (sp.object instanceof FindPropertyAVM2Item) {
@@ -2953,8 +2966,43 @@ public class AVM2Code implements Cloneable {
             paramNamesList.add(AVM2Item.localRegName(abc.getSwf(), localRegNames, ir, usedDeobfuscations));
         }
         injectDeclarations(usedDeobfuscations, 0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
-
+        uniteLocalsDeclarationTypes(d, list);
         return list;
+    }
+    
+    private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {
+        for (int i = 0; i < items.size(); i++) {
+            GraphTargetItem currentItem = items.get(i);
+            List<GraphTargetItem> itemsOnLine = new ArrayList<>();
+            itemsOnLine.add(currentItem);
+            currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                @Override
+                public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                    itemsOnLine.add(item);
+                }
+            });
+            
+            for (GraphTargetItem item : itemsOnLine) {
+                if (item instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) item;
+                    if (declaredRegs[setLocal.regIndex] != null) {                    
+                        setLocal.type = declaredRegs[setLocal.regIndex].type;
+                    }
+                }
+                if (item instanceof LocalRegAVM2Item) {
+                    LocalRegAVM2Item getLocal = (LocalRegAVM2Item) item;
+                    if (declaredRegs[getLocal.regIndex] != null) {
+                        getLocal.type = declaredRegs[getLocal.regIndex].type;
+                    }
+                }
+            }
+            if (currentItem instanceof Block) {
+                Block block = (Block) currentItem;
+                for (List<GraphTargetItem> sub : block.getSubs()) {
+                    uniteLocalsDeclarationTypes(declaredRegs, sub);
+                }
+            }
+        }
     }
 
     /**

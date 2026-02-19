@@ -164,7 +164,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
         code.removeLabelsAndDebugLine(b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>());
+        String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>(), -1);
         actual = actual.replace("\r\n", "\n");
         assertEquals(actual, expected);
     }
@@ -558,7 +558,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "   ofs0030:\n"
                 + "            jump ofs002d\n"
                 + "   ofs0034:\n"
-                + "            ", "         param1 = Math.floor(Math.random() * 6);\n"
+                + "            ", "         param1 = int(Math.floor(Math.random() * 6));\n"
                 + "         if(param1 <= 4)\n"
                 + "         {\n"
                 + "            return;\n"

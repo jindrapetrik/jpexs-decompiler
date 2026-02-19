@@ -478,7 +478,7 @@ public final class MethodBody implements Cloneable {
                                 convertedItems1 = converted.getCode().toGraphTargetItems(usedDeobfuscations, swfVersion, callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>(), initTraitClasses); //converted.getCode().visitCode(converted)
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
-                                Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion, usedDeobfuscations));
+                                Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion, usedDeobfuscations, classIndex));
                             }
                             convertedItems = convertedItems1;
                         }
@@ -537,10 +537,11 @@ public final class MethodBody implements Cloneable {
      * @param writer Writer
      * @param fullyQualifiedNames Fully qualified names
      * @param seenMethods Seen methods      
+     * @param classIndex Class index
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(Set<String> usedDeobfuscations, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
+    public GraphTextWriter toString(Set<String> usedDeobfuscations, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, int classIndex) throws InterruptedException {
         seenMethods.add(method_info);
 
         if (exportMode != ScriptExportMode.AS) {
@@ -571,7 +572,7 @@ public final class MethodBody implements Cloneable {
                         fullyQualifiedNames2.remove(tname);
                     }
                     
-                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods, exportMode, swfVersion, usedDeobfuscations));
+                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods, exportMode, swfVersion, usedDeobfuscations, classIndex));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {
                     // exception was logged in convert method
@@ -665,16 +666,17 @@ public final class MethodBody implements Cloneable {
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param seenMethods Seen methods
+     * @param classIndex Class index
      * @return High-level source code
      */
-    public String toSource(Set<String> usedDeobfuscations, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, int scriptIndex, Set<Integer> seenMethods) {
+    public String toSource(Set<String> usedDeobfuscations, int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, int scriptIndex, Set<Integer> seenMethods, int classIndex) {
         ConvertData convertData = new ConvertData();
         convertData.deobfuscationMode = 0;
         try {
             convert(swfVersion, callStack, abcIndex, convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, seenMethods, new ArrayList<>(), usedDeobfuscations);
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             writer.indent().indent().indent();
-            toString(usedDeobfuscations, swfVersion, callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods);
+            toString(usedDeobfuscations, swfVersion, callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods, classIndex);
             writer.unindent().unindent().unindent();
             writer.finishHilights();
             return writer.toString();

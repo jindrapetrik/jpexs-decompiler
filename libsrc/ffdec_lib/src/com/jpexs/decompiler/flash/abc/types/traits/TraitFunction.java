@@ -121,7 +121,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
         }
         writer.endBlock();
 

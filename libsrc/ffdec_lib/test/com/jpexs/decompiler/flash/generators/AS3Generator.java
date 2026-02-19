@@ -166,7 +166,7 @@ public class AS3Generator {
                             callStack.add(b);
                             Set<String> usedDeobfuscations = new LinkedHashSet<>();
                             b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>(), new ArrayList<>(), usedDeobfuscations);
-                            b.toString(usedDeobfuscations, swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
+                            b.toString(usedDeobfuscations, swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>(), -1);
                             src.finishHilights();
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {

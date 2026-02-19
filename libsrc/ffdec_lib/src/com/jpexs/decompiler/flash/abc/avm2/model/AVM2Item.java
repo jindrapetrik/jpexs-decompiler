@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
@@ -159,8 +160,13 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
 
-        if (empty) {
-            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, false);
+        if (empty) {     
+            TypeItem parentType = null;
+            if (localData.classIndex > -1) {
+                DottedChain thisClass = localData.abc.instance_info.get(localData.classIndex).getName(localData.constantsAvm2).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, false);
+                parentType = new TypeItem(thisClass);
+            }
+            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, false, parentType, isStatic);
             return writer;
         }
 
@@ -223,7 +229,7 @@ public abstract class AVM2Item extends GraphTargetItem {
                 }
             }
             
-            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, true);
+            ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, true, returnType, isStatic);
             return writer;
         } else {
             writer.append("[").allowWrapHere();

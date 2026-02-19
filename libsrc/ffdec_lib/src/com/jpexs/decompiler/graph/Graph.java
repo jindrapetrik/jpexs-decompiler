@@ -1433,11 +1433,10 @@ public class Graph {
      * @return Second pass data or null
      */
     protected SecondPassData prepareSecondPass(BaseLocalData localData, List<GraphTargetItem> list) {
-        if (localData.allSwitchParts.isEmpty() && !localData.gotosUsed.getVal()) {
+        if (!localData.gotosUsed.getVal()) {
             return null;
         }
         SecondPassData spd = new SecondPassData();
-        spd.allSwitchParts.addAll(localData.allSwitchParts);
         return spd;
     }
 
@@ -2998,30 +2997,12 @@ public class Graph {
                 Map<GraphPart, Integer> count = new HashMap<>();
                 GraphPart winner = null;
                 int winnerCount = 0;
-                int winnerNumBlock = Integer.MAX_VALUE;
-
-                Set<GraphPart> bannedCandidates = new HashSet<>();
-                if (localData.secondPassData != null) {
-                    bannedCandidates = localData.secondPassData.allSwitchParts;
-                }
-
-                if (debugPrintLoopList) {
-                    System.err.println("bannedCandidates:");
-                    for (GraphPart p : bannedCandidates) {
-                        System.err.println("- " + p);
-                    }
-                }
+                int winnerNumBlock = Integer.MAX_VALUE;               
 
                 for (GraphPart cand : currentLoop.breakCandidates) {
                     if (removedX.contains(cand)) {
                         if (debugPrintLoopList) {
                             System.err.println("cand " + cand + " is removed");
-                        }
-                        continue;
-                    }
-                    if (bannedCandidates.contains(cand)) {
-                        if (debugPrintLoopList) {
-                            System.err.println("cand " + cand + " is banned");
                         }
                         continue;
                     }
@@ -4955,8 +4936,6 @@ public class Graph {
                     willHaveBreak = true;
                 }
             }
-
-            localData.allSwitchParts.add(caseBodies.get(i));
 
             List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
             List<StopPartKind> stopPartKind2x = new ArrayList<>(stopPartKind);

@@ -258,7 +258,6 @@ public class AVM2LocalData extends BaseLocalData {
      * @param localData Another AVM2LocalData
      */
     public AVM2LocalData(AVM2LocalData localData) {
-        allSwitchParts = localData.allSwitchParts;
         isStatic = localData.isStatic;
         classIndex = localData.classIndex;
         localRegs = localData.localRegs;

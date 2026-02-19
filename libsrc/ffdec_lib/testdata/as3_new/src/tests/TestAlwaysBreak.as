@@ -7,7 +7,7 @@ package tests
 		{
 			while(true)
             {
-               var v = 5;
+               var v:int = 5;
                trace("a");
                if(v > 4)
                {

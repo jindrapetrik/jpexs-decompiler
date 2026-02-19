@@ -34,12 +34,7 @@ public abstract class BaseLocalData {
     /**
      * Line start instruction
      */
-    public GraphSourceItem lineStartInstruction;
-
-    /**
-     * Set of all switch parts
-     */
-    public Set<GraphPart> allSwitchParts = new HashSet<>();
+    public GraphSourceItem lineStartInstruction;   
 
     /**
      * Second pass data

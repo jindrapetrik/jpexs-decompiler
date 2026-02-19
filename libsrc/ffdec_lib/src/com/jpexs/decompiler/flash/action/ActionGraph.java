@@ -1023,10 +1023,9 @@ public class ActionGraph extends Graph {
         checkSecondPassSwitches(processedIfs, list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
 
         
-        if (spd.switchParts.isEmpty() && !localData.gotosUsed.getVal() && localData.allSwitchParts.isEmpty()) {
+        if (spd.switchParts.isEmpty() && !localData.gotosUsed.getVal()) {
             return null; //no need to second pass
         }
-        spd.allSwitchParts.addAll(localData.allSwitchParts);
         return spd;
     }
     

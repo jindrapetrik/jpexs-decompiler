@@ -244,7 +244,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     first.setVal(false);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
                     //first.setVal(true);
                     //writer.endBlock();
                 } else {
@@ -296,7 +296,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 if (body != null) {
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(body);
-                    body.toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    body.toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
                 }
             }
 

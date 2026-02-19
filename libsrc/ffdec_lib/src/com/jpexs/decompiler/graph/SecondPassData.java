@@ -16,18 +16,11 @@
  */
 package com.jpexs.decompiler.graph;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Second pass data.
  *
  * @author JPEXS
  */
 public class SecondPassData {
-
-    /**
-     * All switch parts.
-     */
-    public Set<GraphPart> allSwitchParts = new HashSet<>();
+   
 }

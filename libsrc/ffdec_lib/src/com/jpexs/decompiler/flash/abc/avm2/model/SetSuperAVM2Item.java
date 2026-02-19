@@ -135,7 +135,7 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
             return compoundValue.toString(writer, localData);
         }
         writer.append(" = ");
-        return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
+        return SetTypeIns.handleSetCoerce(value, type).toString(writer, localData);
     }
 
     @Override
