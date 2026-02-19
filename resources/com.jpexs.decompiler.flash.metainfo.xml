@@ -67,6 +67,19 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="25.1.1" date="2026-02-19">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2636 ActionScript - Incorrect always-break detection causing insertion of while(true)</li>
+					<li>#2636 ActionScript 3 - Incorrect switch detection</li>
+					<li>AS3 property resolving for KIND_NAMESPACE (like builtin for Strings, etc.)</li>
+					<li>#2636 ActionScript - switches vs loop breaks</li>
+					<li>#2636 ActionScript 3 - type coercion / convert, local registers type propagation</li>
+					<li>Using public/private/protected/internal keywords on ambiguous namespace references and compiling such keywords with `::` suffix.</li>
+				</ul>
+			</description>
+		</release>
 		<release version="25.1.0" date="2026-02-17">
 			<description>
 				<p>Added</p>
