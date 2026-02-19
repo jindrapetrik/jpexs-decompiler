@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [25.1.1] - 2026-02-19
 ### Fixed
 - [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
@@ -3960,6 +3962,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.1...dev
 [25.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.0...version25.1.1
 [25.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.0.0...version25.1.0
 [25.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...version25.0.0
