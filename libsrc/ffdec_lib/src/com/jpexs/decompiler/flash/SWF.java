@@ -840,7 +840,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
      */
-    public static void initPlayer() throws IOException, InterruptedException {
+    public static synchronized void initPlayer() throws IOException, InterruptedException {
         if (playerGlobalAbcIndex == null) {
             /*if (Configuration.getPlayerSWC() == null) {
                 throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());

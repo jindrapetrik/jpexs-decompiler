@@ -667,6 +667,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         localData.pkg = pkg;
         localData.privateNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PRIVATE, pkg.toRawString().isEmpty() ? baseClassName : pkg.toRawString() + ":" + baseClassName, 0, true);
         localData.protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString().isEmpty() ? baseClassName : pkg.toRawString() + ":" + baseClassName, 0, true);
+        localData.staticProtectedNs =  abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, pkg.toRawString().isEmpty() ? baseClassName : pkg.toRawString() + ":" + baseClassName, 0, true);
+        localData.internalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, pkg.toRawString(), 0, true);
+        
         if (extendsVal == null && !isInterface) {
             extendsVal = new TypeItem(DottedChain.OBJECT);
         }
@@ -1109,6 +1112,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.documentClass = localData.documentClass;
         newlocalData.privateNs = localData.privateNs;
         newlocalData.protectedNs = localData.protectedNs;
+        newlocalData.staticProtectedNs = localData.staticProtectedNs;
+        newlocalData.internalNs = localData.internalNs;                
         newlocalData.isStatic = isStatic;
         newlocalData.subMethod = subMethod;
         newlocalData.numberContext = localData.numberContext;
@@ -1177,6 +1182,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.documentClass = localData.documentClass;
         newlocalData.privateNs = localData.privateNs;
         newlocalData.protectedNs = localData.protectedNs;
+        newlocalData.staticProtectedNs = localData.staticProtectedNs;
+        newlocalData.internalNs = localData.internalNs;
         newlocalData.isStatic = isStatic;
         newlocalData.subMethod = subMethod;
         newlocalData.numberContext = localData.numberContext;
@@ -2474,10 +2481,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
     /**
      * Searches prototype chain.
      *
+     * @param nsKeyword Namespace keyword (public, protected, private, internal)
      * @param namespaceSuffix Namespace suffix
      * @param otherNs Other namespaces
      * @param privateNs Private namespace
      * @param protectedNs Protected namespace
+     * @param staticProtectedNs Static protected namespace
+     * @param internalNs Internal namespace
      * @param instanceOnly Instance only
      * @param abc ABC
      * @param pkg Package
@@ -2494,7 +2504,23 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param isType Is type
      * @return True if found
      */
-    public static boolean searchPrototypeChain(Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
+    public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
+        
+        if (nsKeyword != null) {
+            switch (nsKeyword) {
+                case "public":
+                    return searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);            
+                case "protected":
+                    if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+                        return true;
+                    }
+                    return searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                    
+                case "private":
+                    return searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                               
+                case "internal":
+                    return searchPrototypeChain(internalNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                                               
+            }            
+        }
         // private and protected namespaces first so we find overriding functions before overridden functions
         if (namespaceSuffix != null) {
             if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
@@ -3058,7 +3084,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.NewObject, 0));
             ret.add(ins(AVM2Instructions.PushWith));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack, false));
+            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack, false, null));
         }
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         ret.add(ins(AVM2Instructions.NewFunction, method(null, false, constants.getStringId(item.functionName, true), true, false, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClassBaseName, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));

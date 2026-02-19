@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
@@ -158,13 +160,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>()));
+            cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>(), -1));
         } else {
             cname = (abc.constants.getMultiname(multinameIndex).getName(new LinkedHashSet<>(), abc, abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>()));
+            cns = namespace.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods, ScriptExportMode.AS, -1, new LinkedHashSet<>(), -1));
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {
@@ -189,10 +191,10 @@ public class FullMultinameAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return appendTo(writer, localData, false);
+        return appendTo(writer, localData, false, null, false);
     }    
     
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData, boolean afterDot) throws InterruptedException {
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData, boolean afterDot, GraphTargetItem parentType, boolean isStatic) throws InterruptedException {
         if (namespace != null) {
             namespace.toString(writer, localData);
             writer.append("::");
@@ -229,6 +231,38 @@ public class FullMultinameAVM2Item extends AVM2Item {
                         String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
                         writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
                         writer.appendNoHilight("::");
+                    } else {                       
+                        if (parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
+                            String rawName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, fullyQualifiedNames, true, true);
+                            List<AbcIndexing.PropertyDef> defs = new ArrayList<>();
+                            List<Boolean> staticRef = new ArrayList<>();
+                            localData.abcIndex.getClassTraits(localData.usedDeobfuscations, parentType, localData.abc, null, true, true, true, true, true, defs, staticRef);
+                            int numStaticUsed = 0;
+                            int numInstanceUsed = 0;
+                            for (int i = 0; i < defs.size(); i++) {
+                                AbcIndexing.PropertyDef def = defs.get(i);
+                                if (Objects.equals(rawName, def.getPropertyName())) {
+                                    //cannot access instance properties via static context
+                                    if (isStatic && !staticRef.get(i)) {
+                                        continue;
+                                    }
+                                    if (staticRef.get(i)) {
+                                        numStaticUsed++;
+                                    } else {
+                                        numInstanceUsed++;
+                                    }
+                                }
+                            }
+                            if (numInstanceUsed > 1 || numStaticUsed > 1) {
+                                Namespace ns = constants.getMultiname(multinameIndex).getSingleNamespace(localData.abc.constants);
+                                if (ns != null) {
+                                    String prefix = Namespace.kindToPrefix(ns.kind);
+                                    if (prefix != null) {
+                                        writer.append(prefix).append("::");
+                                    }
+                                }
+                            }
+                        }
                     }
         
                     if (!isAttribute && afterDot && namespaceSuffix.isEmpty() && Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {

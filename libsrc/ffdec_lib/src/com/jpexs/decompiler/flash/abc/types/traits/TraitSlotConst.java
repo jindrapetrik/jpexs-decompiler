@@ -177,9 +177,10 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param writer Writer
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
+     * @param classIndex Class index
      * @throws InterruptedException On interrupt
      */
-    public void getValueStr(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, int classIndex) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -195,7 +196,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations));
+                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations, classIndex));
             }
             writer.endMethod();
             writer.endTrait();
@@ -259,13 +260,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 List<MethodBody> callStack = new ArrayList<>();
                 AssignedValue assignment = convertData.assignedValues.get(this);
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations));
+                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations, classIndex));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames, usedDeobfuscations);
         if (hasValueStr(abc, convertData)) {
             writer.appendNoHilight(" = ");
-            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames, classIndex);
         }
         return writer.appendNoHilight(";").newLine();
     }
@@ -274,7 +275,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public void convert(Set<String> usedDeobfuscations, int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames, usedDeobfuscations);
         if (hasValueStr(abc, convertData)) {
-            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(usedDeobfuscations, swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames, classIndex);
         }
     }
 

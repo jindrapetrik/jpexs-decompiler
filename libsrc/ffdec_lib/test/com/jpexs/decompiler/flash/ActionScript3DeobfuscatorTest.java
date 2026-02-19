@@ -164,7 +164,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
         code.removeLabelsAndDebugLine(b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>());
+        String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>(), -1);
         actual = actual.replace("\r\n", "\n");
         assertEquals(actual, expected);
     }

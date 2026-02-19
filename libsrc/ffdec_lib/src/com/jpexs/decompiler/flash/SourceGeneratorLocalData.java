@@ -145,6 +145,16 @@ public class SourceGeneratorLocalData implements Serializable {
      * Current protected namespace id
      */
     public int protectedNs = 0;
+    
+    /**
+     * Current static protected namespace id
+     */
+    public int staticProtectedNs = 0;
+    
+    /**
+     * Current internal namespace id
+     */
+    public int internalNs = 0;
 
     /**
      * Is in static method
