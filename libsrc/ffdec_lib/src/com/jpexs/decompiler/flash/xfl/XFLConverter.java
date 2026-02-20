@@ -2106,25 +2106,17 @@ public class XFLConverter {
     }
 
     private void convertMedia(Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, ReadOnlyTagList tags, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException {
-        boolean hasMedia = false;
-        for (CharacterTag symbol : characters) {
-            if (symbol instanceof ImageTag
-                    || symbol instanceof DefineSoundTag
-                    || symbol instanceof DefineVideoStreamTag) {
-                //symbol instanceof SoundStreamHeadTypeTag  FIXME
-                hasMedia = true;
-            }
-        }
+        boolean mediaStarted = false;
 
-        if (!hasMedia) {
-            return;
-        }
-
-        writer.writeStartElement("media");
-
+        
         for (CharacterTag symbol : characters) {
             if (symbol instanceof ImageTag) {
 
+                if (!mediaStarted) {
+                    writer.writeStartElement("media");
+                    mediaStarted = true;
+                }
+                
                 statusStack.pushStatus(symbol.toString());
                 ImageTag imageTag = (ImageTag) symbol;
                 boolean allowSmoothing = false;
@@ -2157,8 +2149,8 @@ public class XFLConverter {
                             }
                         }
                     }
-                }
-
+                }                               
+                
                 byte[] imageBytes = Helper.readStream(imageTag.getConvertedImageData());
                 SerializableImage image = imageTag.getImageCached();
                 ImageFormat format = imageTag.getImageFormat();
@@ -2244,6 +2236,10 @@ public class XFLConverter {
                 datfiles.put(datFileName, iba.toByteArray());
                 statusStack.popStatus();
             } else if (symbol instanceof DefineSoundTag) {
+                if (!mediaStarted) {
+                    writer.writeStartElement("media");
+                    mediaStarted = true;
+                }
                 statusStack.pushStatus(symbol.toString());
                 convertSoundMedia(lastItemIdNumber, characterImportLinkageURL, swf, tags, (DefineSoundTag) symbol, writer, files, datfiles);
 
@@ -2252,6 +2248,10 @@ public class XFLConverter {
                 writer.writeEndElement();
                 statusStack.popStatus();
             } else if (symbol instanceof DefineVideoStreamTag) {
+                if (!mediaStarted) {
+                    writer.writeStartElement("media");
+                    mediaStarted = true;
+                }
                 statusStack.pushStatus(symbol.toString());
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
                 String videoType = "no media";
@@ -2327,6 +2327,10 @@ public class XFLConverter {
 
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
+                if (!mediaStarted) {
+                    writer.writeStartElement("media");
+                    mediaStarted = true;
+                }
                 SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
                 for (SoundStreamFrameRange range : head.getRanges()) {
                     statusStack.pushStatus(range.toString());
@@ -2339,6 +2343,10 @@ public class XFLConverter {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 for (Tag st : sprite.getTags()) {
                     if (st instanceof SoundStreamHeadTypeTag) {
+                        if (!mediaStarted) {
+                            writer.writeStartElement("media");
+                            mediaStarted = true;
+                        }
                         SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
                         for (SoundStreamFrameRange range : head.getRanges()) {
                             statusStack.pushStatus(range.toString());
@@ -2352,7 +2360,9 @@ public class XFLConverter {
             }
         }
 
-        writer.writeEndElement();
+        if (mediaStarted) {
+            writer.writeEndElement();
+        }
     }
 
     private static void writeLinkage(XFLXmlWriter writer, CharacterTag symbol, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL) throws XMLStreamException {
