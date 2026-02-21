@@ -33,6 +33,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
@@ -70,22 +72,45 @@ public class DebugStackPanel extends JPanel {
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
             @Override
             public void frameChanged(DebuggerSession session) {
-                if (session == null) {
-                    refresh(null);
-                    return;
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    depth = currentSession.getDepth();
+                    refresh(currentSession);
                 }
-                depth = session.getDepth();
-                refresh(session);
             }
         });
         Main.getDebugHandler().addBreakListener(new DebuggerHandler.BreakListener() {
+            
+            private void updateCurrent() {
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    refresh(currentSession);
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gotoRow(0);
+                        }
+                    });                    
+                } else {
+                    clear();
+                }
+            }
+            
             @Override
             public void breakAt(DebuggerSession session, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
-
+                int numPaused = Main.getDebugHandler().getNumberOfPausedSessions();
+                if (numPaused > 1
+                        && Main.getCurrentDebugSession() != session) {
+                    Logger.getLogger(DebugStackPanel.class.getName()).log(Level.INFO, "Another SWF has reached breakpoint meanwhile");
+                    Main.getMainFrame().getPanel().refreshBreakPoints();
+                    return;
+                }
+                updateCurrent();
             }
 
             @Override
             public void doContinue(DebuggerSession session) {
+                refreshSessionList();
                 clear();
             }
         });
@@ -93,11 +118,17 @@ public class DebugStackPanel extends JPanel {
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
             public void connected(DebuggerSession session) {
+                refreshSessionList();
             }
 
             @Override
             public void disconnected(DebuggerSession session) {
-                clear();
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    refresh(currentSession);
+                } else {
+                    clear();
+                }
             }
         });
         
@@ -260,8 +291,7 @@ public class DebugStackPanel extends JPanel {
     }
         
 
-    public void refresh(DebuggerSession session) {
-        
+    private void refreshSessionList() {
         Map<Integer, DebuggerSession> allSessions = Main.getDebugHandler().getActiveSessions();
         DefaultComboBoxModel<SessionItem> model = new DefaultComboBoxModel<>();
         int itemIndex = -1;
@@ -287,12 +317,22 @@ public class DebugStackPanel extends JPanel {
                 }               
             });            
         }
+    }
+    
+    public void refresh(DebuggerSession session) {
+        
+        refreshSessionList();
         
         
         if (session == null) {
             clear();
             return;
         }
+        if (!session.isPaused()) {
+            clear();
+            return;
+        }
+        
         InBreakAtExt info = session.getBreakInfo();
         if (info == null) {
             clear();

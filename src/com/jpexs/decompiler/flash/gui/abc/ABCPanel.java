@@ -119,6 +119,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -300,6 +301,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public static class VariableNode {
 
+        private static Thread variableLoaderThread;
+        private static List<Runnable> loaderList = Collections.synchronizedList(new ArrayList<>());
+        private static final Object loaderLock = new Object();
+        
         public List<VariableNode> path = new ArrayList<>();
 
         public Variable var;
@@ -318,7 +323,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         public List<Variable> traits = new ArrayList<>();
         private boolean as3;
-
+                
         @Override
         public int hashCode() {
             int hash = 3;
@@ -397,6 +402,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             } else {
                 igv = Main.getCurrentDebugSession().getVariable(parentObjectId, var.name, true, useGetter);
             }
+            if (igv == null) { //timeout
+                return;
+            }
 
             //current var is getter function - set it to value really got
             if ((var.flags & VariableFlags.HAS_GETTER) > 0) {
@@ -419,8 +427,46 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         }
 
-        private void ensureLoaded() {
+        private void ensureLoaded() {            
             if (!loaded) {
+                
+                /*synchronized (VariableNode.class) {
+                    if (variableLoaderThread == null) {
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                while(true) {                                    
+                                    if (loaderList.isEmpty()) {
+                                        synchronized (loaderLock) {
+                                            try {
+                                                loaderLock.wait(500);
+                                            } catch (InterruptedException ex) {
+
+                                            }
+                                        }                                        
+                                    } else {
+                                        Runnable toRun = loaderList.remove(0);
+                                        toRun.run();
+                                    }
+                                }
+                            }
+                        };                              
+                        variableLoaderThread = new Thread(r, "Variable loader");
+                        variableLoaderThread.setDaemon(true);                        
+                        variableLoaderThread.start();
+                    }                
+                }
+                                
+                loaderList.add(new Runnable() {
+                    @Override
+                    public void run() {
+                        reloadChildren();
+                        loaded = true;
+                    }                    
+                });
+                synchronized (loaderLock) {
+                    loaderLock.notify();                
+                }*/
                 reloadChildren();
                 loaded = true;
             }

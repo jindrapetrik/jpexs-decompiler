@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2639] Export to FLA - missing sound streams
+- Debugger - Threading issues with multiple SWFs
 
 ## [25.1.1] - 2026-02-19
 ### Fixed

@@ -3150,7 +3150,7 @@ public class Main {
                 debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
 
                     @Override
-                    public void doContinue(DebuggerSession session) {
+                    public void doContinue(DebuggerSession session) {                        
                         mainFrame.getPanel().clearDebuggerColors();
                         mainFrame.getMenu().updateComponents();
                     }
@@ -3160,7 +3160,7 @@ public class Main {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
-                                String hash = "unknown";
+                                /*String hash = "unknown";
                                 String scriptNameNoHash = scriptName;
                                 if (scriptName.contains(":")) {
                                     hash = scriptName.substring(0, scriptName.indexOf(":"));
@@ -3169,17 +3169,22 @@ public class Main {
                                 SWF swf = Main.findOpenedSwfByHash(hash);
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break. Current session: {0}, New break session: {1}", new Object[]{Main.getCurrentDebugSession(), session});
 
-                                if (Main.getDebugHandler().getNumberOfPausedSessions() > 1
+                                int numPaused = Main.getDebugHandler().getNumberOfPausedSessions();
+                                if (numPaused > 1
                                         && Main.getCurrentDebugSession() != session) {
                                     Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf == null ? "unknown" : swf.toString());
                                     mainFrame.getPanel().refreshBreakPoints();
                                     return;
+                                }
+                                if (numPaused == 1 && Main.getCurrentDebugSession() != session) {
+                                    Main.getDebugHandler().setSelectedSessionId(session.getId());
                                 }
                                 if (swf == null) {
                                     Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break at unknown SWF.");
                                     return;
                                 }
                                 mainFrame.getPanel().gotoScriptLine(swf, scriptNameNoHash, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
+                                */
                             }
                         });
                     }

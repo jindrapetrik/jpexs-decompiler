@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author JPEXS
@@ -162,23 +160,23 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     public List<BreakListener> getBreakListeners() {
-        return Collections.unmodifiableList(breakListeners);
+        return new ArrayList<>(breakListeners);
     }
 
     public List<ErrorListener> getErrorListeners() {
-        return Collections.unmodifiableList(errorListeners);
+        return new ArrayList<>(errorListeners);
     }
 
     public List<ConnectionListener> getConnectionListeners() {
-        return Collections.unmodifiableList(connectionListeners);
+        return new ArrayList<>(connectionListeners);
     }
 
     public List<FrameChangeListener> getFrameChangeListeners() {
-        return Collections.unmodifiableList(frameChangeListeners);
+        return new ArrayList<>(frameChangeListeners);
     }
 
     public List<TraceListener> getTraceListeners() {
-        return Collections.unmodifiableList(traceListeners);
+        return new ArrayList<>(traceListeners);
     }
 
     @Override
@@ -196,25 +194,33 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     @Override
-    public synchronized void connected(DebuggerConnection con) {
-        if (terminating) {
-            return;
-        }
+    public void connected(DebuggerConnection con) {
+                
         Map<SWF, Map<String, Set<Integer>>> breakpoints = new LinkedHashMap<>();
-        Set<SWF> swfs = new LinkedHashSet<>(allBreakPoints.keySet());
-        for (SWF swf : swfs) {
-            breakpoints.put(swf, new LinkedHashMap<>());
-            Set<String> scriptNames = new LinkedHashSet<>(allBreakPoints.get(swf).keySet());
-            for (String scriptName : scriptNames) {
-                breakpoints.get(swf).put(scriptName, new TreeSet<>());
-                for (int line : allBreakPoints.get(swf).get(scriptName)) {
-                    breakpoints.get(swf).get(scriptName).add(line);
+        synchronized (this) {
+            if (terminating) {
+                return;
+            }                        
+            Set<SWF> swfs = new LinkedHashSet<>(allBreakPoints.keySet());
+            for (SWF swf : swfs) {
+                breakpoints.put(swf, new LinkedHashMap<>());
+                Set<String> scriptNames = new LinkedHashSet<>(allBreakPoints.get(swf).keySet());
+                for (String scriptName : scriptNames) {
+                    breakpoints.get(swf).put(scriptName, new TreeSet<>());
+                    for (int line : allBreakPoints.get(swf).get(scriptName)) {
+                        breakpoints.get(swf).get(scriptName).add(line);
+                    }
                 }
             }
         }
-
+        
         DebuggerSession session = new DebuggerSession(this, con, breakpoints);
         sessions.add(session);
+        if (session.isConnected()) {
+            for (DebuggerHandler.ConnectionListener l : getConnectionListeners()) {
+                l.connected(session);
+            }
+        }
     }
 
     public void sessionInited(DebuggerSession session) {
@@ -294,14 +300,16 @@ public class DebuggerHandler implements DebugConnectionListener {
         return true;
     }
 
-    public synchronized void removeBreakPoint(SWF swf, String scriptName, int line) {
-        if (!allBreakPoints.containsKey(swf)) {
-            return;
+    public void removeBreakPoint(SWF swf, String scriptName, int line) {
+        synchronized (this) {                    
+            if (!allBreakPoints.containsKey(swf)) {
+                return;
+            }
+            if (!allBreakPoints.get(swf).containsKey(scriptName)) {
+                return;
+            }
+            allBreakPoints.get(swf).get(scriptName).remove(line);        
         }
-        if (!allBreakPoints.get(swf).containsKey(scriptName)) {
-            return;
-        }
-        allBreakPoints.get(swf).get(scriptName).remove(line);
 
         List<DebuggerSession> currentSessions = new ArrayList<>(sessions);
         for (DebuggerSession session : currentSessions) {

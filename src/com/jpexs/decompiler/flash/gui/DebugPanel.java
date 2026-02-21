@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
@@ -256,7 +257,11 @@ public class DebugPanel extends JPanel {
                             }*/
                             //Variant using comma separated bytes, pretty fast
                             try {
-                                Variable debugConnectionClass = session.getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                                InGetVariable igv = session.getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false);
+                                if (igv == null) {
+                                    return;
+                                }
+                                Variable debugConnectionClass = igv.parent;                                
                                 String dataStr = (String) session.callMethod(debugConnectionClass, "readCommaSeparatedFromByteArray", Arrays.asList(v)).variables.get(0).value;
                                 String[] parts = dataStr.split(",");
                                 byte[] data = new byte[parts.length];
@@ -438,14 +443,19 @@ public class DebugPanel extends JPanel {
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        refresh(session);
+                        refresh(Main.getCurrentDebugSession());
                     }
                 });
             }
 
             @Override
             public void breakAt(DebuggerSession session, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
-
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh(Main.getCurrentDebugSession());
+                    }
+                });
             }
         });
 
@@ -501,11 +511,18 @@ public class DebugPanel extends JPanel {
     }*/
     public void refresh(DebuggerSession session) {       
         
+        if (session != null && !session.isPaused()) {
+            return;
+        }
+        
         currentSessionRef = session == null ? null : new WeakReference<>(session);
         View.execInEventDispatch(new Runnable() {
 
             @Override
             public void run() {
+                if (session != null && !session.isPaused()) {
+                    return;
+                }
                 setLoading(true);
                 synchronized (DebugPanel.this) {
 
@@ -526,9 +543,12 @@ public class DebugPanel extends JPanel {
                             } else if (realName.startsWith("/")) {
                                 continue;
                             }
-                            Variable placedVar = session.getVariable(0, realName, false, false).parent;
-                            if (placedVar != null) {
-                                locals.add(placedVar);
+                            InGetVariable igv = session.getVariable(0, realName, false, false);
+                            if (igv != null) {
+                                Variable placedVar = igv.parent;
+                                if (placedVar != null) {
+                                    locals.add(placedVar);
+                                }
                             }
                         }
                         
