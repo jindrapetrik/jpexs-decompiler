@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Debugger - Debugged SWF file name in the session title
+
 ### Fixed
 - [#2639] Export to FLA - missing sound streams
 - Debugger - Threading issues with multiple SWFs

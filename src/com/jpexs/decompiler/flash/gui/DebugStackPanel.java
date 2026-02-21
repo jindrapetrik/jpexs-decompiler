@@ -275,7 +275,7 @@ public class DebugStackPanel extends JPanel {
             if (session == null) {
                 return "-";
             }
-            return AppStrings.translate("debug.session").replace("%id%", "" + id) + (session.isPaused() ? "" : " " + AppStrings.translate("debug.session.running"));
+            return AppStrings.translate("debug.session").replace("%id%", "" + id) + (session.getTitle().isEmpty() ? "" : " - " + session.getTitle()) + (session.isPaused() ? "" : " " + AppStrings.translate("debug.session.running"));
         }                
     }
 
@@ -305,13 +305,15 @@ public class DebugStackPanel extends JPanel {
             j++;
         }
         sessionComboBoxCreating = true;
-        sessionComboBox.setModel(model);
         if (itemIndex > -1) {
             final int fItemIndex = itemIndex;
             View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {                    
-                    sessionComboBox.setSelectedIndex(fItemIndex);
+                    sessionComboBox.setModel(model);   
+                    if (fItemIndex < model.getSize()) {
+                        sessionComboBox.setSelectedIndex(fItemIndex);
+                    }
                     lastSessionComboBoxIndex = fItemIndex;
                     sessionComboBoxCreating = false;
                 }               

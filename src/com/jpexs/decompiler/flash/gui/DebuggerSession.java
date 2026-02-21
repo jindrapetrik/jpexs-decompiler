@@ -136,12 +136,14 @@ public class DebuggerSession {
     private InSetBreakpoint inSetBreakpoint;
 
     private int id;
+    
+    private String title = "";
 
     
     private List<Thread> getSwfThreadList = Collections.synchronizedList(new ArrayList<>());
 
     public DebuggerSession(DebuggerHandler handler, DebuggerConnection con, Map<SWF, Map<String, Set<Integer>>> breakpoints) {
-        id = con.getId();
+        id = con.getId();        
 
         toAddBPointMap = breakpoints;
         this.handler = handler;
@@ -397,6 +399,9 @@ public class DebuggerSession {
                                     }                                                                       
                                     
                                     if (!debuggedSwfs.isEmpty() && modulesEmptyBefore) {
+                                        if (title.isEmpty()) {
+                                            title = debuggedSwfs.values().iterator().next().toString();
+                                        }
                                         if (con.isAS3) {
                                             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines          
                                             con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
@@ -1274,4 +1279,8 @@ public class DebuggerSession {
     public String toString() {
         return "[s:" + id + "]";
     }
+
+    public String getTitle() {
+        return title;
+    }        
 }
