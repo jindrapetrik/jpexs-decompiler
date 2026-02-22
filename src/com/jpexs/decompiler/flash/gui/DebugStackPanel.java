@@ -45,6 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 /**
  * @author JPEXS
@@ -67,8 +68,23 @@ public class DebugStackPanel extends JPanel {
     private int[] traitIndices = new int[0];
     private WeakReference<DebuggerSession> currentSessionRef = null;
     
+    private DefaultTableModel getStackTableModel(Object[][] data) {
+        return new DefaultTableModel(data, new Object[]{
+            AppStrings.translate("callStack.header.swf"),
+            AppStrings.translate("callStack.header.file"),
+            AppStrings.translate("callStack.header.line"),
+            AppStrings.translate("stack.header.item")
+        }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+    }
+    
     public DebugStackPanel() {
-        stackTable = new JTable();
+        stackTable = new JTable(getStackTableModel(new Object[0][4]));
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
             @Override
             public void frameChanged(DebuggerSession session) {
@@ -160,8 +176,10 @@ public class DebugStackPanel extends JPanel {
         sessionComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (sessionComboBoxCreating) {
-                    return;
+                synchronized (DebugStackPanel.this) {
+                    if (sessionComboBoxCreating) {
+                        return;
+                    }                
                 }
                 SessionItem selection = (SessionItem) sessionComboBox.getSelectedItem();
                 if (selection != null) {
@@ -174,12 +192,13 @@ public class DebugStackPanel extends JPanel {
                         lastSessionComboBoxIndex = sessionComboBox.getSelectedIndex();
                         
                         Main.getDebugHandler().setSelectedSessionId(session.getId());
+                        //session.refreshFrame();
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
                                 refresh(session);
                             }                            
-                        });                        
+                        });
                         View.execInEventDispatchLater(new Runnable() {
                             @Override
                             public void run() {                                
@@ -210,7 +229,7 @@ public class DebugStackPanel extends JPanel {
                 SessionItem item = (SessionItem) value;
                 if (item != null) {
                     DebuggerSession session = Main.getDebugHandler().getSessionById(item.id);
-                    if (!session.isPaused()) {
+                    if (session == null || !session.isPaused()) {
                         c.setForeground(Color.GRAY);
                         c.setBackground(list.getBackground());
                     } else {
@@ -279,8 +298,8 @@ public class DebugStackPanel extends JPanel {
         }                
     }
 
-    public void clear() {
-        stackTable.setModel(new DefaultTableModel());
+    public void clear() {    
+        stackTable.setModel(getStackTableModel(new Object[0][4]));
         if (Main.getDebugHandler().getActiveSessions().isEmpty()) {
             active = false;
         }
@@ -304,7 +323,10 @@ public class DebugStackPanel extends JPanel {
             model.addElement(new SessionItem(id));
             j++;
         }
-        sessionComboBoxCreating = true;
+        synchronized (this) {
+            sessionComboBoxCreating = true;
+        }
+        
         if (itemIndex > -1) {
             final int fItemIndex = itemIndex;
             View.execInEventDispatchLater(new Runnable() {
@@ -315,7 +337,9 @@ public class DebugStackPanel extends JPanel {
                         sessionComboBox.setSelectedIndex(fItemIndex);
                     }
                     lastSessionComboBoxIndex = fItemIndex;
-                    sessionComboBoxCreating = false;
+                    synchronized (DebugStackPanel.this) {
+                        sessionComboBoxCreating = false;
+                    }
                 }               
             });            
         }
@@ -378,19 +402,7 @@ public class DebugStackPanel extends JPanel {
             newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
 
-        DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
-            AppStrings.translate("callStack.header.swf"),
-            AppStrings.translate("callStack.header.file"),
-            AppStrings.translate("callStack.header.line"),
-            AppStrings.translate("stack.header.item")
-        }) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-
-        };
-        stackTable.setModel(tm);
+        stackTable.setModel(getStackTableModel(data));
         this.swfHashes = newSwfHashes;
         this.classIndices = newClassIndices;
         this.methodIndices = newMethodIndices;
@@ -410,11 +422,12 @@ public class DebugStackPanel extends JPanel {
                     }
 
                 };
-                if (stackTable.getColumnModel().getColumnCount() >= 3) {
+                stackTable.setDefaultRenderer(String.class, renderer);
+                /*if (stackTable.getColumnModel().getColumnCount() >= 3) {
                     stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
                     stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
                     stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
-                }
+                }*/
                 repaint();
             }
         });

@@ -31,6 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author JPEXS
@@ -46,6 +50,8 @@ public class DebuggerHandler implements DebugConnectionListener {
     private boolean terminating = false;
 
     private Map<SWF, Map<String, Set<Integer>>> allBreakPoints = new WeakHashMap<>();
+    
+    private static ExecutorService pool = null;
 
     public static class ActionScriptException extends Exception {
 
@@ -263,6 +269,11 @@ public class DebuggerHandler implements DebugConnectionListener {
         synchronized (this) {
             terminating = false;
         }
+        
+        if (pool != null) {
+            pool.shutdownNow();
+            pool = null;
+        }
     }
 
     public synchronized Map<String, Set<Integer>> getAllSessionsBreakPoints(SWF swf) {
@@ -422,5 +433,21 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
         }
         return true;
+    }
+    
+    
+
+    public static synchronized ExecutorService getPool() {
+        if (pool == null) {
+            AtomicInteger counter = new AtomicInteger(1);
+
+            ThreadFactory namedThreadFactory = runnable -> {
+                Thread t = new Thread(runnable);
+                t.setName("debugger-handler-thread-" + counter.getAndIncrement());
+                return t;
+            };
+            pool = Executors.newCachedThreadPool(namedThreadFactory);
+        }
+        return pool;
     }
 }

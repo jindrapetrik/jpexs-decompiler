@@ -441,8 +441,12 @@ public class Main {
     }
 
     public static synchronized boolean addWatch(DebuggerSession session, Variable v, long v_id, boolean watchRead, boolean watchWrite) {
-        DebuggerCommands.Watch w = session.addWatch(v, v_id, watchRead, watchWrite);
+        DebuggerCommands.Watch w = session.addWatch(v.name, v_id, watchRead, watchWrite);
         return w != null;
+    }
+    
+    public static synchronized boolean removeWatch(DebuggerSession session, Variable v, long v_id) {
+        return session.removeWatch(v.name, v_id);
     }
 
     public static void runPlayer(String title, final String exePath, String file, String flashVars) {
@@ -1137,7 +1141,7 @@ public class Main {
     }
 
     public static void updateSession() {
-        DebuggerSession session = getCurrentDebugSession();
+        /*DebuggerSession session = getCurrentDebugSession();
         for (DebuggerHandler.FrameChangeListener l : getDebugHandler().getFrameChangeListeners()) {
             l.frameChanged(session);
         }
@@ -1145,6 +1149,7 @@ public class Main {
         if (getDebugHandler().getNumberOfPausedSessions() > 0) {
             mainFrame.getPanel().showDebugStackFrame();
         }
+        */
     }
 
     public static void ensureMainFrame() {
@@ -3197,7 +3202,7 @@ public class Main {
 
                     @Override
                     public void disconnected(DebuggerSession session) {
-                        Main.updateSession();
+                        //Main.updateSession();
                         if (Main.mainFrame != null) {
                             Main.mainFrame.getMenu().updateComponents();
                         }

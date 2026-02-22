@@ -6,6 +6,8 @@
           <Include href="Button1.xml" itemIcon="0" loadImmediate="false" itemID="699362e3-000001d5" lastModified="1771267090"/>
           <Include href="Button2.xml" itemIcon="0" loadImmediate="false" itemID="6993636a-000001dc" lastModified="1771267096"/>
           <Include href="Button3.xml" itemIcon="0" loadImmediate="false" itemID="699367b4-000001e5" lastModified="1771268063"/>
+          <Include href="ButtonDown.xml" itemIcon="0" loadImmediate="false" itemID="6999ec93-000001e6" lastModified="1771695532"/>
+          <Include href="ButtonUp.xml" itemIcon="0" loadImmediate="false" itemID="6999ec8b-000001e1" lastModified="1771695510"/>
      </symbols>
      <timelines>
           <DOMTimeline name="Scene 1">
@@ -43,6 +45,7 @@ stop();]]></script>
 	var score = parseInt(_root.inpScore.text);
 	score = score + 5;
 	_root.inpScore.text = score;
+	trace("plus 5");
 }]]></script>
                                              </Actionscript>
                                         </DOMSymbolInstance>
@@ -58,6 +61,7 @@ stop();]]></script>
 	var score = parseInt(_root.inpScore.text);
 	score = score * 2;
 	_root.inpScore.text = score;
+	trace("multiply 2");
 }]]></script>
                                              </Actionscript>
                                         </DOMSymbolInstance>
@@ -100,7 +104,7 @@ stop();]]></script>
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMDynamicText>
-                                        <DOMSymbolInstance libraryItemName="Button3" symbolType="button">
+                                        <DOMSymbolInstance libraryItemName="Button3" selected="true" symbolType="button">
                                              <matrix>
                                                   <Matrix tx="216.95" ty="294.5"/>
                                              </matrix>
@@ -110,6 +114,48 @@ stop();]]></script>
                                              <Actionscript>
                                                   <script><![CDATA[on(press) {
 	_root.inpScore.text = 0;
+	trace("reset");
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText fontRenderingMode="standard" width="51" height="22.15" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="474.2" ty="12"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Speed</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="20" bitmapSize="400" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="ButtonUp" name="btnSpeedUp" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="450" ty="11.3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="6.6" y="5.6"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press) {
+	_root.delay = Math.round(_root.delay / 1.1);
+	trace("speed up");
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="ButtonDown" name="btnSpeedDown" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="450" ty="26"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="6.6" y="5.6"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press) {
+	_root.delay = Math.round(_root.delay * 1.1);
+	trace("speed down");
 }]]></script>
                                              </Actionscript>
                                         </DOMSymbolInstance>
@@ -122,6 +168,10 @@ stop();]]></script>
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="9272" publishTime="1771699758"/>
+          <PublishItem publishSize="9288" publishTime="1771695673" publishDebug="true"/>
+          <PublishItem publishSize="9287" publishTime="1771695604" publishDebug="true"/>
+          <PublishItem publishSize="9303" publishTime="1771695543" publishDebug="true"/>
           <PublishItem publishSize="8792" publishTime="1771271352"/>
           <PublishItem publishSize="8784" publishTime="1771269741"/>
           <PublishItem publishSize="8774" publishTime="1771269515"/>
@@ -138,6 +188,5 @@ stop();]]></script>
           <PublishItem publishSize="7223" publishTime="1771267567" publishDebug="true"/>
           <PublishItem publishSize="7203" publishTime="1771267511" publishDebug="true"/>
           <PublishItem publishSize="7172" publishTime="1771267431" publishDebug="true"/>
-          <PublishItem publishSize="7170" publishTime="1771267362" publishDebug="true"/>
      </publishHistory>
 </DOMDocument>

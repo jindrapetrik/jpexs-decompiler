@@ -1636,7 +1636,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void updateUi(final Openable openable) {
         View.checkAccess();
-        Main.updateSession();
+        //Main.updateSession();
         SWF swf = null;
         if (openable instanceof SWF) {
             swf = (SWF) openable;
@@ -5785,7 +5785,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         
-        Main.updateSession();
+        //Main.updateSession();
 
         if (!(treeItem instanceof OpenableList)) {
             Openable openable = treeItem.getOpenable();

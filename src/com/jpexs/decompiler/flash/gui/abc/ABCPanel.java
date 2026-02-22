@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.debugger.flash.DebuggerCommands;
+import com.jpexs.debugger.flash.DebuggerMessage;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
+import com.jpexs.debugger.flash.messages.out.OutAddWatch2;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -266,7 +269,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return;
         }
 
-        this.abc = abc;        
+        this.abc = abc;
         if (Main.isSwfAir(abc.getOpenable())) {
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_AIR);
         } else {
@@ -301,10 +304,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public static class VariableNode {
 
-        private static Thread variableLoaderThread;
-        private static List<Runnable> loaderList = Collections.synchronizedList(new ArrayList<>());
-        private static final Object loaderLock = new Object();
-        
+        private static Map<Integer, Thread> sessionIdToVariableLoaderThread = new HashMap<>();
+        private static Map<Integer, List<Runnable>> sessionIdToLoaderList = new HashMap<>();
+        private static Map<Integer, List<VariableNode>> sessionIdToLoadedVariableNode = new HashMap<>();
+        private static Map<Integer, Object> sessionIdToLoaderLock = new HashMap<>();
+
         public List<VariableNode> path = new ArrayList<>();
 
         public Variable var;
@@ -322,8 +326,25 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         private List<VariableNode> childs;
 
         public List<Variable> traits = new ArrayList<>();
+        private DebuggerSession session;
+        private MyTreeTable treeTable;
         private boolean as3;
-                
+
+        public static void stopLoading(int sessionId) {
+            if (!sessionIdToLoadedVariableNode.containsKey(sessionId)) {
+                return;
+            }
+            sessionIdToLoaderList.get(sessionId).clear();
+            for (VariableNode node : sessionIdToLoadedVariableNode.get(sessionId)) {                
+                synchronized (node) {
+                    node.childs = new ArrayList<>();
+                    node.loading = false;
+                    node.loaded = true;
+                }
+            }
+            sessionIdToLoadedVariableNode.get(sessionId).clear();
+        }
+
         @Override
         public int hashCode() {
             int hash = 3;
@@ -361,6 +382,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         public boolean loaded = false;
 
+        private boolean loading = false;
+
         private static boolean isTraits(Variable v) {
             return (v.vType == VariableType.UNKNOWN && "traits".equals(v.typeName));
         }
@@ -393,19 +416,24 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
 
             //boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+            DebuggerSession currentSession = Main.getCurrentDebugSession();
 
-            if (Main.getCurrentDebugSession() == null) {
+            if (currentSession == null || !currentSession.isPaused()) {
+                return;
+            }
+            if (currentSession != session) {
                 return;
             }
             if (parentObjectId == 0 && objectId != 0L && as3) {
-                igv = Main.getCurrentDebugSession().getVariable(objectId, "", true, useGetter);
+                igv = currentSession.getVariable(objectId, "", true, useGetter);
             } else {
-                igv = Main.getCurrentDebugSession().getVariable(parentObjectId, var.name, true, useGetter);
+                igv = currentSession.getVariable(parentObjectId, var.name, true, useGetter);
             }
             if (igv == null) { //timeout
                 return;
             }
 
+            //Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Get var data: {1}", new Object[]{currentSession.getId(), Helper.byteArrayToHex(igv.data)});
             //current var is getter function - set it to value really got
             if ((var.flags & VariableFlags.HAS_GETTER) > 0) {
                 varInsideGetter = igv.parent;
@@ -416,10 +444,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 if (!Configuration.showVarsWithDontEnumerateFlag.get() && (igv.childs.get(i).flags & VariableFlags.DONT_ENUMERATE) > 0) {
                     continue;
                 }
-                        
+
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(varInsideGetter);
-                    childs.add(new VariableNode(as3, path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
+                    childs.add(new VariableNode(currentSession, treeTable, as3, path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
                 } else {
                     curTrait = igv.childs.get(i);
                     traits.add(curTrait);
@@ -427,62 +455,130 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         }
 
-        private void ensureLoaded() {            
-            if (!loaded) {
-                
-                /*synchronized (VariableNode.class) {
-                    if (variableLoaderThread == null) {
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                while(true) {                                    
-                                    if (loaderList.isEmpty()) {
-                                        synchronized (loaderLock) {
-                                            try {
-                                                loaderLock.wait(500);
-                                            } catch (InterruptedException ex) {
-
-                                            }
-                                        }                                        
-                                    } else {
-                                        Runnable toRun = loaderList.remove(0);
-                                        toRun.run();
-                                    }
-                                }
-                            }
-                        };                              
-                        variableLoaderThread = new Thread(r, "Variable loader");
-                        variableLoaderThread.setDaemon(true);                        
-                        variableLoaderThread.start();
-                    }                
+        private void ensureLoaded() {
+            synchronized (VariableNode.this) {
+                if (loaded || loading) {
+                    return;
                 }
-                                
-                loaderList.add(new Runnable() {
+                loading = true;
+            }
+            int sessionId = session.getId();
+            if (!sessionIdToVariableLoaderThread.containsKey(sessionId)) {
+                Runnable r = new Runnable() {
                     @Override
                     public void run() {
-                        reloadChildren();
-                        loaded = true;
-                    }                    
-                });
-                synchronized (loaderLock) {
-                    loaderLock.notify();                
-                }*/
-                reloadChildren();
-                loaded = true;
+                        while (true) {
+                            if (sessionIdToLoaderList.get(sessionId).isEmpty()) {
+                                Object lock = sessionIdToLoaderLock.get(session.getId());
+                                synchronized (lock) {
+                                    try {
+                                        lock.wait(500);
+                                    } catch (InterruptedException ex) {
+                                        //ignored
+                                    }
+                                }
+                            } else {
+                                Runnable toRun = sessionIdToLoaderList.get(sessionId).remove(0);
+                                toRun.run();
+                            }
+                        }
+                    }
+                };
+                sessionIdToLoaderList.put(sessionId, new ArrayList<>());
+                sessionIdToLoaderLock.put(sessionId, new Object());
+                Thread t = new Thread(r, "Variable loader for session " + sessionId);
+                sessionIdToVariableLoaderThread.put(sessionId, t);
+                t.setDaemon(true);
+                t.start();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
             }
+
+            sessionIdToLoaderList.get(sessionId).add(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (VariableNode.this) {
+                        if (!loading) {
+                            Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Already loaded {1}, skipping", new Object[]{session.getId(), var.name});
+                            return;
+                        }
+                    }
+                    Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Loading children of {1}", new Object[]{session.getId(), var.name});
+
+                    reloadChildren();
+
+                    synchronized (VariableNode.this) {
+                        if (!loading) {
+                            Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Already loaded {1}, not firing", new Object[]{session.getId(), var.name});
+                            return;
+                        }
+                        loaded = true;
+                        loading = false;
+                        Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Children of {1} loaded", new Object[]{session.getId(), var.name});
+                    }
+
+                    DebuggerSession currentSession = Main.getCurrentDebugSession();
+                    if (currentSession == null || currentSession.getId() != sessionId) {
+                        return;
+                    }
+
+                    VariablesTableModel variableModel = (VariablesTableModel) treeTable.getTreeTableModel();
+                    Object[] changedPath = new Object[path.size()];
+                    for (int i = 0; i < path.size(); i++) {
+                        changedPath[i] = path.get(i);
+                    }
+                    View.execInEventDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Firing change of {1} - {2} childs", new Object[]{session.getId(), var.name, childs.size()});
+                            int[] childIds = new int[childs.size()];
+                            Object[] childObjs = new Object[childs.size()];
+
+                            for (int i = 0; i < childIds.length; i++) {
+                                childIds[i] = i;
+                                childObjs[i] = childs.get(i);
+                            }
+
+                            //variableModel.fireTreeStructureChanged(treeTable.getTree(), changedPath, new int[0], null);
+                            variableModel.fireTreeNodesInserted(treeTable.getTree(), changedPath, childIds, childObjs);
+                            treeTable.repaint();
+                        }
+                    });
+                }
+            });
+            if (!sessionIdToLoadedVariableNode.containsKey(sessionId)) {
+                sessionIdToLoadedVariableNode.put(sessionId, new ArrayList<>());
+            }
+            sessionIdToLoadedVariableNode.get(sessionId).add(this);
+            Object lock = sessionIdToLoaderLock.get(sessionId);
+            Logger.getLogger(VariableNode.class.getName()).log(Level.FINE, "session{0}: Scheduling loading children of {1}", new Object[]{session.getId(), var.name});
+            synchronized (lock) {
+                lock.notify();
+            }
+            /*reloadChildren();
+            loaded = true;*/
         }
 
         public VariableNode getChildAt(int index) {
             ensureLoaded();
+            if (!loaded) {
+                return null;
+            }
             return childs.get(index);
         }
 
         public int getChildCount() {
             ensureLoaded();
+            if (!loaded) {
+                return 0;
+            }
             return childs.size();
         }
 
-        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
+        public VariableNode(DebuggerSession session, MyTreeTable treeTable, boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -491,10 +587,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             this.path.addAll(parentPath);
             this.path.add(this);
             loaded = false;
+            this.session = session;
+            this.treeTable = treeTable;
             this.as3 = as3;
         }
 
-        public VariableNode(boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
+        public VariableNode(DebuggerSession session, MyTreeTable treeTable, boolean as3, List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
             this.var = var;
             this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
@@ -510,6 +608,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 vn.path.add(vn);
             }
             loaded = true;
+            this.session = session;
+            this.treeTable = treeTable;
             this.as3 = as3;
         }
     }
@@ -545,17 +645,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         private static final int STRUCTURE_CHANGED = 3;
 
-        private final MyTreeTable ttable;
+        private final MyTreeTable treeTable;
 
-        public VariablesTableModel(boolean as3, MyTreeTable ttable, List<Variable> vars) {
-            this.ttable = ttable;
+        public VariablesTableModel(DebuggerSession session, boolean as3, MyTreeTable treeTable, List<Variable> vars, List<Long> parentIds) {
+            this.treeTable = treeTable;
 
             List<VariableNode> childs = new ArrayList<>();
 
             for (int i = 0; i < vars.size(); i++) {
-                childs.add(new VariableNode(as3, new ArrayList<>(), 1, vars.get(i), 0L, null));
+                childs.add(new VariableNode(session, treeTable, as3, new ArrayList<>(), 1, vars.get(i), parentIds == null ? 0L : parentIds.get(i), null));
             }
-            root = new VariableNode(as3, new ArrayList<>(), 0, null, 0L, null, childs);
+            root = new VariableNode(session, treeTable, as3, new ArrayList<>(), 0, null, 0L, null, childs);
+            root.loaded = true;
         }
 
         @Override
@@ -767,7 +868,26 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 case COLUMN_SCOPE:
                     return flagsToScopeString(var.flags);
                 case COLUMN_FLAGS:
-                    return flagsToString(var.flags);
+                    String flags = flagsToString(var.flags);
+                    DebuggerSession session = Main.getCurrentDebugSession();
+                    DebuggerCommands.Watch w = session == null ? null : session.getWatch(((VariableNode) node).var.name, ((VariableNode) node).parentObjectId);
+                    if (w != null) {
+                        if ((w.flags & OutAddWatch2.FLAG_READ) > 0) {
+                            if (!flags.isEmpty()) {
+                                flags += ", ";
+                            }
+
+                            flags += "watch:read";
+                        }
+                        if ((w.flags & OutAddWatch2.FLAG_WRITE) > 0) {
+                            if (!flags.isEmpty()) {
+                                flags += ", ";
+                            }
+
+                            flags += "watch:write";
+                        }
+                    }
+                    return flags;
                 case COLUMN_TYPE:
                     String typeStr = val.getTypeAsStr();
                     if ("Object".equals(typeStr)) {
@@ -782,7 +902,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         case VariableType.OBJECT:
                         case VariableType.MOVIECLIP:
                         case VariableType.FUNCTION:
-                            return var.getTypeAsStr() + "(" + val.value + ")";
+                            return var.getTypeAsStr() + "(0x" + Long.toUnsignedString((Long) val.value, 16) + ")";
                         case VariableType.STRING:
                             return "\"" + Helper.escapeActionScriptString("" + val.value) + "\"";
                         default:
@@ -868,7 +988,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         @Override
         public void valueForPathChanged(TreePath path, Object newValue) {
-            fireTreeNodesChanged(ttable, path.getParentPath().getPath(), new int[0], new Object[]{path.getLastPathComponent()});
+            fireTreeNodesChanged(treeTable, path.getParentPath().getPath(), new int[0], new Object[]{path.getLastPathComponent()});
         }
 
         @Override
@@ -1068,8 +1188,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
 
                 String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(new LinkedHashSet<>(), ci.abc.getSwf(), true);
-                
-                if (swfRef.getVal() == abc.getSwf()) {                    
+
+                if (swfRef.getVal() == abc.getSwf()) {
                     hilightScript(getOpenable(), scriptNamePrintable);
                     return;
                 }
@@ -1131,12 +1251,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             private Path typeToPath(GraphTargetItem type) {
                 if (type instanceof TypeItem) {
-                    TypeItem ti = (TypeItem) type;                    
+                    TypeItem ti = (TypeItem) type;
                     return new Path(ti.fullTypeName.getStringParts());
                 }
                 return new Path(Helper.splitString(".", type.toString())); //Arrays.asList(type.toString().split("\\.")));
             }
-            
+
             @Override
             public Path getTraitSubType(Path className, String traitName, int level) {
                 Reference<Boolean> foundStatic = new Reference<>(null);
@@ -1212,7 +1332,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     Path callType = null;
                     if (ti != null) {
                         type = typeToPath(ti.returnType);
-                        callType = typeToPath(ti.callReturnType);                        
+                        callType = typeToPath(ti.callReturnType);
                     }
                     if (ti.trait instanceof TraitSlotConst) {
                         callType = null;
@@ -1230,7 +1350,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         }
                         if (tmgs.kindType == Trait.TRAIT_GETTER) {
                             type = callType;
-                            callType = null;                            
+                            callType = null;
                         }
                     }
                     ret.add(new com.jpexs.decompiler.flash.simpleparser.Variable(true, new Path(def.getPropertyName()), 0, isStaticList.get(i), type, callType));
@@ -1318,7 +1438,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 JCheckBoxMenuItem deobfuscateIdentifiersMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.deobfuscateIdentifiers"));
                 deobfuscateIdentifiersMenuItem.setSelected(Configuration.autoDeobfuscateIdentifiers.get());
                 deobfuscateIdentifiersMenuItem.addActionListener(ABCPanel.this::autoDeobfuscateIdentifiersMenuItemActionPerformed);
-                
+
                 JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
                 simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
                 simplifyExpressionsMenuItem.addActionListener(ABCPanel.this::simplifyExpressionsMenuItemActionPerformed);
@@ -1326,14 +1446,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
                  */
-                
-                
+
                 JCheckBoxMenuItem disableDecompilationMenuItem = new JCheckBoxMenuItem(AppStrings.translate("menu.settings.disabledecompilation"));
                 disableDecompilationMenuItem.setSelected(!Configuration.decompile.get());
                 disableDecompilationMenuItem.addActionListener(ABCPanel.this::disableDecompilationMenuItemActionPerformed);
-                
-                
-                popupMenu.add(deobfuscateIdentifiersMenuItem);                
+
+                popupMenu.add(deobfuscateIdentifiersMenuItem);
                 popupMenu.add(simplifyExpressionsMenuItem);
                 //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
                 popupMenu.add(disableDecompilationMenuItem);
@@ -1549,6 +1667,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             splitPane = null;
             add(panB, BorderLayout.CENTER);
         }
+
+        debugPanel.refresh();
     }
 
     private void decompiledTextAreaTextChanged() {
@@ -1811,12 +1931,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
         String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
         Openable openable = Main.findOpenedSwfByHash(swfHash);
-        
+
         if (openable != null) {
             hilightScript(openable, name);
         }
     }
-    
+
     /**
      * Hilights specific script.
      *
@@ -2188,13 +2308,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Configuration.simplifyExpressions.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
-    
+
     private void autoDeobfuscateIdentifiersMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.autoDeobfuscateIdentifiers.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
-    
+
     private void disableDecompilationMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.decompile.set(!menuItem.isSelected());
