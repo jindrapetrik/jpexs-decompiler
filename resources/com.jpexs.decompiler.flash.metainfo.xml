@@ -67,6 +67,32 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="25.1.2" date="2026-02-23">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Debugger - Debugged SWF file name in the session title</li>
+					<li>Debugger - Remove watch</li>
+					<li>Debugger - List of watches</li>
+					<li>Debugger - Show flag of watch type (read/write)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2639 Export to FLA - missing sound streams</li>
+					<li>Debugger - Threading issues with multiple SWFs</li>
+					<li>Debugger - Reading variables on 64bit flash players (like in browsers)</li>
+					<li>DoInitAction should be ignored when exporting as SWF</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2642 Sprite SWF export - do not export as SWF timeline, use DefineSprite tag and PlaceObject of it</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>(Temporary) AS3 ambiguios namespace detection, it is slow - needs optimizations</li>
+				</ul>
+			</description>
+		</release>
 		<release version="25.1.1" date="2026-02-19">
 			<description>
 				<p>Fixed</p>

@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [25.1.2] - 2026-02-23
 ### Added
 - Debugger - Debugged SWF file name in the session title
 - Debugger - Remove watch
@@ -3980,7 +3980,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.1...dev
+[25.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.1...version25.1.2
 [25.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.0...version25.1.1
 [25.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.0.0...version25.1.0
 [25.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...version25.0.0
