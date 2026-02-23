@@ -441,8 +441,12 @@ public class Main {
     }
 
     public static synchronized boolean addWatch(DebuggerSession session, Variable v, long v_id, boolean watchRead, boolean watchWrite) {
-        DebuggerCommands.Watch w = session.addWatch(v, v_id, watchRead, watchWrite);
+        DebuggerCommands.Watch w = session.addWatch(v.name, v_id, watchRead, watchWrite);
         return w != null;
+    }
+    
+    public static synchronized boolean removeWatch(DebuggerSession session, Variable v, long v_id) {
+        return session.removeWatch(v.name, v_id);
     }
 
     public static void runPlayer(String title, final String exePath, String file, String flashVars) {
@@ -1137,7 +1141,7 @@ public class Main {
     }
 
     public static void updateSession() {
-        DebuggerSession session = getCurrentDebugSession();
+        /*DebuggerSession session = getCurrentDebugSession();
         for (DebuggerHandler.FrameChangeListener l : getDebugHandler().getFrameChangeListeners()) {
             l.frameChanged(session);
         }
@@ -1145,6 +1149,7 @@ public class Main {
         if (getDebugHandler().getNumberOfPausedSessions() > 0) {
             mainFrame.getPanel().showDebugStackFrame();
         }
+        */
     }
 
     public static void ensureMainFrame() {
@@ -3150,7 +3155,7 @@ public class Main {
                 debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
 
                     @Override
-                    public void doContinue(DebuggerSession session) {
+                    public void doContinue(DebuggerSession session) {                        
                         mainFrame.getPanel().clearDebuggerColors();
                         mainFrame.getMenu().updateComponents();
                     }
@@ -3160,7 +3165,7 @@ public class Main {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
-                                String hash = "unknown";
+                                /*String hash = "unknown";
                                 String scriptNameNoHash = scriptName;
                                 if (scriptName.contains(":")) {
                                     hash = scriptName.substring(0, scriptName.indexOf(":"));
@@ -3169,17 +3174,22 @@ public class Main {
                                 SWF swf = Main.findOpenedSwfByHash(hash);
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break. Current session: {0}, New break session: {1}", new Object[]{Main.getCurrentDebugSession(), session});
 
-                                if (Main.getDebugHandler().getNumberOfPausedSessions() > 1
+                                int numPaused = Main.getDebugHandler().getNumberOfPausedSessions();
+                                if (numPaused > 1
                                         && Main.getCurrentDebugSession() != session) {
                                     Logger.getLogger(Main.class.getName()).log(Level.INFO, "Another SWF ({0}) has reached breakpoint meanwhile", swf == null ? "unknown" : swf.toString());
                                     mainFrame.getPanel().refreshBreakPoints();
                                     return;
+                                }
+                                if (numPaused == 1 && Main.getCurrentDebugSession() != session) {
+                                    Main.getDebugHandler().setSelectedSessionId(session.getId());
                                 }
                                 if (swf == null) {
                                     Logger.getLogger(Main.class.getName()).log(Level.FINE, "Break at unknown SWF.");
                                     return;
                                 }
                                 mainFrame.getPanel().gotoScriptLine(swf, scriptNameNoHash, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
+                                */
                             }
                         });
                     }
@@ -3192,7 +3202,7 @@ public class Main {
 
                     @Override
                     public void disconnected(DebuggerSession session) {
-                        Main.updateSession();
+                        //Main.updateSession();
                         if (Main.mainFrame != null) {
                             Main.mainFrame.getMenu().updateComponents();
                         }

@@ -231,8 +231,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
                         String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
                         writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
                         writer.appendNoHilight("::");
-                    } else {                       
-                        if (parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
+                    } else {                  
+                        //FIXME!! This is slow, should be moved to indexing
+                        if (false && parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
                             String rawName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, fullyQualifiedNames, true, true);
                             List<AbcIndexing.PropertyDef> defs = new ArrayList<>();
                             List<Boolean> staticRef = new ArrayList<>();

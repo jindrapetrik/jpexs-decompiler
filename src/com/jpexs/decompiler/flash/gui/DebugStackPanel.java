@@ -33,6 +33,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
@@ -43,6 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 /**
  * @author JPEXS
@@ -65,27 +68,65 @@ public class DebugStackPanel extends JPanel {
     private int[] traitIndices = new int[0];
     private WeakReference<DebuggerSession> currentSessionRef = null;
     
+    private DefaultTableModel getStackTableModel(Object[][] data) {
+        return new DefaultTableModel(data, new Object[]{
+            AppStrings.translate("callStack.header.swf"),
+            AppStrings.translate("callStack.header.file"),
+            AppStrings.translate("callStack.header.line"),
+            AppStrings.translate("stack.header.item")
+        }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+    }
+    
     public DebugStackPanel() {
-        stackTable = new JTable();
+        stackTable = new JTable(getStackTableModel(new Object[0][4]));
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
             @Override
             public void frameChanged(DebuggerSession session) {
-                if (session == null) {
-                    refresh(null);
-                    return;
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    depth = currentSession.getDepth();
+                    refresh(currentSession);
                 }
-                depth = session.getDepth();
-                refresh(session);
             }
         });
         Main.getDebugHandler().addBreakListener(new DebuggerHandler.BreakListener() {
+            
+            private void updateCurrent() {
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    refresh(currentSession);
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gotoRow(0);
+                        }
+                    });                    
+                } else {
+                    clear();
+                }
+            }
+            
             @Override
             public void breakAt(DebuggerSession session, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
-
+                int numPaused = Main.getDebugHandler().getNumberOfPausedSessions();
+                if (numPaused > 1
+                        && Main.getCurrentDebugSession() != session) {
+                    Logger.getLogger(DebugStackPanel.class.getName()).log(Level.INFO, "Another SWF has reached breakpoint meanwhile");
+                    Main.getMainFrame().getPanel().refreshBreakPoints();
+                    return;
+                }
+                updateCurrent();
             }
 
             @Override
             public void doContinue(DebuggerSession session) {
+                refreshSessionList();
                 clear();
             }
         });
@@ -93,11 +134,17 @@ public class DebugStackPanel extends JPanel {
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
             public void connected(DebuggerSession session) {
+                refreshSessionList();
             }
 
             @Override
             public void disconnected(DebuggerSession session) {
-                clear();
+                DebuggerSession currentSession = Main.getCurrentDebugSession();
+                if (currentSession != null && currentSession.isPaused()) {
+                    refresh(currentSession);
+                } else {
+                    clear();
+                }
             }
         });
         
@@ -129,8 +176,10 @@ public class DebugStackPanel extends JPanel {
         sessionComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (sessionComboBoxCreating) {
-                    return;
+                synchronized (DebugStackPanel.this) {
+                    if (sessionComboBoxCreating) {
+                        return;
+                    }                
                 }
                 SessionItem selection = (SessionItem) sessionComboBox.getSelectedItem();
                 if (selection != null) {
@@ -143,12 +192,13 @@ public class DebugStackPanel extends JPanel {
                         lastSessionComboBoxIndex = sessionComboBox.getSelectedIndex();
                         
                         Main.getDebugHandler().setSelectedSessionId(session.getId());
+                        //session.refreshFrame();
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
                                 refresh(session);
                             }                            
-                        });                        
+                        });
                         View.execInEventDispatchLater(new Runnable() {
                             @Override
                             public void run() {                                
@@ -179,7 +229,7 @@ public class DebugStackPanel extends JPanel {
                 SessionItem item = (SessionItem) value;
                 if (item != null) {
                     DebuggerSession session = Main.getDebugHandler().getSessionById(item.id);
-                    if (!session.isPaused()) {
+                    if (session == null || !session.isPaused()) {
                         c.setForeground(Color.GRAY);
                         c.setBackground(list.getBackground());
                     } else {
@@ -244,12 +294,12 @@ public class DebugStackPanel extends JPanel {
             if (session == null) {
                 return "-";
             }
-            return AppStrings.translate("debug.session").replace("%id%", "" + id) + (session.isPaused() ? "" : " " + AppStrings.translate("debug.session.running"));
+            return AppStrings.translate("debug.session").replace("%id%", "" + id) + (session.getTitle().isEmpty() ? "" : " - " + session.getTitle()) + (session.isPaused() ? "" : " " + AppStrings.translate("debug.session.running"));
         }                
     }
 
-    public void clear() {
-        stackTable.setModel(new DefaultTableModel());
+    public void clear() {    
+        stackTable.setModel(getStackTableModel(new Object[0][4]));
         if (Main.getDebugHandler().getActiveSessions().isEmpty()) {
             active = false;
         }
@@ -260,8 +310,7 @@ public class DebugStackPanel extends JPanel {
     }
         
 
-    public void refresh(DebuggerSession session) {
-        
+    private void refreshSessionList() {
         Map<Integer, DebuggerSession> allSessions = Main.getDebugHandler().getActiveSessions();
         DefaultComboBoxModel<SessionItem> model = new DefaultComboBoxModel<>();
         int itemIndex = -1;
@@ -274,25 +323,42 @@ public class DebugStackPanel extends JPanel {
             model.addElement(new SessionItem(id));
             j++;
         }
-        sessionComboBoxCreating = true;
-        sessionComboBox.setModel(model);
+        synchronized (this) {
+            sessionComboBoxCreating = true;
+        }
+        
         if (itemIndex > -1) {
             final int fItemIndex = itemIndex;
             View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {                    
-                    sessionComboBox.setSelectedIndex(fItemIndex);
+                    sessionComboBox.setModel(model);   
+                    if (fItemIndex < model.getSize()) {
+                        sessionComboBox.setSelectedIndex(fItemIndex);
+                    }
                     lastSessionComboBoxIndex = fItemIndex;
-                    sessionComboBoxCreating = false;
+                    synchronized (DebugStackPanel.this) {
+                        sessionComboBoxCreating = false;
+                    }
                 }               
             });            
         }
+    }
+    
+    public void refresh(DebuggerSession session) {
+        
+        refreshSessionList();
         
         
         if (session == null) {
             clear();
             return;
         }
+        if (!session.isPaused()) {
+            clear();
+            return;
+        }
+        
         InBreakAtExt info = session.getBreakInfo();
         if (info == null) {
             clear();
@@ -336,19 +402,7 @@ public class DebugStackPanel extends JPanel {
             newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
 
-        DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
-            AppStrings.translate("callStack.header.swf"),
-            AppStrings.translate("callStack.header.file"),
-            AppStrings.translate("callStack.header.line"),
-            AppStrings.translate("stack.header.item")
-        }) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-
-        };
-        stackTable.setModel(tm);
+        stackTable.setModel(getStackTableModel(data));
         this.swfHashes = newSwfHashes;
         this.classIndices = newClassIndices;
         this.methodIndices = newMethodIndices;
@@ -368,11 +422,12 @@ public class DebugStackPanel extends JPanel {
                     }
 
                 };
-                if (stackTable.getColumnModel().getColumnCount() >= 3) {
+                stackTable.setDefaultRenderer(String.class, renderer);
+                /*if (stackTable.getColumnModel().getColumnCount() >= 3) {
                     stackTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
                     stackTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
                     stackTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
-                }
+                }*/
                 repaint();
             }
         });

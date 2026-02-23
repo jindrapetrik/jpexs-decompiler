@@ -1,6 +1,26 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Debugger - Debugged SWF file name in the session title
+- Debugger - Remove watch
+- Debugger - List of watches
+- Debugger - Show flag of watch type (read/write)
+
+### Fixed
+- [#2639] Export to FLA - missing sound streams
+- Debugger - Threading issues with multiple SWFs
+- Debugger - Reading variables on 64bit flash players (like in browsers)
+- DoInitAction should be ignored when exporting as SWF
+
+### Changed
+- [#2642] Sprite SWF export - do not export as SWF timeline, use DefineSprite tag
+  and PlaceObject of it
+
+### Removed
+- (Temporary) AS3 ambiguios namespace detection, it is slow - needs optimizations
+
 ## [25.1.1] - 2026-02-19
 ### Fixed
 - [#2636] ActionScript - Incorrect always-break detection causing insertion of while(true)
@@ -3960,6 +3980,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.1...dev
 [25.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.0...version25.1.1
 [25.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.0.0...version25.1.0
 [25.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version24.1.2...version25.0.0
@@ -4137,6 +4158,8 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2639]: https://www.free-decompiler.com/flash/issues/2639
+[#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636
 [#1209]: https://www.free-decompiler.com/flash/issues/1209
 [#1850]: https://www.free-decompiler.com/flash/issues/1850
