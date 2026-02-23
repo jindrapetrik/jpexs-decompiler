@@ -902,7 +902,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         case VariableType.OBJECT:
                         case VariableType.MOVIECLIP:
                         case VariableType.FUNCTION:
-                            return var.getTypeAsStr() + "(" + Long.toUnsignedString((Long) val.value) + ")";
+                            return var.getTypeAsStr() + "(" + val.value + ")";
                         case VariableType.STRING:
                             return "\"" + Helper.escapeActionScriptString("" + val.value) + "\"";
                         default:
