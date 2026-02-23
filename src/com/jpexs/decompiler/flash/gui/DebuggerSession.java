@@ -23,6 +23,7 @@ import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
+import com.jpexs.debugger.flash.messages.in.InBinaryOp;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InBreakReason;
@@ -44,6 +45,7 @@ import com.jpexs.debugger.flash.messages.in.InSwfInfo;
 import com.jpexs.debugger.flash.messages.in.InTrace;
 import com.jpexs.debugger.flash.messages.in.InVersion;
 import com.jpexs.debugger.flash.messages.out.OutAddWatch2;
+import com.jpexs.debugger.flash.messages.out.OutBinaryOp;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.debugger.flash.messages.out.OutGetSwf;
 import com.jpexs.debugger.flash.messages.out.OutPlay;
@@ -148,6 +150,8 @@ public class DebuggerSession {
     private List<Thread> getSwfThreadList = Collections.synchronizedList(new ArrayList<>());
 
     private Map<String, DebuggerCommands.Watch> watches = new LinkedHashMap<>();
+    
+    private int binaryOpId = 0;
 
     public DebuggerSession(DebuggerHandler handler, DebuggerConnection con, Map<SWF, Map<String, Set<Integer>>> breakpoints) {
         id = con.getId();
@@ -731,6 +735,26 @@ public class DebuggerSession {
             return null;
         }
     }
+    
+    public InBinaryOp binaryOp(int op, String leftType, String leftValue, String rightType, String rightValue) {
+        DebuggerConnection con = commands.getConnection();
+        ++binaryOpId;
+        try {
+            return con.sendMessage(new OutBinaryOp(con, binaryOpId, op, leftType, leftValue, rightType, rightValue), InBinaryOp.class);            
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+    
+    public InBinaryOp binaryOpWithTimeout(int op, String leftType, String leftValue, String rightType, String rightValue) {
+        DebuggerConnection con = commands.getConnection();
+        ++binaryOpId;
+        try {
+            return con.sendMessage(new OutBinaryOp(con, binaryOpId, op, leftType, leftValue, rightType, rightValue), InBinaryOp.class, DEFAULT_TIMEOUT);            
+        } catch (IOException ex) {
+            return null;
+        }
+    }
 
     public void setVariable(long parentId, String varName, int valueType, Object value) {
         try {
@@ -1253,7 +1277,7 @@ public class DebuggerSession {
         return pool;
     }
 
-    public synchronized InCallFunction callMethod(Variable object, String methodName, List<Object> args) throws DebuggerHandler.ActionScriptException {
+    public synchronized InCallFunction callMethod(Object object, String methodName, List<Object> args) throws DebuggerHandler.ActionScriptException {
         return callFunction(false, methodName, object, args);
     }
 
@@ -1301,7 +1325,7 @@ public class DebuggerSession {
         return "" + value;
     }
 
-    public synchronized InCallFunction callFunction(boolean isConstructor, String funcName, Variable thisValue, List<Object> args) throws DebuggerHandler.ActionScriptException {
+    public synchronized InCallFunction callFunction(boolean isConstructor, String funcName, Object thisValue, List<Object> args) throws DebuggerHandler.ActionScriptException {
         List<String> argTypes = new ArrayList<>();
         List<String> argValues = new ArrayList<>();
         for (Object value : args) {
