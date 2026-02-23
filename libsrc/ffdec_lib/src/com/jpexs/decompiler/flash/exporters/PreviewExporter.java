@@ -451,9 +451,7 @@ public class PreviewExporter {
                     }
                 }
 
-                if (!isSprite) {
-                    writeTag((Tag) treeItem, sos2, doneCharacters);
-                }
+                writeTag((Tag) treeItem, sos2, doneCharacters);
 
                 MATRIX mat = new MATRIX();
                 mat.hasRotate = false;
@@ -650,29 +648,30 @@ public class PreviewExporter {
                         new ShowFrameTag(swf).writeTag(sos2);
                         first = false;
                     }
-                } else if (treeItem instanceof DefineSpriteTag) {
-                    DefineSpriteTag s = (DefineSpriteTag) treeItem;
-                    Tag lastTag = null;
-                    for (Tag t : s.getTags()) {
-                        if (t instanceof EndTag) {
-                            break;
-                        } else if (t instanceof PlaceObjectTypeTag) {
-                            PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                            MATRIX m = pt.getMatrix();
-                            MATRIX m2 = new Matrix(m).preConcatenate(new Matrix(mat)).toMATRIX();
-                            pt.writeTagWithMatrix(sos2, m2);
-                            lastTag = t;
-                        } else if (t instanceof DoActionTag) {
-                            //ignore
-                        } else {
-                            t.writeTagNoScripts(sos2);
-                            lastTag = t;
-                        }
-                    }
-                    if (!s.getTags().isEmpty() && (lastTag != null) && (!(lastTag instanceof ShowFrameTag))) {
-                        new ShowFrameTag(swf).writeTag(sos2);
-                    }
                 } else {
+                    /* else if (treeItem instanceof DefineSpriteTag) {
+                        DefineSpriteTag s = (DefineSpriteTag) treeItem;
+                        Tag lastTag = null;
+                        for (Tag t : s.getTags()) {
+                            if (t instanceof EndTag) {
+                                break;
+                            } else if (t instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                                MATRIX m = pt.getMatrix();
+                                MATRIX m2 = new Matrix(m).preConcatenate(new Matrix(mat)).toMATRIX();
+                                pt.writeTagWithMatrix(sos2, m2);
+                                lastTag = t;
+                            } else if (t instanceof DoActionTag) {
+                                //ignore
+                            } else {
+                                t.writeTagNoScripts(sos2);
+                                lastTag = t;
+                            }
+                        }
+                        if (!s.getTags().isEmpty() && (lastTag != null) && (!(lastTag instanceof ShowFrameTag))) {
+                            new ShowFrameTag(swf).writeTag(sos2);
+                        }
+                    }*/
                     new PlaceObject2Tag(swf, false, 1, chtId, mat, null, 0, null, -1, null).writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
                 }
@@ -721,7 +720,10 @@ public class PreviewExporter {
             List<CharacterIdTag> chIdTags = t.getSwf().getCharacterIdTags(((CharacterIdTag) t).getCharacterId());
             if (chIdTags != null) {
                 for (CharacterIdTag chIdTag : chIdTags) {
-                    if (!(chIdTag instanceof PlaceObjectTypeTag || chIdTag instanceof RemoveTag)) {
+                    if (!(chIdTag instanceof PlaceObjectTypeTag 
+                            || chIdTag instanceof RemoveTag
+                            || chIdTag instanceof DoInitActionTag
+                        )) {
 
                         Set<Integer> needed = new LinkedHashSet<>();
                         ((Tag) chIdTag).getNeededCharactersDeep(needed, new HashSet<>());

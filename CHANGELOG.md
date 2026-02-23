@@ -12,6 +12,11 @@ All notable changes to this project will be documented in this file.
 - [#2639] Export to FLA - missing sound streams
 - Debugger - Threading issues with multiple SWFs
 - Debugger - Reading variables on 64bit flash players (like in browsers)
+- DoInitAction should be ignored when exporting as SWF
+
+### Changed
+- [#2642] Sprite SWF export - do not export as SWF timeline, use DefineSprite tag
+  and PlaceObject of it
 
 ### Removed
 - (Temporary) AS3 ambiguios namespace detection, it is slow - needs optimizations
@@ -4154,6 +4159,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
+[#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636
 [#1209]: https://www.free-decompiler.com/flash/issues/1209
 [#1850]: https://www.free-decompiler.com/flash/issues/1850
