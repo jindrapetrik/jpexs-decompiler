@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2639] Export to FLA - missing sound streams
 - Debugger - Threading issues with multiple SWFs
 - Debugger - Reading variables on 64bit flash players (like in browsers)
+- AS3 slow decompilation caused by ambiguios namespace detection
 
 ## [25.1.1] - 2026-02-19
 ### Fixed
