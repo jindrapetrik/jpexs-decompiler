@@ -80,6 +80,17 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
                     needsReturn ? null : ins(AVM2Instructions.Pop)
             );
         }
+        
+        if (resname instanceof ScriptPropertyAVM2Item) {
+            TypeItem t = ((ScriptPropertyAVM2Item) resname).type;
+            int type_index = AVM2SourceGenerator.resolveType(localData, t, ((AVM2SourceGenerator) generator).abcIndex);
+            return toSourceMerge(localData, generator,
+                    new AVM2Instruction(0, AVM2Instructions.FindPropertyStrict, new int[]{type_index, arguments.size()}), arguments,
+                    new AVM2Instruction(0, AVM2Instructions.ConstructProp, new int[]{type_index, arguments.size()}),
+                    needsReturn ? null : ins(AVM2Instructions.Pop)
+            );
+        }
+        
 
         if (resname instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) resname;

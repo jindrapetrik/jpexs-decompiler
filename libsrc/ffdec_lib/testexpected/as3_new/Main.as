@@ -42,21 +42,20 @@ package
                   pushscope
                   getlocal0
                   constructsuper 0
-                  findpropstrict QName(PackageNamespace(""),"Boolean")
                   getlex QName(PackageNamespace(""),"stage")
-                  callproperty QName(PackageNamespace(""),"Boolean"), 1
-                  iffalse ofs0018
+                  convert_b
+                  iffalse ofs0014
                   getlocal0
                   callpropvoid QName(PrivateNamespace("Main"),"init"), 0
-                  jump ofs0024
-         ofs0018:
+                  jump ofs0020
+         ofs0014:
                   findpropstrict QName(PackageNamespace(""),"addEventListener")
                   getlex QName(PackageNamespace("flash.events"),"Event")
                   getproperty QName(PackageNamespace(""),"ADDED_TO_STAGE")
                   getlocal0
                   getproperty QName(PrivateNamespace("Main"),"init")
                   callpropvoid QName(PackageNamespace(""),"addEventListener"), 2
-         ofs0024:
+         ofs0020:
                   returnvoid
                end ; code
             end ; body

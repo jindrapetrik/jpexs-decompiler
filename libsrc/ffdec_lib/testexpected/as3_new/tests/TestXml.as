@@ -266,10 +266,9 @@ package tests
                      coerce TypeName(QName(PackageNamespace("__AS3__.vec"),"Vector")<QName(PackageNamespace(""),"int")>)
                      setslot 1
                      getscopeobject 1
-                     findpropstrict QName(PackageNamespace(""),"int")
                      getlex QName(PackageNamespace(""),"Math")
                      callproperty QName(PackageNamespace(""),"random"), 0
-                     callproperty QName(PackageNamespace(""),"int"), 1
+                     convert_i
                      convert_i
                      setslot 2
                      getscopeobject 1
@@ -288,8 +287,8 @@ package tests
                      pushstring ""
                      construct 1
                      setlocal2
-                     jump ofs0146
-            ofs0121:
+                     jump ofs0142
+            ofs011d:
                      label
                      getlocal 4
                      getlocal3
@@ -305,18 +304,18 @@ package tests
                      pushbyte 1
                      add
                      equals
-                     iffalse ofs0141
+                     iffalse ofs013d
                      getlocal2
                      getlocal3
                      getlocal 5
                      setproperty MultinameL([PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestXml"),ProtectedNamespace("tests:TestXml"),StaticProtectedNs("tests:TestXml"),PrivateNamespace("TestXml.as$0")])
-            ofs0141:
+            ofs013d:
                      popscope
                      kill 6
                      kill 5
-            ofs0146:
+            ofs0142:
                      hasnext2 4, 3
-                     iftrue ofs0121
+                     iftrue ofs011d
                      kill 4
                      kill 3
                      getlocal2

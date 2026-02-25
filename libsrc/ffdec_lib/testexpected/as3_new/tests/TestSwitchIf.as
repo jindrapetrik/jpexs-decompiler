@@ -79,31 +79,30 @@ package tests
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestSwitchIf"),ProtectedNamespace("tests:TestSwitchIf"),StaticProtectedNs("tests:TestSwitchIf"),PrivateNamespace("TestSwitchIf.as$0")]), 1
             ofs0024:
                      label
-                     jump ofs005c
+                     jump ofs0058
             ofs0029:
-                     findpropstrict QName(PackageNamespace(""),"int")
                      getlocal1
-                     callproperty QName(PackageNamespace(""),"int"), 1
+                     convert_i
                      pushbyte 2
                      subtract
                      setlocal3
                      pushbyte 0
                      getlocal3
-                     ifstrictne ofs0040
+                     ifstrictne ofs003c
                      pushbyte 0
-                     jump ofs004f
-            ofs0040:
+                     jump ofs004b
+            ofs003c:
                      pushbyte 1
                      getlocal3
-                     ifstrictne ofs004d
+                     ifstrictne ofs0049
                      pushbyte 1
-                     jump ofs004f
-            ofs004d:
+                     jump ofs004b
+            ofs0049:
                      pushbyte -1
-            ofs004f:
+            ofs004b:
                      kill 3
                      lookupswitch ofs0024, [ofs0017, ofs0017]
-            ofs005c:
+            ofs0058:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestSwitchIf"),ProtectedNamespace("tests:TestSwitchIf"),StaticProtectedNs("tests:TestSwitchIf"),PrivateNamespace("TestSwitchIf.as$0")])
                      pushstring "B"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestSwitchIf"),ProtectedNamespace("tests:TestSwitchIf"),StaticProtectedNs("tests:TestSwitchIf"),PrivateNamespace("TestSwitchIf.as$0")]), 1

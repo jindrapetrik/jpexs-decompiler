@@ -77,44 +77,41 @@ package tests
             ofs001d:
                      label
             ofs001e:
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal1
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-                     iffalse ofs0044
+                     convert_b
+                     iffalse ofs003c
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "x"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal2
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-                     iffalse ofs003d
-                     jump ofs0050
-            ofs003d:
+                     convert_b
+                     iffalse ofs0035
+                     jump ofs0048
+            ofs0035:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "y"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1
-            ofs0044:
+            ofs003c:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "z"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1
                      pushtrue
                      iftrue ofs001d
-            ofs0050:
+            ofs0048:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "g"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal2
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-                     iffalse ofs0065
-                     jump ofs0071
-            ofs0065:
+                     convert_b
+                     iffalse ofs0059
+                     jump ofs0065
+            ofs0059:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "h"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1
                      pushtrue
                      iftrue ofs0018
-            ofs0071:
+            ofs0065:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")])
                      pushstring "finish"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestDoWhileTwice"),ProtectedNamespace("tests:TestDoWhileTwice"),StaticProtectedNs("tests:TestDoWhileTwice"),PrivateNamespace("TestDoWhileTwice.as$0")]), 1

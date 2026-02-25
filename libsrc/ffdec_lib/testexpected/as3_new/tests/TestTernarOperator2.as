@@ -53,7 +53,7 @@ package tests
                returns null
                
                body
-                  maxstack 3
+                  maxstack 2
                   localcount 5
                   initscopedepth 4
                   maxscopedepth 5
@@ -74,29 +74,26 @@ package tests
                      getlocal1
                      iffalse ofs0027
                      getlocal2
-                     jump ofs0030
+                     jump ofs002c
             ofs0027:
-                     findpropstrict QName(PackageNamespace(""),"int")
                      getlocal2
                      pushbyte 1
                      add
-                     callproperty QName(PackageNamespace(""),"int"), 1
-            ofs0030:
+                     convert_i
+            ofs002c:
                      convert_i
                      setlocal3
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal2
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-                     iffalse ofs0041
+                     convert_b
+                     iffalse ofs0039
                      getlocal3
-                     jump ofs004a
-            ofs0041:
-                     findpropstrict QName(PackageNamespace(""),"int")
+                     jump ofs003e
+            ofs0039:
                      getlocal3
                      pushbyte 1
                      add
-                     callproperty QName(PackageNamespace(""),"int"), 1
-            ofs004a:
+                     convert_i
+            ofs003e:
                      convert_i
                      setlocal 4
                      returnvoid

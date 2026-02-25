@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
+- AS3 direct editation - proper use conver/coerce instruction
+- AS3 direct editation - use coerce_f for float values
 
 ## [25.1.2] - 2026-02-23
 ### Added

@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ImportedSlotConstItem extends AssignableAVM2Item {
+public class ScriptPropertyAVM2Item extends AssignableAVM2Item {
 
     /**
      * Type
@@ -48,7 +48,7 @@ public class ImportedSlotConstItem extends AssignableAVM2Item {
      * Constructor.
      * @param type Type
      */
-    public ImportedSlotConstItem(TypeItem type) {
+    public ScriptPropertyAVM2Item(TypeItem type) {
         this.type = type;
     }
 
@@ -69,7 +69,7 @@ public class ImportedSlotConstItem extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        return new ImportedSlotConstItem(type);
+        return new ScriptPropertyAVM2Item(type);
     }
 
     /**
