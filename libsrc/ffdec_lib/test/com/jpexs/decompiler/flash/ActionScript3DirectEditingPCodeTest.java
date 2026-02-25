@@ -20,8 +20,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -29,10 +27,8 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.TranslateException;
-import com.jpexs.helpers.utf8.Utf8Helper;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -49,7 +45,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class DirectEditingTest extends FileTestBase {
+public class ActionScript3DirectEditingPCodeTest {
 
     @BeforeClass
     public void init() {
@@ -59,10 +55,17 @@ public class DirectEditingTest extends FileTestBase {
         Configuration.useFlexAs3Compiler.set(false);
     }
 
-    public static final String TESTDATADIR = "testdata/directediting";
-
-    @Test(dataProvider = "provideFiles")
-    public void testDirectEditing(String filePath) throws IOException, InterruptedException, AVM2ParseException, CompilationException {
+    @Test
+    public void testDirectEditingPCode() throws IOException, InterruptedException, AVM2ParseException, CompilationException {
+        String filePath = "testdata/as3_new/bin/as3_new.flex.swf";
+        File expectedDir = new File("testexpected/as3_new");
+        File actualDir = new File("testactual/as3_new");
+        
+        if (!actualDir.exists()) {
+            actualDir.mkdirs();
+        }
+        
+        
         File playerSWC = Configuration.getPlayerSWC();
         if (playerSWC == null) {
             throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
@@ -70,29 +73,51 @@ public class DirectEditingTest extends FileTestBase {
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false);
             if (swf.isAS3()) {
-                boolean dotest = false;
                 List<ABC> allAbcs = new ArrayList<>();
                 for (ABCContainerTag ct : swf.getAbcList()) {
                     allAbcs.add(ct.getABC());
                 }
                 for (ABC abc : allAbcs) {
                     for (int s = 0; s < abc.script_info.size(); s++) {
-                        String startAfter = null;
                         HighlightedTextWriter htw = new HighlightedTextWriter(new CodeFormatting(), false);
                         ScriptPack en = abc.script_info.get(s).getPacks(abc, s, null, allAbcs).get(0);
                         String classPathString = en.getClassPath().toString();
-                        if (startAfter == null || classPathString.equals(startAfter)) {
-                            dotest = true;
-                        }
-                        if (!dotest) {
-                            continue;
-                        }
-                        
+
                         try {
                             en.toSource(swf.getAbcIndex(), htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false, false);
                             htw.finishHilights();
                             String original = htw.toString();
                             abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original, new ArrayList<>());
+
+                            htw = new HighlightedTextWriter(new CodeFormatting(), false);
+                            en = abc.script_info.get(s).getPacks(abc, s, null, allAbcs).get(0);
+                            en.toSource(swf.getAbcIndex(), htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.PCODE, false, false, false);
+                            htw.finishHilights();
+                            String modifiedPcode = htw.toString();
+                            String classDirPath = classPathString.replace(".", "/");
+                            File actualFile = new File(actualDir.getAbsolutePath() + "/" + classDirPath + ".as");
+                            File expectedFile = new File(expectedDir.getAbsolutePath() + "/" + classDirPath + ".as");                            
+                            File outParent = actualFile.getParentFile();
+                            if (!outParent.exists()) {
+                                outParent.mkdirs();
+                            }
+                            FileOutputStream fos = new FileOutputStream(actualFile);
+                            fos.write(modifiedPcode.getBytes("UTF-8"));
+                            fos.close();
+                        
+                            if (!expectedFile.exists()) {
+                                fail("Expected file " + expectedFile.getAbsolutePath() + " does not exists!");
+                            }
+                            
+                            String expectedText = Helper.readTextFile(expectedFile.getAbsolutePath());
+                            String actualText = modifiedPcode;
+                            
+                            expectedText = expectedText.replace("\r\n", "\n");
+                            actualText = actualText.replace("\r\n", "\n");
+                            
+                            if (!Objects.equals(actualText, expectedText)) {
+                                fail("Files are not same - " + actualDir.getPath() + "/" + classDirPath + ".as");
+                            }
                         } catch (As3ScriptReplaceException ex) {
                             fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                         } catch (Exception ex) {
@@ -101,60 +126,9 @@ public class DirectEditingTest extends FileTestBase {
                         }
                     }
                 }
-            } else {
-                Map<String, ASMSource> asms = swf.getASMs(false);
-
-                for (ASMSource asm : asms.values()) {
-                    try {
-                        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        asm.getActionScriptSource(writer, null);
-                        writer.finishHilights();
-                        String as = writer.toString();
-                        //as = asm.removePrefixAndSuffix(as);
-
-                        ActionScript2Parser par = new ActionScript2Parser(swf, asm);
-                        try {
-                            asm.setActions(par.actionsFromString(as, Utf8Helper.charsetName));
-                        } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + as + "/" + asm.toString(), ex);
-                        }
-                        writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        asm.getActionScriptSource(writer, null);
-                        writer.finishHilights();
-                        String as2 = writer.toString();
-                        //as2 = asm.removePrefixAndSuffix(as2);
-                        try {
-                            asm.setActions(par.actionsFromString(as2, Utf8Helper.charsetName));
-                        } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + asm.getSwf().getTitleOrShortFileName() + "/" + asm.toString(), ex);
-                        }
-                        writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        asm.getActionScriptSource(writer, null);
-                        writer.finishHilights();
-                        String as3 = writer.toString();
-                        //as3 = asm.removePrefixAndSuffix(as3);
-                        if (!as3.equals(as2)) {
-                            fail("ActionScript is different: " + asm.getSwf().getTitleOrShortFileName() + "/" + asm.toString());
-                        }
-                        asm.setModified();
-                    } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
-                    }
-                }
-            }
-            String nFilePath = filePath.substring(0, filePath.length() - 4); //remove .swf
-            nFilePath += ".recompiled.swf";
-
-            try ( FileOutputStream fos = new FileOutputStream(nFilePath)) {
-                swf.saveTo(fos);
-            }
-            //TODO: try tu run it in debug flashplayer (?)
+            } 
         } catch (Exception ex) {
             fail("Exception during decompilation: " + filePath + ":" + ex.getMessage(), ex);
         }
-    }
-
-    @Override
-    public String[] getTestDataDirs() {
-        return new String[]{TESTDATADIR}; //, FREE_ACTIONSCRIPT_AS2, FREE_ACTIONSCRIPT_AS3};
     }
 }
