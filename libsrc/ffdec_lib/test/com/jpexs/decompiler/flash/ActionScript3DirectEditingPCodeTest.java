@@ -70,6 +70,7 @@ public class ActionScript3DirectEditingPCodeTest {
         if (playerSWC == null) {
             throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
         }
+        List<String> paths = new ArrayList<>();
         try {
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false);
             if (swf.isAS3()) {
@@ -104,8 +105,10 @@ public class ActionScript3DirectEditingPCodeTest {
                             FileOutputStream fos = new FileOutputStream(actualFile);
                             fos.write(modifiedPcode.getBytes("UTF-8"));
                             fos.close();
+                            
+                            paths.add(classDirPath);
                         
-                            if (!expectedFile.exists()) {
+                            /*if (!expectedFile.exists()) {
                                 fail("Expected file " + expectedFile.getAbsolutePath() + " does not exists!");
                             }
                             
@@ -117,7 +120,7 @@ public class ActionScript3DirectEditingPCodeTest {
                             
                             if (!Objects.equals(actualText, expectedText)) {
                                 fail("Files are not same - " + actualDir.getPath() + "/" + classDirPath + ".as");
-                            }
+                            }*/
                         } catch (As3ScriptReplaceException ex) {
                             fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                         } catch (Exception ex) {
@@ -129,6 +132,26 @@ public class ActionScript3DirectEditingPCodeTest {
             } 
         } catch (Exception ex) {
             fail("Exception during decompilation: " + filePath + ":" + ex.getMessage(), ex);
+        }
+        
+        StringBuilder notSameBuilder = new StringBuilder();
+        
+        for (String path : paths) {
+            File expectedFile = new File(expectedDir.getAbsolutePath() + "/" + path + ".as");                            
+            File actualFile = new File(actualDir.getAbsolutePath() + "/" + path + ".as");
+            String expectedText = Helper.readTextFile(expectedFile.getAbsolutePath());
+            String actualText= Helper.readTextFile(actualFile.getAbsolutePath());
+            
+            expectedText = expectedText.replace("\r\n", "\n");
+            actualText = actualText.replace("\r\n", "\n");
+            
+            if (!Objects.equals(actualText, expectedText)) {
+                notSameBuilder.append(actualDir.getPath()).append("/").append(path).append(".as\r\n");
+                //
+            }
+        }
+        if (notSameBuilder.length() > 0) {
+            fail("File(s) are not same: " +notSameBuilder.toString());
         }
     }
 }

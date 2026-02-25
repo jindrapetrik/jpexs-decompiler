@@ -55,7 +55,7 @@ package tests
                returns null
                
                body
-                  maxstack 3
+                  maxstack 2
                   localcount 3
                   initscopedepth 4
                   maxscopedepth 5
@@ -71,12 +71,11 @@ package tests
                      getproperty MultinameL([PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestStringCoerce"),ProtectedNamespace("tests:TestStringCoerce"),StaticProtectedNs("tests:TestStringCoerce"),PrivateNamespace("TestStringCoerce.as$0")])
                      coerce_s
                      setlocal1
-                     findpropstrict QName(PackageNamespace(""),"String")
                      getlocal0
                      getproperty QName(PrivateNamespace("tests:TestStringCoerce"),"a")
                      pushstring "test"
                      getproperty MultinameL([PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestStringCoerce"),ProtectedNamespace("tests:TestStringCoerce"),StaticProtectedNs("tests:TestStringCoerce"),PrivateNamespace("TestStringCoerce.as$0")])
-                     callproperty QName(PackageNamespace(""),"String"), 1
+                     coerce_s
                      coerce_s
                      setlocal2
                      returnvoid

@@ -533,6 +533,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
                 if (impName.equals(name.get(0))) {
                     TypeItem ret = new TypeItem(imp);
+                    
                     resolved = ret;
                     for (int i = 1; i < name.size(); i++) {
                         resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null);
@@ -541,14 +542,18 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         }
                     }
 
-                    if (name.size() == 1) {
-                        AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
-                        if (ti != null && (ti.trait instanceof TraitSlotConst)) {
-                            resolved = new ImportedSlotConstItem(ret);
-                            if (assignedValue != null) {
-                                ((ImportedSlotConstItem) resolved).assignedValue = assignedValue;
+                    if (name.size() == 1) {                        
+                        AbcIndexing.ClassIndex ci = abc.findClass(ret, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
+                        if (ci == null) {
+                            AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                            if (ti != null) {
+                                resolved = new ScriptPropertyAVM2Item(ret);
+                                if (assignedValue != null) {
+                                    ((ScriptPropertyAVM2Item) resolved).assignedValue = assignedValue;
+                                }
+                                return resolvedRoot = resolved;
                             }
-                        }
+                        }                                                
                     }
 
                     return resolvedRoot = ret;

@@ -2452,12 +2452,19 @@ public class ActionScript3Parser {
                     break;
             }
         }
-        if (lhs instanceof ParenthesisItem) {
+        /*if (lhs instanceof ParenthesisItem) {
             GraphTargetItem coerced = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false, abc);
+            if (coerced != null) {
+                GraphTargetItem coercedType = ((ParenthesisItem) lhs).value;
+                if (coercedType instanceof UnresolvedAVM2Item) {
+                    UnresolvedAVM2Item unresolved = (UnresolvedAVM2Item) coercedType;
+                    unresolved.resolve(localData, AS3_NAMESPACE, mhs, paramTypes, constantPool, abcIndex, callStack, variables)
+                }
+            }
             if (coerced != null && isType(((ParenthesisItem) lhs).value)) {
                 lhs = new CoerceAVM2Item(null, null, ((ParenthesisItem) lhs).value, coerced);
             }
-        }
+        }*/
 
         if (debugMode) {
             System.out.println("/expression1");

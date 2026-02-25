@@ -195,9 +195,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
             typeItem = item;
         } else if (item instanceof ApplyTypeAVM2Item) {
             typeItem = ((ApplyTypeAVM2Item) item).object;
-        } else if (item instanceof ImportedSlotConstItem) {
-            typeItem = ((ImportedSlotConstItem) item).type;
         } else {
+            /*else if (item instanceof ScriptPropertyAVM2Item) {
+            typeItem = ((ScriptPropertyAVM2Item) item).type;
+            } */ 
+         
             throw new CompilationException("Invalid type:" + item + " (" + item.getClass().getName() + ")", 0/*??*/);
         }
         if (typeItem instanceof UnresolvedAVM2Item) {

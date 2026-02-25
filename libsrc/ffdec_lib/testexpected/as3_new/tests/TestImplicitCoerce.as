@@ -53,7 +53,7 @@ package tests
                returns QName(PackageNamespace(""),"void")
                
                body
-                  maxstack 5
+                  maxstack 3
                   localcount 5
                   initscopedepth 4
                   maxscopedepth 5
@@ -75,41 +75,37 @@ package tests
                      callproperty QName(PackageNamespace(""),"random"), 0
                      coerce_a
                      setlocal3
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal1
-                     findpropstrict QName(PackageNamespace(""),"Number")
                      getlocal3
                      pushbyte 1
                      equals
-                     callproperty QName(PackageNamespace(""),"Number"), 1
+                     convert_d
                      bitand
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
+                     convert_b
                      dup
                      convert_b
-                     iffalse ofs0043
+                     iffalse ofs0037
                      pop
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      pushbyte 5
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-            ofs0043:
-                     iffalse ofs004e
+                     convert_b
+            ofs0037:
+                     iffalse ofs0042
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestImplicitCoerce"),ProtectedNamespace("tests:TestImplicitCoerce"),StaticProtectedNs("tests:TestImplicitCoerce"),PrivateNamespace("TestImplicitCoerce.as$0")])
                      pushstring "OK"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestImplicitCoerce"),ProtectedNamespace("tests:TestImplicitCoerce"),StaticProtectedNs("tests:TestImplicitCoerce"),PrivateNamespace("TestImplicitCoerce.as$0")]), 1
-            ofs004e:
+            ofs0042:
                      pushstring "hello: "
                      getlocal3
                      add
                      coerce_s
                      setlocal 4
-                     findpropstrict QName(PackageNamespace(""),"Boolean")
                      getlocal 4
-                     callproperty QName(PackageNamespace(""),"Boolean"), 1
-                     iffalse ofs0067
+                     convert_b
+                     iffalse ofs0057
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestImplicitCoerce"),ProtectedNamespace("tests:TestImplicitCoerce"),StaticProtectedNs("tests:TestImplicitCoerce"),PrivateNamespace("TestImplicitCoerce.as$0")])
                      pushstring "F"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestImplicitCoerce"),ProtectedNamespace("tests:TestImplicitCoerce"),StaticProtectedNs("tests:TestImplicitCoerce"),PrivateNamespace("TestImplicitCoerce.as$0")]), 1
-            ofs0067:
+            ofs0057:
                      returnvoid
                   end ; code
                end ; body

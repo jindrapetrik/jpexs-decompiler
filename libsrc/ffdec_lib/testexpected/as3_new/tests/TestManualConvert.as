@@ -53,7 +53,7 @@ package tests
                returns null
                
                body
-                  maxstack 3
+                  maxstack 2
                   localcount 1
                   initscopedepth 4
                   maxscopedepth 5
@@ -65,9 +65,8 @@ package tests
                      pushstring "String(this).length"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestManualConvert"),ProtectedNamespace("tests:TestManualConvert"),StaticProtectedNs("tests:TestManualConvert"),PrivateNamespace("TestManualConvert.as$0")]), 1
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestManualConvert"),ProtectedNamespace("tests:TestManualConvert"),StaticProtectedNs("tests:TestManualConvert"),PrivateNamespace("TestManualConvert.as$0")])
-                     findpropstrict QName(PackageNamespace(""),"String")
                      getlocal0
-                     callproperty QName(PackageNamespace(""),"String"), 1
+                     coerce_s
                      getproperty Multiname("length",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestManualConvert"),ProtectedNamespace("tests:TestManualConvert"),StaticProtectedNs("tests:TestManualConvert"),PrivateNamespace("TestManualConvert.as$0")])
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestManualConvert"),ProtectedNamespace("tests:TestManualConvert"),StaticProtectedNs("tests:TestManualConvert"),PrivateNamespace("TestManualConvert.as$0")]), 1
                      returnvoid

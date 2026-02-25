@@ -339,6 +339,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
             case "Number":
                 ins = ins(AVM2Instructions.ConvertD);
                 break;
+            case "float":
+                ins = ins(AVM2Instructions.ConvertF);
+                break;
+            case "float4":
+                ins = ins(AVM2Instructions.ConvertF4);
+                break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abcIndex);
                 ins = ins(AVM2Instructions.Coerce, type_index);

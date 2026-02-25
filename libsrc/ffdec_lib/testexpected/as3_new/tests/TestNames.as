@@ -65,7 +65,7 @@ package tests
                returns null
                
                body
-                  maxstack 4
+                  maxstack 3
                   localcount 8
                   initscopedepth 4
                   maxscopedepth 5
@@ -102,16 +102,14 @@ package tests
                      setlocal3
                      getlocal1
                      coerce QName(PackageNamespace(""),"Namespace")
-                     findpropstrict QName(PackageNamespace(""),"String")
                      getlocal2
-                     callproperty QName(PackageNamespace(""),"String"), 1
+                     coerce_s
                      convert_s
                      findpropstrict RTQNameL()
                      getlocal1
                      coerce QName(PackageNamespace(""),"Namespace")
-                     findpropstrict QName(PackageNamespace(""),"String")
                      getlocal2
-                     callproperty QName(PackageNamespace(""),"String"), 1
+                     coerce_s
                      convert_s
                      getproperty RTQNameL()
                      coerce_a
