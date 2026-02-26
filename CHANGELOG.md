@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#2643] APNG export - images containing multiple IDAT chunks
 - AS3 direct editation - proper use conver/coerce instruction
 - AS3 direct editation - use coerce_f for float values
+- [#2645] Windows MSI installer - Cannot change install directory
 
 ## [25.1.2] - 2026-02-23
 ### Added
@@ -4166,6 +4167,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2643]: https://www.free-decompiler.com/flash/issues/2643
+[#2645]: https://www.free-decompiler.com/flash/issues/2645
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
 [#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636

@@ -18,6 +18,7 @@
              Description="!(loc.GuiLibs_Desc)"
              Level="1" 
              AllowAbsent="no"
+             ConfigurableDirectory="INSTALLFOLDER"
     >
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="LibComponents" />
@@ -62,8 +63,8 @@
       </Directory>
     </StandardDirectory>
         
-    <ui:WixUI Id="WixUI_FeatureTree" InstallDirectory="INSTALLFOLDER"/>   
-    
+    <ui:WixUI Id="WixUI_FeatureTree" InstallDirectory="INSTALLFOLDER"/>
+
     <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
     
     <WixVariable Id="WixUIBannerBmp" Value="installer3_493x58.bmp" />
