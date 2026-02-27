@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
@@ -24,6 +23,7 @@ import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.helpers.Helper;
@@ -57,6 +57,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -97,6 +98,8 @@ public class DebugPanel extends JPanel {
     public ABCPanel.VariablesTableModel localsTable;
 
     private WeakReference<DebuggerSession> currentSessionRef = null;
+    
+    private JToggleButton sortToggleButton;
 
     private boolean as3;
 
@@ -169,9 +172,12 @@ public class DebugPanel extends JPanel {
     public DebugPanel(boolean as3) {
         super(new BorderLayout());
         this.as3 = as3;
-        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugRegistersTable, new ArrayList<>(), new ArrayList<>()), false);
-        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugLocalsTable, new ArrayList<>(), new ArrayList<>()), false);
-        debugWatchesTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugWatchesTable, new ArrayList<>(), new ArrayList<>()), false);
+        
+        sortToggleButton = new JToggleButton(View.getIcon("sort16"));
+        
+        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugRegistersTable, new ArrayList<>(), new ArrayList<>(), false), false);
+        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugLocalsTable, new ArrayList<>(), new ArrayList<>(), false), false);
+        debugWatchesTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugWatchesTable, new ArrayList<>(), new ArrayList<>(), false), false);
 
         MouseAdapter watchHandler = new MouseAdapter() {
 
@@ -409,7 +415,7 @@ public class DebugPanel extends JPanel {
         debugWatchesTable.addMouseListener(watchHandler);
 
         //debugScopeTable.addMouseListener(watchHandler);                           
-        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugScopeTable, new ArrayList<>(), new ArrayList<>()), false);
+        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(null, as3, debugScopeTable, new ArrayList<>(), new ArrayList<>(), false), false);
 
         constantPoolTable = new JTable(new DefaultTableModel(new Object[2][0], new Object[]{
             AppStrings.translate("constantpool.header.id"),
@@ -497,6 +503,30 @@ public class DebugPanel extends JPanel {
                 //reacts to frameChanged instead                
             }
         });
+        
+        sortToggleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refresh();
+            }            
+        });
+        sortToggleButton.setToolTipText(AppStrings.translate("sort.alphabetically"));
+        sortToggleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Configuration.sortDebugVariablesAlphabetically.set(sortToggleButton.isSelected());
+            }            
+        });
+        Configuration.sortDebugVariablesAlphabetically.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                sortToggleButton.setSelected(newValue);
+                refresh();
+            }            
+        });
+        JPanel bottomButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        bottomButtonsPanel.add(sortToggleButton);
+        
 
         varTabs = new JTabbedPane();
         varTabs.addChangeListener(new ChangeListener() {
@@ -511,6 +541,11 @@ public class DebugPanel extends JPanel {
                         int si = varTabs.getSelectedIndex();
                         if (si > -1 && si < tabTypes.size()) {
                             selectedTab = tabTypes.get(si);
+                            
+                            bottomButtonsPanel.setVisible(
+                                    selectedTab == SelectedTab.LOCALS
+                                    || selectedTab == SelectedTab.WATCHES
+                            );
                         }
                     }
                 }
@@ -519,6 +554,10 @@ public class DebugPanel extends JPanel {
 
         add(new HeaderLabel(AppStrings.translate("debugpanel.header")), BorderLayout.NORTH);
         add(varTabs, BorderLayout.CENTER);
+        
+        
+        
+        add(bottomButtonsPanel, BorderLayout.SOUTH);                
     }
 
     /*    private void getVariableList() {
@@ -571,6 +610,8 @@ public class DebugPanel extends JPanel {
                     try {
                         setLoading(true);
 
+                        boolean sort = sortToggleButton.isSelected();
+                        
                         int sessionId = -1;
 
                         if (session != null) {
@@ -583,10 +624,10 @@ public class DebugPanel extends JPanel {
                         localsTable = null;
                         InFrame f = session == null ? null : session.getFrame();
 
-                        ABCPanel.VariablesTableModel registersTableModel = new ABCPanel.VariablesTableModel(session, as3, debugRegistersTable, new ArrayList<>(), new ArrayList<>());
-                        ABCPanel.VariablesTableModel localsTableModel = new ABCPanel.VariablesTableModel(session, as3, debugLocalsTable, new ArrayList<>(), new ArrayList<>());
-                        ABCPanel.VariablesTableModel scopeTableModel = new ABCPanel.VariablesTableModel(session, as3, debugScopeTable, new ArrayList<>(), new ArrayList<>());
-                        ABCPanel.VariablesTableModel watchesTableModel = new ABCPanel.VariablesTableModel(session, as3, debugWatchesTable, new ArrayList<>(), new ArrayList<>());
+                        ABCPanel.VariablesTableModel registersTableModel = new ABCPanel.VariablesTableModel(session, as3, debugRegistersTable, new ArrayList<>(), new ArrayList<>(), sort);
+                        ABCPanel.VariablesTableModel localsTableModel = new ABCPanel.VariablesTableModel(session, as3, debugLocalsTable, new ArrayList<>(), new ArrayList<>(), sort);
+                        ABCPanel.VariablesTableModel scopeTableModel = new ABCPanel.VariablesTableModel(session, as3, debugScopeTable, new ArrayList<>(), new ArrayList<>(), sort);
+                        ABCPanel.VariablesTableModel watchesTableModel = new ABCPanel.VariablesTableModel(session, as3, debugWatchesTable, new ArrayList<>(), new ArrayList<>(), sort);
                         ABCPanel.VariablesTableModel fRegistersTableModel;
                         ABCPanel.VariablesTableModel fLocalsTableModel;
                         ABCPanel.VariablesTableModel fScopeTableModel;
@@ -621,8 +662,8 @@ public class DebugPanel extends JPanel {
 
                             locals.addAll(f.arguments);
                             locals.addAll(f.variables);
-
-                            localsTable = new ABCPanel.VariablesTableModel(session, as3, debugLocalsTable, locals, null);
+                            
+                            localsTable = new ABCPanel.VariablesTableModel(session, as3, debugLocalsTable, locals, null, sort);
 
                             List<Variable> watchedVars = new ArrayList<>();
                             List<Long> watchedParentIds = new ArrayList<>();
@@ -663,10 +704,10 @@ public class DebugPanel extends JPanel {
                                 }
                             };
 
-                            registersTableModel = new ABCPanel.VariablesTableModel(session, as3, debugRegistersTable, f.registers, null);
+                            registersTableModel = new ABCPanel.VariablesTableModel(session, as3, debugRegistersTable, f.registers, null, sort);
                             localsTableModel = localsTable;
-                            scopeTableModel = new ABCPanel.VariablesTableModel(session, as3, debugScopeTable, f.scopeChain, null);
-                            watchesTableModel = new ABCPanel.VariablesTableModel(session, as3, debugWatchesTable, watchedVars, watchedParentIds);
+                            scopeTableModel = new ABCPanel.VariablesTableModel(session, as3, debugScopeTable, f.scopeChain, null, sort);
+                            watchesTableModel = new ABCPanel.VariablesTableModel(session, as3, debugWatchesTable, watchedVars, watchedParentIds, sort);
 
                             localsTableModel.addTreeModelListener(refreshListener);
                             scopeTableModel.addTreeModelListener(refreshListener);
