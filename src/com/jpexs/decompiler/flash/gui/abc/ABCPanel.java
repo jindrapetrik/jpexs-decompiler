@@ -345,6 +345,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
             sessionIdToLoadedVariableNode.get(sessionId).clear();
         }
+
         private boolean sort;
 
         @Override
