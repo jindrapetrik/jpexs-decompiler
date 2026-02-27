@@ -1036,6 +1036,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean isRunning = Main.isRunning();
         boolean isDebugRunning = Main.isDebugRunning();
         boolean isDebugPaused = Main.isDebugPaused();
+        boolean isListening = Main.isListening();
+        boolean isSessionConnected = Main.isSessionConnected();
 
         boolean isRunningOrDebugging = isRunning || isDebugRunning;
 
@@ -1177,11 +1179,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/start/debugpcode", swfSelected && !isRunningOrDebugging);
         setMenuEnabled("/file/start/debuglisten", !isDebugRunning);
 
-        setMenuEnabled("/file/start/stop", isRunningOrDebugging);
+        setMenuEnabled("/file/start/stop", isRunningOrDebugging);        
         setMenuEnabled("/debugging/debug/stop", isRunningOrDebugging); //same as previous
-
-        setPathVisible("/debugging", isDebugRunning);
-        setPathVisible("/debugging/debug", isDebugRunning);
+        
+        setMenuEnabled("/debuggingListen/debug/stopListening", isListening);
+        setMenuEnabled("/debuggingListen/debug/disconnectSession", isSessionConnected);                               
+        
+        setPathVisible("/debugging", !isListening && isDebugRunning);
+        setPathVisible("/debugging/debug", !isListening && isDebugRunning);
         //setMenuEnabled("/debugging/debug/pause", isDebugRunning);
         setMenuEnabled("/debugging/debug/stepOver", isDebugPaused);
         setMenuEnabled("/debugging/debug/stepInto", isDebugPaused);
@@ -1189,6 +1194,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/debugging/debug/continue", isDebugPaused);
         //setMenuEnabled("/debugging/debug/stack", isDebugPaused);
         //setMenuEnabled("/debugging/debug/watch", isDebugPaused);
+        
+        setPathVisible("/debuggingListen", isListening);
+        setPathVisible("/debuggingListen/debug", isListening);
+        setMenuEnabled("/debuggingListen/debug/stepOver", isDebugPaused);
+        setMenuEnabled("/debuggingListen/debug/stepInto", isDebugPaused);
+        setMenuEnabled("/debuggingListen/debug/stepOut", isDebugPaused);
+        setMenuEnabled("/debuggingListen/debug/continue", isDebugPaused);
+        
+        
+        
         StringBuilder titleBuilder = new StringBuilder();
         titleBuilder.append(ApplicationInfo.applicationVerName);
 
@@ -1350,6 +1365,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         //addMenuItem("/debugging/debug/watch", translate("menu.debugging.debug.watch"), "watch32", this::watchActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/debugging/debug");
         finishMenu("/debugging");
+        
+        
+        addMenuItem("/debuggingListen", translate("menu.debugging"), null, null, 0, null, false, null, true);
+        addMenuItem("/debuggingListen/debug", translate("menu.debugging.debug"), null, null, 0, null, false, null, false);
+        addMenuItem("/debuggingListen/debug/stopListening", translate("menu.debugging.debug.stopListening"), "stop32", this::stopActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/debuggingListen/debug/disconnectSession", translate("menu.debugging.debug.disconnectSession"), "disconnect32", this::disconnectSessionActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/debuggingListen/debug/continue", translate("menu.debugging.debug.continue"), "continue32", this::continueActionPerformed, PRIORITY_TOP, null, true, new HotKey("F5"), false);
+        addMenuItem("/debuggingListen/debug/stepOver", translate("menu.debugging.debug.stepOver"), "stepover32", this::stepOverActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("F8"), false);
+        addMenuItem("/debuggingListen/debug/stepInto", translate("menu.debugging.debug.stepInto"), "stepinto32", this::stepIntoActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("F7"), false);
+        addMenuItem("/debuggingListen/debug/stepOut", translate("menu.debugging.debug.stepOut"), "stepout32", this::stepOutActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+F7"), false);
+        finishMenu("/debuggingListen/debug");
+        finishMenu("/debuggingListen");
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false, null, false);
         addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, this::loadRecentSearches, !supportsMenuAction(), null, false);
@@ -1754,6 +1781,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean stopActionPerformed(ActionEvent evt) {
         Main.stopRun();
+        return true;
+    }
+    
+    public boolean disconnectSessionActionPerformed(ActionEvent evt) {
+        Main.disconnectSession();
         return true;
     }
 

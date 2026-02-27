@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Debugger - Button to disconnect current session (stay listening)
+
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
 - AS3 direct editation - proper use conver/coerce instruction
