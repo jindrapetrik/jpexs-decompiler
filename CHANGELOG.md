@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - use coerce_f for float values
 - [#2645] Windows MSI installer - Cannot change install directory
 
+### Changed
+- Icon of Debug listen action from ear to phone receiver
+
 ## [25.1.2] - 2026-02-23
 ### Added
 - Debugger - Debugged SWF file name in the session title
