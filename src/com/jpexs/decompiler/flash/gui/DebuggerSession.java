@@ -158,7 +158,7 @@ public class DebuggerSession {
 
         toAddBPointMap = breakpoints;
         this.handler = handler;
-        Main.startWork(AppStrings.translate("work.debugging"), null);
+        Main.startWork(AppStrings.translate("work.debugging"), null, true);
 
         synchronized (this) {
             paused = false;

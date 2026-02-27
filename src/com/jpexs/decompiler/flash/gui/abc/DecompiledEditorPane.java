@@ -993,7 +993,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             worker.execute();
             setSourceWorker = worker;
             if (!Main.isDebugging()) {
-                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker, true);
             }
         } else {
             setShowMarkers(true);

@@ -3166,6 +3166,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         long timeBefore = System.currentTimeMillis();
         CancellableWorker prepareDebugWorker = new CancellableWorker("prepareDebugWorker") {
             @Override
+            protected void onStart() {
+                Main.startWork(AppStrings.translate("work.prepareDebug"), this, true);
+            }
+                        
+            @Override
             protected Object doInBackground() throws Exception {
                 List<File> tempFiles = new ArrayList<>();
 
@@ -3193,8 +3198,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             public void workerCancelled() {
                 Main.stopWork();
             }
-        };
-        Main.startWork(AppStrings.translate("work.prepareDebug"), prepareDebugWorker);
+        };        
         prepareDebugWorker.execute();
     }
 

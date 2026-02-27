@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - proper use conver/coerce instruction
 - AS3 direct editation - use coerce_f for float values
 - [#2645] Windows MSI installer - Cannot change install directory
+- Long delay before switching critical status bar titles
+  (Causing many actions to look slow - for example Debug listening)
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver
