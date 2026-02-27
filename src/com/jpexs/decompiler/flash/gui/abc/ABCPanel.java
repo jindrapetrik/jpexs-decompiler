@@ -161,6 +161,7 @@ import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
+import natorder.NaturalOrderComparator;
 
 /**
  * @author JPEXS
@@ -458,10 +459,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
             
             if (sort) {
+                NaturalOrderComparator naturalOrder = new NaturalOrderComparator();
                 newChilds.sort(new Comparator<VariableNode>() {
                     @Override
                     public int compare(VariableNode o1, VariableNode o2) {
-                        return o1.var.name.compareTo(o2.var.name);
+                        return naturalOrder.compare(o1.var.name, o2.var.name);
                     }                    
                 });
             }
@@ -676,10 +678,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
            
             if (sort) {
+                NaturalOrderComparator naturalOrder = new NaturalOrderComparator();
                 childs.sort(new Comparator<VariableNode>() {
                     @Override
                     public int compare(VariableNode o1, VariableNode o2) {
-                        return o1.var.name.compareTo(o2.var.name);
+                        return naturalOrder.compare(o1.var.name, o2.var.name);
                     }                    
                 });
             }
