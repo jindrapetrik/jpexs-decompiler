@@ -249,12 +249,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return new ActionScriptSearch().searchAs3(openable, txt, ignoreCase, regexp, pcode, new ScriptSearchListener() {
                 @Override
                 public void onDecompile(int pos, int total, String name) {
-                    Main.startWork(workText + " \"" + txt + "\", " + decAdd + " - (" + pos + "/" + total + ") " + name + "... ", worker);
+                    Main.startWork(workText + " \"" + txt + "\", " + decAdd + " - (" + pos + "/" + total + ") " + name + "... ", worker, false);
                 }
 
                 @Override
                 public void onSearch(int pos, int total, String name) {
-                    Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker);
+                    Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker, false);
                 }
             }, scope);
         }

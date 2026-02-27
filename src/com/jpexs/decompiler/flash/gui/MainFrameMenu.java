@@ -1775,7 +1775,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
             DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
-            Main.startWork(AppStrings.translate("work.debugging") + "...", null);
+            Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
             cmd.stepOver();
         } catch (IOException ex) {
@@ -1789,7 +1789,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         try {
             DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
-            Main.startWork(AppStrings.translate("work.debugging") + "...", null);
+            Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
             cmd.stepInto();
         } catch (IOException ex) {
@@ -1804,7 +1804,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         try {
             DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
-            Main.startWork(AppStrings.translate("work.debugging") + "...", null);
+            Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.stepOut();
         } catch (IOException ex) {
             Main.getCurrentDebugSession().disconnect();
@@ -1818,7 +1818,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         try {
             DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
-            Main.startWork(AppStrings.translate("work.debugging") + "...", null);
+            Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.sendContinue();
         } catch (IOException ex) {
             Main.getCurrentDebugSession().disconnect();

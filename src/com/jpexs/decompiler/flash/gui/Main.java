@@ -523,7 +523,7 @@ public class Main {
         };
 
         mainFrame.getMenu().updateComponents();
-        Main.startWork(title + "...", runWorker);
+        Main.startWork(title + "...", runWorker, true);
         runWorker.execute();
     }
 
@@ -588,7 +588,7 @@ public class Main {
                 @Override
                 public void handleEvent(String event, Object data) {
                     if (event.equals("inject_debuginfo")) {
-                        startWork(AppStrings.translate("work.injecting_debuginfo") + "..." + (String) data, swfPrepareWorker);
+                        startWork(AppStrings.translate("work.injecting_debuginfo") + "..." + (String) data, swfPrepareWorker, false);
                     }
                 }
             };
@@ -675,7 +675,7 @@ public class Main {
                             @Override
                             public void handleEvent(String event, Object data) {
                                 if (event.equals("generate_swd")) {
-                                    startWork(AppStrings.translate("work.generating_swd") + "..." + (String) data, swfPrepareWorker);
+                                    startWork(AppStrings.translate("work.generating_swd") + "..." + (String) data, swfPrepareWorker, false);
                                 }
                             }
                         });
@@ -950,7 +950,7 @@ public class Main {
         Main.stopWork();
         Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
         Main.startDebugger();
-        Main.startWork(AppStrings.translate("work.debugging.listening"), null);
+        Main.startWork(AppStrings.translate("work.debugging.listening"), null, true);
         mainFrame.getMenu().hilightPath("/debugging");
     }
 
@@ -1021,7 +1021,7 @@ public class Main {
                 }
             };
 
-            Main.startWork(AppStrings.translate("work.debugging.instrumenting"), instrumentWorker);
+            Main.startWork(AppStrings.translate("work.debugging.instrumenting"), instrumentWorker, true);
             instrumentWorker.execute();
         }
     }
@@ -1223,7 +1223,7 @@ public class Main {
     }
 
     public static void continueWork(String name, final int percent) {
-        startWork(name, percent, mainFrame.getPanel().getCurrentWorker());
+        startWork(name, percent, mainFrame.getPanel().getCurrentWorker(), false);
     }
 
     private static long lastTimeStartWork = 0L;
@@ -1251,23 +1251,15 @@ public class Main {
             }
         }, 5000, 5000);
     }
-
-    public static void startWork(String name, CancellableWorker worker) {
-        startWork(name, -1, worker, false);
+    
+    public static void startWork(String name, CancellableWorker worker, boolean highPriority) {
+        startWork(name, -1, worker, highPriority);
     }
-
-    public static void startWork(String name, CancellableWorker worker, boolean force) {
-        startWork(name, -1, worker, force);
-    }
-
-    public static void startWork(final String name, final int percent, final CancellableWorker worker) {
-        startWork(name, percent, worker, false);
-    }
-
-    public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean force) {
+    
+    public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean highPriority) {
         working = true;
         long nowTime = System.currentTimeMillis();
-        if (!force && mainFrame != null && nowTime < lastTimeStartWork + 1000) {
+        if (!highPriority && mainFrame != null && nowTime < lastTimeStartWork + 1000) {
             mainFrame.getPanel().setWorkStatusHidden(name, worker);
             return;
         }
@@ -1366,7 +1358,7 @@ public class Main {
                             dummySwf.addTag(doABC2Tag);
                             doABC2Tag.setTimelined(dummySwf);
                             dummySwf.clearModified();
-                            startWork(AppStrings.translate("work.reading.abc"), this);
+                            startWork(AppStrings.translate("work.reading.abc"), this, true);
                             ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
                             doABC2Tag.setABC(abc);
                             return abc;
@@ -1396,13 +1388,13 @@ public class Main {
                             SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
-                                    startWork(AppStrings.translate("work.reading.swf"), p, worker);
+                                    startWork(AppStrings.translate("work.reading.swf"), p, worker, false);
                                 }
 
                                 @Override
                                 public void status(String status) {
                                     if ("renaming.identifiers".equals(status)) {
-                                        startWork(AppStrings.translate("work.renaming.identifiers"), worker);
+                                        startWork(AppStrings.translate("work.renaming.identifiers"), worker, true);
                                     }
                                 }
                             }, Configuration.parallelSpeedUp.get(), charset);
@@ -1438,7 +1430,7 @@ public class Main {
                         dummySwf.addTag(doABC2Tag);
                         doABC2Tag.setTimelined(dummySwf);
                         dummySwf.clearModified();
-                        startWork(AppStrings.translate("work.reading.abc"), this);
+                        startWork(AppStrings.translate("work.reading.abc"), this, true);
                         ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
                         doABC2Tag.setABC(abc);
                         return abc;
@@ -1492,13 +1484,13 @@ public class Main {
                         SWF swf = new SWF(is, file, fileTitle, new ProgressListener() {
                             @Override
                             public void progress(int p) {
-                                startWork(AppStrings.translate("work.reading.swf"), p, worker);
+                                startWork(AppStrings.translate("work.reading.swf"), p, worker, false);
                             }
 
                             @Override
                             public void status(String status) {
                                 if ("renaming.identifiers".equals(status)) {
-                                    startWork(AppStrings.translate("work.renaming.identifiers"), worker);
+                                    startWork(AppStrings.translate("work.renaming.identifiers"), worker, true);
                                 }
                             }
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
@@ -1779,13 +1771,13 @@ public class Main {
                             continueWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
                         }
                         if (event.equals("deobfuscate_pcode")) {
-                            startWork(AppStrings.translate("work.deobfuscating_pcode") + "..." + (String) data, deobfuscatePCodeWorker);
+                            startWork(AppStrings.translate("work.deobfuscating_pcode") + "..." + (String) data, deobfuscatePCodeWorker, false);
                         }
                         if (event.equals("rename")) {
                             continueWork(AppStrings.translate("work.renaming") + "..." + (String) data);
                         }
                         if (event.equals("importing_as")) {
-                            startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);
+                            startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker,false);
                         }
                         if (event.equals("uninitializedClassFields")) {
                             continueWork(AppStrings.translate("work.decompiling") + "..." + (String) data);
@@ -1986,7 +1978,7 @@ public class Main {
                 //Logger.getLogger(Main.class.getName()).log(Level.FINE, "Loading source info {0}", sourceInfo.getFile());
                 OpenableList openables = null;
                 try {
-                    Main.startWork(AppStrings.translate("work.reading.swf") + "...", null);
+                    Main.startWork(AppStrings.translate("work.reading.swf") + "...", null, true);
                     try {
                         openables = parseOpenable(sourceInfo);
                     } catch (ExecutionException ex) {
@@ -2029,7 +2021,7 @@ public class Main {
                 try {
                     View.execInEventDispatch(() -> {
                         ensureMainFrame();
-                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
+                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null, true);
                         if (openables1.isEmpty()) {
                             return;
                         }
@@ -2077,7 +2069,7 @@ public class Main {
             View.execInEventDispatch(() -> {
                 if (mainFrame == null) {
                     ensureMainFrame();
-                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
+                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null, true);
                 }
                 loadingDialog.setVisible(false);
 

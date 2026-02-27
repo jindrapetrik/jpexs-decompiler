@@ -337,12 +337,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             return new ActionScriptSearch().searchAs2(swf, txt, ignoreCase, regexp, pcode, new ScriptSearchListener() {
                 @Override
                 public void onDecompile(int pos, int total, String name) {
-                    Main.startWork(workText + " \"" + txt + "\", " + decAdd + " - (" + pos + "/" + total + ") " + name + "... ", worker);
+                    Main.startWork(workText + " \"" + txt + "\", " + decAdd + " - (" + pos + "/" + total + ") " + name + "... ", worker, false);
                 }
 
                 @Override
                 public void onSearch(int pos, int total, String name) {
-                    Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker);
+                    Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker, false);
                 }
             }, scope);
         }
@@ -604,7 +604,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
                             @Override
                             public void status(String status) {
-                                Main.startWork(AppStrings.translate("work.decompiling") + " " + status + "  ...", that);
+                                Main.startWork(AppStrings.translate("work.decompiling") + " " + status + "  ...", that, false);
                             }                            
                         };
                         UninitializedClassFieldsDetector det = asm.getSwf().getUninitializedClassFieldsDetector();
@@ -662,7 +662,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             setSourceWorker = worker;
             if (!Main.isDebugging()) {
                 decompiledEditor.setShowMarkers(false);
-                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker, true);
             }
         } else {
             setSourceCompleted(asm, decompiledText, actions);
