@@ -1796,7 +1796,7 @@ public class Main {
                             continueWork(AppStrings.translate("work.renaming") + "..." + (String) data);
                         }
                         if (event.equals("importing_as")) {
-                            startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker,false);
+                            startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker, false);
                         }
                         if (event.equals("uninitializedClassFields")) {
                             continueWork(AppStrings.translate("work.decompiling") + "..." + (String) data);
