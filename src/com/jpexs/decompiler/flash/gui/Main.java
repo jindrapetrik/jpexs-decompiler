@@ -382,6 +382,14 @@ public class Main {
     public static synchronized boolean isDebugRunning() {
         return (runProcess != null && runProcessDebug) || !flashDebugger.isStopped();
     }
+    
+    public static synchronized boolean isListening() {
+        return debugListening;
+    }
+    
+    public static synchronized boolean isSessionConnected() {
+        return debugListening && getDebugHandler().isAnySessionConnected();
+    }
 
     public static synchronized boolean isDebugPCode() {
         return runProcessDebugPCode;
@@ -527,6 +535,17 @@ public class Main {
         runWorker.execute();
     }
 
+    public static void disconnectSession() {
+        DebuggerSession session = getCurrentDebugSession();
+        if (session == null) {
+            return;
+        }
+        if (!session.isConnected()) {
+            return;
+        }
+        session.disconnect();
+    }
+    
     public static void stopRun() {
 
         synchronized (Main.class) {
@@ -951,7 +970,7 @@ public class Main {
         Main.startWork(AppStrings.translate("work.debugging.start") + "...", null, true);
         Main.startDebugger();
         Main.startWork(AppStrings.translate("work.debugging.listening"), null, true);
-        mainFrame.getMenu().hilightPath("/debugging");
+        mainFrame.getMenu().hilightPath("/debuggingListen");
     }
 
     public static void runDebug(SWF swf, final boolean doPCode) {
@@ -3223,6 +3242,7 @@ public class Main {
     public static void stopDebugger() {
         getDebugHandler().terminateAllSessions();
         flashDebugger.stopDebugger();
+        debugListening = false;
     }
 
     public static void showModeFrame() {

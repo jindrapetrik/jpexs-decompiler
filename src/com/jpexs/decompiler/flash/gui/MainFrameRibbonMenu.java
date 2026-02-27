@@ -736,10 +736,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     @Override
     public void setPathVisible(String path, boolean val) {
-        Object o = menuItems.get(path);
+        Object o = menuItems.get(path);        
         if (o instanceof RibbonTask) {
             if (menuOptional.get(path)) {
-                RibbonContextualTaskGroup rg = optionalGroups.get(path);
+                RibbonContextualTaskGroup rg = optionalGroups.get(path);                
 
                 if (ribbon.isVisible(rg) != val) {
                     View.execInEventDispatch(new Runnable() {
