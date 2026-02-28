@@ -79,7 +79,7 @@
     <PackagePaths></PackagePaths>
     <AS3PackagePaths>.</AS3PackagePaths>
     <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>
-    <DebuggingPermitted>0</DebuggingPermitted>
+    <DebuggingPermitted>1</DebuggingPermitted>
     <DebuggingPassword></DebuggingPassword>
     <CompressMovie>1</CompressMovie>
     <CompressionType>0</CompressionType>
@@ -158,7 +158,7 @@
     <Animated>0</Animated>
     <MatchMovieDim>1</MatchMovieDim>
     <Loop>1</Loop>
-    <LoopCount></LoopCount>
+    <LoopCount>0</LoopCount>
     <OptimizeColors>1</OptimizeColors>
     <Interlace>0</Interlace>
     <Smooth>1</Smooth>

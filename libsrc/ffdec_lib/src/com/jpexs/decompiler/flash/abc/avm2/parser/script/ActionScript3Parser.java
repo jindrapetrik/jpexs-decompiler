@@ -358,7 +358,7 @@ public class ActionScript3Parser {
                 if (ns != null) {
                     ret = new NamespacedAVM2Item(ns, propName, propItem, ret, attr, openedNamespaces, null);
                 } else {
-                    ret = new PropertyAVM2Item(ret, attr, propName, nsSuffix, abcIndex, openedNamespaces, new ArrayList<>(), nullDot, nsKeyword);
+                    ret = new PropertyAVM2Item(ret, attr, propName, nsSuffix, abcIndex, openedNamespaces, new ArrayList<>(), nullDot, nsKeyword, lexer.yyline());
                 }
                 s = lex();
             }
@@ -472,7 +472,7 @@ public class ActionScript3Parser {
         }
         if (nsname != null) {
             if (nsKeyword != null && nspropItem == null) {
-                ret = new PropertyAVM2Item(ret, nsAtribute, nsprop, nsSuffix, abcIndex, openedNamespaces, new ArrayList<MethodBody>(), false, nsKeyword);
+                ret = new PropertyAVM2Item(ret, nsAtribute, nsprop, nsSuffix, abcIndex, openedNamespaces, new ArrayList<MethodBody>(), false, nsKeyword, lexer.yyline());
             } else {
                 UnresolvedAVM2Item ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, typeOnly, null, lexer.yyline(), new DottedChain(new String[]{nsname}), null, openedNamespaces, abcIndex);
                 variables.add(ns);
