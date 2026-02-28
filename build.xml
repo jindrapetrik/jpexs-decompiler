@@ -946,12 +946,17 @@
     <target name="build_cli">
         <ant antfile="${cli.script}" target="build" inheritAll="false" usenativebasedir="true"/>
     </target>
+   
+    <target name="update-dockefile" depends="-github-newversion-input">
+        <replaceregexp file="Dockerfile" match="version[^/]+/ffdec_[^/]+.zip" replace="version${gh.newversion}/ffdec_${gh.newversion}.zip"/>
+    </target>   
     
-    <target name="github-newversion" depends="-git-required,-git-checkout-master,-github-newversion-input,rename-unreleased-section,update-changelog-md,update-metainfo">
+    <target name="github-newversion" depends="-git-required,-git-checkout-master,-github-newversion-input,rename-unreleased-section,update-changelog-md,update-metainfo,update-dockefile">
         <exec executable="git" failonerror="true">
             <arg value="add"/>
             <arg value="${changelog.file}"/>            
             <arg value="${metainfo.file}"/>   
+            <arg value="Dockerfile"/>
         </exec> 
         
         <exec executable="git" failonerror="true">

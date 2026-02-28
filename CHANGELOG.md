@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#2644] Debugger - Button to sort variables alphabetically
 - AS3 Direct editation - Error when accessing inaccessible namespace
 - AS3 ambiguous namespace detection (back again)
+- [#2648] Dockerfile
 
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
@@ -4180,6 +4181,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2644]: https://www.free-decompiler.com/flash/issues/2644
+[#2648]: https://www.free-decompiler.com/flash/issues/2648
 [#2643]: https://www.free-decompiler.com/flash/issues/2643
 [#2645]: https://www.free-decompiler.com/flash/issues/2645
 [#2514]: https://www.free-decompiler.com/flash/issues/2514
