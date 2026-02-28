@@ -45,8 +45,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,10 +100,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
     private final boolean nullish;
     private final String nsKeyword;
+    
+    private int line;
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack, nullish, nsKeyword);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack, nullish, nsKeyword, line);
         return p;
     }
 
@@ -117,8 +121,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      * @param callStack Call stack
      * @param nullish Nullish
      * @param nsKeyword Namespace keyword (public,protected,private,internal)
+     * @param line Source code line
      */
-    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack, boolean nullish, String nsKeyword) {
+    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack, boolean nullish, String nsKeyword, int line) {
         this.attribute = attribute;
         this.propertyName = propertyName;
         this.namespaceSuffix = namespaceSuffix;
@@ -128,6 +133,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         this.callStack = callStack;
         this.nullish = nullish;
         this.nsKeyword = nsKeyword;
+        this.line = line;
     }
 
     @Override
@@ -302,7 +308,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 propValueAbc = sp.abc;
                                 propTrait = sp.trait;
                             }
-                        }
+                        }                        
                         if (propType == null && AVM2SourceGenerator.searchPrototypeChain(nsKeyword, namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, localData.staticProtectedNs, localData.internalNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
                             objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                             propType = outPropType.getVal();
@@ -313,6 +319,39 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             propValue = outPropValue.getVal();
                             propValueAbc = outPropValueAbc.getVal();
                             propTrait = outPropTrait.getVal();
+                            int nsIndex = propTrait.getName(propValueAbc).namespace_index;
+                            Namespace ns = propValueAbc.constants.getNamespace(nsIndex);
+                            String pkg = ftn.getWithoutLast().toRawString();
+                            switch (ns.kind) {
+                                case Namespace.KIND_PRIVATE:
+                                    if (!(otherNs.contains(nsIndex) && propValueAbc == abc)) {
+                                        throw new CompilationException("Property " + propertyName + " has private access in " + objType.toString(), line);
+                                    }
+                                    break;
+                                case Namespace.KIND_PACKAGE_INTERNAL:
+                                    if (!pkg.equals(localData.pkg.toRawString())) {
+                                        throw new CompilationException("Property " + propertyName + " has package internal access in " + objType.toString(), line);
+                                    }
+                                    break;
+                                case Namespace.KIND_PROTECTED:
+                                case Namespace.KIND_STATIC_PROTECTED:
+                                    AbcIndexing.ClassIndex ci = abcIndex.findClass(thisType, abc, localData.scriptIndex);
+                                    boolean found = false;
+                                    String nsName = ns.getName(propValueAbc.constants).toRawString();
+                                    while (ci != null) {
+                                        DottedChain clsName = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(new HashSet<>(), ci.abc, ci.abc.constants, false);
+                                        String clsNsName = clsName.isTopLevel() ? clsName.getLast() : clsName.getWithoutLast().toRawString() + ":" + clsName.getLast();
+                                        if (Objects.equals(nsName, clsNsName)) {
+                                            found = true;
+                                            break;
+                                        }
+                                        ci = ci.parent;
+                                    }
+                                    if (!found) {
+                                        throw new CompilationException("Property " + propertyName + " has protected access in " + objType.toString(), line);
+                                    }
+                                    break;
+                            }                            
                         }
                     }
                 }
@@ -364,7 +403,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             }
                         }
                         if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {
-                            AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, nsindex), true, true);
+                            Reference<Boolean> foundStatic = new Reference<>(null);
+                            AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, nsindex), true, true, foundStatic);
 
                             Reference<String> outName = new Reference<>("");
                             Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);

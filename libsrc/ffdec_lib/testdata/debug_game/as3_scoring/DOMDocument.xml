@@ -183,6 +183,9 @@ btnSpeedDown.addEventListener(MouseEvent.CLICK, onSpeedDown);
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="10154" publishTime="1772229505" publishDebug="true"/>
+          <PublishItem publishSize="10154" publishTime="1772229364" publishDebug="true"/>
+          <PublishItem publishSize="10152" publishTime="1772229351" publishDebug="true"/>
           <PublishItem publishSize="9791" publishTime="1771699753"/>
           <PublishItem publishSize="10087" publishTime="1771695966" publishDebug="true"/>
           <PublishItem publishSize="9267" publishTime="1771270767"/>
@@ -200,8 +203,5 @@ btnSpeedDown.addEventListener(MouseEvent.CLICK, onSpeedDown);
           <PublishItem publishSize="8757" publishTime="1771268093" publishDebug="true"/>
           <PublishItem publishSize="8231" publishTime="1771267749" publishDebug="true"/>
           <PublishItem publishSize="7175" publishTime="1771267717" publishDebug="true"/>
-          <PublishItem publishSize="7221" publishTime="1771267633" publishDebug="true"/>
-          <PublishItem publishSize="7221" publishTime="1771267610" publishDebug="true"/>
-          <PublishItem publishSize="7223" publishTime="1771267567" publishDebug="true"/>
      </publishHistory>
 </DOMDocument>

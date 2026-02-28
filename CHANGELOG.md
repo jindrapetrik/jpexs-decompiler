@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Debugger - Button to disconnect current session (stay listening)
 - [#2644] Debugger - Button to sort variables alphabetically
+- AS3 Direct editation - Error when accessing inaccessible namespace
 
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
@@ -13,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#2645] Windows MSI installer - Cannot change install directory
 - Long delay before switching critical status bar titles
   (Causing many actions to look slow - for example Debug listening)
+- AS3 goto definition missing some namespaces
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver

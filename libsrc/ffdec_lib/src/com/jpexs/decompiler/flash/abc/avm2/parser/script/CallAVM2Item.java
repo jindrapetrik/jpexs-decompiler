@@ -136,7 +136,7 @@ public class CallAVM2Item extends AVM2Item {
                     nobj.setRegNumber(0);
                     obj = nobj;
                 }*/
-                PropertyAVM2Item p = new PropertyAVM2Item(obj, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), g.abcIndex, n.openedNamespaces, new ArrayList<>(), false, null);
+                PropertyAVM2Item p = new PropertyAVM2Item(obj, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), g.abcIndex, n.openedNamespaces, new ArrayList<>(), false, null, line);
                 p.setAssignedValue(n.getAssignedValue());
                 callable = p;
             }

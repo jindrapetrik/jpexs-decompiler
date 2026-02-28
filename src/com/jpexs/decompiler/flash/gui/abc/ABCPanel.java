@@ -1221,7 +1221,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     swfRef.setVal(ci.abc.getSwf());
                 }
 
-                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(new LinkedHashSet<>(), ci.abc.getSwf(), true);
+                String scriptNamePrintable = DottedChain.parseWithSuffix(scriptName.toString()).toPrintableString(new LinkedHashSet<>(), swfRef.getVal(), true);
 
                 if (swfRef.getVal() == abc.getSwf()) {
                     hilightScript(getOpenable(), scriptNamePrintable);

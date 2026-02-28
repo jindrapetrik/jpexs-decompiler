@@ -2508,10 +2508,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
      */
     public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
         
+        AVM2ConstantPool constants = abc.getSelectedAbc().constants;
+        int publicNs = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, false);
+        
         if (nsKeyword != null) {
             switch (nsKeyword) {
                 case "public":
-                    return searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);            
+                    return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);            
                 case "protected":
                     if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
                         return true;
@@ -2542,14 +2545,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        return searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
+        return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
     }
 
     private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
         isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
         if (sp == null) {
-            Reference<Boolean> foundStatic = new Reference<>(null);                
+            Reference<Boolean> foundStatic = new Reference<>(null);               
             sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
         }
         if (sp != null) {
@@ -3086,7 +3089,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.NewObject, 0));
             ret.add(ins(AVM2Instructions.PushWith));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack, false, null));
+            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack, false, null, -1));
         }
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         ret.add(ins(AVM2Instructions.NewFunction, method(null, false, constants.getStringId(item.functionName, true), true, false, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClassBaseName, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));

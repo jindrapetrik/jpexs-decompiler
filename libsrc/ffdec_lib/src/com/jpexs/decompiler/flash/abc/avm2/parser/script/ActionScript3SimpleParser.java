@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.simpleparser.CatchScope;
@@ -2371,7 +2372,11 @@ public class ActionScript3SimpleParser implements SimpleParser {
         List<VariableOrScope> vars = new ArrayList<>();
         List<DottedChain> importedClasses = new ArrayList<>();
         List<NamespaceItem> openedNamespaces = new ArrayList<>();
-        for (String name : abc.getSwf().getAbcIndex().getPackageObjects(DottedChain.TOPLEVEL)) {
+        SWF swf = abc.getSwf();
+        if (swf == null) {
+            return;
+        }
+        for (String name : swf.getAbcIndex().getPackageObjects(DottedChain.TOPLEVEL)) {
             externalTypes.add(new Path(name));
         }
         externalTypes.add(new Path("__AS3__", "vec", "Vector"));

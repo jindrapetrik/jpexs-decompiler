@@ -162,13 +162,16 @@ public final class AbcIndexing {
                 return;
             }
             Namespace ns = abc.constants.getNamespace(propNsIndex);
-            this.propNsKind = ns.kind;
+            //this.propNsKind = ns.kind;
             switch (ns.kind) {
-                case Namespace.KIND_PACKAGE:
-                case Namespace.KIND_NAMESPACE:
+                case Namespace.KIND_PACKAGE:   
+                case Namespace.KIND_PACKAGE_INTERNAL:
                 case Namespace.KIND_PROTECTED:
                 case Namespace.KIND_STATIC_PROTECTED:
-                    this.abc = null;
+                    //this.abc = null;
+                    //this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
+                    break;
+                case Namespace.KIND_NAMESPACE:
                     this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
                     break;
                 default:
@@ -187,8 +190,11 @@ public final class AbcIndexing {
             this.propName = propName;
             this.parent = parent;
             this.abc = null;
-            this.propNsKind = nsKind;
-            this.propNsString = propNsString;
+            if (nsKind == Namespace.KIND_NAMESPACE) {
+                this.propNsString = propNsString;
+            }
+            //this.propNsKind = nsKind;
+            //this.propNsString = propNsString;
         }
 
         @Override
@@ -242,12 +248,7 @@ public final class AbcIndexing {
 
         private int propNsIndex = 0;
 
-        private ABC abc = null;
-
-        private void setPrivate(ABC abc, int propNsIndex) {
-            this.propNsIndex = propNsIndex;
-            this.abc = abc;
-        }
+        private ABC abc = null;     
 
         /**
          * Gets property name
@@ -280,9 +281,12 @@ public final class AbcIndexing {
                 return;
             }
             int k = abc.constants.getNamespace(nsIndex).kind;
-            if (k != Namespace.KIND_PACKAGE) {
+            /*if (k != Namespace.KIND_PACKAGE) {
                 setPrivate(abc, nsIndex);
-            }
+            }*/
+            
+            this.propNsIndex = nsIndex;
+            this.abc = abc;
         }
 
         /**
@@ -840,33 +844,26 @@ public final class AbcIndexing {
      * @param prop Property to find
      * @param findStatic Find static properties
      * @param findInstance Find instance properties
+     * @param foundStatic  Whether result is static
      * @return Trait index or null
      */
-    public TraitIndex findNsProperty(PropertyNsDef prop, boolean findStatic, boolean findInstance) {
-
-        if (findStatic && classNsProperties.containsKey(prop)) {
-            if (!classNsProperties.containsKey(prop)) {
-                if (parent != null) {
-                    TraitIndex ret = parent.findNsProperty(prop, findStatic, findInstance);
-                    if (ret != null) {
-                        return ret;
-                    }
-                }
-            } else {
+    public TraitIndex findNsProperty(PropertyNsDef prop, boolean findStatic, boolean findInstance, Reference<Boolean> foundStatic) {
+        if (findStatic) {
+            if (classNsProperties.containsKey(prop)) {
+                foundStatic.setVal(true);
                 return classNsProperties.get(prop);
-            }
+            }            
         }
         if (findInstance && instanceNsProperties.containsKey(prop)) {
-            if (!instanceNsProperties.containsKey(prop)) {
-                if (parent != null) {
-                    TraitIndex ret = parent.findNsProperty(prop, findStatic, findInstance);
-                    if (ret != null) {
-                        return ret;
-                    }
-                }
-            } else {
-                return instanceNsProperties.get(prop);
-            }
+            foundStatic.setVal(false);
+            return instanceNsProperties.get(prop);
+        }
+        
+        if (parent != null) {
+            TraitIndex ret = parent.findProperty(new PropertyDef(prop.propName, new TypeItem(prop.ns), prop.abc, prop.propNsIndex), findStatic, findInstance, true, foundStatic);
+            if (ret != null) {
+                return ret;
+            }                
         }
         return null;
     }
