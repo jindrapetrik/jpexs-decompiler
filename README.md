@@ -69,6 +69,19 @@ There are few libraries which need to be built too. These libraries are placed i
 * **ttf** - used for TTF font export (Netbeans/Ant project)
 * **gnujpdf** - used for PDF export (Netbeans/Ant project)
 
+## Docker
+We have `Dockerfile` for headless running for not needing to install Java or FFDec locally.
+(Original script by Mahdi Lazraq)
+### Build
+```
+docker build -t ffdec .
+```
+### Usage
+FFDec CLI is the entrypoint, so you can pass arguments directly:
+```
+docker run --rm -v ./input:/work/input -v ./output:/work/output ffdec [args]
+```
+
 ## Change log
 All notable changes are listed in the file [CHANGELOG.md](CHANGELOG.md)
 
