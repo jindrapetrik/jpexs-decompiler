@@ -158,7 +158,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "a = new tests_classes.mypackage1.TestClass();\n"
                 + "b = new tests_classes.mypackage2.TestClass();\n"
                 + "c = new tests_classes.mypackage3.TestClass();\n"
-                + "var res:String = a.testCall() + b.testCall() + c.testCall() + this.testCall2() + this.testCall3() + this.testCall4() + testCall5() + this.testCall6() + myNamespace::testCall3();\n"
+                + "var res:String = a.testCall() + b.testCall() + c.testCall() + this.public::testCall2() + this.private::testCall3() + this.protected::testCall4() + protected::testCall5() + this.internal::testCall6() + myNamespace::testCall3();\n"
                 + "trace(res);\n"
                 + "return res;\n"
                 + "}\n"

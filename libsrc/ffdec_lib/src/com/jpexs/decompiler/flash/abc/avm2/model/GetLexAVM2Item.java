@@ -18,15 +18,19 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -94,14 +98,28 @@ public class GetLexAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         Reference<DottedChain> customNsRef = new Reference<>(null);
         String localName = propertyName.getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
-        DottedChain customNs = customNsRef.getVal();
-        if (customNs != null) {
+        DottedChain customNs = customNsRef.getVal();                
+        if (customNs != null) {                        
             String nsname = customNs.getLast();
             String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
-            writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
-            writer.appendNoHilight("::");
-            getSrcData().localName = nsname + "::" + localName;            
-            return writer.append(localName);
+            
+            Boolean ambiguous = null;
+            
+            if (localData.classIndex > -1) {
+                DottedChain fullClassName = localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(new HashSet<>(), localData.abc, localData.abc.constants, false);
+                ambiguous = localData.abcIndex.isPropertyAmbiguous(localData.abc, localName, new TypeItem(fullClassName), true, true);                
+            }
+            
+            
+            if (ambiguous == null || ambiguous == true) {
+                writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
+                writer.appendNoHilight("::");
+                getSrcData().localName = nsname + "::" + localName;            
+                return writer.append(localName);
+            } else {
+                getSrcData().localName = nsname + "::" + localName;            
+                return writer.append(localName);
+            }
         }
         
         

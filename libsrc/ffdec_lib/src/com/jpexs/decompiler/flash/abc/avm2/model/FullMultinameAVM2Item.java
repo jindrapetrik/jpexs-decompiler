@@ -225,46 +225,36 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     } else {
                         localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, fullyQualifiedNames, false, true, customNsRef);                        
                     }
+                    
                     DottedChain customNs = customNsRef.getVal();
-                    if (customNs != null) {
-                        String nsname = customNs.getLast();
-                        String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
-                        writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
-                        writer.appendNoHilight("::");
-                    } else {                  
-                        //FIXME!! This is slow, should be moved to indexing
-                        if (false && parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
-                            String rawName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, fullyQualifiedNames, true, true);
-                            List<AbcIndexing.PropertyDef> defs = new ArrayList<>();
-                            List<Boolean> staticRef = new ArrayList<>();
-                            localData.abcIndex.getClassTraits(localData.usedDeobfuscations, parentType, localData.abc, null, true, true, true, true, true, defs, staticRef);
-                            int numStaticUsed = 0;
-                            int numInstanceUsed = 0;
-                            for (int i = 0; i < defs.size(); i++) {
-                                AbcIndexing.PropertyDef def = defs.get(i);
-                                if (Objects.equals(rawName, def.getPropertyName())) {
-                                    //cannot access instance properties via static context
-                                    if (isStatic && !staticRef.get(i)) {
-                                        continue;
-                                    }
-                                    if (staticRef.get(i)) {
-                                        numStaticUsed++;
-                                    } else {
-                                        numInstanceUsed++;
-                                    }
-                                }
-                            }
-                            if (numInstanceUsed > 1 || numStaticUsed > 1) {
-                                Namespace ns = constants.getMultiname(multinameIndex).getSingleNamespace(localData.abc.constants);
-                                if (ns != null) {
-                                    String prefix = Namespace.kindToPrefix(ns.kind);
-                                    if (prefix != null) {
-                                        writer.append(prefix).append("::");
-                                    }
+                    
+                    Boolean isAmbiguous = null;
+                    if (parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
+                        String rawName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, fullyQualifiedNames, true, true);
+                        isAmbiguous = localData.abcIndex.isPropertyAmbiguous(localData.abc, rawName, parentType, true, true);
+                    }
+                    
+                    /*if (customNs != null) {
+                        isAmbiguous = true;
+                    }*/
+                    
+                    if (isAmbiguous == null || isAmbiguous) {
+                        if (customNs != null) {
+                            String nsname = customNs.getLast();
+                            String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    
+                            writer.hilightSpecial(identifier, HighlightSpecialType.TYPE_NAME, customNs.toRawString());
+                            writer.appendNoHilight("::");
+                        } else if (isAmbiguous != null) {   
+                            Namespace ns = constants.getMultiname(multinameIndex).getSingleNamespace(localData.abc.constants);
+                            if (ns != null) {
+                                String prefix = Namespace.kindToPrefix(ns.kind);
+                                if (prefix != null) {
+                                    writer.append(prefix).append("::");
                                 }
                             }
                         }
                     }
+                    
         
                     if (!isAttribute && afterDot && namespaceSuffix.isEmpty() && Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
                         if (IdentifiersDeobfuscation.isValidName(true, localName)) {
