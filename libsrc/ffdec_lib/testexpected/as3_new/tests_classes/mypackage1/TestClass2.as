@@ -178,9 +178,9 @@ package tests_classes.mypackage1
                            add
                            coerce_s
                            setlocal 4
-                           findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),PrivateNamespace("tests_classes.mypackage1:TestClass2"),ProtectedNamespace("tests_classes.mypackage1:TestClass2"),StaticProtectedNs("tests_classes.mypackage1:TestClass2"),PrivateNamespace("TestClass2.as$0")])
+                           findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),Namespace("https://www.free-decompiler.com/flash/test/namespace"),PrivateNamespace("tests_classes.mypackage1:TestClass2"),ProtectedNamespace("tests_classes.mypackage1:TestClass2"),StaticProtectedNs("tests_classes.mypackage1:TestClass2"),PrivateNamespace("TestClass2.as$0")])
                            getlocal 4
-                           callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),PrivateNamespace("tests_classes.mypackage1:TestClass2"),ProtectedNamespace("tests_classes.mypackage1:TestClass2"),StaticProtectedNs("tests_classes.mypackage1:TestClass2"),PrivateNamespace("TestClass2.as$0")]), 1
+                           callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),Namespace("https://www.free-decompiler.com/flash/test/namespace"),PrivateNamespace("tests_classes.mypackage1:TestClass2"),ProtectedNamespace("tests_classes.mypackage1:TestClass2"),StaticProtectedNs("tests_classes.mypackage1:TestClass2"),PrivateNamespace("TestClass2.as$0")]), 1
                            getlocal 4
                            returnvalue
                         end ; code

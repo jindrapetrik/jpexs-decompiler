@@ -104,6 +104,44 @@ public final class AbcIndexing {
         this(null, null);
     }
 
+    private static class AmbiguousPropertyDef {
+        private final String propName;
+       
+        private final GraphTargetItem parent;
+
+        public AmbiguousPropertyDef(String propName, GraphTargetItem parent) {
+            this.propName = propName;
+            this.parent = parent;
+        }                        
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 79 * hash + Objects.hashCode(this.propName);
+            hash = 79 * hash + Objects.hashCode(this.parent);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final AmbiguousPropertyDef other = (AmbiguousPropertyDef) obj;
+            if (!Objects.equals(this.propName, other.propName)) {
+                return false;
+            }
+            return Objects.equals(this.parent, other.parent);
+        }
+        
+    }
+    
     /**
      * Property key
      */
@@ -168,12 +206,13 @@ public final class AbcIndexing {
                 case Namespace.KIND_PACKAGE_INTERNAL:
                 case Namespace.KIND_PROTECTED:
                 case Namespace.KIND_STATIC_PROTECTED:
+                case Namespace.KIND_NAMESPACE:
                     //this.abc = null;
                     //this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
                     break;
-                case Namespace.KIND_NAMESPACE:
-                    this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
-                    break;
+                
+                    //this.propNsString = abc.constants.getNamespace(propNsIndex).getRawName(abc.constants);
+                    //break;
                 default:
                     this.abc = abc;
                     this.propNsIndex = propNsIndex;                     
@@ -191,7 +230,7 @@ public final class AbcIndexing {
             this.parent = parent;
             this.abc = null;
             if (nsKind == Namespace.KIND_NAMESPACE) {
-                this.propNsString = propNsString;
+                //this.propNsString = propNsString;
             }
             //this.propNsKind = nsKind;
             //this.propNsString = propNsString;
@@ -281,12 +320,10 @@ public final class AbcIndexing {
                 return;
             }
             int k = abc.constants.getNamespace(nsIndex).kind;
-            /*if (k != Namespace.KIND_PACKAGE) {
-                setPrivate(abc, nsIndex);
-            }*/
-            
-            this.propNsIndex = nsIndex;
-            this.abc = abc;
+            if (k == Namespace.KIND_PRIVATE) {
+                this.propNsIndex = nsIndex;
+                this.abc = abc;
+            }                       
         }
 
         /**
@@ -556,6 +593,12 @@ public final class AbcIndexing {
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
+    
+    private final Map<AmbiguousPropertyDef, List<TraitIndex>> instanceAmbiguousProperties = new HashMap<>();
+    
+    private final Map<AmbiguousPropertyDef, List<TraitIndex>> classAmbiguousProperties = new HashMap<>();
+
+    private final Map<AmbiguousPropertyDef, List<TraitIndex>> scriptAmbiguousProperties = new HashMap<>();
 
     /**
      * Rebuilds package to objects name map.
@@ -921,7 +964,7 @@ public final class AbcIndexing {
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
             DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(new LinkedHashSet<>(), ciParent.abc, ciParent.abc.constants, true);
-            PropertyDef parentDef = new PropertyDef(prop.propName, new TypeItem(parentClass), prop.propNsString, prop.propNsKind);
+            PropertyDef parentDef = new PropertyDef(prop.propName, new TypeItem(parentClass), (ABC) null, 0);
             TraitIndex pti = findProperty(parentDef, findStatic, findInstance, findProtected, foundStatic);
             if (pti != null) {
                 return pti;
@@ -1059,13 +1102,36 @@ public final class AbcIndexing {
      * @param mapNs Map to index
      * @param scriptIndex Script index
      */
-    protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs, int scriptIndex) {        
+    protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs, Map<AmbiguousPropertyDef, List<TraitIndex>> mapAmbiguous, int scriptIndex) {        
         for (Trait t : ts.traits) {
             ValueKind propValue = null;
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
             }
+            if (mapAmbiguous != null) {
+                AmbiguousPropertyDef dp = new AmbiguousPropertyDef(t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(new LinkedHashSet<>(), name_index, abc, abc.constants));
+                TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(new LinkedHashSet<>(), abc, t), getTraitCallReturnType(new LinkedHashSet<>(), abc, t), propValue, multinameToType(new LinkedHashSet<>(), name_index, abc, abc.constants), scriptIndex);                
+                if (!mapAmbiguous.containsKey(dp)) {
+                    mapAmbiguous.put(dp, new ArrayList<>());
+                    mapAmbiguous.get(dp).add(ti);
+                } else {
+                    int thisNsKind = t.getName(abc).getNamespace(abc.constants).kind;
+                    boolean onlySameNsKind = true;
+                    for (TraitIndex ti2 : mapAmbiguous.get(dp)) {
+                        int prevNsKind = ti2.trait.getName(ti2.abc).getNamespace(ti2.abc.constants).kind;                                
+                        if (prevNsKind != thisNsKind) {
+                            onlySameNsKind = false;
+                            break;
+                        }
+                    }
+                    if (!onlySameNsKind) {
+                        mapAmbiguous.get(dp).add(ti);
+                    }
+                }
+                
+            }
+            
             if (map != null) {
                 PropertyDef dp = new PropertyDef(t.getName(abc).getName(new LinkedHashSet<>(), abc, abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(new LinkedHashSet<>(), name_index, abc, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
                 map.put(dp, new TraitIndex(t, abc, getTraitReturnType(new LinkedHashSet<>(), abc, t), getTraitCallReturnType(new LinkedHashSet<>(), abc, t), propValue, multinameToType(new LinkedHashSet<>(), name_index, abc, abc.constants), scriptIndex));
@@ -1164,7 +1230,7 @@ public final class AbcIndexing {
         List<ClassIndex> addedClasses = new ArrayList<>();
 
         for (int i = 0; i < abc.script_info.size(); i++) {
-            indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties, i);
+            indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties, scriptAmbiguousProperties, i);
             for (int t = 0; t < abc.script_info.get(i).traits.traits.size(); t++) {
                 Trait tr = abc.script_info.get(i).traits.traits.get(t);
                 if (tr instanceof TraitClass) {
@@ -1181,8 +1247,8 @@ public final class AbcIndexing {
                     GraphTargetItem cname = multinameToType(new LinkedHashSet<>(), ii.name_index, abc, abc.constants);
                     classes.put(new ClassDef(cname, abc, classScriptIndex), cindex);
 
-                    indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties, i);
-                    indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties, i);
+                    indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties, instanceAmbiguousProperties, i);
+                    indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties, classAmbiguousProperties, i);
                 }
             }
         }
@@ -1266,5 +1332,24 @@ public final class AbcIndexing {
             return false;
         }
         return isInstanceOf(ci.abc, ci.index, searchClassName);
+    }
+    
+    public Boolean isPropertyAmbiguous(ABC abc, String propertyName, GraphTargetItem parent, boolean findStatic, boolean findInstance) {
+        AmbiguousPropertyDef key = new AmbiguousPropertyDef(propertyName, parent);
+        if (findStatic && classAmbiguousProperties.containsKey(key)) {
+            return classAmbiguousProperties.get(key).size() > 1;
+        }
+        if (findInstance && instanceAmbiguousProperties.containsKey(key)) {
+            return instanceAmbiguousProperties.get(key).size() > 1;
+        }
+        ClassIndex ci = findClass(parent, abc, null);
+        if (ci != null) {
+            if (ci.parent != null) {
+                ci = ci.parent;
+                DottedChain parentClassName = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(new HashSet<>(), ci.abc, ci.abc.constants, false);
+                return isPropertyAmbiguous(ci.abc, propertyName, new TypeItem(parentClassName), findStatic, findInstance);
+            }
+        }
+        return null;
     }
 }

@@ -114,10 +114,10 @@ package tests
                      getproperty RTQNameL()
                      coerce_a
                      setlocal 4
-                     findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
+                     findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
                      getlocal 4
-                     getproperty Multiname("c",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
-                     callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
+                     getproperty Multiname("c",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
+                     callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
                      findproperty QName(PackageNamespace("tests_other"),"myInternal")
                      getproperty QName(PackageNamespace("tests_other"),"myInternal")
                      coerce QName(PackageNamespace(""),"Namespace")
@@ -207,9 +207,9 @@ package tests
                            code
                               getlocal0
                               pushscope
-                              findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
+                              findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
                               pushstring "hello"
-                              callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
+                              callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
                               returnvoid
                            end ; code
                         end ; body
@@ -233,9 +233,9 @@ package tests
                               code
                                  getlocal0
                                  pushscope
-                                 findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
+                                 findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")])
                                  pushstring "hello"
-                                 callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
+                                 callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),Namespace("http://www.adobe.com/2006/actionscript/examples"),PackageInternalNs("tests_other:myInternal2"),PrivateNamespace("tests:TestNames"),ProtectedNamespace("tests:TestNames"),StaticProtectedNs("tests:TestNames"),PrivateNamespace("TestNames.as$0")]), 1
                                  returnvoid
                               end ; code
                            end ; body

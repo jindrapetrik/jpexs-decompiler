@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Debugger - Button to disconnect current session (stay listening)
 - [#2644] Debugger - Button to sort variables alphabetically
 - AS3 Direct editation - Error when accessing inaccessible namespace
+- AS3 ambiguous namespace detection (back again)
 
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
@@ -15,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Long delay before switching critical status bar titles
   (Causing many actions to look slow - for example Debug listening)
 - AS3 goto definition missing some namespaces
+- [#2514] AS3 direct editation - problems with namespaces
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver
@@ -4180,6 +4182,7 @@ Major version of SWF to XML export changed to 2.
 [#2644]: https://www.free-decompiler.com/flash/issues/2644
 [#2643]: https://www.free-decompiler.com/flash/issues/2643
 [#2645]: https://www.free-decompiler.com/flash/issues/2645
+[#2514]: https://www.free-decompiler.com/flash/issues/2514
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
 [#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636

@@ -97,7 +97,7 @@ package tests_classes.mypackage1
                         coerce QName(PackageNamespace("tests_classes.mypackage1"),"TestInterface")
                         setlocal1
                         getlocal1
-                        callpropvoid Multiname("testMethod1",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),PrivateNamespace("tests_classes.mypackage1:TestClass"),ProtectedNamespace("tests_classes.mypackage1:TestClass"),StaticProtectedNs("tests_classes.mypackage1:TestClass"),PrivateNamespace("TestClass.as$0")]), 0
+                        callpropvoid QName(Namespace("tests_classes.mypackage1:TestInterface"),"testMethod1"), 0
                         getlocal0
                         coerce QName(PackageNamespace("tests_classes.mypackage2"),"TestInterface")
                         setlocal2
@@ -134,7 +134,7 @@ package tests_classes.mypackage1
                            coerce QName(PackageNamespace("tests_classes.mypackage1"),"TestInterface")
                            setlocal1
                            getlocal1
-                           callpropvoid Multiname("testMethod1",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests_classes.mypackage1"),PackageInternalNs("tests_classes.mypackage1"),PrivateNamespace("tests_classes.mypackage1:TestClass"),ProtectedNamespace("tests_classes.mypackage1:TestClass"),StaticProtectedNs("tests_classes.mypackage1:TestClass"),PrivateNamespace("TestClass.as$0")]), 0
+                           callpropvoid QName(Namespace("tests_classes.mypackage1:TestInterface"),"testMethod1"), 0
                            getlocal0
                            coerce QName(PackageNamespace("tests_classes.mypackage2"),"TestInterface")
                            setlocal2

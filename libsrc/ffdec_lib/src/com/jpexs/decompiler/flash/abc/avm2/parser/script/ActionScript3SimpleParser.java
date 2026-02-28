@@ -376,15 +376,24 @@ public class ActionScript3SimpleParser implements SimpleParser {
                     continue;
                 }
             } else {
-                if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY)) {
+                if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY,
+                        SymbolType.PUBLIC, SymbolType.PROTECTED, SymbolType.PRIVATE, SymbolType.INTERNAL
+                    )) {
                     lexer.pushback(s);
                     return new Path();
                 }
+                if (s.isType(SymbolType.PUBLIC, SymbolType.PROTECTED, SymbolType.PRIVATE, SymbolType.INTERNAL)) {
+                    nsKeyword = s;
+                }
+                
                 lastName = s.value.toString();
                 identPos = s.position;
             }
             s = lex();
             if (s.type == SymbolType.NAMESPACESUFFIX) {
+                if (nsKeyword != null) {
+                    errors.add(new SimpleParseException(nsKeyword.value + " not expected in this situation", lexer.yyline(), nsKeyword.position));
+                }
                 lastName += "#" + s.value;
                 s = lex();
             }

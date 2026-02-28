@@ -55,6 +55,11 @@ public class NamespaceItem {
      * Namespace index
      */
     private int nsIndex = -1;
+    
+    /**
+     * Line
+     */
+    private int line;
 
     /**
      * Force resolves namespace.
@@ -68,20 +73,24 @@ public class NamespaceItem {
      * Constructor.
      * @param name Name
      * @param kind Kind
+     * @param line Line
      */
-    public NamespaceItem(DottedChain name, int kind) {
+    public NamespaceItem(DottedChain name, int kind, int line) {
         this.name = name;
         this.kind = kind;
+        this.line = line;
     }
 
     /**
      * Constructor.
      * @param name Name
      * @param kind Kind
+     * @param line Line
      */
-    public NamespaceItem(String name, int kind) {
+    public NamespaceItem(String name, int kind, int line) {
         this.name = DottedChain.parseWithSuffix(name);
         this.kind = kind;
+        this.line = line;
     }
 
     /**
@@ -148,35 +157,32 @@ public class NamespaceItem {
                 resolved = false;
             }
             if (!resolved) {
-                DottedChain fullCustom = null;
+                AbcIndexing.TraitIndex ti = null;                
                 for (DottedChain imp : importedClasses) {
                     if (imp.getLast().equals(custom)) {
-                        fullCustom = imp;
+                        ti = abcIndex.findScriptProperty(imp);
                         break;
                     }
                 }
-                if (fullCustom != null) {
-                    /*List<ABC> aas = new ArrayList<>();
-                     aas.add(abc);
-                     aas.addAll(allABCs);*/
-                    AbcIndexing.TraitIndex ti = abcIndex.findScriptProperty(fullCustom);
-
-                    if (ti != null) {
-                        if (ti.trait instanceof TraitSlotConst) {
-                            if (((TraitSlotConst) ti.trait).isNamespace()) {
-                                Namespace ns = ti.abc.constants.getNamespace(((TraitSlotConst) ti.trait).value_index);
-                                nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(ns.kind, ns.getName(ti.abc.constants), 0, true);
-                                return;
-                            }
+                if (ti == null) {
+                    ti = abcIndex.findScriptProperty(pkg.add(custom, ""));                    
+                }
+                if (ti != null) {
+                    if (ti.trait instanceof TraitSlotConst) {
+                        if (((TraitSlotConst) ti.trait).isNamespace()) {
+                            Namespace ns = ti.abc.constants.getNamespace(((TraitSlotConst) ti.trait).value_index);
+                            nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(ns.kind, ns.getName(ti.abc.constants), 0, true);
+                            kind = ns.kind;
+                            return;
                         }
                     }
                 }
 
-                throw new CompilationException("Namespace \"" + name + "\" not defined", -1);
+                throw new CompilationException("Namespace \"" + name + "\" not defined", line);
             }
-            nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE,
-                    outAbc.getVal().constants.getNamespace(value.getVal().value_index).getName(outAbc.getVal().constants), 0, true);
-
+            Namespace ns = outAbc.getVal().constants.getNamespace(value.getVal().value_index);
+            nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(ns.kind, ns.getName(outAbc.getVal().constants), 0, true);
+            kind = Namespace.KIND_NAMESPACE;
         }
     }
 
@@ -199,7 +205,10 @@ public class NamespaceItem {
             return nsIndex;
         }
         if (kind == Namespace.KIND_NAMESPACE) { //must set manually
-            throw new CompilationException("Namespace \"" + name + "\" unresolved", -1);
+            throw new CompilationException("Namespace \"" + name + "\" unresolved", line);
+        }
+        if (kind == KIND_NAMESPACE_CUSTOM) { //must set manually
+            throw new CompilationException("Namespace \"" + name + "\" unresolved", line);
         }
         nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(kind, name, 0, true);
         return nsIndex;
