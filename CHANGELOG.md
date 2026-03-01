@@ -18,9 +18,12 @@ All notable changes to this project will be documented in this file.
   (Causing many actions to look slow - for example Debug listening)
 - AS3 goto definition missing some namespaces
 - [#2514] AS3 direct editation - problems with namespaces
+- [#2649] SVG export - blur scaling (on supported browsers)
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver
+- [#2649] SVG export - using gaussian blur instead of box blur with convolution matrix
+  (Can be turned off in the settings)
 
 ## [25.1.2] - 2026-02-23
 ### Added
@@ -4185,6 +4188,7 @@ Major version of SWF to XML export changed to 2.
 [#2643]: https://www.free-decompiler.com/flash/issues/2643
 [#2645]: https://www.free-decompiler.com/flash/issues/2645
 [#2514]: https://www.free-decompiler.com/flash/issues/2514
+[#2649]: https://www.free-decompiler.com/flash/issues/2649
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
 [#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -277,36 +278,46 @@ public abstract class FILTER implements Serializable {
         if (Double.compare(blurX, 0.0) == 0 && Double.compare(blurY, 0.0) == 0) {
             return in;
         }
-        Element element = document.createElement("feConvolveMatrix");
+        Element element;
+        if (Configuration.svgExportGaussianBlur.get()) {
+            double blurXScaled = blurX * exporter.getZoom();
+            double blurYScaled = blurY * exporter.getZoom();
 
-        List<String> parts = new ArrayList<>();
+            double deviationX = Math.sqrt((blurXScaled * blurXScaled - 1) / 12);
+            double deviationY = Math.sqrt((blurYScaled * blurYScaled - 1) / 12);
 
-        double divisor;
-        if (Double.compare(blurX, 0.0) == 0) {
-            int orderX = (int) Math.ceil(blurX);
-            divisor = orderX;
-            element.setAttribute("order", "" + orderX + " 1");
+            element = document.createElement("feGaussianBlur");
 
-        } else if (Double.compare(blurY, 0.0) == 0) {
-            int orderY = (int) Math.ceil(blurY);
-            divisor = orderY;
-            element.setAttribute("order", "1 " + orderY);
+            element.setAttribute("stdDeviation", "" + deviationX + " " + deviationY);
         } else {
-            int orderX = (int) Math.ceil(blurX);
-            int orderY = (int) Math.ceil(blurY);
-            divisor = orderX * orderY;
+            element = document.createElement("feConvolveMatrix");
+
+            List<String> parts = new ArrayList<>();
+
+            int orderX = (int) Math.ceil(blurX * exporter.getZoom());
+            int orderY = (int) Math.ceil(blurY * exporter.getZoom());
+
+            if (orderX == 0) {
+                orderX = 1;
+            }
+
+            if (orderY == 0) {
+                orderY = 1;
+            }
+
+            double divisor = orderX * orderY;
             element.setAttribute("order", "" + orderX + " " + orderY);
+
+            for (int i = 0; i < divisor; i++) {
+                parts.add("1");
+            }
+
+            element.setAttribute("divisor", "" + divisor);
+
+            element.setAttribute("kernelMatrix", String.join(" ", parts));
+            element.setAttribute("in", in);
         }
-
-        for (int i = 0; i < divisor; i++) {
-            parts.add("1");
-        }
-
-        element.setAttribute("divisor", "" + divisor);
-
-        element.setAttribute("kernelMatrix", String.join(" ", parts));
-        element.setAttribute("in", in);
-
+        
         String result = exporter.getUniqueId("filterResult");
         element.setAttribute("result", result);
 
