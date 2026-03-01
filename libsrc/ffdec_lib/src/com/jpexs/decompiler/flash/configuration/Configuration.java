@@ -1205,6 +1205,9 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> sortDebugVariablesAlphabetically = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> svgExportGaussianBlur = null;
     
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
