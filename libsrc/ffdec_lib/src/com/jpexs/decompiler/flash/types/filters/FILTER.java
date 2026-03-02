@@ -23,9 +23,12 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ConcreteClasses;
+import com.jpexs.helpers.GradientUtil;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -133,10 +136,68 @@ public abstract class FILTER implements Serializable {
             SVGExporter exporter,
             String in
     ) {
+        return dropShadowSvg(
+                distance,
+                angle,
+                new RGBA[]{dropShadowColor},
+                new int[0],
+                innerShadow,
+                knockout,
+                compositeSource,
+                blurX,
+                blurY,
+                strength,
+                iterations,
+                document,
+                filtersElement,
+                exporter,
+                in
+        );
+    }
+
+    /**
+     * Converts drop shadow to SVG.
+     *
+     * @param distance Distance
+     * @param angle Angle
+     * @param dropShadowColor Drop shadow color
+     * @param innerShadow Inner shadow
+     * @param knockout Knockout
+     * @param compositeSource Composite source
+     * @param blurX Blur X
+     * @param blurY Blur Y
+     * @param strength Strength
+     * @param iterations Iterations
+     * @param document Document
+     * @param filtersElement Filters element
+     * @param exporter SVG exporter
+     * @param in Input
+     * @return SVG id of the drop shadow
+     */
+    protected String dropShadowSvg(
+            double distance,
+            double angle,
+            RGBA[] gradientColors,
+            int[] gradientRatio,
+            boolean innerShadow,
+            boolean knockout,
+            boolean compositeSource,
+            double blurX,
+            double blurY,
+            double strength,
+            int iterations,
+            Document document,
+            Element filtersElement,
+            SVGExporter exporter,
+            String in
+    ) {
         double dx = distance * Math.cos(angle);
         double dy = distance * Math.sin(angle);
 
+        RGBA dropShadowColor = gradientColors.length == 1 ? gradientColors[0] : new RGBA(0, 0, 0, 255);
+
         if (innerShadow) {
+
             Element feFlood = document.createElement("feFlood");
             feFlood.setAttribute("flood-color", dropShadowColor.toHexRGB());
             feFlood.setAttribute("flood-opacity", "" + dropShadowColor.getAlphaFloat());
@@ -297,12 +358,12 @@ public abstract class FILTER implements Serializable {
             int orderX = (int) Math.ceil(blurX * exporter.getZoom());
             int orderY = (int) Math.ceil(blurY * exporter.getZoom());
 
-            if (orderX == 0) {
-                orderX = 1;
+            if (orderX % 2 == 0) {
+                orderX++;
             }
 
-            if (orderY == 0) {
-                orderY = 1;
+            if (orderY % 2 == 0) {
+                orderY++;
             }
 
             double divisor = orderX * orderY;
@@ -315,9 +376,10 @@ public abstract class FILTER implements Serializable {
             element.setAttribute("divisor", "" + divisor);
 
             element.setAttribute("kernelMatrix", String.join(" ", parts));
-            element.setAttribute("in", in);
+            element.setAttribute("kernelUnitLength", "1");
         }
-        
+        element.setAttribute("in", in);
+
         String result = exporter.getUniqueId("filterResult");
         element.setAttribute("result", result);
 
@@ -328,6 +390,7 @@ public abstract class FILTER implements Serializable {
 
     /**
      * Converts gradient ratios to Java format float ratios.
+     *
      * @param input 0-255 values
      * @return 0f - 1f values, strictly increasing
      */
@@ -367,5 +430,227 @@ public abstract class FILTER implements Serializable {
         }
 
         return output;
+    }
+
+    protected String bevelSvg(double distance, double angle, RGBA[] gradientColors, int[] gradientRatio, boolean knockout, boolean onTop, boolean innerShadow, double blurX, double blurY, double strength, int passes, Document document, Element filtersElement, SVGExporter exporter, String in) {
+        RGBA highlightColor = new RGBA(255, 0, 0, 255);
+        RGBA shadowColor = new RGBA(0, 0, 255, 255);
+
+        int type = Filtering.INNER;
+        if (onTop && !innerShadow) {
+            type = Filtering.FULL;
+        } else if (!innerShadow) {
+            type = Filtering.OUTER;
+        }
+
+        String shadowInner = null;
+        String hilightInner = null;
+        if (type != Filtering.OUTER) {
+            String hilight = dropShadowSvg(distance, angle, highlightColor, true, true, true, 0, 0, strength, passes, document, filtersElement, exporter, in);
+            String shadow = dropShadowSvg(distance, angle + Math.PI, shadowColor, true, true, true, 0, 0, strength, passes, document, filtersElement, exporter, in);
+
+            Element feComposite1 = document.createElement("feComposite");
+            feComposite1.setAttribute("in", hilight);
+            feComposite1.setAttribute("in2", shadow);
+            feComposite1.setAttribute("operator", "out");
+            hilightInner = exporter.getUniqueId("filterResult");
+            feComposite1.setAttribute("result", hilightInner);
+            filtersElement.appendChild(feComposite1);
+
+            Element feComposite2 = document.createElement("feComposite");
+            feComposite2.setAttribute("in", shadow);
+            feComposite2.setAttribute("in2", hilight);
+            feComposite2.setAttribute("operator", "out");
+            shadowInner = exporter.getUniqueId("filterResult");
+            feComposite2.setAttribute("result", shadowInner);
+            filtersElement.appendChild(feComposite2);
+        }
+
+        String shadowOuter = null;
+        String hilightOuter = null;
+
+        if (type != Filtering.INNER) {
+            String hilight = dropShadowSvg(distance, angle + Math.PI, highlightColor, false, true, true, 0, 0, strength, passes, document, filtersElement, exporter, in);
+            String shadow = dropShadowSvg(distance, angle, shadowColor, false, true, true, 0, 0, strength, passes, document, filtersElement, exporter, in);
+
+            Element feComposite1 = document.createElement("feComposite");
+            feComposite1.setAttribute("in", hilight);
+            feComposite1.setAttribute("in2", shadow);
+            feComposite1.setAttribute("operator", "out");
+            hilightOuter = exporter.getUniqueId("filterResult");
+            feComposite1.setAttribute("result", hilightOuter);
+            filtersElement.appendChild(feComposite1);
+
+            Element feComposite2 = document.createElement("feComposite");
+            feComposite2.setAttribute("in", shadow);
+            feComposite2.setAttribute("in2", hilight);
+            feComposite2.setAttribute("operator", "out");
+            shadowOuter = exporter.getUniqueId("filterResult");
+            feComposite2.setAttribute("result", shadowOuter);
+            filtersElement.appendChild(feComposite2);
+        }
+
+        String hilight = null;
+        String shadow = null;
+
+        switch (type) {
+            case Filtering.OUTER:
+                hilight = hilightOuter;
+                shadow = shadowOuter;
+                break;
+            case Filtering.INNER:
+                hilight = hilightInner;
+                shadow = shadowInner;
+                break;
+            case Filtering.FULL:
+                Element feComposite1 = document.createElement("feComposite");
+                feComposite1.setAttribute("in", hilightInner);
+                feComposite1.setAttribute("in2", hilightOuter);
+                feComposite1.setAttribute("operator", "over");
+                hilight = exporter.getUniqueId("filterResult");
+                feComposite1.setAttribute("result", hilight);
+                filtersElement.appendChild(feComposite1);
+
+                Element feComposite2 = document.createElement("feComposite");
+                feComposite2.setAttribute("in", shadowInner);
+                feComposite2.setAttribute("in2", shadowOuter);
+                feComposite2.setAttribute("operator", "over");
+                shadow = exporter.getUniqueId("filterResult");
+                feComposite2.setAttribute("result", shadow);
+                filtersElement.appendChild(feComposite2);
+                break;
+        }
+
+        Element feFlood = document.createElement("feFlood");
+        feFlood.setAttribute("flood-color", "black");
+        feFlood.setAttribute("flood-opacity", "1");
+        String black = exporter.getUniqueId("filterResult");
+        feFlood.setAttribute("result", black);
+        filtersElement.appendChild(feFlood);
+
+        String result;
+
+        Element feComposite4 = document.createElement("feComposite");
+        feComposite4.setAttribute("in", shadow);
+        feComposite4.setAttribute("in2", black);
+        feComposite4.setAttribute("operator", "over");
+        result = exporter.getUniqueId("filterResult");
+        feComposite4.setAttribute("result", result);
+        filtersElement.appendChild(feComposite4);
+
+        Element feComposite5 = document.createElement("feComposite");
+        feComposite5.setAttribute("in", hilight);
+        feComposite5.setAttribute("in2", result);
+        feComposite5.setAttribute("operator", "over");
+        result = exporter.getUniqueId("filterResult");
+        feComposite5.setAttribute("result", result);
+        filtersElement.appendChild(feComposite5);
+
+        result = blurSvg(blurX, blurY, passes, document, filtersElement, exporter, result);
+
+        Element feColorMatrix = document.createElement("feColorMatrix");
+        feColorMatrix.setAttribute("type", "matrix");
+        feColorMatrix.setAttribute("in", result);
+        double halfStrength = strength / 2;
+        String matrixRow = "" + halfStrength + " 0 " + (-halfStrength) + " 0 0.5";
+        feColorMatrix.setAttribute("values",
+                matrixRow + " "
+                + matrixRow + " "
+                + matrixRow + " "
+                + matrixRow
+        );
+        result = exporter.getUniqueId("filterResult");
+        feColorMatrix.setAttribute("result", result);
+        filtersElement.appendChild(feColorMatrix);
+
+        result = prepareFeComponentTransfer(gradientColors, gradientRatio, document, filtersElement, exporter, result);
+
+        if (type == Filtering.INNER) {
+            Element feComposite6 = document.createElement("feComposite");
+            feComposite6.setAttribute("in", result);
+            feComposite6.setAttribute("in2", in);
+            feComposite6.setAttribute("operator", "in");
+            result = exporter.getUniqueId("filterResult");
+            feComposite6.setAttribute("result", result);
+            filtersElement.appendChild(feComposite6);
+        }
+        if (type == Filtering.OUTER) {
+            Element feComposite6 = document.createElement("feComposite");
+            feComposite6.setAttribute("in", result);
+            feComposite6.setAttribute("in2", in);
+            feComposite6.setAttribute("operator", "out");
+            result = exporter.getUniqueId("filterResult");
+            feComposite6.setAttribute("result", result);
+            filtersElement.appendChild(feComposite6);
+        }
+
+        if (!knockout) {
+            Element feComposite7 = document.createElement("feComposite");
+            feComposite7.setAttribute("in", result);
+            feComposite7.setAttribute("in2", in);
+            feComposite7.setAttribute("operator", "over");
+            result = exporter.getUniqueId("filterResult");
+            feComposite7.setAttribute("result", result);
+            filtersElement.appendChild(feComposite7);
+        }
+        return result;
+    }
+
+    private String prepareFeComponentTransfer(RGBA[] gradientColors, int[] gradientRatio, Document document, Element filtersElement, SVGExporter exporter, String in) {
+        Element feComponentTransfer = document.createElement("feComponentTransfer");
+        feComponentTransfer.setAttribute("in", in);
+
+        List<String> redValues = new ArrayList<>();
+        List<String> greenValues = new ArrayList<>();
+        List<String> blueValues = new ArrayList<>();
+        List<String> alphaValues = new ArrayList<>();
+
+        for (int i = 0; i < 256; i++) {
+            RGBA color = GradientUtil.colorAt(gradientColors, gradientRatio, i, GradientUtil.ColorInterpolation.SRGB);
+            redValues.add("" + (color.red / 255f));
+            greenValues.add("" + (color.green / 255f));
+            blueValues.add("" + (color.blue / 255f));
+            alphaValues.add("" + color.getAlphaFloat());
+        }
+
+        /*
+        //In case we want to map 128 to center
+        
+        for (int i = 0; i < 126; i++) { //126 colors
+            RGBA color = GradientUtil.colorAt(gradientColors, gradientRatio, i * 127f / 125f, GradientUtil.ColorInterpolation.SRGB);
+            redValues.add("" + (color.red / 255f));
+            greenValues.add("" + (color.green / 255f));
+            blueValues.add("" + (color.blue / 255f));
+            alphaValues.add("" + color.getAlphaFloat());
+        }
+        for (int i = 128; i < 256; i++) { //1 center + 126 colors
+            RGBA color = GradientUtil.colorAt(gradientColors, gradientRatio, i, GradientUtil.ColorInterpolation.SRGB);
+            redValues.add("" + (color.red / 255f));
+            greenValues.add("" + (color.green / 255f));
+            blueValues.add("" + (color.blue / 255f));
+            alphaValues.add("" + color.getAlphaFloat());
+        }
+         */
+        Element feFuncR = document.createElement("feFuncR");
+        feFuncR.setAttribute("type", "table");
+        feFuncR.setAttribute("tableValues", String.join(" ", redValues));
+        Element feFuncG = document.createElement("feFuncG");
+        feFuncG.setAttribute("type", "table");
+        feFuncG.setAttribute("tableValues", String.join(" ", greenValues));
+        Element feFuncB = document.createElement("feFuncB");
+        feFuncB.setAttribute("type", "table");
+        feFuncB.setAttribute("tableValues", String.join(" ", blueValues));
+        Element feFuncA = document.createElement("feFuncA");
+        feFuncA.setAttribute("type", "table");
+        feFuncA.setAttribute("tableValues", String.join(" ", alphaValues));
+        feComponentTransfer.appendChild(feFuncR);
+        feComponentTransfer.appendChild(feFuncG);
+        feComponentTransfer.appendChild(feFuncB);
+        feComponentTransfer.appendChild(feFuncA);
+
+        String result = exporter.getUniqueId("filterResult");
+        feComponentTransfer.setAttribute("result", result);
+        filtersElement.appendChild(feComponentTransfer);
+        return result;
     }
 }

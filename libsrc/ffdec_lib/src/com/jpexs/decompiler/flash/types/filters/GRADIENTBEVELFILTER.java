@@ -120,7 +120,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
             colorsArr[i] = gradientColors[i].toColor();
         }
         float[] ratiosArr = convertRatiosToJavaGradient(gradientRatio);
-        
+
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;
@@ -143,7 +143,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     @Override
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
-        return null; //NOT SUPPORTED
+        return bevelSvg(distance, angle, gradientColors, gradientRatio, knockout, onTop, innerShadow, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
 
     @Override
@@ -211,6 +211,5 @@ public class GRADIENTBEVELFILTER extends FILTER {
         }
         return Arrays.equals(this.gradientRatio, other.gradientRatio);
     }
-    
-    
+
 }

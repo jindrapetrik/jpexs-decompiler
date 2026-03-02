@@ -564,6 +564,11 @@ public class SVGExporter implements RequiresNormalizedFonts {
             return;
         }
         Element filtersElement = _svg.createElement("filter");
+        filtersElement.setAttribute("x", "-100%");
+        filtersElement.setAttribute("y", "-100%");
+        filtersElement.setAttribute("width", "300%");
+        filtersElement.setAttribute("height", "300%");
+        filtersElement.setAttribute("color-interpolation-filters", "sRGB");
         String filterId = getUniqueId("filter");
         String in = "SourceGraphic";
         boolean empty = true;
