@@ -1,13 +1,13 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" timelineLabelWidth="236" viewAngle3D="50.6510299754819" nextSceneIdentifier="87" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" timelineLabelWidth="236" viewAngle3D="50.6510299754819" nextSceneIdentifier="91" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="MyFont" itemID="6546c026-00000d2d" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
+          <DOMFontItem name="MyFont" itemID="6546c026-00000d2d" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
-          <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1678292098" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
+          <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1772487294" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
           <DOMVideoItem name="Cute Cat - 3092.flv" itemID="60671758-000001ff" sourceExternalFilepath="C:/Dropbox/Programovani/JavaSE/FFDec/libsrc/ffdec_lib/testdata/graphics/Cute Cat - 3092.flv" sourceLastImported="1617368859" videoDataHRef="M 6 1617368920.dat" videoType="h263 media" fps="24" channels="0" width="640" height="360" length="29.25"/>
-          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1699135424" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
+          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1772487294" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
      </media>
      <symbols>
           <Include href="BlueSquare.xml" itemIcon="1" loadImmediate="false" itemID="604e0a22-000002e1" lastModified="1615730090"/>
@@ -36,7 +36,7 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="66">
+          <DOMTimeline name="Scene 1" currentFrame="50">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -865,10 +865,10 @@ stop();]]></script>
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="7" edges="
-!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="6" edges="
 !2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
+                                                  <Edge strokeStyle="7" edges="
+!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1467,18 +1467,18 @@ stop();]]></script>
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="2" edges="
-!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
+                                                  <Edge strokeStyle="2" edges="
+!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="6" edges="
-!4647 3660/4942 4670!4942 4670/5019 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="4" edges="
 !1000 3660/1295 4670!1295 4670/1372 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2020,7 +2020,7 @@ stop();]]></script>
                                                   <AdjustColorFilter brightness="30" contrast="40" saturation="50" hue="100"/>
                                              </filters>
                                         </DOMSymbolInstance>
-                                        <DOMSymbolInstance libraryItemName="GreenRect" centerPoint3DX="422.05" centerPoint3DY="165">
+                                        <DOMSymbolInstance libraryItemName="GreenRect" selected="true" centerPoint3DX="422.05" centerPoint3DY="165">
                                              <matrix>
                                                   <Matrix tx="384.55" ty="140"/>
                                              </matrix>
@@ -2028,10 +2028,10 @@ stop();]]></script>
                                                   <Point x="37.5" y="25"/>
                                              </transformationPoint>
                                              <filters>
-                                                  <GradientGlowFilter type="outer">
+                                                  <GradientGlowFilter blurX="10" blurY="10" distance="10" type="outer">
                                                        <GradientEntry color="#FF0000" alpha="0" ratio="0"/>
-                                                       <GradientEntry color="#0000FF" alpha="0.462745098039216" ratio="0.250980392156863"/>
-                                                       <GradientEntry color="#FFFF00" alpha="0.733333333333333" ratio="0.749019607843137"/>
+                                                       <GradientEntry color="#0000FF" alpha="0.462745098039216" ratio="0.290196078431373"/>
+                                                       <GradientEntry color="#FFFF00" alpha="0.733333333333333" ratio="0.647058823529412"/>
                                                        <GradientEntry color="#FF00FF" ratio="1"/>
                                                   </GradientGlowFilter>
                                              </filters>
@@ -3335,11 +3335,11 @@ stop();]]></script>
                                                   <Point x="37.5" y="25"/>
                                              </transformationPoint>
                                              <filters>
-                                                  <GradientBevelFilter>
+                                                  <GradientBevelFilter blurX="10" blurY="10" distance="10" type="full">
                                                        <GradientEntry color="#FF0000" ratio="0"/>
-                                                       <GradientEntry color="#00FFFF" alpha="0.549019607843137" ratio="0.250980392156863"/>
+                                                       <GradientEntry color="#00FFFF" alpha="0.549019607843137" ratio="0.349019607843137"/>
                                                        <GradientEntry color="#0000FF" alpha="0" ratio="0.501960784313725"/>
-                                                       <GradientEntry color="#FFFF00" alpha="0.305882352941176" ratio="0.749019607843137"/>
+                                                       <GradientEntry color="#FFFF00" alpha="0.305882352941176" ratio="0.627450980392157"/>
                                                        <GradientEntry color="#FF00FF" ratio="1"/>
                                                   </GradientBevelFilter>
                                              </filters>
@@ -3383,7 +3383,7 @@ stop();]]></script>
                     </DOMLayer>
                     <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" keyMode="9728">
+                              <DOMFrame index="0" name="Filled rectangle" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3400,9 +3400,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="1" keyMode="9728">
+                              <DOMFrame index="1" name="Filled rectangle with stroke" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3417,9 +3417,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="2" keyMode="9728">
+                              <DOMFrame index="2" name="Circle" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3434,9 +3434,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="3" keyMode="9728">
+                              <DOMFrame index="3" name="FillStyle0 FillStyle1" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3451,9 +3451,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="4" keyMode="9728">
+                              <DOMFrame index="4" name="Sprite - resize, translate" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3468,9 +3468,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="5" keyMode="9728">
+                              <DOMFrame index="5" name="Sprite - rotate" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3485,9 +3485,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="6" keyMode="9728">
+                              <DOMFrame index="6" name="Linear gradient fill" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3502,9 +3502,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="7" keyMode="9728">
+                              <DOMFrame index="7" name="Multiple color linear gradient" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3519,7 +3519,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="8" keyMode="9728">
+                              <DOMFrame index="8" name="Gradient spread reflect" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3536,9 +3536,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="9" keyMode="9728">
+                              <DOMFrame index="9" name="Gradient spread repeat" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3553,7 +3553,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="10" keyMode="9728">
+                              <DOMFrame index="10" name="Radial gradient" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3570,7 +3570,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="11" keyMode="9728">
+                              <DOMFrame index="11" name="Radial gradient - spread reflect" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3587,7 +3587,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="12" keyMode="9728">
+                              <DOMFrame index="12" name="Radial gradient - spread repeat" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3604,9 +3604,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="13" keyMode="9728">
+                              <DOMFrame index="13" name="Radial gradient - focal point" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3621,9 +3621,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="14" keyMode="9728">
+                              <DOMFrame index="14" name="Bitmap fill" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3638,9 +3638,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="15" keyMode="9728">
+                              <DOMFrame index="15" name="Bitmap fill transform" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3655,9 +3655,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="16" keyMode="9728">
+                              <DOMFrame index="16" name="Strokes" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3672,9 +3672,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="17" duration="4" keyMode="9728">
+                              <DOMFrame index="17" duration="4" name="Shape tween" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3689,7 +3689,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="21" duration="4" keyMode="9728">
+                              <DOMFrame index="21" duration="4" name="Classic tween" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3706,9 +3706,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="25" duration="4" keyMode="9728">
+                              <DOMFrame index="25" duration="4" name="Gradient tween" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3723,9 +3723,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="29" duration="4" keyMode="9728">
+                              <DOMFrame index="29" duration="4" name="Bitmap tween" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3740,9 +3740,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="33" duration="4" keyMode="9728">
+                              <DOMFrame index="33" duration="4" name="Stroke tween" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3757,9 +3757,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="37" duration="4" keyMode="9728">
+                              <DOMFrame index="37" duration="4" name="Gradient stroke tween" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3774,9 +3774,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="41" keyMode="9728">
+                              <DOMFrame index="41" name="Button" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3791,9 +3791,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="42" keyMode="9728">
+                              <DOMFrame index="42" name="Strokes scaling" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3808,9 +3808,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="43" keyMode="9728">
+                              <DOMFrame index="43" name="Strokes cap, join, miter" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3825,9 +3825,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="44" keyMode="9728">
+                              <DOMFrame index="44" name="Bitmap" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3842,7 +3842,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="45" keyMode="9728">
+                              <DOMFrame index="45" name="Bitmap transparency" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3859,7 +3859,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="46" keyMode="9728">
+                              <DOMFrame index="46" name="Scaling grid" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3876,9 +3876,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="47" keyMode="9728">
+                              <DOMFrame index="47" name="Visible" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3893,9 +3893,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="48" keyMode="9728">
+                              <DOMFrame index="48" name="Color effect" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3910,9 +3910,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="49" keyMode="9728">
+                              <DOMFrame index="49" name="Blend modes" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3927,7 +3927,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="50" keyMode="9728">
+                              <DOMFrame index="50" name="Filters" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3944,7 +3944,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="51" keyMode="9728">
+                              <DOMFrame index="51" name="Clipping" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" isSelectable="false">
                                              <matrix>
@@ -3961,9 +3961,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="52" keyMode="9728">
+                              <DOMFrame index="52" name="Text" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3978,7 +3978,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="53" keyMode="9728">
+                              <DOMFrame index="53" name="Linear RGB gradient" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -3995,7 +3995,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="54" keyMode="9728">
+                              <DOMFrame index="54" name="Transparent gradient" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4012,7 +4012,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="55" keyMode="9728">
+                              <DOMFrame index="55" name="Bitmap smoothing" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4029,9 +4029,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="56" keyMode="9728">
+                              <DOMFrame index="56" name="Video" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -4046,7 +4046,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="57" keyMode="9728">
+                              <DOMFrame index="57" name="Multiline text" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4063,9 +4063,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="58" keyMode="9728">
+                              <DOMFrame index="58" name="Rotated stroke normal scaling" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -4080,9 +4080,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="59" keyMode="9728">
+                              <DOMFrame index="59" name="Rotated vertical/horiz. scaling" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -4097,7 +4097,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="60" keyMode="9728">
+                              <DOMFrame index="60" name="Antialiasing" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4114,7 +4114,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="61" duration="4" keyMode="9728">
+                              <DOMFrame index="61" duration="4" name="Radial/focal tween" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4122,7 +4122,7 @@ stop();]]></script>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>062-065 radial/focal tween</characters>
+                                                       <characters>062-065 Radial/focal tween</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -4131,9 +4131,9 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="65" keyMode="9728">
+                              <DOMFrame index="65" name="EditTexts" labelType="name" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -4148,7 +4148,7 @@ stop();]]></script>
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="66" keyMode="9728">
+                              <DOMFrame index="66" name="CacheAsBitmap + BGColor" labelType="name" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -4172,6 +4172,13 @@ stop();]]></script>
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1433377" publishTime="1772488092"/>
+          <PublishItem publishSize="1433377" publishTime="1772487782"/>
+          <PublishItem publishSize="1433374" publishTime="1772487682"/>
+          <PublishItem publishSize="1632" publishTime="1772487548"/>
+          <PublishItem publishSize="1632" publishTime="1772487548"/>
+          <PublishItem publishSize="1633" publishTime="1772487548"/>
+          <PublishItem publishSize="1633" publishTime="1772487548"/>
           <PublishItem publishSize="1432703" publishTime="1729956785"/>
           <PublishItem publishSize="1432670" publishTime="1729956687"/>
           <PublishItem publishSize="1432375" publishTime="1701024987"/>
@@ -4185,12 +4192,5 @@ stop();]]></script>
           <PublishItem publishSize="1432352" publishTime="1699188841"/>
           <PublishItem publishSize="1432352" publishTime="1699188766"/>
           <PublishItem publishSize="1432347" publishTime="1699185074"/>
-          <PublishItem publishSize="1432265" publishTime="1699184501"/>
-          <PublishItem publishSize="1432257" publishTime="1699184284"/>
-          <PublishItem publishSize="1432137" publishTime="1699135786"/>
-          <PublishItem publishSize="1431729" publishTime="1697292442"/>
-          <PublishItem publishSize="1431716" publishTime="1697292302"/>
-          <PublishItem publishSize="1431768" publishTime="1697292246" publishDebug="true"/>
-          <PublishItem publishSize="1583" publishTime="1678292643"/>
      </publishHistory>
 </DOMDocument>
