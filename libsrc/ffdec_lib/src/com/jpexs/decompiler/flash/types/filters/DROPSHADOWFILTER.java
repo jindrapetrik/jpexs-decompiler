@@ -113,7 +113,7 @@ public class DROPSHADOWFILTER extends FILTER {
 
     @Override
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
-        return dropShadowSvg(distance, angle, dropShadowColor, innerShadow, knockout, compositeSource, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
+        return SvgFiltering.dropShadow(distance, angle, dropShadowColor, innerShadow, knockout, compositeSource, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
 
     @Override
@@ -173,6 +173,5 @@ public class DROPSHADOWFILTER extends FILTER {
         }
         return Objects.equals(this.dropShadowColor, other.dropShadowColor);
     }
-    
-    
+
 }

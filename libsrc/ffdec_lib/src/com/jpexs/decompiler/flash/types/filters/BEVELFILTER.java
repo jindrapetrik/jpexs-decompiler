@@ -129,11 +129,13 @@ public class BEVELFILTER extends FILTER {
 
     @Override
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
-        RGBA shadowColorTransparent = new RGBA(shadowColor);
-        shadowColorTransparent.alpha = 0;
-        RGBA highlightColorTransparent = new RGBA(highlightColor);
-        highlightColorTransparent.alpha = 0;
-        return bevelSvg(distance, angle, new RGBA[]{shadowColor, shadowColorTransparent, highlightColorTransparent, highlightColor}, new int[]{0, 127, 128, 255}, knockout, onTop, innerShadow, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
+        int type = Filtering.INNER;
+        if (onTop && !innerShadow) {
+            type = Filtering.FULL;
+        } else if (!innerShadow) {
+            type = Filtering.OUTER;
+        }
+        return SvgFiltering.bevel(distance, angle, highlightColor, shadowColor, knockout, compositeSource, type, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
 
     @Override
