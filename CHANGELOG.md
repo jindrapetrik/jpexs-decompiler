@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Direct editation - Error when accessing inaccessible namespace
 - AS3 ambiguous namespace detection (back again)
 - [#2648] Dockerfile
-- SVG export - Gradient bevel filter
+- SVG export - Gradient bevel filter, Gradient glow filter
 
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks

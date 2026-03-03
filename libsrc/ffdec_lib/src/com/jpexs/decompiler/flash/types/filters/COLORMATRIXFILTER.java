@@ -119,5 +119,4 @@ public class COLORMATRIXFILTER extends FILTER {
         return Arrays.equals(this.matrix, other.matrix);
     }
 
-    
 }

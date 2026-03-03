@@ -172,6 +172,7 @@ public final class BlendComposite implements Composite {
 
     /**
      * Gets alpha.
+     *
      * @return Alpha
      */
     public float getAlpha() {

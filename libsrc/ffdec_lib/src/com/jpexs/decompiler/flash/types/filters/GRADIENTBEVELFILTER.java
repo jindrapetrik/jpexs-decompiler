@@ -143,7 +143,13 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     @Override
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
-        return bevelSvg(distance, angle, gradientColors, gradientRatio, knockout, onTop, innerShadow, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
+        int type = Filtering.INNER;
+        if (onTop && !innerShadow) {
+            type = Filtering.FULL;
+        } else if (!innerShadow) {
+            type = Filtering.OUTER;
+        }
+        return SvgFiltering.gradientBevel(distance, angle, gradientColors, gradientRatio, knockout, compositeSource, type, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
 
     @Override

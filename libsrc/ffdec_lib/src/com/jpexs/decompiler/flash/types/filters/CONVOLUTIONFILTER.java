@@ -194,6 +194,5 @@ public class CONVOLUTIONFILTER extends FILTER {
         }
         return Objects.equals(this.defaultColor, other.defaultColor);
     }
-    
-    
+
 }

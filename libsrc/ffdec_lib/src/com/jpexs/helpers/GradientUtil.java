@@ -16,7 +16,6 @@
  */
 package com.jpexs.helpers;
 
-
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +106,9 @@ public final class GradientUtil {
             );
         }
     }
-    
+
     public static final class SplitResult {
+
         public final RGBA[] colorsA;
         public final int[] ratioA;
         public final RGBA[] colorsB;
@@ -123,14 +123,12 @@ public final class GradientUtil {
     }
 
     /**
-     * Splits a gradient into two halves:
-     *  - A: original positions 0..127 mapped to 0..255
-     *  - B: original positions 128..255 mapped to 0..255
+     * Splits a gradient into two halves: - A: original positions 0..127 mapped
+     * to 0..255 - B: original positions 128..255 mapped to 0..255
      *
-     * Notes:
-     * - Stop lookup is based on original ratio[].
-     * - Boundary stops at 127 (A) and 128 (B) are ensured (interpolated if missing).
-     * - ratio[] is assumed sorted ascending.
+     * Notes: - Stop lookup is based on original ratio[]. - Boundary stops at
+     * 127 (A) and 128 (B) are ensured (interpolated if missing). - ratio[] is
+     * assumed sorted ascending.
      */
     public static SplitResult splitIntoHalves(
             RGBA[] colors, int[] ratio, ColorInterpolation mode
@@ -152,18 +150,19 @@ public final class GradientUtil {
     }
 
     // ----- Internal representation of stops -----
-
     private static final class Stops {
+
         final List<RGBA> colors = new ArrayList<>();
         final List<Integer> ratio = new ArrayList<>();
     }
 
     /**
-     * Extracts all stops within [from..to] (inclusive), and ensures stops at both ends exist.
-     * If an endpoint stop is missing, it is computed via SvgGradient.colorAt(...).
+     * Extracts all stops within [from..to] (inclusive), and ensures stops at
+     * both ends exist. If an endpoint stop is missing, it is computed via
+     * SvgGradient.colorAt(...).
      */
     private static Stops extractRange(RGBA[] colors, int[] ratio, int from, int to,
-                                      ColorInterpolation mode) {
+            ColorInterpolation mode) {
         Stops out = new Stops();
 
         // Ensure start stop
@@ -184,19 +183,22 @@ public final class GradientUtil {
     }
 
     /**
-     * If there is an existing stop exactly at pos, returns its color;
-     * otherwise computes the color by interpolation at that position.
+     * If there is an existing stop exactly at pos, returns its color; otherwise
+     * computes the color by interpolation at that position.
      */
     private static RGBA stopColorAtOrExisting(RGBA[] colors, int[] ratio, int pos,
-                                              ColorInterpolation mode) {
+            ColorInterpolation mode) {
         for (int i = 0; i < ratio.length; i++) {
-            if (ratio[i] == pos) return colors[i];
+            if (ratio[i] == pos) {
+                return colors[i];
+            }
         }
         return colorAt(colors, ratio, pos, mode);
     }
 
     /**
-     * Adds a stop keeping order; if the same position already exists, it overwrites the color.
+     * Adds a stop keeping order; if the same position already exists, it
+     * overwrites the color.
      */
     private static void addStop(Stops stops, int pos, RGBA color) {
         // Insert in ascending order (ratio is small, linear insert is fine)
@@ -217,8 +219,8 @@ public final class GradientUtil {
     }
 
     /**
-     * Remaps original integer positions in [from..to] to [0..255].
-     * Uses rounding and clamps, guaranteeing endpoints map to 0 and 255.
+     * Remaps original integer positions in [from..to] to [0..255]. Uses
+     * rounding and clamps, guaranteeing endpoints map to 0 and 255.
      */
     private static int[] remap(List<Integer> original, int from, int to) {
         int span = to - from; // for 0..127 and 128..255 span is 127
