@@ -962,7 +962,7 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>
             <arg value="-m"/>
-            <arg value="version changed to ${gh.newversion}"/>   
+            <arg value="chore: change version to ${gh.newversion}"/>   
         </exec> 
         
         <exec executable="git" failonerror="true">
@@ -1000,7 +1000,7 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>
             <arg value="-m"/>
-            <arg value="created new Unreleased section in CHANGELOG.md [ci skip]"/>
+            <arg value="chore: create Unreleased section in CHANGELOG.md&#10;&#10;[ci skip]"/>
         </exec> 
         
         <exec executable="git" failonerror="true">
