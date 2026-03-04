@@ -170,6 +170,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
@@ -2988,7 +2989,14 @@ public class CommandLineArgumentParser {
                 badArguments("format");
             }
             String[] parts = fmt.split(":");
-            ret.put(parts[0].toLowerCase(Locale.ENGLISH), parts[1].toLowerCase(Locale.ENGLISH));
+            String key = parts[0].toLowerCase(Locale.ENGLISH);
+            String val = parts[1].toLowerCase(Locale.ENGLISH);
+            
+            if (val.contains("webp") && !ImageFormat.WEBP.available()) {
+                System.err.println("WEBP format is not available on this platform");
+                badArguments("format");
+            }
+            ret.put(key, val);
         }
         return ret;
     }
