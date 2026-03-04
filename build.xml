@@ -1000,7 +1000,7 @@
         <exec executable="git" failonerror="true">
             <arg value="commit"/>
             <arg value="-m"/>
-            <arg value="created new Unreleased section in CHANGELOG.md"/>   
+            <arg value="created new Unreleased section in CHANGELOG.md [ci skip]"/>
         </exec> 
         
         <exec executable="git" failonerror="true">
