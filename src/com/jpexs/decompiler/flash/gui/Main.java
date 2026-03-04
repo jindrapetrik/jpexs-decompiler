@@ -641,7 +641,7 @@ public class Main {
                 String ffdecHdr = "<rdf:Description xmlns:ffdec=\"https://www.free-decompiler.com/flash\" rdf:about=\"\">";
 
                 if (!metaDataTag.xmlMetadata.contains("<ffdec:originalSwfHash>")) {
-                    //remove previous FFDec description if it alreadyy exists
+                    //remove previous FFDec description if it already exists
                     if (metaDataTag.xmlMetadata.contains(ffdecHdr)) {
                         int pos = metaDataTag.xmlMetadata.indexOf(ffdecHdr);
                         int pos2 = metaDataTag.xmlMetadata.indexOf("</rdf:Description>", pos);

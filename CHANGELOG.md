@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2643] APNG export - images containing multiple IDAT chunks
-- AS3 direct editation - proper use conver/coerce instruction
+- AS3 direct editation - proper use convert/coerce instruction
 - AS3 direct editation - use coerce_f for float values
 - [#2645] Windows MSI installer - Cannot change install directory
 - Long delay before switching critical status bar titles
@@ -46,7 +46,7 @@ All notable changes to this project will be documented in this file.
   and PlaceObject of it
 
 ### Removed
-- (Temporary) AS3 ambiguios namespace detection, it is slow - needs optimizations
+- (Temporary) AS3 ambiguous namespace detection, it is slow - needs optimizations
 
 ## [25.1.1] - 2026-02-19
 ### Fixed

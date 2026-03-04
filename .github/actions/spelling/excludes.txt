@@ -129,6 +129,8 @@ Lexer\.java$
 ^wix/
 ^cert/
 ^versioninfo\.rc$
+^versioninfo-cli\.rc$
 \.flv$
 \.yml$
 (?:^|/)build\.xml$
+^Dockerfile$
