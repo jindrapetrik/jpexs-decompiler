@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#2514] AS3 direct editation - problems with namespaces
 - [#2649] SVG export - blur scaling (on supported browsers)
 - [#2651] Loop breaks detection
+- [#2653] Check for WEBP availability in CLI
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver
@@ -4192,6 +4193,7 @@ Major version of SWF to XML export changed to 2.
 [#2514]: https://www.free-decompiler.com/flash/issues/2514
 [#2649]: https://www.free-decompiler.com/flash/issues/2649
 [#2651]: https://www.free-decompiler.com/flash/issues/2651
+[#2653]: https://www.free-decompiler.com/flash/issues/2653
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
 [#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636
