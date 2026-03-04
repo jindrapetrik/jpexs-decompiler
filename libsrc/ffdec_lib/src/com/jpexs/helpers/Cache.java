@@ -266,7 +266,7 @@ public class Cache<K, V> implements Freed {
 
     @Override
     public boolean isFreeing() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return false;
     }
 
     @Override
