@@ -716,7 +716,7 @@
         <File Id="vlcj_natives.jar" Source="../dist/lib/vlcj-natives-4.7.0.jar" KeyPath="yes" />
       </Component>
       <Component Id="webp4j" Guid="C6D7E8F9-A0B1-2C3D-4E5F-6A7B8C9D0E2A">
-        <File Id="webp4j.jar" Source="../dist/lib/webp4j-1.4.0.jar" KeyPath="yes" />
+        <File Id="webp4j.jar" Source="../dist/lib/webp4j-core-2.1.1.jar" KeyPath="yes" />
       </Component>
       <Component Id="webp4j_license" Guid="D7E8F9A0-B1C2-3D4E-5F6A-7B8C9D0E1F3B">
         <File Id="webp4j.license.txt" Source="../dist/lib/webp4j.license.txt" KeyPath="yes" />
