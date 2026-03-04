@@ -67,6 +67,37 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="25.1.3" date="2026-03-04">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Debugger - Button to disconnect current session (stay listening)</li>
+					<li>#2644 Debugger - Button to sort variables alphabetically</li>
+					<li>AS3 Direct editation - Error when accessing inaccessible namespace</li>
+					<li>AS3 ambiguous namespace detection (back again)</li>
+					<li>#2648 Dockerfile</li>
+					<li>SVG export - Gradient bevel filter, Gradient glow filter</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2643 APNG export - images containing multiple IDAT chunks</li>
+					<li>AS3 direct editation - proper use convert/coerce instruction</li>
+					<li>AS3 direct editation - use coerce_f for float values</li>
+					<li>#2645 Windows MSI installer - Cannot change install directory</li>
+					<li>Long delay before switching critical status bar titles (Causing many actions to look slow - for example Debug listening)</li>
+					<li>AS3 goto definition missing some namespaces</li>
+					<li>#2514 AS3 direct editation - problems with namespaces</li>
+					<li>#2649 SVG export - blur scaling (on supported browsers)</li>
+					<li>#2651 Loop breaks detection</li>
+					<li>#2653 Check for WEBP availability in CLI</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Icon of Debug listen action from ear to phone receiver</li>
+					<li>#2649 SVG export - using gaussian blur instead of box blur with convolution matrix (Can be turned off in the settings)</li>
+				</ul>
+			</description>
+		</release>
 		<release version="25.1.2" date="2026-02-23">
 			<description>
 				<p>Added</p>
