@@ -2647,5 +2647,27 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"finish\");\r\n"
         );
     }
+
+    @Test
+    public void frame97_twoInTest() {
+        compareSrc(97, "trace(\"twoInTest\");\r\n"
+                + "var o = {a:{}};\r\n"
+                + "for(var n in o)\r\n"
+                + "{\r\n"
+                + "var c = 5;\r\n"
+                + "for(var i in o.a)\r\n"
+                + "{\r\n"
+                + "if(i == c)\r\n"
+                + "{\r\n"
+                + "if(i == 0)\r\n"
+                + "{\r\n"
+                + "trace(\"xx\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+        );
+    }
     //--FRAMES-END--
 }

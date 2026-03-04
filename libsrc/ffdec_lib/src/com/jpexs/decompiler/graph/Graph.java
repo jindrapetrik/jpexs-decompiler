@@ -581,7 +581,7 @@ public class Graph {
                 if (q == p) {
                     continue;
                 }
-                if (!q.leadsTo(localData, this, code, p, loops, throwStates)) {
+                if (!q.leadsTo(localData, this, code, p, loops, throwStates, false)) {
                     common = false;
                     break;
                 }
@@ -666,10 +666,10 @@ public class Graph {
                 int levelCompare = o2.level - o1.level;
                 if (levelCompare == 0) {
                     try {
-                        if (o1.part.leadsTo(localData, Graph.this, code, o2.part, loops, throwStates)) {
+                        if (o1.part.leadsTo(localData, Graph.this, code, o2.part, loops, throwStates, false)) {
                             return -1;
                         }
-                        if (o2.part.leadsTo(localData, Graph.this, code, o1.part, loops, throwStates)) {
+                        if (o2.part.leadsTo(localData, Graph.this, code, o1.part, loops, throwStates, false)) {
                             return 1;
                         }
                         return 0;
@@ -732,7 +732,7 @@ public class Graph {
                         if (visited.contains(n)) {
                             continue;
                         }
-                        if (!n.leadsTo(localData, this, code, r, loops, throwStates)) {
+                        if (!n.leadsTo(localData, this, code, r, loops, throwStates, false)) {
                             common = false;
                             break loopprocess;
                         }
@@ -1738,7 +1738,7 @@ public class Graph {
                         }
                     }
                 }
-                if (el.loopContinue.leadsTo(localData, this, code, r, loops, throwStates)) {
+                if (el.loopContinue.leadsTo(localData, this, code, r, loops, throwStates, false)) {
                     el.backEdges.add(r);
                 }
             }
@@ -2713,7 +2713,7 @@ public class Graph {
                         }
 
                         try {
-                            if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2, throwStates)) {
+                            if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2, throwStates, false)) {
                                 if (lastP1.breakCandidatesLocked == 0) {
                                     if (debugGetLoops) {
                                         System.err.println("added breakCandidate " + part + " to " + lastP1);
@@ -2746,7 +2746,7 @@ public class Graph {
                 }
                 part.level = level;
 
-                isLoop = part.leadsTo(localData, this, code, part, loops, throwStates);
+                isLoop = part.leadsTo(localData, this, code, part, loops, throwStates, false);
                 currentLoop = null;
                 if (isLoop) {
                     currentLoop = new Loop(loops.size(), part, null);
@@ -2906,7 +2906,7 @@ public class Graph {
                     for (int c = 0; c < currentLoop.breakCandidates.size(); c++) {
                         GraphPart cand = currentLoop.breakCandidates.get(c);
                         GraphPart sp = currentLoop.stopParts.get(currentLoop.stopParts.size() - 1);
-                        if (cand == sp || cand.leadsTo(localData, this, code, sp, new ArrayList<>() /*ignore existing loop states*/, throwStates)) {
+                        if (cand == sp || cand.leadsTo(localData, this, code, sp, new ArrayList<>() /*ignore existing loop states*/, throwStates, false)) {
                             breakCandidatesLeft.add(c);
                         }
                     }
@@ -2932,7 +2932,7 @@ public class Graph {
                             if (cand == cand2) {
                                 continue;
                             }
-                            if (cand.leadsTo(localData, this, code, cand2, loops, throwStates)) {
+                            if (cand.leadsTo(localData, this, code, cand2, loops, throwStates, false)) {
 
                                 int curLevl = currentLoop.breakCandidatesLevels.get(c1);
                                 int curLev2 = currentLoop.breakCandidatesLevels.get(c2);
@@ -3882,7 +3882,7 @@ public class Graph {
                                             continue;
                                         }
                                         // also #2636
-                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates)) {
+                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates, true /*IMPORTANT*/)) {
                                             continue;
                                         }
                                         
@@ -3901,7 +3901,7 @@ public class Graph {
                                             if (v.contains(n)) {
                                                 continue;
                                             }
-                                            if (!n.leadsTo(localData, this, code, next, loops, throwStates)) {
+                                            if (!n.leadsTo(localData, this, code, next, loops, throwStates, true /*IMPORTANT*/)) {
                                                 GraphPart n2 = getCommonPart(localData, r, Arrays.asList(next, n), loops, throwStates);
                                                 if (n2 != null) {
                                                     //System.err.println("Found block: start = " + part + ", break = " + n2 + ", exit = " + r);
@@ -4834,7 +4834,7 @@ public class Graph {
              */
             //must go backwards to hit case 2, not case 1
             for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
-                if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, throwStates)) {
+                if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, throwStates, false)) {
                     DefaultItem di = new DefaultItem(dialect);
                     caseValuesMap.add(i + 1, di);
                     caseBodyParts.add(i + 1, defaultPart);
@@ -4855,7 +4855,7 @@ public class Graph {
                         trace("2");                    
              */
             for (int i = 0; i < caseBodyParts.size(); i++) {
-                if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, throwStates)) {
+                if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, throwStates, false)) {
                     DefaultItem di = new DefaultItem(dialect);
                     caseValuesMap.add(i, di);
                     caseBodyParts.add(i, defaultPart);
@@ -4905,8 +4905,8 @@ public class Graph {
             GraphPart b = caseBodies.get(i);
             for (int j = i + 1; j < caseBodies.size(); j++) {
                 GraphPart b2 = caseBodies.get(j);
-                if (b2.leadsTo(localData, this, code, b, loops, throwStates)) {
-                    if (b.leadsTo(localData, this, code, b2, loops, throwStates)) { //unstructured code
+                if (b2.leadsTo(localData, this, code, b, loops, throwStates, false)) {
+                    if (b.leadsTo(localData, this, code, b2, loops, throwStates, false)) { //unstructured code
                         continue;
                     }
                     caseBodies.remove(j);
@@ -4914,7 +4914,7 @@ public class Graph {
                     i--;
                     continue loopi;
                 } else if (j > i + 1) {
-                    if (b.leadsTo(localData, this, code, b2, loops, throwStates)) {
+                    if (b.leadsTo(localData, this, code, b2, loops, throwStates, false)) {
                         caseBodies.remove(j);
                         caseBodies.add(i + 1, b2);
                         continue loopi;
@@ -4932,7 +4932,7 @@ public class Graph {
             List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
             boolean willHaveBreak = false;
             if (i < caseBodies.size() - 1) {
-                if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, throwStates)) {
+                if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, throwStates, false)) {
                     willHaveBreak = true;
                 }
             }
