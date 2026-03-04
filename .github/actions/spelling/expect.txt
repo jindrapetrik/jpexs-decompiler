@@ -114,6 +114,7 @@ alsairafi
 alterneigh
 altersingle
 altglyph
+altsigner
 ames
 amf
 amxmlc
@@ -531,7 +532,6 @@ CLIPBRD
 clipdepth
 CLIPEVENTFLAGS
 CLIPFORMAT
-clisteners
 clojuresyntaxkit
 clonesprite
 closeall
@@ -706,6 +706,7 @@ debuggerreplace
 debuggging
 debuginfo
 debugline
+debuglisten
 debugpanel
 debugpcode
 debugswf
@@ -885,6 +886,10 @@ dsh
 DSPGROUP
 DSqrt
 dss
+dstatop
+dstin
+dstout
+dstover
 dsum
 dsx
 dsy
@@ -1508,6 +1513,7 @@ iconinfo
 ict
 icting
 ictx
+IDAT
 idata
 IDCT
 Iddle
@@ -1686,7 +1692,6 @@ ipfix
 iploop
 iro
 ISAKMP
-isb
 isbn
 isbold
 isd
@@ -1838,6 +1843,7 @@ kld
 klikatice
 klute
 KMGTPE
+kmsjarsigner
 Knotentext
 kof
 Kohonen
@@ -1868,6 +1874,7 @@ LASTINPUTINFO
 lastone
 LAUNCHSETUP
 layerschanged
+Lazraq
 lbl
 Lbr
 LBUTTON
@@ -2190,6 +2197,8 @@ Mochi
 mochicrypt
 Modell
 MODEQ
+Modifiersmy
+Modifierstests
 MODULEENTRY
 moduleinfo
 modulemainclass
@@ -2286,6 +2295,7 @@ mystar
 mystvar
 mytypedobject
 myundefined
+myunknown
 myvargetonly
 myvarsetonly
 myvectorint
@@ -2293,6 +2303,7 @@ myxml
 Naashorn
 nabc
 nai
+Namesmy
 namespacekind
 namespaceset
 NAMESPACESUFFIX
@@ -2898,6 +2909,7 @@ RECOVERYINPROGRESS
 rectx
 recursesubdirs
 redistributors
+refeshing
 refobj
 reftest
 refu
@@ -3329,6 +3341,7 @@ SQSTRING
 SQuote
 sra
 srcoff
+srcover
 srcs
 srctest
 srd
@@ -3518,8 +3531,10 @@ tempreg
 TEMPSIZE
 ternars
 ternat
+testactual
 testclass
 TESTDATADIR
+testexpected
 testincludes
 testlib
 testmethods
@@ -3675,7 +3690,6 @@ tsize
 tsort
 TStop
 tstr
-ttable
 ttb
 ttem
 ttffile
@@ -3834,6 +3848,7 @@ vclshlctrls
 vclx
 vcname
 VCP
+vcs
 vdata
 vdir
 velikost
@@ -4020,6 +4035,7 @@ xpos
 XPrewitt
 xrefs
 xscale
+XScaled
 XScharr
 xsi
 XSobel
@@ -4070,6 +4086,7 @@ ypos
 YPrewitt
 YRef
 yscale
+YScaled
 YScharr
 YSobel
 YSpring
