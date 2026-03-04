@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - AS3 goto definition missing some namespaces
 - [#2514] AS3 direct editation - problems with namespaces
 - [#2649] SVG export - blur scaling (on supported browsers)
+- [#2651] Loop breaks detection
 
 ### Changed
 - Icon of Debug listen action from ear to phone receiver
@@ -4190,6 +4191,7 @@ Major version of SWF to XML export changed to 2.
 [#2645]: https://www.free-decompiler.com/flash/issues/2645
 [#2514]: https://www.free-decompiler.com/flash/issues/2514
 [#2649]: https://www.free-decompiler.com/flash/issues/2649
+[#2651]: https://www.free-decompiler.com/flash/issues/2651
 [#2639]: https://www.free-decompiler.com/flash/issues/2639
 [#2642]: https://www.free-decompiler.com/flash/issues/2642
 [#2636]: https://www.free-decompiler.com/flash/issues/2636
