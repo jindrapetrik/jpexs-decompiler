@@ -396,8 +396,8 @@ public class DebugPanel extends JPanel {
                 addWatchMenu.add(watchReadWriteMenuItem);
                 pm.add(addWatchMenu);
 
-                JMenuItem removeWatcheMenuItem = new JMenuItem(AppStrings.translate("debug.watch.remove"));
-                removeWatcheMenuItem.addActionListener((ActionEvent e1) -> {
+                JMenuItem removeWatchMenuItem = new JMenuItem(AppStrings.translate("debug.watch.remove"));
+                removeWatchMenuItem.addActionListener((ActionEvent e1) -> {
                     if (!Main.removeWatch(session, v, watchParentId)) {
                         ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.remove"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                         return;
@@ -405,7 +405,7 @@ public class DebugPanel extends JPanel {
                     refresh();
                 });
                 if (session.getWatch(v.name, watchParentId) != null) {
-                    pm.add(removeWatcheMenuItem);
+                    pm.add(removeWatchMenuItem);
                 }
                 pm.show(e.getComponent(), e.getX(), e.getY());
             }
@@ -845,7 +845,7 @@ public class DebugPanel extends JPanel {
                         });
                     } catch (Throwable t) {
                         int sessionId = session == null ? -1 : session.getId();
-                        Logger.getLogger(DebugPanel.class.getName()).log(Level.FINE, "session" + sessionId + ": Error refeshing debug panel", t);
+                        Logger.getLogger(DebugPanel.class.getName()).log(Level.FINE, "session" + sessionId + ": Error refreshing debug panel", t);
                     }
                 }
             }

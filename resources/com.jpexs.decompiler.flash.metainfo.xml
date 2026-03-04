@@ -89,7 +89,7 @@
 				</ul>
 				<p>Removed</p>
 				<ul>
-					<li>(Temporary) AS3 ambiguios namespace detection, it is slow - needs optimizations</li>
+					<li>(Temporary) AS3 ambiguous namespace detection, it is slow - needs optimizations</li>
 				</ul>
 			</description>
 		</release>
