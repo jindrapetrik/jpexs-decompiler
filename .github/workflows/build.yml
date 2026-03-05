@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    tags:
-        - version*
     branches: 
         - dev
         - master        
@@ -48,6 +46,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          architecture: x64
+          java-version: 8                
+          
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'                    
 
       - name: Compute variables
         id: vars
@@ -60,10 +70,10 @@ jobs:
           git fetch --tags --force | Out-Null
 
           $ref       = "${env:GITHUB_REF}"        # e.g. refs/tags/version1.2.3 or refs/heads/dev
-          $refName   = "${env:GITHUB_REF_NAME}"   # e.g. version1.2.3 or dev
           $eventType = "${env:GITHUB_EVENT_NAME}" # e.g. "push" or "pull_request"
           $isTag     = $ref.StartsWith("refs/tags/")
           $isDev     = ($ref -eq "refs/heads/dev")
+          $isMaster  = ($ref -eq "refs/heads/master")
           $isPush    = ($eventType -eq "push")
                               
           $H = (git rev-parse HEAD).Trim()
@@ -90,27 +100,36 @@ jobs:
           Set-Var "verTag" ""
           Set-Var "verTitle" ""
 
-
-          # Case 1: Tag versionX.Y.Z
-          if ($isTag -and ($refName -match '^version(\d+)\.(\d+)\.(\d+)$')) {
+          $raw = "";
+          if ($isMaster) {
+            $raw = php cicd_scripts/get_changelog.php true
+          }
+          if ($isDev -and $isPush) {
+            $raw = php cicd_scripts/get_changelog.php false
+          }
+          if ($isMaster -or ($isDev -and $isPush)) {
+            javac -cp build/classes -d build/classes src/com/jpexs/build/ChangelogUpdater.java
+            java -cp build/classes com.jpexs.build.ChangelogUpdater
+          }
+                   
+          if ($isMaster -and ($raw -match '^(\d+)\.(\d+)\.(\d+)$')) (
             $X = $Matches[1]
             $Y = $Matches[2]
             $Z = $Matches[3]
-
+            
             Set-Var "verMajor"    $X
             Set-Var "verMinor"    $Y
             Set-Var "verRelease"  $Z
             Set-Var "verBuild"    "0"
             Set-Var "verRevision" $H
 
-            $raw = "$X.$Y.$Z"
             Set-Var "verRaw"   $raw
             Set-Var "verShort" $raw
             Set-Var "verLong"  $raw
             
             Set-Var "verDebug" "false"
             Set-Var "verOldTag" ""
-            Set-Var "verTag"   $refName
+            Set-Var "verTag"   "version$raw"
             
             Set-Var "doRelease" "true"
             Set-Var "verTitle" "version $raw"
@@ -119,7 +138,7 @@ jobs:
           }
 
           # Case 2: dev branch and push
-          if ($isDev -and $isPush) {
+          if ($isDev -and $isPush -and ($raw -eq "nightly")) {
             # Find latest nightlyN tag (max N)
             $nightlyTags = git tag --list 'nightly*'
             $maxN = -1
@@ -195,6 +214,13 @@ jobs:
           echo "revision=${{ steps.vars.outputs.verRevision }}">>$VERSION_PROP_FILE
           echo "debug=${{ steps.vars.outputs.verDebug }}">>$VERSION_PROP_FILE
 
+      - name: Upload CHANGELOG.md artifact
+        uses: actions/upload-artifact@v4
+        if: steps.vars.outputs.doRelease == 'true'
+        with:
+          name: changelog_md
+          path: CHANGELOG.md
+          
       - name: Upload version.properties artifact
         uses: actions/upload-artifact@v4
         with:
@@ -934,12 +960,17 @@ jobs:
       with:
         distribution: adopt
         architecture: x64
-        java-version: 8
+        java-version: 8        
     
     - name: Set up Ant
       run: |
         sudo apt-get update -y -qq
         sudo apt-get install -y -qq ant 
+    
+    - name: Download CHANGELOG.md artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: changelog_md
     
     - name: Download version.properties artifact
       uses: actions/download-artifact@v4
@@ -1005,7 +1036,6 @@ jobs:
           path: ./release_notes.md
 
       - name: Create tag
-        if: needs.compute-version.outputs.verDebug == 'true'
         run: |
           TAG="${{ needs.compute-version.outputs.verTag }}"
           git fetch --tags --force
