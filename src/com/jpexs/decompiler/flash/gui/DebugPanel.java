@@ -668,7 +668,7 @@ public class DebugPanel extends JPanel {
                             List<Variable> watchedVars = new ArrayList<>();
                             List<Long> watchedParentIds = new ArrayList<>();
                             for (DebuggerCommands.Watch w : session.getWatches().values()) {
-                                InGetVariable igv = session.getVariable(w.varId, w.varName, false, false);
+                                InGetVariable igv = session.getVariable(w.varId, w.varName, false, true);
                                 if (igv != null) {
                                     Variable wVar = igv.parent;
                                     if (wVar != null) {
