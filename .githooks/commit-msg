@@ -1,0 +1,15 @@
+#!/bin/sh
+# Enforce conventional commits: type(scope): description
+# Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+msg=$(head -1 "$1")
+
+if ! echo "$msg" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+$'; then
+  echo "ERROR: Commit message must follow Conventional Commits format:"
+  echo "  type(scope): description"
+  echo ""
+  echo "  Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+  echo ""
+  echo "  Got: $msg"
+  exit 1
+fi
