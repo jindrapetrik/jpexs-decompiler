@@ -112,7 +112,7 @@ jobs:
             java -cp build/classes com.jpexs.build.ChangelogUpdater
           }
                    
-          if ($isMaster -and ($raw -match '^(\d+)\.(\d+)\.(\d+)$')) (
+          if ($isMaster -and ($raw -match '^(\d+)\.(\d+)\.(\d+)$')) {
             $X = $Matches[1]
             $Y = $Matches[2]
             $Z = $Matches[3]
