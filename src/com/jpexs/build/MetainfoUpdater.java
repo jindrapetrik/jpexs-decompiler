@@ -16,8 +16,13 @@
  */
 package com.jpexs.build;
 
-import com.jpexs.helpers.Helper;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,10 +37,29 @@ public class MetainfoUpdater {
     public static final String METAINFO_FILENAME = "resources/com.jpexs.decompiler.flash.metainfo.xml";
     private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
 
+    private static String readFile(String file) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buf = new byte[4096];
+            int cnt;
+            while ((cnt = fis.read(buf)) > 0) {
+                baos.write(buf, 0, cnt);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ChangelogUpdater.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            return new String(baos.toByteArray(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(ChangelogUpdater.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
     public static void main(String[] args) throws UnsupportedEncodingException {
-        String metainfo = Helper.readTextFile(METAINFO_FILENAME);
+        String metainfo = readFile(METAINFO_FILENAME);
 
-        String changeLog = Helper.readTextFile(CHANGELOG_FILENAME);
+        String changeLog = readFile(CHANGELOG_FILENAME);
         String newline = System.lineSeparator();
 
         Pattern metainfoVersionPattern = Pattern.compile("<release version=\"(?<version>[0-9]+\\.[0-9]+\\.[0-9]+)\" date=\"(?<date>[0-9]+-[0-9]+-[0-9]+)\">");
@@ -109,7 +133,11 @@ public class MetainfoUpdater {
 
         metainfo = metainfo.replaceAll("<releases>", ("<releases>" + newline + releases).trim());
 
-        Helper.writeFile(METAINFO_FILENAME, metainfo.getBytes("UTF-8"));
+        try (FileOutputStream fos = new FileOutputStream(METAINFO_FILENAME)) {
+            fos.write(metainfo.getBytes("UTF-8"));
+        } catch (IOException iex) {
+            //ignore
+        }
     }
 
     private static String filterLiText(String li) {

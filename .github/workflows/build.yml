@@ -980,6 +980,31 @@ jobs:
     - name: Copy version.properties to lib
       run: cp version.properties libsrc/ffdec_lib/
       
+    - name: Update Dockerfile
+      if: needs.compute-version.outputs.verDebug == 'false'
+      run: |
+        sed -E -i 's|version[^/]+/ffdec_[^/]+\.zip|version${{needs.compute-version.outputs.verRaw}}/ffdec_${{needs.compute-version.outputs.verRaw}}.zip|g' Dockerfile
+    
+    - name: Upload Dockerfile
+      if: needs.compute-version.outputs.verDebug == 'false'
+      uses: actions/upload-artifact@v4
+      with:
+        name: dockerfile
+        path: Dockerfile  
+        
+    - name: Update metainfo
+      if: needs.compute-version.outputs.verDebug == 'false'
+      run: |
+        javac -cp build/classes -d build/classes src/com/jpexs/build/MetainfoUpdater.java
+        java -cp build/classes com.jpexs.build.MetainfoUpdater
+    
+    - name: Upload metainfo
+      if: needs.compute-version.outputs.verDebug == 'false'
+      uses: actions/upload-artifact@v4
+      with:
+        name: metainfo
+        path: resources/com.jpexs.decompiler.flash.metainfo.xml 
+      
     - name: Create packages
       run: ant new-version-set release-no-dist
     
@@ -987,7 +1012,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: packages
-        path: releases      
+        path: releases                   
         
   deploy:
     name: Deploy to GitHub
@@ -1028,6 +1053,35 @@ jobs:
       - name: Generate release description
         if: needs.compute-version.outputs.verDebug == 'false'
         run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" "${{ needs.compute-version.outputs.verShort }}" ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
+
+      - name: Download CHANGELOG.md artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog_md
+     
+      - name: Download Dockerfile artifact
+        if: needs.compute-version.outputs.verDebug == 'false'
+        uses: actions/download-artifact@v4
+        with:
+          name: dockerfile
+     
+      - name: Download metainfo artifact
+        if: needs.compute-version.outputs.verDebug == 'false'
+        uses: actions/download-artifact@v4
+        with:
+          name: metainfo
+          path: resources/
+     
+      - name: Commit CHANGELOG, metainfo, Dockerfile
+        if: needs.compute-version.outputs.verDebug == 'false'
+        run: |
+          git add CHANGELOG.md
+          git add Dockerfile
+          git add resources/com.jpexs.decompiler.flash.metainfo.xml
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: change version to ${{ needs.compute-version.outputs.verRaw }}" -m "[ci skip]"
+          git push origin master
 
       - name: Upload release notes artifact
         uses: actions/upload-artifact@v4
