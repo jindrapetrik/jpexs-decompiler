@@ -102,10 +102,10 @@ jobs:
 
           $raw = "";
           if ($isMaster) {
-            $raw = php cicd_scripts/get_changelog.php true
+            $raw = php cicd_scripts/update_changelog.php true
           }
           if ($isDev -and $isPush) {
-            $raw = php cicd_scripts/get_changelog.php false
+            $raw = php cicd_scripts/update_changelog.php false
           }
           if ($isMaster -or ($isDev -and $isPush)) {
             javac -cp build/classes -d build/classes src/com/jpexs/build/ChangelogUpdater.java
