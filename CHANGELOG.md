@@ -1,8 +1,6 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
 ## [25.1.3] - 2026-03-04
 ### Added
 - Debugger - Button to disconnect current session (stay listening)
