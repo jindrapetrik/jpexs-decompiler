@@ -1046,6 +1046,11 @@ jobs:
           name: lib_javadoc
           path: releases/
           
+      - name: Download CHANGELOG.md artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog_md
+          
       - name: Generate nightly release description
         if: needs.compute-version.outputs.verDebug == 'true'
         run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" Unreleased ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
@@ -1053,12 +1058,7 @@ jobs:
       - name: Generate release description
         if: needs.compute-version.outputs.verDebug == 'false'
         run: php cicd_scripts/format_release_info.php -filever "${{ needs.compute-version.outputs.verShort }}" "${{ needs.compute-version.outputs.verShort }}" ${{ needs.compute-version.outputs.verTag }} ./CHANGELOG.md "${{ env.CICD_REPO_SLUG }}" > ./release_notes.md
-
-      - name: Download CHANGELOG.md artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog_md
-     
+      
       - name: Download Dockerfile artifact
         if: needs.compute-version.outputs.verDebug == 'false'
         uses: actions/download-artifact@v4
