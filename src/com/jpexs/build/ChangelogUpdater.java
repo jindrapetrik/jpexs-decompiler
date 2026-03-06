@@ -45,8 +45,7 @@ public class ChangelogUpdater {
     private static final String PR_URL_PREFIX = GITHUB_ADDRESS + "pull/";
 
     private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
-   
-    
+
     private static String readFile(String file) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -65,7 +64,7 @@ public class ChangelogUpdater {
             return null;
         }
     }
-    
+
     public static void main(String[] args) throws UnsupportedEncodingException {
         String changeLog = readFile(CHANGELOG_FILENAME);
         changeLog = changeLog.replaceAll("\\[[^\\]]+\\]: [^\\r\\n]+\\r\\n", "");
@@ -133,7 +132,7 @@ public class ChangelogUpdater {
             changeLog += "[PR" + pr + "]: " + PR_URL_PREFIX + pr + "\r\n";
         }
 
-        try(FileOutputStream fos = new FileOutputStream(CHANGELOG_FILENAME)) {
+        try (FileOutputStream fos = new FileOutputStream(CHANGELOG_FILENAME)) {
             fos.write(changeLog.getBytes("UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(ChangelogUpdater.class.getName()).log(Level.SEVERE, null, ex);
