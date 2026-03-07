@@ -389,13 +389,13 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
                 case "scripts":
                     if (swf.isAS3()) {
-                        if (!swf.getAbcList().isEmpty()) {
+                        if (addAllFolders || !swf.getAbcList().isEmpty()) {
                             nodeList.add(new ClassesListTreeModel(swf, Configuration.flattenASPackages.get()));
                         }
                     } else {
                         List<TreeItem> subNodes = swf.getFirstLevelASMNodes(currentTagScriptCache);
 
-                        if (subNodes.size() > 0) {
+                        if (addAllFolders || !subNodes.isEmpty()) {
                             TreeItem actionScriptNode = new FolderItem(translate("node.scripts"), FOLDER_SCRIPTS, swf, subNodes);
                             nodeList.add(actionScriptNode);
                         }
