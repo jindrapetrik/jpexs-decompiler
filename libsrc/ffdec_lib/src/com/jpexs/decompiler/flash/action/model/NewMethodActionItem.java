@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -52,6 +55,11 @@ public class NewMethodActionItem extends ActionItem {
      * Arguments
      */
     public List<GraphTargetItem> arguments;
+    
+    /**
+     * Is getter
+     */
+    public boolean isGetter;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -132,6 +140,24 @@ public class NewMethodActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (isGetter) {
+            ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+            String charset = asGenerator.getCharset();
+
+            String methodNameAsStr = ((DirectValueActionItem) methodName).getAsString();
+
+            return toSourceMerge(
+                    localData, generator,
+                    toSourceCall(localData, generator, arguments),
+                    new ActionPush((Long) (long) 0, charset),
+                    scriptObject,
+                    asGenerator.pushConst("__get__" + methodNameAsStr),
+                    new ActionCallMethod(),
+                    new ActionPush(Undefined.INSTANCE, charset),
+                    new ActionNewMethod()
+            );
+        }
+        
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), scriptObject, methodName, new ActionNewMethod());
     }
 

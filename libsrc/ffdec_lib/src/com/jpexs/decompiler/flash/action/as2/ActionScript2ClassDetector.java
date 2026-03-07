@@ -712,11 +712,9 @@ public class ActionScript2ClassDetector {
                                                         }
                                                         if (pos >= 0 && func.actions.get(pos) instanceof ReturnActionItem) {
                                                             GraphTargetItem val = func.actions.get(pos);
-                                                            if (val.value instanceof CallMethodActionItem) {
-                                                                if (((CallMethodActionItem) val.value).methodName instanceof DirectValueActionItem) {
-                                                                    if (((CallMethodActionItem) val.value).methodName.toString().startsWith("__get__")) {
-                                                                        func.actions.remove(pos);
-                                                                    }
+                                                            if (val.value instanceof GetMemberActionItem) {
+                                                                if (((GetMemberActionItem) val.value).isGetter) {
+                                                                    func.actions.remove(pos);
                                                                 }
                                                             }
                                                         }

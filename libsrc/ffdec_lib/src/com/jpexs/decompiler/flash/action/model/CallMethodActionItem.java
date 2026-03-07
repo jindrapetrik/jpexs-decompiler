@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -52,26 +54,12 @@ public class CallMethodActionItem extends ActionItem {
     /**
      * Arguments
      */
-    public List<GraphTargetItem> arguments;
+    public List<GraphTargetItem> arguments;   
 
     /**
-     * Special - getter
+     * Is getter
      */
-    public static int SPECIAL_GETTER = 1;
-    /**
-     * Special - setter
-     */
-    public static int SPECIAL_SETTER = 2;
-
-    /**
-     * Special
-     */
-    private int special = 0;
-
-    /**
-     * Setter/getter variable name
-     */
-    private String setterGetterVarName = null;
+    public boolean isGetter = false;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -92,51 +80,11 @@ public class CallMethodActionItem extends ActionItem {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.methodName = methodName;
         this.arguments = arguments;
-        this.scriptObject = scriptObject;
-
-        if (methodName instanceof DirectValueActionItem) {
-            DirectValueActionItem dv = (DirectValueActionItem) methodName;
-            if (dv.isString()) {
-                String methodNameStr = dv.getAsString();
-                if (methodNameStr.startsWith("__get__") && arguments.isEmpty()) {
-                    special = SPECIAL_GETTER;
-                    setterGetterVarName = methodNameStr.substring(7);
-                } else if (methodNameStr.startsWith("__set__") && arguments.size() == 1) {
-                    special = SPECIAL_SETTER;
-                    setterGetterVarName = methodNameStr.substring(7);
-                    precedence = PRECEDENCE_ASSIGNMENT;
-                }
-            }
-        }
+        this.scriptObject = scriptObject;       
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (special == SPECIAL_GETTER) {
-            if (scriptObject.getPrecedence() > this.precedence) {
-                writer.append("(");
-                scriptObject.toString(writer, localData);
-                writer.append(")");
-            } else {
-                scriptObject.toString(writer, localData);
-            }
-            writer.allowWrapHere().append(".");
-            writer.append(setterGetterVarName);
-            return writer;
-        } else if (special == SPECIAL_SETTER) {
-            if (scriptObject.getPrecedence() > this.precedence) {
-                writer.append("(");
-                scriptObject.toString(writer, localData);
-                writer.append(")");
-            } else {
-                scriptObject.toString(writer, localData);
-            }
-            writer.allowWrapHere().append(".");
-            writer.append(setterGetterVarName);
-            writer.append(" = ");
-            arguments.get(0).toStringNL(writer, localData);
-            return writer;
-        }
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {        
         if (methodName instanceof DirectValueActionItem) {
             boolean blankMethod = false;
 
@@ -210,6 +158,23 @@ public class CallMethodActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (isGetter) {
+            ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+            String charset = asGenerator.getCharset();
+
+            String methodNameAsStr = ((DirectValueActionItem) methodName).getAsString();
+
+            return toSourceMerge(
+                    localData, generator,
+                    toSourceCall(localData, generator, arguments),
+                    new ActionPush((Long) (long) 0, charset),
+                    scriptObject,
+                    asGenerator.pushConst("__get__" + methodNameAsStr),
+                    new ActionCallMethod(),
+                    new ActionPush(Undefined.INSTANCE, charset),
+                    new ActionCallMethod()
+            );
+        }
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), scriptObject, methodName, new ActionCallMethod());
     }
 

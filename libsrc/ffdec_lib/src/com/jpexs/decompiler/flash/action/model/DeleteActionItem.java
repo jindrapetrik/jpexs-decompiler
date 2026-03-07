@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -48,6 +51,11 @@ public class DeleteActionItem extends ActionItem {
      */
     public GraphTargetItem propertyName;
 
+    /**
+     * Is getter
+     */
+    public boolean isGetter = false;
+    
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(object);
@@ -108,6 +116,23 @@ public class DeleteActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        if (isGetter) {
+            ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+            String charset = asGenerator.getCharset();
+
+            String propertyNameAsStr = ((DirectValueActionItem) propertyName).getAsString();
+
+            return toSourceMerge(
+                    localData, generator,
+                    new ActionPush((Long) (long) 0, charset),
+                    object,
+                    asGenerator.pushConst("__get__" + propertyNameAsStr),
+                    new ActionCallMethod(),
+                    new ActionDelete2()
+            );
+        }
+        
         if (object == null) {
             return toSourceMerge(localData, generator, propertyName, new ActionDelete2());
         }
