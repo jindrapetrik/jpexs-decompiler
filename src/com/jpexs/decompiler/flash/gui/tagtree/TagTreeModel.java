@@ -340,7 +340,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     nodeList.add(new HeaderItem(swf, translate("node.header")));
                     break;
                 case "cookies":
-                    addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.cookies"), FOLDER_COOKIES, swf, cookies);
+                    addFolderItem(nodeList, emptyFolders, false, translate("node.cookies"), FOLDER_COOKIES, swf, cookies);
                     break;
                 case "shapes":
                     addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
