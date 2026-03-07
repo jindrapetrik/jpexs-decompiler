@@ -6,8 +6,10 @@ class com.jpexs.flash.test.TestLoader {
 	public function includeTests() {
 		new com.jpexs.flash.test.testcases.TestSetterGetter();
 		new com.jpexs.flash.test.testcases.TestCallSetterGetter();
+        new com.jpexs.flash.test.testcases.TestSuperSetterGetter();
+        new com.jpexs.flash.test.testcases.TestSuper2SetterGetter();
 		new com.jpexs.flash.test.testcases.TestVarsMethods();      
 		new com.jpexs.flash.test.testcases.TestMaintainOrder();
-		new com.jpexs.flash.test.testcases.TestReturnInConstructor();
+		new com.jpexs.flash.test.testcases.TestReturnInConstructor();        
 	}
 }
