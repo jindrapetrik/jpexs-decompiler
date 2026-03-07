@@ -108,11 +108,10 @@ jobs:
             $raw = php cicd_scripts/update_changelog.php false
           }
           if ($isMaster -or ($isDev -and $isPush)) {
-            echo "Running changelog updater"
+            mkdir build/classes -Force
             javac -cp build/classes -d build/classes src/com/jpexs/build/ChangelogUpdater.java
             java -cp build/classes com.jpexs.build.ChangelogUpdater            
           }
-          exit 1         
           if ($isMaster -and ($raw -match '^(\d+)\.(\d+)\.(\d+)$')) {
             $X = $Matches[1]
             $Y = $Matches[2]
@@ -996,6 +995,7 @@ jobs:
     - name: Update metainfo
       if: needs.compute-version.outputs.verDebug == 'false'
       run: |
+        mkdir -p build/classes
         javac -cp build/classes -d build/classes src/com/jpexs/build/MetainfoUpdater.java
         java -cp build/classes com.jpexs.build.MetainfoUpdater
     
