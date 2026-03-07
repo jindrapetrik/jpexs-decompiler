@@ -300,6 +300,7 @@ public class FontNormalizer {
                         if (invertedFontIds.contains(fontId)) {
                             if (text2.textMatrix != null && text2.textMatrix.scaleY < 0) {
                                 text2.textMatrix.scaleY *= -1;
+                                text2.textMatrix.rotateSkew1 *= -1;
                             }
                         }
 
