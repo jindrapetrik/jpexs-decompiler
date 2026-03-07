@@ -24,10 +24,12 @@ import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
@@ -63,6 +65,15 @@ public class PreDecrementActionItem extends UnaryOpItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSourceBoth(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSourceBoth(localData, generator, false);
+    }        
+    
+    private List<GraphSourceItem> toSourceBoth(SourceGeneratorLocalData localData, SourceGenerator generator, boolean wantResult) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         String charset = asGenerator.getCharset();
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -77,21 +88,40 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.addAll(gv.toSource(localData, generator));
             ret.add(new ActionDecrement());
             int tmpReg = asGenerator.getTempRegister(localData);
+
             ret.add(new ActionStoreRegister(tmpReg, charset));
             ret.add(new ActionSetVariable());
             ret.add(new ActionPush(new RegisterNumber(tmpReg), charset));
             asGenerator.releaseTempRegister(localData, tmpReg);
         } else if (val instanceof GetMemberActionItem) {
-            GetMemberActionItem mem = (GetMemberActionItem) val;
-            ret.addAll(mem.toSource(localData, generator));
-            ret.remove(ret.size() - 1); //ActionGetMember
-            ret.addAll(mem.toSource(localData, generator));
-            ret.add(new ActionDecrement());
-            int tmpReg = asGenerator.getTempRegister(localData);
-            ret.add(new ActionStoreRegister(tmpReg, charset));
-            ret.add(new ActionSetMember());
-            ret.add(new ActionPush(new RegisterNumber(tmpReg), charset));
-            asGenerator.releaseTempRegister(localData, tmpReg);
+            GetMemberActionItem mem = (GetMemberActionItem) val;                        
+            if (mem.isGetter) {
+                String memberNameAsStr = ((DirectValueActionItem) mem.memberName).getAsString();
+                ret.addAll(toSourceMerge(localData, generator,
+                    mem,
+                    new ActionDecrement()
+                ));
+                ret.addAll(toSourceMerge(localData, generator, new ActionPush((Long) (long) 1, charset),
+                    mem.object,
+                    asGenerator.pushConst("__set__" + memberNameAsStr), 
+                    new ActionCallMethod()));
+            } else {                        
+                ret.addAll(mem.toSource(localData, generator));
+                ret.remove(ret.size() - 1); //ActionGetMember
+                ret.addAll(mem.toSource(localData, generator));
+                ret.add(new ActionDecrement());
+                int tmpReg = 0;
+                if (wantResult) {
+                    tmpReg = asGenerator.getTempRegister(localData);
+                    ret.add(new ActionStoreRegister(tmpReg, charset));            
+                }
+                ret.add(new ActionSetMember());   
+                if (wantResult) {
+                    ret.add(new ActionPush(new RegisterNumber(tmpReg), charset));
+                    asGenerator.releaseTempRegister(localData, tmpReg);
+                }
+                return ret;
+            }            
         } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
             RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
             ret.add(new ActionPush(new RegisterNumber(rn.number), charset));
@@ -105,6 +135,9 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.addAll(gp.toSource(localData, generator));
             ret.add(new ActionDecrement());
             ret.add(new ActionSetProperty());
+        }
+        if (!wantResult) {
+            ret.add(new ActionPop());
         }
         return ret;
     }

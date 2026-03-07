@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -66,6 +68,11 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
      * Compound operator
      */
     public String compoundOperator;
+    
+    /**
+     * Is setter
+     */
+    public boolean isSetter = false;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -166,6 +173,12 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         String charset = asGenerator.getCharset();
+           
+        if (isSetter) {
+            String objectNameAsStr = ((DirectValueActionItem) objectName).getAsString();
+            return toSourceMerge(localData, generator, value, new ActionPush((Long) (long) 1, charset), object, asGenerator.pushConst("__set__" + objectNameAsStr), new ActionCallMethod());   
+        }
+
         int tmpReg = asGenerator.getTempRegister(localData);
         try {
             return toSourceMerge(localData, generator, object, objectName, value, new ActionStoreRegister(tmpReg, charset), new ActionSetMember(), new ActionPush(new RegisterNumber(tmpReg), charset));
@@ -176,6 +189,10 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (isSetter) {
+            return toSourceMerge(localData, generator, toSource(localData, generator), new ActionPop());   
+        }
+
         return toSourceMerge(localData, generator, object, objectName, value, new ActionSetMember());
     }
 

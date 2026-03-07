@@ -132,7 +132,9 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -176,10 +178,13 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * ActionScript 1/2 parser.
@@ -280,6 +285,7 @@ public class ActionScript2Parser {
         this.charset = swf.getCharset();
         parseSwfClasses(swf);
         this.targetSource = targetSource;
+        this.swf = swf;
     }
 
     private long uniqLast = 0;
@@ -461,9 +467,139 @@ public class ActionScript2Parser {
         return retf;
     }
 
+    private GetMemberActionItem getFirstGetMember(GraphTargetItem item) {
+        while (item instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) item;
+            if (!(mem.memberName instanceof DirectValueActionItem)) {
+                return null;
+            }
+            DirectValueActionItem dv = ((DirectValueActionItem) mem.memberName);
+            if (!dv.isString()) {
+                return null;
+            }
+            if (!(mem.object instanceof GetMemberActionItem)) {
+                return mem;
+            }
+            item = mem.object;
+        }
+        return null;
+    }
+
+    private List<String> getMembersPath(GraphTargetItem item) {
+        List<String> ret = new ArrayList<>();
+        while (item instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) item;
+            if (!(mem.memberName instanceof DirectValueActionItem)) {
+                return null;
+            }
+            DirectValueActionItem dv = ((DirectValueActionItem) mem.memberName);
+            if (!dv.isString()) {
+                return null;
+            }
+            ret.add(0, dv.getAsString());
+            item = mem.object;
+        }
+        if (item instanceof DirectValueActionItem) {
+            DirectValueActionItem dv1 = (DirectValueActionItem) item;
+            if (dv1.value instanceof RegisterNumber) {
+                RegisterNumber rn = (RegisterNumber) dv1.value;
+                if ("this".equals(rn.name)) {
+                    ret.add(0, "this");
+                    return ret;
+                }
+                if ("super".equals(rn.name)) {
+                    ret.add(0, "super");
+                    return ret;
+                }
+            }
+        }
+        if (!((item instanceof GetVariableActionItem || item instanceof VariableActionItem))) {
+            return null;
+        }
+
+        if (item instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) item;
+            if (!(gv.name instanceof DirectValueActionItem)) {
+                return null;
+            }
+            DirectValueActionItem dv = ((DirectValueActionItem) gv.name);
+            if (!dv.isString()) {
+                return null;
+            }
+            String varName = dv.getAsString();
+            ret.add(0, varName);
+            return ret;
+        }
+
+        if (item instanceof VariableActionItem) {
+            VariableActionItem v = (VariableActionItem) item;
+            ret.add(0, v.getVariableName());
+            return ret;
+        }
+
+        return null;
+    }
+    
+    private void fetchGettersSetters(List<String> parts, Set<String> superGetProperties, Set<String> superSetProperties) {
+        if (parts == null) {
+            return;
+        }         
+        String fullExtendsName = String.join(".", parts);
+
+        String clsName = parts.remove(parts.size() - 1);
+
+        String key;
+        if (Configuration.flattenASPackages.get()) {
+            key = "\\__Packages\\" + String.join(".", parts) + "\\" + clsName;
+        } else {
+            key = "\\__Packages\\" + String.join("\\", parts) + "\\" + clsName;
+        }
+
+        ASMSource extendsAsm = swf.getASMs(false).get(key);
+        if (extendsAsm == null) {
+            return;
+        }
+        
+        List<GraphTargetItem> list = extendsAsm.getActionsToTree();
+        for (GraphTargetItem it2 : list) {
+            if (it2 instanceof ClassActionItem) {
+                ClassActionItem cai = (ClassActionItem) it2;
+                List<String> cName = getMembersPath(cai.className);
+                if (cName != null) {
+                    String fullExtendsName2 = String.join(".", cName);
+                    if (fullExtendsName.equals(fullExtendsName2)) {
+                        for (MyEntry<GraphTargetItem, GraphTargetItem> entry : cai.traits) {
+                            String keyAsStr = entry.getKey().toString();
+                            if (keyAsStr.startsWith("__set__")) {
+                                superSetProperties.add(keyAsStr.substring("__set__".length()));
+                            }
+                            if (keyAsStr.startsWith("__get__")) {
+                                superGetProperties.add(keyAsStr.substring("__get__".length()));
+                            }
+                        }
+                    }
+                }
+                if (cai.extendsOp != null) {
+                    fetchGettersSetters(getMembersPath(cai.extendsOp), superGetProperties, superSetProperties);
+                }
+            }
+        }        
+    }
+
     private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
 
-        GraphTargetItem ret = null;
+        Set<String> superGetProperties = new HashSet<>();
+        Set<String> superSetProperties = new HashSet<>();
+        Set<String> thisGetProperties = new HashSet<>();
+        Set<String> thisSetProperties = new HashSet<>();
+
+        if (extendsStr != null) {
+            fetchGettersSetters(getMembersPath(extendsStr), superGetProperties, superSetProperties);
+        }
+        
+        thisGetProperties.addAll(superGetProperties);
+        thisSetProperties.addAll(superSetProperties);
+
         /*for (int i = 0; i < nameStr.size() - 1; i++) {
          List<GraphTargetItem> notBody = new ArrayList<>();
          List<String> globalClassTypeStr = new ArrayList<>();
@@ -487,7 +623,6 @@ public class ActionScript2Parser {
          List<String> globalClassTypeStr = new ArrayList<>();
          globalClassTypeStr.add("_global");
          globalClassTypeStr.addAll(nameStr);*/
-
         ParsedSymbol s;
         List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
         List<Boolean> traitsStatic = new ArrayList<>();
@@ -534,6 +669,16 @@ public class ActionScript2Parser {
                     if (fname.equals(classNameStr)) { //constructor
                         //actually there's no difference, it's instance trait
                     }
+
+                    if (!isStatic) {
+                        if (isGetter) {
+                            thisGetProperties.add(fname);
+                        }
+                        if (isSetter) {
+                            thisSetProperties.add(fname);
+                        }
+                    }
+
                     if (!isInterface) {
                         if (isStatic) {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions, inTellTarget, hasEval);
@@ -593,6 +738,113 @@ public class ActionScript2Parser {
                     lexer.pushback(s);
                     break looptrait;
 
+            }
+        }
+
+        for (MyEntry<GraphTargetItem, GraphTargetItem> it : traits) {
+            GraphTargetItem val = it.getValue();
+            Set<GraphTargetItem> subItems = val.getAllSubItemsRecursively();
+            subItems.add(val);
+            for (GraphTargetItem si : subItems) {
+                if (si instanceof GetMemberActionItem) {
+                    List<String> path = getMembersPath(si);
+                    if (path != null) {
+                        String varName = path.get(0);
+                        String memberName = path.get(1);
+                        switch (varName) {
+                            case "this":
+                                if (thisGetProperties.contains(memberName)) {
+                                    GetMemberActionItem gm = getFirstGetMember(si);
+                                    gm.isGetter = true;
+                                }
+                                break;
+                            case "super":
+                                if (superGetProperties.contains(memberName)) {
+                                    GetMemberActionItem gm = getFirstGetMember(si);
+                                    gm.isGetter = true;
+                                }
+                                break;
+                        }
+                    }
+                }
+                if (si instanceof SetMemberActionItem) {
+                    SetMemberActionItem sm = (SetMemberActionItem) si;
+                    if (sm.objectName instanceof DirectValueActionItem
+                            && (sm.object instanceof VariableActionItem)) {
+
+                        String memberName = ((DirectValueActionItem) sm.objectName).getAsString();
+
+                        VariableActionItem v = (VariableActionItem) sm.object;
+                        if ("this".equals(v.getVariableName())) {
+                            if (thisSetProperties.contains(memberName)) {
+                                sm.isSetter = true;
+                            }
+                        }
+                        if ("super".equals(v.getVariableName())) {
+                            if (superSetProperties.contains(memberName)) {
+                                sm.isSetter = true;
+                            }
+                        }
+                    }
+                }
+                if (si instanceof CallMethodActionItem) {
+                    CallMethodActionItem cm = (CallMethodActionItem) si;
+                    if (cm.methodName instanceof DirectValueActionItem
+                            && (cm.scriptObject instanceof VariableActionItem)) {
+                        String memberName = ((DirectValueActionItem) cm.methodName).getAsString();
+
+                        VariableActionItem v = (VariableActionItem) cm.scriptObject;
+                        if ("this".equals(v.getVariableName())) {
+                            if (thisGetProperties.contains(memberName)) {
+                                cm.isGetter = true;
+                            }
+                        }
+                        if ("super".equals(v.getVariableName())) {
+                            if (superGetProperties.contains(memberName)) {
+                                cm.isGetter = true;
+                            }
+                        }
+                    }
+                }
+                if (si instanceof NewMethodActionItem) {
+                    NewMethodActionItem nm = (NewMethodActionItem) si;
+                    if (nm.methodName instanceof DirectValueActionItem
+                            && (nm.scriptObject instanceof VariableActionItem)) {
+                        String memberName = ((DirectValueActionItem) nm.methodName).getAsString();
+
+                        VariableActionItem v = (VariableActionItem) nm.scriptObject;
+                        if ("this".equals(v.getVariableName())) {
+                            if (thisGetProperties.contains(memberName)) {
+                                nm.isGetter = true;
+                            }
+                        }
+                        if ("super".equals(v.getVariableName())) {
+                            if (superGetProperties.contains(memberName)) {
+                                nm.isGetter = true;
+                            }
+                        }
+                    }
+                }
+                
+                if (si instanceof DeleteActionItem) {
+                    DeleteActionItem d = (DeleteActionItem) si;
+                    if (d.propertyName instanceof DirectValueActionItem
+                            && (d.object instanceof VariableActionItem)) {
+                        String memberName = ((DirectValueActionItem) d.propertyName).getAsString();
+
+                        VariableActionItem v = (VariableActionItem) d.object;
+                        if ("this".equals(v.getVariableName())) {
+                            if (thisGetProperties.contains(memberName)) {
+                                d.isGetter = true;
+                            }
+                        }
+                        if ("super".equals(v.getVariableName())) {
+                            if (superGetProperties.contains(memberName)) {
+                                d.isGetter = true;
+                            }
+                        }
+                    }
+                }
             }
         }
 
