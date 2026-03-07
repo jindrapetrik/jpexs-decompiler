@@ -1,0 +1,2 @@
+Push "star init"
+Trace
