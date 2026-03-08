@@ -96,6 +96,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -299,7 +300,11 @@ public class Timeline {
         ensureInitialized();
         frames.add(frame);
         maxDepth = getMaxDepthInternal();
-        calculateMaxDepthFrames();
+        calculateMaxDepthFramesButtons();
+        int frameIdx = frames.size() - 1;
+        for (int depth : frame.layers.keySet()) {
+            depthMaxFrame.put(depth, frameIdx);
+        }
     }
 
     /**
@@ -518,6 +523,8 @@ public class Timeline {
         scenes = new ArrayList<>();
         Scene prevScene = null;
         List<Tag> tagList = timelined.getTags().toArrayList();
+        depthMaxFrame.clear();
+        Set<Integer> fullDepths = new HashSet<>();
         for (Tag t : tagList) {
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
@@ -582,6 +589,7 @@ public class Timeline {
                 boolean wasOccupied = fl.characterId != -1 || fl.className != null;
 
                 if (po.flagMove() == wasOccupied) {
+                    fullDepths.add(depth);
                     int characterId = po.getCharacterId();
                     if (characterId != -1) {
                         fl.characterId = characterId;
@@ -682,6 +690,7 @@ public class Timeline {
             } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
+                fullDepths.remove(depth);
                 frame.layers.remove(depth);
                 frame.layersChanged = true;
             } else if (t instanceof DoActionTag) {
@@ -690,6 +699,9 @@ public class Timeline {
             } else if (t instanceof ShowFrameTag) {
                 frame.showFrameTag = (ShowFrameTag) t;
                 frames.add(frame);
+                for (int d : fullDepths) {
+                    depthMaxFrame.put(d, frameIdx - 1);
+                }
                 frame = new Frame(frame, frameIdx++);
                 newFrameNeeded = false;
             } else if (t instanceof ASMSource) {
@@ -700,6 +712,9 @@ public class Timeline {
         }
         if (newFrameNeeded) {
             frames.add(frame);
+            for (int d : fullDepths) {
+                depthMaxFrame.put(d, frameIdx - 1);
+            }
         }
 
         if (prevScene != null) {
@@ -708,8 +723,9 @@ public class Timeline {
 
         maxDepth = getMaxDepthInternal();
 
-        detectTweens();
-        calculateMaxDepthFrames();
+        //FIXME: This is too slow! I don't think it's even used.
+        //detectTweens();
+        calculateMaxDepthFramesButtons();
 
         createASPackages();
         if (timelined instanceof SWF) {
@@ -722,6 +738,8 @@ public class Timeline {
 
     /**
      * Detects tweens.
+     *
+     * FIXME: This is slow and thus unused.
      */
     private synchronized void detectTweens() {
         for (int d = 0; d <= maxDepth; d++) {
@@ -772,19 +790,10 @@ public class Timeline {
     }
 
     /**
-     * Calculates max depth frames.
+     * Calculates max depth frames for buttons.
      */
-    private synchronized void calculateMaxDepthFrames() {
-        depthMaxFrame.clear();
+    private synchronized void calculateMaxDepthFramesButtons() {
         depthMaxFrameButtons.clear();
-        for (int d = 0; d <= maxDepth; d++) {
-            for (int f = frames.size() - 1; f >= 0; f--) {
-                if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f);
-                    break;
-                }
-            }
-        }
 
         if (timelined instanceof ButtonTag) {
             ButtonTag button = (ButtonTag) timelined;
@@ -792,7 +801,7 @@ public class Timeline {
 
             for (int d = 0; d <= maxDepth; d++) {
                 for (int f = frames.size() - 1; f >= 0; f--) {
-                    if (frames.get(f).layers.get(d) != null) {
+                    if (frames.get(f).layers.containsKey(d)) {
                         if (!emptyFrames.contains(f)) {
                             depthMaxFrameButtons.put(d, f);
                             break;
