@@ -40,7 +40,10 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,10 +87,39 @@ public class ActionSetMember extends Action {
 
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+        stack.finishBlock(output);
+        stack.allowSwap(output);
+        stack.moveToStack(output);               
+        
+        
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem memberName = stack.pop();
         GraphTargetItem object = stack.pop();
         handleSetMember(false, value, memberName, object, this, usedDeobfuscations, uninitializedClassTraits, secondPassData, insideDoInitAction, lineStartAction, stack, output, regNames, variables, functions, staticOperation, path);
+    }
+
+    private static void cleanupTemp(GraphTargetItem dup1, GraphTargetItem dup2, List<GraphTargetItem> output, TranslateStack stack) {
+        int index1 = -1;
+        int index2 = -1;
+        if (dup1 instanceof HasTempIndex) {
+            index1 = ((HasTempIndex) dup1).getTempIndex();
+        }
+        if (dup2 instanceof HasTempIndex) {
+            index2 = ((HasTempIndex) dup2).getTempIndex();
+        }
+            
+        if (index1 > -1 && index2 > -1 && index1 != index2) {
+            return;
+        }
+        int index = index1 < 0 ? index2 : index1;
+         
+        stack.finishBlock(output);
+        if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+            SetTemporaryItem sti = (SetTemporaryItem) output.get(output.size() - 1);
+            if (sti.tempIndex == index) {
+                output.remove(output.size() - 1);
+            }
+        }        
     }
 
     public static void handleSetMember(
@@ -135,13 +167,14 @@ public class ActionSetMember extends Action {
         try {
             if (value instanceof IncrementActionItem) {
                 if (((IncrementActionItem) value).object instanceof GetMemberActionItem) {
-                    if (((GetMemberActionItem) ((IncrementActionItem) value).object).object.getThroughDuplicate().equals(object)) {
+                    if (((GetMemberActionItem) ((IncrementActionItem) value).object).object.getThroughDuplicate().valueEquals(object.getThroughDuplicate())) {
                         if (((GetMemberActionItem) ((IncrementActionItem) value).object).memberName.equals(memberName)) {
                             ((GetMemberActionItem) ((IncrementActionItem) value).object).object = ((GetMemberActionItem) ((IncrementActionItem) value).object).object.getThroughDuplicate();
+                            cleanupTemp(((GetMemberActionItem) ((IncrementActionItem) value).object).object, object, output, stack);
                             if (setter) {
-                                output.add(new PreIncrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
+                                stack.addToOutput(new PreIncrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
                             } else {
-                                output.add(new PostIncrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
+                                stack.addToOutput(new PostIncrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
                             }
                             return;
                         }
@@ -150,13 +183,14 @@ public class ActionSetMember extends Action {
             }
             if (value instanceof DecrementActionItem) {
                 if (((DecrementActionItem) value).object instanceof GetMemberActionItem) {
-                    if (((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate().valueEquals(object)) {
+                    if (((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate().valueEquals(object.getThroughDuplicate())) {
                         if (((GetMemberActionItem) ((DecrementActionItem) value).object).memberName.equals(memberName)) {
                             ((GetMemberActionItem) ((DecrementActionItem) value).object).object = ((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate();
+                            cleanupTemp(((GetMemberActionItem) ((IncrementActionItem) value).object).object, object, output, stack);                            
                             if (setter) {
-                                output.add(new PreDecrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
+                                stack.addToOutput(new PreDecrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
                             } else {
-                                output.add(new PostDecrementActionItem(action, lineStartAction, ((DecrementActionItem) value).object.getThroughDuplicate()));
+                                stack.addToOutput(new PostDecrementActionItem(action, lineStartAction, ((DecrementActionItem) value).object.getThroughDuplicate()));
                             }
                             return;
                         }
@@ -176,9 +210,11 @@ public class ActionSetMember extends Action {
                     CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) inside;
                     if (binaryOp.getLeftSide() instanceof GetMemberActionItem) {
                         GetMemberActionItem getMember = (GetMemberActionItem) binaryOp.getLeftSide();
-                        if (GraphTargetItem.objectsValueEquals(object, getMember.object.getThroughDuplicate()) && GraphTargetItem.objectsValueEquals(memberName, getMember.memberName)) {
+                        if (GraphTargetItem.objectsValueEquals(object.getThroughDuplicate(), getMember.object.getThroughDuplicate()) && GraphTargetItem.objectsValueEquals(memberName, getMember.memberName)) {
+                            cleanupTemp(object, getMember.object, output, stack);
                             setMem.setCompoundValue(binaryOp.getRightSide());
                             setMem.setCompoundOperator(binaryOp.getOperator());
+                            setMem.object = object.getThroughDuplicate();
                         }
                     }
                 }
@@ -208,14 +244,16 @@ public class ActionSetMember extends Action {
                     }
                     TemporaryRegister tr = new TemporaryRegister(sr.register.number, ret);
                     variables.put("__register" + sr.register.number, tr);
-                    output.add(new TemporaryRegisterMark(tr));
+                    stack.addToOutput(new TemporaryRegisterMark(tr));
                     return;
                 }
             }
-            output.add(ret);
+            stack.addToOutput(ret);
         } finally {
             if (setter) {
+                stack.finishBlock(output);
                 stack.push(output.remove(output.size() - 1));
+                stack.moveToStack(output);
             }
         }
     }

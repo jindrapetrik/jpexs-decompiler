@@ -17,12 +17,10 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
-import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
@@ -88,15 +86,19 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     @Override
     public GraphTargetItem push(GraphTargetItem item) {
-        if (!outputQueue.isEmpty()) {
+        List<GraphTargetItem> myl = outputQueue;
+        if (!outputQueue.isEmpty() && !myl.isEmpty()) {
+            finishBlock(connectedOutput);
+            /*
             if ((item instanceof FindPropertyAVM2Item) || isDupsOnly()) {
                 finishBlock(connectedOutput);
             } else {
                 outputQueue.add(item);
                 item = new CommaExpressionItem(item.dialect, null, item.lineStartItem, outputQueue);
-                outputQueue = new ArrayList<>();
+                outputQueue = new ArrayList<>();          
             }
-        }
+            */
+        }        
         if (connectedOutput != null && item != null) {
             item.outputPos = prevOutputSize + connectedOutput.size();
         }
@@ -304,10 +306,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.pop();
     }
 
-    public void moveToStack(List<GraphTargetItem> output) {
+    public void moveToStack(List<GraphTargetItem> output) {        
+        List<GraphTargetItem> itemsBefore = new ArrayList<>();
         if (!isEmpty()) {
             return;
-        }
+        }        
         int i = output.size() - 1;
         for (; i >= 0; i--) {
             if (!(output.get(i) instanceof PushItem)) {
@@ -346,10 +349,14 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         outputQueue.add(item);
         if (item instanceof ExitItem) {
             finishBlock(connectedOutput);
-        }
+        }        
     }
 
     public void finishBlock(List<GraphTargetItem> output) {
+        finishBlock(output, false);
+    }
+
+    public void finishBlock(List<GraphTargetItem> output, boolean makeBranch) {
         if (connectedOutput == null) {
             return;
         }
@@ -403,7 +410,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         }
         for (int i = size() - 1; i >= 0; i--) {
             GraphTargetItem p = get(i);
-            if (p instanceof BranchStackResistant) {
+            if (makeBranch && p instanceof BranchStackResistant) {
                 continue;
             }
             remove(i);

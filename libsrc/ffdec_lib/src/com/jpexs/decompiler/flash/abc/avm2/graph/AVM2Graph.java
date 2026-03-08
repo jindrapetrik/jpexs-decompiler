@@ -1447,7 +1447,7 @@ public class AVM2Graph extends Graph {
                 }
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
-                st2.finishBlock(currentCatchCommands);
+                st2.finishBlock(currentCatchCommands, true);
                 int tempExceptionPos = 0;
                 if (!currentCatchCommands.isEmpty() && currentCatchCommands.get(0) instanceof WithAVM2Item) {
                     tempExceptionPos++;

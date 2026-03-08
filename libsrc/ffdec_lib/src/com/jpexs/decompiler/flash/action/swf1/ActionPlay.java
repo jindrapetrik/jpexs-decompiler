@@ -63,11 +63,14 @@ public class ActionPlay extends Action {
 
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+        stack.finishBlock(output);
         if (!output.isEmpty() && (output.get(output.size() - 1) instanceof GotoFrameActionItem)) {
             GotoFrameActionItem gta = (GotoFrameActionItem) output.remove(output.size() - 1);
-            output.add(new GotoFrame2ActionItem(this, lineStartAction, new DirectValueActionItem(gta.frame + 1), false, true, 0));
+            stack.moveToStack(output);
+            stack.addToOutput(new GotoFrame2ActionItem(this, lineStartAction, new DirectValueActionItem(gta.frame + 1), false, true, 0));
         } else {
-            output.add(new PlayActionItem(this, lineStartAction));
+            stack.moveToStack(output);
+            stack.addToOutput(new PlayActionItem(this, lineStartAction));
         }
     }
 }

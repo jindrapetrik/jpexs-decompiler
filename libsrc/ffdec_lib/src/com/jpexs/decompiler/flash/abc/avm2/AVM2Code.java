@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
@@ -309,6 +310,7 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -2023,11 +2025,30 @@ public class AVM2Code implements Cloneable {
                 ip++;
             } else {
                 try {
+                    /*System.err.println("executing ins " + ins);
+                    System.err.println("::::::::::::::::::::::::");
+                    */
                     ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
-
+                    /*System.err.println("output:");
+                    for (GraphTargetItem ti : output) {
+                        System.err.println("" + ti.toString(LocalData.create(new ArrayList<MethodBody>(), abcIndex, abc, localRegNames, new ArrayList<DottedChain>(), new HashSet<Integer>(), ScriptExportMode.AS, swfVersion, new HashSet<String>(), classIndex)));
+                    }
+                    
+                    System.err.println("stack output queue:");
+                    for (GraphTargetItem ti : stack.outputQueue) {
+                        System.err.println("" + ti.toString(LocalData.create(new ArrayList<MethodBody>(), abcIndex, abc, localRegNames, new ArrayList<DottedChain>(), new HashSet<Integer>(), ScriptExportMode.AS, swfVersion, new HashSet<String>(), classIndex)));
+                    }
+                    
+                    System.err.println("stack after:");
+                    for (GraphTargetItem ti : stack) {
+                        System.err.println("" + ti.toString(LocalData.create(new ArrayList<MethodBody>(), abcIndex, abc, localRegNames, new ArrayList<DottedChain>(), new HashSet<Integer>(), ScriptExportMode.AS, swfVersion, new HashSet<String>(), classIndex)));
+                    }
+                    System.err.println("/---------------");
+                    */
                     if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
                         bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
                     }
+                    
                 } catch (RuntimeException re) {
                     /*String last="";
                      int len=5;

@@ -58,6 +58,15 @@ public interface GraphSourceItem extends Serializable, Cloneable {
     public int getStackPushCount(BaseLocalData localData, TranslateStack stack);
 
     /**
+     * Gets stack delta. Stack push count - stack pop count.
+     *
+     * @param localData Local data
+     * @param stack Stack
+     * @return Stack delta
+     */
+    public int getStackDelta(BaseLocalData localData, TranslateStack stack);
+    
+    /**
      * Gets file offset.
      *
      * @return File offset

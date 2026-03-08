@@ -77,7 +77,7 @@ public class ActionCloneSprite extends Action {
         GraphTargetItem depth = stack.pop();
         GraphTargetItem source = stack.pop();
         GraphTargetItem target = stack.pop();
-        output.add(new CloneSpriteActionItem(this, lineStartAction, source, target, depth));
+        stack.addToOutput(new CloneSpriteActionItem(this, lineStartAction, source, target, depth));
     }
 
     @Override

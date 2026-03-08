@@ -4767,7 +4767,7 @@ public class Graph {
      * @param stack Stack
      */
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
-        stack.finishBlock(commands);
+        stack.finishBlock(commands, true);
     }
 
     /**
@@ -4959,7 +4959,7 @@ public class Graph {
                     }
                 }
             }
-            subStack.finishBlock(currentCaseCommands);
+            subStack.finishBlock(currentCaseCommands, true);
             caseCommands.add(currentCaseCommands);
         }
 

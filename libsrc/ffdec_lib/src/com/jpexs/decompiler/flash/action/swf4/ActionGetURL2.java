@@ -225,15 +225,15 @@ public class ActionGetURL2 extends Action {
 
         if (loadVariablesFlag) {
             if (num != null) {
-                output.add(new LoadVariablesNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
+                stack.addToOutput(new LoadVariablesNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
             } else {
-                output.add(new LoadVariablesActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
+                stack.addToOutput(new LoadVariablesActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else if (loadTargetFlag) {
             if ((urlString instanceof DirectValueActionItem) && ("".equals(urlString.getResult()))) {
-                output.add(new UnLoadMovieActionItem(this, lineStartAction, targetString));
+                stack.addToOutput(new UnLoadMovieActionItem(this, lineStartAction, targetString));
             } else {
-                output.add(new LoadMovieActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
+                stack.addToOutput(new LoadMovieActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else {
             final String printPrefix = "print:#";
@@ -293,22 +293,22 @@ public class ActionGetURL2 extends Action {
 
             if (num != null) {
                 if (doUnload) {
-                    output.add(new UnLoadMovieNumActionItem(this, lineStartAction, num));
+                    stack.addToOutput(new UnLoadMovieNumActionItem(this, lineStartAction, num));
                 } else if (doPrint) {
-                    output.add(new PrintNumActionItem(this, lineStartAction, num, printType));
+                    stack.addToOutput(new PrintNumActionItem(this, lineStartAction, num, printType));
                 } else if (doPrintAsBitmap) {
-                    output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, num, printType));
+                    stack.addToOutput(new PrintAsBitmapNumActionItem(this, lineStartAction, num, printType));
                 } else {
-                    output.add(new LoadMovieNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
+                    stack.addToOutput(new LoadMovieNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
                 }
             } else if (doPrint) {
-                output.add(new PrintActionItem(this, lineStartAction, targetString, printType));
+                stack.addToOutput(new PrintActionItem(this, lineStartAction, targetString, printType));
             } else if (doPrintAsBitmap) {
-                output.add(new PrintAsBitmapActionItem(this, lineStartAction, targetString, printType));
+                stack.addToOutput(new PrintAsBitmapActionItem(this, lineStartAction, targetString, printType));
             } else if (doFSCommand) {
-                output.add(new FSCommandActionItem(this, lineStartAction, urlString, targetString));
+                stack.addToOutput(new FSCommandActionItem(this, lineStartAction, urlString, targetString));
             } else {
-                output.add(new GetURL2ActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
+                stack.addToOutput(new GetURL2ActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         }
     }

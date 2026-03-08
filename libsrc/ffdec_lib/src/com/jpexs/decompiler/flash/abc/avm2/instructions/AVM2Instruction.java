@@ -633,6 +633,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return definition.getStackPopCount(this, aLocalData.abc);
     }
 
+    @Override
+    public int getStackDelta(BaseLocalData localData, TranslateStack stack) {
+        return getStackPushCount(localData, stack) - getStackPopCount(localData, stack);
+    }
+    
     /**
      * Gets the number of stack items that are pushed by this item.
      *

@@ -1383,8 +1383,9 @@ public abstract class Action implements GraphSourceItem {
             }
             
             action.translate(localData, stack, output, staticOperation, path);
-
+            
             if (((action instanceof ActionSetTarget) || (action instanceof ActionSetTarget2)) && (!stack.isEmpty())) {
+                stack.finishBlock(output);
                 GraphTargetItem lastItem = output.remove(output.size() - 1);
                 graph.makeAllCommands(output, stack);
                 output.add(lastItem);
@@ -1596,5 +1597,10 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public void setVirtualAddress(long virtualAddress) {
         this.virtualAddress = virtualAddress;
+    }
+    
+    @Override
+    public int getStackDelta(BaseLocalData localData, TranslateStack stack) {
+        return getStackPushCount(localData, stack) - getStackPopCount(localData, stack);
     }
 }
