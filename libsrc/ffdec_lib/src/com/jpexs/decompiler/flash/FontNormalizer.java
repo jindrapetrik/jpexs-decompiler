@@ -165,7 +165,7 @@ public class FontNormalizer {
                 }
                 sumH += h;
                 char c = font.glyphToChar(i);
-                Font f = new Font(systemFont, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1000);
+                Font f = new Font(systemFont, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1024);
                 if (!f.canDisplay(c)) {
                     continue;
                 }
@@ -177,7 +177,7 @@ public class FontNormalizer {
 
             if (systemH == null) {
                 h = sumH / shapes1.size();
-                Font f = new Font(Font.SERIF, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1000);               
+                Font f = new Font(Font.SERIF, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1024);
                 FontRenderContext frc = new FontRenderContext(null, true, true);
                 GlyphVector gv = f.createGlyphVector(frc, new char[]{'H'});
                 systemH = gv.getGlyphOutline(0).getBounds2D().getHeight();
