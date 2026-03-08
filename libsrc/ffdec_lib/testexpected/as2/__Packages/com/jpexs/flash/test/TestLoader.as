@@ -1,17 +1,17 @@
-ConstantPool "_global", "com", "Object", "jpexs", "flash", "test", "TestLoader", "prototype", "includeTests", "testcases", "TestSetterGetter", "TestCallSetterGetter", "TestSuperSetterGetter", "TestSuper2SetterGetter", "TestVarsMethods", "TestMaintainOrder", "TestReturnInConstructor", "ASSetPropFlags"
+ConstantPool "_global", "com", "Object", "jpexs", "flash", "test", "TestLoader", "prototype", "includeTests", "testcases", "TestSetterGetter", "TestCallSetterGetter", "TestSuperSetterGetter", "TestSuper2SetterGetter", "TestVarsMethods", "TestMaintainOrder", "TestReturnInConstructor", "TestUnpopped", "ASSetPropFlags"
 Push "_global"
 GetVariable
 Push "com"
 GetMember
 Not
 Not
-If loc011c
+If loc0129
 Push "_global"
 GetVariable
 Push "com", 0.0, "Object"
 NewObject
 SetMember
-loc011c:Pop
+loc0129:Pop
 Push "_global"
 GetVariable
 Push "com"
@@ -20,7 +20,7 @@ Push "jpexs"
 GetMember
 Not
 Not
-If loc0154
+If loc0161
 Push "_global"
 GetVariable
 Push "com"
@@ -28,7 +28,7 @@ GetMember
 Push "jpexs", 0.0, "Object"
 NewObject
 SetMember
-loc0154:Pop
+loc0161:Pop
 Push "_global"
 GetVariable
 Push "com"
@@ -39,7 +39,7 @@ Push "flash"
 GetMember
 Not
 Not
-If loc0198
+If loc01a5
 Push "_global"
 GetVariable
 Push "com"
@@ -49,7 +49,7 @@ GetMember
 Push "flash", 0.0, "Object"
 NewObject
 SetMember
-loc0198:Pop
+loc01a5:Pop
 Push "_global"
 GetVariable
 Push "com"
@@ -62,7 +62,7 @@ Push "test"
 GetMember
 Not
 Not
-If loc01e8
+If loc01f5
 Push "_global"
 GetVariable
 Push "com"
@@ -74,7 +74,7 @@ GetMember
 Push "test", 0.0, "Object"
 NewObject
 SetMember
-loc01e8:Pop
+loc01f5:Pop
 Push "_global"
 GetVariable
 Push "com"
@@ -89,7 +89,7 @@ Push "TestLoader"
 GetMember
 Not
 Not
-If loc03d2
+If loc040d
 Push "com"
 GetVariable
 Push "jpexs"
@@ -200,6 +200,19 @@ GetMember
 Push "TestReturnInConstructor"
 NewMethod
 Pop
+Push 0.0, "com"
+GetVariable
+Push "jpexs"
+GetMember
+Push "flash"
+GetMember
+Push "test"
+GetMember
+Push "testcases"
+GetMember
+Push "TestUnpopped"
+NewMethod
+Pop
 }
 SetMember
 Push 1, null, "com"
@@ -216,4 +229,4 @@ Push "prototype"
 GetMember
 Push 3, "ASSetPropFlags"
 CallFunction
-loc03d2:Pop
+loc040d:Pop
