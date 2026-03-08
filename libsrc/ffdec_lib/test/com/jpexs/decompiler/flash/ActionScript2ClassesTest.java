@@ -47,7 +47,7 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
         Configuration.simplifyExpressions.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
-        Configuration.skipDetectionOfUninitializedClassFields.set(false);        
+        Configuration.skipDetectionOfUninitializedClassFields.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
@@ -232,6 +232,24 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
                 + "      }\n"
                 + "      trace(\"B\");\n"
                 + "      return 5;\n"
+                + "   }");
+    }
+
+    @Test
+    public void testUnpopped() {
+        compareSrc("TestUnpopped", "var a;\n"
+                + "   var c = true;\n"
+                + "   function TestUnpopped()\n"
+                + "   {\n"
+                + "   }\n"
+                + "   function run()\n"
+                + "   {\n"
+                + "      §§push(this.a);\n"
+                + "      trace(\"b\");\n"
+                + "      if(this.c)\n"
+                + "      {\n"
+                + "         trace(\"c\");\n"
+                + "      }\n"
                 + "   }");
     }
 }
