@@ -260,18 +260,7 @@ public class ActionGraph extends Graph {
      * @param path Path
      */
     @Override
-    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
-        if (stack.size() > 0) {
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                //System.err.println(stack.get(i));
-                if (stack.get(i) instanceof FunctionActionItem) {
-                    FunctionActionItem f = (FunctionActionItem) stack.remove(i);
-                    if (!output.contains(f)) {
-                        output.add(0, f);
-                    }
-                }
-            }
-        }
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {        
     }
 
     /**
@@ -343,6 +332,10 @@ public class ActionGraph extends Graph {
                             continue;
                         }
                     }
+                    
+                    if (pi.value instanceof FunctionActionItem) {
+                        list.set(t, pi.value);
+                    }                                                           
                 }
                 if (it instanceof SetTemporaryItem) {
                     SetTemporaryItem st = (SetTemporaryItem) it;
@@ -546,7 +539,7 @@ public class ActionGraph extends Graph {
 
                     if ((sti.getValue() instanceof DirectValueActionItem) && (((DirectValueActionItem) sti.getValue()).value instanceof RegisterNumber)) {
                         if ((comparisonOp.rightSide instanceof DirectValueActionItem) && (((DirectValueActionItem) comparisonOp.rightSide).value instanceof Null)) {
-                            if (comparisonOp.leftSide.value instanceof EnumeratedValueActionItem) {
+                            if (comparisonOp.leftSide.value.getThroughDuplicate() instanceof EnumeratedValueActionItem) {
                                 if (((StoreRegisterActionItem) comparisonOp.leftSide).register.number == ((RegisterNumber) (((DirectValueActionItem) sti.getValue()).value)).number) {
                                     list.remove(t);
                                     checkedBody.remove(0);
@@ -559,6 +552,20 @@ public class ActionGraph extends Graph {
                                     //sti.getObject()
                                     list.remove(t - 1);
                                     t--;
+                                    
+                                    if (comparisonOp.leftSide.value instanceof TemporaryItem) {
+                                        TemporaryItem ti = (TemporaryItem) comparisonOp.leftSide.value;
+                                        if (t > 0) {
+                                            if (list.get(t - 1) instanceof SetTemporaryItem) {
+                                                SetTemporaryItem sti2 = (SetTemporaryItem) list.get(t - 1);
+                                                if (sti2.tempIndex == ti.tempIndex) {
+                                                    list.remove(t - 1);
+                                                    t--;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
                                     continue;
                                 }
                             }
@@ -587,6 +594,19 @@ public class ActionGraph extends Graph {
                 }
             }
         }
+        
+        
+        for (int t = 0; t < list.size(); t++) {
+            GraphTargetItem it = list.get(t);
+            if (it instanceof PushItem) {
+                it = it.value;
+            }
+            if (it instanceof EnumeratedValueActionItem) {
+                list.remove(t);
+                t--;
+            }
+        }
+        
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
 

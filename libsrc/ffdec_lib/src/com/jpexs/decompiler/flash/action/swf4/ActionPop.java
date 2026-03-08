@@ -68,7 +68,7 @@ public class ActionPop extends Action {
         if (val instanceof AnyItem) {
             return;
         }
-        output.add(val);
+        stack.addToOutput(val);
     }
 
     @Override

@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class FunctionActionItem extends ActionItem implements BranchStackResistant {
+public class FunctionActionItem extends ActionItem {
 
     /**
      * Decompile get/set functions

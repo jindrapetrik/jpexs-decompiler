@@ -20,19 +20,16 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SecondPassData;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * PushDuplicate action - Push duplicate of top stack value.
@@ -66,11 +63,36 @@ public class ActionPushDuplicate extends Action {
     }
 
     @Override
-    public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        GraphTargetItem value = stack.peek();
-        //TODO: implement logic similar to Avm2
-        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, lineStartAction, value, 0));
-        value.getMoreSrc().add(new GraphSourceItemPos(this, 0));
+    public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
+        GraphTargetItem v = stack.pop();
+        int temp;
+                  
+        if (v instanceof SimpleValue) {
+            SimpleValue sv = (SimpleValue) v;
+            if (sv.isSimpleValue()) {
+                stack.push(v);
+                stack.push(v);
+                return;
+            }
+        }
+        
+       
+        if (v instanceof HasTempIndex) {
+            temp = ((HasTempIndex) v).getTempIndex();
+            stack.push(v);
+        } else {
+            temp = localData.maxTempIndex.getVal() + 1;
+            localData.maxTempIndex.setVal(temp);
+            stack.finishBlock(output);
+            stack.addToOutput(new SetTemporaryItem(ActionGraphTargetDialect.INSTANCE, this, localData.lineStartInstruction, v, temp, "dup", 2));
+            stack.finishBlock(output);
+
+            stack.push(new DuplicateSourceItem(ActionGraphTargetDialect.INSTANCE, this, localData.lineStartInstruction, v, temp));
+        }
+        
+        //stack.push(v);
+        stack.push(new DuplicateItem(ActionGraphTargetDialect.INSTANCE, this, localData.lineStartInstruction, v, temp));
+        //v.moreSrc.add(new GraphSourceItemPos(ins, 0));
     }
 
     @Override

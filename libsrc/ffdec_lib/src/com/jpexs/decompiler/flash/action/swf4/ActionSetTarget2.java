@@ -67,7 +67,7 @@ public class ActionSetTarget2 extends Action {
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem target = stack.pop();
-        output.add(new SetTarget2ActionItem(this, lineStartAction, target));
+        stack.addToOutput(new SetTarget2ActionItem(this, lineStartAction, target));
     }
 
     @Override

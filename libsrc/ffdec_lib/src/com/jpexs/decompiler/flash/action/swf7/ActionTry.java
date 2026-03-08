@@ -39,10 +39,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
@@ -358,6 +360,8 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return false;
     }
 
+    static int errNum = 1;
+
     @Override
     public void translateContainer(List<List<GraphTargetItem>> contents, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         List<GraphTargetItem> tryCommands = contents.get(0);
@@ -373,6 +377,114 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             if (catchInRegisterFlag) {
                 if (body.size() >= 2) {
                     int pos = 0;
+
+                    loopex:
+                    while (body.get(pos) instanceof SetTemporaryItem) {
+                        SetTemporaryItem sti = (SetTemporaryItem) body.get(pos);
+                        if (pos + 1 >= body.size()) {
+                            break;
+                        }
+                        if (!(body.get(pos + 1) instanceof PushItem)) {
+                            break;
+                        }
+                        PushItem pi = (PushItem) body.get(pos + 1);
+                        if (!(pi.value instanceof DuplicateSourceItem)) {
+                            break;
+                        }
+                        DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
+                        if (ds.tempIndex != sti.tempIndex) {
+                            break;
+                        }
+                        if (!(sti.value instanceof CastOpActionItem)) {
+                            break;
+                        }
+                        CastOpActionItem co = (CastOpActionItem) sti.value;
+                        int regNumber;
+                        if (co.object instanceof DirectValueActionItem) {
+                            DirectValueActionItem dv = (DirectValueActionItem) co.object;
+                            if (!(dv.value instanceof RegisterNumber)) {
+                                break;
+                            }
+                            RegisterNumber rn = (RegisterNumber) dv.value;
+                            regNumber = rn.number;
+                        } else if (co.object instanceof TemporaryRegister) {
+                            TemporaryRegister tr = (TemporaryRegister) co.object;
+                            regNumber = tr.getRegId();
+                        } else {
+                            break;
+                        }
+
+                        if (regNumber != catchRegister) {
+                            break;
+                        }
+
+                        catchExceptionTypes.add(co.constructor);
+                        if (pos + 2 >= body.size()) {
+                            break;
+                        }
+
+                        if (!(body.get(pos + 2) instanceof IfItem)) {
+                            break;
+                        }
+                        IfItem ifi = (IfItem) body.get(pos + 2);
+                        List<GraphTargetItem> onFalse = ifi.onFalse;
+                        int onFalsePos = 0;
+                        if (ifi.onFalse.isEmpty() && !ifi.onTrue.isEmpty() && ((ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem)
+                                || (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof BreakItem)
+                                || (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ContinueItem))) {
+                            onFalse = body;
+                            onFalsePos = pos + 3;
+                        }
+
+                        if (!ifi.onTrue.isEmpty() && (ifi.onTrue.get(0) instanceof DefineLocalActionItem)) {
+                            DefineLocalActionItem dl = (DefineLocalActionItem) ifi.onTrue.get(0);
+                            catchExceptionNames.add(dl.name);
+                            List<GraphTargetItem> catchBody = new ArrayList<>(ifi.onTrue);
+                            catchBody.remove(0);
+                            catchCommands.add(catchBody);
+                            if (onFalse.size() <= onFalsePos) {
+                                break;
+                            }
+                            if (!(onFalse.get(onFalsePos) instanceof PopItem)) {
+                                break;
+                            }
+                            pos = onFalsePos + 1;
+                            body = onFalse;
+                            //continue loopex;                                                            
+                        } else if (onFalse.size() > onFalsePos && (onFalse.get(onFalsePos) instanceof DefineLocalActionItem)) {
+                            DefineLocalActionItem dl = (DefineLocalActionItem) onFalse.get(onFalsePos);
+                            catchExceptionNames.add(dl.name);
+
+                            List<GraphTargetItem> catchBody = new ArrayList<>();
+                            for (int i = onFalsePos; i < onFalse.size(); i++) {
+                                catchBody.add(onFalse.get(i));
+                            }
+                            catchBody.remove(0);
+                            catchCommands.add(catchBody);
+                            if (!ifi.onTrue.isEmpty()) {
+                                if (ifi.onTrue.get(0) instanceof PopItem) {
+                                    pos = 1;
+                                    body = ifi.onTrue;
+                                    //continue loopex;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (body.get(pos) instanceof DefineLocalActionItem) {
+                        DefineLocalActionItem dl = (DefineLocalActionItem) body.get(pos);
+                        catchExceptionNames.add(dl.name);
+                        catchExceptionTypes.add(null);
+                        List<GraphTargetItem> catchBody = new ArrayList<>(body);
+                        catchBody.remove(0); //pop
+                        catchBody.remove(0); //definelocal
+                        catchCommands.add(catchBody);
+                    }
+
+                    /*
+                    
                     loopex:
                     while (body.get(pos) instanceof PushItem) {
                         PushItem pi = (PushItem) body.get(pos);
@@ -459,7 +571,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                         catchBody.remove(0); //pop
                         catchBody.remove(0); //definelocal
                         catchCommands.add(catchBody);
-                    }
+                    }*/
                 }
             } else {
                 catchExceptionNames.add(new DirectValueActionItem(this, lineStartItem, -1, this.catchName, new ArrayList<>()));
@@ -474,7 +586,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             p++;
             finallyCommands = contents.get(p);
         }
-        output.add(new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands));
+        stack.addToOutput(new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands));
     }
 
     @Override

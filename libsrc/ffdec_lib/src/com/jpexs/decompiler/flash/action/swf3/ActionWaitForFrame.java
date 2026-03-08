@@ -144,7 +144,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
             functions.putAll(functionsBackup);
             body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
         }
-        output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
+        stack.addToOutput(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
     }
 
     @Override

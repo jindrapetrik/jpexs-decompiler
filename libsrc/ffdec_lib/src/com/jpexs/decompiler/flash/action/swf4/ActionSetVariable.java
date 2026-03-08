@@ -123,14 +123,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
                         ((GetVariableActionItem) ((IncrementActionItem) value).object).printObfuscatedName = true;
                     }
-                    output.add(new PostIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object));
+                    stack.addToOutput(new PostIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object));
                     return;
                 }
             }
             if (((IncrementActionItem) value).object instanceof EvalActionItem) {
                 if (((IncrementActionItem) value).object.value instanceof DuplicateItem) {
                     if (((IncrementActionItem) value).object.value.value == name) {                        
-                        output.add(new PostIncrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
+                        stack.addToOutput(new PostIncrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
                         return;
                     }
                 }
@@ -142,14 +142,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
                         ((GetVariableActionItem) ((DecrementActionItem) value).object).printObfuscatedName = true;
                     }
-                    output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
+                    stack.addToOutput(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
                     return;
                 }
             }
             if (((DecrementActionItem) value).object instanceof EvalActionItem) {
                 if (((DecrementActionItem) value).object.value instanceof DuplicateItem) {
                     if (((DecrementActionItem) value).object.value.value == name) {                        
-                        output.add(new PostDecrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
+                        stack.addToOutput(new PostDecrementActionItem(this, lineStartAction, new GetVariableActionItem(null, null, name)));
                         return;
                     }
                 }
@@ -209,12 +209,12 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
 
                 TemporaryRegister tr = new TemporaryRegister(sr.register.number, ret);
                 variables.put("__register" + sr.register.number, tr);
-                output.add(new TemporaryRegisterMark(tr));
+                stack.addToOutput(new TemporaryRegisterMark(tr));
                 return;
             }
         }
 
-        output.add(ret);
+        stack.addToOutput(ret);
     }
 
     @Override
