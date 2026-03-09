@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.BlockItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -992,7 +993,8 @@ public class Graph {
          System.err.println("</loopspre>");//*/
         List<GotoItem> gotos = new ArrayList<>();
 
-        List<GraphTargetItem> ret = printGraph(gotos, new HashMap<>(), new HashMap<>(), new HashSet<>(), localData, stack, allParts, null, heads.get(0), null, null, loops, throwStates, staticOperation, path);
+        Reference<Boolean> hasEmptyStackPops = new Reference<>(false);        
+        List<GraphTargetItem> ret = printGraph(hasEmptyStackPops, gotos, new HashMap<>(), new HashMap<>(), new HashSet<>(), localData, stack, allParts, null, heads.get(0), null, null, loops, throwStates, staticOperation, path);
 
         if (localData.secondPassData == null) {
             SecondPassData secondPassData = prepareSecondPass(localData, ret);
@@ -1025,10 +1027,31 @@ public class Graph {
         propagateBreaks(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
+        
+        if (!hasEmptyStackPops.getVal()) {
+            promotePushItemsToCommands(ret);
+        }
+        
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
-        handleSetTemporaryDeclarations(ret);
+        handleSetTemporaryDeclarations(ret);                
         return ret;
+    }
+    
+    private void promotePushItemsToCommands(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem ti = list.get(i);
+            if (ti instanceof PushItem) {
+                PushItem pi = (PushItem) ti;
+                pi.asComment = true;
+                pi.comment = "unpopped";
+            }
+            if (ti instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
+                    promotePushItemsToCommands(sub);
+                }
+            }
+        }
     }
 
     private void handleSetTemporaryDeclarations(List<GraphTargetItem> items) {
@@ -2373,6 +2396,7 @@ public class Graph {
      * Check before decompiling next section. Override this method to provide
      * custom behavior.
      *
+     * @param hasEmptyStackPops Has empty stack pops
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -2396,7 +2420,7 @@ public class Graph {
      * further processing. Null to continue.
      * @throws InterruptedException On interrupt
      */
-    protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
     }
 
@@ -3118,6 +3142,7 @@ public class Graph {
     /**
      * Check before processing with output.
      *
+     * @param hasEmptyStackPops Has empty stack pops
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -3140,7 +3165,7 @@ public class Graph {
      * @return True to stop processing. False to continue.
      * @throws InterruptedException On interrupt
      */
-    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Loop currentLoop, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    protected boolean checkPartOutput(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Loop currentLoop, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         return false;
     }
 
@@ -3227,6 +3252,7 @@ public class Graph {
     /**
      * Walks graph parts and converts them to target items.
      *
+     * @param hasEmptyStackPops Has empty stack pops
      * @param foundGotos Found gotos
      * @param partCodes Part codes
      * @param partCodePos Part code position
@@ -3245,13 +3271,14 @@ public class Graph {
      * @return List of GraphTargetItems
      * @throws InterruptedException On interrupt
      */
-    protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
-        return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
+    protected final List<GraphTargetItem> printGraph(Reference<Boolean> hasEmptyStackPops, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
+        return printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
     }
 
     /**
      * Walks graph parts and converts them to target items.
      *
+     * @param hasEmptyStackPops Has empty stack pops
      * @param foundGotos Found gotos
      * @param partCodes Part codes
      * @param partCodePos Part code position
@@ -3272,7 +3299,7 @@ public class Graph {
      * @return List of GraphTargetItems
      * @throws InterruptedException On interrupt
      */
-    protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    protected final List<GraphTargetItem> printGraph(Reference<Boolean> hasEmptyStackPops, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
 
         if (ret == null) {
             ret = new GraphPartMarkedArrayList<>();
@@ -3526,7 +3553,7 @@ public class Graph {
                     for (Loop el : loops) {
                         loopPhases.add(el.phase);
                     }
-                    precontinueCommands = printGraph(foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
+                    precontinueCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
 
@@ -3583,7 +3610,7 @@ public class Graph {
                 ((GraphPartMarkedArrayList) currentRet).startPart(part);
             }
             stack.setConnectedOutput(0, currentRet, localData);
-            if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
+            if (checkPartOutput(hasEmptyStackPops, currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
                 parseNext = false;
             } else {
                 boolean exHappened = false;
@@ -3592,7 +3619,10 @@ public class Graph {
                     exHappened = false;
                     try {
                         stack.setConnectedOutput(currentRet.size(), output, localData);
-                        code.translatePart(output, this, part, localData, stack, ipStart, part.end, staticOperation, path);
+                        code.translatePart(output, this, part, localData, stack, ipStart, part.end, staticOperation, path);                        
+                        if (stack.emptyPopCount > 0) {
+                            hasEmptyStackPops.setVal(true);
+                        }
                     } catch (GraphPartChangeException ex) { //Special case for ifFrameLoaded when it's over multiple parts
                         //output.addAll(ex.getOutput());
                         for (GraphPart p : allParts) {
@@ -3620,7 +3650,7 @@ public class Graph {
             }
 
             if (parseNext) {
-                List<GraphTargetItem> retCheck = check(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, output, currentLoop, staticOperation, path);
+                List<GraphTargetItem> retCheck = check(hasEmptyStackPops, currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, output, currentLoop, staticOperation, path);
                 if (retCheck != null) {
                     if (!retCheck.isEmpty()) {
                         currentRet.addAll(retCheck);
@@ -3817,7 +3847,7 @@ public class Graph {
                     Reference<GraphTargetItem> tiRef = new Reference<>(null);
                     makeAllCommands(currentRet, stack);
                     SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path,
-                            caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
+                            caseValues, defaultPart, caseBodyParts, nextRef, tiRef, hasEmptyStackPops);
                     sw.additionalDefaultPosition = additionalDefaultPosition;
                     sw.additionalDefaultValues = additionalDefaultValues;
                     GraphPart next = nextRef.getVal();
@@ -3827,7 +3857,7 @@ public class Graph {
                         if (tiRef.getVal() != null) {
                             ret.add(tiRef.getVal());
                         } else {
-                            printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
+                            printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
                         }
                     }
                     pos++;
@@ -3919,7 +3949,7 @@ public class Graph {
 
                                                     if (currentLoop != null) {
                                                         //System.err.println("handling parent loop");
-                                                        handleLoop(loopItem, li, currentLoop, loopTypeFound, doWhileCandidate, precontinueCommands, foundGotos, partCodes, partCodePos, visited, localData, allParts, null /*??*/, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel, sPreLoop);
+                                                        handleLoop(hasEmptyStackPops, loopItem, li, currentLoop, loopTypeFound, doWhileCandidate, precontinueCommands, foundGotos, partCodes, partCodePos, visited, localData, allParts, null /*??*/, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel, sPreLoop);
                                                         currentLoop.phase = 1;
                                                     }
                                                     loopItem = newLoopItem;
@@ -3949,7 +3979,7 @@ public class Graph {
 
                         TranslateStack trueStack = (TranslateStack) stack.clone();
                         TranslateStack falseStack = (TranslateStack) stack.clone();
-
+                        
                         //hack for as1/2 for..in to get enumeration through
                         GraphTargetItem topBsr = !stack.isEmpty() && (stack.peek() instanceof BranchStackResistant) ? stack.peek() : null;
                         trueStack.clear();
@@ -3984,17 +4014,17 @@ public class Graph {
 
                         List<GraphTargetItem> onTrue = new ArrayList<>();
                         if (!isEmpty && hasOnTrue) {
-                            onTrue = printGraph(foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
+                            onTrue = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                         }
                         List<GraphTargetItem> onFalse = new ArrayList<>();
 
                         if (!isEmpty && hasOnFalse) {
-                            onFalse = printGraph(foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
+                            onFalse = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                         }
                         //List<GraphTargetItem> out2 = new ArrayList<>();
                         //makeAllCommands(out2, stack);
                         makeAllCommands(onTrue, trueStack);
-                        makeAllCommands(onFalse, falseStack);
+                        makeAllCommands(onFalse, falseStack);                                              
                         GraphTargetItem addAfterIf = null;
                         if (!onTrue.isEmpty() && !onFalse.isEmpty()
                                 && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)
@@ -4133,7 +4163,7 @@ public class Graph {
                         }
                         //currentRet.addAll(out2);
                         if (next != null) {
-                            printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
+                            printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
                             //currentRet.addAll();
                         }
                     }
@@ -4147,19 +4177,19 @@ public class Graph {
                 }
 
                 if (nextOnePart != null) {
-                    printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, getNextParts(localData, part).get(0), stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
+                    printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, getNextParts(localData, part).get(0), stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel + 1);
                 }
 
             }
             if (isLoop && loopItem != null && currentLoop != null) {
-                handleLoop(loopItem, li, currentLoop, loopTypeFound, doWhileCandidate, precontinueCommands, foundGotos, partCodes, partCodePos, visited, localData, allParts, part, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel, sPreLoop);
+                handleLoop(hasEmptyStackPops, loopItem, li, currentLoop, loopTypeFound, doWhileCandidate, precontinueCommands, foundGotos, partCodes, partCodePos, visited, localData, allParts, part, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel, sPreLoop);
             }
             break;
         }
         return originalRet;
     }
 
-    private void handleLoop(UniversalLoopItem loopItem, LoopItem li, Loop currentLoop, boolean loopTypeFound, boolean doWhileCandidate, List<GraphTargetItem> precontinueCommands,
+    private void handleLoop(Reference<Boolean> hasEmptyStackPops, UniversalLoopItem loopItem, LoopItem li, Loop currentLoop, boolean loopTypeFound, boolean doWhileCandidate, List<GraphTargetItem> precontinueCommands,
             List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, Set<GraphPart> allParts, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel,
             TranslateStack sPreLoop
     ) throws InterruptedException {
@@ -4388,7 +4418,7 @@ public class Graph {
         }
 
         if (currentLoop.loopBreak != null) {
-            printGraph(foundGotos, partCodes, partCodePos, visited, localData, sPreLoop, allParts, part, currentLoop.loopBreak, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel + 1);
+            printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, sPreLoop, allParts, part, currentLoop.loopBreak, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel + 1);
         }
     }
 
@@ -4677,7 +4707,7 @@ public class Graph {
         int tsize = tree.size();
         if (!tree.isEmpty() && (tree.get(tree.size() - 1) instanceof ScriptEndItem)) {
             tsize--;
-        }
+        }        
         for (int i = 0; i < tsize; i++) {
             GraphTargetItem ti = tree.get(i);
             if (!ti.isEmpty()) {
@@ -4686,6 +4716,9 @@ public class Graph {
                 }
                 ti.toStringSemicoloned(writer, localData);
                 if (!ti.handlesNewLine()) {
+                    if (!ti.comment.isEmpty()) {
+                        writer.append(" //").append(ti.comment);
+                    }
                     writer.newLine();
                 }
                 lastNewLine = false;
@@ -4694,7 +4727,7 @@ public class Graph {
                     lastNewLine = true;
                 }
             }
-        }
+        }        
         return writer;
     }
 
@@ -4793,12 +4826,13 @@ public class Graph {
      * @param caseBodyParts Case body parts
      * @param nextRef Next reference
      * @param tiRef Target item reference
+     * @param hasEmptyStackPops Has empty stack pops
      * @return Switch item
      * @throws InterruptedException On interrupt
      */
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
-            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
+            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef, Reference<Boolean> hasEmptyStackPops) throws InterruptedException {
 
         boolean hasDefault = false;
         /*
@@ -4950,7 +4984,7 @@ public class Graph {
                 stopPartKind2x.add(StopPartKind.OTHER);
             }
             TranslateStack subStack = (TranslateStack) stack.clone();
-            currentCaseCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, subStack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
+            currentCaseCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, subStack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
             if (willHaveBreak) {
                 if (!currentCaseCommands.isEmpty()) {
                     GraphTargetItem last = currentCaseCommands.get(currentCaseCommands.size() - 1);
