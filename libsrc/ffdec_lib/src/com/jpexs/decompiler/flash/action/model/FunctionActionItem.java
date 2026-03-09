@@ -305,7 +305,7 @@ public class FunctionActionItem extends ActionItem {
         }
         writer.append(")").startBlock();
 
-        Graph.graphToString(actions, writer, localData);
+        Graph.graphToString(actions, writer, localData);        
 
         writer.endBlock();
         writer.endMethod();

@@ -1101,6 +1101,7 @@ public class AVM2Graph extends Graph {
     /**
      * Checks try.
      *
+     * @param hasEmptyStackPops Has empty stack pops
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -1120,7 +1121,7 @@ public class AVM2Graph extends Graph {
      * @return True if try is found
      * @throws InterruptedException On interrupt
      */
-    private boolean checkTry(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    private boolean checkTry(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (localData.parsedExceptions == null) {
             localData.parsedExceptions = new ArrayList<>();
         }
@@ -1255,7 +1256,7 @@ public class AVM2Graph extends Graph {
                     }
                 }
                 stack = (TranslateStack) stack.clone();
-                tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
+                tryCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
             }
 
             boolean inlinedFinally = false;
@@ -1376,7 +1377,7 @@ public class AVM2Graph extends Graph {
                     tryStopPartKind.add(StopPartKind.OTHER);
                 }
 
-                tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, tryStopPart, tryStopPartKind, loops, throwStates, staticOperation, path);
+                tryCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, tryStopPart, tryStopPartKind, loops, throwStates, staticOperation, path);
                 makeAllCommands(tryCommands, stack);
                 processIfs(tryCommands);
 
@@ -1394,7 +1395,7 @@ public class AVM2Graph extends Graph {
                     finallyStopPartKind.add(StopPartKind.OTHER);
                 }
                 if (finallyPart != null) {
-                    finallyCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, finallyPart, finallyStopPart, finallyStopPartKind, loops, throwStates, staticOperation, path);
+                    finallyCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, finallyPart, finallyStopPart, finallyStopPartKind, loops, throwStates, staticOperation, path);
                 }
                 if (switchPart != null) {
                     try {
@@ -1446,7 +1447,7 @@ public class AVM2Graph extends Graph {
                     stopPartKind2.add(StopPartKind.OTHER);
                 }
 
-                List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
+                List<GraphTargetItem> currentCatchCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
                 st2.finishBlock(currentCatchCommands, true);
                 int tempExceptionPos = 0;
                 if (!currentCatchCommands.isEmpty() && currentCatchCommands.get(0) instanceof WithAVM2Item) {
@@ -1616,7 +1617,7 @@ public class AVM2Graph extends Graph {
                 if (finallyIndex > -1 && localData.finallyIndicesWithDoublePush.contains(finallyIndex)) {
                     stack.push(new AnyItem());
                 }
-                printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, afterPart, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel);
+                printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, afterPart, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel);
             }
             return true;
         }
@@ -1691,34 +1692,9 @@ public class AVM2Graph extends Graph {
         }
         return true;
     }
-
-    /**
-     * Check part output.
-     *
-     * @param currentRet Current return
-     * @param foundGotos Found gotos
-     * @param partCodes Part codes
-     * @param partCodePos Part code position
-     * @param visited Visited
-     * @param code Code
-     * @param localData Local data
-     * @param allParts All parts
-     * @param stack Stack
-     * @param parent Parent part
-     * @param part Part
-     * @param stopPart Stop part
-     * @param stopPartKind Stop part kind
-     * @param loops Loops
-     * @param throwStates Throw states
-     * @param currentLoop Current loop
-     * @param staticOperation Unused
-     * @param path Path
-     * @param recursionLevel Recursion level
-     * @return True to stop processing. False to continue.
-     * @throws InterruptedException On interrupt
-     */
+    
     @Override
-    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
+    protected boolean checkPartOutput(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
             Set<GraphPart> visited, GraphSource code,
             BaseLocalData localData, Set<GraphPart> allParts,
@@ -1729,38 +1705,11 @@ public class AVM2Graph extends Graph {
             int staticOperation, String path,
             int recursionLevel) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
-        return checkTry(currentRet, foundGotos, partCodes, partCodePos, visited, aLocalData, part, stopPart, stopPartKind, loops, throwStates, allParts, stack, staticOperation, path, recursionLevel);
+        return checkTry(hasEmptyStackPops, currentRet, foundGotos, partCodes, partCodePos, visited, aLocalData, part, stopPart, stopPartKind, loops, throwStates, allParts, stack, staticOperation, path, recursionLevel);
     }
-
-    /**
-     * Check before decompiling next section. Override this method to provide
-     * custom behavior.
-     *
-     * @param currentRet Current return
-     * @param foundGotos Found gotos
-     * @param partCodes Part codes
-     * @param partCodePos Part code position
-     * @param visited Visited
-     * @param code Code
-     * @param localData Local data
-     * @param allParts All parts
-     * @param stack Stack
-     * @param parent Parent part
-     * @param part Part
-     * @param stopPart Stop part
-     * @param stopPartKind Stop part kind
-     * @param loops Loops
-     * @param throwStates Throw states
-     * @param output Output
-     * @param currentLoop Current loop
-     * @param staticOperation Unused
-     * @param path Path
-     * @return List of GraphTargetItems to replace current output and stop
-     * further processing. Null to continue.
-     * @throws InterruptedException On interrupt
-     */
+   
     @Override
-    protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
+    protected List<GraphTargetItem> check(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
             Set<GraphPart> visited, GraphSource code,
             BaseLocalData localData, Set<GraphPart> allParts,
@@ -1963,7 +1912,7 @@ public class AVM2Graph extends Graph {
                 Reference<GraphPart> nextRef = new Reference<>(null);
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
                 makeAllCommands(output, stack);
-                SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
+                SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, visited, allParts, stack, stopPart, stopPartKind, loops, throwStates, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef, hasEmptyStackPops);
                 ret = new ArrayList<>();
                 ret.addAll(output);
                 checkSwitch(localData, sw, otherSide, ret.isEmpty() ? currentRet : ret /*hack :-(*/);
@@ -1972,7 +1921,7 @@ public class AVM2Graph extends Graph {
                     if (tiRef.getVal() != null) {
                         ret.add(tiRef.getVal());
                     } else {
-                        ret.addAll(printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, nextRef.getVal(), stopPart, stopPartKind, loops, throwStates, staticOperation, path));
+                        ret.addAll(printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, nextRef.getVal(), stopPart, stopPartKind, loops, throwStates, staticOperation, path));
                     }
                 }
             }

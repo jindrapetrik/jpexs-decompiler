@@ -141,6 +141,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * report bugs.
      */
     public int line;
+    
+    /**
+     * Comment
+     */
+    public String comment = "";
 
     /**
      * Gets the line start item
@@ -1060,16 +1065,29 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             writer.startBlock();
         }
         boolean first = true;
+        GraphTargetItem prevTi = null;
         for (GraphTargetItem ti : commands) {
-            if (!ti.isEmpty()) {
-                //Use stored line information if available to place commands on same line
+            if (!ti.isEmpty()) {                
                 if (!first && (!useLineInfo || (ti.getLine() < 1 || prevLine < 1 || (prevLine >= 1 && prevLine != ti.getLine())))) {
+                    //Use stored line information if available to place commands on same line
+                
+                    if (prevTi != null && !prevTi.comment.isEmpty()) {
+                        writer.append(" //").append(prevTi.comment);
+                    }
                     writer.newLine();
+                } else {
+                    if (prevTi != null && !prevTi.comment.isEmpty()) {
+                        writer.append(" /*").append(prevTi.comment).append(" */ ");
+                    } 
                 }
                 prevLine = ti.getLine();
                 first = false;
                 ti.toStringSemicoloned(writer, localData);
+                prevTi = ti;
             }
+        }
+        if (prevTi != null && !prevTi.comment.isEmpty()) {
+            writer.append(" //").append(prevTi.comment);
         }
         if (asBlock) {
             if (!first) {

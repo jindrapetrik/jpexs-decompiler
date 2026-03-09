@@ -64,7 +64,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public List<GraphTargetItem> outputQueue = new ArrayList<>();
 
     public BaseLocalData localData = null;
-
+    
+    public int emptyPopCount = 0;
+    
     @Override
     public synchronized Object clone() {
         TranslateStack st = (TranslateStack) super.clone();
@@ -300,6 +302,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                 PopItem oldpop = getPop();
                 pop = null;
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Pop empty stack", path);
+                emptyPopCount++;
                 return oldpop;
             }
         }
