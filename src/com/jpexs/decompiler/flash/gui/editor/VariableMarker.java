@@ -84,6 +84,7 @@ import javax.swing.plaf.ScrollBarUI;
 import javax.swing.plaf.ScrollPaneUI;
 import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
 import javax.swing.text.Highlighter;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
@@ -997,8 +998,10 @@ public class VariableMarker implements SyntaxComponent, CaretListener, PropertyC
         try {
             SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
 
-            sDoc.readLock();;
-            int pos = pane.getCaretPosition();
+            sDoc.readLock();
+            Caret caret = pane.getCaret();
+            
+            int pos = caret == null ? 0 : caret.getDot();
             String fullText = sDoc.getText(0, sDoc.getLength());
             sDoc.readUnlock();
             if (!(pane instanceof LineMarkedEditorPane)) {
