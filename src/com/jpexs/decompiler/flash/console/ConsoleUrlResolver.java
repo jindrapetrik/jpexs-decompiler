@@ -26,7 +26,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
@@ -46,6 +48,8 @@ public class ConsoleUrlResolver implements UrlResolver {
     private Character toAll = null;
 
     private Map<String, String> importSources = new HashMap<>();
+    
+    private final List<String> ignoredUrls = new ArrayList<>();
 
     /**
      *
@@ -61,9 +65,18 @@ public class ConsoleUrlResolver implements UrlResolver {
         this.importSources = importSources;
     }
 
+    public void clearIgnored() {
+        ignoredUrls.clear();
+    }
+    
+    @Override
+    public boolean doIgnoreUrl(String basePath, String url) {
+        return ignoredUrls.contains(basePath + "|" + url);
+    }        
+
     @Override
     public SWF resolveUrl(String basePath, String url) {
-
+        ignoredUrls.add(url);
         Character choice = toAll;
         String currentUrl = url;
 
