@@ -231,7 +231,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     Boolean isAmbiguous = null;
                     if (parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
                         String rawName = constants.getMultiname(multinameIndex).getName(localData.usedDeobfuscations, localData.abc, localData.abc.constants, fullyQualifiedNames, true, true);
-                        isAmbiguous = localData.abcIndex.isPropertyAmbiguous(localData.abc, rawName, parentType, true, true);
+                        if (localData.abcIndex != null) {
+                            isAmbiguous = localData.abcIndex.isPropertyAmbiguous(localData.abc, rawName, parentType, true, true);
+                        }
                     }
                     
                     /*if (customNs != null) {
