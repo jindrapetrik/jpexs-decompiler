@@ -694,11 +694,6 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private transient Map<String, String> obfuscatedIdentifiersMap = null;
 
     /**
-     * Lock for characters synchronization
-     */
-    private final Object charactersLock = new Object();
-
-    /**
      * SHA 256 hash of original data
      */
     private String hashSha256 = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -1003,56 +998,54 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param withImported Include tags imported with importasset/2 tag?
      * @return Character id to character map
      */
-    public Map<Integer, CharacterTag> getCharacters(boolean withImported) {
+    public synchronized Map<Integer, CharacterTag> getCharacters(boolean withImported) {
         Map<Integer, CharacterTag> newCharacters = characters;
         Map<Integer, CharacterTag> newCharactersWithImported = charactersWithImported;
-        synchronized (charactersLock) {
-            if (newCharacters == null || newCharactersWithImported == null) {
-                if (destroyed) {
-                    return new HashMap<>();
-                }
-                Map<Integer, CharacterTag> chars = new HashMap<>();
-                Map<Integer, CharacterTag> charsWithImported = new HashMap<>();
-                Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
-                Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
-                parseCharacters(getTags(), eimages, chars, charIdtags);
-                charsWithImported.putAll(chars);
-                for (int importedCharacterId : importedCharacterIds.keySet()) {
-                    int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
-                    SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
-                    CharacterTag exportedCharacter = importedSwf.getCharacter(exportedCharacterId);
-                    charsWithImported.put(importedCharacterId, exportedCharacter);
-                    charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
-                    //FIXME? eimages
+        if (newCharacters == null || newCharactersWithImported == null) {
+            if (destroyed) {
+                return new HashMap<>();
+            }
+            Map<Integer, CharacterTag> chars = new HashMap<>();
+            Map<Integer, CharacterTag> charsWithImported = new HashMap<>();
+            Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
+            Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
+            parseCharacters(getTags(), eimages, chars, charIdtags);
+            charsWithImported.putAll(chars);
+            for (int importedCharacterId : importedCharacterIds.keySet()) {
+                int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
+                SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
+                CharacterTag exportedCharacter = importedSwf.getCharacter(exportedCharacterId);
+                charsWithImported.put(importedCharacterId, exportedCharacter);
+                charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
+                //FIXME? eimages
 
-                    charsWithImported.get(importedCharacterId).setImported(true, true);
-                    for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
-                        if (chi instanceof Tag) {
-                            ((Tag) chi).setImported(true, true);
-                        }
+                charsWithImported.get(importedCharacterId).setImported(true, true);
+                for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
+                    if (chi instanceof Tag) {
+                        ((Tag) chi).setImported(true, true);
                     }
                 }
-                Map<CharacterIdTag, Integer> charToId = new IdentityHashMap<>();
-                for (int id : charsWithImported.keySet()) {
-                    charToId.put(charsWithImported.get(id), id);
+            }
+            Map<CharacterIdTag, Integer> charToId = new IdentityHashMap<>();
+            for (int id : charsWithImported.keySet()) {
+                charToId.put(charsWithImported.get(id), id);
+            }
+            for (int id : charIdtags.keySet()) {
+                for (CharacterIdTag ch : charIdtags.get(id)) {
+                    charToId.put(ch, id);
                 }
-                for (int id : charIdtags.keySet()) {
-                    for (CharacterIdTag ch : charIdtags.get(id)) {
-                        charToId.put(ch, id);
-                    }
-                }
-
-                newCharacters = Collections.unmodifiableMap(chars);
-                newCharactersWithImported = Collections.unmodifiableMap(charsWithImported);
-                characters = newCharacters;
-                charactersWithImported = newCharactersWithImported;
-                characterToId = Collections.unmodifiableMap(charToId);
-                characterIdTags = Collections.unmodifiableMap(charIdtags);
-                externalImages2 = Collections.unmodifiableMap(eimages);
             }
 
-            return withImported ? newCharactersWithImported : newCharacters;
+            newCharacters = Collections.unmodifiableMap(chars);
+            newCharactersWithImported = Collections.unmodifiableMap(charsWithImported);
+            characters = newCharacters;
+            charactersWithImported = newCharactersWithImported;
+            characterToId = Collections.unmodifiableMap(charToId);
+            characterIdTags = Collections.unmodifiableMap(charIdtags);
+            externalImages2 = Collections.unmodifiableMap(eimages);
         }
+
+        return withImported ? newCharactersWithImported : newCharacters;        
     }
 
     /**
@@ -1701,7 +1694,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param characters Map of characterId to CharacterTag
      * @param characterIdTags Map of characterId to list of CharacterIdTags
      */
-    private synchronized void parseCharacters(Iterable<Tag> list, Map<Integer, DefineExternalImage2> externalImages2, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
+    private void parseCharacters(Iterable<Tag> list, Map<Integer, DefineExternalImage2> externalImages2, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
         Iterator<Tag> iterator = list.iterator();
         while (iterator.hasNext()) {
             Tag t = iterator.next();
