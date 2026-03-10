@@ -67,6 +67,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     
     public int emptyPopCount = 0;
     
+    //Used by deobfuscation
+    public boolean doNoPushItemsToOutput = false;
+    
     @Override
     public synchronized Object clone() {
         TranslateStack st = (TranslateStack) super.clone();
@@ -363,25 +366,12 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         if (connectedOutput == null) {
             return;
         }
-        /*int pos = output.size();
         
-        for (int i = size() - 1; i >= 0; i--) {
-            GraphTargetItem item = get(i);
-            if (item instanceof BranchStackResistant) {
-                continue;
-            }
-            if (item instanceof NewActivationAVM2Item) {
-                break;
-            }
-            if (item instanceof  ExceptionAVM2Item) {
-                break;
-            }
-            remove(i);
-            if (item instanceof PopItem) {
-                continue;
-            }
-            output.add(pos, beforeExit ? item : new PushItem(item));
-        }*/
+        if (doNoPushItemsToOutput) {
+            output.addAll(outputQueue);
+            outputQueue.clear();
+            return;
+        }
 
         int clen = output.size();
         boolean isExit = false;
