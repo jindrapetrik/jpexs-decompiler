@@ -38,6 +38,7 @@ public class FixItemCounterTranslateStack extends TranslateStack {
      */
     public FixItemCounterTranslateStack(String path) {
         super(null); //null path => do not add PushItems
+        doNoPushItemsToOutput = true;
     }
 
     /**

@@ -201,7 +201,11 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
         }
 
         Set<Integer> visited = new HashSet<>();
-        return visitCode(assignment, visited, new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
+        
+        TranslateStack stack = new TranslateStack("deo");
+        stack.doNoPushItemsToOutput = true;
+        
+        return visitCode(assignment, visited, stack, classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
     }
 
     /**
@@ -296,7 +300,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             }
 
             idx = toVisit.remove(0);
-            stack = toVisitStacks.remove(0);
+            stack = toVisitStacks.remove(0);                        
 
             while (true) {
                 if (idx > endIdx) {
@@ -325,9 +329,21 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                 if (stack.size() < requiredStackSize) {
                     continue outer;
                 }
+                
+                if (ins.definition instanceof ReturnValueIns) {
+                    break;
+                }
 
-                stack.setConnectedOutput(0, output, localData);        
-                ins.translate(localData, stack, output, 0, "");
+                if (ins.definition instanceof ThrowIns) {
+                    break;
+                }
+
+                if (ins.definition instanceof ReturnVoidIns) {
+                    break;
+                }
+                
+                stack.setConnectedOutput(0, output, localData);                
+                ins.translate(localData, stack, output, 0, "");                                
                 if (def instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                     if (!ignored.contains(regId)) {
@@ -431,19 +447,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                  throw new TranslateException("If target not found: " + address);
                  }
                  visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, newIdx, endIdx, result);
-                 }*/
-
-                if (ins.definition instanceof ReturnValueIns) {
-                    break;
-                }
-
-                if (ins.definition instanceof ThrowIns) {
-                    break;
-                }
-
-                if (ins.definition instanceof ReturnVoidIns) {
-                    break;
-                }
+                 }*/               
             }
         }
         return -1;
