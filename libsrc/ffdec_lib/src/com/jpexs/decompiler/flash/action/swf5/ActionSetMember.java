@@ -186,7 +186,7 @@ public class ActionSetMember extends Action {
                     if (((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate().valueEquals(object.getThroughDuplicate())) {
                         if (((GetMemberActionItem) ((DecrementActionItem) value).object).memberName.equals(memberName)) {
                             ((GetMemberActionItem) ((DecrementActionItem) value).object).object = ((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate();
-                            cleanupTemp(((GetMemberActionItem) ((IncrementActionItem) value).object).object, object, output, stack);                            
+                            cleanupTemp(((GetMemberActionItem) ((DecrementActionItem) value).object).object, object, output, stack);                            
                             if (setter) {
                                 stack.addToOutput(new PreDecrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
                             } else {
