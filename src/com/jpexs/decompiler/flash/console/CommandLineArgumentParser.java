@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
-import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
@@ -504,7 +503,7 @@ public class CommandLineArgumentParser {
         }
 
         AbortRetryIgnoreHandler handler = null;
-        UrlResolver urlResolver = new ConsoleUrlResolver(false, false, false, new HashMap<>());
+        ConsoleUrlResolver urlResolver = new ConsoleUrlResolver(false, false, false, new HashMap<>());
         Map<String, String> format = new HashMap<>();
         Map<String, String> changedImports = new LinkedHashMap<>();
         double zoom = 1;
@@ -1925,7 +1924,7 @@ public class CommandLineArgumentParser {
         changedImports.put(args.pop(), args.pop());
     }
 
-    private static UrlResolver parseImportAssets(Stack<String> args, Map<String, String> changedImports) {
+    private static ConsoleUrlResolver parseImportAssets(Stack<String> args, Map<String, String> changedImports) {
         if (args.isEmpty()) {
             System.err.println("importassets options expected");
             badArguments("importassets");
@@ -2164,7 +2163,7 @@ public class CommandLineArgumentParser {
             String charset, 
             boolean exportEmbed, 
             boolean transparentBackground, 
-            UrlResolver urlResolver,
+            ConsoleUrlResolver urlResolver,
             int subFrameLength,
             double morphDuration,
             int morphNumFrames
@@ -2240,6 +2239,9 @@ public class CommandLineArgumentParser {
             }
 
             for (File inFile : inFiles) {
+                
+                urlResolver.clearIgnored();
+                
                 String inFileName = Path.getFileNameWithoutExtension(inFile);
                 if (stdOut != null) {
                     String outFilePath = stdOut.replace("{swfFile}", inFileName);
