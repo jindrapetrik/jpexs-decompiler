@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
+ * Copyright (C) 2018 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,23 +16,15 @@
  */
 package com.jpexs.decompiler.graph;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Second pass data.
  *
  * @author JPEXS
  */
-public class SecondPassData {
+public interface PrevNextWalker {
 
-    /**
-     * List of cases for each switch statement
-     */
-    public List<List<GraphPart>> switchCases = new ArrayList<>();
-    
-    /**
-     * List of breaks of each switch statement
-     */
-    public List<GraphPart> switchBreaks = new ArrayList<>();
+    public List<? extends GraphPart> getPrev(GraphPart node);
+
+    public List<? extends GraphPart> getNext(GraphPart node);
 }

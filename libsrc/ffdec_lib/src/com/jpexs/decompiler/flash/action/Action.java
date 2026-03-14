@@ -1256,7 +1256,7 @@ public abstract class Action implements GraphSourceItem {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
-        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits(), usedDeobfuscations);
+        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits(), usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
         localData.lineStartAction = lineStartActionRef.getVal();
         int ip = start;
         boolean isWhile = false;

@@ -123,7 +123,7 @@ public class GraphPrecontinueDetector {
                             } else {
                                 other = prev.next.get(0);
                             }
-                            if (other.graphPart == el.loopBreak) {
+                            if (other.graphPart == el.loopBreak && el.loopBreak != null) {
                                 node = prev;
                                 usePreNode = true;
                             }
@@ -139,7 +139,7 @@ public class GraphPrecontinueDetector {
                         } else {
                             other = node.next.get(0);
                         }
-                        if (other.graphPart != el.loopBreak) {
+                        if (other.graphPart != el.loopBreak && el.loopBreak != null) {
                             hasMoreNexts = true;
                         }
                     } else {

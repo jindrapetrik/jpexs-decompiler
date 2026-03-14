@@ -300,6 +300,8 @@ public class AVM2LocalData extends BaseLocalData {
         maxTempIndex = localData.maxTempIndex;
         gotosUsed = localData.gotosUsed;
         secondPassData = localData.secondPassData;
+        switchCases = localData.switchCases;
+        switchBreaks = localData.switchBreaks;
     }
 
     /**

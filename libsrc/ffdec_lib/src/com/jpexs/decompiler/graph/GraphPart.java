@@ -234,6 +234,7 @@ public class GraphPart implements Serializable {
             l.leadsToMark = 0;
         }
         return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, throwStates, firstCanBeLoopContinue);
+        //return gr.partLeadsTo(localData, this, part, code, loops, throwStates, firstCanBeLoopContinue);
     }
 
     /**

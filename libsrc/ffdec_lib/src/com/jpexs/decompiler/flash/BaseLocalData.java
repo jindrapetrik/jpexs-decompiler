@@ -20,8 +20,10 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.helpers.Reference;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -59,7 +61,17 @@ public abstract class BaseLocalData {
     /**
      * Whether goto statements were used
      */
-    public Reference<Boolean> gotosUsed = new Reference<>(false);
+    public Reference<Boolean> gotosUsed = new Reference<>(false);   
+
+    /**
+     * Switch cases
+     */
+    public List<List<GraphPart>> switchCases = new ArrayList<>();
+    
+    /**
+     * Switch breaks
+     */
+    public List<GraphPart> switchBreaks = new ArrayList<>();
     
     /**
      * Constructor.
