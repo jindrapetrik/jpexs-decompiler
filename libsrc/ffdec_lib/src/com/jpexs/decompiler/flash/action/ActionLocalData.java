@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +72,7 @@ public class ActionLocalData extends BaseLocalData {
      * @param insideDoInitAction Is inside doInitAction
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations, List<List<GraphPart>> switchCases, List<GraphPart> switchBreaks) {
         this.secondPassData = secondPassData;
         regNames = new HashMap<>();
         variables = new HashMap<>();
@@ -79,6 +80,8 @@ public class ActionLocalData extends BaseLocalData {
         this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.usedDeobfuscations = usedDeobfuscations;
+        this.switchCases = switchCases;
+        this.switchBreaks = switchBreaks;
     }
 
     /**
@@ -88,8 +91,9 @@ public class ActionLocalData extends BaseLocalData {
      * @param insideDoInitAction Is inside doInitAction
      * @param regNames Register names
      * @param uninitializedClassTraits Uninitialized class traits
+     * @param switchCases Switch cases
      */
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations, List<List<GraphPart>> switchCases, List<GraphPart> switchBreaks) {
         this.regNames = regNames;
         this.secondPassData = secondPassData;
         variables = new HashMap<>();
@@ -97,6 +101,8 @@ public class ActionLocalData extends BaseLocalData {
         this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.usedDeobfuscations = usedDeobfuscations;
+        this.switchCases = switchCases;
+        this.switchBreaks = switchBreaks;
     }
 
     /**
@@ -109,7 +115,7 @@ public class ActionLocalData extends BaseLocalData {
      * @param functions Functions
      * @param uninitializedClassTraits Uninitialized class traits
      */
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits, Set<String> usedDeobfuscations, List<List<GraphPart>> switchCases, List<GraphPart> switchBreaks) {
         this.regNames = regNames;
         this.variables = variables;
         this.functions = functions;
@@ -117,5 +123,7 @@ public class ActionLocalData extends BaseLocalData {
         this.secondPassData = secondPassData;
         this.uninitializedClassTraits = uninitializedClassTraits;
         this.usedDeobfuscations = usedDeobfuscations;
+        this.switchCases = switchCases;
+        this.switchBreaks = switchBreaks;
     }
 }

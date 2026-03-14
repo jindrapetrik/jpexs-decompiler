@@ -3953,7 +3953,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @throws InterruptedException On interrupt
      */
     private static void getVariables(SWF swf, boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, long addr, String path) throws InterruptedException {
-        ActionLocalData localData = new ActionLocalData(null, insideDoInitAction, new HashMap<>() /*??*/, new LinkedHashSet<>());
+        ActionLocalData localData = new ActionLocalData(null, insideDoInitAction, new HashMap<>() /*??*/, new LinkedHashSet<>(), new ArrayList<>(), new ArrayList<>());
         getVariables(swf, null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 

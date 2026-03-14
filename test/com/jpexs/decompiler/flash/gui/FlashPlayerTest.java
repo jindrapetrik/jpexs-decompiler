@@ -560,7 +560,7 @@ public class FlashPlayerTest {
                     task.actions = newActions;
 
                     List<GraphTargetItem> output = new ArrayList<>();
-                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>(), new LinkedHashSet<>());
+                    ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>(), new LinkedHashSet<>(), new ArrayList<>(), new ArrayList<>());
                     TranslateStack stack = new TranslateStack("");
                     for (Action a : newActions) {
                         a.translate(localData, stack, output, 0, "");

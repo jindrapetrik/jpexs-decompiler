@@ -131,6 +131,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1692,7 +1693,7 @@ public class AVM2Graph extends Graph {
         }
         return true;
     }
-    
+
     @Override
     protected boolean checkPartOutput(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
@@ -1707,7 +1708,7 @@ public class AVM2Graph extends Graph {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         return checkTry(hasEmptyStackPops, currentRet, foundGotos, partCodes, partCodePos, visited, aLocalData, part, stopPart, stopPartKind, loops, throwStates, allParts, stack, staticOperation, path, recursionLevel);
     }
-   
+
     @Override
     protected List<GraphTargetItem> check(Reference<Boolean> hasEmptyStackPops, List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
@@ -1760,14 +1761,14 @@ public class AVM2Graph extends Graph {
                 Set<GraphPart> ignoredParts = new LinkedHashSet<>();
                 for (Loop el : loops) {
                     ignoredParts.add(el.loopContinue);
-                } 
+                }
                 while (true) {
                     List<GraphTargetItem> out = new ArrayList<>();
-                    
+
                     if (ignoredParts.contains(part)) {
                         break;
                     }
-                    
+
                     //Special: In Flex (not air) there are these blocks sometimes:
                     // if(false) {
                     //    §§push(5);
@@ -1780,16 +1781,20 @@ public class AVM2Graph extends Graph {
                     if (part.nextParts.size() == branchCount
                             && part.nextParts.get(branchNum).getHeight() == 2
                             && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).start >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).start)).definition instanceof NopIns
-                            && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).end >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).end)).definition instanceof JumpIns) {
+                            && ((AVM2Instruction) getLastPartSourceItem(part.nextParts.get(branchNum))).definition instanceof JumpIns) {
                         part = part.nextParts.get(branchNum);
                         branchNum = 0;
                         branchCount = 1;
                     } else if (part.nextParts.size() == branchCount
-                            && part.nextParts.get(branchNum).getHeight() > 1
-                            && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).end >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).end)).definition instanceof IfStrictEqIns
+                            //&& part.nextParts.get(branchNum).getHeight() > 1
+                            && ((AVM2Instruction) getLastPartSourceItem(part.nextParts.get(branchNum))).definition instanceof IfStrictEqIns
                             && ((top = translatePartGetStack(localData, part.nextParts.get(branchNum), stack, staticOperation, out)) instanceof StrictEqAVM2Item)) {
                         cnt++;
                         part = part.nextParts.get(branchNum);
+
+                        while (part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
+                            part = part.nextParts.get(0);
+                        }
                         caseBodyParts.add(part.nextParts.get(0));
                         branchNum = 1;
 
@@ -1800,11 +1805,17 @@ public class AVM2Graph extends Graph {
                         caseValuesMapRight.add(set.rightSide);
                         branchCount = 2;
                     } else if (part.nextParts.size() == branchCount
-                            && part.nextParts.get(branchNum).getHeight() > 1
-                            && ((AVM2Instruction) code.get(part.nextParts.get(branchNum).end >= code.size() ? code.size() - 1 : part.nextParts.get(branchNum).end)).definition instanceof IfStrictNeIns
+                            //&& part.nextParts.get(branchNum).getHeight() > 1
+                            && ((AVM2Instruction) getLastPartSourceItem(part.nextParts.get(branchNum))).definition instanceof IfStrictNeIns
                             && ((top = translatePartGetStack(localData, part.nextParts.get(branchNum), stack, staticOperation, out)) instanceof StrictNeqAVM2Item)) {
+
                         cnt++;
                         part = part.nextParts.get(branchNum);
+
+                        while (part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
+                            part = part.nextParts.get(0);
+                        }
+
                         caseBodyParts.add(part.nextParts.get(1));
                         branchNum = 0;
 
@@ -1822,18 +1833,18 @@ public class AVM2Graph extends Graph {
                 //ignore
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
-            
+
             //It's not switch, it's an If            
             if (caseBodyParts.size() == 2) {
                 boolean isIf = false;
-                for (GraphPart r : part.refs) {                    
+                for (GraphPart r : part.refs) {
                     if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
                         isIf = true;
                         break;
                     }
                 }
                 if (!isIf) {
-                    for (GraphPart r : caseBodyParts.get(1).refs) {                    
+                    for (GraphPart r : caseBodyParts.get(1).refs) {
                         if (r != origPart && !origPart.leadsTo(localData, this, code, r, loops, throwStates, false)) {
                             isIf = true;
                             break;
@@ -1845,7 +1856,7 @@ public class AVM2Graph extends Graph {
                     return ret;
                 }
             }
-            
+
             if (caseBodyParts.size() < 2) {
                 stack.push(firstSet);
                 return ret;
@@ -2087,7 +2098,7 @@ public class AVM2Graph extends Graph {
      */
     @Override
     protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates, TranslateStack stack) {
-        if (debugDoNotProcess) {
+        if (doNotProcessIfs) {
             return loopItem;
         }
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
@@ -2553,7 +2564,7 @@ public class AVM2Graph extends Graph {
 
     @Override
     protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
-        if (debugDoNotProcess) {
+        if (doNotProcessIfs) {
             return;
         }
 
@@ -3321,6 +3332,7 @@ public class AVM2Graph extends Graph {
 
             //Search all parts which have same or greater scope level, these all belong to catch
             Set<GraphPart> catchParts = new HashSet<>();
+            Reference<GraphPart> partAfter = new Reference<>(null);
             if (scopePos > -1) {
                 walkCatchParts(avm2LocalData.codeStats, part, ip, catchParts, scopePos, allParts, body.exceptions[e].isFinally());
             } else {

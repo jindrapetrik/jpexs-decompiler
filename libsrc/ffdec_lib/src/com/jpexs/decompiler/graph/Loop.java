@@ -65,7 +65,7 @@ public class Loop implements Serializable {
     /**
      * Unique id of the loop
      */
-    public final long id;
+    public long id;
 
     /**
      * Mark for leads to method
@@ -92,6 +92,26 @@ public class Loop implements Serializable {
      * Stop parts before entering the loop
      */
     public List<GraphPart> stopParts = new ArrayList<>();
+    
+    /**
+     * Loop body
+     */
+    public Set<GraphPart> loopBody = new LinkedHashSet<>();
+    
+    /**
+     * Edges outside
+     */
+    public Set<GraphPartEdge> edgesOutside = new LinkedHashSet<>();
+    
+    /**
+     * Order part
+     */
+    public GraphPart orderPart;
+    
+    /**
+     * Parent loop
+     */
+    public Loop parentLoop;
 
     /**
      * Constructs a loop
