@@ -76,15 +76,21 @@ foreach (array_keys($changelog_types) as $type) {
     $changelog[$type] = [];
 }
 
+$has_breaking_change = false;
 
 foreach ($messages as $message) {
     $first_line = $message[0];
 
 
-    if (preg_match('/^(?<type>feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\((?<scope>.+)\))?: (?<desc>.+)$/', $first_line, $matches)) {
+    if (preg_match('/^(?<type>feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\((?<scope>.+)\))?(?<breaking>!)?: (?<desc>.+)$/', $first_line, $matches)) {
         $type = $matches["type"];
         $scope = $matches["scope"];
         $desc = $matches["desc"];
+        $breaking = $matches["breaking"] === "!";
+        
+        if ($breaking) {
+            $has_breaking_change = true;
+        }
 
         if ($scope !== "") {
             $desc = $scope . ": " . $desc;
@@ -125,8 +131,13 @@ $major = (int) $matches["major"];
 $minor = (int) $matches["minor"];
 $patch = (int) $matches["patch"];
 
-if (count($changelog["feat"]) > 0) {
+if ($has_breaking_change) {
+    $major++;
+    $minor = 0;
+    $patch = 0;
+} else if (count($changelog["feat"]) > 0) {
     $minor++;
+    $patch = 0;
 } else if (count($changelog["fix"]) > 0 || count($changelog["perf"]) > 0) {
     $patch++;
 } else {
