@@ -88,37 +88,42 @@ public class UndoFixedEditorPane extends JEditorPane {
     }
 
     public void changeContentType(String type) {
-        if (!type.equals(getContentType())) {
-            removeDocumentListener();
-            Font oldFont = getFont();
-            setContentType(type);
-            setFont(oldFont);
-            addDocumentListener();
-        }
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (!type.equals(getContentType())) {
+                    removeDocumentListener();
+                    Font oldFont = getFont();
+                    setContentType(type);
+                    setFont(oldFont);
+                    addDocumentListener();
+                }
 
-        if (!Configuration.autoCloseQuotes.get()) {
-            getActionMap().remove("quotes");
-            KeyStroke ks = KeyStroke.getKeyStroke("typed '");
-            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
-        }
+                if (!Configuration.autoCloseQuotes.get()) {
+                    getActionMap().remove("quotes");
+                    KeyStroke ks = KeyStroke.getKeyStroke("typed '");
+                    getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+                }
 
-        if (!Configuration.autoCloseDoubleQuotes.get()) {
-            getActionMap().remove("double-quotes");
-            KeyStroke ks = KeyStroke.getKeyStroke("typed \"");
-            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
-        }
+                if (!Configuration.autoCloseDoubleQuotes.get()) {
+                    getActionMap().remove("double-quotes");
+                    KeyStroke ks = KeyStroke.getKeyStroke("typed \"");
+                    getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+                }
 
-        if (!Configuration.autoCloseBrackets.get()) {
-            getActionMap().remove("brackets");
-            KeyStroke ks = KeyStroke.getKeyStroke("typed [");
-            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
-        }
+                if (!Configuration.autoCloseBrackets.get()) {
+                    getActionMap().remove("brackets");
+                    KeyStroke ks = KeyStroke.getKeyStroke("typed [");
+                    getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+                }
 
-        if (!Configuration.autoCloseParenthesis.get()) {
-            getActionMap().remove("parenthesis");
-            KeyStroke ks = KeyStroke.getKeyStroke("typed (");
-            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
-        }
+                if (!Configuration.autoCloseParenthesis.get()) {
+                    getActionMap().remove("parenthesis");
+                    KeyStroke ks = KeyStroke.getKeyStroke("typed (");
+                    getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+                }
+            }
+        });
     }
 
     @Override
@@ -139,7 +144,11 @@ public class UndoFixedEditorPane extends JEditorPane {
             if (!t.equals(getText())) {
                 boolean plain = t.length() > Configuration.syntaxHighlightLimit.get();
                 if (plain) {
-                    contentType = "text/plain";
+                    if (this instanceof DebuggableEditorPane) {
+                        contentType = "text/plaindebug";
+                    } else {
+                        contentType = "text/plain";
+                    }
                     originalContentType = getContentType();
                     changeContentType(contentType);
                 } else if (originalContentType != null) {
