@@ -130,6 +130,7 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -142,6 +143,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -584,6 +586,18 @@ public class AVM2Graph extends Graph {
         }
     }
 
+    
+    private class WalkLocalRegsUsageWindow {
+        GraphPart part;
+        int ip;
+
+        public WalkLocalRegsUsageWindow(GraphPart part, int ip) {
+            this.part = part;
+            this.ip = ip;
+        }
+        
+    }
+    
     /**
      * Walk local registers usage
      *
@@ -597,91 +611,104 @@ public class AVM2Graph extends Graph {
      * @param searchRegId Search register ID
      */
     private void walkLocalRegsUsage(List<ThrowState> throwStates, AVM2LocalData localData, Set<Integer> getLocalPos, GraphPart startPart, GraphPart part, Set<GraphPart> visited, int ip, int searchRegId) {
-        if (visited.contains(part) && part != startPart) {
-            return;
-        }
+        
+        
+        Queue<WalkLocalRegsUsageWindow> q = new ArrayDeque<>();
+        q.offer(new WalkLocalRegsUsageWindow(part, ip));
+        
+        loopq: while (!q.isEmpty()) {
+            WalkLocalRegsUsageWindow window = q.poll();
+            part = window.part;
+            ip = window.ip;
+            
+            if (visited.contains(part) && part != startPart) {
+                continue;
+            }
 
-        if (localData.finallyThrowParts.containsValue(part)) {
+            if (localData.finallyThrowParts.containsValue(part)) {
+                visited.add(part);
+                continue;
+            }
+
+            for (int i = ip; i <= part.end; i++) {
+                AVM2Instruction ins = avm2code.code.get(i);
+                if (ins.definition instanceof SetLocalTypeIns) {
+                    int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
+                    if (searchRegId == regId) {
+                        continue loopq;
+                    }
+                }
+                if (ins.definition instanceof GetLocalTypeIns) {
+                    int regId = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
+                    if (regId == searchRegId) {
+                        getLocalPos.add(i);
+                    }
+                }
+                if ((ins.definition instanceof IncLocalIns)
+                        || (ins.definition instanceof IncLocalIIns)
+                        || (ins.definition instanceof IncLocalPIns)
+                        || (ins.definition instanceof DecLocalIns)
+                        || (ins.definition instanceof DecLocalIIns)
+                        || (ins.definition instanceof DecLocalPIns)) {
+                    int regId = ins.operands[0];
+                    if (regId == searchRegId) {
+                        getLocalPos.add(i);
+                    }
+                }
+                if ((ins.definition instanceof IncLocalPIns)
+                        || (ins.definition instanceof DecLocalPIns)) {
+                    int regId = ins.operands[1];
+                    if (regId == searchRegId) {
+                        getLocalPos.add(i);
+                    }
+                }
+                if (ins.definition instanceof HasNext2Ins) {
+                    int regId1 = ins.operands[0];
+                    if (regId1 == searchRegId) {
+                        getLocalPos.add(i);
+                    }
+                    int regId2 = ins.operands[1];
+                    if (regId2 == searchRegId) {
+                        getLocalPos.add(i);
+                    }
+                }
+            }
+
+            if (visited.contains(part)) {
+                continue;
+            }
             visited.add(part);
-            return;
-        }
 
-        for (int i = ip; i <= part.end; i++) {
-            AVM2Instruction ins = avm2code.code.get(i);
-            if (ins.definition instanceof SetLocalTypeIns) {
-                int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
-                if (searchRegId == regId) {
+            try {
+                //stop on switch
+                if (localData.ignoredSwitches.values().contains(part)) {
                     return;
                 }
-            }
-            if (ins.definition instanceof GetLocalTypeIns) {
-                int regId = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
-                if (regId == searchRegId) {
-                    getLocalPos.add(i);
+                if (localData.finallyJumps.containsKey(part)) {
+                    GraphPart targetPart = localData.finallyJumps.get(part);
+                    if (localData.defaultParts.containsValue(targetPart)) {
+                        //okay, proceed to finally block
+                    } else if (targetPart.nextParts.size() == 1) {
+                        //continue or break, definitely not a return, there won't be a register usage
+                        //walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, targetPart.nextParts.get(0), visited, ip, searchRegId);
+                        q.offer(new WalkLocalRegsUsageWindow(targetPart.nextParts.get(0), ip));
+                        continue;
+                    } else {
+                        continue;
+                    }
                 }
-            }
-            if ((ins.definition instanceof IncLocalIns)
-                    || (ins.definition instanceof IncLocalIIns)
-                    || (ins.definition instanceof IncLocalPIns)
-                    || (ins.definition instanceof DecLocalIns)
-                    || (ins.definition instanceof DecLocalIIns)
-                    || (ins.definition instanceof DecLocalPIns)) {
-                int regId = ins.operands[0];
-                if (regId == searchRegId) {
-                    getLocalPos.add(i);
+                for (GraphPart p : part.nextParts) {
+                    //walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, p, visited, p.start, searchRegId);
+                    q.offer(new WalkLocalRegsUsageWindow(p, p.start));
                 }
-            }
-            if ((ins.definition instanceof IncLocalPIns)
-                    || (ins.definition instanceof DecLocalPIns)) {
-                int regId = ins.operands[1];
-                if (regId == searchRegId) {
-                    getLocalPos.add(i);
+            } finally {
+                for (ThrowState ts : throwStates) {
+                    if (ts.throwingParts.contains(part)) {
+                        GraphPart p = ts.targetPart;
+                        //walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, p, visited, p.start, searchRegId);
+                        q.offer(new WalkLocalRegsUsageWindow(p, p.start));
+                    }
                 }
-            }
-            if (ins.definition instanceof HasNext2Ins) {
-                int regId1 = ins.operands[0];
-                if (regId1 == searchRegId) {
-                    getLocalPos.add(i);
-                }
-                int regId2 = ins.operands[1];
-                if (regId2 == searchRegId) {
-                    getLocalPos.add(i);
-                }
-            }
-        }
-
-        if (visited.contains(part)) {
-            return;
-        }
-        visited.add(part);
-
-        try {
-            //stop on switch
-            if (localData.ignoredSwitches.values().contains(part)) {
-                return;
-            }
-            if (localData.finallyJumps.containsKey(part)) {
-                GraphPart targetPart = localData.finallyJumps.get(part);
-                if (localData.defaultParts.containsValue(targetPart)) {
-                    //okay, proceed to finally block
-                } else if (targetPart.nextParts.size() == 1) {
-                    //continue or break, definitely not a return, there won't be a register usage
-                    walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, targetPart.nextParts.get(0), visited, ip, searchRegId);
-                    return;
-                } else {
-                    return;
-                }
-            }
-            for (GraphPart p : part.nextParts) {
-                walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, p, visited, p.start, searchRegId);
-            }
-        } finally {
-            for (ThrowState ts : throwStates) {
-                if (ts.throwingParts.contains(part)) {
-                    GraphPart p = ts.targetPart;
-                    walkLocalRegsUsage(throwStates, localData, getLocalPos, startPart, p, visited, p.start, searchRegId);
-                }
-
             }
         }
     }
@@ -3467,12 +3494,8 @@ public class AVM2Graph extends Graph {
                     part.nextParts.add(secondPart);
                     secondPart.refs.add(part);
 
-                    secondPart.discoveredTime = part.discoveredTime;
                     secondPart.closedTime = part.closedTime;
-                    secondPart.finishedTime = part.finishedTime;
                     secondPart.level = part.level;
-                    secondPart.numBlocks = part.numBlocks;
-                    secondPart.order = part.order;
                     secondPart.path = part.path;
                     allParts.add(secondPart);
                 }

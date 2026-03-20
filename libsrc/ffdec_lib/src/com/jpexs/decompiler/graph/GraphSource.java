@@ -20,9 +20,11 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.helpers.CancellableWorker;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -91,68 +93,19 @@ public abstract class GraphSource implements Serializable {
      */
     public abstract String insToString(int pos);        
 
-    /**
-     * Visits the code
-     *
-     * @param ip Start position
-     * @param lastIp Last position
-     * @param refs References
-     * @param endIp End position
-     * @throws InterruptedException On interrupt
-     */
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
-        if (CancellableWorker.isInterrupted()) {
-            throw new InterruptedException();
+    private class VisitCodeWindow {
+        int ip;
+        int lastIp; 
+        int endIp;
+
+        public VisitCodeWindow(int ip, int lastIp, int endIp) {
+            this.ip = ip;
+            this.lastIp = lastIp;
+            this.endIp = endIp;
         }
-
-        boolean debugMode = false;
-        while (((endIp == -1) || (ip < endIp)) && (ip < size())) {
-            refs.get(ip).add(lastIp);
-            lastIp = ip;
-            if (refs.get(ip).size() > 1) {
-                break;
-            }
-            GraphSourceItem ins = get(ip);
-
-            if (ins.isIgnored()) {
-                ip++;
-                continue;
-            }
-            if (debugMode) {
-                System.err.println("visit ip " + ip + " action:" + ins);
-            }
-            if (ins.isExit()) {
-                break;
-            }
-
-            if (ins instanceof GraphSourceItemContainer) {
-                GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
-                if (ins instanceof Action) { //TODO: Remove dependency of AVM1
-                    long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
-                    for (long size : cnt.getContainerSizes()) {
-                        if (size != 0) {
-                            visitCode(adr2pos(endAddr), ip, refs, adr2pos(endAddr + size));
-                        }
-                        endAddr += size;
-                    }
-                    ip = adr2pos(endAddr);
-                    continue;
-                }
-
-            }
-
-            if (ins.isBranch() || ins.isJump()) {
-                List<Integer> branches = ins.getBranches(this);
-                for (int b : branches) {
-                    if (b >= 0) {
-                        visitCode(b, ip, refs, endIp);
-                    }
-                }
-                break;
-            }
-            ip++;
-        }
+        
     }
+    
 
     /**
      * Visits the code
@@ -167,11 +120,77 @@ public abstract class GraphSource implements Serializable {
         for (int i = 0; i < siz; i++) {
             refs.put(i, new ArrayList<>());
         }
-        visitCode(startIp, 0, refs, -1);
+        
+        Queue<VisitCodeWindow> q = new ArrayDeque<>();
+        q.offer(new VisitCodeWindow(startIp, 0, -1));                
+        //visitCode(startIp, 0, refs, -1);
         int pos = 0;
         for (int e : alternateEntries) {
             pos++;
-            visitCode(e, -pos, refs, -1);
+            //visitCode(e, -pos, refs, -1);
+            q.offer(new VisitCodeWindow(e, -pos, -1));
+        }
+        
+        
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        
+        while (!q.isEmpty()) {
+            VisitCodeWindow window = q.poll();
+            int ip = window.ip;
+            int lastIp = window.lastIp;
+            int endIp = window.endIp;
+            
+            boolean debugMode = false;
+            while (((endIp == -1) || (ip < endIp)) && (ip < size())) {
+                refs.get(ip).add(lastIp);
+                lastIp = ip;
+                if (refs.get(ip).size() > 1) {
+                    break;
+                }
+                GraphSourceItem ins = get(ip);
+
+                if (ins.isIgnored()) {
+                    ip++;
+                    continue;
+                }
+                if (debugMode) {
+                    System.err.println("visit ip " + ip + " action:" + ins);
+                }
+                if (ins.isExit()) {
+                    break;
+                }
+
+                if (ins instanceof GraphSourceItemContainer) {
+                    GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
+                    if (ins instanceof Action) { //TODO: Remove dependency of AVM1
+                        long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
+                        for (long size : cnt.getContainerSizes()) {
+                            if (size != 0) {
+                                //visitCode(adr2pos(endAddr), ip, refs, adr2pos(endAddr + size));
+                                q.offer(new VisitCodeWindow(adr2pos(endAddr), ip, adr2pos(endAddr + size)));
+                            }
+                            endAddr += size;
+                        }
+                        ip = adr2pos(endAddr);
+                        continue;
+                    }
+
+                }
+
+                if (ins.isBranch() || ins.isJump()) {
+                    List<Integer> branches = ins.getBranches(this);
+                    for (int b : branches) {
+                        if (b >= 0) {
+                            q.offer(new VisitCodeWindow(b, ip, endIp));
+                            //visitCode(b, ip, refs, endIp);
+                        }
+                    }
+                    break;
+                }
+                ip++;
+            }
         }
         return refs;
     }
