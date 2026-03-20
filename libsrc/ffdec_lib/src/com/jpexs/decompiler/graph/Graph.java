@@ -275,8 +275,17 @@ public class Graph {
             return;
         }
         allParts.add(part);
-        for (GraphPart p : part.nextParts) {
-            populateParts(p, allParts);
+        
+        Queue<GraphPart> q = new ArrayDeque<>();
+        q.offer(part);
+        while (!q.isEmpty()) {
+            part = q.poll();            
+            for (GraphPart p : part.nextParts) {
+                if (!allParts.contains(p)) {
+                    allParts.add(p);
+                    q.offer(p);
+                }            
+            }
         }
     }
 
