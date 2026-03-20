@@ -60,74 +60,13 @@ public class GraphPart implements Serializable {
     /**
      * Level in the graph
      */
-    public int level;
-
-    /**
-     * Discovered time in DFS
-     */
-    public int discoveredTime;
-
-    /**
-     * Finished time in DFS Calculated in setTime.
-     */
-    public int finishedTime;
+    public int level; 
 
     /**
      * Closed time. The node is closed when all its input edges are already
      * visited. Calculated in Graph.calculateClosedTime.
      */
     public int closedTime;
-
-    /**
-     * Order in DFS. Calculated in setTime.
-     */
-    public int order;
-
-    /**
-     * Number of parts following this part. Calculated in setNumblocks.
-     */
-    public int numBlocks = Integer.MAX_VALUE;
-
-    /**
-     * Sets the time of this part in DFS.
-     *
-     * @param time Time
-     * @param ordered Ordered parts
-     * @param visited Visited parts
-     * @return Time
-     */
-    public int setTime(int time, List<GraphPart> ordered, List<GraphPart> visited) {
-        if (visited.contains(this)) {
-            return time;
-        }
-        discoveredTime = time;
-        visited.add(this);
-        for (GraphPart next : nextParts) {
-            if (!visited.contains(next)) {
-                time = next.setTime(time + 1, ordered, visited);
-            }
-        }
-        time++;
-        finishedTime = time;
-        order = ordered.size();
-        ordered.add(this);
-        return time;
-    }
-
-    /**
-     * Sets the number of blocks following this part.
-     *
-     * @param numBlocks Number of blocks
-     */
-    public void setNumblocks(int numBlocks) {
-        this.numBlocks = numBlocks;
-        numBlocks++;
-        for (GraphPart next : nextParts) {
-            if (next.numBlocks > numBlocks) {
-                next.setNumblocks(numBlocks);
-            }
-        }
-    }
 
     /**
      * Checks if this part leads to another part.

@@ -322,6 +322,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -981,100 +982,123 @@ public class AVM2Code implements Cloneable {
         return Undefined.INSTANCE;
     }
 
+    private class DebugFileLineWindow {
+
+        String debugFile;
+        int debugLine;
+        int pos;
+        Set<Integer> seen;
+        Set<Integer> seenMethods;
+
+        public DebugFileLineWindow(String debugFile, int debugLine, int pos, Set<Integer> seen, Set<Integer> seenMethods) {
+            this.debugFile = debugFile;
+            this.debugLine = debugLine;
+            this.pos = pos;
+            this.seen = seen;
+            this.seenMethods = seenMethods;
+        }
+    }
+
     /**
      * Calculates the line debug file/line info and sets it to the instructions.
      *
      * @param abc ABC
      */
     public void calculateDebugFileLine(ABC abc) {
-        calculateDebugFileLine(null, 0, 0, abc, new HashSet<>(), new HashSet<>());
-    }
 
-    /**
-     * Calculates the line debug file/line info and sets it to the instructions.
-     *
-     * @param debugFile Debug file
-     * @param debugLine Debug line
-     * @param pos Position
-     * @param abc ABC
-     * @param seen Seen instructions
-     * @param seenMethods Seen methods
-     * @return True of seen.
-     */
-    private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen, Set<Integer> seenMethods) {
-        while (pos < code.size()) {
-            AVM2Instruction ins = code.get(pos);
-            if (seen.contains(pos)) {
-                return true;
-            }
+        Queue<DebugFileLineWindow> q = new ArrayDeque<>();
+        q.add(new DebugFileLineWindow(null, 0, 0, new HashSet<>(), new HashSet<>()));
 
-            seen.add(pos);
+        String debugFile;
+        int debugLine;
+        int pos;
+        Set<Integer> seen;
+        Set<Integer> seenMethods;
 
-            if (ins.definition instanceof DebugFileIns) {
-                debugFile = abc.constants.getString(ins.operands[0]);
-            }
+        while (!q.isEmpty()) {
+            DebugFileLineWindow window = q.poll();
+            pos = window.pos;
+            debugFile = window.debugFile;
+            debugLine = window.debugLine;
+            seen = window.seen;
+            seenMethods = window.seenMethods;
+            while (pos < code.size()) {
+                AVM2Instruction ins = code.get(pos);
+                if (seen.contains(pos)) {
+                    break;
+                }
 
-            if (ins.definition instanceof DebugLineIns) {
-                debugLine = ins.operands[0];
-            }
+                seen.add(pos);
 
-            ins.setFileLine(debugFile, debugLine);
+                if (ins.definition instanceof DebugFileIns) {
+                    debugFile = abc.constants.getString(ins.operands[0]);
+                }
 
-            if (ins.definition instanceof NewFunctionIns) {
-                //Only analyze NewFunction objects that are not immediately discarded by Pop.
-                //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
-                if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
-                    int newMethodInfo = ins.operands[0];
-                    if (!seenMethods.contains(newMethodInfo)) { //avoid recursion
-                        MethodBody innerBody = abc.findBody(newMethodInfo);
-                        if (innerBody != null) { //Ignore functions without body
-                            seenMethods.add(newMethodInfo);
-                            innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>(), seenMethods);
+                if (ins.definition instanceof DebugLineIns) {
+                    debugLine = ins.operands[0];
+                }
+
+                ins.setFileLine(debugFile, debugLine);
+
+                if (ins.definition instanceof NewFunctionIns) {
+                    //Only analyze NewFunction objects that are not immediately discarded by Pop.
+                    //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
+                    if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
+                        int newMethodInfo = ins.operands[0];
+                        if (!seenMethods.contains(newMethodInfo)) { //avoid recursion
+                            MethodBody innerBody = abc.findBody(newMethodInfo);
+                            if (innerBody != null) { //Ignore functions without body
+                                seenMethods.add(newMethodInfo);
+                                //innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>(), seenMethods);
+                                q.offer(new DebugFileLineWindow(debugFile, debugLine, 0, new HashSet<Integer>(), seenMethods));
+                            }
                         }
-                    }
 
-                }
-            }
-
-            if (ins.definition instanceof ReturnValueIns) {
-                return true;
-            }
-            if (ins.definition instanceof ReturnVoidIns) {
-                return true;
-            }
-            if (ins.definition instanceof JumpIns) {
-                try {
-                    pos = adr2pos(ins.getTargetAddress());
-                    continue;
-                } catch (ConvertException ex) {
-                    return false;
-                }
-            } else if (ins.definition instanceof IfTypeIns) {
-                try {
-                    int newpos = adr2pos(ins.getTargetAddress());
-                    calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods);
-                } catch (ConvertException ex) {
-                    return false;
-                }
-            }
-            if (ins.definition instanceof LookupSwitchIns) {
-                for (int i = 0; i < ins.operands.length; i++) {
-                    if (i == 1) {
-                        continue;
                     }
+                }
+
+                if (ins.definition instanceof ReturnValueIns) {
+                    break;
+                }
+                if (ins.definition instanceof ReturnVoidIns) {
+                    break;
+                }
+                if (ins.definition instanceof JumpIns) {
                     try {
-                        int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
-                        if (!calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods)) {
-                            return false;
-                        }
+                        pos = adr2pos(ins.getTargetAddress());
+                        continue;
                     } catch (ConvertException ex) {
-                        return false;
+                        break;
+                    }
+                } else if (ins.definition instanceof IfTypeIns) {
+                    try {
+                        int newpos = adr2pos(ins.getTargetAddress());
+                        //calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods);
+                        q.offer(new DebugFileLineWindow(debugFile, debugLine, newpos, seen, seenMethods));
+                    } catch (ConvertException ex) {
+                        break;
                     }
                 }
+                if (ins.definition instanceof LookupSwitchIns) {
+                    for (int i = 0; i < ins.operands.length; i++) {
+                        if (i == 1) {
+                            continue;
+                        }
+                        try {
+                            int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
+
+                            q.offer(new DebugFileLineWindow(debugFile, debugLine, newpos, seen, seenMethods));
+                            /*if (!calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods)) {
+                                return false;
+                            }*/
+                        } catch (ConvertException ex) {
+                            break;
+                        }
+                    }
+                }
+                pos++;
             }
-            pos++;
         }
-        return true;
     }
 
     /**
@@ -2027,7 +2051,7 @@ public class AVM2Code implements Cloneable {
                 try {
                     /*System.err.println("executing ins " + ins);
                     System.err.println("::::::::::::::::::::::::");
-                    */
+                     */
                     ins.definition.translate(maxTempIndex, usedDeobfuscations, swfVersion, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                     /*System.err.println("output:");
                     for (GraphTargetItem ti : output) {
@@ -2044,11 +2068,11 @@ public class AVM2Code implements Cloneable {
                         System.err.println("" + ti.toString(LocalData.create(new ArrayList<MethodBody>(), abcIndex, abc, localRegNames, new ArrayList<DottedChain>(), new HashSet<Integer>(), ScriptExportMode.AS, swfVersion, new HashSet<String>(), classIndex)));
                     }
                     System.err.println("/---------------");
-                    */
+                     */
                     if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
                         bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
                     }
-                    
+
                 } catch (RuntimeException re) {
                     /*String last="";
                      int len=5;
@@ -2199,15 +2223,13 @@ public class AVM2Code implements Cloneable {
             return assignment;
         }
         GraphTargetItem vtype = TypeItem.UNBOUNDED;
-        
-        if (
-            (assignment instanceof PostIncrementAVM2Item) 
+
+        if ((assignment instanceof PostIncrementAVM2Item)
                 || (assignment instanceof PostDecrementAVM2Item)
                 || (assignment instanceof PreIncrementAVM2Item)
-                || (assignment instanceof PreIncrementAVM2Item)
-        ) {
+                || (assignment instanceof PreIncrementAVM2Item)) {
             vtype = assignment.returnType();
-        } else {        
+        } else {
             if (assignment.value instanceof ConvertAVM2Item) {
                 vtype = ((ConvertAVM2Item) assignment.value).type;
             } else if (assignment.value instanceof CoerceAVM2Item) {
@@ -2452,7 +2474,7 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 }
-                if ((subItem instanceof PostIncrementAVM2Item) 
+                if ((subItem instanceof PostIncrementAVM2Item)
                         || (subItem instanceof PostDecrementAVM2Item)
                         || (subItem instanceof PreIncrementAVM2Item)
                         || (subItem instanceof PreIncrementAVM2Item)) {
@@ -2475,7 +2497,7 @@ public class AVM2Code implements Cloneable {
                         setLocal.type = declaredRegisters[setLocal.regIndex].type;
                     }
                 }
-                */
+                 */
                 if (subItem instanceof SetPropertyAVM2Item) {
                     SetPropertyAVM2Item sp = (SetPropertyAVM2Item) subItem;
                     if (sp.object instanceof FindPropertyAVM2Item) {
@@ -2990,7 +3012,7 @@ public class AVM2Code implements Cloneable {
         uniteLocalsDeclarationTypes(d, list);
         return list;
     }
-    
+
     private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
@@ -3002,11 +3024,11 @@ public class AVM2Code implements Cloneable {
                     itemsOnLine.add(item);
                 }
             });
-            
+
             for (GraphTargetItem item : itemsOnLine) {
                 if (item instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) item;
-                    if (declaredRegs[setLocal.regIndex] != null) {                    
+                    if (declaredRegs[setLocal.regIndex] != null) {
                         setLocal.type = declaredRegs[setLocal.regIndex].type;
                     }
                 }
@@ -3406,6 +3428,19 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    private class WalkCodeWindow {
+
+        int pos;
+        int stack;
+        int scope;
+
+        public WalkCodeWindow(int pos, int stack, int scope) {
+            this.pos = pos;
+            this.stack = stack;
+            this.scope = scope;
+        }
+    }
+
     /**
      * Walks code for stats.
      *
@@ -3418,103 +3453,119 @@ public class AVM2Code implements Cloneable {
      * @return True if success
      */
     private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc, boolean autoFill) {
-        while (pos < code.size()) {
-            AVM2Instruction ins = code.get(pos);
-            if (stats.instructionStats[pos].seen) {
-                // check stack mismatch here
-                return true;
-            }
+        Queue<WalkCodeWindow> q = new ArrayDeque<>();
+        q.offer(new WalkCodeWindow(pos, stack, scope));
 
-            if (ins.definition instanceof NewFunctionIns) {
-                MethodBody innerBody = abc.findBody(ins.operands[0]);
-                if (autoFill) {
-                    innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0), false);
+        loopq:
+        while (!q.isEmpty()) {
+            WalkCodeWindow window = q.poll();
+            pos = window.pos;
+            stack = window.stack;
+            scope = window.scope;
+            while (pos < code.size()) {
+                AVM2Instruction ins = code.get(pos);
+                if (stats.instructionStats[pos].seen) {
+                    // check stack mismatch here
+                    //return true
+                    continue loopq;
                 }
-            }
 
-            stats.instructionStats[pos].seen = true;
-            stats.instructionStats[pos].stackpos = stack;
-            stats.instructionStats[pos].scopepos = scope;
-
-            int stackDelta = ins.definition.getStackDelta(ins, abc);
-            int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
-            int oldStack = stack;
-
-            //+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
-            stack += stackDelta;
-            scope += scopeDelta;
-
-            stats.instructionStats[pos].stackpos_after = stack;
-            stats.instructionStats[pos].scopepos_after = scope;
-
-            if (stack > stats.maxstack) {
-                stats.maxstack = stack;
-            }
-            if (scope > stats.maxscope) {
-                stats.maxscope = scope;
-            }
-
-            //System.out.println("stack "+oldStack+(stackDelta>=0?"+"+stackDelta:stackDelta)+" max:"+stats.maxstack+" "+ins);
-            if ((ins.definition instanceof DXNSIns) || (ins.definition instanceof DXNSLateIns)) {
-                stats.has_set_dxns = true;
-            }
-            if (ins.definition instanceof NewActivationIns) {
-                stats.has_activation = true;
-            }
-            if (ins.definition instanceof SetLocalTypeIns) {
-                handleRegister(stats, ((SetLocalTypeIns) ins.definition).getRegisterId(ins));
-            } else if (ins.definition instanceof GetLocalTypeIns) {
-                handleRegister(stats, ((GetLocalTypeIns) ins.definition).getRegisterId(ins));
-            } else {
-                for (int i = 0; i < ins.definition.operands.length; i++) {
-                    int op = ins.definition.operands[i];
-                    if (op == DAT_LOCAL_REG_INDEX) {
-                        handleRegister(stats, ins.operands[i]);
+                if (ins.definition instanceof NewFunctionIns) {
+                    MethodBody innerBody = abc.findBody(ins.operands[0]);
+                    if (autoFill) {
+                        innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0), false);
                     }
                 }
-            }
-            if (ins.definition instanceof ReturnValueIns) {
-                // check stack=1
-                return true;
-            }
-            if (ins.definition instanceof ReturnVoidIns) {
-                // check stack=0
-                return true;
-            }
-            if (ins.definition instanceof ThrowIns) {
-                return true;
-            }
-            if (ins.definition instanceof JumpIns) {
-                try {
-                    pos = adr2pos(ins.getTargetAddress());
-                    continue;
-                } catch (ConvertException ex) {
-                    return false;
+
+                stats.instructionStats[pos].seen = true;
+                stats.instructionStats[pos].stackpos = stack;
+                stats.instructionStats[pos].scopepos = scope;
+
+                int stackDelta = ins.definition.getStackDelta(ins, abc);
+                int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
+                int oldStack = stack;
+
+                //+" deltaScope:"+(scopeDelta>0?"+"+scopeDelta:scopeDelta)+" stack:"+stack+" scope:"+scope);
+                stack += stackDelta;
+                scope += scopeDelta;
+
+                stats.instructionStats[pos].stackpos_after = stack;
+                stats.instructionStats[pos].scopepos_after = scope;
+
+                if (stack > stats.maxstack) {
+                    stats.maxstack = stack;
                 }
-            } else if (ins.definition instanceof IfTypeIns) {
-                try {
-                    int newpos = adr2pos(ins.getTargetAddress());
-                    walkCode(stats, newpos, stack, scope, abc, autoFill);
-                } catch (ConvertException ex) {
-                    return false;
+                if (scope > stats.maxscope) {
+                    stats.maxscope = scope;
                 }
-            }
-            if (ins.definition instanceof LookupSwitchIns) {
-                for (int i = 0; i < ins.operands.length; i++) {
-                    if (i == 1) {
-                        continue;
-                    }
-                    try {
-                        int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
-                        if (!walkCode(stats, newpos, stack, scope, abc, autoFill)) {
-                            return false;
+
+                //System.out.println("stack "+oldStack+(stackDelta>=0?"+"+stackDelta:stackDelta)+" max:"+stats.maxstack+" "+ins);
+                if ((ins.definition instanceof DXNSIns) || (ins.definition instanceof DXNSLateIns)) {
+                    stats.has_set_dxns = true;
+                }
+                if (ins.definition instanceof NewActivationIns) {
+                    stats.has_activation = true;
+                }
+                if (ins.definition instanceof SetLocalTypeIns) {
+                    handleRegister(stats, ((SetLocalTypeIns) ins.definition).getRegisterId(ins));
+                } else if (ins.definition instanceof GetLocalTypeIns) {
+                    handleRegister(stats, ((GetLocalTypeIns) ins.definition).getRegisterId(ins));
+                } else {
+                    for (int i = 0; i < ins.definition.operands.length; i++) {
+                        int op = ins.definition.operands[i];
+                        if (op == DAT_LOCAL_REG_INDEX) {
+                            handleRegister(stats, ins.operands[i]);
                         }
+                    }
+                }
+                if (ins.definition instanceof ReturnValueIns) {
+                    // check stack=1
+                    //return true;
+                    continue loopq;
+                }
+                if (ins.definition instanceof ReturnVoidIns) {
+                    // check stack=0
+                    //return true;
+                    continue loopq;
+                }
+                if (ins.definition instanceof ThrowIns) {
+                    //return true;
+                    continue loopq;
+                }
+                if (ins.definition instanceof JumpIns) {
+                    try {
+                        pos = adr2pos(ins.getTargetAddress());
+                        continue;
+                    } catch (ConvertException ex) {
+                        return false;
+                    }
+                } else if (ins.definition instanceof IfTypeIns) {
+                    try {
+                        int newpos = adr2pos(ins.getTargetAddress());
+                        //walkCode(stats, newpos, stack, scope, abc, autoFill);
+                        q.offer(new WalkCodeWindow(newpos, stack, scope));
                     } catch (ConvertException ex) {
                         return false;
                     }
                 }
+                if (ins.definition instanceof LookupSwitchIns) {
+                    for (int i = 0; i < ins.operands.length; i++) {
+                        if (i == 1) {
+                            continue;
+                        }
+                        try {
+                            int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
+                            /*if (!walkCode(stats, newpos, stack, scope, abc, autoFill)) {
+                                return false;
+                            }*/
+                            q.offer(new WalkCodeWindow(newpos, stack, scope));
+                        } catch (ConvertException ex) {
+                            return false;
+                        }
+                    }
+                }
+                pos++;
             }
-            pos++;
         }
         return true;
     }
