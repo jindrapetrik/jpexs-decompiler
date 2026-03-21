@@ -887,7 +887,7 @@ public class CommandLineArgumentParser {
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
 
             if (type == String.class) {
-                System.out.println("Config " + item.getName() + " set to \"" + Helper.escapeString(stringValue) +"\"");
+                System.out.println("Config " + item.getName() + " set to \"" + Helper.escapeString(stringValue) + "\"");
                 ((ConfigurationItem<String>) item).set(stringValue);
             } else if (type == Calendar.class) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -1611,7 +1611,7 @@ public class CommandLineArgumentParser {
         public boolean contains(int index) {
             return contains(0, index);
         }
-        
+
         public boolean contains(int prefix, int index) {
             if (this.prefix == null && prefix == 0) {
                 return false;
@@ -1642,7 +1642,7 @@ public class CommandLineArgumentParser {
         public boolean contains(int index) {
             return contains(0, index);
         }
-        
+
         public boolean contains(int prefix, int index) {
             boolean prefixFound = false;
             for (Range r : ranges) {
@@ -1673,9 +1673,9 @@ public class CommandLineArgumentParser {
         } else {
             ranges = new String[]{range};
         }
-        
+
         Integer prefix = 0;
-        
+
         for (String r : ranges) {
             Integer min = null;
             Integer max = null;
@@ -1735,7 +1735,7 @@ public class CommandLineArgumentParser {
         }
         return new Selection(ret);
     }
-    
+
     private static int parseSubLength(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("sub length parameter expected");
@@ -1769,7 +1769,7 @@ public class CommandLineArgumentParser {
         }
         return 1;
     }
-    
+
     private static double parseMorphDuration(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("duration parameter expected");
@@ -1779,7 +1779,7 @@ public class CommandLineArgumentParser {
             double val = Double.parseDouble(args.pop());
             if (val <= 0) {
                 throw new NumberFormatException();
-            }                    
+            }
             return val;
         } catch (NumberFormatException nfe) {
             System.err.println("invalid duration");
@@ -1787,7 +1787,7 @@ public class CommandLineArgumentParser {
         }
         return 2;
     }
-    
+
     private static int parseMorphNumFrames(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("number of frames parameter expected");
@@ -2155,17 +2155,17 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseExport(
-            List<String> selectionClasses, 
+            List<String> selectionClasses,
             Selection selection,
             Selection selectionIds,
             Stack<String> args,
-            AbortRetryIgnoreHandler handler, 
+            AbortRetryIgnoreHandler handler,
             Level traceLevel,
-            Map<String, String> formats, 
+            Map<String, String> formats,
             double zoom,
-            String charset, 
-            boolean exportEmbed, 
-            boolean transparentBackground, 
+            String charset,
+            boolean exportEmbed,
+            boolean transparentBackground,
             ConsoleUrlResolver urlResolver,
             int subFrameLength,
             double morphDuration,
@@ -2242,9 +2242,9 @@ public class CommandLineArgumentParser {
             }
 
             for (File inFile : inFiles) {
-                
+
                 urlResolver.clearIgnored();
-                
+
                 String inFileName = Path.getFileNameWithoutExtension(inFile);
                 if (stdOut != null) {
                     String outFilePath = stdOut.replace("{swfFile}", inFileName);
@@ -2333,7 +2333,7 @@ public class CommandLineArgumentParser {
                 }
 
                 int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
-                
+
                 // Here the exportFormats array should contain only validitems
                 commandLineMode = true;
                 boolean exportAll = exportFormats.contains("all");
@@ -2412,7 +2412,7 @@ public class CommandLineArgumentParser {
                     System.out.println("Exporting sprite...");
                     SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom, aaScale);
                     for (Tag t : extags) {
-                        if (t instanceof DefineSpriteTag) {                            
+                        if (t instanceof DefineSpriteTag) {
                             List<Integer> frames = new ArrayList<>();
                             int spriteId = ((DefineSpriteTag) t).getCharacterId();
                             for (int i = 0; i < ((DefineSpriteTag) t).getFrameCount(); i++) {
@@ -2996,7 +2996,7 @@ public class CommandLineArgumentParser {
             String[] parts = fmt.split(":");
             String key = parts[0].toLowerCase(Locale.ENGLISH);
             String val = parts[1].toLowerCase(Locale.ENGLISH);
-            
+
             if (val.contains("webp") && !ImageFormat.WEBP.available()) {
                 System.err.println("WEBP format is not available on this platform");
                 badArguments("format");
@@ -3013,7 +3013,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         printHeader();
-        
+
         int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
@@ -3280,8 +3280,8 @@ public class CommandLineArgumentParser {
                                     }
                                     if (Utf8Helper.charToCodePoint(c, fontTag.getCodesCharset()) == -1) {
                                         continue;
-                                    }                                    
-                                    selChars.add(c);                                                                        
+                                    }
+                                    selChars.add(c);
                                 }
                             } catch (FontFormatException | IOException e) {
                                 System.err.println("replace font tag fail: " + e.getMessage());
@@ -3292,7 +3292,7 @@ public class CommandLineArgumentParser {
                             if (font.getSize() != 1024) {
                                 font = font.deriveFont(fontTag.getFontStyle(), 1024);
                             }
-                                                                
+
                             for (char c : selChars) {
                                 if (!fontTag.addCharacter(c, font)) {
                                     break;
