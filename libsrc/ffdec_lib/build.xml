@@ -36,6 +36,7 @@
         <include name="**/?*.js"/>
         <include name="**/?*.css"/>        
         <include name="**/?*.bat"/>
+        <include name="**/?*.zip"/>
     </patternset>
 
     
