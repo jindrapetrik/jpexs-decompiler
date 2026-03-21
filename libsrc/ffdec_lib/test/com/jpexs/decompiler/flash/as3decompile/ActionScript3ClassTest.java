@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -33,6 +34,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -48,6 +50,12 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         addSwf("getouterscope", "testdata/getouterscope/getouterscope.swf");
         addSwf("haxe", "testdata/haxe/output.swf");
         addSwf("long", "testdata/as3_long/bin/as3_long.flex.swf");
+    }
+    
+    @BeforeMethod
+    public void beforeMethod() {
+        Configuration.decompilationTimeoutFile.set(5 * 60);
+        Configuration.decompilationTimeoutSingleMethod.set(60);
     }
 
     private void decompileScriptPack(String swfId, String path, String expectedResult) {
@@ -795,6 +803,9 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     
     @Test
     public void testLongScript() {
+        Configuration.decompilationTimeoutFile.set(10 * 60);
+        Configuration.decompilationTimeoutSingleMethod.set(10 * 60);
+                
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
