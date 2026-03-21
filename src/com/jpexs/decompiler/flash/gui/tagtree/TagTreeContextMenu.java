@@ -255,6 +255,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem saveExeMenuItem;
 
+    private JMenuItem exportXamlMenuItem;
+
     private JMenuItem importSwfXmlMenuItem;
 
     private JMenuItem importScriptsMenuItem;
@@ -590,6 +592,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         saveExeMenuItem.addActionListener(this::saveExeActionPerformed);
         saveExeMenuItem.setIcon(View.getIcon("saveasexe16"));
         add(saveExeMenuItem);
+
+        exportXamlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportXaml"));
+        exportXamlMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.exportXaml((SWF) getCurrentItem().getOpenable());
+            }
+        });
+        exportXamlMenuItem.setIcon(View.getIcon("exportxml16"));
+        add(exportXamlMenuItem);
 
         addSeparator();
 
@@ -1423,6 +1435,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
         saveSwcMenuItem.setVisible(allSelectedIsSwf && items.size() == 1);
         saveExeMenuItem.setVisible(allSelectedIsSwf && items.size() == 1);
+        exportXamlMenuItem.setVisible(allSelectedIsSwf && items.size() == 1);
 
         importImagesMenuItem.setVisible(false);
         importShapesMenuItem.setVisible(false);
@@ -3169,7 +3182,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             protected void onStart() {
                 Main.startWork(AppStrings.translate("work.prepareDebug"), this, true);
             }
-                        
+
             @Override
             protected Object doInBackground() throws Exception {
                 List<File> tempFiles = new ArrayList<>();
@@ -3198,7 +3211,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             public void workerCancelled() {
                 Main.stopWork();
             }
-        };        
+        };
         prepareDebugWorker.execute();
     }
 

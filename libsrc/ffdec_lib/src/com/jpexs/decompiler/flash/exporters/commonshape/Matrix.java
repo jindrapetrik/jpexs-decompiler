@@ -304,6 +304,17 @@ public final class Matrix implements Cloneable {
         return "matrix(" + scaleX + ", " + rotateSkew0 + ", "
                 + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
     }
+    
+    public String getXamlTransformationString(double translateDivisor, double unitDivisor) {
+        double translateX = roundPixels400(this.translateX / translateDivisor);
+        double translateY = roundPixels400(this.translateY / translateDivisor);
+        double rotateSkew0 = roundPixels400(this.rotateSkew0 / unitDivisor);
+        double rotateSkew1 = roundPixels400(this.rotateSkew1 / unitDivisor);
+        double scaleX = roundPixels400(this.scaleX / unitDivisor);
+        double scaleY = roundPixels400(this.scaleY / unitDivisor);
+        return "" + scaleX + " " + rotateSkew0 + " "
+                + rotateSkew1 + " " + scaleY + " " + translateX + " " + translateY;
+    }
 
     public static String[] parseSvgNumberList(String params) {
         while (params.contains("  ")) {
