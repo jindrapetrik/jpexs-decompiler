@@ -3592,7 +3592,9 @@ public class Main {
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration._debugMode.get());
 
-        initJna();
+        if (!(args.length == 2 && "-config".equals(args[0]))) { //To be able to reset JNA directory with -config, if invalid
+            initJna();       
+        }
         initLang();
 
         if (Configuration.cacheOnDisk.get()) {

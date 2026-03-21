@@ -877,7 +877,7 @@ public class CommandLineArgumentParser {
         for (String c : cfgs) {
             String[] cp = c.split("=");
             if (cp.length == 1) {
-                cp = new String[]{cp[0], "1"};
+                cp = new String[]{cp[0], ""};
             }
 
             String nameLowerCase = cp[0].toLowerCase(Locale.ENGLISH);
@@ -887,7 +887,7 @@ public class CommandLineArgumentParser {
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
 
             if (type == String.class) {
-                System.out.println("Config " + item.getName() + " set to " + stringValue);
+                System.out.println("Config " + item.getName() + " set to \"" + Helper.escapeString(stringValue) +"\"");
                 ((ConfigurationItem<String>) item).set(stringValue);
             } else if (type == Calendar.class) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -903,7 +903,7 @@ public class CommandLineArgumentParser {
             } else if (type == Integer.class) {
                 int intValue = Integer.parseInt(stringValue);
                 ((ConfigurationItem<Integer>) item).set(intValue);
-            } else if ((type == Integer.class) || (type == Long.class)) {
+            } else if (type == Long.class) {
                 long longValue = Long.parseLong(stringValue);
                 ((ConfigurationItem<Long>) item).set(longValue);
             } else if (type == Double.class) {
@@ -913,6 +913,9 @@ public class CommandLineArgumentParser {
                 float floatValue = Float.parseFloat(stringValue);
                 ((ConfigurationItem<Float>) item).set(floatValue);
             } else if (type == Boolean.class) {
+                if (stringValue.isEmpty()) {
+                    stringValue = "1";
+                }
                 Boolean boolValue = parseBooleanConfigValue(stringValue);
                 if (boolValue != null) {
                     System.out.println("Config " + item.getName() + " set to " + boolValue);
