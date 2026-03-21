@@ -152,7 +152,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         gradient.setAttribute("id", gradientId);
         path.setAttribute("stroke", "none");
         path.setAttribute("fill", "url(#" + gradientId + ")");
-        path.setAttribute("fill-rule", "evenodd");
+        path.setAttribute("fill-rule", windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd");
         exporter.addToDefs(gradient);
     }
 
@@ -226,6 +226,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         finalizePath();
         String patternId = getPattern(bitmapId, matrix, colorTransform, smooth);
         path.setAttribute("ffdec:fill-bitmapId", "" + bitmapId);
+        path.setAttribute("fill-rule", windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd");        
         if (patternId != null) {
             path.setAttribute("style", "fill:url(#" + patternId + ")");
             return;
