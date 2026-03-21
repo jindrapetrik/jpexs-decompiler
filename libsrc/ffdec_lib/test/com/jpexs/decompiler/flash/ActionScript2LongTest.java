@@ -40,6 +40,8 @@ public class ActionScript2LongTest extends ActionScript2TestBase {
         Configuration.autoDeobfuscate.set(false);
         Configuration.showAllAddresses.set(false);
         Configuration.pluginPath.set(null);
+        Configuration.decompilationTimeoutFile.set(10 * 60);
+        Configuration.decompilationTimeoutSingleMethod.set(10 * 60);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2_long/as2_long.swf")), false);
     }
     
