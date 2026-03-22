@@ -757,4 +757,14 @@ public class DefineFont3Tag extends FontTag {
         }
         return getCharset();
     }
+    
+    @Override
+    public List<KERNINGRECORD> getKerningTable() {
+        return fontKerningTable;
+    }   
+
+    @Override
+    public void setKerningTable(List<KERNINGRECORD> kerningTable) {
+        fontKerningTable = kerningTable;
+    }        
 }

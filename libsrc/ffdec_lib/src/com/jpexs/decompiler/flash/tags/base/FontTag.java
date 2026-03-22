@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
@@ -862,5 +863,13 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     @Override
     public Dimension getFilterDimensions() {
         return new Dimension(0, 0);                
+    }
+    
+    public List<KERNINGRECORD> getKerningTable() {
+        return new ArrayList<>();
+    }
+    
+    public void setKerningTable(List<KERNINGRECORD> kerningTable) {
+        
     }
 }

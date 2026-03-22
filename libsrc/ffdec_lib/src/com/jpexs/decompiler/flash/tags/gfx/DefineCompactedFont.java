@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.gfx.FontType;
@@ -450,6 +451,11 @@ public final class DefineCompactedFont extends FontTag {
         FontType ft = fonts.get(0);
         return (int) Math.round(val * 1024.0 / ft.nominalSize);
     }
+    
+    public double unresize(int val) {
+        FontType ft = fonts.get(0);
+        return val * ft.nominalSize / 1024.0;
+    }
 
     @Override
     public FontTag toClassicFont() {
@@ -514,4 +520,24 @@ public final class DefineCompactedFont extends FontTag {
     public String getCodesCharset() {
         return getCharset();
     }
+
+    @Override
+    public List<KERNINGRECORD> getKerningTable() {
+        List<KERNINGRECORD> ret = new ArrayList<>();
+        
+        for (KerningPairType kp : fonts.get(0).kerning) {
+            ret.add(new KERNINGRECORD(kp.char1, kp.char2, resize(kp.advance)));
+        }
+        return ret;
+    }        
+
+    @Override
+    public void setKerningTable(List<KERNINGRECORD> kerningTable) {
+        List<KerningPairType> val = new ArrayList<>();
+        for (KERNINGRECORD rec : kerningTable) {
+            val.add(new KerningPairType(rec.fontKerningCode1, rec.fontKerningCode2, (int) unresize(rec.fontKerningAdjustment)));
+        }
+        
+        fonts.get(0).kerning = val;
+    }        
 }

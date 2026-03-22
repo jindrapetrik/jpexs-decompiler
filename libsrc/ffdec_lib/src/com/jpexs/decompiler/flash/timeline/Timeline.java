@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.BlendModeSettable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
+import com.jpexs.decompiler.flash.exporters.RequiresNormalizedFonts;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -1274,7 +1275,11 @@ public class Timeline {
                             textRecords = ((StaticTextTag) textTag).textRecords;
                         }
                         if (textTag instanceof DefineEditTextTag) {
-                            textRecords = ((DefineEditTextTag) textTag).getTextRecords(textTag.getSwf());
+                            Map<Integer, FontTag> normalizedFonts = new HashMap<>();
+                            if (g instanceof RequiresNormalizedFonts) {
+                                normalizedFonts = ((RequiresNormalizedFonts) g).getNormalizedFonts();
+                            }
+                            textRecords = ((DefineEditTextTag) textTag).getTextRecords(textTag.getSwf(), normalizedFonts);
                         }
 
                         List<RECT> glyphPositions = TextTag.getGlyphEntriesPositions(textRecords, textTag.getSwf());

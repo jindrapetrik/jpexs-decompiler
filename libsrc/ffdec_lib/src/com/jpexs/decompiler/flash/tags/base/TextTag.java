@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.GraphicsTextDrawable;
+import com.jpexs.decompiler.flash.exporters.RequiresNormalizedFonts;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -680,6 +681,13 @@ public abstract class TextTag extends DrawableTag {
             ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
             return;
         }
+        
+        Map<Integer, FontTag> normalizedFonts = new HashMap<>();
+        if (image.getGraphics() instanceof RequiresNormalizedFonts) {
+            RequiresNormalizedFonts reqNormFonts = (RequiresNormalizedFonts) image.getGraphics();
+            normalizedFonts = reqNormFonts.getNormalizedFonts();
+        }
+        
         int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
@@ -709,6 +717,11 @@ public abstract class TextTag extends DrawableTag {
             }
             if (rec.styleFlagsHasFont) {
                 FontTag font2 = rec.getFont(swf);
+                if (rec.fontId > -1) {
+                    if (normalizedFonts.containsKey(rec.fontId)) {
+                        font2 = normalizedFonts.get(rec.fontId);
+                    }
+                }
                 if (font2 != null) {
                     font = font2;
                 }
@@ -766,6 +779,10 @@ public abstract class TextTag extends DrawableTag {
                     DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
                     if (dynamicEntry.fontFace != null) {
                         FontTag fnt = swf.getFontByName(dynamicEntry.fontFace);
+                        int fontId = swf.getCharacterId(fnt);
+                        if (normalizedFonts.containsKey(fontId)) {
+                            fnt = normalizedFonts.get(fontId);
+                        }
                         if (fnt != null && entry.glyphIndex != -1) {
                             shape = fnt.getGlyphShapeTable().get(entry.glyphIndex);
                             textColor3 = textColor2;

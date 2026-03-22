@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.text.xml.XmlLexer;
 import com.jpexs.decompiler.flash.tags.text.xml.XmlParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.xml.XmlSymbolType;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
@@ -165,6 +166,10 @@ public class FontNormalizer {
                 }
                 sumH += h;
                 char c = font.glyphToChar(i);
+                if (!Character.isAlphabetic(c)) {
+                    continue;
+                }
+                
                 Font f = new Font(systemFont, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1024);
                 if (!f.canDisplay(c)) {
                     continue;
@@ -173,6 +178,27 @@ public class FontNormalizer {
                 GlyphVector gv = f.createGlyphVector(frc, new char[]{c});
                 systemH = gv.getGlyphOutline(0).getBounds2D().getHeight();
                 break;
+            }
+            
+            if (systemH == null) {
+                sumH = 0;
+                for (int i = 0; i < shapes1.size(); i++) {
+                    RECT b = shapes1.get(i).getBounds(1);
+                    h = b.getHeight() / font.getDivider();
+                    if (h <= 0) {
+                        continue;
+                    }
+                    sumH += h;
+                    char c = font.glyphToChar(i);
+                    Font f = new Font(systemFont, (font.isBold() ? Font.BOLD : 0) | (font.isItalic() ? Font.ITALIC : 0), 1024);
+                    if (!f.canDisplay(c)) {
+                        continue;
+                    }
+                    FontRenderContext frc = new FontRenderContext(null, true, true);
+                    GlyphVector gv = f.createGlyphVector(frc, new char[]{c});
+                    systemH = gv.getGlyphOutline(0).getBounds2D().getHeight();
+                    break;
+                }
             }
 
             if (systemH == null) {
@@ -240,7 +266,13 @@ public class FontNormalizer {
                 font2.setAscent((int) Math.round(font2.getAscent() * scale));
                 font2.setDescent((int) Math.round(font2.getDescent() * scale));
                 font2.setLeading((int) Math.round(font2.getLeading() * scale));
-
+                
+                List<KERNINGRECORD> kerning = font2.getKerningTable();
+                for (KERNINGRECORD rec : kerning) {
+                    rec.fontKerningAdjustment = (int) Math.round(rec.fontKerningAdjustment * scale);
+                }
+                font2.setKerningTable(kerning);
+                
                 if (invertedFontIds.contains(fontId)) {
                     int ascent = font2.getAscent();
                     int descent = font2.getDescent();
@@ -500,11 +532,12 @@ public class FontNormalizer {
                 }
             }
             text2.fontHeight = round20(text2.fontHeight / fontNewScale.get(fontId));
+            text2.leading = round20(text2.leading / fontNewScale.get(fontId));
             outTexts.put(textId, text2);
             text2.setModified(true);
         }
 
-        style.fontHeight = text.fontHeight;
+        style.fontHeight = text.fontHeight;                        
         style.fontLeading = text.leading;
         if (text.hasTextColor) {
             style.textColor = text.textColor;
