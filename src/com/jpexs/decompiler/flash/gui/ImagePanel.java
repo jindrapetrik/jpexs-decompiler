@@ -121,6 +121,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -438,7 +439,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             textRecords = ((StaticTextTag) text).textRecords;
         }
         if (text instanceof DefineEditTextTag) {
-            textRecords = ((DefineEditTextTag) text).getTextRecords(text.getSwf());
+            textRecords = ((DefineEditTextTag) text).getTextRecords(text.getSwf(), new HashMap<>());
         }
 
         List<RECT> glyphPositions = TextTag.getGlyphEntriesPositions(textRecords, text.getSwf());
@@ -1657,7 +1658,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (text != null) {
                             if (text instanceof DefineEditTextTag) {
                                 DefineEditTextTag defineEditText = (DefineEditTextTag) text;
-                                List<TEXTRECORD> recs = defineEditText.getTextRecords(defineEditText.getSwf());
+                                List<TEXTRECORD> recs = defineEditText.getTextRecords(defineEditText.getSwf(), new HashMap<>());
                                 FontTag font = null;
                                 int pos = 0;
                                 int selStart = getSelectionStartInt();
