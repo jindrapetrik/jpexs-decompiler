@@ -5229,7 +5229,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             newStartTag.getTimelined().removeTag(newStartTag);
 
             if (shapeEnd.shapes.shapeRecords.size() <= 1) {
-                File fileEnd = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.endShape"));
+                File fileEnd = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.endShape"), "importmorphshape");
 
                 if (fileEnd == null) {
                     fileEnd = fileStart;
