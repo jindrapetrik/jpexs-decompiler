@@ -521,6 +521,31 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainFrame.getPanel().exportVsCode((SWF) openable);
     }
+    
+    protected void exportJavaActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+
+        List<TreeItem> items = new ArrayList<>();
+        items.add(openable);
+        
+        mainFrame.getPanel().exportJavaSource(items);
+    }
+    
+    /*protected void exportXamlActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+
+        mainFrame.getPanel().exportXaml((SWF) openable);
+    }*/
 
     protected void exportFlaActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
@@ -1126,15 +1151,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportAll", openableSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
-        setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking && canExportFlashDevelop);
-        setMenuEnabled("/file/export/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking && canExportFlashDevelop);
-        setMenuEnabled("_/exportIdea", swfSelected && !isWorking && canExportIdea);
-        setMenuEnabled("/file/export/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking && canExportIdea);
-        setMenuEnabled("_/exportVsCode", swfSelected && !isWorking && canExportVsCode);
-        setMenuEnabled("/file/export/exportVsCode", allSameSwf && openableSelected && isAs3 && !isWorking && canExportVsCode);
+        //setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking && canExportFlashDevelop);
+        setMenuEnabled("/file/export/exportMore/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking && canExportFlashDevelop);
+        //setMenuEnabled("_/exportIdea", swfSelected && !isWorking && canExportIdea);
+        setMenuEnabled("/file/export/exportMore/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking && canExportIdea);
+        //setMenuEnabled("_/exportVsCode", swfSelected && !isWorking && canExportVsCode);
+        setMenuEnabled("/file/export/exportMore/exportVsCode", allSameSwf && openableSelected && isAs3 && !isWorking && canExportVsCode);
+        
         setMenuEnabled("_/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportSelected", openableSelected && !isWorking);
-        setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
+        //setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
         setMenuEnabled("/import/importtab", openableSelected);
         setMenuEnabled("/import/importtab/importText", allSameSwf && swfSelected && !isWorking);
@@ -1249,9 +1275,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("_/saveAs", translate("menu.file.saveas"), "saveas32", this::saveAsActionPerformed, PRIORITY_TOP, null, true, null, false);
             addSeparator("_");
             addMenuItem("_/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);
-            addMenuItem("_/exportFlashDevelop", translate("menu.file.export.flashDevelop"), "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_TOP, null, true, null, false);
+            /*addMenuItem("_/exportFlashDevelop", translate("menu.file.export.flashDevelop"), "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportIdea", translate("menu.file.export.idea"), "exportidea32", this::exportIdeaActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportVsCode", translate("menu.file.export.vsCode"), "exportvscode32", this::exportVsCodeActionPerformed, PRIORITY_TOP, null, true, null, false);
+            */
             addMenuItem("_/exportAll", translate("menu.file.export.all"), "export32", this::exportAllActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportSelected", translate("menu.file.export.selection"), "exportsel32", this::exportSelectedActionPerformed, PRIORITY_TOP, null, true, null, false);
             addSeparator("_");
@@ -1286,12 +1313,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
         addMenuItem("/file/export/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);
-        addMenuItem("/file/export/exportFlashDevelop", translate("menu.file.export.flashDevelop"), "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportIdea", translate("menu.file.export.idea"), "exportidea32", this::exportIdeaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportVsCode", translate("menu.file.export.vsCode"), "exportvscode32", this::exportVsCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportXml", translate("menu.file.export.xml"), "exportxml32", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportAll", translate("menu.file.export.all"), "export16", this::exportAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+E"), false);
+        addMenuItem("/file/export/exportAll", translate("menu.file.export.all"), "exportall16", this::exportAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+E"), false);
         addMenuItem("/file/export/exportSelected", translate("menu.file.export.selection"), "exportsel16", this::exportSelectedActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        
+        addMenuItem("/file/export/exportMore", translate("menu.export.file"), "export16", null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/export/exportMore/exportXml", "XML", "exportxml32", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/export/exportMore/exportFlashDevelop", "Flash Develop", "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/export/exportMore/exportIdea", "IntelliJ Idea", "exportidea32", this::exportIdeaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/export/exportMore/exportVsCode", "Visual Studio Code", "exportvscode32", this::exportVsCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/export/exportMore/exportJava", "Java", "exportjava32", this::exportJavaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        //addMenuItem("/file/export/exportMore/exportXaml", "XAML", "exportxml32", this::exportXamlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        
+        finishMenu("/file/export/exportMore");
+        
         finishMenu("/file/export");
 
         addMenuItem("/import", translate("menu.import"), null, null, 0, null, false, null, false);
