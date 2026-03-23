@@ -1039,8 +1039,8 @@ public class XamlExporter {
 
                 if (depthState.clipDepth > -1) {
                     writer.writeStartElement("Canvas");
-                    writer.writeStartElement("Canvas.Clip");
                     if (character instanceof ShapeTag) {
+                        writer.writeStartElement("Canvas.Clip");                    
                         ShapeTag shape = (ShapeTag) character;
                         Matrix matrix = depthState.matrix == null ? new Matrix() : new Matrix(depthState.matrix);
                         matrix = matrix.preConcatenate(zoomMatrix);
@@ -1048,8 +1048,10 @@ public class XamlExporter {
                         exporter.export();
                         String shapeGeometry = exporter.getResultAsString();
                         writer.writeCharactersRaw(shapeGeometry);
+                        writer.writeEndElement(); //Canvas.Clip                    
+                    } else {
+                        //TODO: Create shape from sprites, etc.
                     }
-                    writer.writeEndElement(); //Canvas.Clip
                     clipDepths.push(depthState.clipDepth);
                     continue;
                 }
