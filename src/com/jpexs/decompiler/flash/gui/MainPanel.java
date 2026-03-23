@@ -4562,6 +4562,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
     }
+    
+    public void exportXaml(SWF swf) {
+        //TODO
+    }
 
     public void exportJavaSource(List<TreeItem> items) {
         Set<SWF> swfs = new LinkedHashSet<>();
