@@ -30,8 +30,17 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -71,6 +80,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 /**
@@ -568,6 +578,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         mainFrame.getPanel().exportFla((SWF) openable);
     }
 
+    protected void createTagFromFile(Class<?> cls, TreeNodeType treeNodeType) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+        
+        mainFrame.getPanel().createTagFromFile((SWF) openable, cls, treeNodeType);
+    } 
+    
     protected void importXmlActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -1189,6 +1210,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/import/importtab/importSymbolClass", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/import/importtab/importXml", allSameSwf && swfSelected && !isWorking);*/
         setMenuEnabled("/file/import/importXml", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/file/import/createTagFromFile", allSameSwf && swfSelected && !isWorking);        
         setMenuEnabled("/file/import/bulkImport", allSameSwf && swfSelected && !isWorking);
 
         setMenuEnabled("/tools/deobfuscation", openableSelected);
@@ -1347,7 +1369,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import", translate("menu.import"), null, null, 0, null, false, null, false);
         addMenuItem("/file/import/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         
-        addMenuItem("/file/import/bulkImport", translate("menu.file.import.bulkImport"), "import16", null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile", translate("menu.file.import.createTagFromFile"), "import16", null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/shape", translate("tag.shape.create"), "importshape16", (ActionEvent e) -> createTagFromFile(DefineShape4Tag.class, TreeNodeType.SHAPE), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/morphshape", translate("tag.morphshape.create"), "importmorphshape16", (ActionEvent e) -> createTagFromFile(DefineMorphShape2Tag.class, TreeNodeType.MORPH_SHAPE), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/image", translate("tag.image.create"), "importimage16", (ActionEvent e) -> createTagFromFile(DefineBitsLossless2Tag.class, TreeNodeType.IMAGE), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/sprite", translate("tag.sprite.create"), "importsprite16", (ActionEvent e) -> createTagFromFile(DefineSpriteTag.class, TreeNodeType.SPRITE), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/movie", translate("tag.movie.create"), "importmovie16", (ActionEvent e) -> createTagFromFile(DefineVideoStreamTag.class, TreeNodeType.MOVIE), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/sound", translate("tag.sound.create"), "importsound16", (ActionEvent e) -> createTagFromFile(DefineSoundTag.class, TreeNodeType.SOUND), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/font", translate("tag.font.create"), "importfont16", (ActionEvent e) -> createTagFromFile(DefineFont3Tag.class, TreeNodeType.FONT), PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/createTagFromFile/binaryData", translate("tag.binaryData.create"), "importbinarydata16", (ActionEvent e) -> createTagFromFile(DefineBinaryDataTag.class, TreeNodeType.BINARY_DATA), PRIORITY_MEDIUM, null, false, null, false);
+        
+        finishMenu("/file/import/createTagFromFile");                
+        
+        addMenuItem("/file/import/bulkImport", translate("menu.file.import.bulkImport"), "bulkimport16", null, PRIORITY_MEDIUM, null, false, null, false);
         addMenuItem("/file/import/bulkImport/text", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/bulkImport/script", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/bulkImport/images", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);

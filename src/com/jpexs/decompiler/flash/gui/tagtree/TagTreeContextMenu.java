@@ -255,10 +255,14 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem saveExeMenuItem;
 
+    private JMenu exportFileMenu;
+    
     private JMenuItem exportXamlMenuItem;
 
     private JMenuItem importSwfXmlMenuItem;
 
+    private JMenu bulkImportMenu;            
+    
     private JMenuItem importScriptsMenuItem;
 
     private JMenuItem importTextsMenuItem;
@@ -547,21 +551,25 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportFlaMenuItem.addActionListener(this::exportFlaActionPerformed);
         exportFlaMenuItem.setIcon(View.getIcon("exportfla16"));
         add(exportFlaMenuItem);
+        
+        
+        exportFileMenu = new JMenu(mainPanel.translate("menu.export.file"));
+        exportFileMenu.setIcon(View.getIcon("export16"));
 
         exportFlashDevelopMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportFlashDevelop"));
         exportFlashDevelopMenuItem.addActionListener(this::exportFlashDevelopActionPerformed);
         exportFlashDevelopMenuItem.setIcon(View.getIcon("exportflashdevelop16"));
-        add(exportFlashDevelopMenuItem);
+        exportFileMenu.add(exportFlashDevelopMenuItem);
 
         exportIdeaMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportIdea"));
         exportIdeaMenuItem.addActionListener(this::exportIdeaActionPerformed);
         exportIdeaMenuItem.setIcon(View.getIcon("exportidea16"));
-        add(exportIdeaMenuItem);
+        exportFileMenu.add(exportIdeaMenuItem);
 
         exportVsCodeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportVsCode"));
         exportVsCodeMenuItem.addActionListener(this::exportVsCodeActionPerformed);
         exportVsCodeMenuItem.setIcon(View.getIcon("exportvscode16"));
-        add(exportVsCodeMenuItem);
+        exportFileMenu.add(exportVsCodeMenuItem);
 
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
         exportJavaSourceMenuItem.addActionListener(new ActionListener() {
@@ -581,17 +589,17 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         });
         exportSwfXmlMenuItem.setIcon(View.getIcon("exportxml16"));
-        add(exportSwfXmlMenuItem);
+        exportFileMenu.add(exportSwfXmlMenuItem);
 
         saveSwcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveSwc"));
         saveSwcMenuItem.addActionListener(this::saveSwcActionPerformed);
         saveSwcMenuItem.setIcon(View.getIcon("bundleswc16"));
-        add(saveSwcMenuItem);
+        exportFileMenu.add(saveSwcMenuItem);
 
         saveExeMenuItem = new JMenuItem(mainPanel.translate("menu.file.saveasexe"));
         saveExeMenuItem.addActionListener(this::saveExeActionPerformed);
         saveExeMenuItem.setIcon(View.getIcon("saveasexe16"));
-        add(saveExeMenuItem);
+        exportFileMenu.add(saveExeMenuItem);
 
         exportXamlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportXaml"));
         exportXamlMenuItem.addActionListener(new ActionListener() {
@@ -601,7 +609,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         });
         exportXamlMenuItem.setIcon(View.getIcon("exportxml16"));
-        add(exportXamlMenuItem);
+        exportFileMenu.add(exportXamlMenuItem);
+        add(exportFileMenu);
 
         addSeparator();
 
@@ -764,45 +773,50 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem.setIcon(View.getIcon("importxml16"));
         add(importSwfXmlMenuItem);
 
+        
+        bulkImportMenu = new JMenu(mainPanel.translate("menu.file.import.bulkImport"));
+        bulkImportMenu.setIcon(View.getIcon("bulkimport16"));
+        
         importScriptsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.script"));
         importScriptsMenuItem.addActionListener(this::importScriptsActionPerformed);
         importScriptsMenuItem.setIcon(View.getIcon("importscript16"));
-        add(importScriptsMenuItem);
+        bulkImportMenu.add(importScriptsMenuItem);
 
         importTextsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.text"));
         importTextsMenuItem.addActionListener(this::importTextsActionPerformed);
         importTextsMenuItem.setIcon(View.getIcon("importtext16"));
-        add(importTextsMenuItem);
+        bulkImportMenu.add(importTextsMenuItem);
 
         importImagesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.image"));
         importImagesMenuItem.addActionListener(this::importImagesActionPerformed);
         importImagesMenuItem.setIcon(View.getIcon("importimage16"));
-        add(importImagesMenuItem);
+        bulkImportMenu.add(importImagesMenuItem);
 
         importShapesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.shape"));
         importShapesMenuItem.addActionListener(this::importShapesActionPerformed);
         importShapesMenuItem.setIcon(View.getIcon("importshape16"));
-        add(importShapesMenuItem);
+        bulkImportMenu.add(importShapesMenuItem);
 
         importShapesNoFillMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.shapeNoFill"));
         importShapesNoFillMenuItem.addActionListener(this::importShapesNoFillActionPerformed);
         importShapesNoFillMenuItem.setIcon(View.getIcon("importshape16"));
-        add(importShapesNoFillMenuItem);
+        bulkImportMenu.add(importShapesNoFillMenuItem);
 
         importMoviesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.movie"));
         importMoviesMenuItem.addActionListener(this::importMoviesActionPerformed);
         importMoviesMenuItem.setIcon(View.getIcon("importmovie16"));
-        add(importMoviesMenuItem);
+        bulkImportMenu.add(importMoviesMenuItem);
 
         importSoundsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.sound"));
         importSoundsMenuItem.addActionListener(this::importSoundsActionPerformed);
         importSoundsMenuItem.setIcon(View.getIcon("importsound16"));
-        add(importSoundsMenuItem);
+        bulkImportMenu.add(importSoundsMenuItem);
 
         importSymbolClassMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.symbolClass"));
         importSymbolClassMenuItem.addActionListener(this::importSymbolClassActionPerformed);
         importSymbolClassMenuItem.setIcon(View.getIcon("importsymbolclass16"));
-        add(importSymbolClassMenuItem);
+        bulkImportMenu.add(importSymbolClassMenuItem);
+        add(bulkImportMenu);
 
         addSeparator();
 
@@ -2084,10 +2098,36 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
+        
+        //These will be hidden when they do not contain any visible item
+        exportFileMenu.setVisible(true);
+        bulkImportMenu.setVisible(true);
+        
+        
         updateSeparators();
     }
 
     private void updateSeparators() {
+        //hide empty menus, like export, import
+        for (Component comp : getComponents()) {
+            if (comp instanceof JMenu) {
+                JMenu menu = (JMenu) comp;
+                boolean somethingVisible = false;
+                for (int i = 0; i < menu.getItemCount(); i++) {
+                    JMenuItem item = menu.getItem(i);
+                    if (item != null) {
+                        if (item.isVisible()) {
+                            somethingVisible = true;
+                            break;
+                        }
+                    }
+                }
+                if (!somethingVisible) {
+                    menu.setVisible(false);
+                }
+            }
+        }
+        
         final int ITEM_COUNT_LIMIT = 6;
         int totalVisible = 0;
         for (Component comp : getComponents()) {
@@ -2436,7 +2476,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.updateCharacters();
                 mainPanel.refreshTree(swf);
                 mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
-                handleCreateFromFile(t, createNodeType);
+                mainPanel.handleCreateFromFile(t, createNodeType);
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
                     | IllegalArgumentException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -2485,7 +2525,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.updateCharacters();
             mainPanel.refreshTree(swf);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
-            handleCreateFromFile(t, createNodeType);
+            mainPanel.handleCreateFromFile(t, createNodeType);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
                 | IllegalArgumentException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -2535,7 +2575,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.updateCharacters();
             mainPanel.refreshTree(swf);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
-            handleCreateFromFile(t, createNodeType);
+            mainPanel.handleCreateFromFile(t, createNodeType);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
                 | IllegalArgumentException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -6453,33 +6493,5 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private void handleCreateFromFile(Tag tag, TreeNodeType createNodeType) {
-        if (createNodeType == null) {
-            return;
-        }
-        boolean remove;
-        switch (createNodeType) {
-            case SPRITE:
-                remove = !mainPanel.replaceSpriteWithGif(tag);
-                break;
-            case SHAPE:
-                remove = !mainPanel.replaceNoFill(tag);
-                break;
-            case MORPH_SHAPE:
-                remove = !mainPanel.replaceMorphShape((MorphShapeTag) tag, true, false);
-                break;
-            case FONT:
-                remove = !mainPanel.fontEmbed(tag, true);
-                break;
-            default:
-                List<TreeItem> sel = new ArrayList<>();
-                sel.add(tag);
-                remove = !mainPanel.replace(sel, true);
-                break;
-        }
-        if (remove) {
-            tag.getTimelined().removeTag(tag);
-            mainPanel.refreshTree();
-        }
-    }
+    
 }
