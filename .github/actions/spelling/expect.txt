@@ -367,6 +367,7 @@ bugtracker
 buildingscripttree
 buildlog
 BUILDNUMBER
+bulkimport
 bundleswc
 buttoncondaction
 buttonicon
@@ -423,6 +424,7 @@ caseoffsets
 casesensitive
 Casteljau
 castop
+catchparts
 CATID
 cbbox
 CBench
@@ -573,6 +575,7 @@ Commaised
 commandline
 commondesktop
 COMMONLOG
+commonpart
 commonset
 commonshape
 compareresources
@@ -761,6 +764,7 @@ dequantize
 deringing
 derrt
 dery
+descs
 desktophints
 desktopicon
 destdir
@@ -942,6 +946,7 @@ ebph
 ebpw
 ebsp
 eby
+ecd
 ECHOSC
 ECIMAL
 ecj
@@ -1030,6 +1035,7 @@ explizit
 expmsb
 exportabc
 exportables
+exportall
 exportassets
 exportdialog
 exportembed
@@ -1080,6 +1086,7 @@ felem
 fes
 ffd
 ffdec
+ffe
 ffile
 ffname
 fframe
@@ -1998,12 +2005,14 @@ loopopened
 loopp
 loopparts
 loopprocess
+loopq
 loopread
 loopregs
 looproot
 loopsetmembers
 loopsize
 loopspre
+loopstack
 looptags
 looptodo
 looptrait
@@ -2277,6 +2286,7 @@ MYFONT
 mygraph
 myhash
 myjson
+myl
 mylongstring
 mymethod
 myname
@@ -2720,6 +2730,8 @@ pipename
 placeobject
 PLACETAG
 plaf
+plaindebug
+plaindebugsyntaxkit
 plainsyntaxkit
 PLATFORMID
 plattform
@@ -2735,6 +2747,7 @@ pmenu
 pmi
 pnd
 PNGs
+pnw
 pobj
 podle
 pointsedit
@@ -2896,6 +2909,7 @@ RCURLY
 rdh
 RDW
 reachableparts
+reachables
 readlimit
 READMODE
 realityinteractive
@@ -3252,6 +3266,7 @@ skm
 slashesh
 Slispinner
 slist
+slnx
 slocate
 slota
 slotb
@@ -3643,6 +3658,7 @@ tplace
 TPlay
 tpmapi
 Tpng
+tpnw
 tpos
 tprev
 traceroute
@@ -3785,6 +3801,7 @@ unpremultiply
 unr
 Unreads
 Unregisters
+unresize
 unser
 unshar
 unsignedinteger
@@ -3956,6 +3973,7 @@ WOR
 wordpointer
 wordsize
 wparam
+Wpf
 WRITEABLECONST
 writeblock
 writecolourmap
