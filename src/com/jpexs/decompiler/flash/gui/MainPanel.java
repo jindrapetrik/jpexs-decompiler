@@ -179,7 +179,6 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
@@ -230,10 +229,6 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
@@ -251,6 +246,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -277,7 +273,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -289,7 +284,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -7118,5 +7112,60 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void showDebugStackFrame() {
         showDetail(DETAILCARDDEBUGSTACKFRAME);
+    }
+    
+    public void createTagFromFile(SWF swf, Class<?> cl, TreeNodeType createNodeType) {
+        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(getMainFrame().getWindow(), swf, true);
+        if (selectPositionDialog.showDialog() == AppDialog.OK_OPTION) {
+            Timelined selectedTimelined = selectPositionDialog.getSelectedTimelined();
+            Tag selectedTag = selectPositionDialog.getSelectedTag();
+            try {
+                Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+                t.setTimelined(selectedTimelined);
+                if (selectedTag == null) {
+                    selectedTimelined.addTag(t);
+                } else {
+                    selectedTimelined.addTag(selectedTimelined.indexOfTag(selectedTag), t);
+                }
+                selectedTimelined.resetTimeline();
+                swf.updateCharacters();
+                refreshTree(swf);
+                setTagTreeSelectedNode(getCurrentTree(), t);
+                handleCreateFromFile(t, createNodeType);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
+                    | IllegalArgumentException | InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public void handleCreateFromFile(Tag tag, TreeNodeType createNodeType) {
+        if (createNodeType == null) {
+            return;
+        }
+        boolean remove;
+        switch (createNodeType) {
+            case SPRITE:
+                remove = !replaceSpriteWithGif(tag);
+                break;
+            case SHAPE:
+                remove = !replaceNoFill(tag);
+                break;
+            case MORPH_SHAPE:
+                remove = !replaceMorphShape((MorphShapeTag) tag, true, false);
+                break;
+            case FONT:
+                remove = !fontEmbed(tag, true);
+                break;
+            default:
+                List<TreeItem> sel = new ArrayList<>();
+                sel.add(tag);
+                remove = !replace(sel, true);
+                break;
+        }
+        if (remove) {
+            tag.getTimelined().removeTag(tag);
+            refreshTree();
+        }
     }
 }
