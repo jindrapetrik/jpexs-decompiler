@@ -33,6 +33,10 @@ public enum ButtonExportMode {
      */
     SVG,
     /**
+     * SVG - Scalable Vector Graphics - Combined button
+     */
+    SVG_COMBINED,
+    /**
      * BMP - Windows Bitmap
      */
     BMP,
