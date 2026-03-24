@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -107,6 +109,7 @@ import net.kroo.elliot.GifSequenceWriter;
 import net.weiner.kevin.AnimatedGifEncoder;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
+import org.w3c.dom.Element;
 
 /**
  * Frame exporter.
@@ -129,6 +132,9 @@ public class FrameExporter {
             case SVG:
                 fem = FrameExportMode.SVG;
                 break;
+            case SVG_COMBINED:
+                fem = FrameExportMode.SVG;
+                break;
             case WEBP:
                 fem = FrameExportMode.WEBP;
                 break;
@@ -139,16 +145,16 @@ public class FrameExporter {
                 throw new Error("Unsupported button export mode: " + settings.mode);
         }
 
-        if (frames == null) {
+        /*if (frames == null) {
             frames = new ArrayList<>();
             frames.add(ButtonTag.FRAME_UP);
             frames.add(ButtonTag.FRAME_OVER);
             frames.add(ButtonTag.FRAME_DOWN);
             frames.add(ButtonTag.FRAME_HITTEST);
-        }
+        }*/
 
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true, settings.aaScale);
-        return exportFrames(handler, outdir, swf, containerId, frames, 1, fes, evl, true);
+        return exportFrames(handler, outdir, swf, containerId, frames, 1, fes, evl, true, settings.mode == ButtonExportMode.SVG_COMBINED);
     }
 
     public List<File> exportSpriteFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, int subframesLength, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
@@ -275,10 +281,6 @@ public class FrameExporter {
         }
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
-        return exportFrames(handler, outdir, swf, containerId, frames, subFramesLength, settings, evl, false);
-    }
-    
     private String getFrameFileName(int frame, boolean button) {
         String buttonSuffix = "";
         if (button) {
@@ -300,7 +302,11 @@ public class FrameExporter {
         return "" + frame + buttonSuffix;
     }
     
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl, boolean button) throws IOException, InterruptedException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
+        return exportFrames(handler, outdir, swf, containerId, frames, subFramesLength, settings, evl, false, false);
+    }        
+    
+    private List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl, boolean button, boolean combined) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
             return ret;
@@ -309,6 +315,7 @@ public class FrameExporter {
         if (swf.getTags().isEmpty()) {
             return ret;
         }
+        Timelined timelined;
         Timeline tim0;
         List<String> paths = new ArrayList<>();
         String subPath = "";
@@ -317,10 +324,12 @@ public class FrameExporter {
         }
 
         if (containerId == 0) {
+            timelined = swf;
             tim0 = swf.getTimeline();
             paths.add(subPath);
         } else {
-            tim0 = ((Timelined) swf.getCharacter(containerId)).getTimeline();
+            timelined = (Timelined) swf.getCharacter(containerId);
+            tim0 = timelined.getTimeline();
 
             Set<String> classNames = swf.getCharacter(containerId).getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
@@ -367,23 +376,12 @@ public class FrameExporter {
             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
-
-            int max = frames.size();
-            if (subFramesLength > 1) {
-                max = subFramesLength;
-            }
-            for (int i = 0; i < max; i++) {
-                if (evl != null) {
-                    Tag parentTag = tim.getParentTag();
-                    evl.handleExportingEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
-                }
-
-                final int fi = i;
+            
+            if (combined) {
                 final Color fbackgroundColor = backgroundColor;
                 for (File foutdir : foutdirs) {
                     new RetryTask(() -> {
-                        int frame = subFramesLength > 1 ? fframes.get(0) : fframes.get(fi);                        
-                        File f = new File(foutdir + File.separator + getFrameFileName(((subFramesLength > 1 ? fi : fframes.get(fi)) + 1), button) + ".svg");
+                        File f = new File(foutdir + File.separator + "combined.svg");
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             ExportRectangle rect = new ExportRectangle(tim.displayRect);
                             rect.xMax *= settings.zoom;
@@ -391,21 +389,56 @@ public class FrameExporter {
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
-                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);
-                            tim.toSVG(frame, subFramesLength > 1 ? fi : 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
+                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);                            
+                            //Here is not timelined.toSVG, but drawableTag.toSVG, which draws combined button
+                            ((DrawableTag) timelined).toSVG(0, 0, exporter, 0, null, 0, new Matrix(), new Matrix());
+                                
+                            
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                         ret.add(f);
                     }, handler).run();
                 }
-
-                if (CancellableWorker.isInterrupted()) {
-                    break;
+            } else {            
+                int max = frames.size();
+                if (subFramesLength > 1) {
+                    max = subFramesLength;
                 }
+                for (int i = 0; i < max; i++) {
+                    if (evl != null) {
+                        Tag parentTag = tim.getParentTag();
+                        evl.handleExportingEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
+                    }
 
-                if (evl != null) {
-                    Tag parentTag = tim.getParentTag();
-                    evl.handleExportedEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
+                    final int fi = i;
+                    final Color fbackgroundColor = backgroundColor;
+                    for (File foutdir : foutdirs) {
+                        new RetryTask(() -> {
+                            int frame = subFramesLength > 1 ? fframes.get(0) : fframes.get(fi);                        
+                            File f = new File(foutdir + File.separator + getFrameFileName(((subFramesLength > 1 ? fi : fframes.get(fi)) + 1), button) + ".svg");
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                                ExportRectangle rect = new ExportRectangle(tim.displayRect);
+                                rect.xMax *= settings.zoom;
+                                rect.yMax *= settings.zoom;
+                                rect.xMin *= settings.zoom;
+                                rect.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
+                                exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);
+                                tim.toSVG(frame, subFramesLength > 1 ? fi : 0, null, 0, exporter, null, 0, new Matrix(), new Matrix());
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                            ret.add(f);
+                        }, handler).run();
+                    }
+
+                    if (CancellableWorker.isInterrupted()) {
+                        break;
+                    }
+
+                    if (evl != null) {
+                        Tag parentTag = tim.getParentTag();
+                        evl.handleExportedEvent("frame", i + 1, max, parentTag == null ? "" : parentTag.getName());
+                    }
                 }
             }
 

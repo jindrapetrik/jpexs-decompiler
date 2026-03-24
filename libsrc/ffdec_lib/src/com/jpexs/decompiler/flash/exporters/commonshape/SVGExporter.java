@@ -100,6 +100,8 @@ public class SVGExporter implements RequiresNormalizedFonts {
     
     private Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
     private Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
+    
+    private boolean buttonStyleAdded = false;
 
     @Override
     public void setNormalizedFonts(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts) {
@@ -656,7 +658,55 @@ public class SVGExporter implements RequiresNormalizedFonts {
         }
     }
 
-    public void addStyle(String fontFace, byte[] data, FontExportMode mode) {
+    public void addStyle(String css) {
+        String value = getStyle().getTextContent();
+        value += Helper.newLine;
+        value += css;
+        getStyle().setTextContent(value);
+    }
+    
+    public void requireButtonStyle() {
+        if (buttonStyleAdded) {
+            return;
+        }
+        buttonStyleAdded = true;
+        addStyle("    .button-frame {\n"
+            + "      pointer-events: none;\n"
+            + "    }\n"
+            + "\n"
+            + "    .button-frame-up,\n"
+            + "    .button-frame-over,\n"
+            + "    .button-frame-down {\n"
+            + "      opacity: 0;\n"
+            + "    }\n"
+            + "\n"
+            + "    .button .button-frame-up {\n"
+            + "      opacity: 1;\n"
+            + "    }\n"
+            + "\n"
+            + "    .button:hover .button-frame-up {\n"
+            + "      opacity: 0;\n"
+            + "    }\n"
+            + "    .button:hover .button-frame-over {\n"
+            + "      opacity: 1;\n"
+            + "    }\n"
+            + "\n"
+            + "    .button:active .button-frame-over {\n"
+            + "      opacity: 0;\n"
+            + "    }\n"
+            + "    .button:active .button-frame-down {\n"
+            + "      opacity: 1;\n"
+            + "    }\n"
+            + "\n"
+            + "    .button-frame-hittest {\n"
+            + "      opacity: 0;\n"
+            + "      pointer-events: all;\n"
+            + "      cursor: pointer;\n"
+            + "    }\n");
+                            
+    }
+    
+    public void addFontFace(String fontFace, byte[] data, FontExportMode mode) {
         if (!fontFaces.contains(fontFace)) {
             fontFaces.add(fontFace);
             String base64Data = Helper.byteArrayToBase64String(data);

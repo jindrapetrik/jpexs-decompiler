@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.w3c.dom.Element;
 
 /**
  * Base class for button tags.
@@ -134,7 +135,36 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
 
     @Override
     public void toSVG(int frame, int time, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, Matrix transformation, Matrix strokeTransformation) throws IOException {
-        getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        //getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        exporter.requireButtonStyle();                            
+                            
+        Timeline tim = getTimeline();
+        
+        Element buttonGroup = exporter.createSubGroup(new Matrix(), null);
+        buttonGroup.setAttribute("class", "button");
+
+        Element upGroup = exporter.createSubGroup(new Matrix(), null);
+        upGroup.setAttribute("class", "button-frame button-frame-up");
+        tim.toSVG(ButtonTag.FRAME_UP, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        exporter.endGroup();
+
+        Element overGroup = exporter.createSubGroup(new Matrix(), null);
+        overGroup.setAttribute("class", "button-frame button-frame-over");                            
+        tim.toSVG(ButtonTag.FRAME_OVER, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        exporter.endGroup();
+
+        Element downGroup = exporter.createSubGroup(new Matrix(), null);
+        downGroup.setAttribute("class", "button-frame button-frame-down");   
+        tim.toSVG(ButtonTag.FRAME_DOWN, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        exporter.endGroup();
+
+        Element hitTestGroup = exporter.createSubGroup(new Matrix(), null);
+        hitTestGroup.setAttribute("class", "button-frame button-frame-hittest");                               
+        tim.toSVG(ButtonTag.FRAME_HITTEST, 0, null, 0, exporter, colorTransform, level + 1, transformation, strokeTransformation);
+        exporter.endGroup();
+
+        exporter.endGroup(); //buttonGroup
+        
     }
 
     /**

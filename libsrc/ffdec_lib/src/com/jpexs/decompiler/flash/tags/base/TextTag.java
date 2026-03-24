@@ -1114,7 +1114,7 @@ public abstract class TextTag extends DrawableTag {
 
                 exporter.addToGroup(textElement);
                 FontExportMode fontExportMode = FontExportMode.WOFF;
-                exporter.addStyle(fontFamily, new FontExporter().exportFont(font, fontExportMode), fontExportMode);
+                exporter.addFontFace(fontFamily, new FontExporter().exportFont(font, fontExportMode), fontExportMode);
 
                 if (hasOffset) {
                     exporter.endGroup();

@@ -356,6 +356,7 @@ Pre-options:
         sprite:webp_animated - WEBP animated format for Sprites
         button:png - PNG format for Buttons
         button:svg - SVG format for Buttons
+        button:svg_combined - SVG combined format for Buttons
         button:bmp - BMP format for Buttons
         button:webp - WEBP format for Buttons
         image:png_gif_jpeg - PNG/GIF/JPEG format for Images
