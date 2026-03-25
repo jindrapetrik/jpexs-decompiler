@@ -291,9 +291,11 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     @Override
     protected void initTimeline(Timeline timeline) {
         int maxDepth = 0;
+        //Note: There is frameIndex 0 everywhere, as below if frameDown is empty, it uses frameOver items
+        //I hope this won't cause problems...
         Frame frameUp = new Frame(timeline, 0);
-        Frame frameDown = new Frame(timeline, 0);
         Frame frameOver = new Frame(timeline, 0);
+        Frame frameDown = new Frame(timeline, 0);
         Frame frameHit = new Frame(timeline, 0);
         for (BUTTONRECORD r : this.characters) {
             if (swf.getCyclicCharacters().contains(r.characterId)) {

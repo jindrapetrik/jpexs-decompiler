@@ -347,10 +347,12 @@ public class FrameExporter {
         final Timeline tim = tim0;
 
         boolean exportAll = frames == null;
-        if (frames == null) {
+                
+        if (exportAll) {
             frames = new ArrayList<>();
-            for (Frame frame : tim.getFrames()) {
-                frames.add(frame.frame);
+            List<Frame> timFrames = tim.getFrames();
+            for (int f = 0; f < timFrames.size(); f++) {
+                frames.add(f);
             }
         }
 
