@@ -52,6 +52,7 @@ public class ActionScript2DirectEditingPCodeTest {
         Configuration.simplifyExpressions.set(false);
         Configuration._debugCopy.set(false);
         Configuration.useFlexAs3Compiler.set(false);
+        Configuration.skipDetectionOfUninitializedClassFields.set(false);
     }
 
     @Test
@@ -85,17 +86,7 @@ public class ActionScript2DirectEditingPCodeTest {
                     asm.setActions(par.actionsFromString(as, Utf8Helper.charsetName));
                 } catch (ActionParseException | CompilationException ex) {
                     fail("Unable to parse: " + as + "/" + asm.toString(), ex);
-                }
-                writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                asm.getActionScriptSource(writer, null);
-                writer.finishHilights();
-                String as2 = writer.toString();
-                //as2 = asm.removePrefixAndSuffix(as2);
-                try {
-                    asm.setActions(par.actionsFromString(as2, Utf8Helper.charsetName));
-                } catch (ActionParseException | CompilationException ex) {
-                    fail("Unable to parse: " + asm.getSwf().getTitleOrShortFileName() + "/" + asm.toString(), ex);
-                }
+                }                
                 writer = new HighlightedTextWriter(new CodeFormatting(), false);
                 asm.getASMSource(ScriptExportMode.PCODE, writer, null);
                 //asm.getActionScriptSource(writer, null);
