@@ -70,6 +70,17 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testAndInt() {
+        decompileMethod("classic", "testAndInt", "var a:int = 1;\r\n"
+                + "var b:int = 5;\r\n"
+                + "if(Boolean(0) && (Boolean(1) || Boolean(a < b)))\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testAndOrCoercion() {
         decompileMethod("classic", "testAndOrCoercion", "var x:TestInterface = this.ti || (this.ti = new TestClass()) && (this.ti = new TestClass());\r\n"
                 + "var y:TestInterface = this.ti && (this.ti = new TestClass());\r\n"

@@ -18,6 +18,7 @@ package
     {
         TestActivationArguments;
         TestAlwaysBreak;
+        TestAndInt;
         TestAndOrCoercion;
         TestArguments;
         TestBitwiseOperands;

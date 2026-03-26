@@ -70,6 +70,17 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testAndInt() {
+        decompileMethod("classic_air", "testAndInt", "var a:int = 1;\r\n"
+                + "var b:int = 5;\r\n"
+                + "if(0 && (1 || a < b))\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testAndOrCoercion() {
         decompileMethod("classic_air", "testAndOrCoercion", "var x:TestInterface = ti || (ti = new TestClass()) && (ti = new TestClass());\r\n"
                 + "var y:TestInterface = ti && (ti = new TestClass());\r\n"

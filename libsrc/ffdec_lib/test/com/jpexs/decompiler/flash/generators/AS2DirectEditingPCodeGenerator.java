@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -49,6 +48,7 @@ public class AS2DirectEditingPCodeGenerator {
         Configuration.simplifyExpressions.set(false);
         Configuration._debugCopy.set(false);
         Configuration.useFlexAs3Compiler.set(false);
+        Configuration.skipDetectionOfUninitializedClassFields.set(false);
         
         if (!outDir.exists()) {
             outDir.mkdirs();
@@ -71,17 +71,7 @@ public class AS2DirectEditingPCodeGenerator {
                 asm.setActions(par.actionsFromString(as, Utf8Helper.charsetName));
             } catch (ActionParseException | CompilationException ex) {
                 fail("Unable to parse: " + as + "/" + asm.toString(), ex);
-            }
-            writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            asm.getActionScriptSource(writer, null);
-            writer.finishHilights();
-            String as2 = writer.toString();
-            //as2 = asm.removePrefixAndSuffix(as2);
-            try {
-                asm.setActions(par.actionsFromString(as2, Utf8Helper.charsetName));
-            } catch (ActionParseException | CompilationException ex) {
-                fail("Unable to parse: " + asm.getSwf().getTitleOrShortFileName() + "/" + asm.toString(), ex);
-            }
+            }           
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             asm.getASMSource(ScriptExportMode.PCODE, writer, null);
             //asm.getActionScriptSource(writer, null);

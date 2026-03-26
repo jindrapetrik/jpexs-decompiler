@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
-import com.jpexs.decompiler.graph.model.BlockItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -33,7 +32,6 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
-import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
@@ -56,16 +54,13 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -4087,16 +4082,25 @@ public class Graph {
                             }
                             if (!stack.isEmpty() && ((filteredOnTrue.size() == 1 && (filteredOnTrue.get(0) instanceof PopItem)) || ((filteredOnTrue.size() >= 2) && (filteredOnTrue.get(0) instanceof PopItem) && (filteredOnTrue.get(filteredOnTrue.size() - 1) instanceof PushItem)))) {
                                 if (filteredOnTrue.size() > 1) {
+                                    PushItem pi = (PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1);
+                                    GraphTargetItem pushedValue = pi.value;
                                     GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
                                     GraphTargetItem prevExpr = stack.pop();
-                                    GraphTargetItem leftSide = expr.getNotCoercedNoDup();
+                                    GraphTargetItem leftSide = expr.getNotCoercedNoDup();                                    
+                                    GraphTargetItem invertedLeftSide = leftSide;
+                                    if (invertedLeftSide instanceof NotItem) {
+                                        invertedLeftSide = ((NotItem) invertedLeftSide).value;
+                                    } else {
+                                        invertedLeftSide = invertedLeftSide.invert(null);
+                                    }
 
                                     prevExpr = prevExpr.getThroughDuplicate();
 
-                                    boolean hideEmptyTrueFalse = true;
+                                    boolean hideEmptyTrueFalse = true;                                                                    
 
-                                    if (leftSide instanceof DuplicateItem) {
-                                        if (!currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
+                                    if (leftSide instanceof DuplicateItem
+                                            || leftSide.getNotCoerced() == prevExpr) {
+                                        if (leftSide instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
                                             DuplicateItem d = (DuplicateItem) leftSide;
                                             SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
                                             if (st.tempIndex == d.tempIndex) {
@@ -4112,8 +4116,9 @@ public class Graph {
                                         } else {
                                             stack.push(new OrItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
-                                    } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
-                                        if (!currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
+                                    } else if (invertedLeftSide.getNotCoercedNoDup() instanceof DuplicateItem
+                                            || invertedLeftSide.getNotCoerced() == prevExpr) { //.getNotCoercedNoDup() instanceof DuplicateItem) {
+                                        if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
                                             DuplicateItem d = (DuplicateItem) leftSide.invert(null).getNotCoercedNoDup();
                                             SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
                                             if (st.tempIndex == d.tempIndex) {

@@ -51,7 +51,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         addSwf("haxe", "testdata/haxe/output.swf");
         addSwf("long", "testdata/as3_long/bin/as3_long.flex.swf");
     }
-    
+
     @BeforeMethod
     public void beforeMethod() {
         Configuration.decompilationTimeoutFile.set(5 * 60);
@@ -800,12 +800,12 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "}\n"
                 + "}");
     }
-    
+
     @Test
     public void testLongScript() {
         Configuration.decompilationTimeoutFile.set(10 * 60);
         Configuration.decompilationTimeoutSingleMethod.set(10 * 60);
-                
+
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
@@ -830,7 +830,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         } catch (InterruptedException ex) {
             fail();
         }
-        
+
         String result = sb.toString();
         if (result.contains("/*")) {
             fail();

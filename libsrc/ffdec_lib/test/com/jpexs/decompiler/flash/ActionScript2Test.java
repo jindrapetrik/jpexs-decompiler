@@ -48,6 +48,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
         Configuration.autoRenameIdentifiers.set(false);
+        Configuration.skipDetectionOfUninitializedClassFields.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
@@ -2666,6 +2667,18 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "}\r\n"
+                + "}\r\n"
+        );
+    }
+
+    @Test
+    public void frame98_andIntTest() {
+        compareSrc(98, "trace(\"andIntTest\");\r\n"
+                + "var a = 1;\r\n"
+                + "var b = 5;\r\n"
+                + "if(0 && (1 || a < b))\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
                 + "}\r\n"
         );
     }
