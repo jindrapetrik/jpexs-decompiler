@@ -336,7 +336,8 @@ jobs:
         env:
           RH_DIR: tools/wine/resourcehacker
           RH_ZIP: tools/wine/resourcehacker.zip
-          RH_URL: https://www.angusj.com/resourcehacker/resource_hacker.zip
+          RH_URL: https://www.free-decompiler.com/flash/tools/resource_hacker.zip
+          #https://www.angusj.com/resourcehacker/resource_hacker.zip
         run: |              
           set -euxo pipefail
 
