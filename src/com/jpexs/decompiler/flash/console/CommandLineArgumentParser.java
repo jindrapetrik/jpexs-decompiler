@@ -3240,7 +3240,7 @@ public class CommandLineArgumentParser {
 
                             if (".svg".equals(ext)) {
                                 String svgText = Helper.readTextFile(repFile);
-                                new SvgImporter().importSvg(shapeTag, svgText);
+                                new SvgImporter().importSvg(shapeTag, svgText, fill);
                             } else {
                                 int format = parseImageFormat(args);
                                 new ShapeImporter().importImage(shapeTag, data, format, fill);
