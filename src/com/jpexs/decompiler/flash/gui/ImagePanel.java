@@ -414,27 +414,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean selectingText = false;
 
     private boolean textCursorBlinkOn = false;
-    
+
     private WeakReference<Timelined> lastTimelinedRef = null;
-    
+
     /**
-     * This was a test to edit texts inline, but it failed horribly.
-     * You can try to enable it, but the results are bad, very bad.
+     * This was a test to edit texts inline, but it failed horribly. You can try
+     * to enable it, but the results are bad, very bad.
      */
     private boolean editTexts = false;
 
     private Timer textCursorBlinkTimer;
-    
+
     private void setTextSelection(int value) {
         int selStart = getSelectionStartInt();
         int delta = value - selStart;
         changeTextSelection(delta);
     }
-    
+
     private void changeTextSelection(int delta) {
         TextTag text = textSelectionText;
         if (text == null) {
-            return;                        
+            return;
         }
         int selStart = getSelectionStartInt();
         List<TEXTRECORD> textRecords = new ArrayList<>();
@@ -446,7 +446,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         List<RECT> glyphPositions = TextTag.getGlyphEntriesPositions(textRecords, text.getSwf());
-        
+
         selStart += delta;
 
         if (selStart < 0) {
@@ -454,14 +454,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         if (selStart > glyphPositions.size()) {
             selStart = glyphPositions.size();
-        }                
-        
+        }
+
         if (glyphPositions.size() == 0) {
             textSelectionStartPrecise = (double) selStart;
             textSelectionEndPrecise = (double) selStart;
             return;
         }
-        
+
         RECT gp = glyphPositions.get(selStart == glyphPositions.size() ? selStart - 1 : selStart);
         Rectangle2D r = new Rectangle2D.Double(
                 gp.Xmin,
@@ -823,7 +823,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             depths.add(depth);
         }
         selectDepths(depths);
-        /*
+
         if (timelined != null) {
             Frame frameObj = timelined.getTimeline().getFrame(frame);
             if (frameObj.layers.containsKey(depth)) {
@@ -836,14 +836,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         m = m.preConcatenate(Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor));
                         RECT drawableRect = dt.getRect();
                         ExportRectangle rect = m.transform(new ExportRectangle(drawableRect));
-                        
-                        if (rect.xMax + offsetPoint.getX() < 0 
-                                || rect.yMax + offsetPoint.getY() < 0 
+
+                        if (rect.xMax + offsetPoint.getX() < 0
+                                || rect.yMax + offsetPoint.getY() < 0
                                 || rect.xMin + offsetPoint.getX() > iconPanel.getWidth()
-                                || rect.yMin + offsetPoint.getY() > iconPanel.getHeight()
-                        ) {
+                                || rect.yMin + offsetPoint.getY() > iconPanel.getHeight()) {
                             double offsetX = -rect.xMin;
-                            double offsetY = -rect.yMin;                                                                        
+                            double offsetY = -rect.yMin;
 
                             if (rect.getWidth() < iconPanel.getWidth()) {
                                 offsetX += (iconPanel.getWidth() - rect.getWidth()) / 2;
@@ -857,7 +856,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
             }
-        }*/
         }
     }
 
@@ -1586,12 +1584,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 @Override
-                public void keyTyped(KeyEvent e) {                                            
-                    
+                public void keyTyped(KeyEvent e) {
+
                     if (!editTexts) {
                         return;
                     }
-                    
+
                     if (e.getKeyChar() == KeyEvent.VK_DELETE) {
                         if (textSelectionText != null) {
                             TextTag text = textSelectionText;
@@ -1611,7 +1609,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (text != null && selStart > 0) {
                                 changeTextSelection(-1);
                                 text.removeCharacterGlyph(selStart - 1);
-                                fireTextChanged();                                
+                                fireTextChanged();
                             }
                         }
                         return;
@@ -1636,7 +1634,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             changeTextSelection(-1);
                         }
                     }
-                    
+
                     if (hilightedPoints != null) {
                         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             List<Integer> selectedPointsDesc = new ArrayList<>(selectedPoints);
@@ -1706,7 +1704,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 int y = 0;
                                 for (TEXTRECORD r : recs) {
                                     if (r.styleFlagsHasFont) {
-                                        font = r.getFont(defineEditText.getSwf());                                        
+                                        font = r.getFont(defineEditText.getSwf());
                                     }
                                     if (r.styleFlagsHasYOffset) {
                                         int oldY = y;
@@ -1729,7 +1727,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
                                 String textToCopy = sb.toString();
                                 int fullLength = pos;
-                                
+
                                 JPopupMenu pm = new JPopupMenu();
                                 JMenuItem copyMenuItem = new JMenuItem(AppStrings.translate("text.copy"), View.getIcon("copy16"));
                                 copyMenuItem.addActionListener(new ActionListener() {
@@ -1738,7 +1736,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         StringSelection stringSelection = new StringSelection(textToCopy);
                                         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                                         clipboard.setContents(stringSelection, null);
-                                    }                                    
+                                    }
                                 });
                                 JMenuItem selectAllMenuItem = new JMenuItem(AppStrings.translate("text.selectAll"), View.getIcon("selectall16"));
                                 selectAllMenuItem.addActionListener(new ActionListener() {
@@ -1749,21 +1747,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         textSelectionEndPrecise = (double) fullLength;
                                         textSelectionStartGlyphRect = new Rectangle2D.Double(); //??
                                         textSelectionStartGlyphXPosition = 0.0; //??                                
-                                
+
                                         repaint();
-                                    }                                    
+                                    }
                                 });
-                                
+
                                 if (!textToCopy.isEmpty()) {
-                                    pm.add(copyMenuItem);                                    
+                                    pm.add(copyMenuItem);
                                 }
                                 pm.add(selectAllMenuItem);
                                 pm.show(iconPanel, e.getX(), e.getY());
-                                
+
                             }
                         }
                     }
-                    
+
                     if (e.getClickCount() == 2) {
                         if (Configuration.showGuides.get() && !Configuration.lockGuides.get()) {
                             Point mousePoint = e.getPoint();
@@ -1810,7 +1808,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
 
                         DepthState ds = depthStateUnderCursor;
-                        if (ds != null) {                            
+                        if (ds != null) {
                             openDepth(frame, ds.depth);
                             //gotoFrame(1);
                         }
@@ -4781,10 +4779,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
-            this.parentDepths.clear();    
-            Timelined lastTimelined = lastTimelinedRef == null ? null : lastTimelinedRef.get();            
+            this.parentDepths.clear();
+            Timelined lastTimelined = lastTimelinedRef == null ? null : lastTimelinedRef.get();
             boolean sameTimelined = lastTimelined == drawable;
-            
+
             if (!sameTimelined) {
                 centerImage();
             }
@@ -4842,26 +4840,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
-            
+
             if (sameTimelined) {
                 updateScrollBars();
             } else {
                 iconPanel.calcRect();
             }
-            
-            if (selectionMode) {                
+
+            if (selectionMode) {
                 SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
                 int chid = -1;
                 if (timelined instanceof CharacterTag) {
                     chid = ((CharacterTag) timelined).getCharacterId();
                 }
                 conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "" + chid);
-                
-                
-                loadOpenedDepths();                                
+
+                loadOpenedDepths();
             }
-            
-            
 
             clearGuidesInternal();
             setNoGuidesCharacter();
@@ -5085,10 +5080,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        
+
         int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
-                
-        
+
         textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
 
         if (newTextTag != null) {
@@ -5224,9 +5218,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
         int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
-        
+
         aaScale = Configuration.calculateRealAaScale((int) viewRect.getWidth(), (int) viewRect.getHeight(), zoom, aaScale);
-        
+
         int width = aaScale * (int) (viewRect.getWidth() * zoom);
         int height = aaScale * (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
@@ -5235,13 +5229,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (height == 0) {
             height = 1;
         }
-        
+
         Rectangle realRectAA = new Rectangle(realRect);
         realRectAA.x *= aaScale;
         realRectAA.y *= aaScale;
         realRectAA.width *= aaScale;
         realRectAA.height *= aaScale;
-        
+
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
@@ -5313,9 +5307,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
 
         if (Configuration.reduceAntialiasConflationByScalingForDisplay.get()) {
-            image  = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));                 
+            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));
         }
-        
+
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
@@ -5610,7 +5604,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         return selStartInt;
     }
-    
+
     private int getSelectionEndInt() {
         Double selStart = textSelectionStartPrecise;
         Double selEnd = textSelectionEndPrecise;
@@ -6324,19 +6318,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (frame < 1) {
             frame = 1;
         }
-               
+
         this.autoPlayed = true;
         this.frame = frame - 1;
         this.prevFrame = -1;
-        
+
         if (selectionMode) {
             SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
             conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "" + frame);
         }
-        
+
         stopInternal();
-        
-        
+
         redraw();
         fireMediaDisplayStateChanged();
     }
@@ -6618,7 +6611,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return timelined;
         }
     }
-    
+
     public void loadOpenedDepths() {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
         if (conf != null) {
@@ -6636,28 +6629,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             int lastChid = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_TIMELINE, "-1"));
             if (lastChid != chid) {
                 return;
-            }            
+            }
             List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
             List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
             while (parentFrames.size() < parentDepths.size()) {
                 parentFrames.add("0");
             }
-            
+
             conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
             conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
-            
+
             int frame = Integer.parseInt(conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, "1"));
-            
-            for (int i = 0; i < parentDepths.size(); i++) {                
+
+            for (int i = 0; i < parentDepths.size(); i++) {
                 openDepth(Integer.parseInt(parentFrames.get(i)), Integer.parseInt(parentDepths.get(i)));
             }
 
-            gotoFrame(frame);            
+            gotoFrame(frame);
         } else {
             gotoFrame(1);
         }
     }
-    
+
     public void openDepth(int frame, int depth) {
         Timelined tim = timelined;
         if (tim == null) {
@@ -6667,7 +6660,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         DepthState ds = tim.getTimeline().getFrame(frame).layers.get(depth);
-        if (ds != null) {                            
+        if (ds != null) {
             CharacterTag cht = ds.getCharacter();
             if (cht instanceof Timelined) {
                 int newFrame = 0;
@@ -6677,7 +6670,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     parentFrames.add(ds.frame.frame);
                     timelined = (Timelined) cht;
                     selectedDepths.clear();
-                    
+
                     int time = ds.time;
                     newFrame = time % timelined.getFrameCount();
                     if (timelined instanceof ButtonTag) {
@@ -6690,14 +6683,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (parentTimelineds.size() == 1) {
                         conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "" + (ds.frame.frame + 1));
                     }
-                    
+
                     List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
                     parentDepths.add("" + ds.depth);
                     conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, parentDepths);
-                    
+
                     List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
                     parentFrames.add("" + ds.frame.frame);
-                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);                
+                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);
                 }
                 gotoFrame(newFrame + 1);
                 fireMediaDisplayStateChanged();
