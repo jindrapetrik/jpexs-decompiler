@@ -603,7 +603,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             public void actionPerformed(ActionEvent e) {
                 PlaceObjectTypeTag placeObject = imagePanel.getPlaceTagUnderCursor();
                 if (placeObject != null) {
-                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);
+                    displayEditImagePanel.zoom(imagePanel.getZoom());
+                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);                    
                 }
             }
         });

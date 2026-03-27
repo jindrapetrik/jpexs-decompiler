@@ -116,6 +116,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -413,6 +414,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean selectingText = false;
 
     private boolean textCursorBlinkOn = false;
+    
+    private WeakReference<Timelined> lastTimelinedRef = null;
     
     /**
      * This was a test to edit texts inline, but it failed horribly.
@@ -820,6 +823,42 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             depths.add(depth);
         }
         selectDepths(depths);
+        /*
+        if (timelined != null) {
+            Frame frameObj = timelined.getTimeline().getFrame(frame);
+            if (frameObj.layers.containsKey(depth)) {
+                DepthState ds = frameObj.layers.get(depth);
+                CharacterTag ch = ds.getCharacter();
+                if (ch instanceof DrawableTag) {
+                    DrawableTag dt = (DrawableTag) ch;
+                    if (ds.matrix != null) {
+                        Matrix m = new Matrix(ds.matrix);
+                        m = m.preConcatenate(Matrix.getScaleInstance(getRealZoom() / SWF.unitDivisor));
+                        RECT drawableRect = dt.getRect();
+                        ExportRectangle rect = m.transform(new ExportRectangle(drawableRect));
+                        
+                        if (rect.xMax + offsetPoint.getX() < 0 
+                                || rect.yMax + offsetPoint.getY() < 0 
+                                || rect.xMin + offsetPoint.getX() > iconPanel.getWidth()
+                                || rect.yMin + offsetPoint.getY() > iconPanel.getHeight()
+                        ) {
+                            double offsetX = -rect.xMin;
+                            double offsetY = -rect.yMin;                                                                        
+
+                            if (rect.getWidth() < iconPanel.getWidth()) {
+                                offsetX += (iconPanel.getWidth() - rect.getWidth()) / 2;
+                            }
+                            if (rect.getHeight() < iconPanel.getHeight()) {
+                                offsetY += (iconPanel.getHeight() - rect.getHeight()) / 2;
+                            }
+                            offsetPoint.setLocation(offsetX, offsetY);
+                            repaint();
+                        }
+                    }
+                }
+            }
+        }*/
+        }
     }
 
     public synchronized void selectDepths(List<Integer> depths) {
@@ -4742,8 +4781,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
-            this.parentDepths.clear();            
-            centerImage();
+            this.parentDepths.clear();    
+            Timelined lastTimelined = lastTimelinedRef == null ? null : lastTimelinedRef.get();            
+            boolean sameTimelined = lastTimelined == drawable;
+            
+            if (!sameTimelined) {
+                centerImage();
+            }
+            lastTimelinedRef = new WeakReference<>(drawable);
             this.swf = swf;
             zoomAvailable = allowZoom;
             if (frame > -1) {
@@ -4797,7 +4842,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
-            iconPanel.calcRect();
+            
+            if (sameTimelined) {
+                updateScrollBars();
+            } else {
+                iconPanel.calcRect();
+            }
             
             if (selectionMode) {                
                 SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
