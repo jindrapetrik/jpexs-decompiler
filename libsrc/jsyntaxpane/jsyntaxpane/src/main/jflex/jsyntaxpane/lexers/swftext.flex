@@ -75,6 +75,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
     "]"                          {
                                     yybegin(YYINITIAL);
                                     tokenStart = -1;
+                                    tokenLength = 0;
                                     return token(TokenType.OPERATOR,  -BRACKET);
                                  }
 }
@@ -98,6 +99,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
     "]"                          {
                                     yybegin(YYINITIAL);
                                     tokenStart = -1;
+                                    tokenLength = 0;
                                     return token(TokenType.OPERATOR,  -BRACKET);
                                  }    
 }
@@ -106,7 +108,10 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   \"                             {
                                      yybegin(VALUE);
                                      // length also includes the trailing quote
-                                     return token(TokenType.STRING, tokenStart, tokenLength + 1);
+                                     Token ret = token(TokenType.STRING, tokenStart, tokenLength + 1);
+                                     tokenStart = -1;
+                                     tokenLength = 0;
+                                     return ret;
                                  }
 
   {StringCharacter}+             { tokenLength += yylength(); }
@@ -123,7 +128,9 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "\u00A7"                            {
                                      yybegin(PARAMETER);
                                      // length also includes the trailing quote
-                                     return token(TokenType.REGEX, tokenStart, tokenLength + 1);
+                                     Token ret = token(TokenType.REGEX, tokenStart, tokenLength + 1);
+                                     tokenStart = -1;
+                                     tokenLength = 0;
                                  }
 
   {OIdentifierCharacter}+             { tokenLength += yylength(); }
@@ -132,7 +139,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   /* escape sequences */
 
   \\.                            { tokenLength += 2; }
-  {LineTerminator}               { yybegin(PARAMETER);  }
+  {LineTerminator}               { tokenStart = -1; tokenLength = 0; yybegin(PARAMETER);  }
 }
 
 /* error fallback */
