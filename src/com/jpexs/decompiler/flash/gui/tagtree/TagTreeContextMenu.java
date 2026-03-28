@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.gui.ClipboardType;
 import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
 import com.jpexs.decompiler.flash.gui.ConvertPlaceObjectTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertShapeTypeDialog;
+import com.jpexs.decompiler.flash.gui.ConvertTextTypeDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
@@ -70,11 +71,14 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -120,6 +124,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
+import com.jpexs.decompiler.flash.tags.converters.TextTypeConverter;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
@@ -387,6 +392,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem convertPlaceObjectTypeMenuItem;
 
+    private JMenuItem convertTextTypeMenuItem;
+    
     private JMenuItem normalizeFontsMenuItem;
 
     private JMenuItem prepareDebugInject;
@@ -673,6 +680,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         convertPlaceObjectTypeMenuItem.addActionListener(this::convertPlaceObjectTypeActionPerformed);
         convertPlaceObjectTypeMenuItem.setIcon(View.getIcon("placeobject16"));
         add(convertPlaceObjectTypeMenuItem);
+        
+        convertTextTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertTextType"));
+        convertTextTypeMenuItem.addActionListener(this::convertTextTypeActionPerformed);
+        convertTextTypeMenuItem.setIcon(View.getIcon("text16"));
+        add(convertTextTypeMenuItem);
 
         normalizeFontsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.normalizeFonts"));
         normalizeFontsMenuItem.addActionListener(this::normalizeFontsActionPerformed);
@@ -1249,12 +1261,14 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean allSelectedIsShape = true;
         boolean allSelectedIsPlaceObject = true;
+        boolean allSelectedIsText = true;
         boolean allSelectedIsFont = true;
 
         if (items.isEmpty()) {
             allSelectedIsShape = false;
             allSelectedIsPlaceObject = false;
             allSelectedIsFont = false;
+            allSelectedIsText = false;
         }
 
         for (TreeItem item : items) {
@@ -1267,6 +1281,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (!(item instanceof FontTag)) {
                 allSelectedIsFont = false;
+            }
+            
+            if (!(item instanceof TextTag)) {
+                allSelectedIsText = false;
             }
 
             if (item instanceof Tag) {
@@ -1436,6 +1454,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setVisible(false);
         convertShapeTypeMenuItem.setVisible(false);
         convertPlaceObjectTypeMenuItem.setVisible(false);
+        convertTextTypeMenuItem.setVisible(false);
         normalizeFontsMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
         cleanAbcMenuItem.setVisible(false);
@@ -1935,6 +1954,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsPlaceObject) {
             convertPlaceObjectTypeMenuItem.setVisible(true);
+        }
+        
+        if (allSelectedIsText) {
+            convertTextTypeMenuItem.setVisible(true);
         }
         if (allSelectedIsSwf) {
             normalizeFontsMenuItem.setVisible(true);
@@ -2985,6 +3008,46 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.refreshTree();
         if (itemr.size() == 1) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), lastConverted);
+        }
+    }
+    
+    private void convertTextTypeActionPerformed(ActionEvent evt) {
+        List<TreeItem> itemr = getSelectedItems();
+        if (itemr.isEmpty()) {
+            return;
+        }
+        int currentTextType = 0;
+        
+        TextTypeConverter converter = new TextTypeConverter();
+
+        if (itemr.size() == 1) {
+            TextTag t = (TextTag) itemr.get(0);
+            if (t instanceof DefineTextTag) {
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINETEXT;
+            } else if (t instanceof DefineText2Tag) {
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINETEXT2;
+            } else if (t instanceof DefineEditTextTag) {
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINEEXITTEXT;
+            }
+        }
+
+        ConvertTextTypeDialog dialog = new ConvertTextTypeDialog(Main.getDefaultDialogsOwner(), currentTextType);
+
+        int newTextType = dialog.showDialog();
+
+        if (newTextType == 0) {
+            return;
+        }
+
+        for (TreeItem item : itemr) {
+            TextTag t = (TextTag) item;            
+            converter.convertCharacter(t.getSwf(), t.getCharacterId(), newTextType);
+        }
+
+        mainPanel.refreshTree();
+        if (itemr.size() == 1) {
+            TextTag t = (TextTag) itemr.get(0);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t.getSwf().getCharacter(t.getCharacterId()));
         }
     }
 
