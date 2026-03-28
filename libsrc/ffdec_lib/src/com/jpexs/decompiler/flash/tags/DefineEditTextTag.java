@@ -704,10 +704,10 @@ public class DefineEditTextTag extends TextTag {
                                         try {
                                             char firstChar = size.charAt(0);
                                             if (firstChar != '+' && firstChar != '-') {
-                                                int fontSize = Integer.parseInt(size);
+                                                double fontSize = Double.parseDouble(size);
                                                 style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
                                             } else {
-                                                int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
+                                                int fontSizeDelta = (int) Math.round(Double.parseDouble(size.substring(1)) * SWF.unitDivisor);
                                                 if (firstChar == '+') {
                                                     style.fontHeight = style.fontHeight + fontSizeDelta;
                                                 } else {
