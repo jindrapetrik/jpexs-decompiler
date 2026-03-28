@@ -47,7 +47,13 @@ public class XFLXmlWriter implements XMLStreamWriter {
     private final Map<String, String> namespaces = new HashMap<>();
 
     private final Stack<String> tagsStack = new Stack<>();
+    
+    private boolean makeNewLines = true;
 
+    public void setMakeNewLines(boolean makeNewLines) {
+        this.makeNewLines = makeNewLines;
+    }   
+    
     @Override
     public String toString() {
         return sb.toString();
@@ -66,6 +72,9 @@ public class XFLXmlWriter implements XMLStreamWriter {
     }
 
     private void makeNewLine() {
+        if (!makeNewLines) {
+            return;
+        }
         if (!newLine) {
             sb.append(newLineCharacters);
             newLine = true;
