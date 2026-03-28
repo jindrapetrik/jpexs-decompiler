@@ -1209,6 +1209,10 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> svgExportGaussianBlur = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> exportFlaAs3DisableScriptLayer = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
