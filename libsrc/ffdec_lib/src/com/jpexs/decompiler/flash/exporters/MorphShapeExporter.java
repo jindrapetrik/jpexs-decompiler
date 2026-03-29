@@ -116,7 +116,7 @@ public class MorphShapeExporter {
                 }
 
                 final int fCharacterID = characterID;
-                
+
                 final File file = new File(outdir + File.separator + characterID + settings.getFileExtension());
                 final File fileStart = new File(outdir + File.separator + characterID + ".start" + settings.getFileExtension());
                 final File fileEnd = new File(outdir + File.separator + characterID + ".end" + settings.getFileExtension());
@@ -173,8 +173,11 @@ public class MorphShapeExporter {
 
                             int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
 
-                            int newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
-                            int newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            int originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                            int originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
+
+                            int newWidth = originalWidth * realAaScale;
+                            int newHeight = originalHeight * realAaScale;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == MorphShapeExportMode.BMP_START_END) {
@@ -192,8 +195,7 @@ public class MorphShapeExporter {
                             BufferedImage bim = img.getBufferedImage();
 
                             if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
-                                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);                                                            
+                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                             }
 
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
@@ -210,8 +212,12 @@ public class MorphShapeExporter {
                             rect = st.getRect();
                             realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
 
-                            newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
-                            newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                            originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
+
+                            newWidth = originalWidth * realAaScale;
+                            newHeight = originalHeight * realAaScale;
+
                             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == MorphShapeExportMode.BMP_START_END) {
@@ -229,8 +235,7 @@ public class MorphShapeExporter {
                             bim = img.getBufferedImage();
 
                             if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
-                                    ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);                                                            
+                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                             }
 
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
@@ -256,7 +261,7 @@ public class MorphShapeExporter {
                                 ct.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 //FIXME!!! Handle Library Classes
-                                baos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));                        
+                                baos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
                                 SWF.libraryToHtmlCanvas(ct.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }
@@ -269,17 +274,16 @@ public class MorphShapeExporter {
                                     Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
-                            break;                                              
+                            break;
                     }
                 }, handler).run();
 
-                
                 SetBackgroundColorTag bkgTag = mst.getSwf().getBackgroundColor();
                 Color backgroundColor = null;
                 if (bkgTag != null) {
                     backgroundColor = bkgTag.backgroundColor.toColor();
                 }
-                
+
                 int iteratorNumFrames = 2;
                 if (settings.mode.hasDuration()) {
                     iteratorNumFrames = (int) Math.round(settings.duration * PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE);
@@ -287,14 +291,12 @@ public class MorphShapeExporter {
                     iteratorNumFrames = settings.numberOfFrames;
                 }
 
-                final boolean usesTransparency = settings.mode == MorphShapeExportMode.PNG_FRAMES 
-                    || settings.mode == MorphShapeExportMode.GIF
-                    || settings.mode == MorphShapeExportMode.WEBP_FRAMES;
-                        
-                
+                final boolean usesTransparency = settings.mode == MorphShapeExportMode.PNG_FRAMES
+                        || settings.mode == MorphShapeExportMode.GIF
+                        || settings.mode == MorphShapeExportMode.WEBP_FRAMES;
+
                 MyFrameIterator frameImages = new MyFrameIterator(mst, iteratorNumFrames, evl, usesTransparency, backgroundColor, settings);
 
-                
                 File dir;
                 switch (settings.mode) {
                     case SVG_FRAMES:
@@ -302,7 +304,7 @@ public class MorphShapeExporter {
                         RECT rect = mst.getRect();
                         m = Matrix.getScaleInstance(settings.zoom);
                         m.translate(-rect.Xmin, -rect.Ymin);
-                    
+
                         dir = new File(outdir + File.separator + fCharacterID);
                         Path.createDirectorySafe(dir);
 
@@ -312,12 +314,11 @@ public class MorphShapeExporter {
                         rect2.xMin *= settings.zoom;
                         rect2.yMin *= settings.zoom;
 
-
                         for (int f = 0; f < settings.numberOfFrames; f++) {
                             int ratio = (int) Math.round(f * 65535.0 / (settings.numberOfFrames - 1));
-                            File frameFile = new File(outdir + File.separator + fCharacterID + File.separator + (f + 1) + "_of_" + settings.numberOfFrames + settings.getFileExtension()); 
+                            File frameFile = new File(outdir + File.separator + fCharacterID + File.separator + (f + 1) + "_of_" + settings.numberOfFrames + settings.getFileExtension());
 
-                            new RetryTask(() -> {   
+                            new RetryTask(() -> {
                                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(frameFile))) {
                                     SVGExporter exporter = new SVGExporter(rect2, settings.zoom, "shape");
                                     mst.getShapeTagAtRatio(ratio).toSVG(0, 0, exporter, -2, new CXFORMWITHALPHA(), 0, m, m);
@@ -325,16 +326,16 @@ public class MorphShapeExporter {
                                 }
                             }, handler).run();
                         }
-                        break; 
-                        
+                        break;
+
                     case GIF:
                         frameImages.reset();
-                        new RetryTask(() -> {                            
+                        new RetryTask(() -> {
                             FrameExporter.makeGIF(frameImages, PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE, file, evl);
                             ret.add(file);
                         }, handler).run();
                         break;
-                        
+
                     case AVI:
                         frameImages.reset();
                         new RetryTask(() -> {
@@ -357,17 +358,16 @@ public class MorphShapeExporter {
                         }, handler).run();
                         break;
                     case PNG_FRAMES:
-                    case BMP_FRAMES:                        
-                    case WEBP_FRAMES:                                
+                    case BMP_FRAMES:
+                    case WEBP_FRAMES:
                         dir = new File(outdir + File.separator + fCharacterID);
                         Path.createDirectorySafe(dir);
 
-                        
                         frameImages.reset();
                         for (int i = 0; frameImages.hasNext(); i++) {
                             final int fi = i;
-                            new RetryTask(() -> {                                
-                                File frameFile = new File(outdir + File.separator + fCharacterID + File.separator + (fi + 1) + "_of_" + settings.numberOfFrames + settings.getFileExtension()); 
+                            new RetryTask(() -> {
+                                File frameFile = new File(outdir + File.separator + fCharacterID + File.separator + (fi + 1) + "_of_" + settings.numberOfFrames + settings.getFileExtension());
                                 BufferedImage img = frameImages.next();
                                 if (img != null) {
                                     if (settings.mode == MorphShapeExportMode.PNG_FRAMES) {
@@ -380,12 +380,12 @@ public class MorphShapeExporter {
                                         BMPFile.saveBitmap(img, frameFile);
                                     }
                                     ret.add(frameFile);
-                                }                                
+                                }
                             }, handler).run();
-                        }                                                
+                        }
                         break;
                 }
-                
+
                 Set<String> classNames = mst.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
@@ -441,7 +441,7 @@ public class MorphShapeExporter {
         }
         return ret;
     }
-    
+
     private class MyFrameIterator implements Iterator<BufferedImage> {
 
         private int pos = 0;
@@ -453,9 +453,11 @@ public class MorphShapeExporter {
         private final MorphShapeExportSettings settings;
         private final RECT rect;
         private final int realAaScale;
+        private final int originalWidth;
+        private final int originalHeight;
         private final int newWidth;
         private final int newHeight;
-        
+
         public MyFrameIterator(
                 MorphShapeTag mst,
                 int numFrames,
@@ -470,12 +472,13 @@ public class MorphShapeExporter {
             this.usesTransparency = usesTransparency;
             this.backgroundColor = backgroundColor;
             this.settings = settings;
-            
-            
+
             rect = mst.getRect();
             realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
-            newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
-            newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+            originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
+            originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
+            newWidth = originalWidth * realAaScale;
+            newHeight = originalHeight * realAaScale;
         }
 
         public void reset() {
@@ -486,7 +489,7 @@ public class MorphShapeExporter {
         public boolean hasNext() {
             if (CancellableWorker.isInterrupted()) {
                 return false;
-            }            
+            }
             return numFrames > pos;
         }
 
@@ -506,9 +509,9 @@ public class MorphShapeExporter {
             if (evl != null) {
                 evl.handleExportingEvent("frame", pos + 1, numFrames, tagName);
             }
-            
+
             int ratio = (int) Math.round(pos * 65535.0 / (numFrames - 1));
-                                
+
             ShapeTag st = mst.getShapeTagAtRatio(ratio);
 
             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
@@ -529,11 +532,9 @@ public class MorphShapeExporter {
             BufferedImage result = img.getBufferedImage();
 
             if (realAaScale > 1) {
-                result = ImageResizer.resizeImage(result, ((newWidth - 1) / realAaScale) + 1,
-                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);                                                            
+                result = ImageResizer.resizeImage(result, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
             }
-            
-            
+
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }

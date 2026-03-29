@@ -5031,9 +5031,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             return image;
         }
 
+        int originalWidth = (int) Math.ceil(rect.getWidth() * zoom / SWF.unitDivisor);
+        int originalHeight = (int) Math.ceil(rect.getHeight() * zoom / SWF.unitDivisor);        
+        
         SerializableImage image = new SerializableImage(
-                (int) Math.ceil(rect.getWidth() * zoom * aaScale / SWF.unitDivisor),
-                (int) Math.ceil(rect.getHeight() * zoom * aaScale / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE
+                originalWidth * aaScale,
+                originalHeight * aaScale, 
+                SerializableImage.TYPE_INT_ARGB_PRE
         );
         if (backGroundColor == null) {
             image.fillTransparent();
@@ -5061,7 +5065,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom * aaScale, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>(), aaScale);
 
         if (aaScale > 1) {
-            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));
+            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));
         }
 
         return image;
