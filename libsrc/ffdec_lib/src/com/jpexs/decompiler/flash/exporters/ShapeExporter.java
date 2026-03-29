@@ -77,8 +77,8 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ShapeExporter {       
-    
+public class ShapeExporter {
+
     public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom, int aaScale) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
@@ -133,8 +133,10 @@ public class ShapeExporter {
                         case BMP:
                         case WEBP:
                             int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, aaScale);
-                            int newWidth = (int) (rect.getWidth() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
-                            int newHeight = (int) (rect.getHeight() * settings.zoom * realAaScale / SWF.unitDivisor) + 1;
+                            int originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                            int originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
+                            int newWidth = originalWidth * realAaScale;
+                            int newHeight = originalHeight * realAaScale;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == ShapeExportMode.BMP) {
@@ -144,18 +146,17 @@ public class ShapeExporter {
                                     g.setColor(backColor.toColor());
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
-                            }                 
+                            }
                             Matrix m2 = Matrix.getScaleInstance(settings.zoom * realAaScale);
                             m2.translate(-rect.Xmin, -rect.Ymin);
-                            
+
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
-                            
+
                             BufferedImage bim = img.getBufferedImage();
                             if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, ((newWidth - 1) / realAaScale) + 1,
-                                        ((newHeight - 1) / realAaScale) + 1, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
+                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                             }
-                            
+
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(bim, ImageFormat.PNG, file);
                             } else if (settings.mode == ShapeExportMode.WEBP) {
@@ -178,7 +179,7 @@ public class ShapeExporter {
                                 needed.add(st.getCharacterId());
                                 st.getNeededCharactersDeep(needed, neededClasses);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                baos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));                        
+                                baos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
                                 //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
