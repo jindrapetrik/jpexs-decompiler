@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2026 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -64,6 +64,24 @@ public abstract class AbstractGfxImageTag extends ImageTag {
     }
 
     /**
+     * Searches for the DDS magic bytes "DDS " in the given data and returns
+     * the offset, or -1 if not found. This allows loading XBT files, which are
+     * DDS files with a custom header prepended.
+     *
+     * @param data File data
+     * @return Offset of DDS magic bytes, or -1 if not found
+     */
+    private int findDdsOffset(byte[] data) {
+        for (int i = 0; i <= data.length - 4; i++) {
+            if (data[i] == 0x44 && data[i + 1] == 0x44
+                    && data[i + 2] == 0x53 && data[i + 3] == 0x20) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Gets external buffered image.
      * @param fileName File name
      * @param bitmapFormat Bitmap format
@@ -79,6 +97,18 @@ public abstract class AbstractGfxImageTag extends ImageTag {
         } catch (InvalidPathException ip) {
             //ignore
         }
+
+        // If the file doesn't exist with its original extension, try .xbt
+        // (XBT files are DDS files with a custom header, named with .xbt on disk
+        // but referenced as .dds in the GFX tag)
+        if (imagePath != null && !imagePath.toFile().exists()) {
+            String xbtPath = imagePath.toString().replaceAll("(?i)\\.[^./\\\\]+$", ".xbt");
+            Path xbtImagePath = Paths.get(xbtPath);
+            if (xbtImagePath.toFile().exists()) {
+                imagePath = xbtImagePath;
+            }
+        }
+
         if (imagePath == null || !imagePath.toFile().exists()) {
 
             SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(getSwf().getShortPathTitle());
@@ -111,6 +141,16 @@ public abstract class AbstractGfxImageTag extends ImageTag {
                         imagePath = newImagePath;
                         break;
                     }
+                    // Also try .xbt extension
+                    String fileNameXbt = fileNameNoPrefix.replaceAll("(?i)\\.[^./]+$", ".xbt");
+                    if (!fileNameXbt.equals(fileNameNoPrefix)) {
+                        Path xbtPath = Paths.get(searchPath).resolve(fileNameXbt);
+                        if (xbtPath.toFile().exists()) {
+                            found = true;
+                            imagePath = xbtPath;
+                            break;
+                        }
+                    }
                 }
             }
             if (!found) {
@@ -124,12 +164,14 @@ public abstract class AbstractGfxImageTag extends ImageTag {
         } catch (IOException ex) {
             return null;
         }
-        if (imageData.length >= 4
-                && imageData[0] == 0x44
-                && imageData[1] == 0x44
-                && imageData[2] == 0x53
-                && imageData[3] == 0x20) {
-            return loadDds(imageData);
+
+        // Search for "DDS " magic bytes - handles both plain DDS files (offset 0)
+        // and XBT files where DDS data is preceded by a custom header.
+        int ddsOffset = findDdsOffset(imageData);
+        if (ddsOffset >= 0) {
+            byte[] ddsData = new byte[imageData.length - ddsOffset];
+            System.arraycopy(imageData, ddsOffset, ddsData, 0, ddsData.length);
+            return loadDds(ddsData);
         }
 
         if (fileName.toLowerCase().endsWith(".tga")
