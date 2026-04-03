@@ -219,6 +219,9 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
         r.Ymin -= maxWidth;
         r.Xmax += maxWidth;
         r.Ymax += maxWidth;
+        
+        r.Xmin -= SWF.unitDivisor / 2;
+        r.Ymin -= SWF.unitDivisor / 2;
 
         return r;
     }

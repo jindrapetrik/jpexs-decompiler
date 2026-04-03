@@ -118,7 +118,7 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     @Override
     public RECT getBounds(int shapeNum) {
         return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum, false);
-    }
+    }       
 
     /**
      * Updates morph shape tag.
@@ -290,5 +290,10 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
             }
         }
         return result;
+    }
+    
+    @Override
+    public int getMaxStrokeWidth(int shapeNum) {
+        return SHAPERECORD.getMaxStrokeWidth(shapeRecords, lineStyles, shapeNum);
     }
 }

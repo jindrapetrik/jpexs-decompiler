@@ -171,13 +171,11 @@ public class MorphShapeExporter {
                             st = mst.getStartShapeTag();
                             rect = st.getRect();
 
-                            int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
-
                             int originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
                             int originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
 
-                            int newWidth = originalWidth * realAaScale;
-                            int newHeight = originalHeight * realAaScale;
+                            int newWidth = originalWidth;
+                            int newHeight = originalHeight;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == MorphShapeExportMode.BMP_START_END) {
@@ -188,16 +186,11 @@ public class MorphShapeExporter {
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
                             }
-                            m = Matrix.getScaleInstance(settings.zoom * realAaScale);
+                            m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
 
                             BufferedImage bim = img.getBufferedImage();
-
-                            if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-                            }
-
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(bim, ImageFormat.PNG, fileStart);
                             } else if (settings.mode == MorphShapeExportMode.WEBP_START_END) {
@@ -210,13 +203,12 @@ public class MorphShapeExporter {
 
                             st = mst.getEndShapeTag();
                             rect = st.getRect();
-                            realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
-
+                            
                             originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
                             originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
 
-                            newWidth = originalWidth * realAaScale;
-                            newHeight = originalHeight * realAaScale;
+                            newWidth = originalWidth;
+                            newHeight = originalHeight;
 
                             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
@@ -228,15 +220,11 @@ public class MorphShapeExporter {
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
                             }
-                            m = Matrix.getScaleInstance(settings.zoom * realAaScale);
+                            m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
                             st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
 
                             bim = img.getBufferedImage();
-
-                            if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-                            }
 
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(bim, ImageFormat.PNG, fileEnd);
@@ -452,11 +440,8 @@ public class MorphShapeExporter {
         private final Color backgroundColor;
         private final MorphShapeExportSettings settings;
         private final RECT rect;
-        private final int realAaScale;
         private final int originalWidth;
         private final int originalHeight;
-        private final int newWidth;
-        private final int newHeight;
 
         public MyFrameIterator(
                 MorphShapeTag mst,
@@ -474,11 +459,8 @@ public class MorphShapeExporter {
             this.settings = settings;
 
             rect = mst.getRect();
-            realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, settings.aaScale);
             originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
             originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
-            newWidth = originalWidth * realAaScale;
-            newHeight = originalHeight * realAaScale;
         }
 
         public void reset() {
@@ -514,7 +496,7 @@ public class MorphShapeExporter {
 
             ShapeTag st = mst.getShapeTagAtRatio(ratio);
 
-            SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
+            SerializableImage img = new SerializableImage(originalWidth, originalHeight, SerializableImage.TYPE_INT_ARGB_PRE);
             img.fillTransparent();
             if (!usesTransparency) {
                 Graphics2D g = (Graphics2D) img.getGraphics();
@@ -525,15 +507,11 @@ public class MorphShapeExporter {
                 }
                 g.fillRect(0, 0, img.getWidth(), img.getHeight());
             }
-            Matrix m = Matrix.getScaleInstance(settings.zoom * realAaScale);
+            Matrix m = Matrix.getScaleInstance(settings.zoom);
             m.translate(-rect.Xmin, -rect.Ymin);
-            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), settings.zoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), settings.zoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
 
             BufferedImage result = img.getBufferedImage();
-
-            if (realAaScale > 1) {
-                result = ImageResizer.resizeImage(result, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-            }
 
             if (CancellableWorker.isInterrupted()) {
                 return null;

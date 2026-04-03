@@ -186,6 +186,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 }
             }
         }
+
+        if (min_x == Integer.MAX_VALUE) {
+            min_x = 0;
+        }
+        if (min_y == Integer.MAX_VALUE) {
+            min_y = 0;
+        }
         return new RECT(min_x, max_x, min_y, max_y);
     }
 
@@ -537,4 +544,33 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     }
 
     public abstract boolean isTooLarge();
+
+    public static int getMaxStrokeWidth(List<SHAPERECORD> records, LINESTYLEARRAY baseLineStyles, int shapeNum) {
+        LINESTYLEARRAY lineStyles = baseLineStyles;
+
+        int ret = 0;
+
+        for (SHAPERECORD rec : records) {
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateNewStyles) {
+                    lineStyles = scr.lineStyles;
+                }
+                if (scr.stateLineStyle) {
+                    if (scr.lineStyle > 0) {
+                        int width;
+                        if (shapeNum <= 3) {
+                            width = lineStyles.lineStyles[scr.lineStyle - 1].width;
+                        } else {
+                            width = lineStyles.lineStyles2[scr.lineStyle - 1].width;
+                        }
+                        if (width > ret) {
+                            ret = width;
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
 }

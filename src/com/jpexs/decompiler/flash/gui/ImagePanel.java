@@ -5081,7 +5081,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
 
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+        int aaScale = Configuration.useMsaaForDisplay.get() ? Configuration.msaaGridForDisplay.get() : 1;
 
         textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false, aaScale);
 
@@ -5217,12 +5217,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+        int aaScale = Configuration.useMsaaForDisplay.get() ? Configuration.msaaGridForDisplay.get() : 1;
 
-        aaScale = Configuration.calculateRealAaScale((int) viewRect.getWidth(), (int) viewRect.getHeight(), zoom, aaScale);
-
-        int width = aaScale * (int) (viewRect.getWidth() * zoom);
-        int height = aaScale * (int) (viewRect.getHeight() * zoom);
+        int width = (int) (viewRect.getWidth() * zoom);
+        int height = (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
             width = 1;
         }
@@ -5231,18 +5229,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         Rectangle realRectAA = new Rectangle(realRect);
-        realRectAA.x *= aaScale;
-        realRectAA.y *= aaScale;
-        realRectAA.width *= aaScale;
-        realRectAA.height *= aaScale;
-
+        
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
 
         Matrix m = new Matrix();
-        m.translate(-viewRect.xMin * zoom * aaScale, -viewRect.yMin * zoom * aaScale);
-        m.scale(zoom * aaScale);
+        m.translate(-viewRect.xMin * zoom, -viewRect.yMin * zoom);
+        m.scale(zoom);
 
         Matrix fullM = m.clone();
 
@@ -5279,7 +5273,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         if (Configuration.showGrid.get() && (drawable instanceof SWF) && !Configuration.gridOverObjects.get()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
-            drawGridSwf(g, realRectAA, zoom * aaScale);
+            drawGridSwf(g, realRectAA, zoom);
         }
 
         parentMatrix = new Matrix();
@@ -5291,7 +5285,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             ignoreDepths.add(parentDepthState.depth);
             if (Configuration.halfTransparentParentLayersEasy.get()) {
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
-                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
+                        parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
                         ignoreDepths, aaScale);
             }
             parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
@@ -5304,12 +5298,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
-        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom * aaScale, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
+        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
 
-        if (Configuration.reduceAntialiasConflationByScalingForDisplay.get()) {
-            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), image.getWidth() / aaScale, image.getHeight() / aaScale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));
-        }
-
+        
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
@@ -5885,12 +5876,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     first = false;
                     CharacterTag c = ds.getCharacter();
 
-                    ret.append(tagNameResolver.getTagName(c));
-                    if (ds.depth > -1) {
-                        ret.append(" ");
-                        ret.append(AppStrings.translate("imagePanel.depth"));
-                        ret.append(" ");
-                        ret.append(ds.depth);
+                    if (c != null) {
+                        ret.append(tagNameResolver.getTagName(c));
+                        if (ds.depth > -1) {
+                            ret.append(" ");
+                            ret.append(AppStrings.translate("imagePanel.depth"));
+                            ret.append(" ");
+                            ret.append(ds.depth);
+                        }
                     }
                 }
 

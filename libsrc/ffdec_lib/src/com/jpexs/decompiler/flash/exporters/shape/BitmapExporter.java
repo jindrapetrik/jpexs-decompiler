@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.shape.aa.AntialiasedBitmapExporter;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -66,49 +66,49 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
 
-    private SerializableImage image;
+    protected SerializableImage image;
 
-    private Graphics2D graphics;
+    protected Graphics2D graphics;
 
-    private final Color defaultColor;
+    protected final Color defaultColor;
 
-    private final SWF swf;
+    protected final SWF swf;
 
-    private final GeneralPath path;
+    protected final GeneralPath path;
 
-    private Paint fillPaint;
+    protected Paint fillPaint;
 
-    private boolean fillRepeat;
+    protected boolean fillRepeat;
 
-    private boolean fillSmooth;
+    protected boolean fillSmooth;
 
-    private AffineTransform fillTransform;
+    protected AffineTransform fillTransform;
 
-    private Paint linePaint;
+    protected Paint linePaint;
 
-    private AffineTransform lineTransform;
+    protected AffineTransform lineTransform;
 
-    private Color lineColor;
+    protected Color lineColor;
 
-    private Stroke lineStroke;
+    protected Stroke lineStroke;
 
-    private Stroke defaultStroke;
+    protected Stroke defaultStroke;
 
-    private Matrix strokeTransformation;
+    protected Matrix strokeTransformation;
 
-    private double thicknessScale;
-    private double thicknessScaleX;
-    private double thicknessScaleY;
+    protected double thicknessScale;
+    protected double thicknessScaleX;
+    protected double thicknessScaleY;
 
-    private double unzoom;
+    protected double unzoom;
     
-    private int aaScale;
+    protected int aaScale;
 
-    private static boolean linearGradientColorWarningShown = false;
+    protected static boolean linearGradientColorWarningShown = false;
 
-    private boolean scaleStrokes;
-
-    private class TransformedStroke implements Stroke {
+    protected boolean scaleStrokes;
+    
+    protected class TransformedStroke implements Stroke {
 
         /**
          * To make this serializable without problems.
@@ -176,41 +176,49 @@ public class BitmapExporter extends ShapeExporterBase {
      * @param aaScale Antialias conflation reducing scale coefficient
      */
     public static void export(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing, int aaScale) {
-        BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
-        exporter.setCanUseSmoothing(canUseSmoothing);
-        exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);
+        if (aaScale > 1) {
+            AntialiasedBitmapExporter.export(windingRule, shapeNum, swf, shape, defaultColor, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing, aaScale);
+        } else {
+            BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
+            exporter.setCanUseSmoothing(canUseSmoothing);
+            exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);      
+        }
     }
 
-    private BitmapExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
+    protected BitmapExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
         path = new GeneralPath(windingRule == ShapeTag.WIND_NONZERO ? GeneralPath.WIND_NON_ZERO : GeneralPath.WIND_EVEN_ODD);
     }
 
-    private void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes, int aaScale) {
+    protected void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes, int aaScale) {
         this.image = image;
         this.scaleStrokes = scaleStrokes;
         ExportRectangle bounds = new ExportRectangle(shape.getBounds(shapeNum));
         this.strokeTransformation = strokeTransformation;
-        calculateThicknessScale(bounds, transformation);
+        calculateThicknessScale();
 
         graphics = (Graphics2D) image.getGraphics();
-        AffineTransform at = transformation.toTransform();
-        at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        graphics.setTransform(at);
+        setTransform(graphics, transformation);
         defaultStroke = graphics.getStroke();
         this.unzoom = unzoom;
         this.aaScale = aaScale;
         super.export();
     }
+    
+    protected void setTransform(Graphics2D g, Matrix transformation) {
+        AffineTransform at = transformation.toTransform();
+        at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+        graphics.setTransform(at);        
+    }            
 
-    private void calculateThicknessScale(ExportRectangle bounds, Matrix transformation) {
+    protected void calculateThicknessScale() {
         com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
         com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
         thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
         thicknessScaleX = Math.abs(p11.x - p00.x);
-        thicknessScaleY = Math.abs(p11.y - p00.y);      
+        thicknessScaleY = Math.abs(p11.y - p00.y);            
     }
 
     /**
@@ -417,19 +425,9 @@ public class BitmapExporter extends ShapeExporterBase {
         //always display minimum stroke of 1 pixel, no matter how zoomed it is
         if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
             thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
-        }
-        
-        /*
-        if (Configuration.fixAntialiasConflation.get()) {
-            thickness += 1 * SWF.unitDivisor / unzoom;
-        }
-        */
-
+        }   
+                
         if (joinStyle == BasicStroke.JOIN_MITER) {
-            //lineStroke =  new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
-            /*if (Configuration.allowMiterClipLinestyle.get()) {
-                lineStroke = new MiterClipBasicStroke((BasicStroke) lineStroke);
-            }*/
             lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
