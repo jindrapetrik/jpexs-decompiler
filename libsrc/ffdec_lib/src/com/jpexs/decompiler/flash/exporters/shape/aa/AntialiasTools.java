@@ -451,7 +451,7 @@ public class AntialiasTools {
             return new PreparedContours(
                     windingRule,
                     new ArrayList<PreparedContour>(),
-                    (List<PreparedEdge>[]) new List[imageHeight],
+                    new PreparedEdge[imageHeight][],
                     0, 0, 0, 0
             );
         }
@@ -463,6 +463,7 @@ public class AntialiasTools {
         double globalMaxX = Double.NEGATIVE_INFINITY;
         double globalMaxY = Double.NEGATIVE_INFINITY;
 
+        @SuppressWarnings("unchecked")
         List<PreparedEdge>[] buckets = (List<PreparedEdge>[]) new List[imageHeight];
 
         for (List<Vec2> contour : contours) {
@@ -531,10 +532,17 @@ public class AntialiasTools {
             globalMinX = globalMinY = globalMaxX = globalMaxY = 0.0;
         }
 
+        PreparedEdge[][] arrayBuckets = new PreparedEdge[imageHeight][];
+        for (int i = 0; i < imageHeight; i++) {
+            if (buckets[i] != null) {
+                arrayBuckets[i] = buckets[i].toArray(new PreparedEdge[0]);
+            }
+        }
+
         return new PreparedContours(
                 windingRule,
                 preparedContours,
-                buckets,
+                arrayBuckets,
                 globalMinX, globalMinY, globalMaxX, globalMaxY
         );
     }
@@ -549,33 +557,26 @@ public class AntialiasTools {
         }
 
         int row = clamp((int) Math.floor(py), 0, prepared.edgeBucketsByRow.length - 1);
-        List<PreparedEdge> candidateEdges = prepared.edgeBucketsByRow[row];
-        if (candidateEdges == null || candidateEdges.isEmpty()) {
+        PreparedEdge[] candidateEdges = prepared.edgeBucketsByRow[row];
+        if (candidateEdges == null || candidateEdges.length == 0) {
             return false;
         }
 
         final double eps = 1e-9;
-
-        // Hrana
-        for (PreparedEdge e : candidateEdges) {
-            if (!e.bboxContains(px, py, eps)) {
-                continue;
-            }
-            if (pointOnPreparedEdge(px, py, e, eps)) {
-                return true;
-            }
-        }
+        final int edgeCount = candidateEdges.length;
 
         if (prepared.windingRule == PathIterator.WIND_EVEN_ODD) {
             int crossings = 0;
 
-            for (PreparedEdge e : candidateEdges) {
-                if (e.horizontal) {
-                    continue;
+            for (int i = 0; i < edgeCount; i++) {
+                PreparedEdge e = candidateEdges[i];
+
+                if (e.bboxContains(px, py, eps) && pointOnPreparedEdge(px, py, e, eps)) {
+                    return true;
                 }
 
-                if (((e.y0 > py) != (e.y1 > py))) {
-                    double xCross = e.x0 + (py - e.y0) * e.dx / e.dy;
+                if (!e.horizontal && ((e.y0 > py) != (e.y1 > py))) {
+                    double xCross = e.x0 + (py - e.y0) * e.dxOverDy;
                     if (px < xCross) {
                         crossings++;
                     }
@@ -586,18 +587,23 @@ public class AntialiasTools {
         } else {
             int winding = 0;
 
-            for (PreparedEdge e : candidateEdges) {
-                if (e.horizontal) {
-                    continue;
+            for (int i = 0; i < edgeCount; i++) {
+                PreparedEdge e = candidateEdges[i];
+
+                if (e.bboxContains(px, py, eps) && pointOnPreparedEdge(px, py, e, eps)) {
+                    return true;
                 }
 
-                if (e.y0 <= py) {
-                    if (e.y1 > py && isLeft(e.x0, e.y0, e.x1, e.y1, px, py) > 0.0) {
-                        winding++;
-                    }
-                } else {
-                    if (e.y1 <= py && isLeft(e.x0, e.y0, e.x1, e.y1, px, py) < 0.0) {
-                        winding--;
+                if (!e.horizontal) {
+                    double dpy = py - e.y0;
+                    if (e.y0 <= py) {
+                        if (e.y1 > py && e.dx * dpy - (px - e.x0) * e.dy > 0.0) {
+                            winding++;
+                        }
+                    } else {
+                        if (e.y1 <= py && e.dx * dpy - (px - e.x0) * e.dy < 0.0) {
+                            winding--;
+                        }
                     }
                 }
             }
@@ -982,12 +988,12 @@ public class AntialiasTools {
 
         final int windingRule;
         final List<PreparedContour> contours;
-        final List<PreparedEdge>[] edgeBucketsByRow;
+        final PreparedEdge[][] edgeBucketsByRow;
         final double minX, minY, maxX, maxY;
 
         PreparedContours(int windingRule,
                 List<PreparedContour> contours,
-                List<PreparedEdge>[] edgeBucketsByRow,
+                PreparedEdge[][] edgeBucketsByRow,
                 double minX, double minY, double maxX, double maxY) {
             this.windingRule = windingRule;
             this.contours = contours;
@@ -1026,6 +1032,7 @@ public class AntialiasTools {
         final double x0, y0, x1, y1;
         final double minX, minY, maxX, maxY;
         final double dx, dy;
+        final double dxOverDy;
         final double len2;
         final boolean horizontal;
 
@@ -1042,6 +1049,7 @@ public class AntialiasTools {
             this.dy = y1 - y0;
             this.len2 = dx * dx + dy * dy;
             this.horizontal = Math.abs(dy) <= 1e-15;
+            this.dxOverDy = horizontal ? 0.0 : dx / dy;
         }
 
         boolean bboxContains(double x, double y, double eps) {
