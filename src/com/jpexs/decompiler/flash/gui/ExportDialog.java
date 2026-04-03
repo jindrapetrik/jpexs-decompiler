@@ -174,6 +174,8 @@ public class ExportDialog extends AppDialog {
 
     private JCheckBox transparentFrameBackgroundCheckBox;
 
+    private JCheckBox antialiasCheckBox;
+
     private JTextField durationTextField = new JTextField(4);
 
     private JTextField numberOfFramesTextField = new JTextField(4);
@@ -276,6 +278,8 @@ public class ExportDialog extends AppDialog {
             }
         }
 
+        Configuration.useMsaaForExport.set(antialiasCheckBox.isSelected());
+
         StringBuilder cfg = new StringBuilder();
         for (int i = 0; i < optionNames.length; i++) {
             Object val = ((ComboValue) combos[i].getSelectedItem()).value;
@@ -346,6 +350,70 @@ public class ExportDialog extends AppDialog {
             numberOfFramesLabel.setVisible(mode.hasFrames());
             numberOfFramesTextField.setVisible(mode.hasFrames());
         }
+
+        boolean aaVisible = false;
+
+        if (isOptionEnabled(FrameExportMode.class)) {
+            FrameExportMode mode = getValue(FrameExportMode.class);
+            switch (mode) {
+                case CANVAS:
+                case PDF:
+                case SWF:
+                case SVG:
+                    break;
+                default:
+                    aaVisible = true;
+            }
+        }
+        if (isOptionEnabled(SpriteExportMode.class)) {
+            SpriteExportMode mode = getValue(SpriteExportMode.class);
+            switch (mode) {
+                case CANVAS:
+                case PDF:
+                case SWF:
+                case SVG:
+                    break;
+                default:
+                    aaVisible = true;
+            }
+        }
+        if (isOptionEnabled(ButtonExportMode.class)) {
+            ButtonExportMode mode = getValue(ButtonExportMode.class);
+            switch (mode) {
+                case SWF:
+                case SVG:
+                case SVG_COMBINED:
+                    break;
+                default:
+                    aaVisible = true;
+            }
+        }
+        if (isOptionEnabled(ShapeExportMode.class)) {
+            ShapeExportMode mode = getValue(ShapeExportMode.class);
+            switch (mode) {
+                case CANVAS:
+                case SWF:
+                case SVG:
+                    break;
+                default:
+                    aaVisible = true;
+            }
+        }
+        if (isOptionEnabled(MorphShapeExportMode.class)) {
+            MorphShapeExportMode mode = getValue(MorphShapeExportMode.class);
+            switch (mode) {
+                case CANVAS:
+                case SWF:
+                case SVG:
+                case SVG_FRAMES:
+                case SVG_START_END:
+                    break;
+                default:
+                    aaVisible = true;
+            }
+        }
+
+        antialiasCheckBox.setVisible(aaVisible);
 
         transparentFrameBackgroundCheckBox.setVisible(isOptionEnabled(FrameExportMode.class));
 
@@ -521,14 +589,13 @@ public class ExportDialog extends AppDialog {
             label.setLabelFor(combos[i]);
         }
 
-        
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.BOTH;
-        
+
         comboPanel.add(new JPanel(), gbc);
-        
+
         gbc.insets = new Insets(2, 2, 2, 2);
 
         embedCheckBox = new JCheckBox(translate("embed"));
@@ -569,6 +636,24 @@ public class ExportDialog extends AppDialog {
             if (Configuration.lastExportTransparentBackground.get()) {
                 transparentFrameBackgroundCheckBox.setSelected(true);
             }
+        }
+
+        antialiasCheckBox = new JCheckBox(translate("antialias"));
+        antialiasCheckBox.setToolTipText(translate("antialias.hint"));
+        antialiasCheckBox.setVisible(false);
+
+        if (Configuration.useMsaaForExport.get()) {
+            antialiasCheckBox.setSelected(true);
+        }
+
+        if (visibleOptionClasses.contains(FrameExportMode.class)
+                || visibleOptionClasses.contains(ButtonExportMode.class)
+                || visibleOptionClasses.contains(ShapeExportMode.class)
+                || visibleOptionClasses.contains(MorphShapeExportMode.class)
+                || visibleOptionClasses.contains(SpriteExportMode.class)) {
+            gbc.gridy++;
+            antialiasCheckBox.setVisible(true);
+            comboPanel.add(antialiasCheckBox, gbc);
         }
 
         durationTextField.setVisible(false);

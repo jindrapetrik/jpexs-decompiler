@@ -5035,8 +5035,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         int originalHeight = (int) Math.ceil(rect.getHeight() * zoom / SWF.unitDivisor);        
         
         SerializableImage image = new SerializableImage(
-                originalWidth * aaScale,
-                originalHeight * aaScale, 
+                originalWidth,
+                originalHeight, 
                 SerializableImage.TYPE_INT_ARGB_PRE
         );
         if (backGroundColor == null) {
@@ -5049,25 +5049,17 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         Matrix m = transformation.clone();
-        m.translate(-rect.Xmin * zoom * aaScale, -rect.Ymin * zoom * aaScale);
-        m.scale(zoom * aaScale);
+        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+        m.scale(zoom);
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
 
         ExportRectangle viewRect = new ExportRectangle(rect);
 
-        viewRect.xMin *= aaScale;
-        viewRect.yMin *= aaScale;
-        viewRect.xMax *= aaScale;
-        viewRect.yMax *= aaScale;
-
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom * aaScale, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>(), aaScale);
-
-        if (aaScale > 1) {
-            image = new SerializableImage(ImageResizer.resizeImage(image.getBufferedImage(), originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true));
-        }
-
+        
+        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, true, viewRect, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing, new ArrayList<>(), aaScale);
+        
         return image;
     }
 
@@ -6476,6 +6468,6 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Override
     public RECT getRectWithFilters() {
-        return getRect();
+        return getRectWithStrokes();
     }
 }

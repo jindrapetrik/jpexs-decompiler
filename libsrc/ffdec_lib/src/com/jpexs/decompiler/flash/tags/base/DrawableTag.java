@@ -145,7 +145,7 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
     
     @Override
     public RECT getRectWithFilters() {
-        RECT r = new RECT(getRect());
+        RECT r = new RECT(getRectWithStrokes());
         Dimension filterDimension = getFilterDimensions();
         r.Xmin -= filterDimension.width;
         r.Xmax += filterDimension.width;

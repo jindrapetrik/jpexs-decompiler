@@ -112,7 +112,7 @@ public class SHAPE implements NeedsCharacters, Serializable {
     public RECT getEdgeBounds() {
         return SHAPERECORD.getBounds(shapeRecords, null, 1, true);
     }
-
+    
     /**
      * Clears cached outline.
      */
@@ -205,5 +205,9 @@ public class SHAPE implements NeedsCharacters, Serializable {
         ret.shapeRecords = new ArrayList<>();
         ret.shapeRecords.add(new EndShapeRecord());
         return ret;
+    }
+    
+    public int getMaxStrokeWidth(int shapeNum) {
+        return SHAPERECORD.getMaxStrokeWidth(shapeRecords, null, shapeNum);
     }
 }

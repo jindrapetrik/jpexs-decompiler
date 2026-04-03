@@ -132,11 +132,10 @@ public class ShapeExporter {
                         case PNG:
                         case BMP:
                         case WEBP:
-                            int realAaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), settings.zoom, aaScale);
                             int originalWidth = (int) Math.ceil(rect.getWidth() * settings.zoom / SWF.unitDivisor);
                             int originalHeight = (int) Math.ceil(rect.getHeight() * settings.zoom / SWF.unitDivisor);
-                            int newWidth = originalWidth * realAaScale;
-                            int newHeight = originalHeight * realAaScale;
+                            int newWidth = originalWidth;
+                            int newHeight = originalHeight;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             if (settings.mode == ShapeExportMode.BMP) {
@@ -147,15 +146,13 @@ public class ShapeExporter {
                                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                                 }
                             }
-                            Matrix m2 = Matrix.getScaleInstance(settings.zoom * realAaScale);
+                            Matrix m2 = Matrix.getScaleInstance(settings.zoom);
                             m2.translate(-rect.Xmin, -rect.Ymin);
 
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom * realAaScale, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, realAaScale);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, aaScale);
 
                             BufferedImage bim = img.getBufferedImage();
-                            if (realAaScale > 1) {
-                                bim = ImageResizer.resizeImage(bim, originalWidth, originalHeight, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-                            }
+                           
 
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(bim, ImageFormat.PNG, file);

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -125,7 +126,9 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final int zeroCharacterWidth;
 
-    private JButton selectColorButton;
+    private final JButton selectColorButton;
+    
+    private JToggleButton msaaButton;
 
     static {
         Font font = new JLabel().getFont();
@@ -152,6 +155,19 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         selectColorButton = new JButton(View.getIcon("color16"));
         selectColorButton.addActionListener(this::selectBkColorButtonActionPerformed);
         selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
+        
+        msaaButton = new JToggleButton(View.getIcon("antialias16"));
+        msaaButton.addActionListener(this::msaaButtonActionPerformed);
+        msaaButton.setToolTipText(AppStrings.translate("button.antialias.hint"));
+        msaaButton.setSelected(Configuration.useMsaaForDisplay.get());
+        
+        Configuration.useMsaaForDisplay.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                msaaButton.setSelected(newValue);
+            }            
+        });
+        
 
         zoomPanel = new ZoomPanel(display);
         zoomPanel.setVisible(false);
@@ -162,6 +178,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         snapshotButton.setVisible(false);
 
         graphicButtonsPanel.add(zoomPanel);
+        graphicButtonsPanel.add(msaaButton);
         graphicButtonsPanel.add(selectColorButton);
         graphicButtonsPanel.add(snapshotButton);
 
@@ -499,6 +516,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         putImageToClipBoard(display.printScreen());
     }
 
+    private void msaaButtonActionPerformed(ActionEvent evt) {
+        Configuration.useMsaaForDisplay.set(msaaButton.isSelected());
+    }
+    
     private void showButtonActionPerformed(ActionEvent evt) {
         display.setDisplayed(showButton.isSelected());
         if (!showButton.isSelected()) {

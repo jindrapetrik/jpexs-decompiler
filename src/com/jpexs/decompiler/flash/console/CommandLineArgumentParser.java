@@ -2332,7 +2332,7 @@ public class CommandLineArgumentParser {
                     }
                 }
 
-                int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+                int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
                 // Here the exportFormats array should contain only validitems
                 commandLineMode = true;
@@ -3014,7 +3014,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         printHeader();
 
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+        int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
 

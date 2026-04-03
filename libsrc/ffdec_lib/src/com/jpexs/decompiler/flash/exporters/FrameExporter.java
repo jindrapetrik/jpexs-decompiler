@@ -268,8 +268,7 @@ public class FrameExporter {
 
             int fframe = subFrameMode ? fframes.get(0) : fframes.get(pos++);
             RECT displayRect = tim.getDisplayRectWithFilters();
-            int realAaScale = Configuration.calculateRealAaScale(displayRect.getWidth(), displayRect.getHeight(), settings.zoom, settings.aaScale);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, realAaScale).getBufferedImage();
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, subFrameMode ? pos++ : 0, null, 0, displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true, settings.aaScale).getBufferedImage();
             if (CancellableWorker.isInterrupted()) {
                 return null;
             }

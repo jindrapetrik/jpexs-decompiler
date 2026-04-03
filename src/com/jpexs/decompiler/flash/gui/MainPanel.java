@@ -2275,7 +2275,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 selFile2 = selFile;
             }
 
-            int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+            int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
             EventListener evl = swf.getExportEventListener();
 
@@ -2395,7 +2395,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+        int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
         EventListener evl = swf.getExportEventListener();
 
@@ -2491,7 +2491,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void exportAllDebug(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
         EventListener evl = swf.getExportEventListener();
 
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+        int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
         if (export.isOptionEnabled(ImageExportMode.class)) {
             for (ImageExportMode exportMode : ImageExportMode.values()) {
@@ -5667,7 +5667,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
 
-                        int aaScale = Configuration.reduceAntialiasConflationByScalingForExport.get() ? Configuration.reduceAntialiasConflationByScalingValueForExport.get() : 1;
+                        int aaScale = Configuration.useMsaaForExport.get() ? Configuration.msaaGridForExport.get() : 1;
 
                         FrameExporter frameExporter = new FrameExporter();
                         FrameExportSettings fes = new FrameExportSettings(mode, dialog.getZoom(), dialog.isTransparentFrameBackgroundEnabled(), aaScale);

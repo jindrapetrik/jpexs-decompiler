@@ -308,7 +308,7 @@ public class FolderPreviewPanel extends JPanel {
             treeItem = ((SceneFrame) treeItem).getFrame();
         }
         
-        int aaScale = Configuration.reduceAntialiasConflationByScalingForDisplay.get() ? Configuration.reduceAntialiasConflationByScalingValueForDisplay.get() : 1;
+        int aaScale = Configuration.useMsaaForDisplay.get() ? Configuration.msaaGridForDisplay.get() : 1;
                 
         if (treeItem instanceof Frame) {
             Frame fn = (Frame) treeItem;
@@ -333,8 +333,6 @@ public class FolderPreviewPanel extends JPanel {
             String key = "frame_" + fn.frame + "_" + timeline.id + "_" + zoom;
             imgSrc = swf.getFromCache(key);
             if (imgSrc == null) {            
-                aaScale = Configuration.calculateRealAaScale(rect.getWidth(), rect.getHeight(), zoom, aaScale);
-                
                 imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, swf.getBackgroundColor() == null ? null : swf.getBackgroundColor().backgroundColor.toColor(), zoom, !Configuration.disableBitmapSmoothing.get(), aaScale);
                 swf.putToCache(key, imgSrc);
             }
@@ -385,23 +383,14 @@ public class FolderPreviewPanel extends JPanel {
             return null;
         }
 
-        aaScale = Configuration.calculateRealAaScale(width, height, 1, aaScale);
-        
         if (imgSrc == null) {
-            m = m.preConcatenate(Matrix.getScaleInstance(scale * aaScale));        
+            m = m.preConcatenate(Matrix.getScaleInstance(scale));        
             DrawableTag drawable = (DrawableTag) treeItem;
             ExportRectangle viewRectangle = new ExportRectangle(0, 0, ow, oh);
             
-            SerializableImage imageLarger = new SerializableImage(width * aaScale, height * aaScale, SerializableImage.TYPE_INT_ARGB);
+            SerializableImage imageLarger = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
             imageLarger.fillTransparent();                    
-            drawable.toImage(0, 0, 0, new RenderContext(), imageLarger, imageLarger, false, m, new Matrix(), m, m, null, scale * aaScale, false, viewRectangle, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), aaScale);
-            if (aaScale > 1) {
-                SerializableImage imageNormalSize = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
-                imageNormalSize.fillTransparent();
-            
-                imageNormalSize.getGraphics().drawImage(imageLarger.getBufferedImage().getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-                return imageNormalSize;
-            }
+            drawable.toImage(0, 0, 0, new RenderContext(), imageLarger, imageLarger, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), aaScale);            
             return imageLarger;
         } 
         
