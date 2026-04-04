@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +146,7 @@ public class NamespaceItem {
         }
         if (kind == KIND_NAMESPACE_CUSTOM) {
             String custom = name.toRawString();
-            PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, "", abcIndex, openedNamespaces, new ArrayList<>(), false, null, -1);
+            PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, "", abcIndex, openedNamespaces, new ArrayList<>(), false, null, -1, new TypeItem(""));
             Reference<ValueKind> value = new Reference<>(null);
             Reference<ABC> outAbc = new Reference<>(null);
             Reference<Boolean> isType = new Reference<>(false);
