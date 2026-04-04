@@ -31,6 +31,8 @@ public class CurvedEdgeRecord extends SHAPERECORD {
     public static final boolean typeFlag = true;
 
     public static final boolean straightFlag = false;
+    
+    public static final int MAX_NUM_BITS = 15;
 
     @Calculated
     @SWFType(value = BasicType.UB, count = 4)
@@ -127,5 +129,5 @@ public class CurvedEdgeRecord extends SHAPERECORD {
         }
         return this.anchorDeltaY == other.anchorDeltaY;
     }
-
+    
 }

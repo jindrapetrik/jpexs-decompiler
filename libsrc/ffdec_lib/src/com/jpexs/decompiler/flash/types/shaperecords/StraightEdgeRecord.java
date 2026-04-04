@@ -43,6 +43,8 @@ public class StraightEdgeRecord extends SHAPERECORD {
     public static final boolean typeFlag = true;
 
     public static final boolean straightFlag = true;
+    
+    public static final int MAX_NUM_BITS = 15;
 
     @Calculated
     @SWFType(value = BasicType.UB, count = 4)
