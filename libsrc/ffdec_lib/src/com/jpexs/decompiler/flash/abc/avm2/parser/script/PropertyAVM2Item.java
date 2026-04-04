@@ -500,8 +500,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<Trait> outPropTrait = new Reference<>(null);
         try {
             SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0);
-            localData.pkg = thisType.fullTypeName.getWithoutLast();
-            localData.currentClassBaseName = thisType.fullTypeName.getLast();
+            if (thisType != null) {
+                localData.pkg = thisType.fullTypeName.getWithoutLast();
+                localData.currentClassBaseName = thisType.fullTypeName.getLast();            
+            }
             
             resolve(false, localData /*???*/, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
 
