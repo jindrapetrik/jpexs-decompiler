@@ -70,6 +70,7 @@ public class CallAVM2Item extends AVM2Item {
      * ABC indexing
      */
     private AbcIndexing abcIndex;
+    private final TypeItem thisType;
 
     /**
      * Constructor.
@@ -78,14 +79,16 @@ public class CallAVM2Item extends AVM2Item {
      * @param name Name
      * @param arguments Arguments
      * @param abcIndex ABC indexing
+     * @param thisType This type
      */
-    public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex) {
+    public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex, TypeItem thisType) {
         super(null, null, NOPRECEDENCE);
         this.openedNamespaces = openedNamespaces;
         this.name = name;
         this.arguments = arguments;
         this.line = line;
         this.abcIndex = abcIndex;
+        this.thisType = thisType;
     }
 
     @Override
@@ -136,7 +139,7 @@ public class CallAVM2Item extends AVM2Item {
                     nobj.setRegNumber(0);
                     obj = nobj;
                 }*/
-                PropertyAVM2Item p = new PropertyAVM2Item(obj, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), g.abcIndex, n.openedNamespaces, new ArrayList<>(), false, null, line);
+                PropertyAVM2Item p = new PropertyAVM2Item(obj, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), g.abcIndex, n.openedNamespaces, new ArrayList<>(), false, null, line, thisType);
                 p.setAssignedValue(n.getAssignedValue());
                 callable = p;
             }

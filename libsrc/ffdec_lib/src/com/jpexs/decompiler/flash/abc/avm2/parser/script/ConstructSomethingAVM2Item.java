@@ -37,7 +37,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
      * Opened namespaces
      */
     public List<NamespaceItem> openedNamespaces;
-
+    
     /**
      * Constructor.
      * @param line Line
@@ -46,8 +46,8 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
      * @param arguments Arguments
      * @param abcIndex ABC index
      */
-    public ConstructSomethingAVM2Item(int line, List<NamespaceItem> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex) {
-        super(openedNamespaces, line, name, arguments, abcIndex);
+    public ConstructSomethingAVM2Item(int line, List<NamespaceItem> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex, TypeItem thisType) {
+        super(openedNamespaces, line, name, arguments, abcIndex, thisType);
         this.openedNamespaces = openedNamespaces;
     }
 

@@ -102,10 +102,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     private final String nsKeyword;
     
     private int line;
+    private final TypeItem thisType;
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack, nullish, nsKeyword, line);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack, nullish, nsKeyword, line, thisType);
         return p;
     }
 
@@ -122,8 +123,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      * @param nullish Nullish
      * @param nsKeyword Namespace keyword (public,protected,private,internal)
      * @param line Source code line
+     * @param thisType This class
      */
-    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack, boolean nullish, String nsKeyword, int line) {
+    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack, boolean nullish, String nsKeyword, int line, TypeItem thisType) {
         this.attribute = attribute;
         this.propertyName = propertyName;
         this.namespaceSuffix = namespaceSuffix;
@@ -134,6 +136,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         this.nullish = nullish;
         this.nsKeyword = nsKeyword;
         this.line = line;
+        this.thisType = thisType;
     }
 
     @Override
@@ -496,13 +499,17 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<Boolean> isType = new Reference<>(false);
         Reference<Trait> outPropTrait = new Reference<>(null);
         try {
-            resolve(false, new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
+            SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0);
+            localData.pkg = thisType.fullTypeName.getWithoutLast();
+            localData.currentClassBaseName = thisType.fullTypeName.getLast();
+            
+            resolve(false, localData /*???*/, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
 
             return propType.getVal();
         } catch (CompilationException ex) {
             Logger.getLogger(PropertyAVM2Item.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        return TypeItem.UNBOUNDED;
     }
 
     /**
