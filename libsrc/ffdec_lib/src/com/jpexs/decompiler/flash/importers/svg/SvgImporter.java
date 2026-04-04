@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.svg.css.CssParseException;
 import com.jpexs.decompiler.flash.importers.svg.css.CssParser;
 import com.jpexs.decompiler.flash.importers.svg.css.CssSelectorToXPath;
+import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -53,6 +54,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -611,6 +613,69 @@ public class SvgImporter {
             }
         }
     }
+    
+    private void addStraightRecord(List<SHAPERECORD> newRecords, int deltaX, int deltaY) {
+        StraightEdgeRecord ser = new StraightEdgeRecord();
+        ser.deltaX = deltaX;
+        ser.deltaY = deltaY;
+        ser.generalLineFlag = true;
+        ser.simplify();
+        ser.calculateBits();
+        
+        //Line is too long, split into half
+        if (ser.numBits > StraightEdgeRecord.MAX_NUM_BITS) {
+            int deltaX1 = deltaX / 2;
+            int deltaY1 = deltaY / 2;
+            int deltaX2 = deltaX1;
+            int deltaY2 = deltaY1;
+            
+            if (deltaX1 + deltaX2 < deltaX) {
+                deltaX2++;
+            }
+            if (deltaY1 + deltaY2 < deltaY) {
+                deltaY2++;
+            }
+            
+            addStraightRecord(newRecords, deltaX1, deltaY1);
+            addStraightRecord(newRecords, deltaX2, deltaY2);
+            return;
+        }
+        
+        newRecords.add(ser);
+    }
+    
+    private void addCurvedRecord(List<SHAPERECORD> newRecords, int controlDeltaX, int controlDeltaY, int anchorDeltaX, int anchorDeltaY) {
+        CurvedEdgeRecord cer = new CurvedEdgeRecord();
+        cer.controlDeltaX = controlDeltaX;
+        cer.controlDeltaY = controlDeltaY;
+        cer.anchorDeltaX = anchorDeltaX;
+        cer.anchorDeltaY = anchorDeltaY;
+        cer.calculateBits();
+        
+        //Curve is too long, split into half
+        if (cer.numBits > CurvedEdgeRecord.MAX_NUM_BITS) {
+            BezierEdge be = new BezierEdge(0, 0, cer.controlDeltaX, cer.controlDeltaY, cer.controlDeltaX + cer.anchorDeltaX, cer.controlDeltaY + cer.anchorDeltaY);
+            Reference<BezierEdge> leftRef = new Reference<>(null);
+            Reference<BezierEdge> rightRef = new Reference<>(null);
+            be.split(0.5, leftRef, rightRef);
+            BezierEdge left = leftRef.getVal();
+            BezierEdge right = rightRef.getVal();
+            int controlDeltaX1 = (int) Math.round(left.points.get(1).getX());
+            int controlDeltaY1 = (int) Math.round(left.points.get(1).getY());
+            int anchorDeltaX1 = (int) Math.round(left.points.get(2).getX()) - controlDeltaX1;
+            int anchorDeltaY1 = (int) Math.round(left.points.get(2).getY()) - controlDeltaY1;
+            int controlDeltaX2 = (int) Math.round(right.points.get(1).getX()) - controlDeltaX1 - anchorDeltaX1;
+            int controlDeltaY2 = (int) Math.round(right.points.get(1).getY()) - controlDeltaY1 - anchorDeltaY1;
+            int anchorDeltaX2 = controlDeltaX + anchorDeltaX - controlDeltaX1 - anchorDeltaX1 - controlDeltaX2;
+            int anchorDeltaY2 = controlDeltaY + anchorDeltaY - controlDeltaY1 - anchorDeltaY1 - controlDeltaY2;
+            
+            addCurvedRecord(newRecords, controlDeltaX1, controlDeltaY1, anchorDeltaX1, anchorDeltaY1);
+            addCurvedRecord(newRecords, controlDeltaX2, controlDeltaY2, anchorDeltaX2, anchorDeltaY2);
+            return;
+        }
+        
+        newRecords.add(cer);
+    }
 
     private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style, boolean morphShape, boolean shape2) {
 
@@ -706,85 +771,69 @@ public class SvgImporter {
                     empty = true;
                     break;
                 case 'Z':
-                    StraightEdgeRecord serz = new StraightEdgeRecord();
                     p = startPoint;
-                    serz.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    serz.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + serz.deltaX, prevPoint.y + serz.deltaY);
-                    serz.generalLineFlag = true;
-                    serz.simplify();
-                    serz.calculateBits();
-                    newRecords.add(serz);
+                    int deltaX = (int) Math.round(p.x - prevPoint.x);
+                    int deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + deltaX, prevPoint.y + deltaY);
+                    addStraightRecord(newRecords, deltaX, deltaY);
                     if (lineStyle2Obj != null) {
                         lineStyle2Obj.noClose = false;
                     }
                     empty = true;
                     break;
-                case 'L':
-                    StraightEdgeRecord serl = new StraightEdgeRecord();
+                case 'L':                    
                     x = command.params[0];
                     y = command.params[1];
 
                     p = transform2.transform(x, y);
-                    serl.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    serl.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + serl.deltaX, prevPoint.y + serl.deltaY);
-                    serl.generalLineFlag = true;
-                    serl.simplify();
-                    serl.calculateBits();
-                    newRecords.add(serl);
+                    deltaX = (int) Math.round(p.x - prevPoint.x);
+                    deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + deltaX, prevPoint.y + deltaY);
+                    addStraightRecord(newRecords, deltaX, deltaY);
                     empty = false;
                     break;
                 case 'H':
-                    StraightEdgeRecord serh = new StraightEdgeRecord();
                     x = command.params[0];
 
                     p = transform2.transform(x, y);
-                    serh.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    deltaX = (int) Math.round(p.x - prevPoint.x);
                     //deltaX is not enough as transformation can make deltaY difference
-                    serh.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + serh.deltaX, prevPoint.y + serh.deltaY);
-                    serh.generalLineFlag = true;
-                    serh.simplify();
-                    serh.calculateBits();
-                    newRecords.add(serh);
+                    deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + deltaX, prevPoint.y + deltaY);
+                    addStraightRecord(newRecords, deltaX, deltaY);
                     empty = false;
                     break;
                 case 'V':
-                    StraightEdgeRecord serv = new StraightEdgeRecord();
                     y = command.params[0];
 
                     p = transform2.transform(x, y);
 
                     //deltaY is not enough as transformation can make deltaX difference
-                    serv.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    serv.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + serv.deltaX, prevPoint.y + serv.deltaY);
-                    serv.generalLineFlag = true;
-                    serv.simplify();
-                    serv.calculateBits();
-                    newRecords.add(serv);
+                    deltaX = (int) Math.round(p.x - prevPoint.x);
+                    deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + deltaX, prevPoint.y + deltaY);
+                    addStraightRecord(newRecords, deltaX, deltaY);
                     empty = false;
                     break;
                 case 'Q':
-                    CurvedEdgeRecord cer = new CurvedEdgeRecord();
                     x = command.params[0];
                     y = command.params[1];
 
                     p = transform2.transform(x, y);
-                    cer.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
-                    cer.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + cer.controlDeltaX, prevPoint.y + cer.controlDeltaY);
+                    int controlDeltaX = (int) Math.round(p.x - prevPoint.x);
+                    int controlDeltaY = (int) Math.round(p.y - prevPoint.y);                                        
+                    
+                    prevPoint = new Point(prevPoint.x + controlDeltaX, prevPoint.y + controlDeltaY);
 
                     x = command.params[2];
                     y = command.params[3];
 
                     p = transform2.transform(x, y);
-                    cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
-                    cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x + cer.anchorDeltaX, prevPoint.y + cer.anchorDeltaY);
-                    cer.calculateBits();
-                    newRecords.add(cer);
+                    int anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
+                    int anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + anchorDeltaX, prevPoint.y + anchorDeltaY);
+                    
+                    addCurvedRecord(newRecords, controlDeltaX, controlDeltaY, anchorDeltaX, anchorDeltaY);
                     empty = false;
                     break;
                 case 'C':
@@ -811,18 +860,17 @@ public class SvgImporter {
 
                     List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 1);
                     for (int i = 2; i < quadCoordinates.size();) {
-                        CurvedEdgeRecord cerc = new CurvedEdgeRecord();
                         p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
-                        cerc.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
-                        cerc.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
-                        prevPoint = new Point(prevPoint.x + cerc.controlDeltaX, prevPoint.y + cerc.controlDeltaY);
+                        int subControlDeltaX = (int) Math.round(p.x - prevPoint.x);
+                        int subControlDeltaY = (int) Math.round(p.y - prevPoint.y);
+                        prevPoint = new Point(prevPoint.x + subControlDeltaX, prevPoint.y + subControlDeltaY);
 
                         p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
-                        cerc.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
-                        cerc.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
-                        prevPoint = new Point(prevPoint.x + cerc.anchorDeltaX, prevPoint.y + cerc.anchorDeltaY);
-                        cerc.calculateBits();
-                        newRecords.add(cerc);
+                        int subAnchorDeltaX = (int) Math.round(p.x - prevPoint.x);
+                        int subAnchorDeltaY = (int) Math.round(p.y - prevPoint.y);
+                        prevPoint = new Point(prevPoint.x + subAnchorDeltaX, prevPoint.y + subAnchorDeltaY);
+                        
+                        addCurvedRecord(newRecords, subControlDeltaX, subControlDeltaY, subAnchorDeltaX, subAnchorDeltaY);                        
                     }
 
                     empty = false;
@@ -2217,5 +2265,5 @@ public class SvgImporter {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, text);
             shownWarnings.add(name);
         }
-    }
+    }        
 }
