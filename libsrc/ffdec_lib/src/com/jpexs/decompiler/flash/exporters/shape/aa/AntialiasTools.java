@@ -675,6 +675,7 @@ public class AntialiasTools {
         private final int height;
         private final int sampleCount;
         private final int[] sampleOffsets;
+        private ColorMode colorMode = ColorMode.SRGB_FLASH_COMPAT;
 
         private static final int SUBPIXEL_BITS = 8;
         private static final int SUBPIXEL_SCALE = 1 << SUBPIXEL_BITS;
@@ -764,9 +765,19 @@ public class AntialiasTools {
             int b8 = argb & 0xFF;
 
             float a = a8 / 255.0f;
-            float r = (float) srgbToLinear(r8) * a;
-            float g = (float) srgbToLinear(g8) * a;
-            float b = (float) srgbToLinear(b8) * a;
+            float r;
+            float g;
+            float b;
+
+            if (colorMode == ColorMode.SRGB_FLASH_COMPAT) {
+                r = (r8 / 255.0f) * a;
+                g = (g8 / 255.0f) * a;
+                b = (b8 / 255.0f) * a;
+            } else {
+                r = SRGB_TO_LINEAR_8[r8] * a;
+                g = SRGB_TO_LINEAR_8[g8] * a;
+                b = SRGB_TO_LINEAR_8[b8] * a;
+            }
 
             for (int i = 0; i < sampleA.length; i++) {
                 sampleA[i] = a;
@@ -875,9 +886,18 @@ public class AntialiasTools {
                                 continue;
                             }
 
-                            float srcR = (float) SRGB_TO_LINEAR_8[r8] * srcA;
-                            float srcG = (float) SRGB_TO_LINEAR_8[g8] * srcA;
-                            float srcB = (float) SRGB_TO_LINEAR_8[b8] * srcA;
+                            float srcR;
+                            float srcG;
+                            float srcB;
+                            if (colorMode == ColorMode.SRGB_FLASH_COMPAT) {
+                                srcR = (r8 / 255.0f) * srcA;
+                                srcG = (g8 / 255.0f) * srcA;
+                                srcB = (b8 / 255.0f) * srcA;
+                            } else {
+                                srcR = SRGB_TO_LINEAR_8[r8] * srcA;
+                                srcG = SRGB_TO_LINEAR_8[g8] * srcA;
+                                srcB = SRGB_TO_LINEAR_8[b8] * srcA;
+                            }
 
                             int idx = base + s;
                             float dstA = sampleA[idx];
@@ -1027,13 +1047,11 @@ public class AntialiasTools {
                         sumPB += sampleB[idx];
                     }
 
-                    // source z MSAA bufferu: linear premultiplied
                     float srcA = sumA / sampleCount;
                     float srcPR = sumPR / sampleCount;
                     float srcPG = sumPG / sampleCount;
                     float srcPB = sumPB / sampleCount;
 
-                    // destination pixel
                     int dstArgb = dst[pixelIndex];
                     int dstA8 = (dstArgb >>> 24) & 0xFF;
                     int dstR8 = (dstArgb >>> 16) & 0xFF;
@@ -1046,36 +1064,45 @@ public class AntialiasTools {
                     float dstPB = 0f;
 
                     if (dstA > 1e-12f) {
-                        if (dstIsPremultiplied) {
-                            // ARGB_PRE: uložené RGB je sRGB-premultiplied
-                            float dstRs = (dstR8 / 255.0f) / dstA;
-                            float dstGs = (dstG8 / 255.0f) / dstA;
-                            float dstBs = (dstB8 / 255.0f) / dstA;
-
-                            dstRs = clamp01(dstRs);
-                            dstGs = clamp01(dstGs);
-                            dstBs = clamp01(dstBs);
-
-                            float dstRl = srgbToLinearFloat(dstRs);
-                            float dstGl = srgbToLinearFloat(dstGs);
-                            float dstBl = srgbToLinearFloat(dstBs);
-
-                            dstPR = dstRl * dstA;
-                            dstPG = dstGl * dstA;
-                            dstPB = dstBl * dstA;
+                        if (colorMode == ColorMode.SRGB_FLASH_COMPAT) {
+                            if (dstIsPremultiplied) {
+                                dstPR = dstR8 / 255.0f;
+                                dstPG = dstG8 / 255.0f;
+                                dstPB = dstB8 / 255.0f;
+                            } else {
+                                dstPR = (dstR8 / 255.0f) * dstA;
+                                dstPG = (dstG8 / 255.0f) * dstA;
+                                dstPB = (dstB8 / 255.0f) * dstA;
+                            }
                         } else {
-                            // ARGB: uložené RGB je straight sRGB
-                            float dstRl = srgb8ToLinearFloat(dstR8);
-                            float dstGl = srgb8ToLinearFloat(dstG8);
-                            float dstBl = srgb8ToLinearFloat(dstB8);
+                            if (dstIsPremultiplied) {
+                                float dstRs = (dstR8 / 255.0f) / dstA;
+                                float dstGs = (dstG8 / 255.0f) / dstA;
+                                float dstBs = (dstB8 / 255.0f) / dstA;
 
-                            dstPR = dstRl * dstA;
-                            dstPG = dstGl * dstA;
-                            dstPB = dstBl * dstA;
+                                dstRs = clamp01(dstRs);
+                                dstGs = clamp01(dstGs);
+                                dstBs = clamp01(dstBs);
+
+                                float dstRl = srgbToLinearFloat(dstRs);
+                                float dstGl = srgbToLinearFloat(dstGs);
+                                float dstBl = srgbToLinearFloat(dstBs);
+
+                                dstPR = dstRl * dstA;
+                                dstPG = dstGl * dstA;
+                                dstPB = dstBl * dstA;
+                            } else {
+                                float dstRl = srgb8ToLinearFloat(dstR8);
+                                float dstGl = srgb8ToLinearFloat(dstG8);
+                                float dstBl = srgb8ToLinearFloat(dstB8);
+
+                                dstPR = dstRl * dstA;
+                                dstPG = dstGl * dstA;
+                                dstPB = dstBl * dstA;
+                            }
                         }
                     }
 
-                    // SrcOver v linear premultiplied
                     float invSrcA = 1.0f - srcA;
 
                     float outA = srcA + dstA * invSrcA;
@@ -1089,29 +1116,38 @@ public class AntialiasTools {
                     int outB8;
 
                     if (outA > 1e-12f) {
-                        float outRl = outPR / outA;
-                        float outGl = outPG / outA;
-                        float outBl = outPB / outA;
+                        if (colorMode == ColorMode.SRGB_FLASH_COMPAT) {
+                            float outRs = clamp01(outPR / outA);
+                            float outGs = clamp01(outPG / outA);
+                            float outBs = clamp01(outPB / outA);
 
-                        outRl = clamp01(outRl);
-                        outGl = clamp01(outGl);
-                        outBl = clamp01(outBl);
-
-                        if (dstIsPremultiplied) {
-                            // zapisujeme do ARGB_PRE:
-                            // linear premult -> straight linear -> straight sRGB -> premult v sRGB
-                            float outRs = linearToSrgbFloat(outRl);
-                            float outGs = linearToSrgbFloat(outGl);
-                            float outBs = linearToSrgbFloat(outBl);
-
-                            outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
-                            outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
-                            outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            if (dstIsPremultiplied) {
+                                outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            } else {
+                                outR8 = clamp255((int) (outRs * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * 255.0f + 0.5f));
+                            }
                         } else {
-                            // zapisujeme do straight ARGB
-                            outR8 = linearToSrgb8Fast(outRl);
-                            outG8 = linearToSrgb8Fast(outGl);
-                            outB8 = linearToSrgb8Fast(outBl);
+                            float outRl = clamp01(outPR / outA);
+                            float outGl = clamp01(outPG / outA);
+                            float outBl = clamp01(outPB / outA);
+
+                            if (dstIsPremultiplied) {
+                                float outRs = linearToSrgbFloat(outRl);
+                                float outGs = linearToSrgbFloat(outGl);
+                                float outBs = linearToSrgbFloat(outBl);
+
+                                outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            } else {
+                                outR8 = linearToSrgb8Fast(outRl);
+                                outG8 = linearToSrgb8Fast(outGl);
+                                outB8 = linearToSrgb8Fast(outBl);
+                            }
                         }
                     } else {
                         outR8 = outG8 = outB8 = 0;
@@ -1174,7 +1210,6 @@ public class AntialiasTools {
                         sumPB += sampleB[idx];
                     }
 
-                    // source z MSAA bufferu: linear premultiplied
                     float outA = sumA / sampleCount;
                     float outPR = sumPR / sampleCount;
                     float outPG = sumPG / sampleCount;
@@ -1186,30 +1221,38 @@ public class AntialiasTools {
                     int outB8;
 
                     if (outA > 1e-12f) {
-                        // straight linear
-                        float outRl = outPR / outA;
-                        float outGl = outPG / outA;
-                        float outBl = outPB / outA;
+                        if (colorMode == ColorMode.SRGB_FLASH_COMPAT) {
+                            float outRs = clamp01(outPR / outA);
+                            float outGs = clamp01(outPG / outA);
+                            float outBs = clamp01(outPB / outA);
 
-                        outRl = clamp01(outRl);
-                        outGl = clamp01(outGl);
-                        outBl = clamp01(outBl);
-
-                        if (dstIsPremultiplied) {
-                            // zapisujeme do ARGB_PRE:
-                            // linear premult -> straight linear -> straight sRGB -> premult v sRGB
-                            float outRs = linearToSrgbFloat(outRl);
-                            float outGs = linearToSrgbFloat(outGl);
-                            float outBs = linearToSrgbFloat(outBl);
-
-                            outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
-                            outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
-                            outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            if (dstIsPremultiplied) {
+                                outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            } else {
+                                outR8 = clamp255((int) (outRs * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * 255.0f + 0.5f));
+                            }
                         } else {
-                            // zapisujeme do straight ARGB
-                            outR8 = linearToSrgb8Fast(outRl);
-                            outG8 = linearToSrgb8Fast(outGl);
-                            outB8 = linearToSrgb8Fast(outBl);
+                            float outRl = clamp01(outPR / outA);
+                            float outGl = clamp01(outPG / outA);
+                            float outBl = clamp01(outPB / outA);
+
+                            if (dstIsPremultiplied) {
+                                float outRs = linearToSrgbFloat(outRl);
+                                float outGs = linearToSrgbFloat(outGl);
+                                float outBs = linearToSrgbFloat(outBl);
+
+                                outR8 = clamp255((int) (outRs * outA * 255.0f + 0.5f));
+                                outG8 = clamp255((int) (outGs * outA * 255.0f + 0.5f));
+                                outB8 = clamp255((int) (outBs * outA * 255.0f + 0.5f));
+                            } else {
+                                outR8 = linearToSrgb8Fast(outRl);
+                                outG8 = linearToSrgb8Fast(outGl);
+                                outB8 = linearToSrgb8Fast(outBl);
+                            }
                         }
                     } else {
                         outR8 = outG8 = outB8 = 0;
@@ -1218,6 +1261,18 @@ public class AntialiasTools {
                     dst[pixelIndex] = (outA8 << 24) | (outR8 << 16) | (outG8 << 8) | outB8;
                 }
             }
+        }
+
+        public void setColorMode(ColorMode colorMode) {
+            if (colorMode == null) {
+                this.colorMode = ColorMode.LINEAR;
+            } else {
+                this.colorMode = colorMode;
+            }
+        }
+
+        public ColorMode getColorMode() {
+            return colorMode;
         }
     }
 
@@ -1342,5 +1397,10 @@ public class AntialiasTools {
         };
         f.setContentPane(p);
         f.setVisible(true);
+    }
+
+    public static enum ColorMode {
+        LINEAR,
+        SRGB_FLASH_COMPAT
     }
 }
