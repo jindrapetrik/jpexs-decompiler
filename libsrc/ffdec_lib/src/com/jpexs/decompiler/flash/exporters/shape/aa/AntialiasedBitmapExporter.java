@@ -17,13 +17,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
@@ -48,13 +49,13 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
     private Matrix vecTrans;
     private Matrix vecTransLines;
 
-    private ExportRectangle viewRect;
-
     private boolean inLines = false;
 
     private boolean closeLine = false;
 
     private double curveFlattness = 1.0;
+
+    private static final int BASE_TILE_SIZE = 4096;
 
     /**
      * Exports a shape to a bitmap.
@@ -85,10 +86,8 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
     @Override
     protected void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes, int aaScale) {
-
         this.strokeTransformation = strokeTransformation;
         calculateThicknessScale();
-        //double s = Math.max(transformation.scaleX,transformation.scaleY);
 
         RECT bounds = new RECT(shape.getBounds(shapeNum));
 
@@ -100,82 +99,109 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
         bounds.Ymax += maxStrokeWidth;
 
         vecTrans = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
-        viewRect = vecTrans.transform(new ExportRectangle(bounds));
+        ExportRectangle shapeViewRect = vecTrans.transform(new ExportRectangle(bounds));
 
-        /*viewRect.xMin -= 1;
-        viewRect.yMin -= 1;
-        viewRect.yMax += 1;
-        viewRect.xMax += 1;*/
-        viewRect.xMin = Math.floor(viewRect.xMin - unzoom - 0.5);
-        viewRect.yMin = Math.floor(viewRect.yMin - unzoom - 0.5);
-        viewRect.xMax = Math.ceil(viewRect.xMax + unzoom);
-        viewRect.yMax = Math.ceil(viewRect.yMax + unzoom);
+        if (shapeViewRect.xMax > image.getWidth()) {
+            shapeViewRect.xMax = image.getWidth();
+        }
 
-        int width = (int) viewRect.getWidth();
-        int height = (int) viewRect.getHeight();
-        vecTrans = vecTrans.preConcatenate(Matrix.getTranslateInstance(-viewRect.xMin, -viewRect.yMin));
-        vecTransLines = vecTrans.preConcatenate(Matrix.getTranslateInstance(-0.5, -0.5));
-        Graphics2D g = (Graphics2D) image.getGraphics();
+        if (shapeViewRect.yMax > image.getHeight()) {
+            shapeViewRect.yMax = image.getHeight();
+        }
 
-        //g.setTransform(t);
+        if (shapeViewRect.xMin < 0) {
+            shapeViewRect.xMin = 0;
+        }
+
+        if (shapeViewRect.yMin < 0) {
+            shapeViewRect.yMin = 0;
+        }
+
+        shapeViewRect.xMin = Math.floor(shapeViewRect.xMin - unzoom - 0.5);
+        shapeViewRect.yMin = Math.floor(shapeViewRect.yMin - unzoom - 0.5);
+        shapeViewRect.xMax = Math.ceil(shapeViewRect.xMax + unzoom);
+        shapeViewRect.yMax = Math.ceil(shapeViewRect.yMax + unzoom);
+
+        int width = (int) shapeViewRect.getWidth();
+        int height = (int) shapeViewRect.getHeight();
+
         if (width <= 0 || height <= 0) {
             return;
         }
 
+        int tileSize = BASE_TILE_SIZE / aaScale;
+
+        int cx = (int) Math.ceil(width / (double) tileSize);
+        int cy = (int) Math.ceil(height / (double) tileSize);
+
+        vecTrans = vecTrans.preConcatenate(Matrix.getTranslateInstance(-shapeViewRect.xMin, -shapeViewRect.yMin));
+
         curveFlattness = 1.0 / aaScale;
-
-        BufferedImage image2 = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-        Graphics2D g2 = (Graphics2D) image2.getGraphics();
-        g2.setComposite(AlphaComposite.Src);
-        g2.setColor(new Color(0, 0, 0, 0));
-        g2.fillRect(0, 0, width, height);
-        try {
-            rz = new AntialiasTools.SceneRasterizerMSAA(width, height, aaScale);
-        } catch (OutOfMemoryError er) {
-            System.gc();
-            return;
-        }
-        rz.clear(0x00000000);
-        Shape clip = g.getClip();
-        if (clip != null) {
-            AffineTransform t = new AffineTransform(g.getTransform());
-            t.preConcatenate(AffineTransform.getTranslateInstance(-viewRect.xMin, -viewRect.yMin));
-            clip = t.createTransformedShape(clip);
-            List<List<Vec2>> clipContours = AntialiasTools.shapeToContours(clip, curveFlattness);
-            rz.setClipContours(clipContours, Path2D.WIND_EVEN_ODD);
-        }
-
         this.image = image;
         this.scaleStrokes = scaleStrokes;
-
         graphics = (Graphics2D) image.getGraphics();
-        setTransform(graphics, transformation);
-        defaultStroke = graphics.getStroke();
-        this.unzoom = unzoom;
-        this.aaScale = 1; //aaScale;
-        super.export();
 
-        //super.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);
-        //rz.resolveToReplace(image2);
-        rz.resolveTo(image2);
+        Matrix vecTransBase = vecTrans;
 
-        g.setComposite(AlphaComposite.SrcOver);
-        g.setTransform(new AffineTransform());
-        g.drawImage(image2, (int) viewRect.xMin, (int) viewRect.yMin, null);
+        for (int y = 0; y < cy; y++) {
+            for (int x = 0; x < cx; x++) {
+                vecTrans = vecTransBase.preConcatenate(Matrix.getTranslateInstance(-tileSize * x, -tileSize * y));
+                vecTransLines = vecTrans.preConcatenate(Matrix.getTranslateInstance(-0.5, -0.5));
+
+                int subWidth = tileSize;
+                int subHeight = tileSize;
+
+                if (x * tileSize + tileSize > width) {
+                    subWidth = width - x * tileSize;
+                }
+                if (y * tileSize + tileSize > height) {
+                    subHeight = height - y * tileSize;
+                }
+
+                BufferedImage image2 = new BufferedImage(subWidth, subHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+                Graphics2D g2 = (Graphics2D) image2.getGraphics();
+                g2.setComposite(AlphaComposite.Src);
+                g2.setColor(new Color(0, 0, 0, 0));
+                g2.fillRect(0, 0, subWidth, subHeight);
+                try {
+                    rz = new AntialiasTools.SceneRasterizerMSAA(subWidth, subHeight, aaScale);
+                } catch (OutOfMemoryError er) {
+                    System.gc();
+                    return;
+                }
+                rz.clear(0x00000000);
+                Shape clip = graphics.getClip();
+                if (clip != null) {
+                    AffineTransform t = new AffineTransform(graphics.getTransform());
+                    t.preConcatenate(AffineTransform.getTranslateInstance(-shapeViewRect.xMin - tileSize * x, -shapeViewRect.yMin - tileSize * y));
+                    clip = t.createTransformedShape(clip);
+                    List<List<Vec2>> clipContours = AntialiasTools.shapeToContours(clip, curveFlattness);
+                    rz.setClipContours(clipContours, Path2D.WIND_EVEN_ODD);
+                }
+
+                AffineTransform at = transformation.toTransform();
+                at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+                at.preConcatenate(AffineTransform.getTranslateInstance(-shapeViewRect.xMin - tileSize * x, -shapeViewRect.yMin - tileSize * y));
+                graphics.setTransform(at);
+
+                defaultStroke = graphics.getStroke();
+                this.unzoom = unzoom;
+                this.aaScale = 1; //aaScale;
+                super.export();
+
+                rz.resolveTo(image2);
+
+                graphics.setComposite(AlphaComposite.SrcOver);
+                graphics.setTransform(new AffineTransform());
+                graphics.drawImage(image2, (int) shapeViewRect.xMin + tileSize * x, (int) shapeViewRect.yMin + tileSize * y, null);
+            }
+        }
 
         /*
         g.setColor(new Color(0,0,0,128));
         g.setStroke(new BasicStroke(1));
         g.drawRect((int) viewRect.xMin, (int) viewRect.yMin, (int) viewRect.getWidth(), (int) viewRect.getHeight());
          */
-    }
-
-    @Override
-    protected void setTransform(Graphics2D g, Matrix transformation) {
-        AffineTransform at = transformation.toTransform();
-        at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        at.preConcatenate(AffineTransform.getTranslateInstance(-viewRect.xMin, -viewRect.yMin));
-        graphics.setTransform(at);
     }
 
     /**
@@ -289,23 +315,6 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
             t.preConcatenate(fillTransform);
         }
 
-        /*int w = sx2 - sx;
-        int h = sy2 - sy;
-        
-        int one = (int) (1 * unzoom);
-        BufferedImage imgTrans = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB_PRE);
-        Graphics2D g = (Graphics2D) imgTrans.getGraphics();
-        g.setComposite(AlphaComposite.Src);
-        g.setColor(new Color(0,255,0,255));
-        g.fillRect(0, 0, w + 2, h + 2);
-        
-        g.drawImage(image, 1, 1, 1 + w, 1 + h, sx,sy,sx2,sy2, null);
-         */
-        //t.concatenate(AffineTransform.getTranslateInstance(-1, -1));
-        //t.preConcatenate(AffineTransform.getTranslateInstance(-1 * unzoom, -1 * unzoom));
-        //new Rectangle2D.Double(sx, sy, sx2 - sx, sy2 - sy)
-        //rz.fillContoursWithPaint(cs, windingRule, new TexturePaint(imgTrans, new Rectangle2D.Double(0,0,w+2,h+2)), t, smooth);
-        //new TexturePaint(image, new Rectangle2D.Double(sx, sy, sx2 - sx, sy2 - sy))
         rz.fillContoursWithPaint(cs, windingRule, Color.black, t, smooth, image);
     }
 
