@@ -49,6 +49,35 @@ public class AntialiasTools {
         }
     }
 
+    private static IVec2[] toFixedContour(List<Vec2> contour) {
+        if (contour == null || contour.isEmpty()) {
+            return null;
+        }
+
+        List<IVec2> pts = new ArrayList<>();
+
+        for (Vec2 p : contour) {
+            if (p == null) {
+                continue;
+            }
+            if (!Double.isFinite(p.x) || !Double.isFinite(p.y)) {
+                continue;
+            }
+
+            IVec2 ip = new IVec2(toFixed(p.x), toFixed(p.y));
+
+            if (pts.isEmpty()) {
+                pts.add(ip);
+            } else {
+                IVec2 last = pts.get(pts.size() - 1);
+                if (last.x != ip.x || last.y != ip.y) {
+                    pts.add(ip);
+                }
+            }
+        }
+        return pts.toArray(new IVec2[0]);
+    }
+
     private static IVec2[] toCleanFixedContour(List<Vec2> contour) {
         if (contour == null || contour.isEmpty()) {
             return null;
@@ -108,7 +137,7 @@ public class AntialiasTools {
         return pts.toArray(new IVec2[0]);
     }
 
-    public static Shape contoursToShape(List<List<Vec2>> contours, int windingRule, boolean close) {
+    public static Shape contoursToShape(List<List<Vec2>> contours, int windingRule, boolean close, boolean isStroke) {
         GeneralPath path = new GeneralPath(windingRule);
 
         if (contours == null) {
@@ -116,7 +145,7 @@ public class AntialiasTools {
         }
 
         for (List<Vec2> contour : contours) {
-            IVec2[] ipts = toCleanFixedContour(contour);
+            IVec2[] ipts = isStroke ? toFixedContour(contour) : toCleanFixedContour(contour);
             if (ipts == null || ipts.length < 2) {
                 continue;
             }

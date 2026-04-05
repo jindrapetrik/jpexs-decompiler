@@ -21,12 +21,16 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  * Antialiased Shape Bitmap Exporter
@@ -334,7 +338,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         if ((linePaint != null && lineStroke != null) || lineColor != null) {
             Stroke stroke = lineStroke == null ? defaultStroke : lineStroke;
-            Shape shape = AntialiasTools.contoursToShape(contours, Path2D.WIND_EVEN_ODD, closeLine);
+            Shape shape = AntialiasTools.contoursToShape(contours, Path2D.WIND_EVEN_ODD, closeLine, true);
             Shape strokedShape = stroke.createStrokedShape(shape);
             List<List<Vec2>> strokeContours = AntialiasTools.shapeToContours(strokedShape, curveFlattness);
 
