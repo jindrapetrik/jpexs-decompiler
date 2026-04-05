@@ -421,7 +421,6 @@
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
     </target>    
     <target name="dist" unless="no_dist">
-        <echo>DIST called</echo>
         <!-- depends="build,exe" -->
     </target>
     
