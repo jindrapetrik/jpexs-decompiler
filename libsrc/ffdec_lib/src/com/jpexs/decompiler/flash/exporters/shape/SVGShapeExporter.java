@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -238,11 +239,13 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         finalizePath();
         
-        //always display minimum stroke of 1 pixel, no matter how zoomed it is
-        if (thickness * displayZoom * thicknessScale < 1 * SWF.unitDivisor) {
-            path.setAttribute("ffdec:has-small-stroke", "true");
-            path.setAttribute("ffdec:original-stroke-width", Double.toString(thickness * displayZoom / SWF.unitDivisor));
-            thickness = 1 * SWF.unitDivisor / displayZoom / thicknessScale;
+        if (Configuration.useMinimumStrokeWidth1Px.get()) {
+            //display minimum stroke of 1 pixel, no matter how zoomed it is
+            if (thickness * displayZoom * thicknessScale < 1 * SWF.unitDivisor) {
+                path.setAttribute("ffdec:has-small-stroke", "true");
+                path.setAttribute("ffdec:original-stroke-width", Double.toString(thickness * displayZoom / SWF.unitDivisor));
+                thickness = 1 * SWF.unitDivisor / displayZoom / thicknessScale;
+            }
         }
         
         thickness *= zoom / SWF.unitDivisor;        

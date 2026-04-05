@@ -1233,6 +1233,10 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Integer> msaaGridForExport = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> useMinimumStrokeWidth1Px = null;
+    
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
