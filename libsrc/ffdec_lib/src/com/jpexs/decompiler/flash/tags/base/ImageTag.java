@@ -293,28 +293,42 @@ public abstract class ImageTag extends DrawableTag {
             style.moveDeltaY = rect.Ymin;
         }
         shape.shapeRecords.add(style);
-        StraightEdgeRecord top = new StraightEdgeRecord();
-        top.generalLineFlag = true;
-        top.deltaX = rect.getWidth();
-        top.calculateBits();
-        StraightEdgeRecord right = new StraightEdgeRecord();
-        right.generalLineFlag = true;
-        right.deltaY = rect.getHeight();
-        right.calculateBits();
-        StraightEdgeRecord bottom = new StraightEdgeRecord();
-        bottom.generalLineFlag = true;
-        bottom.deltaX = -rect.getWidth();
-        bottom.calculateBits();
-        StraightEdgeRecord left = new StraightEdgeRecord();
-        left.generalLineFlag = true;
-        left.deltaY = -rect.getHeight();
-        left.calculateBits();
-        shape.shapeRecords.add(top);
-        shape.shapeRecords.add(right);
-        shape.shapeRecords.add(bottom);
-        shape.shapeRecords.add(left);
+        
+        addStraightRecord(shape, rect.getWidth(), 0);
+        addStraightRecord(shape, 0, rect.getHeight());
+        addStraightRecord(shape, -rect.getWidth(), 0);
+        addStraightRecord(shape, 0, -rect.getHeight());
+        
         shape.shapeRecords.add(new EndShapeRecord());
         return shape;
+    }
+    
+    private void addStraightRecord(SHAPEWITHSTYLE shape, int deltaX, int deltaY) {
+        StraightEdgeRecord ser = new StraightEdgeRecord();
+        ser.generalLineFlag = true;
+        ser.deltaX = deltaX;
+        ser.deltaY = deltaY;
+        ser.simplify();
+        ser.calculateBits();
+        
+        //Line is too long, split into half
+        if (ser.numBits > StraightEdgeRecord.MAX_NUM_BITS) {
+            int deltaX1 = deltaX / 2;
+            int deltaY1 = deltaY / 2;
+            int deltaX2 = deltaX1;
+            int deltaY2 = deltaY1;
+            
+            if (deltaX1 + deltaX2 < deltaX) {
+                deltaX2++;
+            }
+            if (deltaY1 + deltaY2 < deltaY) {
+                deltaY2++;
+            }
+            addStraightRecord(shape, deltaX1, deltaY1);
+            addStraightRecord(shape, deltaX2, deltaY2);
+            return;
+        }
+        shape.shapeRecords.add(ser);
     }
 
     @Override
@@ -424,5 +438,5 @@ public abstract class ImageTag extends DrawableTag {
     @Override
     public Dimension getFilterDimensions() {
         return new Dimension(0, 0);                
-    }       
+    }
 }
