@@ -1,8 +1,12 @@
 package com.jpexs.decompiler.flash.exporters.shape.aa;
 
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -10,7 +14,9 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,7 +37,6 @@ public class AntialiasTools {
 
     private static final int FIXED_SHIFT = 8;
     private static final int FIXED_ONE = 1 << FIXED_SHIFT;
-
 
     static final class IVec2 {
 
@@ -1434,6 +1439,11 @@ public class AntialiasTools {
         }
     }
 
+    public static enum ColorMode {
+        LINEAR,
+        SRGB_FLASH_COMPAT
+    }
+
     public static void main(String[] args) {
         System.setProperty("sun.java2d.uiScale", "1.0");
         JFrame f = new JFrame();
@@ -1450,26 +1460,45 @@ public class AntialiasTools {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+
+                g.setColor(Color.white);
+                g.fillRect(0, 0, 500, 500);
                 Graphics2D g2 = (Graphics2D) g;
-                /*AffineTransform t = AffineTransform.getScaleInstance(16, 16);
-                t.preConcatenate(AffineTransform.getTranslateInstance(100, 100));*/
-                g2.translate(100, 100);
-                g2.scale(16, 16);
-                //g2.setTransform(t);
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g2.setPaint(new TexturePaint(fimg, new Rectangle2D.Double(0, 0, 10, 10)));
-                //g2.fillRect(0,0,10,10);
-                double eps = 0; //0.5; //0.5 / 16.0;   // půl cílového pixelu v "user space"
-                g2.fill(new Rectangle2D.Double(0, 0, 10 - eps, 10 - eps));
+
+                BufferedImage img = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB_PRE);
+                Graphics2D gi = (Graphics2D) img.getGraphics();
+                gi.setComposite(AlphaComposite.Src);
+                gi.setColor(new Color(0, 0, 0, 0));
+                gi.fillRect(0, 0, 500, 500);
+                SceneRasterizerMSAA sr = new SceneRasterizerMSAA(500, 500, 4);
+                List<List<Vec2>> contours = new ArrayList<>();
+                List<Vec2> contour = new ArrayList<>();
+                contour.add(new Vec2(0, 0));
+                contour.add(new Vec2(500, 0));
+                contour.add(new Vec2(500, 500));
+                contour.add(new Vec2(0, 500));
+                contours.add(contour);
+                sr.fillContoursWithPaint(contours, Path2D.WIND_EVEN_ODD, Color.blue);
+
+                LinearGradientPaint gp = new LinearGradientPaint(
+                        new Point2D.Double(0, 0),
+                        new Point2D.Double(0, 500),
+                        new float[]{0, 1},
+                        new Color[]{new Color(255, 0, 0, 128), new Color(0, 255, 0, 128)},
+                        MultipleGradientPaint.CycleMethod.NO_CYCLE,
+                        MultipleGradientPaint.ColorSpaceType.SRGB,
+                        new AffineTransform()
+                );
+
+                sr.fillContoursWithPaint(contours, Path2D.WIND_EVEN_ODD, gp);
+
+                sr.resolveTo(img);
+                g.drawImage(img, 0, 0, null);
+
             }
 
         };
         f.setContentPane(p);
         f.setVisible(true);
-    }
-
-    public static enum ColorMode {
-        LINEAR,
-        SRGB_FLASH_COMPAT
     }
 }
