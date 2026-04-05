@@ -324,7 +324,7 @@ class SvgStyle {
         }
         Color strokeFillColor = ((SvgColor) strokeFill).color;
 
-        int opacity = (int) Math.round(getOpacity() * getStopOpacity() * 255);
+        int opacity = (int) Math.round(getOpacity() * getStrokeOpacity() * 255);
         if (opacity > 255) {
             opacity = 255;
         }
