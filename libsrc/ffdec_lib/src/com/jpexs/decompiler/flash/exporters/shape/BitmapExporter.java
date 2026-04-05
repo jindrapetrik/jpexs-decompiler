@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -422,10 +423,12 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        //always display minimum stroke of 1 pixel, no matter how zoomed it is
-        if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
-            thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
-        }   
+        if (Configuration.useMinimumStrokeWidth1Px.get()) {
+            //display minimum stroke of 1 pixel, no matter how zoomed it is
+            if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
+                thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
+            }   
+        }
                 
         if (joinStyle == BasicStroke.JOIN_MITER) {
             lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);

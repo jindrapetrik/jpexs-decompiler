@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.exporters.shape.aa;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
@@ -412,9 +413,11 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         thickness *= unzoom / SWF.unitDivisor;
 
-        //always display minimum stroke of 1 pixel, no matter how zoomed it is
-        if (thickness < 1) {
-            thickness = 1;
+        if (Configuration.useMinimumStrokeWidth1Px.get()) {
+            //display minimum stroke of 1 pixel, no matter how zoomed it is
+            if (thickness < 1) {
+                thickness = 1;
+            }
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
