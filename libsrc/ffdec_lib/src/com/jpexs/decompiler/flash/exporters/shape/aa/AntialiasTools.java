@@ -32,6 +32,77 @@ public class AntialiasTools {
     private static final int FIXED_SHIFT = 8;
     private static final int FIXED_ONE = 1 << FIXED_SHIFT;
 
+
+    static final class IVec2 {
+
+        final int x;
+        final int y;
+
+        IVec2(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private static IVec2[] toCleanFixedContour(List<Vec2> contour) {
+        if (contour == null || contour.isEmpty()) {
+            return null;
+        }
+
+        List<IVec2> pts = new ArrayList<IVec2>();
+
+        for (Vec2 p : contour) {
+            if (p == null) {
+                continue;
+            }
+            if (!Double.isFinite(p.x) || !Double.isFinite(p.y)) {
+                continue;
+            }
+
+            IVec2 ip = new IVec2(toFixed(p.x), toFixed(p.y));
+
+            if (pts.isEmpty()) {
+                pts.add(ip);
+            } else {
+                IVec2 last = pts.get(pts.size() - 1);
+                if (last.x != ip.x || last.y != ip.y) {
+                    pts.add(ip);
+                }
+            }
+        }
+
+        if (pts.size() > 1) {
+            IVec2 first = pts.get(0);
+            IVec2 last = pts.get(pts.size() - 1);
+            if (first.x == last.x && first.y == last.y) {
+                pts.remove(pts.size() - 1);
+            }
+        }
+
+        boolean changed = true;
+        while (changed && pts.size() >= 3) {
+            changed = false;
+            for (int i = 0; i < pts.size(); i++) {
+                IVec2 a = pts.get((i - 1 + pts.size()) % pts.size());
+                IVec2 b = pts.get(i);
+                IVec2 c = pts.get((i + 1) % pts.size());
+
+                long area2 = (long) (b.x - a.x) * (c.y - a.y) - (long) (b.y - a.y) * (c.x - a.x);
+                if (area2 == 0) {
+                    pts.remove(i);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        if (pts.size() < 3) {
+            return null;
+        }
+
+        return pts.toArray(new IVec2[0]);
+    }
+
     public static Shape contoursToShape(List<List<Vec2>> contours, int windingRule, boolean close) {
         GeneralPath path = new GeneralPath(windingRule);
 
@@ -40,16 +111,15 @@ public class AntialiasTools {
         }
 
         for (List<Vec2> contour : contours) {
-            if (contour == null || contour.isEmpty()) {
+            IVec2[] ipts = toCleanFixedContour(contour);
+            if (ipts == null || ipts.length < 2) {
                 continue;
             }
 
-            Vec2 first = contour.get(0);
-            path.moveTo((float) first.x, (float) first.y);
+            path.moveTo(ipts[0].x / (float) FIXED_ONE, ipts[0].y / (float) FIXED_ONE);
 
-            for (int i = 1; i < contour.size(); i++) {
-                Vec2 p = contour.get(i);
-                path.lineTo((float) p.x, (float) p.y);
+            for (int i = 1; i < ipts.length; i++) {
+                path.lineTo(ipts[i].x / (float) FIXED_ONE, ipts[i].y / (float) FIXED_ONE);
             }
 
             if (close) {
@@ -494,48 +564,43 @@ public class AntialiasTools {
         List<PreparedEdge>[] buckets = (List<PreparedEdge>[]) new List[imageHeight];
 
         for (List<Vec2> contour : contours) {
-            List<Vec2> cleaned = AntialiasTools.removeDuplicateAndCollinear(contour, 1e-9);
-            if (cleaned == null || cleaned.size() < 3) {
+            IVec2[] ipts = toCleanFixedContour(contour);
+            if (ipts == null || ipts.length < 3) {
                 continue;
             }
-
-            int pointCount = cleaned.size();
-            int[] xs = new int[pointCount];
-            int[] ys = new int[pointCount];
 
             int minX = Integer.MAX_VALUE;
             int minY = Integer.MAX_VALUE;
             int maxX = Integer.MIN_VALUE;
             int maxY = Integer.MIN_VALUE;
 
-            for (int i = 0; i < pointCount; i++) {
-                Vec2 p = cleaned.get(i);
-                int fx = toFixed(p.x);
-                int fy = toFixed(p.y);
-                xs[i] = fx;
-                ys[i] = fy;
-                if (fx < minX) {
-                    minX = fx;
+            for (IVec2 p : ipts) {
+                if (p.x < minX) {
+                    minX = p.x;
                 }
-                if (fy < minY) {
-                    minY = fy;
+                if (p.y < minY) {
+                    minY = p.y;
                 }
-                if (fx > maxX) {
-                    maxX = fx;
+                if (p.x > maxX) {
+                    maxX = p.x;
                 }
-                if (fy > maxY) {
-                    maxY = fy;
+                if (p.y > maxY) {
+                    maxY = p.y;
                 }
             }
 
-            PreparedEdge[] edges = new PreparedEdge[pointCount];
-            for (int i = 0; i < pointCount; i++) {
-                int x0 = xs[i];
-                int y0 = ys[i];
-                int x1 = xs[(i + 1) % pointCount];
-                int y1 = ys[(i + 1) % pointCount];
-                PreparedEdge e = new PreparedEdge(x0, y0, x1, y1);
-                edges[i] = e;
+            List<PreparedEdge> edgeList = new ArrayList<PreparedEdge>();
+
+            for (int i = 0; i < ipts.length; i++) {
+                IVec2 a = ipts[i];
+                IVec2 b = ipts[(i + 1) % ipts.length];
+
+                if (a.x == b.x && a.y == b.y) {
+                    continue;
+                }
+
+                PreparedEdge e = new PreparedEdge(a.x, a.y, b.x, b.y);
+                edgeList.add(e);
 
                 int rowMin = clamp(fixedFloorToInt(e.minY), 0, imageHeight - 1);
                 int rowMax = clamp(fixedCeilToInt(e.maxY), 0, imageHeight - 1);
@@ -548,7 +613,12 @@ public class AntialiasTools {
                 }
             }
 
-            preparedContours.add(new PreparedContour(xs, ys, edges, minX, minY, maxX, maxY));
+            PreparedEdge[] edges = edgeList.toArray(new PreparedEdge[0]);
+            if (edges.length < 3) {
+                continue;
+            }
+
+            preparedContours.add(new PreparedContour(ipts, edges, minX, minY, maxX, maxY));
 
             if (minX < globalMinX) {
                 globalMinX = minX;
@@ -650,10 +720,12 @@ public class AntialiasTools {
     }
 
     private static boolean pointOnPreparedEdge(int pxFixed, int pyFixed, PreparedEdge e, int eps) {
-        if (e.len2 <= (long) eps * eps) {
-            long ex = (long) pxFixed - e.x0;
-            long ey = (long) pyFixed - e.y0;
-            return ex * ex + ey * ey <= (long) eps * eps;
+        if (e.len2 == 0) {
+            return pxFixed == e.x0 && pyFixed == e.y0;
+        }
+
+        if (pxFixed < e.minX || pxFixed > e.maxX || pyFixed < e.minY || pyFixed > e.maxY) {
+            return false;
         }
 
         long cross = (long) e.dx * ((long) pyFixed - e.y0) - (long) e.dy * ((long) pxFixed - e.x0);
@@ -810,7 +882,7 @@ public class AntialiasTools {
             setClipContours(contours, PathIterator.WIND_EVEN_ODD);
         }
 
-        private boolean passesClip(int sxFixed, int syFixed) {
+        private boolean passesClipFixed(int sxFixed, int syFixed) {
             if (preparedClip == null) {
                 return true;
             }
@@ -871,7 +943,7 @@ public class AntialiasTools {
                         int sxFixed = pxFixedBase + sampleOffsets[2 * s];
                         int syFixed = pyFixedBase + sampleOffsets[2 * s + 1];
 
-                        if (pointInPreparedContours(sxFixed, syFixed, prepared) && passesClip(sxFixed, syFixed)) {
+                        if (pointInPreparedContours(sxFixed, syFixed, prepared) && passesClipFixed(sxFixed, syFixed)) {
                             int sampleX = clamp(fixedFloorToInt(sxFixed), 0, width - 1);
                             int sampleY = clamp(fixedFloorToInt(syFixed), 0, height - 1);
                             int argb = paintImage.getRGB(sampleX, sampleY);
@@ -955,7 +1027,7 @@ public class AntialiasTools {
                         double sx = px + (sampleOffsets[2 * s] / (double) SUBPIXEL_SCALE);
                         double sy = py + (sampleOffsets[2 * s + 1] / (double) SUBPIXEL_SCALE);
 
-                        if (pointInContours(sx, sy, contours, windingRule) && passesClip(toFixed(sx), toFixed(sy))) {
+                        if (pointInContours(sx, sy, contours, windingRule) && passesClipFixed(toFixed(sx), toFixed(sy))) {
                             int sampleX = clamp((int) Math.floor(sx), 0, width - 1);
                             int sampleY = clamp((int) Math.floor(sy), 0, height - 1);
                             int argb = paintImage.getRGB(sampleX, sampleY);
@@ -1302,20 +1374,17 @@ public class AntialiasTools {
 
     static final class PreparedContour {
 
-        final int[] xs;
-        final int[] ys;
+        final IVec2[] points;
         final PreparedEdge[] edges;
         final int minX;
         final int minY;
         final int maxX;
         final int maxY;
 
-        PreparedContour(int[] xs,
-                int[] ys,
+        PreparedContour(IVec2[] points,
                 PreparedEdge[] edges,
                 int minX, int minY, int maxX, int maxY) {
-            this.xs = xs;
-            this.ys = ys;
+            this.points = points;
             this.edges = edges;
             this.minX = minX;
             this.minY = minY;
