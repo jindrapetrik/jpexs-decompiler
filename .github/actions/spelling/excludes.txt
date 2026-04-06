@@ -134,3 +134,4 @@ Lexer\.java$
 \.yml$
 (?:^|/)build\.xml$
 ^Dockerfile$
+(?:^|/)DoAction\.as$

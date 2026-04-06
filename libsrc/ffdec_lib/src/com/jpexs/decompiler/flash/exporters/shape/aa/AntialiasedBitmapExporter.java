@@ -17,21 +17,16 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 /**
  * Antialiased Shape Bitmap Exporter
@@ -53,7 +48,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
     private boolean closeLine = false;
 
-    private double curveFlattness = 1.0;
+    private double curveFlatness = 1.0;
 
     private static final int BASE_TILE_SIZE = 4096;
 
@@ -136,7 +131,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         vecTrans = vecTrans.preConcatenate(Matrix.getTranslateInstance(-shapeViewRect.xMin, -shapeViewRect.yMin));
 
-        curveFlattness = 1.0 / aaScale;
+        curveFlatness = 1.0 / aaScale;
         this.image = image;
         this.scaleStrokes = scaleStrokes;
         graphics = (Graphics2D) image.getGraphics();
@@ -175,7 +170,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
                     AffineTransform t = new AffineTransform(graphics.getTransform());
                     t.preConcatenate(AffineTransform.getTranslateInstance(-shapeViewRect.xMin - tileSize * x, -shapeViewRect.yMin - tileSize * y));
                     clip = t.createTransformedShape(clip);
-                    List<List<Vec2>> clipContours = AntialiasTools.shapeToContours(clip, curveFlattness);
+                    List<List<Vec2>> clipContours = AntialiasTools.shapeToContours(clip, curveFlatness);
                     rz.setClipContours(clipContours, Path2D.WIND_EVEN_ODD);
                 }
 
@@ -277,7 +272,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
         Vec2 anchorVec2 = new Vec2(dst.getX(), dst.getY());
 
         List<Vec2> contour = contours.get(contours.size() - 1);
-        AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(lastPos, controlVec2, anchorVec2, curveFlattness), true);
+        AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(lastPos, controlVec2, anchorVec2, curveFlatness), true);
         lastPos = anchorVec2;
     }
 
@@ -349,7 +344,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
             Stroke stroke = lineStroke == null ? defaultStroke : lineStroke;
             Shape shape = AntialiasTools.contoursToShape(contours, Path2D.WIND_EVEN_ODD, closeLine, true);
             Shape strokedShape = stroke.createStrokedShape(shape);
-            List<List<Vec2>> strokeContours = AntialiasTools.shapeToContours(strokedShape, curveFlattness);
+            List<List<Vec2>> strokeContours = AntialiasTools.shapeToContours(strokedShape, curveFlatness);
 
             if (linePaint != null && lineStroke != null) {
                 if (linePaint instanceof MultipleGradientPaint) {

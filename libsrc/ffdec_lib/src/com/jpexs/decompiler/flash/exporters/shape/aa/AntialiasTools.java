@@ -145,15 +145,15 @@ public class AntialiasTools {
         }
 
         for (List<Vec2> contour : contours) {
-            IVec2[] ipts = isStroke ? toFixedContour(contour) : toCleanFixedContour(contour);
-            if (ipts == null || ipts.length < 2) {
+            IVec2[] iPts = isStroke ? toFixedContour(contour) : toCleanFixedContour(contour);
+            if (iPts == null || iPts.length < 2) {
                 continue;
             }
 
-            path.moveTo(ipts[0].x / (float) FIXED_ONE, ipts[0].y / (float) FIXED_ONE);
+            path.moveTo(iPts[0].x / (float) FIXED_ONE, iPts[0].y / (float) FIXED_ONE);
 
-            for (int i = 1; i < ipts.length; i++) {
-                path.lineTo(ipts[i].x / (float) FIXED_ONE, ipts[i].y / (float) FIXED_ONE);
+            for (int i = 1; i < iPts.length; i++) {
+                path.lineTo(iPts[i].x / (float) FIXED_ONE, iPts[i].y / (float) FIXED_ONE);
             }
 
             if (close) {

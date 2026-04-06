@@ -3023,11 +3023,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (itemr.size() == 1) {
             TextTag t = (TextTag) itemr.get(0);
             if (t instanceof DefineTextTag) {
-                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINETEXT;
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINE_TEXT;
             } else if (t instanceof DefineText2Tag) {
-                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINETEXT2;
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINE_TEXT2;
             } else if (t instanceof DefineEditTextTag) {
-                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINEEXITTEXT;
+                currentTextType = TextTypeConverter.TEXT_TYPE_DEFINE_EDIT_TEXT;
             }
         }
 

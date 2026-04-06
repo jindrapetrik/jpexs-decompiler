@@ -32,9 +32,9 @@ import javax.xml.stream.XMLStreamException;
  */
 public class TextTypeConverter {
 
-    public static int TEXT_TYPE_DEFINETEXT = 1;
-    public static int TEXT_TYPE_DEFINETEXT2 = 2;
-    public static int TEXT_TYPE_DEFINEEXITTEXT = 3;
+    public static int TEXT_TYPE_DEFINE_TEXT = 1;
+    public static int TEXT_TYPE_DEFINE_TEXT2 = 2;
+    public static int TEXT_TYPE_DEFINE_EDIT_TEXT = 3;
 
     /**
      * Converts static text version
@@ -117,7 +117,7 @@ public class TextTypeConverter {
     }
 
     /**
-     * Convers static text (DefineText, DefineText2) to DefineEditText
+     * Converts static text (DefineText, DefineText2) to DefineEditText
      *
      * @param tag DefineText or DefineText2
      * @param targetSWF Target SWF
@@ -281,23 +281,23 @@ public class TextTypeConverter {
     public TextTag convertTagType(TextTag sourceTextTag, SWF targetSWF, int targetTextNum) {
         int currentTextNum;
         if (sourceTextTag instanceof DefineTextTag) {
-            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINETEXT;
+            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINE_TEXT;
         } else if (sourceTextTag instanceof DefineText2Tag) {
-            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINETEXT2;
+            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINE_TEXT2;
         } else if (sourceTextTag instanceof DefineEditTextTag) {
-            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINEEXITTEXT;
+            currentTextNum = TextTypeConverter.TEXT_TYPE_DEFINE_EDIT_TEXT;
         } else {
             throw new IllegalArgumentException("Invalid text");
         }
 
-        if (currentTextNum < TEXT_TYPE_DEFINEEXITTEXT && targetTextNum < TEXT_TYPE_DEFINEEXITTEXT) {
+        if (currentTextNum < TEXT_TYPE_DEFINE_EDIT_TEXT && targetTextNum < TEXT_TYPE_DEFINE_EDIT_TEXT) {
             return convertStaticText((StaticTextTag) sourceTextTag, targetTextNum, targetSWF);
         }
-        if (currentTextNum < TEXT_TYPE_DEFINEEXITTEXT && targetTextNum == TEXT_TYPE_DEFINEEXITTEXT) {
+        if (currentTextNum < TEXT_TYPE_DEFINE_EDIT_TEXT && targetTextNum == TEXT_TYPE_DEFINE_EDIT_TEXT) {
             return staticTextToEditText((StaticTextTag) sourceTextTag, targetSWF);
         }
 
-        if (currentTextNum == TEXT_TYPE_DEFINEEXITTEXT && targetTextNum < TEXT_TYPE_DEFINEEXITTEXT) {
+        if (currentTextNum == TEXT_TYPE_DEFINE_EDIT_TEXT && targetTextNum < TEXT_TYPE_DEFINE_EDIT_TEXT) {
             return editTextToStaticText((DefineEditTextTag) sourceTextTag, targetTextNum, targetSWF);
         }
 
