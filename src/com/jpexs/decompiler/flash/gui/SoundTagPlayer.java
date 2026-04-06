@@ -339,6 +339,7 @@ public class SoundTagPlayer implements MediaDisplay {
                     }
 
                     if (getPausedFlag()) {
+                        sourceLine.flush();
                         synchronized (thread) {
                             try {
                                 thread.wait(1000);
@@ -350,8 +351,8 @@ public class SoundTagPlayer implements MediaDisplay {
                 }
 
                 if (getClosedFlag()) {
-                    sourceLine.drain();
                     sourceLine.stop();
+                    sourceLine.flush();                    
                     sourceLine.close();
                 }
                 audioStream.close();
@@ -362,6 +363,7 @@ public class SoundTagPlayer implements MediaDisplay {
             }
 
             if (!getClosedFlag()) {
+                sourceLine.drain();                        
                 decreaseLoopCount();
 
                 int currentLoopCount;
@@ -383,7 +385,6 @@ public class SoundTagPlayer implements MediaDisplay {
                     firePlayingFinished();
 
                     if (getClosedFlag()) {
-                        sourceLine.drain();
                         sourceLine.stop();
                         sourceLine.close();
                         return;
