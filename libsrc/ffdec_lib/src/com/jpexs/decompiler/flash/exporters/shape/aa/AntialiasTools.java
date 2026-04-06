@@ -598,8 +598,8 @@ public class AntialiasTools {
         List<PreparedEdge>[] buckets = (List<PreparedEdge>[]) new List[imageHeight];
 
         for (List<Vec2> contour : contours) {
-            IVec2[] ipts = toCleanFixedContour(contour);
-            if (ipts == null || ipts.length < 3) {
+            IVec2[] iPts = toCleanFixedContour(contour);
+            if (iPts == null || iPts.length < 3) {
                 continue;
             }
 
@@ -608,7 +608,7 @@ public class AntialiasTools {
             int maxX = Integer.MIN_VALUE;
             int maxY = Integer.MIN_VALUE;
 
-            for (IVec2 p : ipts) {
+            for (IVec2 p : iPts) {
                 if (p.x < minX) {
                     minX = p.x;
                 }
@@ -625,9 +625,9 @@ public class AntialiasTools {
 
             List<PreparedEdge> edgeList = new ArrayList<PreparedEdge>();
 
-            for (int i = 0; i < ipts.length; i++) {
-                IVec2 a = ipts[i];
-                IVec2 b = ipts[(i + 1) % ipts.length];
+            for (int i = 0; i < iPts.length; i++) {
+                IVec2 a = iPts[i];
+                IVec2 b = iPts[(i + 1) % iPts.length];
 
                 if (a.x == b.x && a.y == b.y) {
                     continue;
@@ -652,7 +652,7 @@ public class AntialiasTools {
                 continue;
             }
 
-            preparedContours.add(new PreparedContour(ipts, edges, minX, minY, maxX, maxY));
+            preparedContours.add(new PreparedContour(iPts, edges, minX, minY, maxX, maxY));
 
             if (minX < globalMinX) {
                 globalMinX = minX;
