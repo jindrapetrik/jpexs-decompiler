@@ -46,12 +46,12 @@ public class MetainfoUpdater {
                 baos.write(buf, 0, cnt);
             }
         } catch (IOException ex) {
-            Logger.getLogger(ChangelogUpdater.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MetainfoUpdater.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             return new String(baos.toByteArray(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ChangelogUpdater.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MetainfoUpdater.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
