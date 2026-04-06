@@ -302,7 +302,7 @@ public class TextTypeConverter {
         }
 
         try {
-            //currentTextNum == TEXT_TYPE_DEFINEEXITTEXT && targetTextNum == TEXT_TYPE_DEFINEEXITTEXT
+            //currentTextNum == TEXT_TYPE_DEFINE_EDIT_TEXT && targetTextNum == TEXT_TYPE_DEFINE_EDIT_TEXT
             TextTag ret = (TextTag) sourceTextTag.cloneTag();
             ret.setSwf(targetSWF);
             return ret;
