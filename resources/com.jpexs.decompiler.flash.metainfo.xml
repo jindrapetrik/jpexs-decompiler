@@ -67,6 +67,69 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="26.0.0" date="2026-04-06">
+			<description>
+				<p>Features</p>
+				<ul>
+					<li>redesigned loop detector (#2542)</li>
+					<li>move file exports to separate submenu to make menu shorter</li>
+					<li>XAML export (#2674)</li>
+					<li>bigger toolbar icon for search memory tool</li>
+					<li>move import to file tab, use bulk import term</li>
+					<li>create tag from file on toolbar, group items on context menu</li>
+					<li>export all four states of a button (#2671)</li>
+					<li>combined button SVG export using all states</li>
+					<li>do not reset position on selection of same timelined (#2670)</li>
+					<li>scroll object to visible on placeobject selection</li>
+					<li>as3 fla export - option to disable scripts layer (#2673)</li>
+					<li>add text tag type conversion (#2383)</li>
+					<li>add advanced multi sample anti-aliased shape renderer</li>
+					<li>add XBT texture support for GFX external images (#251)</li>
+					<li>SVG import: allow larger edges by splitting them in the half</li>
+					<li>allow turning off the minimum stroke width of 1 pixel</li>
+				</ul>
+				<p>Bug Fixes</p>
+				<ul>
+					<li>debugger: read watched variables</li>
+					<li>scripts folder not visible on show empty folders setting (#2656)</li>
+					<li>do not show cookies folder in "show empty folders"</li>
+					<li>visitable variable action item</li>
+					<li>direct edit properties with getters/setters (#2655)</li>
+					<li>font normalizer axis flip (#2657)</li>
+					<li>as1/2 maintain push order, temp variables usage</li>
+					<li>font normalizer uses 1024em (#2661)</li>
+					<li>null pointer on null caret in variable marker</li>
+					<li>push commands in as2 left in code (#2654)</li>
+					<li>deadlock on getcharacters vs drawframe (#2492)</li>
+					<li>nullpointer on as3 deobfuscation</li>
+					<li>as3 deobfuscation - null values instead of registers (#2568, #2665)</li>
+					<li>stackoverflow on circular importassets (#2666)</li>
+					<li>allow add breakpoints on large classes (#2672)</li>
+					<li>unable to reset JNA temp directory (#2675)</li>
+					<li>svg shape export - use proper winding</li>
+					<li>properly normalize fonts in defineedittexts, kerning</li>
+					<li>properly draw edittext border, normalize size</li>
+					<li>illegal argument exception on creating morphshape from svg (#2676)</li>
+					<li>respect nofill argument in shape CLI SVG export (#2681)</li>
+					<li>actionscript and/or operators with simple value operands (#2680)</li>
+					<li>correct syntax highlighting for texts</li>
+					<li>allow float values in font size in DefineEditText</li>
+					<li>fix image size off by 1 pixel when conflation fix is on (#2616)</li>
+					<li>fix as3 direct edit - protected access (#2686, #2688)</li>
+					<li>SVG importer: fix getStrokeFillWithOpacity call to getStrokeOpacity</li>
+					<li>SVG importer: apply fillOpacity and strokeOpacity to gradient</li>
+					<li>allow importing large shapes by splitting edges (#2691)</li>
+					<li>FLA export: fix nullpointer exception (#2690)</li>
+					<li>correctly flush sound data to avoid weird sound noises (#2689)</li>
+				</ul>
+				<p>Performance Improvements</p>
+				<ul>
+					<li>faster calculate max depth frame, skip morph detection (#2662)</li>
+					<li>optimize recursion, avoid stackoverflow on larger scripts (#2672)</li>
+					<li>load dependent characters/frames in the separate thread</li>
+				</ul>
+			</description>
+		</release>
 		<release version="25.1.3" date="2026-03-04">
 			<description>
 				<p>Added</p>

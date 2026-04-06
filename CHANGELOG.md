@@ -1,6 +1,63 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [26.0.0] - 2026-04-06
+### Features
+- redesigned loop detector ([#2542])
+- move file exports to separate submenu to make menu shorter
+- XAML export ([#2674])
+- bigger toolbar icon for search memory tool
+- move import to file tab, use bulk import term
+- create tag from file on toolbar, group items on context menu
+- export all four states of a button ([#2671])
+- combined button SVG export using all states
+- do not reset position on selection of same timelined ([#2670])
+- scroll object to visible on placeobject selection
+- as3 fla export - option to disable scripts layer ([#2673])
+- add text tag type conversion ([#2383])
+- add advanced multi sample anti-aliased shape renderer
+- add XBT texture support for GFX external images ([#251])
+- SVG import: allow larger edges by splitting them in the half
+- allow turning off the minimum stroke width of 1 pixel
+
+### Bug Fixes
+- debugger: read watched variables
+- scripts folder not visible on show empty folders setting ([#2656])
+- do not show cookies folder in "show empty folders"
+- visitable variable action item
+- direct edit properties with getters/setters ([#2655])
+- font normalizer axis flip ([#2657])
+- as1/2 maintain push order, temp variables usage
+- font normalizer uses 1024em ([#2661])
+- null pointer on null caret in variable marker
+- push commands in as2 left in code ([#2654])
+- deadlock on getcharacters vs drawframe ([#2492])
+- nullpointer on as3 deobfuscation
+- as3 deobfuscation - null values instead of registers ([#2568], [#2665])
+- stackoverflow on circular importassets ([#2666])
+- allow add breakpoints on large classes ([#2672])
+- unable to reset JNA temp directory ([#2675])
+- svg shape export - use proper winding
+- properly normalize fonts in defineedittexts, kerning
+- properly draw edittext border, normalize size
+- illegal argument exception on creating morphshape from svg ([#2676])
+- respect nofill argument in shape CLI SVG export ([#2681])
+- actionscript and/or operators with simple value operands ([#2680])
+- correct syntax highlighting for texts
+- allow float values in font size in DefineEditText
+- fix image size off by 1 pixel when conflation fix is on ([#2616])
+- fix as3 direct edit - protected access ([#2686], [#2688])
+- SVG importer: fix getStrokeFillWithOpacity call to getStrokeOpacity
+- SVG importer: apply fillOpacity and strokeOpacity to gradient
+- allow importing large shapes by splitting edges ([#2691])
+- FLA export: fix nullpointer exception ([#2690])
+- correctly flush sound data to avoid weird sound noises ([#2689])
+
+### Performance Improvements
+- faster calculate max depth frame, skip morph detection ([#2662])
+- optimize recursion, avoid stackoverflow on larger scripts ([#2672])
+- load dependent characters/frames in the separate thread
+
 ## [25.1.3] - 2026-03-04
 ### Added
 - Debugger - Button to disconnect current session (stay listening)
@@ -4007,7 +4064,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.3...dev
+[26.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.3...version26.0.0
 [25.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.2...version25.1.3
 [25.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.1...version25.1.2
 [25.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version25.1.0...version25.1.1
@@ -4187,6 +4244,34 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2542]: https://www.free-decompiler.com/flash/issues/2542
+[#2674]: https://www.free-decompiler.com/flash/issues/2674
+[#2671]: https://www.free-decompiler.com/flash/issues/2671
+[#2670]: https://www.free-decompiler.com/flash/issues/2670
+[#2673]: https://www.free-decompiler.com/flash/issues/2673
+[#2383]: https://www.free-decompiler.com/flash/issues/2383
+[#251]: https://www.free-decompiler.com/flash/issues/251
+[#2656]: https://www.free-decompiler.com/flash/issues/2656
+[#2655]: https://www.free-decompiler.com/flash/issues/2655
+[#2657]: https://www.free-decompiler.com/flash/issues/2657
+[#2661]: https://www.free-decompiler.com/flash/issues/2661
+[#2654]: https://www.free-decompiler.com/flash/issues/2654
+[#2492]: https://www.free-decompiler.com/flash/issues/2492
+[#2568]: https://www.free-decompiler.com/flash/issues/2568
+[#2665]: https://www.free-decompiler.com/flash/issues/2665
+[#2666]: https://www.free-decompiler.com/flash/issues/2666
+[#2672]: https://www.free-decompiler.com/flash/issues/2672
+[#2675]: https://www.free-decompiler.com/flash/issues/2675
+[#2676]: https://www.free-decompiler.com/flash/issues/2676
+[#2681]: https://www.free-decompiler.com/flash/issues/2681
+[#2680]: https://www.free-decompiler.com/flash/issues/2680
+[#2616]: https://www.free-decompiler.com/flash/issues/2616
+[#2686]: https://www.free-decompiler.com/flash/issues/2686
+[#2688]: https://www.free-decompiler.com/flash/issues/2688
+[#2691]: https://www.free-decompiler.com/flash/issues/2691
+[#2690]: https://www.free-decompiler.com/flash/issues/2690
+[#2689]: https://www.free-decompiler.com/flash/issues/2689
+[#2662]: https://www.free-decompiler.com/flash/issues/2662
 [#2644]: https://www.free-decompiler.com/flash/issues/2644
 [#2648]: https://www.free-decompiler.com/flash/issues/2648
 [#2643]: https://www.free-decompiler.com/flash/issues/2643
@@ -5293,7 +5378,6 @@ Major version of SWF to XML export changed to 2.
 [#265]: https://www.free-decompiler.com/flash/issues/265
 [#266]: https://www.free-decompiler.com/flash/issues/266
 [#281]: https://www.free-decompiler.com/flash/issues/281
-[#251]: https://www.free-decompiler.com/flash/issues/251
 [#257]: https://www.free-decompiler.com/flash/issues/257
 [#259]: https://www.free-decompiler.com/flash/issues/259
 [#260]: https://www.free-decompiler.com/flash/issues/260
