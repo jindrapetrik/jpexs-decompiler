@@ -213,7 +213,7 @@ public class DefineEditTextTag extends TextTag {
      */
     public DefineEditTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
-        readData(sis, data, 0, false, false, false);
+        readData(sis, data, 0, false, false, false);        
     }
 
     @Override
@@ -924,7 +924,7 @@ public class DefineEditTextTag extends TextTag {
             String text = initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
             writer.hilightSpecial(text, HighlightSpecialType.TEXT);
         }
-        writer.finishHilights();
+        writer.finishHilights();        
         return new HighlightedText(writer);
     }
 
@@ -1642,7 +1642,7 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public ExportRectangle calculateTextBounds() {
-        return null;
+        return calculateTextBounds(swf, this, getTextRecords(swf, new HashMap<>()), new MATRIX());
     }
 
     @Override
