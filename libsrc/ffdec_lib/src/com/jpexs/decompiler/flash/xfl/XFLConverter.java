@@ -1153,6 +1153,9 @@ public class XFLConverter {
         ct.getNeededCharactersDeep(needed, neededClasses);
         for (int n : needed) {
             CharacterTag nc = ct.getSwf().getCharacter(n);
+            if (nc == null) {
+                continue;
+            }
             if (result.contains(nc)) {
                 continue;
             }
@@ -1166,6 +1169,9 @@ public class XFLConverter {
         
         for (String n : neededClasses) {
             CharacterTag nc = ct.getSwf().getCharacterByClass(n);
+            if (nc == null) {
+                continue;
+            }
             if (result.contains(nc)) {
                 continue;
             }
