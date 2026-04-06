@@ -263,6 +263,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -448,6 +450,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private static final DataFlavor TREE_FILE_FLAVOR = new DataFlavor(TreeFileFlavor.class, "TreeFile");
 
     private boolean editingStatusSet = false;
+    
+    private ExecutorService loadTagInfoExecutor = Executors.newSingleThreadExecutor();
 
     public synchronized void setLoadingScrollPosEnabled(boolean loadingScrollPosEnabled) {
         this.loadingScrollPosEnabled = loadingScrollPosEnabled;
@@ -6579,18 +6583,33 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
             }
 
-            if (tag instanceof CharacterTag) {
+            if (tag instanceof CharacterTag) {  
+                
                 int characterId = ((CharacterTag) tag).getCharacterId();
-                Set<Integer> dependent = tag.getSwf().getDependentCharacters(characterId);
-                if (dependent != null) {
-                    if (dependent.size() > 0) {
-                        tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
-                    }
-                }
-
-                Set<Integer> dependent2 = tag.getSwf().getDependentFrames(characterId);
-                if (dependent2 != null && dependent2.size() > 0) {
-                    tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
+                                
+                //getting dependent characters/frames for the first time may be long task                
+                
+                Runnable addDependentFramesRunnable = new Runnable() {
+                    @Override
+                    public void run() {                 
+                        Set<Integer> dependent = tag.getSwf().getDependentCharacters(characterId);
+                        if (dependent != null) {
+                            if (!dependent.isEmpty()) {
+                                tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
+                            }
+                        }
+                        Set<Integer> dependent2 = tag.getSwf().getDependentFrames(characterId);
+                        if (dependent2 != null && !dependent2.isEmpty()) {
+                            tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
+                        }
+                        tagInfoPanel.updateTagInfo();
+                    } 
+                };
+                
+                if (tag.getSwf().isDependentFramesLoaded() && tag.getSwf().isDependentCharactersLoaded()) {
+                    addDependentFramesRunnable.run();
+                } else {
+                    loadTagInfoExecutor.execute(addDependentFramesRunnable);                    
                 }
             }
 

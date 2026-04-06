@@ -108,13 +108,17 @@ public class TagInfoPanel extends JPanel {
         this.tagInfo = tagInfo;
         buildHtmlContent();
     }
+    
+    public void updateTagInfo() {
+        buildHtmlContent();
+    }
 
     public void clear() {
         this.tagInfo = new TagInfo(null);
         buildHtmlContent();
     }
     
-    private void updateHtmlContent(boolean expand, boolean showDetails) {
+    private synchronized void updateHtmlContent(boolean expand, boolean showDetails) {
         String categoryName = "general";
         StringBuilder result = new StringBuilder();
         result.append("<html><body><table cellspacing='0' cellpadding='0'>");
@@ -232,7 +236,6 @@ public class TagInfoPanel extends JPanel {
         }
 
         result.append("</table></body></html>");
-
         editorPane.setText(result.toString());
     }
 

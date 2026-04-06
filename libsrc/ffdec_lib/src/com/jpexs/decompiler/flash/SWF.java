@@ -617,6 +617,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     @Internal
     public String debuggerPackage = null;
+    
+    /**
+     * Lock for getting dependent
+     */
+    @Internal
+    private final Object dependentLock = new Object();
 
     /**
      * Imported characterId to SWF map.
@@ -1156,14 +1162,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @return Map of characterId to set of dependent characterIds
      */
     public Map<Integer, Set<Integer>> getDependentCharacters() {
-        if (dependentCharacters == null) {
-            synchronized (this) {
-                if (dependentCharacters == null) {
-                    computeDependentCharacters();
-                }
-            }
+        synchronized (dependentLock) {            
+            if (dependentCharacters == null) {
+                computeDependentCharacters();
+            }        
         }
-
         return dependentCharacters;
     }
 
@@ -1245,17 +1248,31 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
+     * Check if dependent characters are loaded
+     * @return True if loaded
+     */
+    public boolean isDependentCharactersLoaded() {
+        return dependentCharacters != null;        
+    }
+    
+    /**
+     * Check if dependent frames are loaded
+     * @return True if loaded
+     */
+    public boolean isDependentFramesLoaded() {        
+        return dependentFrames != null && dependentClassFrames != null;    
+    }
+    
+    /**
      * Gets dependent frames for specified character.
      *
      * @param characterId Character id
      * @return Set of dependent characterids
      */
     public Set<Integer> getDependentFrames(int characterId) {
-        if (dependentFrames == null) {
-            synchronized (this) {
-                if (dependentFrames == null) {
-                    computeDependentFrames();
-                }
+        synchronized (dependentLock) {
+            if (dependentFrames == null) {
+                computeDependentFrames();
             }
         }
 
@@ -1270,7 +1287,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public Set<Integer> getDependentFramesByClass(String characterClass) {
         if (dependentClassFrames == null) {
-            synchronized (this) {
+            synchronized (dependentLock) {
                 if (dependentClassFrames == null) {
                     computeDependentFrames();
                 }
