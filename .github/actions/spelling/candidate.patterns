@@ -462,7 +462,7 @@ Name\[[^\]]+\]=.*
 \b(?i)ml(?=[a-z]{2,})
 
 # python
-\b(?i)py(?!gments|gmy|lon|ramid|ro|th)(?=[a-z]{2,})
+#\b(?i)py(?!gments|gmy|lon|ramid|ro|th)(?=[a-z]{2,})
 
 # scrypt / argon
 \$(?:scrypt|argon\d+[di]*)\$\S+

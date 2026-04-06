@@ -1441,7 +1441,7 @@ hilighting
 hilite
 hiliter
 hinst
-HITTEST
+hittest
 HIWORD
 HKEYBy
 HKLM
@@ -2239,6 +2239,7 @@ movieclip
 moviesfolder
 MPEGLAYER
 mpis
+msaa
 msb
 msc
 MSDTC
@@ -3989,6 +3990,7 @@ xattrname
 xattrval
 xbar
 XBefore
+xbt
 XButton
 xcenter
 xcontent
