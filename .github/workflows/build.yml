@@ -1132,7 +1132,7 @@ jobs:
           gh release delete ${{needs.compute-version.outputs.verOldTag}} --yes --cleanup-tag
       - name: Upload to Nexus Mods
         if: needs.compute-version.outputs.verDebug == 'false'
-        uses: Nexus-Mods/upload-action@v1
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.3
         with:
           api_key: ${{ secrets.NEXUSMODS_API_KEY }}
           file_group_id: 7255064
