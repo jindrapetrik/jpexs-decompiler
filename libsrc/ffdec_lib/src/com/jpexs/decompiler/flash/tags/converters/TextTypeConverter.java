@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.tags.converters;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
@@ -109,8 +110,9 @@ public class TextTypeConverter {
             }
         }
         ret.textRecords = records;
-        ret.textBounds = tag.getBounds();
-        ret.textMatrix = new MATRIX();
+        ret.textMatrix = new MATRIX();        
+        ExportRectangle bounds = ret.calculateTextBounds();
+        ret.textBounds = new RECT((int) Math.round(bounds.xMin), (int) Math.round(bounds.xMax), (int) Math.round(bounds.yMin), (int) Math.round(bounds.yMax));
         return ret;
     }
 
@@ -223,6 +225,9 @@ public class TextTypeConverter {
         det.html = true;
         det.hasText = true;
         det.initialText = writer.toString();
+        
+        ExportRectangle bounds = det.calculateTextBounds();
+        det.bounds = new RECT((int) Math.round(bounds.xMin), (int) Math.round(bounds.xMax), (int) Math.round(bounds.yMin), (int) Math.round(bounds.yMax));
 
         return det;
     }

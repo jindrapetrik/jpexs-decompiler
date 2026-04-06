@@ -248,7 +248,7 @@ public abstract class StaticTextTag extends TextTag {
 
     @Override
     public ExportRectangle calculateTextBounds() {
-        return calculateTextBounds(swf, textRecords, getTextMatrix());
+        return calculateTextBounds(swf, this, textRecords, getTextMatrix());
     }
 
     @Override
