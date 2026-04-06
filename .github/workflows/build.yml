@@ -1137,6 +1137,6 @@ jobs:
           api_key: ${{ secrets.NEXUSMODS_API_KEY }}
           file_group_id: 7255064
           filename: "releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip"
-          version: {{ needs.compute-version.outputs.verShort }}
+          version: ${{ needs.compute-version.outputs.verShort }}
           display_name: "FFDec - Zipped"
           file_category: main
