@@ -40,7 +40,7 @@ if ($result !== 0) {
     exit(1);
 }
 
-
+$output = [];
 $result = 0;
 exec('git log ' . $version1 . '..' . $version2 . ' --pretty=format:"%s%n%b%n---SPLIT---" --reverse', $output, $result);
 if ($result !== 0) {
@@ -99,7 +99,7 @@ foreach ($messages as $message) {
         if (array_key_exists($type, $changelog_types)) {
             $changelog[$type][] = $desc;
         }
-    }
+    }       
 }       
 
 $result = "";
