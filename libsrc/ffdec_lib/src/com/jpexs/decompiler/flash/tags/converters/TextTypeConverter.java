@@ -17,6 +17,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.xfl.XFLXmlWriter;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +140,8 @@ public class TextTypeConverter {
         det.useOutlines = true;
         det.multiline = true;
 
+        det.hasLayout = true;
+        det.align = DefineEditTextTag.ALIGN_LEFT;
         det.indent = (int) attrs.get("indent");
         det.leftMargin = leftMargins.isEmpty() ? 0 : leftMargins.get(0);
         det.leading = (int) attrs.get("lineSpacing");
@@ -146,6 +149,8 @@ public class TextTypeConverter {
 
         XFLXmlWriter writer = new XFLXmlWriter();
         writer.setMakeNewLines(false);
+        RGBA firstTextColor = new RGBA(Color.BLACK);   
+        int firstFontId = -1;
         try {
             int fontId;
             FontTag font = null;
@@ -160,10 +165,16 @@ public class TextTypeConverter {
             for (int r = 0; r < textRecords.size(); r++) {
                 TEXTRECORD rec = textRecords.get(r);
                 if (rec.styleFlagsHasColor) {
+                    RGBA newTextColor;
                     if (tag instanceof DefineTextTag) {
                         textColor = rec.textColor;
+                        newTextColor = new RGBA(textColor);
                     } else {
                         textColorA = rec.textColorA;
+                        newTextColor = rec.textColorA;
+                    }
+                    if (r == 0) {
+                        firstTextColor = newTextColor;
                     }
                 }
                 if (rec.styleFlagsHasFont) {
@@ -182,6 +193,9 @@ public class TextTypeConverter {
                     if (fontName == null) {
                         fontName = FontTag.getDefaultFontName();
                     }
+                    if (r == 0) {
+                        firstFontId = fontId;
+                    }
                 }
                 newline = false;
                 if (!firstRun && rec.styleFlagsHasYOffset) {
@@ -190,6 +204,7 @@ public class TextTypeConverter {
                 firstRun = false;
                 if (font != null) {
                     writer.writeStartElement("p");
+                    writer.writeAttribute("align", "left");
                     writer.writeStartElement("font");
                     writer.writeAttribute("face", fontName);
                     writer.writeAttribute("size", doubleToString(twipToPixel(textHeight)));
@@ -225,6 +240,12 @@ public class TextTypeConverter {
         det.html = true;
         det.hasText = true;
         det.initialText = writer.toString();
+        det.hasTextColor = true;
+        det.textColor = firstTextColor;      
+        if (firstFontId > -1) {
+            det.hasFont = true;
+            det.fontId = firstFontId;
+        }
         
         ExportRectangle bounds = det.calculateTextBounds();
         det.bounds = new RECT((int) Math.round(bounds.xMin), (int) Math.round(bounds.xMax), (int) Math.round(bounds.yMin), (int) Math.round(bounds.yMax));
