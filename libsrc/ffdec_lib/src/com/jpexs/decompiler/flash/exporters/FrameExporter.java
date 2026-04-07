@@ -952,6 +952,10 @@ public class FrameExporter {
             lastTime = timeAfter;
             delays.add(delay);
         }
+
+        // Keep transparency?
+        allImages = FrameNormalizer.normalize(allImages);
+        
         int[] delaysInt = new int[delays.size()];
         for (int i = 0; i < delays.size(); i++) {
             delaysInt[i] = delays.get(i);
