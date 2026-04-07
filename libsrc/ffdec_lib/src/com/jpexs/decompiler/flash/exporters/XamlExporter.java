@@ -402,7 +402,7 @@ public class XamlExporter {
                     int fontId = defineEditText.fontId;
                     FontTag font = null;
                     if (fontId == -1) {
-                        if (defineEditText.fontClass != null) {
+                        if (defineEditText.hasFontClass) {
                             font = swf.getFontByClass(defineEditText.fontClass);
                             fontId = swf.getCharacterId(font);
                         }

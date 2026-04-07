@@ -390,7 +390,7 @@ public class FontNormalizer {
     private Set<Integer> getDefineEditTextFonts(DefineEditTextTag text) {
         Set<Integer> ret = new LinkedHashSet<>();
         TextStyle style = new TextStyle();
-        if (text.fontClass != null) {
+        if (text.hasFontClass) {
             style.font = text.getSwf().getFontByClass(text.fontClass);
         } else {
             style.font = text.getSwf().getFont(text.fontId);
@@ -513,7 +513,7 @@ public class FontNormalizer {
     private void scaleDefineEditTextFonts(DefineEditTextTag text, Map<Integer, Double> fontNewScale, boolean inPlace, Map<Integer, TextTag> outTexts) {
         String str = "";
         TextStyle style = new TextStyle();
-        if (text.fontClass != null) {
+        if (text.hasFontClass) {
             style.font = text.getSwf().getFontByClass(text.fontClass);
         } else {
             style.font = text.getSwf().getFont(text.fontId);

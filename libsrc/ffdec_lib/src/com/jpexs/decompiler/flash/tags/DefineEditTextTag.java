@@ -538,7 +538,7 @@ public class DefineEditTextTag extends TextTag {
         }
         String str = "";
         TextStyle style = new TextStyle();
-        if (fontClass != null) {
+        if (hasFontClass) {
             style.font = swf.getFontByClass(fontClass);
         } else {
             style.font = swf.getFont(fontId);
@@ -1607,8 +1607,8 @@ public class DefineEditTextTag extends TextTag {
             for (SameStyleTextRecord tr : line) {
                 AdvancedTextRecord tr2 = new AdvancedTextRecord();
                 int fid = fontId;
-                if (fontClass != null) {
-                    tr2.fontClass = fontClass;
+                if (hasFontClass) {
+                    tr2.fontClass = fontClass; //FIXME?
                 }
                 if (tr.style.font != null) {
                     fid = swf.getCharacterId(tr.style.font);
