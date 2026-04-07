@@ -607,7 +607,9 @@ public class FrameExporter {
         final Color fbackgroundColor = backgroundColor;
         final boolean usesTransparency = settings.mode == FrameExportMode.PNG
                 || settings.mode == FrameExportMode.GIF
-                || settings.mode == FrameExportMode.WEBP;
+                || settings.mode == FrameExportMode.WEBP
+                || settings.mode == FrameExportMode.WEBP_ANIMATED
+                || settings.mode == FrameExportMode.APNG;
         final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings, subFramesLength);
 
         switch (settings.mode) {
