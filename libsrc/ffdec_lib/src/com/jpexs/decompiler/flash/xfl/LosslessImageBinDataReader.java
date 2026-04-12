@@ -34,6 +34,19 @@ import javax.imageio.ImageIO;
  */
 public class LosslessImageBinDataReader {
 
+    /*
+    Major versions:
+    
+    0 = basic uncompressed, no alpha
+    1 = ?? - not encountered
+    2 = has compression (variant field)
+    3 = adds alpha channel (flags field)
+    
+    Minor version: always 5
+    
+    */     
+    
+    
     private final DataInputStream is;
 
     public LosslessImageBinDataReader(InputStream is) {
@@ -41,9 +54,9 @@ public class LosslessImageBinDataReader {
     }
 
     public BufferedImage readImage() throws IOException {
-        int sign1 = readEx();
-        int sign2 = readEx();
-        if (sign1 != 0x03 || sign2 != 0x05) {
+        int major = readEx();
+        int minor = readEx();
+        if (major > 3 || minor != 0x05) {
             throw new IOException("Invalid image");
         }
         int rowSize = readUI16();
@@ -53,29 +66,38 @@ public class LosslessImageBinDataReader {
         long frameRight = readUI32();
         long frameTop = readUI32();
         long frameBottom = readUI32();
-        int flags = readEx();
-
-        boolean hasAlpha = (flags & 1) == 1;
+        
+        boolean hasAlpha = false;
+        
+        if (major >= 3) {
+            int flags = readEx();
+            hasAlpha = (flags & 1) == 1;
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int variant = readEx();
-        if (variant == 1) { //compressed
-            while (true) {
-                int chunkLen = readUI16();
-                if (chunkLen == 0) {
-                    break;
+        
+        InputStream dis = is;
+        
+        if (major >= 2) {
+            int variant = readEx();            
+            if (variant == 1) { //compressed
+                while (true) {
+                    int chunkLen = readUI16();
+                    if (chunkLen == 0) {
+                        break;
+                    }
+                    byte[] chunk = new byte[chunkLen];
+                    is.readFully(chunk);
+                    baos.write(chunk);
                 }
-                byte[] chunk = new byte[chunkLen];
-                is.readFully(chunk);
-                baos.write(chunk);
+                dis = new InflaterInputStream(new ByteArrayInputStream(baos.toByteArray()));
             }
         }
 
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        InflaterInputStream iis = new InflaterInputStream(new ByteArrayInputStream(baos.toByteArray()));
         byte[] buf = new byte[4096];
         int cnt;
-        while ((cnt = iis.read(buf)) > 0) {
+        while ((cnt = dis.read(buf)) > 0) {
             baos2.write(buf, 0, cnt);
         }
 
