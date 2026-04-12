@@ -149,7 +149,7 @@ public class ShapeExporter {
                             Matrix m2 = Matrix.getScaleInstance(settings.zoom);
                             m2.translate(-rect.Xmin, -rect.Ymin);
 
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, m2, m2, m2, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, aaScale);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m2, new Matrix(), m2, m2, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, aaScale);
 
                             BufferedImage bim = img.getBufferedImage();
                            

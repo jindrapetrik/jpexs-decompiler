@@ -188,7 +188,7 @@ public class MorphShapeExporter {
                             }
                             m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, new Matrix(), m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
 
                             BufferedImage bim = img.getBufferedImage();
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
@@ -222,7 +222,7 @@ public class MorphShapeExporter {
                             }
                             m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, new Matrix(), m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true, settings.aaScale);
 
                             bim = img.getBufferedImage();
 
