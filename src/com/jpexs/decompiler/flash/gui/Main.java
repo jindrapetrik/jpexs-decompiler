@@ -3892,7 +3892,7 @@ public class Main {
         for (int i = 0; i < arr.size(); i++) {
             JsonObject versionObj = arr.get(i).asObject();
             String tagName = versionObj.get("tag_name").asString();
-            if (currentVersion.equals(tagName) || stableTagName.equals(tagName)) {
+            if (currentTagName.equals(tagName) || stableTagName.equals(tagName)) {
                 //Stop at current version, do not display more
                 break;
             }
