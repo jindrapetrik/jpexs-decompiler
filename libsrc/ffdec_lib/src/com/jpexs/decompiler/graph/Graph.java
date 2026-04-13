@@ -181,7 +181,7 @@ public class Graph {
         if (heads != null) {
             return;
         }
-        heads = makeGraph(code, new ArrayList<>(), exceptions);        
+        heads = makeGraph(code, new ArrayList<>(), exceptions);
     }
 
     /**
@@ -270,16 +270,16 @@ public class Graph {
             return;
         }
         allParts.add(part);
-        
+
         Queue<GraphPart> q = new ArrayDeque<>();
         q.offer(part);
         while (!q.isEmpty()) {
-            part = q.poll();            
+            part = q.poll();
             for (GraphPart p : part.nextParts) {
                 if (!allParts.contains(p)) {
                     allParts.add(p);
                     q.offer(p);
-                }            
+                }
             }
         }
     }
@@ -2545,7 +2545,7 @@ public class Graph {
         }
 
         for (Loop l : loops) {
-            if (l.phase == 2) {
+            if (l.phase != 1) {
                 continue;
             }
             if (l.loopContinue == part) {
@@ -4086,7 +4086,7 @@ public class Graph {
                                     GraphTargetItem pushedValue = pi.value;
                                     GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
                                     GraphTargetItem prevExpr = stack.pop();
-                                    GraphTargetItem leftSide = expr.getNotCoercedNoDup();                                    
+                                    GraphTargetItem leftSide = expr.getNotCoercedNoDup();
                                     GraphTargetItem invertedLeftSide = leftSide;
                                     if (invertedLeftSide instanceof NotItem) {
                                         invertedLeftSide = ((NotItem) invertedLeftSide).value;
@@ -4096,7 +4096,7 @@ public class Graph {
 
                                     prevExpr = prevExpr.getThroughDuplicate();
 
-                                    boolean hideEmptyTrueFalse = true;                                                                    
+                                    boolean hideEmptyTrueFalse = true;
 
                                     if (leftSide instanceof DuplicateItem
                                             || leftSide.getNotCoerced() == prevExpr) {
@@ -4205,7 +4205,7 @@ public class Graph {
                     loopStack.push(new LoopLocalData(part, isLoop, loopItem, li, currentLoop, loopTypeFound, doWhileCandidate, precontinueCommands, stopPart, stopPartKind, ret, sPreLoop));
                 }
                 parent = part;
-                part = nextOnePart;                
+                part = nextOnePart;
                 nextOnePart = null;
                 isLoop = false;
                 li = null;
@@ -4223,7 +4223,7 @@ public class Graph {
             }
             break;
         }
-        
+
         while (!loopStack.isEmpty()) {
             LoopLocalData loopLocalData = loopStack.pop();
             if (loopLocalData.isLoop && loopLocalData.loopItem != null && loopLocalData.currentLoop != null) {
@@ -4624,10 +4624,9 @@ public class Graph {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> gret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];
-        
+
         Queue<MakeGraphWindow> q = new ArrayDeque<>();
-        
-        
+
         //ret.add(makeGraph(null, new GraphPath(), code, startIp, 0, allBlocks, refs, visited));
         q.offer(new MakeGraphWindow(null, new GraphPath(), startIp, 0));
         for (int pos : alternateEntries) {
@@ -4635,14 +4634,14 @@ public class Graph {
             e1.path = new GraphPath("e");
             //ret.add(makeGraph(e1, new GraphPath("e"), code, pos, pos, allBlocks, refs, visited));
             q.offer(new MakeGraphWindow(e1, new GraphPath("e"), pos, pos));
-        }                        
+        }
 
-        
-        loopq: while (!q.isEmpty()) {
+        loopq:
+        while (!q.isEmpty()) {
             if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
-            MakeGraphWindow window = q.poll();                        
+            MakeGraphWindow window = q.poll();
             GraphPart parent = window.parent;
             GraphPath path = window.path;
             int startIp = window.startIp;
@@ -4768,14 +4767,14 @@ public class Graph {
                     part.nextParts.add(gp);
                     allBlocks.add(part);
                 }
-            }        
+            }
         }
-        
-        gret.add(searchPart(startIp, allBlocks));        
+
+        gret.add(searchPart(startIp, allBlocks));
         for (int pos : alternateEntries) {
             gret.add(searchPart(pos, allBlocks));
         }
-        
+
         if (Configuration.autoDeobfuscate.get()) {
             flattenJumps(gret, allBlocks);
         }
@@ -4783,8 +4782,8 @@ public class Graph {
         return gret;
     }
 
-    
     private class MakeGraphWindow {
+
         GraphPart parent;
         GraphPath path;
         int startIp;
@@ -4795,10 +4794,9 @@ public class Graph {
             this.path = path;
             this.startIp = startIp;
             this.lastIp = lastIp;
-        }      
+        }
     }
-    
-    
+
     /**
      * Converts list of TreeItems to string.
      *
