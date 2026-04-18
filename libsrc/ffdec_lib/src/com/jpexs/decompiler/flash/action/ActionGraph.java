@@ -355,8 +355,8 @@ public class ActionGraph extends Graph {
                     SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.isEmpty()) {
                         if (targetStart > -1) {
-                            targetEnd = t;
-                            break;
+                        targetEnd = t;
+                        break;
                         }
                     } else {
                         target = new DirectValueActionItem(null, null, 0, st.target, new ArrayList<>());
@@ -378,8 +378,8 @@ public class ActionGraph extends Graph {
                     }
                     if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
                         if (targetStart > -1) {
-                            targetEnd = t;
-                            break;
+                        targetEnd = t;
+                        break;
                         }
                     } else {
                         targetStart = t;
@@ -433,6 +433,8 @@ public class ActionGraph extends Graph {
                         targetStartItem = st;
                         target = new DirectValueActionItem(null, null, 0, st.target, new ArrayList<>());
                     }
+                } else if (targetStart > -1) {
+                    targetEnd = t;
                 }
             }
             if (it instanceof SetTarget2ActionItem) {
@@ -445,7 +447,13 @@ public class ActionGraph extends Graph {
                         targetStartItem = st;
                         target = st.target;
                     }
+                } else if (targetStart > -1) {
+                    targetEnd = t;
                 }
+            }
+            
+            if (it instanceof TellTargetActionItem && targetStart > -1) {
+                targetEnd = t;
             }
 
             if (targetStart > -1 && targetEnd > -1) {
@@ -459,7 +467,7 @@ public class ActionGraph extends Graph {
                 }
                 newlist.add(new TellTargetActionItem(targetStartItem.getSrc(), targetStartItem.getLineStartItem(), target, tellist));
                 //TODO: maybe set nested flag
-                for (int i = targetEnd + 1; i < list.size(); i++) {
+                for (int i = targetEnd + (it instanceof TellTargetActionItem ? 0 : 1); i < list.size(); i++) {
                     newlist.add(list.get(i));
                 }
                 list.clear();
@@ -467,7 +475,7 @@ public class ActionGraph extends Graph {
                 targetStart = -1;
                 targetEnd = -1;
                 target = null;
-                t = 0;
+                t = -1;
             }
         }
         for (int t = 1/*not first*/; t < list.size(); t++) {

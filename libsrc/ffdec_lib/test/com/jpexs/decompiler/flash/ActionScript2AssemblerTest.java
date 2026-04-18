@@ -627,4 +627,23 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         assertEquals(res, "c += 1;");
     }
 
+    @Test
+    public void testTellTarget() {
+        String res = decompilePcode("SetTarget \"\"\n"
+                + "GotoFrame 1\n"
+                + "SetTarget \"../test\"\n"
+                + "GoToLabel \"MyLabel\"\n"
+                + "Play");
+        res = cleanPCode(res);
+        assertEquals(res, "tellTarget(\"\")\n"
+                + "{\n"
+                + "gotoAndStop(2);\n"
+                + "}\n"
+                + "tellTarget(\"../test\")\n"
+                + "{\n"
+                + "gotoAndStop(\"MyLabel\");\n"
+                + "play();\n"
+                + "}");
+    }
+
 }
