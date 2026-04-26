@@ -355,8 +355,8 @@ public class ActionGraph extends Graph {
                     SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.isEmpty()) {
                         if (targetStart > -1) {
-                        targetEnd = t;
-                        break;
+                            targetEnd = t;
+                            break;
                         }
                     } else {
                         target = new DirectValueActionItem(null, null, 0, st.target, new ArrayList<>());
@@ -378,8 +378,8 @@ public class ActionGraph extends Graph {
                     }
                     if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
                         if (targetStart > -1) {
-                        targetEnd = t;
-                        break;
+                            targetEnd = t;
+                            break;
                         }
                     } else {
                         targetStart = t;
@@ -451,7 +451,7 @@ public class ActionGraph extends Graph {
                     targetEnd = t;
                 }
             }
-            
+
             if (it instanceof TellTargetActionItem && targetStart > -1) {
                 targetEnd = t;
             }
@@ -1051,7 +1051,7 @@ public class ActionGraph extends Graph {
         ActionSecondPassData spd = new ActionSecondPassData();
         Set<GraphPart> processedIfs = new HashSet<>();
         checkSecondPassSwitches(localData, loops, throwStates, spd.switchCases, spd.switchBreaks, processedIfs, list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
-        
+
         return spd;
     }
 
@@ -1182,7 +1182,7 @@ public class ActionGraph extends Graph {
                                 allSwitchParts.add(switchParts);
                                 allSwitchOnFalseParts.add(switchOnFalseParts);
                                 allSwitchExpressions.add(switchExpressions);
-                                allSwitchCases.add(switchCases);                                
+                                allSwitchCases.add(switchCases);
                                 try {
                                     allSwitchBreaks.add(getMostCommonPart(localData, switchCases, loops, throwStates, new ArrayList<>()));
                                 } catch (InterruptedException ex) {
