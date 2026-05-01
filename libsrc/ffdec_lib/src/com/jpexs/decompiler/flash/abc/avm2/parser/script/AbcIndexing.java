@@ -1104,6 +1104,11 @@ public final class AbcIndexing {
      */
     protected void indexTraits(ABC abc, int name_index, Traits ts, Map<PropertyDef, TraitIndex> map, Map<PropertyNsDef, TraitIndex> mapNs, Map<AmbiguousPropertyDef, List<TraitIndex>> mapAmbiguous, int scriptIndex) {        
         for (Trait t : ts.traits) {
+            // Skip any stale traits that were left over from delete/replace
+            if (t.name_index < 0 || t.name_index >= abc.constants.getMultinameCount()) {
+                continue;
+            }
+            
             ValueKind propValue = null;
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
@@ -1235,6 +1240,12 @@ public final class AbcIndexing {
                 Trait tr = abc.script_info.get(i).traits.traits.get(t);
                 if (tr instanceof TraitClass) {
                     TraitClass tc = (TraitClass) tr;
+                    
+                    // Skip any stale traits that were left over from delete/replace
+                    if (tc.name_index < 0 || tc.name_index >= abc.constants.getMultinameCount()) {
+                        continue;
+                    }
+                    
                     InstanceInfo ii = abc.instance_info.get(tc.class_info);
                     if (ii.deleted) {
                         continue;
