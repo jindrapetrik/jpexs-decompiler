@@ -74,6 +74,7 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -117,6 +118,9 @@ public class Translator extends JFrame implements ItemListener {
     private DefaultTableModel tableModel;
     private JComboBox<LocaleItem> localeComboBox;
     private JComboBox<ResourceItem> resourcesComboBox;
+
+    private boolean autosaveOnExit = true;
+    private JCheckBox autosaveCheckBox;
 
     private String lastSaveDir = "";
 
@@ -318,7 +322,9 @@ public class Translator extends JFrame implements ItemListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 try {
-                    save();
+                    if (autosaveOnExit) {
+                        save();
+                    }
                     saveWindow();
                 } catch (IOException ex) {
                     Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
@@ -729,11 +735,24 @@ public class Translator extends JFrame implements ItemListener {
                 }
             }
         });
+
+        autosaveCheckBox = new JCheckBox("Autosave on exit", true);
+        autosaveCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                autosaveOnExit = autosaveCheckBox.isSelected();
+            }
+        });
+
         buttonsPanel.add(importButton);
         buttonsPanel.add(exportButton);
         buttonsPanel.add(startOverButton);
 
-        cnt.add(buttonsPanel, BorderLayout.SOUTH);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(buttonsPanel, BorderLayout.CENTER);
+        bottomPanel.add(autosaveCheckBox, BorderLayout.EAST);
+
+        cnt.add(bottomPanel, BorderLayout.SOUTH);
 
         cnt.add(new JScrollPane(table), BorderLayout.CENTER);
         resizeColumnWidth(table);
@@ -1108,6 +1127,10 @@ public class Translator extends JFrame implements ItemListener {
                 case "export.dir":
                     lastSaveDir = value;
                     break;
+                case "autosave":
+                    autosaveOnExit = value.equals("true");
+                    autosaveCheckBox.setSelected(autosaveOnExit);
+                    break;
             }
 
         }
@@ -1133,6 +1156,7 @@ public class Translator extends JFrame implements ItemListener {
         pw.println("column.en.width=" + table.getColumn("en").getWidth());
         pw.println("column.translated.width=" + table.getColumn("translated").getWidth());
         pw.println("export.dir=" + lastSaveDir);
+        pw.println("autosave=" + autosaveOnExit);
 
         writer.close();
     }
