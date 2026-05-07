@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -81,8 +82,10 @@ public class MainFrameStatusPanel extends JPanel {
             if (w != null) {           
                 w.userCancel(true);
             }
-        });                               
-        statusLeftPanel.add(loadingPanel);
+        });
+        if (Configuration.showLoadingSpinner.get()) {
+            statusLeftPanel.add(loadingPanel);
+        }
         statusLeftPanel.add(cancelButton);
         statusLeftPanel.add(statusLabel);
         setPreferredSize(new Dimension(1, 30));
@@ -131,19 +134,23 @@ public class MainFrameStatusPanel extends JPanel {
     }
 
     public void showOldStatus() {
-        if (oldStatus.isEmpty()) {
-            loadingPanel.setVisible(false);
-        } else {
-            loadingPanel.setVisible(true);
+        if (Configuration.showLoadingSpinner.get()) {
+            if (oldStatus.isEmpty()) {
+                loadingPanel.setVisible(false);
+            } else {
+                loadingPanel.setVisible(true);
+            }
         }
         statusLabel.setText(oldStatus);
     }
 
     public void setWorkStatus(String s, CancellableWorker worker) {
-        if (s.isEmpty()) {
-            loadingPanel.setVisible(false);
-        } else {
-            loadingPanel.setVisible(true);
+        if (Configuration.showLoadingSpinner.get()) {
+            if (s.isEmpty()) {
+                loadingPanel.setVisible(false);
+            } else {
+                loadingPanel.setVisible(true);
+            }
         }
         statusLabel.setText(s);
         currentWorker = worker;
