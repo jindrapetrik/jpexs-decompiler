@@ -2971,16 +2971,19 @@ public class Main {
         System.setProperty("sun.java2d.d3d", "false");
         System.setProperty("sun.java2d.noddraw", "true");
 
-        if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.       
+        if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.
+            double scaleToUse = Configuration.uiScale.get();
             if (!Configuration.uiScale.hasValue()) {
+                // Auto-detect from current screen. Do NOT persist to config so the scale is
+                // re-detected on each launch (prevents stale 4K scale being applied on a
+                // lower-DPI monitor after a display change).
                 GraphicsConfiguration configuration = View.getMainDefaultScreenDevice().getDefaultConfiguration();
-
                 AffineTransform transform = configuration.getDefaultTransform();
                 if (transform != null) {
-                    Configuration.uiScale.set(transform.getScaleX());
+                    scaleToUse = transform.getScaleX();
                 }
             }
-            System.setProperty("sun.java2d.uiScale", "" + Configuration.uiScale.get());
+            System.setProperty("sun.java2d.uiScale", "" + scaleToUse);
         }
 
         if (Configuration.hwAcceleratedGraphics.get()) {
