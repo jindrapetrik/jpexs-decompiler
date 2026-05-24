@@ -2973,7 +2973,7 @@ public class Main {
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.
             double scaleToUse = Configuration.uiScale.get();
-            if (!Configuration.uiScale.hasValue()) {
+            if (!Configuration.uiScale.hasValue() || Configuration.uiScale.get() == null) {
                 // Auto-detect from current screen. Do NOT persist to config so the scale is
                 // re-detected on each launch (prevents stale 4K scale being applied on a
                 // lower-DPI monitor after a display change).
