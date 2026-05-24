@@ -2972,8 +2972,8 @@ public class Main {
         System.setProperty("sun.java2d.noddraw", "true");
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.
-            double scaleToUse = Configuration.uiScale.get();
-            if (!Configuration.uiScale.hasValue() || Configuration.uiScale.get() == null) {
+            Double scaleToUse = Configuration.uiScale.get();
+            if (scaleToUse == null || !Configuration.uiScale.hasValue()) {
                 // Auto-detect from current screen. Do NOT persist to config so the scale is
                 // re-detected on each launch (prevents stale 4K scale being applied on a
                 // lower-DPI monitor after a display change).
@@ -2981,6 +2981,8 @@ public class Main {
                 AffineTransform transform = configuration.getDefaultTransform();
                 if (transform != null) {
                     scaleToUse = transform.getScaleX();
+                } else {
+                    scaleToUse = 1.0;
                 }
             }
             System.setProperty("sun.java2d.uiScale", "" + scaleToUse);
