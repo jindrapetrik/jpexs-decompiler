@@ -188,7 +188,7 @@ public class ActionSetMember extends Action {
                             ((GetMemberActionItem) ((DecrementActionItem) value).object).object = ((GetMemberActionItem) ((DecrementActionItem) value).object).object.getThroughDuplicate();
                             cleanupTemp(((GetMemberActionItem) ((DecrementActionItem) value).object).object, object, output, stack);                            
                             if (setter) {
-                                stack.addToOutput(new PreDecrementActionItem(action, lineStartAction, ((IncrementActionItem) value).object.getThroughDuplicate()));
+                                stack.addToOutput(new PreDecrementActionItem(action, lineStartAction, ((DecrementActionItem) value).object.getThroughDuplicate()));
                             } else {
                                 stack.addToOutput(new PostDecrementActionItem(action, lineStartAction, ((DecrementActionItem) value).object.getThroughDuplicate()));
                             }
@@ -252,8 +252,14 @@ public class ActionSetMember extends Action {
         } finally {
             if (setter) {
                 stack.finishBlock(output);
-                stack.push(output.remove(output.size() - 1));
-                stack.moveToStack(output);
+                // Guard against an empty output: if the try block exited via an
+                // exception before producing a statement, removing from an empty
+                // list would throw IndexOutOfBoundsException here and mask the
+                // original exception. Mirrors the check used in cleanupTemp().
+                if (!output.isEmpty()) {
+                    stack.push(output.remove(output.size() - 1));
+                    stack.moveToStack(output);
+                }
             }
         }
     }
