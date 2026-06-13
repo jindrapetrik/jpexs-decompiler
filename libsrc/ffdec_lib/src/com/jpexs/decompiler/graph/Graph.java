@@ -5192,6 +5192,20 @@ public class Graph {
                                         valuesMapping.set(k, vm - 1);
                                     }
                                 }
+                                
+                                if (j > 0) {
+                                    int mp = valuesMapping.get(j - 1);
+                                    GraphTargetItem last = null;
+                                    if (!caseCommands.get(mp).isEmpty()) {
+                                        last = caseCommands.get(mp).get(caseCommands.get(mp).size() - 1);
+                                    }
+                                    if (
+                                            last == null 
+                                            || (!(last instanceof BreakItem || last instanceof ContinueItem || last instanceof ExitItem))
+                                    ) {
+                                        caseCommands.get(mp).add(new BreakItem(br.dialect, null, null, loopId));
+                                    }
+                                }
                             }
                             break;
                         }
