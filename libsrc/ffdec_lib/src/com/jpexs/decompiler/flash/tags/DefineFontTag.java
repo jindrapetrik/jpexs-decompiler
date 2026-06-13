@@ -59,10 +59,7 @@ public class DefineFontTag extends FontTag {
     private FontInfoTag fontInfoTag = null;
 
     @Internal
-    public long unknownGfx;
-
-    @Internal
-    public boolean strippedShapes = false;
+    public boolean strippedShapes = false; //Can be in GFX
 
     /**
      * Constructor
@@ -92,25 +89,27 @@ public class DefineFontTag extends FontTag {
         fontId = sis.readUI16("fontId");
         glyphShapeTable = new ArrayList<>();
 
-        strippedShapes = swf.hasStrippedShapesFromFonts();
+        strippedShapes = false;
 
-        if (!strippedShapes && sis.available() > 0) {
-            long pos = sis.getPos();
-            int firstOffset = sis.readUI16("firstOffset");
-            int nGlyphs = firstOffset / 2;
+        long pos = sis.getPos();
+        int firstOffset = sis.readUI16("firstOffset");
+        int nGlyphs = firstOffset / 2;
 
-            long[] offsetTable = new long[nGlyphs];
-            offsetTable[0] = firstOffset;
-            for (int i = 1; i < nGlyphs; i++) {
-                offsetTable[i] = sis.readUI16("offset");
+        long[] offsetTable = new long[nGlyphs];
+        offsetTable[0] = firstOffset;
+        for (int i = 1; i < nGlyphs; i++) {
+            int offset = sis.readUI16("offset");
+            if (offset == 0) {
+                strippedShapes = true;
+                break;
             }
+            offsetTable[i] = offset;
+        }
+        if (!strippedShapes) {
             for (int i = 0; i < nGlyphs; i++) {
                 sis.seek(pos + offsetTable[i]);
                 glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
             }
-        }
-        if (strippedShapes) {
-            unknownGfx = sis.readUI32("unknownGfx");
         }
     }
 
@@ -123,7 +122,10 @@ public class DefineFontTag extends FontTag {
     @Override
     public synchronized void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(fontId);
-        if (!swf.hasStrippedShapesFromFonts()) {
+        if (strippedShapes) {
+            sos.writeUI16(glyphShapeTable.size() * 2);
+            sos.writeUI16(0);
+        } else {
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             List<Integer> offsetTable = new ArrayList<>();
             SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
@@ -135,8 +137,6 @@ public class DefineFontTag extends FontTag {
                 sos.writeUI16(offset);
             }
             sos.write(baos2.toByteArray());
-        } else {
-            sos.writeUI32(unknownGfx);
         }
     }
 
