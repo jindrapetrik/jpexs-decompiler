@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Dotted chain class. Represents a chain of names separated by dots.
@@ -140,7 +141,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             for (String part : parts) {
                 String nameNoSuffix = part;
                 String namespaceSuffix = "";
-                if (part.matches(".*#[0-9]+$")) {
+                if (NAME_PATTERN.matcher(part).matches()) {
                     nameNoSuffix = part.substring(0, part.lastIndexOf("#"));
                     namespaceSuffix = part.substring(part.lastIndexOf("#"));
                 }
@@ -364,6 +365,8 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return subChain(parts.size() - 1);
     }
 
+    private static final Pattern NAME_PATTERN = Pattern.compile(".*#[0-9]+$");
+
     /**
      * Adds a part to the chain with a suffix.
      *
@@ -373,7 +376,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     public DottedChain addWithSuffix(String name) {
         String addedNameNoSuffix = name;
         String addedNamespaceSuffix = "";
-        if (name != null && name.matches(".*#[0-9]+$")) {
+        if (name != null && NAME_PATTERN.matcher(name).matches()) {
             addedNameNoSuffix = name.substring(0, name.lastIndexOf("#"));
             addedNamespaceSuffix = name.substring(name.lastIndexOf("#"));
         }
