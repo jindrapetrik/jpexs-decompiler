@@ -100,7 +100,7 @@ package tests
                      setlocal1
                      getlocal2
                      iffalse ofs00ed
-                     jump ofs008f
+                     jump ofs009c
             ofs0056:
                      label
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
@@ -116,58 +116,58 @@ package tests
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
                      pushstring "2"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")]), 1
-                     jump ofs00e0
-            ofs0076:
+                     getlocal 4
+                     iffalse ofs007f
+                     findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
+                     pushstring "2c"
+                     callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")]), 1
+            ofs007f:
+                     jump ofs00ed
+            ofs0083:
                      label
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
                      pushstring "3"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")]), 1
-                     jump ofs00e0
-            ofs0082:
+                     jump ofs00ed
+            ofs008f:
                      label
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
                      pushstring "4"
                      callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")]), 1
-            ofs008a:
+            ofs0097:
                      label
-                     jump ofs00e0
-            ofs008f:
+                     jump ofs00ed
+            ofs009c:
                      getlocal 5
                      setlocal 9
                      pushbyte 1
                      getlocal 9
-                     ifstrictne ofs00a1
+                     ifstrictne ofs00ae
                      pushbyte 0
-                     jump ofs00cd
-            ofs00a1:
+                     jump ofs00da
+            ofs00ae:
                      pushbyte 2
                      getlocal 9
-                     ifstrictne ofs00af
+                     ifstrictne ofs00bc
                      pushbyte 1
-                     jump ofs00cd
-            ofs00af:
+                     jump ofs00da
+            ofs00bc:
                      pushbyte 3
                      getlocal 9
-                     ifstrictne ofs00bd
+                     ifstrictne ofs00ca
                      pushbyte 2
-                     jump ofs00cd
-            ofs00bd:
+                     jump ofs00da
+            ofs00ca:
                      pushbyte 4
                      getlocal 9
-                     ifstrictne ofs00cb
+                     ifstrictne ofs00d8
                      pushbyte 3
-                     jump ofs00cd
-            ofs00cb:
+                     jump ofs00da
+            ofs00d8:
                      pushbyte -1
-            ofs00cd:
+            ofs00da:
                      kill 9
-                     lookupswitch ofs008a, [ofs0056, ofs006a, ofs0076, ofs0082]
-            ofs00e0:
-                     getlocal 4
-                     iffalse ofs00ed
-                     findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
-                     pushstring "2c"
-                     callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")]), 1
+                     lookupswitch ofs0097, [ofs0056, ofs006a, ofs0083, ofs008f]
             ofs00ed:
                      findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("tests"),PackageInternalNs("tests"),PrivateNamespace("tests:TestForEachSwitch"),ProtectedNamespace("tests:TestForEachSwitch"),StaticProtectedNs("tests:TestForEachSwitch"),PrivateNamespace("TestForEachSwitch.as$0")])
                      pushstring "before_continue"
