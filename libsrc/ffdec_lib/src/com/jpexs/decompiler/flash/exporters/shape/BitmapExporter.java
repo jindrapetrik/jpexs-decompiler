@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.graphics.ExtendedBasicStroke;
+import com.jpexs.helpers.CorrectedTexturePaint;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -352,7 +353,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 if (colorTransform == null) {
                     bufImg = new ImageTagBufferedImage(imageTag, bufImg);
                 }
-                fillPaint = new TexturePaint(bufImg, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                fillPaint = new CorrectedTexturePaint(bufImg, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
 
                 fillTransform = matrix.toTransform();
                 fillRepeat = repeat;
@@ -524,7 +525,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     img = colorTransform.apply(img);
                 }
 
-                linePaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                linePaint = new CorrectedTexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 lineTransform = matrix.toTransform();
                 return;
             }
