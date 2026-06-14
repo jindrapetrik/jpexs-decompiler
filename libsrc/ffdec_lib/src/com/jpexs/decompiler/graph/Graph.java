@@ -1593,7 +1593,8 @@ public class Graph {
                 if (hasContinues && breakCaseIndex > -1 && i + 1 < list.size()) {
                     List<GraphTargetItem> toAdd = new ArrayList<>();
                     boolean continueOnEnd = list.get(list.size() - 1) instanceof ContinueItem;
-                    for (int j = i + 1; j < list.size() - (continueOnEnd ? 1 : 0); j++) {
+                    int size = list.size();
+                    for (int j = i + 1; j < size - (continueOnEnd ? 1 : 0); j++) {
                         toAdd.add(list.remove(i + 1));
                     }
                     List<GraphTargetItem> targetCommands = swi.caseCommands.get(breakCaseIndex);
