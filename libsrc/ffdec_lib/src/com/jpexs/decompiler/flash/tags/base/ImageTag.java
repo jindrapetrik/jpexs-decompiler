@@ -261,7 +261,7 @@ public abstract class ImageTag extends DrawableTag {
         FILLSTYLE fillStyle = new FILLSTYLE();
         fillStyle.inShape3 = shapeNum >= 3;
         fillStyle.fillStyleType = Configuration.shapeImportUseNonSmoothedFill.get()
-                ? FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP : FILLSTYLE.REPEATING_BITMAP;
+                ? FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP : FILLSTYLE.CLIPPED_BITMAP;
         fillStyle.bitmapId = getCharacterId();
         MATRIX matrix = new MATRIX();
         matrix.hasScale = true;
