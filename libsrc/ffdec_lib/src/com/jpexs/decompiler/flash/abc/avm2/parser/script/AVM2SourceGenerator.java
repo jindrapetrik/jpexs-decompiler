@@ -1196,13 +1196,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         localData.activationReg = 0;
 
+        UnresolvedAVM2Item.ResolveAccelerator accelerator = new UnresolvedAVM2Item.ResolveAccelerator(subvariables);
+
         for (int i = 0; i < subvariables.size(); i++) {
             AssignableAVM2Item an = subvariables.get(i);
             if (an instanceof UnresolvedAVM2Item) {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1219,7 +1221,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     paramTypes.set(t, res);
                 }
             }

@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -396,6 +397,28 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new CompilationException("Cannot assign", line);
     }
 
+    public static class ResolveAccelerator {
+        public HashMap<String, NameAVM2Item> definitionNameIndex = new HashMap<>();
+
+        public ResolveAccelerator(List<AssignableAVM2Item> variables) {
+            for (AssignableAVM2Item an : variables) {
+                if (an instanceof NameAVM2Item) {
+                    NameAVM2Item n = (NameAVM2Item) an;
+                    if (n.isDefinition() && !definitionNameIndex.containsKey(n.getVariableName())) {
+                        definitionNameIndex.put(n.getVariableName(), n);
+                    }
+                }
+            }
+        }
+    }
+
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {        
+        ResolveAccelerator accelerator = new ResolveAccelerator(variables);
+
+        return resolve(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+    }
+
+
     /**
      * Resolves.
      * @param localData Local data
@@ -406,14 +429,15 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
      * @param abc ABC
      * @param callStack Call stack
      * @param variables Variables
+     * @param accelerator Resolve accelerator
      * @return Resolved item
      * @throws CompilationException On compilation error
      */
-    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         boolean isResolved = false;
 
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
-            isResolved = resolve1(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolve1(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
             if (isResolved) { return resolvedRoot; }
         }
 
@@ -474,34 +498,28 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return resolvedRoot;
     }
 
-    private boolean resolve1(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolve1(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         //search for variable
-        for (AssignableAVM2Item a : variables) {
-            if (a instanceof NameAVM2Item) {
-                NameAVM2Item n = (NameAVM2Item) a;
-                if (n.isDefinition() && name.get(0).equals(n.getVariableName())) {
-                    NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
-                    ret.setSlotScope(n.getSlotScope());
-                    ret.setSlotNumber(n.getSlotNumber());
-                    ret.setRegNumber(n.getRegNumber());
-                    resolved = ret;
-                    for (int i = 1; i < name.size(); i++) {
-                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                        if (i == name.size() - 1) {
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                        }
-                    }
-                    if (name.size() == 1) {
-                        ret.setAssignedValue(assignedValue);
-                    }
-                    ret.setNs(n.getNs());
-                    resolvedRoot = ret;
-                    return true;
-                }
+        NameAVM2Item n = accelerator.definitionNameIndex.get(name.get(0));
+        if (n == null) { return false; }
+
+        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
+        ret.setSlotScope(n.getSlotScope());
+        ret.setSlotNumber(n.getSlotNumber());
+        ret.setRegNumber(n.getRegNumber());
+        resolved = ret;
+        for (int i = 1; i < name.size(); i++) {
+            resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+            if (i == name.size() - 1) {
+                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
             }
         }
-
-        return false;
+        if (name.size() == 1) {
+            ret.setAssignedValue(assignedValue);
+        }
+        ret.setNs(n.getNs());
+        resolvedRoot = ret;
+        return true;
     }
 
     private boolean resolve2(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
