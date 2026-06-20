@@ -399,6 +399,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     public static class ResolveAccelerator {
         public HashMap<String, NameAVM2Item> definitionNameIndex = new HashMap<>();
+        public PropertyAVM2Item.ResolveAccelerator propertyResolveAccelerator = new PropertyAVM2Item.ResolveAccelerator();
 
         public ResolveAccelerator(List<AssignableAVM2Item> variables) {
             for (AssignableAVM2Item an : variables) {
@@ -446,7 +447,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             if (isResolved) { return resolvedRoot; }
         }
 
-        boolean isProperty = resolve3(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+        boolean isProperty = resolve3(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
 
         //search same package classes
         if (currentClassFullName != null && !isProperty) {
@@ -546,7 +547,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    private boolean resolve3(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolve3(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         boolean isProperty = false;
         if (localData != null) { //resolve can be called without localData
             PropertyAVM2Item resolvedx = new PropertyAVM2Item(null, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), abc, openedNamespaces, callStack, false, null, line, this.thisType);
@@ -560,7 +561,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             Reference<Boolean> isType = new Reference<>(false);
             Reference<Trait> outPropTrait = new Reference<>(null);
 
-            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC, outPropTrait);
+            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC, outPropTrait, accelerator.propertyResolveAccelerator);
 
             if (objectType.getVal() != null && !isType.getVal()) {
                 isProperty = true;
@@ -717,8 +718,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
         return false;
-
     }
+
     private boolean resolve9(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         boolean isSuper = name.get(0).equals("super");
         GraphTargetItem ntype = thisType;
@@ -766,9 +767,6 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         resolvedRoot = ret;
         return true;
     }
-
-
-
 
     @Override
     public int hashCode() {
