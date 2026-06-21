@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.LRULinkedHashMap;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -518,20 +519,6 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return null;
     }
 
-
-    private static class LRULinkedHashMap<K, V> extends LinkedHashMap<K, V> {
-        private final int maxEntries;
-
-        public LRULinkedHashMap(int maxEntries) {
-            super(maxEntries + 1, 1.0f, true);
-            this.maxEntries = maxEntries;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > maxEntries;
-        }
-    }
 
     private static class ResolveNameIndexKey {
         int nsindex;

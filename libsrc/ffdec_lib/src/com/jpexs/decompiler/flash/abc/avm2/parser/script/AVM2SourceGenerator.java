@@ -109,6 +109,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.helpers.LRULinkedHashMap;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -2583,12 +2584,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
     }
 
-    private static LinkedHashMap<AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LinkedHashMap<AbcFindPropertyKey, AbcIndexing.TraitIndex>(10, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<AbcFindPropertyKey, AbcIndexing.TraitIndex> eldest) {
-            return size() > 100;
-        }
-    };
+    private static LinkedHashMap<AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LRULinkedHashMap<>(100);
 
     private static class AbcFindPropertyKey {
         public AbcIndexing abc;
