@@ -439,12 +439,16 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
             isResolved = resolve1(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         if ((paramNames.contains(name.get(0)) || name.get(0).equals("arguments"))) {
             isResolved = resolve2(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         boolean isProperty = resolve3(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
@@ -452,28 +456,38 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         //search same package classes
         if (currentClassFullName != null && !isProperty) {
             isResolved = resolve4(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         //Search toplevel classes
         if (currentClassFullName != null && !isProperty) {
             isResolved = resolve5(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         //Search for types in imported classes
         if (!isProperty) {
             isResolved = resolve6(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         //Search all fully qualified types
         if (!isProperty) {
             isResolved = resolve7(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
 
             isResolved = resolve8(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         if (!isProperty && (name.get(0).equals("this") || name.get(0).equals("super"))) {
@@ -482,7 +496,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
 
             isResolved = resolve9(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
-            if (isResolved) { return resolvedRoot; }
+            if (isResolved) {
+                return resolvedRoot;
+            }
         }
 
         if (!isProperty && (name.size() == 1 && name.get(0).equals("Vector"))) {
@@ -502,7 +518,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     private boolean resolve1(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         //search for variable
         NameAVM2Item n = accelerator.definitionNameIndex.get(name.get(0));
-        if (n == null) { return false; }
+        if (n == null) {
+            return false;
+        }
 
         NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
         ret.setSlotScope(n.getSlotScope());
@@ -587,7 +605,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
                 }
-                    resolvedRoot = ti;
+                resolvedRoot = ti;
                 return true;
             }
         }
