@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
+import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
@@ -65,6 +66,8 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextAttribute;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1211,10 +1214,76 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    
+    public static Shape staticTextToOutline(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix, Map<Integer, FontTag> normalizedFonts, Matrix transformation) {
+        Area shp = new Area();
+        FontTag font = null;
+        int fontId = -1;
+        double textHeight = 12;
+        int x = 0;
+        int y = 0;
+        List<SHAPE> glyphs = new ArrayList<>();
+        for (int r = 0; r < textRecords.size(); r++) {
+            TEXTRECORD rec = textRecords.get(r);
+            if (rec.styleFlagsHasFont) {
+                font = rec.getFont(swf);
+                fontId = swf.getCharacterId(font);
+                if (normalizedFonts.containsKey(fontId)) {
+                    font = normalizedFonts.get(fontId);
+                }
+                glyphs = font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            int offsetX = 0;
+            int offsetY = 0;
+            if (rec.styleFlagsHasXOffset) {
+                offsetX = rec.xOffset;
+                x = offsetX;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                offsetY = rec.yOffset;
+                y = offsetY;
+            }
+
+            double rat = textHeight / 1024.0 / font.getDivider();
+
+            
+                Matrix mat0 = transformation.clone();
+                mat0 = mat0.concatenate(new Matrix(textMatrix));
+                Matrix matScale = Matrix.getScaleInstance(rat);
+
+                
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
+                    
+                    
+                    matScale.translateX = x;
+                    matScale.translateY = y;
+                    
+                    Matrix matX = mat0.concatenate(matScale);
+                    if (entry.glyphIndex != -1) {
+                        // shapeNum: 1
+                        SHAPE shape = glyphs.get(entry.glyphIndex);
+                        List<GeneralPath> strokes = new ArrayList<>();
+                        List<GeneralPath> paths = PathExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, strokes);                        
+                        
+                        for (GeneralPath p : paths) {
+                            shp.add(new Area(p.createTransformedShape(matX.toTransform())));
+                        }
+
+                        x += entry.glyphAdvance;
+                    }
+                }
+            
+        }
+        
+        return shp;
+    }
+    
     @Override
     public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         RECT r = getBounds();
         Shape shp = new Rectangle.Double(r.Xmin, r.Ymin, r.getWidth(), r.getHeight());
-        return transformation.toTransform().createTransformedShape(shp); //TODO: match character shapes (?)
+        return transformation.toTransform().createTransformedShape(shp); //TODO: override with outline matching shapes
     }
 }

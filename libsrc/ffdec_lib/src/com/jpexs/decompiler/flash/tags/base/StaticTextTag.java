@@ -45,9 +45,11 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
+import java.awt.Shape;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1071,4 +1073,9 @@ public abstract class StaticTextTag extends TextTag {
     public Dimension getFilterDimensions() {
         return new Dimension(0, 0);                
     }
+
+    @Override
+    public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+        return staticTextToOutline(swf, textRecords, textMatrix, new HashMap<>(), transformation);
+    }        
 }
