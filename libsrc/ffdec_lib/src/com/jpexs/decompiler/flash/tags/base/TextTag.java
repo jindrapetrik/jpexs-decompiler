@@ -86,6 +86,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Constructor.
+     *
      * @param swf SWF
      * @param id ID
      * @param name Name
@@ -97,45 +98,52 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Inserts character at the given position.
+     *
      * @param glyphPos Glyph position
      * @param character Character
      */
     public abstract void insertCharacterGlyph(int glyphPos, char character);
-    
+
     /**
      * Removes character glyph at the given position
+     *
      * @param glyphPos Glyph position
      */
     public abstract void removeCharacterGlyph(int glyphPos);
-    
+
     /**
      * Gets text matrix.
+     *
      * @return Text matrix
      */
     public abstract MATRIX getTextMatrix();
 
     /**
      * Gets texts.
+     *
      * @return Texts
      */
     public abstract List<String> getTexts();
 
     /**
      * Gets font IDs.
+     *
      * @return Font IDs
      */
     public abstract List<Integer> getFontIds();
 
     /**
      * Gets formatted text.
+     *
      * @param ignoreLetterSpacing Ignore letter spacing
      * @return Formatted text
      */
     public abstract HighlightedText getFormattedText(boolean ignoreLetterSpacing);
 
     /**
-     * Sets formatted text.
-     * Use the texts from the "texts" argument when it is not null.
+     * Sets formatted text. Use the texts from the "texts" argument when it is
+     * not null.
+     *
      * @param missingCharHandler Missing character handler
      * @param formattedText Formatted text
      * @param texts Texts
@@ -146,6 +154,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Changes text x position by diff.
+     *
      * @param diff Difference
      * @return True if the text was moved successfully
      */
@@ -153,12 +162,14 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Gets text bounds.
+     *
      * @return Text bounds
      */
     public abstract RECT getBounds();
 
     /**
      * Sets text bounds.
+     *
      * @param r Bounds
      */
     public abstract void setBounds(RECT r);
@@ -170,6 +181,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Updates text bounds.
+     *
      * @param ret Bounds
      * @param x X
      * @param y Y
@@ -191,6 +203,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Aligns text.
+     *
      * @param textAlign Text align
      * @return True if the text was aligned successfully
      */
@@ -198,6 +211,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Aligns text.
+     *
      * @param swf SWF
      * @param textRecords Text records
      * @param textAlign Text align
@@ -317,12 +331,13 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Gets rectangle positions of glyph entries of the TEXTRECORDs.
+     *
      * @param list Text record list
      * @param swf SWF
      * @return List of RECTs
      */
     public static List<RECT> getGlyphEntriesPositions(List<TEXTRECORD> list, SWF swf) {
-        
+
         List<RECT> ret = new ArrayList<>();
         int x = 0;
         int y = 0;
@@ -336,7 +351,7 @@ public abstract class TextTag extends DrawableTag {
         BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         Graphics graphics = bi.getGraphics();
         Font aFont;
-        
+
         for (int r = 0; r < list.size(); r++) {
             TEXTRECORD rec = list.get(r);
             if (rec.styleFlagsHasXOffset) {
@@ -345,7 +360,7 @@ public abstract class TextTag extends DrawableTag {
             if (rec.styleFlagsHasYOffset) {
                 y = rec.yOffset;
             }
-            
+
             if (rec.styleFlagsHasFont) {
                 FontTag font2 = rec.getFont(swf);
                 if (font2 != null) {
@@ -378,7 +393,7 @@ public abstract class TextTag extends DrawableTag {
                     leading = ((double) font.getLeading() * textHeight / 1024.0 / font.getDivider());
                 }
             }
-            
+
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 ret.add(new RECT(x, x + entry.glyphAdvance, (int) Math.round(y - ascent), (int) Math.round(y + descent + leading)));
                 x += entry.glyphAdvance;
@@ -386,9 +401,10 @@ public abstract class TextTag extends DrawableTag {
         }
         return ret;
     }
-    
+
     /**
      * Gets text records attributes.
+     *
      * @param list Text records
      * @param swf SWF
      * @param normalizedFonts Normalized fonts
@@ -422,14 +438,14 @@ public abstract class TextTag extends DrawableTag {
             if (rec.styleFlagsHasFont) {
                 FontTag font2 = rec.getFont(swf);
                 if (font2 != null) {
-                    
+
                     int fontId = swf.getCharacterId(font2);
                     if (normalizedFonts.containsKey(fontId)) {
-                        font2 = normalizedFonts.get(fontId);                        
+                        font2 = normalizedFonts.get(fontId);
                     }
-                    
+
                     font = font2;
-                }                
+                }
                 textHeight = rec.textHeight;
                 if (font == null) {
                     Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id={0} was not found.", rec.fontId);
@@ -543,6 +559,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Gets border shape.
+     *
      * @param borderColor Border color
      * @param fillColor Fill color
      * @param rect Rectangle
@@ -606,6 +623,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Draws border.
+     *
      * @param swf SWF
      * @param image Image
      * @param borderColor Border color
@@ -624,6 +642,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Draws border to HTML canvas.
+     *
      * @param swf SWF
      * @param result Result
      * @param borderColor Border color
@@ -646,6 +665,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Draws border to SVG.
+     *
      * @param swf SWF
      * @param exporter Exporter
      * @param borderColor Border color
@@ -658,9 +678,9 @@ public abstract class TextTag extends DrawableTag {
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        
+
         Matrix mat = transformation.clone();
-        mat = mat.concatenate(new Matrix(textMatrix));        
+        mat = mat.concatenate(new Matrix(textMatrix));
         //??FIXME
         SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, 0, exporter, null, colorTransform, 1, zoom, mat);
         shapeExporter.export();
@@ -669,6 +689,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Converts static text to image.
+     *
      * @param swf SWF
      * @param textRecords Text records
      * @param numText Number of text (DefineText = 1, DefineText2 = 2)
@@ -685,13 +706,13 @@ public abstract class TextTag extends DrawableTag {
             ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
             return;
         }
-        
+
         Map<Integer, FontTag> normalizedFonts = new HashMap<>();
         if (image.getGraphics() instanceof RequiresNormalizedFonts) {
             RequiresNormalizedFonts reqNormFonts = (RequiresNormalizedFonts) image.getGraphics();
             normalizedFonts = reqNormFonts.getNormalizedFonts();
         }
-        
+
         int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
@@ -731,8 +752,7 @@ public abstract class TextTag extends DrawableTag {
                 }
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
-                
-                
+
                 if (font != null) {
                     if (!font.hasLayout()) {
                         String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
@@ -750,7 +770,7 @@ public abstract class TextTag extends DrawableTag {
                         descent = lm.getDescent() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
                         leading = lm.getLeading() * 1024 * font.getDivider() / (textHeight / SWF.unitDivisor);
                     } else {
-                        ascent =  font.getAscent(); //((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
+                        ascent = font.getAscent(); //((double) font.getAscent() * textHeight / 1024.0 / font.getDivider());
                         descent = font.getDescent(); //(double) font.getDescent() * textHeight / 1024.0 / font.getDivider());
                         leading = font.getLeading(); //(double) font.getLeading()* textHeight / 1024.0 / font.getDivider());
                     }
@@ -767,7 +787,7 @@ public abstract class TextTag extends DrawableTag {
             double rat = textHeight / 1024.0 / divider;
 
             Matrix matScale = Matrix.getScaleInstance(rat);
-            Color textColor2 = new Color(textColor, true); 
+            Color textColor2 = new Color(textColor, true);
             Color textColor3 = textColor2;
             Color noAlphaTextColor = new Color(textColor2.getRed(), textColor2.getGreen(), textColor2.getBlue());
             for (GLYPHENTRY entry : rec.glyphEntries) {
@@ -797,10 +817,9 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
 
-                
                 if (pos >= selectionStart && pos < selectionEnd) {
                     Graphics2D g = (Graphics2D) image.getGraphics();
-                    
+
                     RGB borderColor = new RGBA(Color.black);
                     RGB fillColor = new RGBA(Color.black);
                     RECT bounds = new RECT(0, (int) Math.round(entry.glyphAdvance * 1024 * font.getDivider() / textHeight),
@@ -812,7 +831,7 @@ public abstract class TextTag extends DrawableTag {
                     Matrix mat2 = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
                     TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat2, colorTransform, aaScale);
                 }
-                
+
                 if (shape != null) {
                     BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, pos >= selectionStart && pos < selectionEnd ? Color.white : textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false, aaScale);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
@@ -823,7 +842,7 @@ public abstract class TextTag extends DrawableTag {
                         TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform, aaScale);
                     }
                 }
-                
+
                 pos++;
 
                 x += entry.glyphAdvance;
@@ -833,12 +852,14 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Calculates text bounds.
+     *
      * @return Text bounds
      */
     public abstract ExportRectangle calculateTextBounds();
 
     /**
      * Calculates text bounds.
+     *
      * @param swf SWF
      * @param tag Text tag
      * @param textRecords Text records
@@ -866,53 +887,53 @@ public abstract class TextTag extends DrawableTag {
             }
 
             double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
-                           
+
             int leading = 0;
-            
+
             if (font.hasLayout()) {
                 leading = font.getLeading();
             }
             if (tag instanceof DefineEditTextTag) {
-                DefineEditTextTag det = (DefineEditTextTag) tag;                
+                DefineEditTextTag det = (DefineEditTextTag) tag;
                 if (det.hasLayout) {
                     leading = (int) Math.round(det.leading / rat);
                 }
             }
-            for (GLYPHENTRY entry : rec.glyphEntries) {                                                                                
+            for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = new Matrix();
                 mat = mat.preConcatenate(new Matrix(textMatrix));
                 mat = mat.preConcatenate(Matrix.getScaleInstance(rat));
-                mat = mat.preConcatenate(Matrix.getTranslateInstance(x, y));                                                                                
-                
+                mat = mat.preConcatenate(Matrix.getTranslateInstance(x, y));
+
                 if (entry.glyphIndex != -1 && glyphs != null) {
-                    SHAPE shape = glyphs.get(entry.glyphIndex);                                                            
-                    
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+
                     ExportRectangle glyphBounds = new ExportRectangle(shape.getBounds(1)); // shapeNum: 1
-                    
-                    if (font.hasLayout()) {                       
+
+                    if (font.hasLayout()) {
                         glyphBounds = new ExportRectangle(0, -font.getAscent(), entry.glyphAdvance / rat, font.getDescent() + leading);
-                    } else {                                        
+                    } else {
                         double glyphWidth = glyphBounds.getWidth();
-                        double glyphHeight = glyphBounds.getHeight();                       
+                        double glyphHeight = glyphBounds.getHeight();
                         glyphBounds.xMin -= glyphWidth / 2;
                         glyphBounds.yMin -= glyphHeight / 2;
                         glyphBounds.xMax += glyphWidth;
                         glyphBounds.yMax += glyphHeight;
                     }
                     if (glyphBounds.xMax > glyphBounds.xMin && glyphBounds.yMax > glyphBounds.yMin) {
-                        ExportRectangle rect = mat.transform(glyphBounds);                                                
-                        
+                        ExportRectangle rect = mat.transform(glyphBounds);
+
                         if (result == null) {
                             result = new ExportRectangle(Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
                         }
-                       
+
                         result.xMin = Math.min(result.xMin, Math.round(rect.xMin));
                         result.yMin = Math.min(result.yMin, Math.round(rect.yMin));
                         result.xMax = Math.max(result.xMax, Math.round(rect.xMax));
                         result.yMax = Math.max(result.yMax, Math.round(rect.yMax));
                     }
                     x += entry.glyphAdvance;
-                }                
+                }
             }
         }
 
@@ -935,6 +956,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Updates text bounds.
+     *
      * @param textBounds Text bounds
      */
     protected void updateTextBounds(RECT textBounds) {
@@ -963,6 +985,7 @@ public abstract class TextTag extends DrawableTag {
 
     /**
      * Converts static text to HTML canvas.
+     *
      * @param unitDivisor Unit divisor
      * @param swf SWF
      * @param textRecords Text records
@@ -1029,7 +1052,7 @@ public abstract class TextTag extends DrawableTag {
         //this may be incomplete list of incompatibilities
         return family;
     }
-    
+
     private static String sanitizeUtf16(String s) {
         if (s == null) {
             return null;
@@ -1053,9 +1076,10 @@ public abstract class TextTag extends DrawableTag {
         }
         return out.toString();
     }
-    
+
     /**
      * Converts static text to SVG.
+     *
      * @param swf SWF
      * @param textRecords Text records
      * @param numText Number of text (DefineText = 1, DefineText2 = 2)
@@ -1121,12 +1145,12 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
                 String text = sanitizeUtf16(textBuilder.toString());
-    
+
                 boolean hasOffset = x != 0 || y != 0;
                 if (hasOffset) {
                     exporter.createSubGroup(Matrix.getTranslateInstance(x, y), null);
                 }
-                
+
                 String fontFamily = makeValidStyleFontFamily(font.getFontNameIntag());
 
                 Element textElement = exporter.createElement("text");
@@ -1159,14 +1183,12 @@ public abstract class TextTag extends DrawableTag {
                 mat0 = mat0.concatenate(new Matrix(textMatrix));
                 Matrix matScale = Matrix.getScaleInstance(rat);
 
-                
                 for (GLYPHENTRY entry : rec.glyphEntries) {
                     Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
-                    
-                    
+
                     matScale.translateX = x;
                     matScale.translateY = y;
-                    
+
                     Matrix matX = mat0.concatenate(matScale);
                     if (entry.glyphIndex != -1) {
                         // shapeNum: 1
@@ -1214,7 +1236,6 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
-    
     public static Shape staticTextToOutline(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix, Map<Integer, FontTag> normalizedFonts, Matrix transformation) {
         Area shp = new Area();
         FontTag font = null;
@@ -1247,39 +1268,36 @@ public abstract class TextTag extends DrawableTag {
 
             double rat = textHeight / 1024.0 / font.getDivider();
 
-            
-                Matrix mat0 = transformation.clone();
-                mat0 = mat0.concatenate(new Matrix(textMatrix));
-                Matrix matScale = Matrix.getScaleInstance(rat);
+            Matrix mat0 = transformation.clone();
+            mat0 = mat0.concatenate(new Matrix(textMatrix));
+            Matrix matScale = Matrix.getScaleInstance(rat);
 
-                
-                for (GLYPHENTRY entry : rec.glyphEntries) {
-                    Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
-                    
-                    
-                    matScale.translateX = x;
-                    matScale.translateY = y;
-                    
-                    Matrix matX = mat0.concatenate(matScale);
-                    if (entry.glyphIndex != -1) {
-                        // shapeNum: 1
-                        SHAPE shape = glyphs.get(entry.glyphIndex);
-                        List<GeneralPath> strokes = new ArrayList<>();
-                        List<GeneralPath> paths = PathExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, strokes);                        
-                        
-                        for (GeneralPath p : paths) {
-                            shp.add(new Area(p.createTransformedShape(matX.toTransform())));
-                        }
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                Matrix mat = Matrix.getTranslateInstance(x, y).concatenate(Matrix.getScaleInstance(rat));
 
-                        x += entry.glyphAdvance;
+                matScale.translateX = x;
+                matScale.translateY = y;
+
+                Matrix matX = mat0.concatenate(matScale);
+                if (entry.glyphIndex != -1) {
+                    // shapeNum: 1
+                    SHAPE shape = glyphs.get(entry.glyphIndex);
+                    List<GeneralPath> strokes = new ArrayList<>();
+                    List<GeneralPath> paths = PathExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, strokes);
+
+                    for (GeneralPath p : paths) {
+                        shp.add(new Area(p.createTransformedShape(matX.toTransform())));
                     }
+
+                    x += entry.glyphAdvance;
                 }
-            
+            }
+
         }
-        
+
         return shp;
     }
-    
+
     @Override
     public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         RECT r = getBounds();
