@@ -1417,6 +1417,8 @@ public class Timeline {
                 mergedColorTransform2 = null;
             }
 
+            
+            /*
             if (clipDepth > -1) {
                 //Make transparent colors opaque, mask should be only made by shapes
                 CXFORMWITHALPHA clrMask = new CXFORMWITHALPHA();
@@ -1427,9 +1429,11 @@ public class Timeline {
                 clrMask.greenMultTerm = 0;
                 clrMask.blueMultTerm = 0;
                 mergedColorTransform2 = clrMask;
-            }
-
-            if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
+            }*/
+            
+            if (clipDepth > -1) {
+                //nothing, outline is used
+            } else if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
                 drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, mergedColorTransform2, unzoom, sameImage, viewRect2, viewRectRaw, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing, aaScale);
             } else {
                 // todo: show one time warning
@@ -1522,18 +1526,22 @@ public class Timeline {
             }
         }
         if (clipDepth > -1) {
-            BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-            Graphics2D gm = (Graphics2D) mask.getGraphics();
-            gm.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            gm.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            gm.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            gm.setComposite(AlphaComposite.Src);
-            gm.setColor(new Color(0, 0, 0, 0f));
-            gm.fillRect(0, 0, image.getWidth(), image.getHeight());
-            gm.setTransform(trans);
-            gm.drawImage(img.getBufferedImage(), 0, 0, null);
-            Clip clip = new Clip(Helper.imageToShape(mask), clipDepth); // Maybe we can get current outline instead converting from image (?)
+            Clip clip = new Clip(drawable.getOutline(false, dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), false, viewRect, unzoom), clipDepth);
             clips.add(clip);
+            /*
+                BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+                Graphics2D gm = (Graphics2D) mask.getGraphics();
+                gm.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                gm.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                gm.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                gm.setComposite(AlphaComposite.Src);
+                gm.setColor(new Color(0, 0, 0, 0f));
+                gm.fillRect(0, 0, image.getWidth(), image.getHeight());
+                gm.setTransform(trans);
+                gm.drawImage(img.getBufferedImage(), 0, 0, null);
+                Clip clip = new Clip(Helper.imageToShape(mask), clipDepth);
+                clips.add(clip);                
+            */
         } else {
             if (renderContext.cursorPosition != null) {
                 int dx = (int) Math.round(viewRectRaw.xMin * unzoom);
