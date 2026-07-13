@@ -1237,6 +1237,9 @@ public abstract class TextTag extends DrawableTag {
     }
 
     public static Shape staticTextToOutline(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix, Map<Integer, FontTag> normalizedFonts, Matrix transformation) {
+        
+        //This is not working correctly yet (#2736)
+        
         Area shp = new Area();
         FontTag font = null;
         int fontId = -1;
