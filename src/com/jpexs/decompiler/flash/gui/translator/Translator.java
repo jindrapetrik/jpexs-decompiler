@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.gui.translator;
 
 import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
+import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.helpers.Helper;
@@ -125,6 +128,10 @@ public class Translator extends JFrame implements ItemListener {
     private String lastSaveDir = "";
 
     private static final String DO_NOT_EDIT = "!!!! FFDec translators - please do not edit anything below this line !!!";
+    
+    private static String columnKey = "";
+    private static String columnEn = "";
+    private static String columnTranslated = "";
 
     private List<String> ignoredResources = Arrays.asList(
             "project",
@@ -357,14 +364,14 @@ public class Translator extends JFrame implements ItemListener {
 
         };
 
-        tableModel.addColumn("key");
-        tableModel.addColumn("en");
-        tableModel.addColumn("translated");
+        tableModel.addColumn(columnKey);
+        tableModel.addColumn(columnEn);
+        tableModel.addColumn(columnTranslated);
 
         tableModel.addRow(new Object[]{"menu.new", "New", "Nový"});
         tableModel.addRow(new Object[]{"error.missing", "Error: missing xy", "Chyba: chybí xy"});
 
-        table.getColumn("key").setCellRenderer(new DefaultTableCellRenderer() {
+        table.getColumn(columnKey).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -396,7 +403,7 @@ public class Translator extends JFrame implements ItemListener {
 
         });
 
-        table.getColumn("en").setCellRenderer(new DefaultTableCellRenderer() {
+        table.getColumn(columnEn).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -408,7 +415,7 @@ public class Translator extends JFrame implements ItemListener {
             }
 
         });
-        table.getColumn("translated").setCellRenderer(new DefaultTableCellRenderer() {
+        table.getColumn(columnTranslated).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -456,11 +463,11 @@ public class Translator extends JFrame implements ItemListener {
         });
 
         table.putClientProperty("terminateEditOnFocusLost", true);
-        table.getColumn("translated").setCellEditor(new JTextAreaColumn(resourceValues, localeComboBox, resourcesComboBox));
+        table.getColumn(columnTranslated).setCellEditor(new JTextAreaColumn(resourceValues, localeComboBox, resourcesComboBox));
 
-        table.getColumn("en").setCellEditor(new JTextAreaColumn(resourceValues, localeComboBox, resourcesComboBox));
+        table.getColumn(columnEn).setCellEditor(new JTextAreaColumn(resourceValues, localeComboBox, resourcesComboBox));
 
-        TableCellEditor editor = table.getColumn("translated").getCellEditor();
+        TableCellEditor editor = table.getColumn(columnTranslated).getCellEditor();
         editor.addCellEditorListener(getEditorListener());
         editor.addCellEditorListener(new CellEditorListener() {
             @Override
@@ -524,7 +531,7 @@ public class Translator extends JFrame implements ItemListener {
 
         c.gridx = 0;
         c.gridy = 0;
-        topPanel.add(new JLabel("Locale:"), c);
+        topPanel.add(new JLabel(AppStrings.translate("label.locale")), c);
 
         c.gridx = 1;
         c.gridy = 0;
@@ -533,7 +540,7 @@ public class Translator extends JFrame implements ItemListener {
         c.gridx = 2;
         c.gridy = 0;
 
-        JButton newLocaleButton = new JButton("New");
+        JButton newLocaleButton = new JButton(AppStrings.translate("button.new"));
         newLocaleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -573,7 +580,7 @@ public class Translator extends JFrame implements ItemListener {
 
         c.gridx = 0;
         c.gridy = 1;
-        topPanel.add(new JLabel("Resource:"), c);
+        topPanel.add(new JLabel(AppStrings.translate("label.resource")), c);
 
         c.gridx = 1;
         c.gridy = 1;
@@ -582,7 +589,7 @@ public class Translator extends JFrame implements ItemListener {
         c.gridx = 2;
         c.gridy = 1;
 
-        JButton nextMissingButton = new JButton("Next missing");
+        JButton nextMissingButton = new JButton(AppStrings.translate("button.nextMissing"));
         nextMissingButton.addActionListener(new ActionListener() {
             private void selectFirstMissing() {
                 String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
@@ -629,7 +636,7 @@ public class Translator extends JFrame implements ItemListener {
         cnt.add(topPanel, BorderLayout.NORTH);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton exportButton = new JButton("Export JPT");
+        JButton exportButton = new JButton(AppStrings.translate("button.exportJpt"));
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -674,11 +681,11 @@ public class Translator extends JFrame implements ItemListener {
             }
         });
 
-        JButton importButton = new JButton("Import JPT");
+        JButton importButton = new JButton(AppStrings.translate("button.importJpt"));
         importButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (ViewMessages.showConfirmDialog(Translator.this, "WARNING: This will erase all your previous work and imports data from other JPT file", "WARNING", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                if (ViewMessages.showConfirmDialog(Translator.this, AppStrings.translate("dialog.importJpt.text"), AppStrings.translate("dialog.importJpt.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
 
                     JFileChooser fc = new JFileChooser();
                     FileFilter jptFilter = new FileFilter() {
@@ -719,11 +726,11 @@ public class Translator extends JFrame implements ItemListener {
             }
         });
 
-        JButton startOverButton = new JButton("Start over");
+        JButton startOverButton = new JButton(AppStrings.translate("button.startOver"));
         startOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (ViewMessages.showConfirmDialog(Translator.this, "Do you really want to lose all your work? This is unreversable!", "WARNING", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                if (ViewMessages.showConfirmDialog(Translator.this, AppStrings.translate("dialog.startOver.text"), AppStrings.translate("dialog.startOver.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
                     newValues.clear();
                     try {
                         save();
@@ -736,7 +743,7 @@ public class Translator extends JFrame implements ItemListener {
             }
         });
 
-        autosaveCheckBox = new JCheckBox("Autosave on exit", true);
+        autosaveCheckBox = new JCheckBox(AppStrings.translate("checkbox.autoSave"), true);
         autosaveCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -757,7 +764,7 @@ public class Translator extends JFrame implements ItemListener {
         cnt.add(new JScrollPane(table), BorderLayout.CENTER);
         resizeColumnWidth(table);
         setSize(800, 600);
-        setTitle("JPEXS Free Flash Decompiler Translator");
+        setTitle(AppStrings.translate("window.title"));
         itemStateChanged(null);
         table.setRowHeight(table.getFont().getSize() + 10);
         table.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -1114,15 +1121,15 @@ public class Translator extends JFrame implements ItemListener {
                     break;
                 case "column.key.width":
                     valueInt = Integer.parseInt(value);
-                    table.getColumn("key").setPreferredWidth(valueInt);
+                    table.getColumn(columnKey).setPreferredWidth(valueInt);
                     break;
                 case "column.en.width":
                     valueInt = Integer.parseInt(value);
-                    table.getColumn("en").setPreferredWidth(valueInt);
+                    table.getColumn(columnEn).setPreferredWidth(valueInt);
                     break;
                 case "column.translated.width":
                     valueInt = Integer.parseInt(value);
-                    table.getColumn("translated").setPreferredWidth(valueInt);
+                    table.getColumn(columnTranslated).setPreferredWidth(valueInt);
                     break;
                 case "export.dir":
                     lastSaveDir = value;
@@ -1152,9 +1159,9 @@ public class Translator extends JFrame implements ItemListener {
         } else {
             pw.println("window.maximized=false");
         }
-        pw.println("column.key.width=" + table.getColumn("key").getWidth());
-        pw.println("column.en.width=" + table.getColumn("en").getWidth());
-        pw.println("column.translated.width=" + table.getColumn("translated").getWidth());
+        pw.println("column.key.width=" + table.getColumn(columnKey).getWidth());
+        pw.println("column.en.width=" + table.getColumn(columnEn).getWidth());
+        pw.println("column.translated.width=" + table.getColumn(columnTranslated).getWidth());
         pw.println("export.dir=" + lastSaveDir);
         pw.println("autosave=" + autosaveOnExit);
 
@@ -1227,6 +1234,19 @@ public class Translator extends JFrame implements ItemListener {
             new File(storageFileTmp).renameTo(new File(storageFile));
         }
     }
+    
+    /**
+     * Initialize the UI language.
+     */
+    private static void initUiLang() {
+        AppStrings.setResourceClass(MainFrame.class);
+        Main.initUiLang();
+        
+        AppStrings.setResourceClass(Translator.class);
+        columnKey = AppStrings.translate("text.column.key");
+        columnEn = AppStrings.translate("text.column.en");
+        columnTranslated = AppStrings.translate("text.column.translated");
+    }
 
     /**
      * @param args the command line arguments
@@ -1240,6 +1260,9 @@ public class Translator extends JFrame implements ItemListener {
                 | IllegalAccessException ignored) {
             //ignored
         }
+        
+        initUiLang();
+        
         try {
             Translator t = new Translator();
             t.setVisible(true);
@@ -1276,13 +1299,13 @@ public class Translator extends JFrame implements ItemListener {
                 ret += " (";
                 List<String> parts2 = new ArrayList<>();
                 if (missingCount > 0) {
-                    parts2.add("" + missingCount + " missing");
+                    parts2.add("" + missingCount + " " + AppStrings.translate("text.missing"));
                 }
                 if (modifiedCount > 0) {
-                    parts2.add("" + modifiedCount + " modified");
+                    parts2.add("" + modifiedCount + " " + AppStrings.translate("text.modified"));
                 }
                 if (newCount > 0) {
-                    parts2.add("" + newCount + " new");
+                    parts2.add("" + newCount + " " + AppStrings.translate("text.new"));
                 }
                 ret += String.join(", ", parts2);
 
