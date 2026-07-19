@@ -573,6 +573,9 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         int x = 0;
         int y = 0;
         int textColor = 0;
+        Map<Integer, Character> glyphToPuaChar = new LinkedHashMap<>();
+        Map<Character, String> puaCharToOrigChar = new LinkedHashMap<>();
+                
         for (TEXTRECORD rec : textRecords) {
 
             if (rec.styleFlagsHasColor) {
@@ -594,6 +597,9 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                     font = normalizedFonts.get(fontId);
                 }
                 textHeight = rec.textHeight;
+                glyphToPuaChar = new LinkedHashMap<>();
+                puaCharToOrigChar = new LinkedHashMap<>();                
+                font.getDuplicatedCharsPuaMap(glyphToPuaChar, puaCharToOrigChar);
             }
             if (rec.styleFlagsHasXOffset) {
                 int offsetX = rec.xOffset;
@@ -620,14 +626,16 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                     int calcAdvance = StaticTextTag.getAdvance(font, entry.glyphIndex, textHeight, currentChar, nextChar);
                     int spacing = entry.glyphAdvance - calcAdvance;
                     char ch = font.glyphToChar(entry.glyphIndex);
+                    if (glyphToPuaChar.containsKey(entry.glyphIndex)) {
+                        ch = glyphToPuaChar.get(entry.glyphIndex);
+                    }
+                    text.append(ch);
                     if (spacing != 0) {
-                        text.append(currentChar);
                         drawText(swf, x, y, trans, textColor, existingFonts, fontId, font, text.toString(), textHeight, pdfGraphics);
                         text = new StringBuilder();
                         x = x + deltaX + entry.glyphAdvance;
                         deltaX = 0;
                     } else {
-                        text.append(ch);
                         deltaX += entry.glyphAdvance;
                     }
 
@@ -672,10 +680,14 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                 File tempFile = null;
                 try {
                     tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
+                    Map<Integer, Character> glyphToPuaChar = new LinkedHashMap<>();
+                    Map<Character, String> puaCharToOrigChar = new LinkedHashMap<>();
+                    font.getDuplicatedCharsPuaMap(glyphToPuaChar, puaCharToOrigChar);
+                    
                     fe.exportFont(font, FontExportMode.TTF, tempFile);
                     Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
                     existingFonts.put(fontId, f);
-                    g.setTtfFont(f, tempFile);
+                    g.setTtfFont(f, tempFile, puaCharToOrigChar);
                 } catch (IOException ex) {
                     Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }

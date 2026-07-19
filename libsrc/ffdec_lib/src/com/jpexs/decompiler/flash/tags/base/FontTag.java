@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -48,6 +49,7 @@ import java.awt.geom.Area;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -871,5 +873,60 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     
     public void setKerningTable(List<KERNINGRECORD> kerningTable) {
         
+    }
+    
+    public abstract List<Integer> getRawCodeTable();
+    
+    public final List<Integer> getUnicodeCodeTable() {
+        List<Integer> raw = getRawCodeTable();
+        List<Integer> ret = new ArrayList<>();
+        
+        for (int i = 0; i < getCharacterCount(); i++) {
+            ret.add((int) Utf8Helper.codePointToChar((int) raw.get(i), getCodesCharset()));
+        }
+        return ret;
+    }
+    
+    /**
+     * Mapping glyphs that point to the same character
+     * into Unicode Private Use Area.
+     * @param outGlyphToPuaChar Out - Glyph index to Pua character
+     * @param outPuaCharToOrigChar Out - Pua character to original char
+     */
+    public void getDuplicatedCharsPuaMap(Map<Integer, Character> outGlyphToPuaChar, Map<Character, String> outPuaCharToOrigChar) {
+        Set<Character> processedCharacters = new HashSet<>();
+        Set<Character> privateUseCodesUsed = new HashSet<>();
+        
+        final char PUA_MIN = 0xE000;
+        final char PUA_MAX = 0xF8FF;
+        char nextPrivateUseCode = PUA_MIN;
+        
+        int cnt = getCharacterCount();
+         
+        //get all characters that are mapped to unicode private use area
+        for (int i = 0; i < cnt; i++) {
+            char c = glyphToChar(i);
+            if (c >= PUA_MIN && c <= PUA_MAX) {
+                privateUseCodesUsed.add(c);
+            }
+        }
+        
+       
+        for (int i = 0; i < cnt; i++) {
+            char c = glyphToChar(i);
+            char origChar = c;
+            if (processedCharacters.contains((Character) c)) {
+                //If the font has more than singe glyph per unicode character,
+                //then map the glyph to unicode private use area
+                c = nextPrivateUseCode++;
+                outGlyphToPuaChar.put(i, c);
+                outPuaCharToOrigChar.put(c, "" + origChar);                
+                while (privateUseCodesUsed.contains(nextPrivateUseCode)) {
+                    nextPrivateUseCode++;
+                }
+            } else {
+                processedCharacters.add(c);
+            }
+        }
     }
 }

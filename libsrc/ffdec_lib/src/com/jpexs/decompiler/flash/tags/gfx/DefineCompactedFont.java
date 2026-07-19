@@ -540,4 +540,13 @@ public final class DefineCompactedFont extends FontTag {
         
         fonts.get(0).kerning = val;
     }        
+
+    @Override
+    public List<Integer> getRawCodeTable() {
+        List<Integer> ret = new ArrayList<>();
+        for (int i = 0; i < getCharacterCount(); i++) {
+            ret.add((int) glyphToChar(i));
+        }
+        return ret;
+    }        
 }
