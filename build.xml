@@ -52,7 +52,6 @@
         <property name="version.major" value="0" />
         <property name="version.minor" value="0" />
         <property name="version.release" value="0" />
-        <property name="version.major" value="0" />
         <property name="version.build" value="0" />
         <!-- <property name="version.revision" value="" /> -->
         <property name="version.debug" value="true" />
