@@ -1729,10 +1729,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                             CharacterTag ct = (CharacterTag) t;
                             CharacterTag oldCt = characters.get(characterId);
                             logger.log(Level.SEVERE, "SWF already contains characterId={0} of type {1}, tried to add type {2}", new Object[]{characterId, oldCt.getTagName(), ct.getTagName()});
+                        } else {
+                            characters.put(characterId, (CharacterTag) t);
+                            characterIdTags.put(characterId, new ArrayList<>());
                         }
-
-                        characters.put(characterId, (CharacterTag) t);
-                        characterIdTags.put(characterId, new ArrayList<>());
                     } else if (characterIdTags.containsKey(characterId)) {
                         characterIdTags.get(characterId).add((CharacterIdTag) t);
                     }
