@@ -477,5 +477,13 @@ public class DefineFontTag extends FontTag {
     public boolean isLeadingEditable() {
         return false;
     }
-
+    
+    @Override
+    public List<Integer> getRawCodeTable() {
+        ensureFontInfo();
+        if (fontInfoTag == null) {
+            return new ArrayList<>();
+        }
+        return fontInfoTag.getCodeTable();
+    }
 }
