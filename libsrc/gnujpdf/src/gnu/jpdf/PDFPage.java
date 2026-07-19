@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -229,6 +231,10 @@ public class PDFPage extends PDFObject implements Serializable {
     }
 
     public PDFFont getEmbeddedFont(String font, int style, File file) throws IOException {
+        return getEmbeddedFont(font, style, file, new HashMap<>());
+    }            
+    
+    public PDFFont getEmbeddedFont(String font, int style, File file, Map<Character, String> specialCharMapping /*JPEXS*/) throws IOException {
         // Search the fonts on this page, and return one that matches this
         // font.
         // This keeps the number of font definitions down to one per font/style
@@ -247,7 +253,7 @@ public class PDFPage extends PDFObject implements Serializable {
         }
 
         // finally create and return the font
-        PDFFont f = pdfDocument.getEmbeddedFont(font, style, file);
+        PDFFont f = pdfDocument.getEmbeddedFont(font, style, file, specialCharMapping);
         fonts.addElement(f);
         return f;
     }
