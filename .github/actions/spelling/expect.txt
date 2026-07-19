@@ -280,6 +280,7 @@ BGRc
 biasdist
 bic
 bigs
+bilerp
 bimg
 binarydata
 binaryexcludes
@@ -734,6 +735,7 @@ defaultvalue
 definefunc
 definefunction
 definelocal
+definesound
 defragmented
 Deinitializes
 deinstalled
@@ -1941,6 +1943,7 @@ linkreport
 linmax
 listconfigs
 Listswf
+Liushui
 livedocs
 lix
 ljcb

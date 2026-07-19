@@ -167,13 +167,13 @@ public class SwfXmlExporter {
             Map<Tag, String> tagExternalFiles = new IdentityHashMap<>();
             List<Tag> imagesList = new ArrayList<>();
             if (settings.imageExportMode != null) {
-                ImageExportSettings imageExportSetttings = new ImageExportSettings(settings.imageExportMode);
+                ImageExportSettings imageExportSettings = new ImageExportSettings(settings.imageExportMode);
                 Map<Integer, CharacterTag> chars = swf.getCharacters(false);
                 for (int charId : chars.keySet()) {
                     CharacterTag ch = chars.get(charId);
                     if (ch instanceof ImageTag) {
                         ImageTag imageTag = (ImageTag) ch;
-                        tagExternalFiles.put(imageTag, assetsDirName + "/images/" + Helper.makeFileName(imageTag.getCharacterExportFileName()) + "." + ImageExporter.getExportExtension(imageTag, imageExportSetttings));
+                        tagExternalFiles.put(imageTag, assetsDirName + "/images/" + Helper.makeFileName(imageTag.getCharacterExportFileName()) + "." + ImageExporter.getExportExtension(imageTag, imageExportSettings));
                         imagesList.add(imageTag);
                     }
                 }
@@ -181,13 +181,13 @@ public class SwfXmlExporter {
 
             List<SoundTag> soundList = new ArrayList<>();
             if (settings.defineSoundExportMode != null) {
-                SoundExportSettings soundExportSetttings = new SoundExportSettings(settings.defineSoundExportMode);
+                SoundExportSettings soundExportSettings = new SoundExportSettings(settings.defineSoundExportMode);
                 Map<Integer, CharacterTag> chars = swf.getCharacters(false);
                 for (int charId : chars.keySet()) {
                     CharacterTag ch = chars.get(charId);
                     if (ch instanceof DefineSoundTag) {
                         DefineSoundTag soundTag = (DefineSoundTag) ch;
-                        tagExternalFiles.put(soundTag, assetsDirName + "/sounds/" + Helper.makeFileName(soundTag.getCharacterExportFileName()) + "." + SoundExporter.getExportExtension(soundTag, soundExportSetttings));
+                        tagExternalFiles.put(soundTag, assetsDirName + "/sounds/" + Helper.makeFileName(soundTag.getCharacterExportFileName()) + "." + SoundExporter.getExportExtension(soundTag, soundExportSettings));
                         soundList.add(soundTag);
                     }
                 }
