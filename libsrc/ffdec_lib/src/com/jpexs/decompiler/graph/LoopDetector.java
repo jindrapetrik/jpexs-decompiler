@@ -582,9 +582,9 @@ public class LoopDetector {
 
             for (GraphPartEdge edge : consideredOutsideEdges) {
                 GraphPart outPart = edge.to;
-                Set<GraphPart> reachable = getReachable(outPart, backEdges, classifiedAbruptTargets, walker, ignoredEdges);
+                Set<GraphPart> reachable = getReachable(outPart, backEdges, parentBreaks, walker, ignoredEdges);
 
-                if (classifiedAbruptTargets.contains(outPart)) {
+                if (parentContinues.contains(outPart)) {
                     reachable.clear();
                     reachable.add(outPart);
                 }
@@ -628,7 +628,7 @@ public class LoopDetector {
                         numBranches++;
                     }
                 }
-                candidateList.add(new CandidateResult(part, numBranches, outParts.contains(part), classifiedAbruptTargets.contains(part)));
+                candidateList.add(new CandidateResult(part, numBranches, outParts.contains(part), parentBreaks.contains(part)));
             }
 
             candidateList.sort(new Comparator<CandidateResult>() {
@@ -637,8 +637,8 @@ public class LoopDetector {
                     boolean op1 = outParts.contains(o1.part);
                     boolean op2 = outParts.contains(o2.part);
 
-                    boolean a1 = classifiedAbruptTargets.contains(o1.part);
-                    boolean a2 = classifiedAbruptTargets.contains(o2.part);
+                    boolean a1 = parentBreaks.contains(o1.part);
+                    boolean a2 = parentBreaks.contains(o2.part);
 
                     if (a1 != a2) {
                         if (a1) {
@@ -647,8 +647,14 @@ public class LoopDetector {
                         return -1;
                     }
 
-                    if (o1.numBranches != o2.numBranches) {
-                        return o2.numBranches - o1.numBranches;
+                    boolean mb1 = o1.numBranches > 1;
+                    boolean mb2 = o2.numBranches > 1;
+
+                    if (mb1 != mb2) {
+                        if (mb1) {
+                            return -1;
+                        }
+                        return 1;
                     }
 
                     if (op1 != op2) {
