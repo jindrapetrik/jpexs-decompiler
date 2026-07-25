@@ -223,7 +223,7 @@ public class FontExporter {
         
         Map<Integer, Character> glyphToPuaChar = new LinkedHashMap<>();
         Map<Character, String> puaCharToOrigChar = new LinkedHashMap<>();
-        t.getDuplicatedCharsPuaMap(glyphToPuaChar, puaCharToOrigChar);
+        t.getCharactersPuaMap(glyphToPuaChar, puaCharToOrigChar);
         
         int glyphCount = 0;
         

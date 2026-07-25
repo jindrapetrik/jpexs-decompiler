@@ -888,12 +888,12 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
     
     /**
-     * Mapping glyphs that point to the same character
+     * Mapping surrogate chars or glyphs that point to the same character
      * into Unicode Private Use Area.
      * @param outGlyphToPuaChar Out - Glyph index to Pua character
      * @param outPuaCharToOrigChar Out - Pua character to original char
      */
-    public void getDuplicatedCharsPuaMap(Map<Integer, Character> outGlyphToPuaChar, Map<Character, String> outPuaCharToOrigChar) {
+    public void getCharactersPuaMap(Map<Integer, Character> outGlyphToPuaChar, Map<Character, String> outPuaCharToOrigChar) {
         Set<Character> processedCharacters = new HashSet<>();
         Set<Character> privateUseCodesUsed = new HashSet<>();
         
@@ -911,12 +911,15 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             }
         }
         
+        final char SURROGATE_MIN = 0xD800;
+        final char SURROGATE_MAX = 0xDFFF;
+        
        
         for (int i = 0; i < cnt; i++) {
             char c = glyphToChar(i);
             char origChar = c;
-            if (processedCharacters.contains((Character) c)) {
-                //If the font has more than singe glyph per unicode character,
+            if ((c >= SURROGATE_MIN && c <= SURROGATE_MAX) || processedCharacters.contains((Character) c)) {
+                //If the font has more than singe glyph per unicode character or it is a surrogate,
                 //then map the glyph to unicode private use area
                 c = nextPrivateUseCode++;
                 outGlyphToPuaChar.put(i, c);
