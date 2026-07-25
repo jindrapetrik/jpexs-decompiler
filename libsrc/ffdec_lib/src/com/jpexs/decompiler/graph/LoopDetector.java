@@ -496,32 +496,7 @@ public class LoopDetector {
             PrevNextWalker walker = loopWalkers.get(loop);
             List<ThrowState> subThrowStates = loopThrowStates.get(loop);
 
-            Set<GraphPart> allOutReachable = new LinkedHashSet<>();
-            List<Set<GraphPart>> allReachable = new ArrayList<>();
-            Logger.getLogger(LoopDetector.class.getName()).log(Level.FINE, "loop {0} outside:", loopIndex);
-            Set<GraphPart> outParts = new LinkedHashSet<>();
-            for (GraphPartEdge edge : loop.edgesOutside) {
-                if (ignoredEdges.contains(edge)) {
-                    Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "Ignored outside edge {0}->{1}", new Object[]{edge.from, edge.to});
-                    continue;
-                }
-                GraphPart outPart = edge.to;
-                outParts.add(outPart);
-                Set<GraphPart> reachable = getReachable(outPart, backEdges, parentBreaks, walker, ignoredEdges);
-
-                if (parentContinues.contains(outPart)) {
-                    reachable.clear();
-                    reachable.add(outPart);
-                }
-
-                Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "Reachables of {0}:", outPart);
-                for (GraphPart r : reachable) {
-                    Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- {0}:", r);
-                }
-                allReachable.add(reachable);
-                allOutReachable.addAll(reachable);
-            }
-
+            Set<GraphPart> exceptionTargets = new LinkedHashSet<>();
             for (ThrowState ts : subThrowStates) {
                 Set<GraphPart> catchParts = ts.catchParts;
                 if (catchParts.isEmpty()) {
@@ -540,15 +515,105 @@ public class LoopDetector {
 
                 catchParts.removeAll(parentContinues);
                 catchParts.removeAll(parentBreaks);
+                exceptionTargets.addAll(catchParts);
 
                 Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "removing catchparts:");
                 for (GraphPart part : catchParts) {
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- {0}", part);
                 }
-                allOutReachable.removeAll(catchParts);
             }
 
+            Set<GraphPart> abruptTargets = new LinkedHashSet<>();
+            abruptTargets.addAll(parentBreaks);
+            abruptTargets.addAll(parentContinues);
+
+            Set<GraphPart> allOutReachable = new LinkedHashSet<>();
+            List<Set<GraphPart>> allReachable = new ArrayList<>();
+            Logger.getLogger(LoopDetector.class.getName()).log(Level.FINE, "loop {0} outside:", loopIndex);
+            Set<GraphPart> outParts = new LinkedHashSet<>();
+            Set<GraphPart> naturalOutParts = new LinkedHashSet<>();
+            List<GraphPartEdge> consideredOutsideEdges = new ArrayList<>();
+            for (GraphPartEdge edge : loop.edgesOutside) {
+                if (ignoredEdges.contains(edge)) {
+                    Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "Ignored outside edge {0}->{1}", new Object[]{edge.from, edge.to});
+                    continue;
+                }
+                consideredOutsideEdges.add(edge);
+                outParts.add(edge.to);
+                if (edge.from == loop.loopContinue) {
+                    naturalOutParts.add(edge.to);
+                }
+            }
+
+            Set<GraphPart> classifiedAbruptTargets = new LinkedHashSet<>(abruptTargets);
+            if (!naturalOutParts.isEmpty() && !abruptTargets.isEmpty()) {
+                Set<GraphPart> boundaryTargets = new LinkedHashSet<>(abruptTargets);
+                boundaryTargets.addAll(naturalOutParts);
+                boundaryTargets.addAll(exceptionTargets);
+                for (GraphPart outPart : outParts) {
+                    if (naturalOutParts.contains(outPart)
+                            || exceptionTargets.contains(outPart)
+                            || abruptTargets.contains(outPart)) {
+                        continue;
+                    }
+                    if (leadsOnlyToAbruptTargets(
+                            outPart,
+                            boundaryTargets,
+                            abruptTargets,
+                            backEdges,
+                            walker,
+                            ignoredEdges
+                    )) {
+                        classifiedAbruptTargets.add(outPart);
+                        Logger.getLogger(LoopDetector.class.getName()).log(
+                                Level.FINE,
+                                "classified exit prefix {0} as abrupt",
+                                outPart
+                        );
+                    }
+                }
+            }
+
+            Set<GraphPart> excludedTargets = new LinkedHashSet<>(classifiedAbruptTargets);
+            excludedTargets.addAll(exceptionTargets);
+
+            Set<GraphPart> localOutParts = new LinkedHashSet<>(outParts);
+            localOutParts.removeAll(excludedTargets);
+
+            for (GraphPartEdge edge : consideredOutsideEdges) {
+                GraphPart outPart = edge.to;
+                Set<GraphPart> reachable = getReachable(outPart, backEdges, classifiedAbruptTargets, walker, ignoredEdges);
+
+                if (classifiedAbruptTargets.contains(outPart)) {
+                    reachable.clear();
+                    reachable.add(outPart);
+                }
+
+                Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "Reachables of {0}:", outPart);
+                for (GraphPart r : reachable) {
+                    Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- {0}:", r);
+                }
+                allReachable.add(reachable);
+                allOutReachable.addAll(reachable);
+            }
+
+            allOutReachable.removeAll(exceptionTargets);
+
             if (allOutReachable.isEmpty()) {
+                continue;
+            }
+
+            GraphPart commonLocalExit = findNearestCommonPostDominator(
+                    localOutParts,
+                    backEdges,
+                    classifiedAbruptTargets,
+                    walker,
+                    ignoredEdges,
+                    excludedTargets,
+                    outParts
+            );
+            if (commonLocalExit != null) {
+                loop.loopBreak = commonLocalExit;
                 continue;
             }
 
@@ -563,33 +628,27 @@ public class LoopDetector {
                         numBranches++;
                     }
                 }
-                candidateList.add(new CandidateResult(part, numBranches, outParts.contains(part), parentBreaks.contains(part)));
+                candidateList.add(new CandidateResult(part, numBranches, outParts.contains(part), classifiedAbruptTargets.contains(part)));
             }
 
             candidateList.sort(new Comparator<CandidateResult>() {
                 @Override
                 public int compare(CandidateResult o1, CandidateResult o2) {
-                    boolean b1 = parentBreaks.contains(o1.part);
-                    boolean b2 = parentBreaks.contains(o2.part);
-
                     boolean op1 = outParts.contains(o1.part);
                     boolean op2 = outParts.contains(o2.part);
 
-                    if (b1 != b2) {
-                        if (b1) {
+                    boolean a1 = classifiedAbruptTargets.contains(o1.part);
+                    boolean a2 = classifiedAbruptTargets.contains(o2.part);
+
+                    if (a1 != a2) {
+                        if (a1) {
                             return 1;
                         }
                         return -1;
                     }
 
-                    boolean mb1 = o1.numBranches > 1;
-                    boolean mb2 = o2.numBranches > 1;
-
-                    if (mb1 != mb2) {
-                        if (mb1) {
-                            return -1;
-                        }
-                        return 1;
+                    if (o1.numBranches != o2.numBranches) {
+                        return o2.numBranches - o1.numBranches;
                     }
 
                     if (op1 != op2) {
@@ -608,6 +667,241 @@ public class LoopDetector {
             }
             loop.loopBreak = candidateList.get(0).part;
         }
+    }
+
+    private boolean leadsOnlyToAbruptTargets(
+            GraphPart startPart,
+            Set<GraphPart> boundaryTargets,
+            Set<GraphPart> abruptTargets,
+            Set<GraphPartEdge> backEdges,
+            PrevNextWalker pnw,
+            Set<GraphPartEdge> ignoredEdges
+    ) {
+        Map<GraphPart, List<GraphPart>> successors = new LinkedHashMap<>();
+        Queue<GraphPart> queue = new ArrayDeque<>();
+        queue.offer(startPart);
+        boolean abruptTargetFound = false;
+
+        while (!queue.isEmpty()) {
+            GraphPart part = queue.poll();
+            if (successors.containsKey(part)) {
+                continue;
+            }
+
+            List<GraphPart> nextParts = new ArrayList<>();
+            successors.put(part, nextParts);
+            boolean hasSuccessor = false;
+
+            for (GraphPart next : pnw.getNext(part)) {
+                GraphPartEdge edge = new GraphPartEdge(part, next);
+                if (ignoredEdges.contains(edge) || backEdges.contains(edge)) {
+                    continue;
+                }
+                hasSuccessor = true;
+                if (boundaryTargets.contains(next)) {
+                    if (!abruptTargets.contains(next)) {
+                        return false;
+                    }
+                    abruptTargetFound = true;
+                    continue;
+                }
+                nextParts.add(next);
+                queue.offer(next);
+            }
+
+            if (!hasSuccessor) {
+                return false;
+            }
+        }
+
+        if (!abruptTargetFound) {
+            return false;
+        }
+
+        Map<GraphPart, Integer> incomingEdgeCounts = new LinkedHashMap<>();
+        for (GraphPart part : successors.keySet()) {
+            incomingEdgeCounts.put(part, 0);
+        }
+        for (List<GraphPart> nextParts : successors.values()) {
+            for (GraphPart next : nextParts) {
+                incomingEdgeCounts.put(next, incomingEdgeCounts.get(next) + 1);
+            }
+        }
+
+        Queue<GraphPart> zeroIncoming = new ArrayDeque<>();
+        for (Map.Entry<GraphPart, Integer> entry : incomingEdgeCounts.entrySet()) {
+            if (entry.getValue() == 0) {
+                zeroIncoming.offer(entry.getKey());
+            }
+        }
+
+        int processed = 0;
+        while (!zeroIncoming.isEmpty()) {
+            GraphPart part = zeroIncoming.poll();
+            processed++;
+            for (GraphPart next : successors.get(part)) {
+                int incoming = incomingEdgeCounts.get(next) - 1;
+                incomingEdgeCounts.put(next, incoming);
+                if (incoming == 0) {
+                    zeroIncoming.offer(next);
+                }
+            }
+        }
+        return processed == successors.size();
+    }
+
+    private GraphPart findNearestCommonPostDominator(
+            Set<GraphPart> startParts,
+            Set<GraphPartEdge> backEdges,
+            Set<GraphPart> stopParts,
+            PrevNextWalker pnw,
+            Set<GraphPartEdge> ignoredEdges,
+            Set<GraphPart> excludedCandidates,
+            Set<GraphPart> directOutParts
+    ) {
+        if (startParts.isEmpty()) {
+            return null;
+        }
+
+        Map<GraphPart, List<GraphPart>> successors = new LinkedHashMap<>();
+        Queue<GraphPart> queue = new ArrayDeque<>();
+        queue.addAll(startParts);
+
+        while (!queue.isEmpty()) {
+            GraphPart part = queue.poll();
+            if (successors.containsKey(part)) {
+                continue;
+            }
+
+            List<GraphPart> nextParts = new ArrayList<>();
+            successors.put(part, nextParts);
+            if (stopParts.contains(part)) {
+                continue;
+            }
+
+            for (GraphPart next : pnw.getNext(part)) {
+                GraphPartEdge edge = new GraphPartEdge(part, next);
+                if (ignoredEdges.contains(edge) || backEdges.contains(edge)) {
+                    continue;
+                }
+                nextParts.add(next);
+                queue.offer(next);
+            }
+        }
+
+        Set<GraphPart> allParts = new LinkedHashSet<>(successors.keySet());
+        Map<GraphPart, Set<GraphPart>> postDominators = new LinkedHashMap<>();
+        for (Map.Entry<GraphPart, List<GraphPart>> entry : successors.entrySet()) {
+            Set<GraphPart> initial = new LinkedHashSet<>();
+            if (entry.getValue().isEmpty()) {
+                initial.add(entry.getKey());
+            } else {
+                initial.addAll(allParts);
+            }
+            postDominators.put(entry.getKey(), initial);
+        }
+
+        boolean changed;
+        do {
+            changed = false;
+            for (Map.Entry<GraphPart, List<GraphPart>> entry : successors.entrySet()) {
+                GraphPart part = entry.getKey();
+                List<GraphPart> nextParts = entry.getValue();
+                Set<GraphPart> updated = new LinkedHashSet<>();
+                updated.add(part);
+
+                if (!nextParts.isEmpty()) {
+                    Set<GraphPart> common = new LinkedHashSet<>(postDominators.get(nextParts.get(0)));
+                    for (int i = 1; i < nextParts.size(); i++) {
+                        common.retainAll(postDominators.get(nextParts.get(i)));
+                    }
+                    updated.addAll(common);
+                }
+
+                if (!updated.equals(postDominators.get(part))) {
+                    postDominators.put(part, updated);
+                    changed = true;
+                }
+            }
+        } while (changed);
+
+        Set<GraphPart> commonPostDominators = null;
+        for (GraphPart startPart : startParts) {
+            Set<GraphPart> partPostDominators = postDominators.get(startPart);
+            if (partPostDominators == null) {
+                return null;
+            }
+            if (commonPostDominators == null) {
+                commonPostDominators = new LinkedHashSet<>(partPostDominators);
+            } else {
+                commonPostDominators.retainAll(partPostDominators);
+            }
+        }
+
+        if (commonPostDominators == null) {
+            return null;
+        }
+        commonPostDominators.removeAll(excludedCandidates);
+        if (commonPostDominators.isEmpty()) {
+            return null;
+        }
+
+        Map<GraphPart, Long> distanceSums = new LinkedHashMap<>();
+        for (GraphPart candidate : commonPostDominators) {
+            distanceSums.put(candidate, 0L);
+        }
+
+        for (GraphPart startPart : startParts) {
+            Map<GraphPart, Integer> distances = new LinkedHashMap<>();
+            Queue<GraphPart> distanceQueue = new ArrayDeque<>();
+            distances.put(startPart, 0);
+            distanceQueue.offer(startPart);
+
+            while (!distanceQueue.isEmpty()) {
+                GraphPart part = distanceQueue.poll();
+                int nextDistance = distances.get(part) + 1;
+                for (GraphPart next : successors.get(part)) {
+                    if (!distances.containsKey(next)) {
+                        distances.put(next, nextDistance);
+                        distanceQueue.offer(next);
+                    }
+                }
+            }
+
+            for (GraphPart candidate : commonPostDominators) {
+                Integer distance = distances.get(candidate);
+                if (distance == null) {
+                    return null;
+                }
+                distanceSums.put(candidate, distanceSums.get(candidate) + distance);
+            }
+        }
+
+        GraphPart result = null;
+        for (GraphPart candidate : commonPostDominators) {
+            if (result == null) {
+                result = candidate;
+                continue;
+            }
+
+            int distanceCompare = Long.compare(distanceSums.get(candidate), distanceSums.get(result));
+            if (distanceCompare < 0
+                    || (distanceCompare == 0
+                    && directOutParts.contains(candidate)
+                    && !directOutParts.contains(result))
+                    || (distanceCompare == 0
+                    && directOutParts.contains(candidate) == directOutParts.contains(result)
+                    && candidate.closedTime < result.closedTime)) {
+                result = candidate;
+            }
+        }
+
+        Logger.getLogger(LoopDetector.class.getName()).log(
+                Level.FINE,
+                "nearest common local exit postdominator: {0}",
+                result
+        );
+        return result;
     }
 
     private Set<GraphPart> buildNaturalLoop(GraphPart tail, GraphPart header, PrevNextWalker pnw) {
