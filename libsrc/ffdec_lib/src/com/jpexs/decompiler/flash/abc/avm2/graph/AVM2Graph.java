@@ -1796,6 +1796,21 @@ public class AVM2Graph extends Graph {
                         break;
                     }
 
+                    if (part.nextParts.size() == branchCount) {
+                        GraphPart possibleNextDispatchPart = part.nextParts.get(branchNum);
+                        boolean reachedFromCaseBody = false;
+                        for (GraphPart caseBodyPart : caseBodyParts) {
+                            if (caseBodyPart == possibleNextDispatchPart
+                                    || caseBodyPart.leadsTo(localData, this, code, possibleNextDispatchPart, loops, throwStates, false)) {
+                                reachedFromCaseBody = true;
+                                break;
+                            }
+                        }
+                        if (reachedFromCaseBody) {
+                            break;
+                        }
+                    }
+
                     //Special: In Flex (not air) there are these blocks sometimes:
                     // if(false) {
                     //    §§push(5);
