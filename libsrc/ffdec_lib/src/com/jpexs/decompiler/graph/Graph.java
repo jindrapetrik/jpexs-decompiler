@@ -996,7 +996,7 @@ public class Graph {
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
 
-        if (!hasEmptyStackPops.getVal()) {
+        if (!hasEmptyStackPops.getVal() || !containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
         }
 
@@ -1004,6 +1004,29 @@ public class Graph {
         //fixSwitchEnds(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    private boolean containsPopItems(List<GraphTargetItem> list) {
+        Reference<Boolean> containsPopItem = new Reference<>(false);
+        for (GraphTargetItem item : list) {
+            if (item instanceof PopItem) {
+                return true;
+            }
+            item.visitRecursively(new AbstractGraphTargetVisitor() {
+                @Override
+                public boolean visit(GraphTargetItem item) {
+                    if (item instanceof PopItem) {
+                        containsPopItem.setVal(true);
+                        return false;
+                    }
+                    return true;
+                }
+            });
+            if (containsPopItem.getVal()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void promotePushItemsToCommands(List<GraphTargetItem> list) {
