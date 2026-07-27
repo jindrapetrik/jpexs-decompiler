@@ -329,8 +329,16 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (t instanceof TraitSlotConst) {
                     continue;
                 }
+                
+                Multiname mn = t.getName(abc);
+                Namespace ns = mn.getNamespace(abc.constants);
+                int nskind = ns.kind;
+                
+                if ((nskind != Namespace.KIND_PACKAGE) && (nskind != Namespace.KIND_PACKAGE_INTERNAL)) {
+                    continue;
+                }
 
-                String fullName = t.getName(abc).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
+                String fullName = mn.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(usedDeobfuscations, abc.getSwf(), true);
                 writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
