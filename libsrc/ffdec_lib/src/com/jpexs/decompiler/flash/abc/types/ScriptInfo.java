@@ -149,14 +149,16 @@ public class ScriptInfo {
         }
         List<ScriptPack> ret = new ArrayList<>();
 
-        List<Integer> otherTraits = new ArrayList<>();
+        List<Integer> initialPrivateTraits = new ArrayList<>();
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if (!((nskind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (nskind == Namespace.KIND_PACKAGE))) {
-                otherTraits.add(j);
+                initialPrivateTraits.add(j);
+            } else {
+                break;
             }
         }
 
@@ -188,9 +190,20 @@ public class ScriptInfo {
                 List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);
-                if (!otherTraits.isEmpty()) {
-                    traitIndices.addAll(otherTraits);
-                    otherTraits.clear();
+                if (!initialPrivateTraits.isEmpty()) {
+                    traitIndices.addAll(initialPrivateTraits);
+                    initialPrivateTraits.clear();
+                }
+                for (int k = j + 1; k < traits.traits.size(); k++) {
+                    Trait t2 = traits.traits.get(k);
+                    Multiname name2 = t2.getName(abc);
+                    int nskind2 = name2.getSimpleNamespaceKind(abc.constants);
+                    if (!((nskind2 == Namespace.KIND_PACKAGE_INTERNAL)
+                            || (nskind2 == Namespace.KIND_PACKAGE))) {
+                        traitIndices.add(k);
+                    } else {
+                        break;
+                    }
                 }
 
                 if (packagePrefix == null || packageName.toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true).startsWith(packagePrefix)) {
@@ -202,9 +215,9 @@ public class ScriptInfo {
                 }
             }
         }
-        if (ret.isEmpty() && !otherTraits.isEmpty()) { //no public/package internal traits to determine common pack name
+        if (ret.isEmpty() && !initialPrivateTraits.isEmpty()) { //no public/package internal traits to determine common pack name
             //make each trait separate pack
-            for (int traitIndex : otherTraits) {
+            for (int traitIndex : initialPrivateTraits) {
                 Trait t = traits.traits.get(traitIndex);
                 Multiname name = t.getName(abc);
 
