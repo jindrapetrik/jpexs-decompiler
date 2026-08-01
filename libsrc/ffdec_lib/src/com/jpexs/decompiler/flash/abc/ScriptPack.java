@@ -1045,7 +1045,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                     i -= 2;
                 }
             }
-            String filename = swfHash + ":" + "#PCODE " + bodyName + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
+            String filename = swfHash + ":" + "#PCODE " + bodyName + ";" + pkg.replace(".", File.separator).replace(";", "{{semicolon}}") + ";" + cls.replace(";", "{{semicolon}}") + ".as";
+            
+            filename = filename.replaceAll("\\{(invalid_utf8=[0-9]+)\\}", "[$1]");
 
             b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
             b.setModified();
