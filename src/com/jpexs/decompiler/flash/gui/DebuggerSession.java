@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -245,7 +246,7 @@ public class DebuggerSession {
                         Matcher m;
                         if ((m = patAS3.matcher(name)).matches()) {
                             String clsNameWithSuffix = m.group(3).replace("{{semicolon}}", ";");
-                            String pkg = m.group(2).replace("{{semicolon}}", ";").replace("\\", ".");
+                            String pkg = m.group(2).replace("{{semicolon}}", ";").replace(File.separator, ".");
                             m = patAS3PCode.matcher(name);
                             if (m.matches()) {
                                 moduleToClassIndex.put(file, Integer.parseInt(m.group("class")));
