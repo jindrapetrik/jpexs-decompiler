@@ -300,7 +300,7 @@ public class PreviewExporter {
 
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, swf.getCharset());
+            SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
             RECT outrect = new RECT(swf.displayRect);
 
             RECT treeItemBounds = null;

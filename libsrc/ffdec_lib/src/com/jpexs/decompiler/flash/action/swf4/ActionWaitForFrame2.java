@@ -61,17 +61,24 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
      * Skipped actions
      */
     public List<Action> skipped;
+    
+    /**
+     * SWF version
+     */
+    private final int swfVersion;
 
     /**
      * Constructor.
      *
      * @param skipCount Number of actions to skip
      * @param charset Charset
+     * @param swfVersion SWF version
      */
-    public ActionWaitForFrame2(int skipCount, String charset) {
+    public ActionWaitForFrame2(int skipCount, String charset, int swfVersion) {
         super(0x8D, 1, charset);
         this.skipCount = skipCount;
         skipped = new ArrayList<>();
+        this.swfVersion = swfVersion;
     }
 
     @Override
@@ -90,12 +97,14 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
      *
      * @param actionLength Action length
      * @param sis SWF input stream
+     * @param swfVersion SWF version
      * @throws IOException On I/O error
      */
-    public ActionWaitForFrame2(int actionLength, SWFInputStream sis) throws IOException {
+    public ActionWaitForFrame2(int actionLength, SWFInputStream sis, int swfVersion) throws IOException {
         super(0x8D, actionLength, sis.getCharset());
         skipCount = sis.readUI8("skipCount");
         skipped = new ArrayList<>();
+        this.swfVersion = swfVersion;
         /*for (int i = 0; i < skipCount; i++) {
          Action a = sis.readAction(cpool);
          if (a instanceof ActionEnd) {
@@ -131,13 +140,15 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
      *
      * @param lexer Flasm lexer
      * @param charset Charset
+     * @param swfVersion SWF version
      * @throws IOException On I/O error
      * @throws ActionParseException On action parse error
      */
-    public ActionWaitForFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+    public ActionWaitForFrame2(FlasmLexer lexer, String charset, int swfVersion) throws IOException, ActionParseException {
         super(0x8D, -1, charset);
         skipCount = (int) lexLong(lexer);
         skipped = new ArrayList<>();
+        this.swfVersion = swfVersion;
     }
 
     @Override
@@ -185,13 +196,13 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
+            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, null, insideDoInitAction, true, regNames, variables, functions, skipped, swfVersion, staticOperation, path, getCharset(), 0);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset(), 0);
+            body = ActionGraph.translateViaGraph(usedDeobfuscations, false, uninitializedClassTraits, spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, swfVersion, staticOperation, path, getCharset(), 0);
         }
         stack.addToOutput(new IfFrameLoadedActionItem(frame, body, this, lineStartAction));
     }

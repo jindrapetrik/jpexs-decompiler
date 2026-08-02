@@ -134,7 +134,7 @@ public class ActionSourceGenerator implements SourceGenerator {
      */
     public String getCharset() {
         return charset;
-    }
+    }       
 
     private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {
         return toActionList(generate(localData, commands));
@@ -253,7 +253,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 onFalse = generateToActionList(localData, onFalseCmds);
             }
         }
-        byte[] onTrueBytes = Action.actionsToBytes(onTrue, false, SWF.DEFAULT_VERSION);
+        byte[] onTrueBytes = Action.actionsToBytes(onTrue, false, swfVersion);
         int onTrueLen = onTrueBytes.length;
 
         if (onTrueLen > 32767) {
@@ -277,7 +277,7 @@ public class ActionSourceGenerator implements SourceGenerator {
                 throw new CompilationException("Generated offset for onTrue part of " + errorTitle + " is larger than maximum allowed for SI16.", errorLine);
             }
             ifaif.setJumpOffset(onTrueLen);
-            byte[] onFalseBytes = Action.actionsToBytes(onFalse, false, SWF.DEFAULT_VERSION);
+            byte[] onFalseBytes = Action.actionsToBytes(onFalse, false, swfVersion);
             int onFalseLen = onFalseBytes.length;
             if (ajmp != null) {
                 ajmp.setJumpOffset(onFalseLen);
@@ -655,7 +655,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             ret.addAll(typeToActions(globalClassTypeStr, null));
             ret.add(new ActionNot());
             ret.add(new ActionNot());
-            ret.add(new ActionIf(Action.actionsToBytes(notBody, false, SWF.DEFAULT_VERSION).length, charset));
+            ret.add(new ActionIf(Action.actionsToBytes(notBody, false, swfVersion).length, charset));
             ret.addAll(notBody);
             ret.add(new ActionPop());
         }
@@ -682,7 +682,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         if (constructor == null) {
             List<Action> val = new ArrayList<>();
-            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, SWF.DEFAULT_VERSION, charset));
+            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, charset));
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1, charset));
             }
@@ -755,13 +755,13 @@ public class ActionSourceGenerator implements SourceGenerator {
                 ifbody.add(new ActionPush(new Object[]{new RegisterNumber(1), "__set__" + prop}, charset));
                 ifbody.add(new ActionGetMember());
             } else {
-                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion, charset));
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, charset));
             }
             if (staticGetters.contains(prop)) {
                 ifbody.add(new ActionPush(new Object[]{new RegisterNumber(1), "__get__" + prop}, charset));
                 ifbody.add(new ActionGetMember());
             } else {
-                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion, charset));
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, charset));
             }
             ifbody.add(new ActionPush(new Object[]{prop, 3, new RegisterNumber(1), "addProperty"}, charset));
             ifbody.add(new ActionCallMethod());
@@ -772,13 +772,13 @@ public class ActionSourceGenerator implements SourceGenerator {
                 ifbody.add(new ActionPush(new Object[]{new RegisterNumber(2), "__set__" + prop}, charset));
                 ifbody.add(new ActionGetMember());
             } else {
-                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion, charset));
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, charset));
             }
             if (getters.contains(prop)) {
                 ifbody.add(new ActionPush(new Object[]{new RegisterNumber(2), "__get__" + prop}, charset));
                 ifbody.add(new ActionGetMember());
             } else {
-                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion, charset));
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, charset));
             }
             ifbody.add(new ActionPush(new Object[]{prop, 3, new RegisterNumber(2), "addProperty"}, charset));
             ifbody.add(new ActionCallMethod());
@@ -797,7 +797,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         if (constr.isEmpty()) {
             List<Action> val = new ArrayList<>();
-            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, SWF.DEFAULT_VERSION, charset));
+            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, charset));
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1, charset));
             }
@@ -833,7 +833,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(typeToActions(globalClassTypeStr, null));
         ret.add(new ActionNot());
         ret.add(new ActionNot());
-        int ifOffset = Action.actionsToBytes(ifbody, false, SWF.DEFAULT_VERSION).length;
+        int ifOffset = Action.actionsToBytes(ifbody, false, swfVersion).length;
         if (ifOffset > 0x7fff) {
             if (!localData.secondRun) { //to avoid printing the warning twice
                 Logger.getLogger(ActionSourceGenerator.class.getName()).warning("The class is long. If offset for its header would be longer than max value for SI16, 0 was stored instead. This should not have any negative impact.");
@@ -864,7 +864,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(new ActionNot());
         List<Action> andExpr = generateToActionList(localData, item.rightSide);
         andExpr.add(0, new ActionPop());
-        int andExprLen = Action.actionsToBytes(andExpr, false, SWF.DEFAULT_VERSION).length;
+        int andExprLen = Action.actionsToBytes(andExpr, false, swfVersion).length;
         ret.add(new ActionIf(andExprLen, charset));
         ret.addAll(andExpr);
         return ret;
@@ -878,7 +878,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(new ActionPushDuplicate());
         List<Action> orExpr = generateToActionList(localData, item.rightSide);
         orExpr.add(0, new ActionPop());
-        int orExprLen = Action.actionsToBytes(orExpr, false, SWF.DEFAULT_VERSION).length;
+        int orExprLen = Action.actionsToBytes(orExpr, false, swfVersion).length;
         ret.add(new ActionIf(orExprLen, charset));
         ret.addAll(orExpr);
         return ret;
@@ -916,8 +916,8 @@ public class ActionSourceGenerator implements SourceGenerator {
         whileExpr.add(whileaif);
         ActionJump whileajmp = new ActionJump(0, charset);
         whileBody.add(whileajmp);
-        int whileExprLen = Action.actionsToBytes(whileExpr, false, SWF.DEFAULT_VERSION).length;
-        int whileBodyLen = Action.actionsToBytes(whileBody, false, SWF.DEFAULT_VERSION).length;
+        int whileExprLen = Action.actionsToBytes(whileExpr, false, swfVersion).length;
+        int whileBodyLen = Action.actionsToBytes(whileBody, false, swfVersion).length;
 
         if (whileBodyLen > 32767) {
             throw new CompilationException("Generated offset for While is larger than maximum allowed for SI16.", item.line);
@@ -948,8 +948,8 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         List<Action> doBody = generateToActionList(localData, item.commands);
 
-        int doBodyLen = Action.actionsToBytes(doBody, false, SWF.DEFAULT_VERSION).length;
-        int doExprLen = Action.actionsToBytes(doExpr, false, SWF.DEFAULT_VERSION).length;
+        int doBodyLen = Action.actionsToBytes(doBody, false, swfVersion).length;
+        int doExprLen = Action.actionsToBytes(doExpr, false, swfVersion).length;
 
         ret.addAll(doBody);
         ret.addAll(doExpr);
@@ -1016,13 +1016,13 @@ public class ActionSourceGenerator implements SourceGenerator {
             ActionIf forInIfPop = new ActionIf(0, charset);
             loopPop.add(forInIfPop);
 
-            popLen = Action.actionsToBytes(loopPop, false, SWF.DEFAULT_VERSION).length;
+            popLen = Action.actionsToBytes(loopPop, false, swfVersion).length;
             forInIfPop.setJumpOffset(-popLen);        
         }
         
         
-        int bodyLen = Action.actionsToBytes(loopBody, false, SWF.DEFAULT_VERSION).length;
-        int exprLen = Action.actionsToBytes(loopExpr, false, SWF.DEFAULT_VERSION).length;
+        int bodyLen = Action.actionsToBytes(loopBody, false, swfVersion).length;
+        int exprLen = Action.actionsToBytes(loopExpr, false, swfVersion).length;
         forinJmpBack.setJumpOffset(-bodyLen - exprLen);
         forInEndIf.setJumpOffset(bodyLen + popLen);
         int forinJmpBackLen = forinJmpBack.getTotalActionLength();
@@ -1047,9 +1047,9 @@ public class ActionSourceGenerator implements SourceGenerator {
         forExpr.add(foraif);
         ActionJump forajmp = new ActionJump(0, charset);
         int forajmpLen = forajmp.getTotalActionLength();
-        int forExprLen = Action.actionsToBytes(forExpr, false, SWF.DEFAULT_VERSION).length;
-        int forBodyLen = Action.actionsToBytes(forBody, false, SWF.DEFAULT_VERSION).length;
-        int forFinalLen = Action.actionsToBytes(forFinalCommands, false, SWF.DEFAULT_VERSION).length;
+        int forExprLen = Action.actionsToBytes(forExpr, false, swfVersion).length;
+        int forBodyLen = Action.actionsToBytes(forBody, false, swfVersion).length;
+        int forFinalLen = Action.actionsToBytes(forFinalCommands, false, swfVersion).length;
         int jmpOffset = -(forExprLen + forBodyLen + forFinalLen + forajmpLen);
         int ifOffset = forBodyLen + forFinalLen + forajmpLen;
         if (jmpOffset < -32768) {
@@ -1139,13 +1139,13 @@ public class ActionSourceGenerator implements SourceGenerator {
         for (List<List<Action>> caseExprs : caseExprsAll) {
             List<Integer> lengths = new ArrayList<>();
             for (List<Action> caseExpr : caseExprs) {
-                lengths.add(Action.actionsToBytes(caseExpr, false, SWF.DEFAULT_VERSION).length);
+                lengths.add(Action.actionsToBytes(caseExpr, false, swfVersion).length);
             }
             exprLengths.add(lengths);
         }
         List<Integer> caseLengths = new ArrayList<>();
         for (List<Action> caseCmd : caseCmds) {
-            caseLengths.add(Action.actionsToBytes(caseCmd, false, SWF.DEFAULT_VERSION).length);
+            caseLengths.add(Action.actionsToBytes(caseCmd, false, swfVersion).length);
         }
 
         for (int i = 0; i < caseIfs.size(); i++) {

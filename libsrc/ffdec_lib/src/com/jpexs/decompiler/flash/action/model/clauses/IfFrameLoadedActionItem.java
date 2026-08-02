@@ -119,7 +119,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         if (body.size() > 0xFF) {
             throw new CompilationException("ifFrameLoaded body exceeds limit of 255 actions", line);
         }
-        return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size(), charset), body);
+        return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size(), charset, actionGenerator.getSwfVersion()), body);
     }
 
     @Override

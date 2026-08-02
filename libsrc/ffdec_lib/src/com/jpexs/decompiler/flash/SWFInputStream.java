@@ -1993,7 +1993,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);
                 case 0x83:
-                    return new ActionGetURL(actionLength, this, swf.version);
+                    return new ActionGetURL(actionLength, this);
                 case 0x04:
                     return new ActionNextFrame();
                 case 0x05:
@@ -2007,14 +2007,14 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x09:
                     return new ActionStopSounds();
                 case 0x8A:
-                    return new ActionWaitForFrame(actionLength, this);
+                    return new ActionWaitForFrame(actionLength, this, swf.version);
                 case 0x8B:
-                    return new ActionSetTarget(actionLength, this, swf.version);
+                    return new ActionSetTarget(actionLength, this);
                 case 0x8C:
-                    return new ActionGoToLabel(actionLength, this, swf.version);
+                    return new ActionGoToLabel(actionLength, this);
                 // SWF4 Actions
                 case 0x96:
-                    return new ActionPush(actionLength, this, swf.version);
+                    return new ActionPush(actionLength, this);
                 case 0x17:
                     return new ActionPop();
                 case 0x0A:
@@ -2088,7 +2088,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x28:
                     return new ActionEndDrag();
                 case 0x8D:
-                    return new ActionWaitForFrame2(actionLength, this);
+                    return new ActionWaitForFrame2(actionLength, this, swf.version);
                 case 0x26:
                     return new ActionTrace();
                 case 0x34:
@@ -2101,9 +2101,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x52:
                     return new ActionCallMethod();
                 case 0x88:
-                    return new ActionConstantPool(actionLength, this, swf.version);
+                    return new ActionConstantPool(actionLength, this);
                 case 0x9B:
-                    return new ActionDefineFunction(actionLength, this, swf.version);
+                    return new ActionDefineFunction(actionLength, this);
                 case 0x3C:
                     return new ActionDefineLocal();
                 case 0x41:
@@ -2181,7 +2181,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionStringGreater();
                 // SWF7 Actions
                 case 0x8E:
-                    return new ActionDefineFunction2(actionLength, this, swf.version);
+                    return new ActionDefineFunction2(actionLength, this);
                 case 0x69:
                     return new ActionExtends(getCharset());
                 case 0x2B:

@@ -83,10 +83,9 @@ public class ActionGetURL extends Action {
      * Constructor
      * @param actionLength Action length
      * @param sis SWF input stream
-     * @param version SWF version
      * @throws IOException On I/O error
      */
-    public ActionGetURL(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionGetURL(int actionLength, SWFInputStream sis) throws IOException {
         super(0x83, actionLength, sis.getCharset());
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);

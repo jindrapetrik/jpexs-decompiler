@@ -105,7 +105,7 @@ public class ActionListReader {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        return new ActionList(sis.getCharset());
+        return new ActionList(sis.getCharset(), version);
     }
 
     /**
@@ -135,7 +135,7 @@ public class ActionListReader {
                 sis.getCharset());
 
         if (actionMap.isEmpty()) {
-            return new ActionList(sis.getCharset());
+            return new ActionList(sis.getCharset(), version);
         }
 
         List<Long> addresses = new ArrayList<>(actionMap.keySet());
@@ -205,7 +205,7 @@ public class ActionListReader {
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         getContainerLastActions(actions, containerLastActions);
 
-        ActionList ret = new ActionList(actions.getCharset());
+        ActionList ret = new ActionList(actions.getCharset(), actions.getVersion());
         ret.fileData = actions.fileData;
 
         if (nextOffsets != null) {

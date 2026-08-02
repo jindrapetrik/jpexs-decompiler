@@ -140,11 +140,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public int codeSize;
 
     /**
-     * Version
-     */
-    private int version;
-
-    /**
      * Constant pool
      */
     public List<String> constantPool;
@@ -173,12 +168,11 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
      * @param preloadGlobalFlag Preload global flag
      * @param registerCount Register count
      * @param codeSize Code size
-     * @param version Version
      * @param paramNames Parameter names
      * @param paramRegisters Parameter registers
      * @param charset Charset
      */
-    public ActionDefineFunction2(String functionName, boolean preloadParentFlag, boolean preloadRootFlag, boolean suppressSuperFlag, boolean preloadSuperFlag, boolean suppressArgumentsFlag, boolean preloadArgumentsFlag, boolean suppressThisFlag, boolean preloadThisFlag, boolean preloadGlobalFlag, int registerCount, int codeSize, int version, List<String> paramNames, List<Integer> paramRegisters, String charset) {
+    public ActionDefineFunction2(String functionName, boolean preloadParentFlag, boolean preloadRootFlag, boolean suppressSuperFlag, boolean preloadSuperFlag, boolean suppressArgumentsFlag, boolean preloadArgumentsFlag, boolean suppressThisFlag, boolean preloadThisFlag, boolean preloadGlobalFlag, int registerCount, int codeSize, List<String> paramNames, List<Integer> paramRegisters, String charset) {
         super(0x8E, 0, charset);
         this.functionName = functionName;
         this.preloadParentFlag = preloadParentFlag;
@@ -192,7 +186,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         this.preloadGlobalFlag = preloadGlobalFlag;
         this.registerCount = registerCount;
         this.codeSize = codeSize;
-        this.version = version;
         this.paramNames = paramNames;
         this.paramRegisters = paramRegisters;
     }
@@ -202,12 +195,10 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
      *
      * @param actionLength Action length
      * @param sis SWF input stream
-     * @param version Version
      * @throws IOException On I/O error
      */
-    public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionDefineFunction2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x8E, actionLength, sis.getCharset());
-        this.version = version;
         functionName = sis.readString("functionName");
         int numParams = sis.readUI16("numParams");
         registerCount = sis.readUI8("registerCount");

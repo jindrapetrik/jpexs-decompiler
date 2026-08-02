@@ -75,12 +75,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     /**
      * Code size
      */
-    public int codeSize;
-
-    /**
-     * Version
-     */
-    private int version;
+    public int codeSize;  
 
     /**
      * Constant pool
@@ -102,14 +97,12 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
      * @param functionName Function name
      * @param paramNames Parameter names
      * @param codeSize Code size
-     * @param version Version
      * @param charset Charset
      */
-    public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, int version, String charset) {
+    public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, String charset) {
         super(0x9B, 0, charset);
         this.functionName = functionName;
         this.codeSize = codeSize;
-        this.version = version;
         this.paramNames = paramNames;
     }
 
@@ -118,12 +111,10 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
      *
      * @param actionLength Action length
      * @param sis SWF input stream
-     * @param version Version
      * @throws IOException On I/O error
      */
-    public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionDefineFunction(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9B, actionLength, sis.getCharset());
-        this.version = version;
         functionName = sis.readString("functionName");
         int numParams = sis.readUI16("numParams");
         for (int i = 0; i < numParams; i++) {
