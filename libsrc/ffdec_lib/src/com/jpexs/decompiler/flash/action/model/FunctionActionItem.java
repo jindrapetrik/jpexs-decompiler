@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
@@ -26,6 +25,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -44,6 +44,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import natorder.NaturalOrderComparator;
 
 /**
  * Function.
@@ -488,13 +491,80 @@ public class FunctionActionItem extends ActionItem {
             getDeeplyUsedVariableNames(topLevelVariableNames, fun, deeplyUsedVariableNames);
         }
 
-        if (needsFun2) {
-            for (int i = 0; i < paramNames.size(); i++) {
-                if (deeplyUsedVariableNames.contains(paramNames.get(i))) {
-                    paramRegs.add(0); //this will be variable, no register
-                } else {
-                    paramRegs.add(registerNames.size());
-                    registerNames.add(paramNames.get(i));
+        for (int i = 0; i < paramNames.size(); i++) {
+            paramRegs.add(0); //0 = use variable, no reg
+        }
+        
+        if (needsFun2 && !hasEval) {
+            String registerNameMask = Configuration.registerNameFormat.get();
+            Pattern registerNamePattern = Pattern.compile(registerNameMask.replace("%d", "(?<regnum>[0-9]+)"));
+            
+            List<String> newRegisterNames = new ArrayList<>();
+            for (VariableActionItem v : variables) {
+                String varName = v.getVariableName();
+                if (v.isDefinition() 
+                        && !registerNames.contains(varName) 
+                        && !paramNames.contains(varName)
+                        && !newRegisterNames.contains(varName)
+                        && !deeplyUsedVariableNames.contains(varName)                        
+                    ) {
+                    Matcher m = registerNamePattern.matcher(varName);
+                    if (m.matches()) {
+                        newRegisterNames.add(varName);                                                  
+                    }
+                }
+            }
+            
+            for (int i = 0; i < paramNames.size(); i++) {    
+                String varName = paramNames.get(i);
+                if (newRegisterNames.contains(varName)) {
+                    continue;
+                }
+                Matcher m = registerNamePattern.matcher(varName);
+                if (m.matches()) {
+                    int regNum = Integer.parseInt(m.group("regnum"));  
+                    
+                    while (registerNames.size() <= regNum) {
+                        registerNames.add("**EMPTY**");
+                    }                   
+                    registerNames.set(regNum, varName);
+                    
+                    paramNames.set(i, "");
+                    paramRegs.set(i, regNum);
+                }
+            }
+            
+            newRegisterNames.sort(new NaturalOrderComparator());
+            
+            int numRegistersBeforeParams = registerNames.size();
+            
+            for (String varName : newRegisterNames) {
+                Matcher m = registerNamePattern.matcher(varName);
+                if (m.matches()) {
+                    int regNum = Integer.parseInt(m.group("regnum"));                    
+                    while (registerNames.size() <= regNum) {
+                        registerNames.add("**EMPTY**");
+                    }                   
+                    registerNames.set(regNum, varName);
+                }
+            }
+            
+            int posReg = numRegistersBeforeParams;
+            for (int i = 0; i < paramNames.size(); i++) {                
+                if (paramRegs.get(i) != 0) {
+                    continue;
+                }
+                if (!deeplyUsedVariableNames.contains(paramNames.get(i))) {
+                    while (posReg < registerNames.size() 
+                            && !registerNames.get(posReg).equals("**EMPTY**")) {
+                        posReg++;
+                    }
+                    while (registerNames.size() <= posReg) {
+                        registerNames.add("**EMPTY**");
+                    }
+
+                    paramRegs.set(i, posReg);                                        
+                    registerNames.set(posReg, paramNames.get(i));
                 }
             }
         }
@@ -503,15 +573,15 @@ public class FunctionActionItem extends ActionItem {
         
         localDataCopy.inFunction++;
 
+        
         for (VariableActionItem v : variables) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
-            if (needsFun2) {
-                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)
-                        && !hasEval) {
+            /*if (needsFun2 && !hasEval) {
+                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
                     registerNames.add(varName);
                 }
-            }
+            }*/
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {
