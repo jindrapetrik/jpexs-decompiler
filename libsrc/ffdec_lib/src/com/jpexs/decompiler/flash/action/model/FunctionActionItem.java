@@ -393,6 +393,7 @@ public class FunctionActionItem extends ActionItem {
     }        
 
     @Override
+    @SuppressWarnings("unchecked")            
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
