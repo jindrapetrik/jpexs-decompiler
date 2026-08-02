@@ -187,7 +187,7 @@ public class ActionGraph extends Graph {
                 List<Integer> startIps = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
-                        outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
+                        outs.add(new ActionList(((ActionGraphSource) code).getCharset(), ((ActionGraphSource) code).version));
                         startIps.add(0);
                         continue;
                     }
@@ -201,7 +201,7 @@ public class ActionGraph extends Graph {
                     ActionList al = outs.get(i);
                     int startIp = startIps.get(i);
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
+                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), ((ActionGraphSource) code).version, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
                     );
                 }
             }

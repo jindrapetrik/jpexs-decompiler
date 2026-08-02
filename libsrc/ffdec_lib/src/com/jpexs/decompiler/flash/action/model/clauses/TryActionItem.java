@@ -295,11 +295,11 @@ public class TryActionItem extends ActionItem implements Block {
                                 new ActionDefineLocal(),
                                 ebody);
                         fullCatchBody.add(0, new ActionPop());
-                        int toFinishSize = Action.actionsToBytes(asGenerator.toActionList(fullCatchBody), false, SWF.DEFAULT_VERSION).length;
+                        int toFinishSize = Action.actionsToBytes(asGenerator.toActionList(fullCatchBody), false, asGenerator.getSwfVersion()).length;
                         ActionJump finishJump = new ActionJump(toFinishSize, charset);
                         ifBody.add(finishJump);
                         List<Action> ifBodyA = asGenerator.toActionList(ifBody);
-                        int ifBodySize = Action.actionsToBytes(ifBodyA, false, SWF.DEFAULT_VERSION).length;
+                        int ifBodySize = Action.actionsToBytes(ifBodyA, false, asGenerator.getSwfVersion()).length;
                         fullCatchBody.addAll(0, ifBody);
                         fullCatchBody.addAll(0,
                                 GraphTargetItem.toSourceMerge(localData, generator,
@@ -317,15 +317,15 @@ public class TryActionItem extends ActionItem implements Block {
                 asGenerator.releaseTempRegister(localData, catchRegister);
             }
             catchCommandsA = asGenerator.toActionList(fullCatchBody);
-            catchSize = Action.actionsToBytes(catchCommandsA, false, SWF.DEFAULT_VERSION).length;
+            catchSize = Action.actionsToBytes(catchCommandsA, false, asGenerator.getSwfVersion()).length;
             tryCommandsA.add(new ActionJump(catchSize, charset));
         }
         int finallySize = 0;
         if (finallyCommandsA != null) {
-            finallySize = Action.actionsToBytes(finallyCommandsA, false, SWF.DEFAULT_VERSION).length;
+            finallySize = Action.actionsToBytes(finallyCommandsA, false, asGenerator.getSwfVersion()).length;
         }
-        int trySize = Action.actionsToBytes(tryCommandsA, false, SWF.DEFAULT_VERSION).length;
-        ret.add(new ActionTry(catchInRegisterFlag, finallyCommands != null, !catchCommands.isEmpty(), catchName, catchRegister, trySize, catchSize, finallySize, SWF.DEFAULT_VERSION, charset));
+        int trySize = Action.actionsToBytes(tryCommandsA, false, asGenerator.getSwfVersion()).length;
+        ret.add(new ActionTry(catchInRegisterFlag, finallyCommands != null, !catchCommands.isEmpty(), catchName, catchRegister, trySize, catchSize, finallySize, asGenerator.getSwfVersion(), charset));
         ret.addAll(tryCommandsA);
         if (catchCommandsA != null) {
             ret.addAll(catchCommandsA);

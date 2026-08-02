@@ -61,14 +61,21 @@ public class ActionList extends ArrayList<Action> {
      * Charset - SWF version 5 or lower does not have UTF-8 charset
      */
     private String charset;
+    
+    /**
+     * SWF version
+     */
+    private int version;
 
     /**
      * Constructs a new action list with the specified charset.
      *
      * @param charset Charset
+     * @param version SWF version
      */
-    public ActionList(String charset) {
+    public ActionList(String charset, int version) {
         this.charset = charset;
+        this.version = version;
     }
 
     /**
@@ -79,6 +86,15 @@ public class ActionList extends ArrayList<Action> {
     public String getCharset() {
         return charset;
     }
+
+    /**
+     * Gets SWF version.
+     * 
+     * @return SWF version
+     */
+    public int getVersion() {
+        return version;
+    }        
 
     /**
      * Constructs a new action list with the specified actions and charset.
@@ -708,7 +724,7 @@ public class ActionList extends ArrayList<Action> {
     public void saveToFile(String fileName) {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
-            Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+            Action.actionsToString(new ArrayList<>(), 0, this, version, ScriptExportMode.PCODE, writer);
         } catch (IOException ex) {
             Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -722,7 +738,7 @@ public class ActionList extends ArrayList<Action> {
     @Override
     public String toString() {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+        Action.actionsToString(new ArrayList<>(), 0, this, version, ScriptExportMode.PCODE, writer);
         writer.finishHilights();
         return writer.toString();
     }

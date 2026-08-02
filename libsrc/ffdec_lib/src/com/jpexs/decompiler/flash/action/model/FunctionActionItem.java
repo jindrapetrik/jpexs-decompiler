@@ -416,56 +416,60 @@ public class FunctionActionItem extends ActionItem {
         boolean suppressThisFlag = false;
 
         boolean needsFun2 = false;
-
+        
+        boolean canFun2 = asGenerator.getSwfVersion() >= 7;
+        
         List<String> registerNames = new ArrayList<>();
-        registerNames.add("***** ZERO *****");
-        if (usedNames.contains("this")) {
-            needsFun2 = true;
-            preloadThisFlag = true;
-            registerNames.add("this");
-        } else {
-            suppressThisFlag = true;
-        }
-        if (usedNames.contains("arguments")) {
-            preloadArgumentsFlag = true;
-            needsFun2 = true;
-            registerNames.add("arguments");
-        } else {
-            suppressArgumentsFlag = true;
-        }
-        if (usedNames.contains("super")) {
-            preloadSuperFlag = true;
-            needsFun2 = true;
-            registerNames.add("super");
-        } else {
-            suppressSuperFlag = true;
-        }
+        if (canFun2) {
+            registerNames.add("***** ZERO *****");
+            if (usedNames.contains("this")) {
+                needsFun2 = true;
+                preloadThisFlag = true;
+                registerNames.add("this");
+            } else {
+                suppressThisFlag = true;
+            }
+            if (usedNames.contains("arguments")) {
+                preloadArgumentsFlag = true;
+                needsFun2 = true;
+                registerNames.add("arguments");
+            } else {
+                suppressArgumentsFlag = true;
+            }
+            if (usedNames.contains("super")) {
+                preloadSuperFlag = true;
+                needsFun2 = true;
+                registerNames.add("super");
+            } else {
+                suppressSuperFlag = true;
+            }
 
-        if (usedNames.contains("_root")) {
-            preloadRootFlag = true;
-            needsFun2 = true;
-            registerNames.add("_root");
-        }
-        if (usedNames.contains("_parent")) {
-            preloadParentFlag = true;
-            needsFun2 = true;
-            registerNames.add("_parent");
-        }
-        if (usedNames.contains("_global")) {
-            needsFun2 = true;
-            preloadGlobalFlag = true;
-            registerNames.add("_global");
-        }
-
-        int preloadedNumber = registerNames.size();
-        if (!paramNames.isEmpty()) {
-            needsFun2 = true;
-        }
-        if (localData.inMethod) {
-            //needsFun2 = true;
-        }
-        if (localData.inFunction > 1) {
-            needsFun2 = true;
+            if (usedNames.contains("_root")) {
+                preloadRootFlag = true;
+                needsFun2 = true;
+                registerNames.add("_root");
+            }
+            if (usedNames.contains("_parent")) {
+                preloadParentFlag = true;
+                needsFun2 = true;
+                registerNames.add("_parent");
+            }
+            if (usedNames.contains("_global")) {
+                needsFun2 = true;
+                preloadGlobalFlag = true;
+                registerNames.add("_global");
+            }
+        
+            //int preloadedNumber = registerNames.size();
+            if (!paramNames.isEmpty()) {
+                needsFun2 = true;
+            }
+            if (localData.inMethod) {
+                //needsFun2 = true;
+            }
+            if (localData.inFunction > 1) {
+                needsFun2 = true;
+            }        
         }
 
         //If the function parameter or local variable is used in inner function, 
@@ -547,12 +551,12 @@ public class FunctionActionItem extends ActionItem {
                 }
             }
         }        
-        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
+        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, asGenerator.getSwfVersion()).length;
         if (len > 0xFFFF) {
             throw new CompilationException("Function body is too large to fit into UI16.", line);
         }
-        if (!needsFun2 && paramNames.isEmpty()) {
-            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION, charset));
+        if (!needsFun2) {
+            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, charset));
         } else {
             ret.add(0, new ActionDefineFunction2(functionName,
                     preloadParentFlag,
@@ -564,7 +568,7 @@ public class FunctionActionItem extends ActionItem {
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    regCount, len, SWF.DEFAULT_VERSION, paramNames, paramRegs, charset));
+                    regCount, len, paramNames, paramRegs, charset));
         }
 
         return ret;

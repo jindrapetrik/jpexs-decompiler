@@ -91,10 +91,9 @@ public class ActionPush extends Action {
      *
      * @param actionLength Action length
      * @param sis SWF input stream
-     * @param version SWF version
      * @throws IOException On I/O error
      */
-    public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionPush(int actionLength, SWFInputStream sis) throws IOException {
         super(0x96, actionLength, sis.getCharset());
         int type;
         values = new ArrayList<>();

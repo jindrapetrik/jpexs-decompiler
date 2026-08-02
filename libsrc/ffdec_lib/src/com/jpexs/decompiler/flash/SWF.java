@@ -3802,7 +3802,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(code.getCharset()), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool(), swf, new LinkedHashSet<>())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(code.getCharset(), code.version), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool(), swf, new LinkedHashSet<>())));
             }
             if (ins.isExit()) {
                 break;
@@ -4887,7 +4887,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 throw ex;
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Reading action list error in " + src.getSwf().getShortPathTitle() + ":" + src.getScriptName(), ex);
-                return new ActionList(src.getSwf().getCharset());
+                return new ActionList(src.getSwf().getCharset(), src.getSwf().version);
             }
         }
     }

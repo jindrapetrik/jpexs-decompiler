@@ -99,7 +99,7 @@ public class WithActionItem extends ActionItem {
                 dataA.add((Action) s);
             }
         }
-        int codeLen = Action.actionsToBytes(dataA, false, SWF.DEFAULT_VERSION).length;
+        int codeLen = Action.actionsToBytes(dataA, false, asGenerator.getSwfVersion()).length;
         return toSourceMerge(localData, generator, scope, new ActionWith(codeLen, charset), data);
     }
 
