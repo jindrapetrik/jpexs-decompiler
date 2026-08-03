@@ -122,12 +122,12 @@ public class IdentifiersDeobfuscation {
     /**
      * Valid name pattern with dot.
      */
-    private static final Pattern VALID_NAME_PATTERN_DOT = Pattern.compile("^[a-zA-Z_\\$][a-zA-Z0-9_.\\$]*$");
+    private static final Pattern VALID_NAME_PATTERN_DOT = Pattern.compile("^[a-zA-Z_\\$][a-zA-Z0-9_\\$]*(\\.[a-zA-Z_\\$][a-zA-Z0-9_\\$]*)*$");
 
     /**
      * Identifier pattern with dot.
      */
-    private static final Pattern IDENTIFIER_PATTERN_DOT = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + ".]*$");
+    private static final Pattern IDENTIFIER_PATTERN_DOT = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*(\\.[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*)*$");
 
     /**
      * Random name generator characters.
