@@ -878,16 +878,22 @@ public class View {
     public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {
         try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             //method does not exist, we must be on Java8
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex.getCause());           
+            return 0;
         }
 
         //Try older method
         Point p = new Point((int) Math.round(pt.getX()), (int) Math.round(pt.getY()));
         try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex);
+            return 0;
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex.getCause());           
             return 0;
         }
     }
@@ -917,15 +923,29 @@ public class View {
     public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {
         try {
             return (Rectangle2D) JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            //method does not exist, we must be on Java8
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            //method does not exist, we must be on Java8                               
+        } catch (InvocationTargetException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BadLocationException) {
+                throw (BadLocationException) cause;
+            }
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentModelToView", cause);
+            return null;
         }
 
         //Try older method
         try {
             return (Rectangle) JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } catch (InvocationTargetException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BadLocationException) {
+                throw (BadLocationException) cause;
+            }
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentModelToView", cause);
             return null;
         }
     }
@@ -943,15 +963,21 @@ public class View {
     public static Rectangle2D textUIModelToView(TextUI textUi, JTextComponent t, int pos, Position.Bias bias) throws BadLocationException {
         try {
             return (Rectangle2D) TextUI.class.getDeclaredMethod("modelToView2D", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             //method does not exist, we must be on Java8
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textUIModelToView", ex.getCause());
+            return null;
         }
 
         //Try older method
         try {
             return (Rectangle) TextUI.class.getDeclaredMethod("modelToView", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE,  "Exception while calling textUIModelToView", ex);
+            return null;
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textUIModelToView", ex.getCause());
             return null;
         }
     }

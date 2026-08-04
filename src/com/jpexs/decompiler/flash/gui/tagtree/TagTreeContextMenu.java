@@ -2501,8 +2501,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
                 mainPanel.handleCreateFromFile(t, createNodeType);
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-                    | IllegalArgumentException | InvocationTargetException ex) {
+                    | IllegalArgumentException ex) {
                 logger.log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex.getCause());
             }
         }
     }
@@ -2550,9 +2552,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
             mainPanel.handleCreateFromFile(t, createNodeType);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-                | IllegalArgumentException | InvocationTargetException ex) {
+                | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }
+        } catch (InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex.getCause());
+        }        
     }
 
     private void addTagAfterActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl, TreeNodeType createNodeType) {
@@ -2600,9 +2604,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
             mainPanel.handleCreateFromFile(t, createNodeType);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-                | IllegalArgumentException | InvocationTargetException ex) {
+                | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }
+        } catch (InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex.getCause());
+        }  
     }
 
     private int checkUniqueCharacterId(Tag tag) {
@@ -5310,8 +5316,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.refreshTree(swf);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-                | IllegalArgumentException | InvocationTargetException ex) {
+                | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex.getCause());
         }
     }
 
