@@ -533,12 +533,16 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (!isProperty) {
             for (DottedChain imp : importedClasses) {
                 if (imp.equals(name)) {
-                    AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
-                    if (ti != null) {
-                        ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(new TypeItem(imp));
-                        ret.assignedValue = assignedValue;
-                        resolved = ret;
-                        return resolvedRoot = ret;
+                    TypeItem importedItem = new TypeItem(imp);
+                    AbcIndexing.ClassIndex ci = abc.findClass(importedItem, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
+                    if (ci == null) {
+                        AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                        if (ti != null) {
+                            ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(importedItem);
+                            ret.assignedValue = assignedValue;
+                            resolved = ret;
+                            return resolvedRoot = ret;
+                        }
                     }
                 }
 
