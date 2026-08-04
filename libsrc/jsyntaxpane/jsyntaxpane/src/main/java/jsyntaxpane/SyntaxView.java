@@ -199,7 +199,8 @@ public class SyntaxView extends PlainView {
         int p0 = line.getStartOffset();
         Segment s = new Segment();
         doc.getText(p0, pos - p0, s);
-        int xOffs = UniTools.getTabbedTextWidth(getContainer().getGraphics(), s, tabBase, this,p0);
+        Graphics g = getContainer().getGraphics();
+        int xOffs = g == null ? 0 : UniTools.getTabbedTextWidth(g, s, tabBase, this,p0);
         //System.err.println("calling Utilities.getTabbedTextWidth from normal: x = " + tabBase + ", startOffset = "+(p0));                    
         /*int xOffs2 = Utilities.getTabbedTextWidth(s, metrics, tabBase, this,p0);
         System.err.println("result = " + xOffs2);
@@ -266,7 +267,8 @@ public class SyntaxView extends PlainView {
                     Segment s = new Segment();
                     doc.getText(p0, p1 - p0, s);
                     int tabBase = alloc.x;
-                    int offs = p0 + UniTools.getTabbedTextOffset(getContainer().getGraphics(), s, metrics,
+                    Graphics g = getContainer().getGraphics();
+                    int offs = g == null ? 0 : p0 + UniTools.getTabbedTextOffset(g, s, metrics,
                                                                   tabBase, x, this, p0);
                     //SegmentCache.releaseSharedSegment(s);
                     return offs;
