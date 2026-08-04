@@ -532,6 +532,16 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         //Search for types in imported classes
         if (!isProperty) {
             for (DottedChain imp : importedClasses) {
+                if (imp.equals(name)) {
+                    AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                    if (ti != null) {
+                        ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(new TypeItem(imp));
+                        ret.assignedValue = assignedValue;
+                        resolved = ret;
+                        return resolvedRoot = ret;
+                    }
+                }
+
                 String impName = imp.getLast();
 
                 if (impName.equals(name.get(0))) {
