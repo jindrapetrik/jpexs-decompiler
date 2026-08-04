@@ -417,9 +417,12 @@ public abstract class Trait implements Cloneable, Serializable {
             DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
         }
         List<DottedChain> imports = new ArrayList<>();
+        List<String> builtInClassesList = Arrays.asList(builtInClasses);
         for (Dependency d : dependencies) {
             if (!imports.contains(d.getId())) {
-                imports.add(d.getId());
+                if (!builtInClassesList.contains(d.getId().toRawString())) { 
+                    imports.add(d.getId());
+                }
             }
         }
 
@@ -456,7 +459,7 @@ public abstract class Trait implements Cloneable, Serializable {
             DottedChain ipath = imports.get(i);
             DottedChain pkg = ipath.getWithoutLast();
 
-            if (pkg.equals(ignorePackage)) {
+            if (pkg.equals(ignorePackage) && !ignorePackage.isTopLevel()) {
                 imports.remove(i);
                 i--;
             }

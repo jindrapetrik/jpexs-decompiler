@@ -395,6 +395,33 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     }
 
     @Test
+    public void testImports3() {
+        decompileScriptPack("standard", "tests_classes.TestImports3", "package tests_classes\n"
+                + "{\n"
+                + "   import flash.utils.getTimer;\n"
+                + "   \n"
+                + "   public class TestImports3\n"
+                + "   {\n"
+                + "      \n"
+                + "      public function TestImports3()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public static function getTimer() : Number\n"
+                + "      {\n"
+                + "         return 0;\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function run() : *\n"
+                + "      {\n"
+                + "         return flash.utils.getTimer();\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
     public void testInitializer() {
         decompileScriptPack("standard", "tests_classes.TestInitializer", "package tests_classes\n"
                 + "{\n"
