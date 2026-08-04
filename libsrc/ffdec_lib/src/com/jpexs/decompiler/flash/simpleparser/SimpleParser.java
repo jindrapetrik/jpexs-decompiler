@@ -272,7 +272,12 @@ public interface SimpleParser {
                         definitionToSubType.put(v.position, v.subType);
                     }
                 } else {
-                    if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
+                    if (v instanceof Import) {
+                        Path fullName = ((Import) v).getFullName();
+                        if (externalFullTypes.contains(fullName)) {
+                            referenceToExternalTypeIndex.put(v.position, externalFullTypes.indexOf(fullName));
+                        }
+                    } else if (!privateVarFullNameToDefinitionPosition.containsKey(v.name)
                             && !privateVarNameToDefinitionPosition.containsKey(v.name)) {
 
                         if (externalFullTypes.contains(v.name)) {
