@@ -209,7 +209,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             writer.append("]");
         } else {
             AVM2ConstantPool constants = localData.constantsAvm2;
-            List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
+            List<DottedChain> fullyQualifiedNames = afterDot ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
                 String simpleName = constants.getMultiname(multinameIndex).getName(new HashSet<>(), localData.abc, constants, fullyQualifiedNames, true, false);
                 if ("*".equals(simpleName)) {
