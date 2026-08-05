@@ -967,7 +967,7 @@ public class Graph {
         if (localData.secondPassData == null) {
             SecondPassData secondPassData = prepareSecondPass(localData, loops, throwStates, ret);
             if (secondPassData != null) {
-                throw new SecondPassException(secondPassData);
+                throw new SecondPassException(secondPassData, ret);
             }
         }
 

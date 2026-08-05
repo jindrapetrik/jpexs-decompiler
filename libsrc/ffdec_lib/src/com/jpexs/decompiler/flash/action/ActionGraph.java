@@ -64,6 +64,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SecondPassData;
+import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -251,6 +252,41 @@ public class ActionGraph extends Graph {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+        ActionSecondPassContext context = ActionSecondPassContext.current();
+        if (context != null && secondPassData == null) {
+            ActionSecondPassContext.GraphKey key = context.getKey(code, startIp, path);
+            if (context.isCollecting()) {
+                try {
+                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                } catch (SecondPassException spe) {
+                    context.put(key, spe.getData());
+                    return spe.getFirstPassResult();
+                }
+            }
+
+            SecondPassData collectedData = context.get(key);
+            if (collectedData == null) {
+                HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
+                HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
+                context.startCollecting();
+                try {
+                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                } finally {
+                    context.startRendering();
+                }
+                variables.clear();
+                variables.putAll(variablesBackup);
+                functions.clear();
+                functions.putAll(functionsBackup);
+                collectedData = context.get(key);
+            }
+            secondPassData = collectedData;
+        }
+
+        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+    }
+
+    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
         ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits, usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
         g.init(localData);
