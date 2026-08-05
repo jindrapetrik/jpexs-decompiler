@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.graph;
 
+import java.util.List;
+
 /**
  * Second pass exception.
  *
@@ -29,12 +31,28 @@ public class SecondPassException extends RuntimeException {
     private final SecondPassData data;
 
     /**
+     * Result produced by the first pass.
+     */
+    private final List<GraphTargetItem> firstPassResult;
+
+    /**
      * Constructs a new SecondPassException.
      *
      * @param data Second pass data
      */
     public SecondPassException(SecondPassData data) {
+        this(data, null);
+    }
+
+    /**
+     * Constructs a new SecondPassException.
+     *
+     * @param data Second pass data
+     * @param firstPassResult Result produced by the first pass
+     */
+    public SecondPassException(SecondPassData data, List<GraphTargetItem> firstPassResult) {
         this.data = data;
+        this.firstPassResult = firstPassResult;
     }
 
     /**
@@ -44,6 +62,15 @@ public class SecondPassException extends RuntimeException {
      */
     public SecondPassData getData() {
         return data;
+    }
+
+    /**
+     * Gets the result produced by the first pass.
+     *
+     * @return First pass result, or null when not provided
+     */
+    public List<GraphTargetItem> getFirstPassResult() {
+        return firstPassResult;
     }
 
 }
