@@ -39,6 +39,7 @@ import com.jpexs.helpers.SerializableImage;
  * @author JPEXS, Josh Tynjala
  */
 public class AS3ShapeExporter extends ShapeExporterBase {
+
     /**
      * Shape data
      */
@@ -116,6 +117,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     /**
      * Gets shape data.
+     *
      * @return Shape data
      */
     public String getShapeData() {
@@ -124,6 +126,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     /**
      * Constructor.
+     *
      * @param windingRule Winding rule
      * @param shapeNum Shape number
      * @param basicFill Basic fill
@@ -213,11 +216,13 @@ public class AS3ShapeExporter extends ShapeExporterBase {
                 break;
         }
         shapeData.append(", ");
-        
+
         // colors
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(colorToHexString(gradientRecords[i].color));
         }
         shapeData.append("], ");
@@ -225,7 +230,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         // alpha
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(colorToAlpha(gradientRecords[i].color));
         }
         shapeData.append("], ");
@@ -233,18 +240,20 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         // ratios
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(gradientRecords[i].ratio);
         }
         shapeData.append("], ");
 
         shapeData.append("new Matrix(");
         shapeData.append(matrix.scaleX / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew0 / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew1 / unitDivisor).append(", ")
-                 .append(matrix.scaleY / unitDivisor).append(", ")
-                 .append(matrix.translateX / unitDivisor).append(", ")
-                 .append(matrix.translateY / unitDivisor);
+                .append(matrix.rotateSkew0 / unitDivisor).append(", ")
+                .append(matrix.rotateSkew1 / unitDivisor).append(", ")
+                .append(matrix.scaleY / unitDivisor).append(", ")
+                .append(matrix.translateX / unitDivisor).append(", ")
+                .append(matrix.translateY / unitDivisor);
         shapeData.append("), ");
 
         switch (spreadMethod) {
@@ -283,11 +292,11 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
         shapeData.append("new Matrix(");
         shapeData.append(matrix.scaleX / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew0 / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew1 / unitDivisor).append(", ")
-                 .append(matrix.scaleY / unitDivisor).append(", ")
-                 .append(matrix.translateX / unitDivisor).append(", ")
-                 .append(matrix.translateY / unitDivisor);
+                .append(matrix.rotateSkew0 / unitDivisor).append(", ")
+                .append(matrix.rotateSkew1 / unitDivisor).append(", ")
+                .append(matrix.scaleY / unitDivisor).append(", ")
+                .append(matrix.translateX / unitDivisor).append(", ")
+                .append(matrix.translateY / unitDivisor);
         shapeData.append("), ");
 
         shapeData.append(repeat);
@@ -308,12 +317,11 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         thickness /= SWF.unitDivisor;
 
         shapeData.append("shape.graphics.lineStyle(");
-        shapeData.append(thickness).append(", ");        
+        shapeData.append(thickness).append(", ");
         shapeData.append(colorToHexString(color)).append(", ");
         shapeData.append(colorToAlpha(color)).append(", ");
         shapeData.append(pixelHinting).append(", ");
-        switch (scaleMode)
-        {
+        switch (scaleMode) {
             case "VERTICAL":
                 shapeData.append("LineScaleMode.VERTICAL").append(", ");
                 break;
@@ -366,11 +374,13 @@ public class AS3ShapeExporter extends ShapeExporterBase {
                 break;
         }
         shapeData.append(", ");
-        
+
         // colors
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(colorToHexString(gradientRecords[i].color));
         }
         shapeData.append("], ");
@@ -378,7 +388,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         // alpha
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(colorToAlpha(gradientRecords[i].color));
         }
         shapeData.append("], ");
@@ -386,18 +398,20 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         // ratios
         shapeData.append("[");
         for (int i = 0; i < gradientRecords.length; i++) {
-            if (i > 0) shapeData.append(", ");
+            if (i > 0) {
+                shapeData.append(", ");
+            }
             shapeData.append(gradientRecords[i].ratio);
         }
         shapeData.append("], ");
 
         shapeData.append("new Matrix(");
         shapeData.append(matrix.scaleX / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew0 / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew1 / unitDivisor).append(", ")
-                 .append(matrix.scaleY / unitDivisor).append(", ")
-                 .append(matrix.translateX / unitDivisor).append(", ")
-                 .append(matrix.translateY / unitDivisor);
+                .append(matrix.rotateSkew0 / unitDivisor).append(", ")
+                .append(matrix.rotateSkew1 / unitDivisor).append(", ")
+                .append(matrix.scaleY / unitDivisor).append(", ")
+                .append(matrix.translateX / unitDivisor).append(", ")
+                .append(matrix.translateY / unitDivisor);
         shapeData.append("), ");
 
         switch (spreadMethod) {
@@ -436,11 +450,11 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
         shapeData.append("new Matrix(");
         shapeData.append(matrix.scaleX / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew0 / unitDivisor).append(", ")
-                 .append(matrix.rotateSkew1 / unitDivisor).append(", ")
-                 .append(matrix.scaleY / unitDivisor).append(", ")
-                 .append(matrix.translateX / unitDivisor).append(", ")
-                 .append(matrix.translateY / unitDivisor);
+                .append(matrix.rotateSkew0 / unitDivisor).append(", ")
+                .append(matrix.rotateSkew1 / unitDivisor).append(", ")
+                .append(matrix.scaleY / unitDivisor).append(", ")
+                .append(matrix.translateX / unitDivisor).append(", ")
+                .append(matrix.translateY / unitDivisor);
         shapeData.append("), ");
 
         shapeData.append(repeat);
@@ -457,7 +471,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         y += deltaY;
         shapeData.append("shape.graphics.moveTo(");
         shapeData.append(Helper.doubleStr(x / unitDivisor)).append(", ")
-                 .append(Helper.doubleStr(y / unitDivisor));
+                .append(Helper.doubleStr(y / unitDivisor));
         shapeData.append(");\r\n");
     }
 
@@ -467,7 +481,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         y += deltaY;
         shapeData.append("shape.graphics.lineTo(");
         shapeData.append(Helper.doubleStr(x / unitDivisor)).append(", ")
-                 .append(Helper.doubleStr(y / unitDivisor));
+                .append(Helper.doubleStr(y / unitDivisor));
         shapeData.append(");\r\n");
     }
 
@@ -479,9 +493,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         anchorY += deltaY;
         shapeData.append("shape.graphics.curveTo(");
         shapeData.append(Helper.doubleStr(controlX / unitDivisor)).append(", ")
-                 .append(Helper.doubleStr(controlY / unitDivisor)).append(", ")
-                 .append(Helper.doubleStr(anchorX / unitDivisor)).append(", ")
-                 .append(Helper.doubleStr(anchorY / unitDivisor));
+                .append(Helper.doubleStr(controlY / unitDivisor)).append(", ")
+                .append(Helper.doubleStr(anchorX / unitDivisor)).append(", ")
+                .append(Helper.doubleStr(anchorY / unitDivisor));
         shapeData.append(");\r\n");
     }
 }
