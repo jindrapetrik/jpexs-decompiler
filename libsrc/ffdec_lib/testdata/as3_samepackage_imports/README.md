@@ -2,9 +2,13 @@
 
 Minimal SWF used by `ActionScript3SamePackageImportTest`.
 
-A public class and a file-private helper live in the same script. The helper
-references another public type from the same package, so the decompiler must
-emit an `import` for that type outside the `package { }` block.
+Covers traits written outside the `package { }` block:
+
+- file-private **classes** that reference same-package public types
+  (`Outer` / `Helper` / `SharedType`)
+- file-private **script functions** (stored as `TraitSlotConst` + `newfunction`
+  in script_init) that need other-package imports (`WithScriptFun`)
+- public-only classes must not get a trailing self-import (`SharedType`)
 
 Rebuild (optional, requires AIR/Flex SDK):
 

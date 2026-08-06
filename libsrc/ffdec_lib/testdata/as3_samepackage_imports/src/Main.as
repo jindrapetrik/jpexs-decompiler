@@ -2,6 +2,7 @@ package
 {
    import flash.display.Sprite;
    import tests_classes.samepkg.Outer;
+   import tests_classes.samepkg.WithScriptFun;
 
    public class Main extends Sprite
    {
@@ -9,6 +10,7 @@ package
       {
          super();
          new Outer();
+         new WithScriptFun();
       }
    }
 }

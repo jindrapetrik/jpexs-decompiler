@@ -152,6 +152,47 @@ public class DependencyParser {
     }
 
     /**
+     * Parses dependencies from nested newfunction bodies in a method only.
+     * Used for script initializers: file-private script functions are wired via
+     * newfunction there, while the rest of script_init only registers the public
+     * class and must not contribute imports.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abcIndex AbcIndexing
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param method_index Method index
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @param numberContextRef Number context reference
+     * @throws InterruptedException On interrupt
+     */
+    public static void parseDependenciesFromNewFunctionsInMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        if ((method_index < 0) || (method_index >= abc.method_info.size())) {
+            return;
+        }
+        MethodBody body = abc.findBody(method_index);
+        if (body == null || body.convertException != null) {
+            return;
+        }
+        body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
+        List<Integer> visitedMethods = new ArrayList<>();
+        for (AVM2Instruction ins : body.getCode().code) {
+            if (ins.definition instanceof NewFunctionIns) {
+                if (ins.operands[0] != method_index && !visitedMethods.contains(ins.operands[0])) {
+                    parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                }
+            }
+        }
+    }
+
+    /**
      * Parses dependencies from method info.
      * 
      * @param usedDeobfuscations Used deobfuscations

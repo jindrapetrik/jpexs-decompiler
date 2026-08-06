@@ -414,7 +414,10 @@ public abstract class Trait implements Cloneable, Serializable {
             trait.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
         }
         if (methodIndex != -1) {
-            DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+            // ScriptPack passes script_init here for file-private functions.
+            // Only nested newfunction bodies contribute imports; the rest of
+            // script_init merely registers the public class.
+            DependencyParser.parseDependenciesFromNewFunctionsInMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
         }
         List<DottedChain> imports = new ArrayList<>();
         List<String> builtInClassesList = Arrays.asList(builtInClasses);
@@ -423,6 +426,25 @@ public abstract class Trait implements Cloneable, Serializable {
                 if (!builtInClassesList.contains(d.getId().toRawString())) { 
                     imports.add(d.getId());
                 }
+            }
+        }
+
+        // Drop pkg.* for packages that define public traits in this script:
+        // the star would otherwise replace the specific same-package imports
+        // that file-private helpers outside package { } need.
+        Set<DottedChain> packagesDefinedInThisScript = new LinkedHashSet<>();
+        for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
+            Multiname stName = st.getName(abc);
+            int stNsKind = stName.getSimpleNamespaceKind(abc.constants);
+            if ((stNsKind == Namespace.KIND_PACKAGE) || (stNsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                packagesDefinedInThisScript.add(stName.getSimpleNamespaceName(abc.constants));
+            }
+        }
+        for (int i = 0; i < imports.size(); i++) {
+            DottedChain ipath = imports.get(i);
+            if ("*".equals(ipath.getLast()) && packagesDefinedInThisScript.contains(ipath.getWithoutLast())) {
+                imports.remove(i);
+                i--;
             }
         }
 

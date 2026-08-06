@@ -30,7 +30,9 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.IOException;
 import java.util.Arrays;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -88,7 +90,6 @@ public class ActionScript3SamePackageImportTest extends ActionScript3DecompileTe
                 + "   }\n"
                 + "}\n"
                 + "\n"
-                + "import tests_classes.samepkg.Outer;\n"
                 + "import tests_classes.samepkg.SharedType;\n"
                 + "\n"
                 + "class Helper\n"
@@ -109,5 +110,69 @@ public class ActionScript3SamePackageImportTest extends ActionScript3DecompileTe
                 + "}";
 
         assertEquals(cleanPCode(writer.toString()), cleanPCode(expected));
+    }
+
+    @Test
+    public void testPublicOnlyClassHasNoTrailingSamePackageSelfImport() {
+        Configuration.decompilationTimeoutFile.set(5 * 60);
+        Configuration.decompilationTimeoutSingleMethod.set(60);
+
+        ScriptPack scriptPack = null;
+        ABC abc = null;
+        SWF swf = getSwf("samepkg");
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DoABC2Tag) {
+                abc = ((DoABC2Tag) t).getABC();
+                scriptPack = abc.findScriptPackByPath("tests_classes.samepkg.SharedType", Arrays.asList(abc));
+                if (scriptPack != null) {
+                    break;
+                }
+            }
+        }
+        assertNotNull(scriptPack);
+
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        try {
+            scriptPack.toSource(swf.getAbcIndex(), writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false, false);
+        } catch (InterruptedException ex) {
+            fail(ex.getMessage());
+        }
+        writer.finishHilights();
+
+        String actual = cleanPCode(writer.toString());
+        assertFalse(actual.contains("import tests_classes.samepkg.SharedType"), actual);
+    }
+
+    @Test
+    public void testFilePrivateScriptFunctionKeepsOtherPackageImports() {
+        Configuration.decompilationTimeoutFile.set(5 * 60);
+        Configuration.decompilationTimeoutSingleMethod.set(60);
+
+        ScriptPack scriptPack = null;
+        ABC abc = null;
+        SWF swf = getSwf("samepkg");
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DoABC2Tag) {
+                abc = ((DoABC2Tag) t).getABC();
+                scriptPack = abc.findScriptPackByPath("tests_classes.samepkg.WithScriptFun", Arrays.asList(abc));
+                if (scriptPack != null) {
+                    break;
+                }
+            }
+        }
+        assertNotNull(scriptPack);
+
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        try {
+            scriptPack.toSource(swf.getAbcIndex(), writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false, false);
+        } catch (InterruptedException ex) {
+            fail(ex.getMessage());
+        }
+        writer.finishHilights();
+
+        String actual = cleanPCode(writer.toString());
+        assertTrue(actual.contains("import flash.geom.Point"), actual);
+        assertTrue(actual.contains("function helper"), actual);
+        assertFalse(actual.contains("import tests_classes.samepkg.WithScriptFun"), actual);
     }
 }
