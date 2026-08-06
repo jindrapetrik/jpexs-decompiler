@@ -1888,8 +1888,17 @@ public class AVM2Graph extends Graph {
                     }
                 }
                 if (lookupSwitchPart != null) {
-                    stack.push(firstSet);
-                    return ret;
+                    boolean lookupSwitchIsInLoop = false;
+                    for (Loop loop : loops) {
+                        if (loop.loopBody.contains(lookupSwitchPart)) {
+                            lookupSwitchIsInLoop = true;
+                            break;
+                        }
+                    }
+                    if (lookupSwitchIsInLoop) {
+                        stack.push(firstSet);
+                        return ret;
+                    }
                 }
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;

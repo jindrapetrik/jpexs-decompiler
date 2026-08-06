@@ -1613,6 +1613,7 @@ public class Graph {
                     }
                 }
                 if (hasContinues && !supportsLabeledBreaksAndContinues()) {
+                    boolean loopControlMoved = false;
                     if (breakCaseIndex > -1 && isDefaultOnlyCase(swi, breakCaseIndex)) {
                         List<GraphTargetItem> defaultCommands = swi.caseCommands.get(breakCaseIndex);
                         if (!defaultCommands.isEmpty()) {
@@ -1621,10 +1622,13 @@ public class Graph {
                                 defaultCommands.remove(defaultCommands.size() - 1);
                                 fixSwitchEnd(swi);
                                 list.add(i + 1, lastCommand);
+                                loopControlMoved = true;
                             }
                         }
                     }
-                    continue loopi;
+                    if (loopControlMoved) {
+                        continue loopi;
+                    }
                 }
                 if (hasContinues) {
                     for (int c = 0; c < swi.caseCommands.size(); c++) {
