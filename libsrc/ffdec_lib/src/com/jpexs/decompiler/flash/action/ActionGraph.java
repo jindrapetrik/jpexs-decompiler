@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -71,7 +70,9 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
@@ -103,6 +104,11 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class ActionGraph extends Graph {
+
+    /**
+     * Labels whose unreachable goto was removed.
+     */
+    private final Set<String> labelsOfRemovedGotos = new HashSet<>();
 
     /**
      * Inside DoInitAction
@@ -655,7 +661,56 @@ public class ActionGraph extends Graph {
 
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
+        removeUnreachableGotosAfterTerminalControl(list);
 
+    }
+
+    private void removeUnreachableGotosAfterTerminalControl(List<GraphTargetItem> list) {
+        for (int i = 1; i < list.size(); i++) {
+            GraphTargetItem previous = list.get(i - 1);
+            if (list.get(i) instanceof GotoItem
+                    && (previous instanceof BreakItem
+                    || previous instanceof ContinueItem
+                    || previous instanceof ExitItem)) {
+                String labelName = ((GotoItem) list.get(i)).labelName;
+                if (labelName != null) {
+                    labelsOfRemovedGotos.add(labelName);
+                }
+                list.remove(i);
+                i--;
+            }
+        }
+    }
+
+    @Override
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
+        super.finalProcessAfter(list, level, localData, path);
+        Set<String> usedLabels = new HashSet<>();
+        collectUsedLabels(list, usedLabels);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof LabelItem
+                    && labelsOfRemovedGotos.contains(((LabelItem) item).labelName)
+                    && !usedLabels.contains(((LabelItem) item).labelName)) {
+                list.remove(i);
+            }
+        }
+    }
+
+    private void collectUsedLabels(List<GraphTargetItem> list, Set<String> usedLabels) {
+        for (GraphTargetItem item : list) {
+            if (item instanceof GotoItem) {
+                String labelName = ((GotoItem) item).labelName;
+                if (labelName != null) {
+                    usedLabels.add(labelName);
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    collectUsedLabels(sub, usedLabels);
+                }
+            }
+        }
     }
 
     /**
@@ -989,6 +1044,11 @@ public class ActionGraph extends Graph {
             }
         }
         return ret;
+    }
+
+    @Override
+    protected boolean supportsLabeledBreaksAndContinues() {
+        return false;
     }
 
     private int ipAfterJumps(int nip) {

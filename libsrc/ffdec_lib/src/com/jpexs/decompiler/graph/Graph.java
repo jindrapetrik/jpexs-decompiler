@@ -1608,6 +1608,31 @@ public class Graph {
                             ContinueItem cnt = (ContinueItem) commands.get(commands.size() - 1);
                             if (cnt.loopId == lastLoopId) {
                                 hasContinues = true;
+                            }
+                        }
+                    }
+                }
+                if (hasContinues && !supportsLabeledBreaksAndContinues()) {
+                    if (breakCaseIndex > -1 && isDefaultOnlyCase(swi, breakCaseIndex)) {
+                        List<GraphTargetItem> defaultCommands = swi.caseCommands.get(breakCaseIndex);
+                        if (!defaultCommands.isEmpty()) {
+                            GraphTargetItem lastCommand = defaultCommands.get(defaultCommands.size() - 1);
+                            if (isLoopControl(lastCommand, lastLoopId)) {
+                                defaultCommands.remove(defaultCommands.size() - 1);
+                                fixSwitchEnd(swi);
+                                list.add(i + 1, lastCommand);
+                            }
+                        }
+                    }
+                    continue loopi;
+                }
+                if (hasContinues) {
+                    for (int c = 0; c < swi.caseCommands.size(); c++) {
+                        List<GraphTargetItem> commands = swi.caseCommands.get(c);
+                        if (!commands.isEmpty()) {
+                            GraphTargetItem lastCommand = commands.get(commands.size() - 1);
+                            if (lastCommand instanceof ContinueItem
+                                    && ((ContinueItem) lastCommand).loopId == lastLoopId) {
                                 commands.set(commands.size() - 1, new BreakItem(dialect, null, null, swi.loop.id));
                             }
                         }
@@ -1635,6 +1660,35 @@ public class Graph {
                 processSwitches(((IfItem) item).onFalse, lastLoopId);
             }
         }
+    }
+
+    /**
+     * Checks whether the target language supports labeled break and continue
+     * statements.
+     *
+     * @return True when labeled loop control is supported
+     */
+    protected boolean supportsLabeledBreaksAndContinues() {
+        return true;
+    }
+
+    private boolean isDefaultOnlyCase(SwitchItem switchItem, int commandsIndex) {
+        boolean hasDefault = false;
+        for (int i = 0; i < switchItem.valuesMapping.size(); i++) {
+            if (switchItem.valuesMapping.get(i) == commandsIndex) {
+                if (switchItem.caseValues.get(i) instanceof DefaultItem) {
+                    hasDefault = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return hasDefault;
+    }
+
+    private boolean isLoopControl(GraphTargetItem item, long loopId) {
+        return (item instanceof BreakItem && ((BreakItem) item).loopId == loopId)
+                || (item instanceof ContinueItem && ((ContinueItem) item).loopId == loopId);
     }
 
     /**
