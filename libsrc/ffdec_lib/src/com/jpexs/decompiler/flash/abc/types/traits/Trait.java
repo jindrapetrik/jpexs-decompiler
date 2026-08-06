@@ -413,8 +413,42 @@ public abstract class Trait implements Cloneable, Serializable {
             }
             trait.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
         }
+        // Types referenced by the traits themselves (incl. file-private helpers).
+        // Used below to decide which same-script public types are real deps.
+        Set<DottedChain> depsFromTraits = new LinkedHashSet<>();
+        for (Dependency d : dependencies) {
+            depsFromTraits.add(d.getId());
+        }
         if (methodIndex != -1) {
+            // ScriptPack passes script_init: top-level script code and
+            // file-private functions (via newfunction) both live there.
             DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+
+            // script_init also registers the public class; that must not become
+            // a self-import unless an outside trait / nested function uses it.
+            Set<DottedChain> depsFromNewFunctions = new LinkedHashSet<>();
+            List<Dependency> newFunctionDependencies = new ArrayList<>();
+            DependencyParser.parseDependenciesFromNewFunctionsInMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, newFunctionDependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
+            for (Dependency d : newFunctionDependencies) {
+                depsFromNewFunctions.add(d.getId());
+            }
+            Set<DottedChain> typesDefinedInThisScript = new LinkedHashSet<>();
+            for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
+                Multiname stName = st.getName(abc);
+                int stNsKind = stName.getSimpleNamespaceKind(abc.constants);
+                if ((stNsKind == Namespace.KIND_PACKAGE) || (stNsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                    typesDefinedInThisScript.add(stName.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true));
+                }
+            }
+            for (int i = 0; i < dependencies.size(); i++) {
+                DottedChain id = dependencies.get(i).getId();
+                if (typesDefinedInThisScript.contains(id)
+                        && !depsFromTraits.contains(id)
+                        && !depsFromNewFunctions.contains(id)) {
+                    dependencies.remove(i);
+                    i--;
+                }
+            }
         }
         List<DottedChain> imports = new ArrayList<>();
         List<String> builtInClassesList = Arrays.asList(builtInClasses);
@@ -423,6 +457,25 @@ public abstract class Trait implements Cloneable, Serializable {
                 if (!builtInClassesList.contains(d.getId().toRawString())) { 
                     imports.add(d.getId());
                 }
+            }
+        }
+
+        // Drop pkg.* for packages that define public traits in this script:
+        // the star would otherwise replace the specific same-package imports
+        // that file-private helpers outside package { } need.
+        Set<DottedChain> packagesDefinedInThisScript = new LinkedHashSet<>();
+        for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
+            Multiname stName = st.getName(abc);
+            int stNsKind = stName.getSimpleNamespaceKind(abc.constants);
+            if ((stNsKind == Namespace.KIND_PACKAGE) || (stNsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                packagesDefinedInThisScript.add(stName.getSimpleNamespaceName(abc.constants));
+            }
+        }
+        for (int i = 0; i < imports.size(); i++) {
+            DottedChain ipath = imports.get(i);
+            if ("*".equals(ipath.getLast()) && packagesDefinedInThisScript.contains(ipath.getWithoutLast())) {
+                imports.remove(i);
+                i--;
             }
         }
 
