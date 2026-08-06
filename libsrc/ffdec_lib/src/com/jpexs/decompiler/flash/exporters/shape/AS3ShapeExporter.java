@@ -171,6 +171,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     }
 
     protected String colorToHexString(RGB color) {
+        if (color == null) {
+            return "0x000000";
+        }
         int rgbInt = ((color.red & 0xFF) << 16)
                 | ((color.green & 0xFF) << 8)
                 | (color.blue & 0xFF);
@@ -178,6 +181,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     }
 
     protected float colorToAlpha(RGB color) {
+        if (color == null) {
+            return 0.0f;
+        }
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             double alpha = colorA.alpha / 255.0;
@@ -302,7 +308,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         thickness /= SWF.unitDivisor;
 
         shapeData.append("shape.graphics.lineStyle(");
-        shapeData.append(thickness).append(", ");
+        shapeData.append(thickness).append(", ");        
         shapeData.append(colorToHexString(color)).append(", ");
         shapeData.append(colorToAlpha(color)).append(", ");
         shapeData.append(pixelHinting).append(", ");
