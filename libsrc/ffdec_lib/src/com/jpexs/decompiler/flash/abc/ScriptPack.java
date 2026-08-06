@@ -382,11 +382,24 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (!first) {
             writer.newLine();
         }
-        DottedChain ignorePackage = null;
-        if (isSimple) {
-            ignorePackage = getPathPackage();
+        // Remaining traits are outside the package block (file-private classes /
+        // script functions). They are not in getPathPackage(), so same-package
+        // public types must still be imported (ignorePackage = null).
+        //
+        // Only scan script_init when a TraitSlotConst remains: ASC wires
+        // file-private functions via newfunction there, and top-level script
+        // code shares that initializer. writeImports then drops same-script
+        // public self-imports that only come from class registration.
+        if (!traitList.isEmpty()) {
+            boolean needsScriptInitDeps = false;
+            for (Trait t : traitList) {
+                if (t instanceof TraitSlotConst) {
+                    needsScriptInitDeps = true;
+                    break;
+                }
+            }
+            Trait.writeImports(usedDeobfuscations, traitList, needsScriptInitDeps ? script_init : -1, abcIndex, scriptIndex, -1, true, abc, writer, null, fullyQualifiedNames);
         }
-        Trait.writeImports(usedDeobfuscations, traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
         first = true;
 
         for (int t = 0; t < traitList.size(); t++) {
