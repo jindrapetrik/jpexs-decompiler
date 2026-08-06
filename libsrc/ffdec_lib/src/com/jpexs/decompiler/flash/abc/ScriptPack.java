@@ -382,11 +382,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (!first) {
             writer.newLine();
         }
-        DottedChain ignorePackage = null;
-        if (isSimple) {
-            ignorePackage = getPathPackage();
-        }
-        Trait.writeImports(usedDeobfuscations, traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+        // Remaining traits are written outside the package block (file-private
+        // classes, script functions, ...). They are not in getPathPackage(), so
+        // same-package types must still be imported.
+        Trait.writeImports(usedDeobfuscations, traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, null, fullyQualifiedNames);
         first = true;
 
         for (int t = 0; t < traitList.size(); t++) {
