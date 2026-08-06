@@ -211,6 +211,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
 
     private String recompile(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         str = "package { public class Test {  public static function trace(s){ } public static function test(){ " + str + " }   }  }";
+        return recompileSource(str);
+    }
+
+    private String recompileSource(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         final ABC abc = new ABC(new ABCContainerTag() {
             @Override
             public ABC getABC() {
@@ -1177,6 +1181,33 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "               this.test();\n"
                 + "         }\n"
                 + "         this.testX = 0;\n");
+    }
+
+    @Test
+    public void testStringSwitchCasesContinuingOuterLoop() throws Exception {
+        String res = recompileSource("package { public class Test { public function testLoop() {"
+                + "var result = 0;"
+                + "while (true) {"
+                + "switch (this.getValue()) {"
+                + "case \"a\":"
+                + "result = 1;"
+                + "continue;"
+                + "case \"b\":"
+                + "result = 2;"
+                + "continue;"
+                + "case \"c\":"
+                + "result = 3;"
+                + "continue;"
+                + "}"
+                + "break;"
+                + "}"
+                + "return result;"
+                + "} } }");
+        Assert.assertTrue(res.contains("function testLoop()"), res);
+        Assert.assertTrue(res.contains("case \"a\":"), res);
+        Assert.assertTrue(res.contains("case \"b\":"), res);
+        Assert.assertTrue(res.contains("case \"c\":"), res);
+        Assert.assertFalse(res.contains("§§goto"), res);
     }
 
     // TODO: JPEXS @Test

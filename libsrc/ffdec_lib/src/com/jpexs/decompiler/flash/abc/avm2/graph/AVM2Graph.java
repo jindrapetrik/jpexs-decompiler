@@ -1874,6 +1874,24 @@ public class AVM2Graph extends Graph {
             } catch (GraphPartChangeException gpc) {
                 //ignore
             }
+
+            // Non-integer switches first use strict comparisons
+            // to select an index and then dispatch through a shared lookupswitch.
+            // Leave that pattern for the real switch handler below instead of
+            // mistaking the index-selection comparisons for the source switch.
+            GraphPart lookupSwitchPart = getLinearLookupSwitchTarget(part.nextParts.get(branchNum));
+            if (lookupSwitchPart != null) {
+                for (GraphPart caseBodyPart : caseBodyParts) {
+                    if (getLinearLookupSwitchTarget(caseBodyPart) != lookupSwitchPart) {
+                        lookupSwitchPart = null;
+                        break;
+                    }
+                }
+                if (lookupSwitchPart != null) {
+                    stack.push(firstSet);
+                    return ret;
+                }
+            }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
 
             //It's not switch, it's an If            
@@ -3321,6 +3339,20 @@ public class AVM2Graph extends Graph {
             return false;
         }
         return avm2code.code.get(part.end).definition instanceof LookupSwitchIns;
+    }
+
+    private GraphPart getLinearLookupSwitchTarget(GraphPart part) {
+        Set<GraphPart> visited = new HashSet<>();
+        while (visited.add(part)) {
+            if (partIsSwitch(part)) {
+                return part;
+            }
+            if (part.nextParts.size() != 1) {
+                return null;
+            }
+            part = part.nextParts.get(0);
+        }
+        return null;
     }
 
     /**
