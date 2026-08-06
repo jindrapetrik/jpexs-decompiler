@@ -394,6 +394,7 @@ public class ExportDialog extends AppDialog {
                 case CANVAS:
                 case SWF:
                 case SVG:
+                case AS3:
                     break;
                 default:
                     aaVisible = true;

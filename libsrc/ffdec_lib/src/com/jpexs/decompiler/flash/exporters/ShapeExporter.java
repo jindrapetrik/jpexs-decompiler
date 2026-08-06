@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.shape.AS3ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -180,6 +181,14 @@ public class ShapeExporter {
                                 //FIXME!!! Handle Library Classes
                                 SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
+                            }
+                            break;
+                        case AS3:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                SHAPE shp = st.getShapes();
+                                AS3ShapeExporter exporter = new AS3ShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), 0, 0);
+                                exporter.export();
+                                fos.write(Utf8Helper.getBytes(exporter.getShapeData()));
                             }
                             break;
                         case SWF:
