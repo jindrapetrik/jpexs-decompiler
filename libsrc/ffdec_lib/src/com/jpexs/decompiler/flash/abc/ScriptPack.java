@@ -387,8 +387,9 @@ public class ScriptPack extends AS3ClassTreeItem {
         // public types must still be imported (ignorePackage = null).
         //
         // Only scan script_init when a TraitSlotConst remains: ASC wires
-        // file-private functions via newfunction there (writeImports follows
-        // those nested functions only, not the whole initializer).
+        // file-private functions via newfunction there, and top-level script
+        // code shares that initializer. writeImports then drops same-script
+        // public self-imports that only come from class registration.
         if (!traitList.isEmpty()) {
             boolean needsScriptInitDeps = false;
             for (Trait t : traitList) {
