@@ -2662,6 +2662,17 @@ public class AVM2Code implements Cloneable {
             }
             initClassMultinames.put(-1, initTraits);
 
+            // Activation slots (NEED_ACTIVATION) are method-local; values that
+            // read them must not be promoted to field initializers.
+            List<Multiname> activationMultinames = new ArrayList<>();
+            if (body != null && body.traits != null) {
+                for (Trait t : body.traits.traits) {
+                    if (t.name_index > 0) {
+                        activationMultinames.add(abc.constants.getMultiname(t.name_index));
+                    }
+                }
+            }
+
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -2747,13 +2758,21 @@ public class AVM2Code implements Cloneable {
                                                 //if later slot is referenced, we must add it in constructor instead of direct assignment
                                                 if (item instanceof GetPropertyAVM2Item) {
                                                     Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
-                                                    if (laterMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)) {
+                                                        continue loopi;
+                                                    }
+                                                    if (((GetPropertyAVM2Item) item).object instanceof NewActivationAVM2Item) {
                                                         continue loopi;
                                                     }
                                                 }
                                                 if (item instanceof GetLexAVM2Item) {
                                                     Multiname multiName = ((GetLexAVM2Item) item).propertyName;
-                                                    if (laterMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)) {
+                                                        continue loopi;
+                                                    }
+                                                }
+                                                if (item instanceof GetSlotAVM2Item) {
+                                                    if (((GetSlotAVM2Item) item).slotObject instanceof NewActivationAVM2Item) {
                                                         continue loopi;
                                                     }
                                                 }
