@@ -576,6 +576,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   import flash.events.EventDispatcher;\n"
                 + "   import flash.text.TextField;\n"
                 + "   \n"
+                + "   [SWF(width=\"256\", height=\"256\", backgroundColor=\"#ffffff\", frameRate=\"24\")]\n"
                 + "   public class MainClass extends MovieClip\n"
                 + "   {\n"
                 + "       \n"
