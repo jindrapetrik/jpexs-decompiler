@@ -4,6 +4,7 @@ package
    import flash.events.Event;
    import tests_classes.TestScriptInitializer;
    
+   [SWF(frameRate="24",backgroundColor="#ffffff",width="500",height="375")]
    public class Main extends Sprite
    {
       

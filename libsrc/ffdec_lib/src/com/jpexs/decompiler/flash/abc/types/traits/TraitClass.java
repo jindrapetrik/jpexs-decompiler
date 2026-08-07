@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -170,6 +172,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
         Reference<Boolean> first = new Reference<>(true);
 
         String instanceInfoName = instanceInfoMultiname.getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true);
+
+        // Compile-time [SWF] is not stored in ABC; reconstruct from the SWF header
+        // so recompilation keeps display size / frame rate.
+        if (exportMode == ScriptExportMode.AS) {
+            appendDocumentClassSwfMetadata(usedDeobfuscations, abc, instanceInfoMultiname, writer);
+        }
 
         getMetaData(usedDeobfuscations, this, convertData, abc, writer);
 
@@ -633,6 +641,53 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.unindent();
         writer.appendNoHilight("end ; class").newLine();
         return writer;
+    }
+
+    /**
+     * Emits compile-time {@code [SWF(...)]} for the document class from the SWF
+     * header (display rect, background, frame rate). ASC does not store this
+     * metadata in ABC, so round-trip exports would otherwise fall back to
+     * amxmlc defaults (500×375 @ 24).
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
+     * @param instanceInfoMultiname Instance multiname
+     * @param writer Writer
+     */
+    private void appendDocumentClassSwfMetadata(Set<String> usedDeobfuscations, ABC abc, Multiname instanceInfoMultiname, GraphTextWriter writer) {
+        SWF swf = abc.getSwf();
+        if (swf == null || swf.displayRect == null) {
+            return;
+        }
+        String documentClass = swf.getDocumentClass();
+        if (documentClass == null) {
+            return;
+        }
+        String className = instanceInfoMultiname.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
+        if (!documentClass.equals(className)) {
+            return;
+        }
+
+        int width = (int) Math.round(swf.displayRect.getWidth() / SWF.unitDivisor);
+        int height = (int) Math.round(swf.displayRect.getHeight() / SWF.unitDivisor);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[SWF(width=\"").append(width).append("\", height=\"").append(height).append("\"");
+
+        SetBackgroundColorTag bgTag = swf.getBackgroundColor();
+        if (bgTag != null && bgTag.backgroundColor != null) {
+            sb.append(", backgroundColor=\"").append(bgTag.backgroundColor.toHexRGB()).append("\"");
+        }
+
+        float frameRate = swf.frameRate;
+        String frameRateStr;
+        if (Math.abs(frameRate - Math.round(frameRate)) < 0.001f) {
+            frameRateStr = Integer.toString(Math.round(frameRate));
+        } else {
+            frameRateStr = Float.toString(frameRate);
+        }
+        sb.append(", frameRate=\"").append(frameRateStr).append("\")]");
+        writer.appendNoHilight(sb.toString()).newLine();
     }
 
     /**
