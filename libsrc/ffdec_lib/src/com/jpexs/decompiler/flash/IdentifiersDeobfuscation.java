@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import natorder.NaturalOrderComparator;
 
@@ -66,8 +67,13 @@ public class IdentifiersDeobfuscation {
      * Safe prefix for classes
      */
     public static final String SAFE_CLASS_PREFIX = "_SafeCls_";
-    
-    
+
+    /**
+     * ASC/Flex [Embed] of a .swf invents {@code stem$md5-int} / {@code stem$md5-intByteArray}
+     * class names. The hyphen makes them illegal AS3 identifiers.
+     */
+    private static final Pattern EMBED_DOLLAR_HYPHEN_NAME = Pattern.compile(
+            "^([A-Za-z_][A-Za-z0-9_]*)\\$[0-9a-fA-F]+-[0-9]+(ByteArray)?$");
 
     /**
      * Random number generator.
@@ -204,6 +210,63 @@ public class IdentifiersDeobfuscation {
      * meaning in certain contexts
      */
     public static final String[] syntacticKeywordsAS3 = {"each", "get", "set", "namespace", "include", "dynamic", "final", "native", "override", "static"};
+
+    /**
+     * Suggests a legal AS3 identifier for ASC/Flex embed {@code stem$md5-int}
+     * names, or {@code null} if {@code s} does not match that pattern.
+     * Applied even when {@code autoDeobfuscateIdentifiers} is off — these are
+     * compiler-generated illegal identifiers, not obfuscation.
+     *
+     * @param s Original identifier
+     * @return Suggested name, or null
+     */
+    public static String suggestEmbedDollarHyphenReplacement(String s) {
+        if (s == null) {
+            return null;
+        }
+        Matcher m = EMBED_DOLLAR_HYPHEN_NAME.matcher(s);
+        if (!m.matches()) {
+            return null;
+        }
+        String stem = m.group(1);
+        if (m.group(2) != null) {
+            return stem + "_ByteArray";
+        }
+        return stem;
+    }
+
+    /**
+     * Picks a unique printable replacement for an invalid identifier. Prefers
+     * {@link #suggestEmbedDollarHyphenReplacement(String)} when applicable,
+     * otherwise {@code fallbackPrefix} + map size.
+     *
+     * @param s Original identifier
+     * @param map Existing obfuscated→safe map (values must stay unique)
+     * @param fallbackPrefix Prefix such as {@link #SAFE_CLASS_PREFIX}
+     * @return Replacement identifier
+     */
+    public static String assignDeobfuscatedIdentifier(String s, Map<String, String> map, String fallbackPrefix) {
+        String suggested = suggestEmbedDollarHyphenReplacement(s);
+        if (suggested != null && isValidName(true, suggested) && !isReservedWord(suggested, true)
+                && !isReservedWord2(suggested) && !mapContainsValue(map, suggested) && !map.containsKey(suggested)) {
+            return suggested;
+        }
+        if (suggested != null) {
+            int n = 2;
+            while (n < 1000) {
+                String candidate = suggested + "_" + n;
+                if (isValidName(true, candidate) && !mapContainsValue(map, candidate) && !map.containsKey(candidate)) {
+                    return candidate;
+                }
+                n++;
+            }
+        }
+        return fallbackPrefix + map.size();
+    }
+
+    private static boolean mapContainsValue(Map<String, String> map, String value) {
+        return map.containsValue(value);
+    }
 
     /**
      * Checks if string is reserved word.
@@ -577,6 +640,20 @@ public class IdentifiersDeobfuscation {
      * @return Writer
      */
     public static GraphTextWriter appendObfuscatedIdentifier(SWF swf, Set<String> used, String s, GraphTextWriter writer) {
+        // ASC/Flex embed stem$md5-int: illegal hyphen, not obfuscation — always use stem
+        if (swf != null && suggestEmbedDollarHyphenReplacement(s) != null) {
+            Map<String, String> map = swf.getObfuscatedIdentifiersMap();
+            used.add(s);
+            if (map.containsKey(s)) {
+                writer.append(map.get(s));
+            } else {
+                String ret = assignDeobfuscatedIdentifier(s, map, SAFE_STRING_PREFIX);
+                map.put(s, ret);
+                writer.append(ret);
+            }
+            return writer;
+        }
+
         Map<String, String> map = new LinkedHashMap<>();
         if (Configuration.autoDeobfuscateIdentifiers.get() && swf != null) {
             map = swf.getObfuscatedIdentifiersMap();
@@ -584,7 +661,7 @@ public class IdentifiersDeobfuscation {
             if (map.containsKey(s)) {
                 writer.append(map.get(s));
             } else {
-                String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();
+                String ret = assignDeobfuscatedIdentifier(s, map, SAFE_STRING_PREFIX);
                 map.put(s, ret);
                 writer.append(ret);
             }
@@ -670,8 +747,27 @@ public class IdentifiersDeobfuscation {
             return s;
         }
 
+        // ASC/Flex embed stem$md5-int: illegal hyphen, not obfuscation — always use stem
+        // (independent of autoDeobfuscateIdentifiers)
+        if (as3 && suggestEmbedDollarHyphenReplacement(s) != null) {
+            if (swf != null) {
+                map = swf.getObfuscatedIdentifiersMap();
+            }
+            if (map.containsKey(s)) {
+                used.add(s);
+                String stemRet = map.get(s);
+                nameCache.put(s, stemRet);
+                return stemRet;
+            }
+            String stemRet = assignDeobfuscatedIdentifier(s, map, SAFE_STRING_PREFIX);
+            map.put(s, stemRet);
+            used.add(s);
+            nameCache.put(s, stemRet);
+            return stemRet;
+        }
+
         if (Configuration.autoDeobfuscateIdentifiers.get()) {
-            String ret = IdentifiersDeobfuscation.SAFE_STRING_PREFIX + map.size();            
+            String ret = assignDeobfuscatedIdentifier(s, map, SAFE_STRING_PREFIX);
             map.put(s, ret);
             used.add(s);
             return ret;

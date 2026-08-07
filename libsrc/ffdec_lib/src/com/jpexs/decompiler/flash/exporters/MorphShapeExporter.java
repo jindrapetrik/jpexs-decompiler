@@ -377,9 +377,7 @@ public class MorphShapeExporter {
                 Set<String> classNames = mst.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), mst.getSwf(), true);
-                        }
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), mst.getSwf(), true);
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
                         File classFileStart = new File(outdir + File.separator + Helper.makeFileName(className + ".start" + settings.getFileExtension()));
                         File classFileEnd = new File(outdir + File.separator + Helper.makeFileName(className + ".end" + settings.getFileExtension()));
