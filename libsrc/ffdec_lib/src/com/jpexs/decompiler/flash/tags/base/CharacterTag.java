@@ -139,11 +139,9 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             }
         }
         if (classNames.size() == 1) {
-            if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                result += "_" + DottedChain.parseNoSuffix(classNames.iterator().next()).toPrintableString(new LinkedHashSet<>(), swf, true);
-            } else {
-                result += "_" + classNames.iterator().next();
-            }
+            // Always printable: ASC embed stem$md5-int → stem must match [Embed] source
+            // and class name (independent of autoDeobfuscateIdentifiers).
+            result += "_" + DottedChain.parseNoSuffix(classNames.iterator().next()).toPrintableString(new LinkedHashSet<>(), swf, true);
         }
         return result;
     }

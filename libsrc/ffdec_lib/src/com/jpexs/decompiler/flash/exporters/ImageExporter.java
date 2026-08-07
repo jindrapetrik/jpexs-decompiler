@@ -184,9 +184,7 @@ public class ImageExporter {
                 Set<String> classNames = imageTag.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), imageTag.getSwf(), true);
-                        }
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), imageTag.getSwf(), true);
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + "." + ImageHelper.getImageFormatString(fileFormat)));
                         File classAlphaPngFile = new File(outdir + File.separator + Helper.makeFileName(className + ".alpha.png"));
                         new RetryTask(() -> {

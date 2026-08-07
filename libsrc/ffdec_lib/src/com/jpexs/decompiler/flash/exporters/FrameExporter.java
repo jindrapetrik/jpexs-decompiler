@@ -333,9 +333,7 @@ public class FrameExporter {
             Set<String> classNames = swf.getCharacter(containerId).getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
-                    if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
-                    }
+                    className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
                     paths.add(File.separator + Helper.makeFileName(className) + subPath);
                 }
             } else {

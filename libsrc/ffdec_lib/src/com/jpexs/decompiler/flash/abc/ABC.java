@@ -685,7 +685,7 @@ public class ABC implements Openable {
             }
         }
 
-        map.put(s, prefix + map.size());
+        map.put(s, IdentifiersDeobfuscation.assignDeobfuscatedIdentifier(s, map, prefix));
     }
 
     private void getObfuscatedPackageIdentifier(int strIndex, Map<String, String> map) {
