@@ -2801,8 +2801,16 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 } else if (!isStatic) {
-                    //We will ignore the fact, that in obfuscated code, the constructor can
-                    //start with SetLocal in favor of turning on the deobfuscation...
+                    // Locals before field inits (e.g. pushbyte 0 / setlocal) must not
+                    // abort promotion — but only in the real instance constructor.
+                    // Call sites such as decompileMethod also pass instance_traits as
+                    // initTraits for ordinary methods (initializerType == 0); skipping
+                    // locals there would incorrectly promote later SetProperty.
+                    if (initializerType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER
+                            && ((ti instanceof SetLocalAVM2Item) || (ti instanceof DeclarationAVM2Item))) {
+                        continue loopi;
+                    }
+                    // Stop once real constructor body starts (calls, super, control flow, …).
                     break;
                 }
             }
