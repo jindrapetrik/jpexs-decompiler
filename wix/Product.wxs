@@ -86,6 +86,7 @@
                 Icon="FFDecIcon" />
       <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
       <RegistryValue Root="HKCU" Key="Software\JPEXS\FFDec" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      <RegistryValue Root="HKCU" Key="Software\JPEXS\FFDec" Name="installDir" Type="string" Value="[INSTALLFOLDER]" />
     </Component>
 
     <!-- Desktop Shortcut -->
