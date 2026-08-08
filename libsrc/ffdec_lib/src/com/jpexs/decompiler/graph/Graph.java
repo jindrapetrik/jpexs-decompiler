@@ -1931,6 +1931,169 @@ public class Graph {
                 }
             }
         }
+        // ASC often merges "break" from an inner search loop with the outer
+        // for/for-each continue target. That yields:
+        //   while (true) { if (fail) continue outer; ... if (match) break; }
+        //   after; // only reached via break
+        // Recover while (cond) and move "after" back before breaks so labels
+        // are not required.
+        restructureWhileTrueContinueOuter(list);
+    }
+
+    /**
+     * Restructures {@code while (true) { if (cond) continue outer; ... }}
+     * followed by break-only trailing statements into
+     * {@code while (!cond) { ... trailing before break; }}.
+     *
+     * @param list Commands in the current block
+     */
+    private void restructureWhileTrueContinueOuter(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (!(item instanceof WhileItem)) {
+                continue;
+            }
+            WhileItem whi = (WhileItem) item;
+            if (whi.expression.isEmpty() || !(whi.expression.get(whi.expression.size() - 1) instanceof TrueItem)) {
+                continue;
+            }
+            if (whi.commands.isEmpty() || !(whi.commands.get(0) instanceof IfItem)) {
+                continue;
+            }
+            IfItem ifi = (IfItem) whi.commands.get(0);
+            ContinueItem outerContinue = null;
+            boolean invertCond = false;
+            List<GraphTargetItem> bodyFromIf = null;
+
+            if (ifi.onFalse.isEmpty()
+                    && ifi.onTrue.size() == 1
+                    && ifi.onTrue.get(0) instanceof ContinueItem) {
+                outerContinue = (ContinueItem) ifi.onTrue.get(0);
+                invertCond = true;
+            } else if (ifi.onTrue.isEmpty()
+                    && ifi.onFalse.size() == 1
+                    && ifi.onFalse.get(0) instanceof ContinueItem) {
+                outerContinue = (ContinueItem) ifi.onFalse.get(0);
+                invertCond = false;
+            } else if (ifi.onTrue.size() == 1
+                    && ifi.onTrue.get(0) instanceof ContinueItem
+                    && !ifi.onFalse.isEmpty()) {
+                outerContinue = (ContinueItem) ifi.onTrue.get(0);
+                invertCond = true;
+                bodyFromIf = ifi.onFalse;
+            } else if (ifi.onFalse.size() == 1
+                    && ifi.onFalse.get(0) instanceof ContinueItem
+                    && !ifi.onTrue.isEmpty()) {
+                outerContinue = (ContinueItem) ifi.onFalse.get(0);
+                invertCond = false;
+                bodyFromIf = ifi.onTrue;
+            }
+
+            if (outerContinue == null || outerContinue.loopId == whi.loop.id) {
+                continue;
+            }
+
+            List<GraphTargetItem> after = new ArrayList<>();
+            for (int j = i + 1; j < list.size(); j++) {
+                after.add(list.get(j));
+            }
+            while (!after.isEmpty()
+                    && after.get(after.size() - 1) instanceof ContinueItem
+                    && ((ContinueItem) after.get(after.size() - 1)).loopId == outerContinue.loopId) {
+                after.remove(after.size() - 1);
+            }
+
+            whi.commands.remove(0);
+            if (bodyFromIf != null) {
+                whi.commands.addAll(0, bodyFromIf);
+            }
+
+            // Continues to the same outer target are equivalent to breaking
+            // this while once trailing "after" is only on the break path.
+            changeContinueToBreak(whi.commands, outerContinue.loopId, whi.loop.id);
+
+            int breakCount = countBreaksOfLoop(whi.commands, whi.loop.id);
+            if (!after.isEmpty()) {
+                if (breakCount == 0) {
+                    // Unreachable after the while in this pattern.
+                    after.clear();
+                } else if (breakCount == 1) {
+                    insertBeforeBreaksOfLoop(whi.commands, whi.loop.id, after, false);
+                } else {
+                    insertBeforeBreaksOfLoop(whi.commands, whi.loop.id, after, true);
+                }
+            }
+
+            GraphTargetItem expr = ifi.expression;
+            if (invertCond) {
+                if (expr instanceof LogicalOpItem) {
+                    expr = ((LogicalOpItem) expr).invert(null);
+                } else {
+                    expr = expr.invert(null);
+                }
+            }
+            List<GraphTargetItem> newExpr = new ArrayList<>();
+            newExpr.add(expr);
+            whi.expression = newExpr;
+
+            while (list.size() > i + 1) {
+                list.remove(list.size() - 1);
+            }
+        }
+    }
+
+    /**
+     * Counts {@link BreakItem}s that target {@code loopId} in {@code commands}.
+     *
+     * @param commands Commands
+     * @param loopId Loop id
+     * @return Number of matching breaks
+     */
+    private int countBreaksOfLoop(List<GraphTargetItem> commands, long loopId) {
+        int count = 0;
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
+                count++;
+            }
+            if (ti instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
+                    count += countBreaksOfLoop(sub, loopId);
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Inserts {@code toInsert} immediately before each break of {@code loopId}.
+     *
+     * @param commands Commands
+     * @param loopId Loop id
+     * @param toInsert Statements to insert
+     * @param cloneItems When true, clone items for each break; otherwise move once
+     */
+    private void insertBeforeBreaksOfLoop(List<GraphTargetItem> commands, long loopId, List<GraphTargetItem> toInsert, boolean cloneItems) {
+        for (int i = 0; i < commands.size(); i++) {
+            GraphTargetItem ti = commands.get(i);
+            if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
+                for (int j = 0; j < toInsert.size(); j++) {
+                    GraphTargetItem ins = toInsert.get(j);
+                    commands.add(i + j, cloneItems ? ins.clone() : ins);
+                }
+                i += toInsert.size();
+                if (!cloneItems) {
+                    return;
+                }
+            } else if (ti instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
+                    insertBeforeBreaksOfLoop(sub, loopId, toInsert, cloneItems);
+                    if (!cloneItems && countBreaksOfLoop(sub, loopId) > 0) {
+                        // Moved into this sublist already.
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**
