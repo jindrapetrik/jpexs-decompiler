@@ -80,12 +80,12 @@ public class ActionScript3NestedSearchLoopTest extends ActionScript3DecompileTes
         assertFalse(actual.contains("continue loop0"), actual);
         assertFalse(actual.contains("while(true)"), actual);
 
-        // refresh: splice stays in the match branch of while (i < length)
-        assertTrue(actual.contains("while(_loc2_ < blocked.length)"), actual);
-        assertTrue(actual.contains("blocked.splice(_loc2_,1)"), actual);
+        // removeMatches: splice stays in the match branch of while (i < length)
+        assertTrue(actual.contains("while(_loc2_ < items.length)"), actual);
+        assertTrue(actual.contains("items.splice(_loc2_,1)"), actual);
 
-        // loadOffers: assignment stays before break inside while (i < length)
-        assertTrue(actual.contains("while(_loc4_ < _loc3_.length)"), actual);
-        assertTrue(actual.contains("map[_loc5_.id] = _loc2_"), actual);
+        // fillCache: assignment stays before break inside while (i < length)
+        assertTrue(actual.contains("while(_loc3_ < _loc4_.length)"), actual);
+        assertTrue(actual.contains("cache[_loc2_.key] = _loc5_"), actual);
     }
 }

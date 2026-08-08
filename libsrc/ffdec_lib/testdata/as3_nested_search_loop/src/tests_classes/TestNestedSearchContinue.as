@@ -7,28 +7,28 @@ package tests_classes
     */
    public class TestNestedSearchContinue
    {
-      private var blocked:Array;
-      private var offers:Array;
-      private var map:Object;
+      private var items:Array;
+      private var rows:Array;
+      private var cache:Object;
 
       public function TestNestedSearchContinue()
       {
-         blocked = [];
-         offers = [];
-         map = {};
+         items = [];
+         rows = [];
+         cache = {};
       }
 
-      public function refresh(list:Array):void
+      public function removeMatches(keys:Array):void
       {
          var i:* = 0;
-         for each (var id in list)
+         for each (var key in keys)
          {
             i = 0;
-            while (i < blocked.length)
+            while (i < items.length)
             {
-               if (blocked[i].id == id)
+               if (items[i].key == key)
                {
-                  blocked.splice(i, 1);
+                  items.splice(i, 1);
                   break;
                }
                i++;
@@ -36,24 +36,24 @@ package tests_classes
          }
       }
 
-      public function loadOffers(heroes:Array):void
+      public function fillCache(entries:Array):void
       {
-         var offer:Object = null;
+         var row:Object = null;
          var i:int = 0;
-         var allOffers:Array = offers;
-         for each (var hero in heroes)
+         var allRows:Array = rows;
+         for each (var entry in entries)
          {
-            if (!(hero.hidden && !wantHidden()))
+            if (!(entry.flag && !allowFlagged()))
             {
                i = 0;
-               while (i < allOffers.length)
+               while (i < allRows.length)
                {
-                  offer = allOffers[i];
-                  if (offer.tab == "HERO" && offer.location == "STORE" && !offer.isBundle)
+                  row = allRows[i];
+                  if (row.kind == "TYPE_A" && row.place == "ZONE_B" && !row.grouped)
                   {
-                     if (offer.heroId == hero.id)
+                     if (row.ref == entry.key)
                      {
-                        map[hero.id] = offer;
+                        cache[entry.key] = row;
                         break;
                      }
                   }
@@ -63,7 +63,7 @@ package tests_classes
          }
       }
 
-      private function wantHidden():Boolean
+      private function allowFlagged():Boolean
       {
          return false;
       }
