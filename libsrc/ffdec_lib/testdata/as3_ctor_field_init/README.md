@@ -10,6 +10,11 @@ stay in the constructor body and must not become field initializers such as
 Also keeps a local-register path (`TestCtorFieldInit`) and literal field
 inits (`mLiteral`) that should still be promoted.
 
+`TestCtorDependsOnInstanceSlot` covers ctor assigns that read another
+instance slot set earlier in the same constructor (e.g. `mText = String(mSource)`
+after `mSource = data`). Those must stay in the constructor: field initializers
+run before the ctor body, so the source slot is still null.
+
 ## Rebuild
 
 ```bash

@@ -2753,12 +2753,34 @@ public class AVM2Code implements Cloneable {
                                                     laterMultinames.add(tMultiname);
                                                 }
                                             }
+                                            // Instance slots with no field initializer yet (neither ABC
+                                            // constant nor already promoted) are still null when field
+                                            // inits run — before the constructor body. Ctor assigns that
+                                            // read them (e.g. derived = f(source) after source = arg)
+                                            // must stay in the constructor or they evaluate against null.
+                                            List<Multiname> uninitializedInstanceSlots = new ArrayList<>();
+                                            for (Trait ut : initTraits.traits) {
+                                                if (!(ut instanceof TraitSlotConst)) {
+                                                    continue;
+                                                }
+                                                TraitSlotConst utsc = (TraitSlotConst) ut;
+                                                if (convertData.assignedValues.containsKey(utsc)) {
+                                                    continue;
+                                                }
+                                                if (utsc.value_kind != 0) {
+                                                    continue;
+                                                }
+                                                if (ut.name_index > 0) {
+                                                    uninitializedInstanceSlots.add(abc.constants.getMultiname(ut.name_index));
+                                                }
+                                            }
                                             for (GraphTargetItem item : subItems) {
 
                                                 //if later slot is referenced, we must add it in constructor instead of direct assignment
                                                 if (item instanceof GetPropertyAVM2Item) {
                                                     Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
-                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
+                                                            || uninitializedInstanceSlots.contains(multiName)) {
                                                         continue loopi;
                                                     }
                                                     if (((GetPropertyAVM2Item) item).object instanceof NewActivationAVM2Item) {
@@ -2767,7 +2789,8 @@ public class AVM2Code implements Cloneable {
                                                 }
                                                 if (item instanceof GetLexAVM2Item) {
                                                     Multiname multiName = ((GetLexAVM2Item) item).propertyName;
-                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
+                                                            || uninitializedInstanceSlots.contains(multiName)) {
                                                         continue loopi;
                                                     }
                                                 }
