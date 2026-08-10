@@ -15,6 +15,11 @@ instance slot set earlier in the same constructor (e.g. `mText = String(mSource)
 after `mSource = data`). Those must stay in the constructor: field initializers
 run before the ctor body, so the source slot is still null.
 
+`TestCtorDependsOnBaseSlot` covers the same pattern when the source slot is
+declared on a superclass (`mText = String(mOrigin)` after `mOrigin = origin`).
+Child field initializers run before `super()`, so inherited slots without an
+ABC constant are still at default there.
+
 ## Rebuild
 
 ```bash

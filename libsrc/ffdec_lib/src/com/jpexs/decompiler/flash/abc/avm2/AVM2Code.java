@@ -283,6 +283,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -2673,6 +2674,16 @@ public class AVM2Code implements Cloneable {
                 }
             }
 
+            // Inherited instance slots with no ABC constant are still at default
+            // when child field inits run (before super()). Collected once — they
+            // are never promoted while decompiling this class.
+            List<Multiname> uninitializedInheritedSlots = new ArrayList<>();
+            Set<Integer> uninitializedInheritedSlotNameIndices = new HashSet<>();
+            if (!isStatic) {
+                collectUninitializedInheritedInstanceSlots(abc, classIndex, convertData,
+                        uninitializedInheritedSlots, uninitializedInheritedSlotNameIndices);
+            }
+
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -2753,34 +2764,21 @@ public class AVM2Code implements Cloneable {
                                                     laterMultinames.add(tMultiname);
                                                 }
                                             }
-                                            // Instance slots with no field initializer yet (neither ABC
-                                            // constant nor already promoted) are still null when field
-                                            // inits run — before the constructor body. Ctor assigns that
-                                            // read them (e.g. derived = f(source) after source = arg)
-                                            // must stay in the constructor or they evaluate against null.
+                                            // Same-class slots: rebuild each time so already-promoted
+                                            // traits (e.g. i_b before i_c = i_a + i_b) no longer block.
                                             List<Multiname> uninitializedInstanceSlots = new ArrayList<>();
-                                            for (Trait ut : initTraits.traits) {
-                                                if (!(ut instanceof TraitSlotConst)) {
-                                                    continue;
-                                                }
-                                                TraitSlotConst utsc = (TraitSlotConst) ut;
-                                                if (convertData.assignedValues.containsKey(utsc)) {
-                                                    continue;
-                                                }
-                                                if (utsc.value_kind != 0) {
-                                                    continue;
-                                                }
-                                                if (ut.name_index > 0) {
-                                                    uninitializedInstanceSlots.add(abc.constants.getMultiname(ut.name_index));
-                                                }
-                                            }
+                                            Set<Integer> uninitializedInstanceSlotNameIndices = new HashSet<>();
+                                            collectUninitializedInstanceSlots(abc, initTraits, convertData,
+                                                    uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices);
+                                            uninitializedInstanceSlots.addAll(uninitializedInheritedSlots);
+                                            uninitializedInstanceSlotNameIndices.addAll(uninitializedInheritedSlotNameIndices);
                                             for (GraphTargetItem item : subItems) {
 
                                                 //if later slot is referenced, we must add it in constructor instead of direct assignment
                                                 if (item instanceof GetPropertyAVM2Item) {
                                                     Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
                                                     if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
-                                                            || uninitializedInstanceSlots.contains(multiName)) {
+                                                            || refersToUninitializedInstanceSlot(multiName, uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices)) {
                                                         continue loopi;
                                                     }
                                                     if (((GetPropertyAVM2Item) item).object instanceof NewActivationAVM2Item) {
@@ -2790,7 +2788,7 @@ public class AVM2Code implements Cloneable {
                                                 if (item instanceof GetLexAVM2Item) {
                                                     Multiname multiName = ((GetLexAVM2Item) item).propertyName;
                                                     if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
-                                                            || uninitializedInstanceSlots.contains(multiName)) {
+                                                            || refersToUninitializedInstanceSlot(multiName, uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices)) {
                                                         continue loopi;
                                                     }
                                                 }
@@ -3063,6 +3061,91 @@ public class AVM2Code implements Cloneable {
         injectDeclarations(usedDeobfuscations, 0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
         uniteLocalsDeclarationTypes(d, list);
         return list;
+    }
+
+    /**
+     * Collects instance slot/const traits that still have no initializer
+     * (neither ABC constant nor already promoted).
+     */
+    private static void collectUninitializedInstanceSlots(ABC abc, Traits traits, ConvertData convertData,
+            List<Multiname> outSlots, Set<Integer> outNameIndices) {
+        if (traits == null) {
+            return;
+        }
+        for (Trait ut : traits.traits) {
+            if (!(ut instanceof TraitSlotConst)) {
+                continue;
+            }
+            TraitSlotConst utsc = (TraitSlotConst) ut;
+            if (convertData.assignedValues.containsKey(utsc)) {
+                continue;
+            }
+            if (utsc.value_kind != 0) {
+                continue;
+            }
+            if (ut.name_index > 0) {
+                Multiname mn = abc.constants.getMultiname(ut.name_index);
+                outSlots.add(mn);
+                if (mn.name_index > 0) {
+                    outNameIndices.add(mn.name_index);
+                }
+            }
+        }
+    }
+
+    /**
+     * Walks the superclass chain in the same ABC and collects uninitialized
+     * instance slots. Child field inits run before {@code super()}, so parent
+     * slots without an ABC constant are still at default there.
+     * <p>
+     * Only same-ABC parents are considered: name indices are pool-local, so
+     * matching against traits from another ABC (e.g. playerglobal) would be
+     * meaningless.
+     */
+    private static void collectUninitializedInheritedInstanceSlots(
+            ABC abc, int classIndex, ConvertData convertData,
+            List<Multiname> outSlots, Set<Integer> outNameIndices) {
+        if (classIndex < 0 || classIndex >= abc.instance_info.size()) {
+            return;
+        }
+        Set<Integer> visited = new HashSet<>();
+        int walkClassIndex = classIndex;
+        while (walkClassIndex >= 0 && walkClassIndex < abc.instance_info.size() && visited.add(walkClassIndex)) {
+            InstanceInfo ii = abc.instance_info.get(walkClassIndex);
+            if (walkClassIndex != classIndex) {
+                collectUninitializedInstanceSlots(abc, ii.instance_traits, convertData, outSlots, outNameIndices);
+            }
+            if (ii.super_index <= 0) {
+                break;
+            }
+            Multiname superName = abc.constants.getMultiname(ii.super_index);
+            int parentClassIndex = -1;
+            for (int ci = 0; ci < abc.instance_info.size(); ci++) {
+                if (abc.constants.getMultiname(abc.instance_info.get(ci).name_index).equals(superName)) {
+                    parentClassIndex = ci;
+                    break;
+                }
+            }
+            if (parentClassIndex < 0) {
+                break;
+            }
+            walkClassIndex = parentClassIndex;
+        }
+    }
+
+    /**
+     * Inherited protected/private slots often use a different Multiname
+     * (namespace) than the declaring trait; matching by name index covers that.
+     */
+    private static boolean refersToUninitializedInstanceSlot(Multiname multiName,
+            List<Multiname> uninitializedSlots, Set<Integer> uninitializedNameIndices) {
+        if (multiName == null) {
+            return false;
+        }
+        if (uninitializedSlots.contains(multiName)) {
+            return true;
+        }
+        return multiName.name_index > 0 && uninitializedNameIndices.contains(multiName.name_index);
     }
 
     private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {

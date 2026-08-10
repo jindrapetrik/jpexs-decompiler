@@ -38,9 +38,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Constructor assignments that read activation slots (named params/locals)
- * or other instance slots assigned earlier in the same constructor must stay
- * in the constructor and must not become field initializers.
+ * Constructor assignments that read activation slots (named params/locals),
+ * other instance slots assigned earlier in the same constructor, or inherited
+ * instance slots must stay in the constructor and must not become field
+ * initializers.
  */
 public class ActionScript3CtorFieldInitTest extends ActionScript3DecompileTestBase {
 
@@ -143,5 +144,15 @@ public class ActionScript3CtorFieldInitTest extends ActionScript3DecompileTestBa
         assertTrue(actual.contains("mSource = data"));
         assertTrue(actual.contains("mText = String(mSource)"));
         assertTrue(actual.contains("mNote = mSource == null"));
+    }
+
+    @Test
+    public void testDependsOnInheritedSlotStayInConstructor() {
+        String actual = decompile("tests_classes.TestCtorDependsOnBaseSlot");
+
+        assertFalse(actual.contains("mText:String = String(mOrigin)"));
+        assertTrue(actual.contains("mLiteral:int = 9"));
+        assertTrue(actual.contains("mOrigin = origin"));
+        assertTrue(actual.contains("mText = String(mOrigin)"));
     }
 }
