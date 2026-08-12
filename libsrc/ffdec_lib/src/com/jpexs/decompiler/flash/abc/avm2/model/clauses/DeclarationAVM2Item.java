@@ -90,27 +90,40 @@ public class DeclarationAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
-        if (assignment instanceof LocalRegAVM2Item) { //for..in
+        if (assignment instanceof LocalRegAVM2Item) { //for..in / for each
             LocalRegAVM2Item lti = (LocalRegAVM2Item) assignment;
             String localName = localRegName(localData.abc.getSwf(), localData.localRegNames, lti.regIndex, localData.usedDeobfuscations);
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
             srcData.regIndex = lti.regIndex;
-            srcData.declaredType = DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
+            // Keep convert/coerce-after-nextvalue as for-each var type (e.g. var t:int).
+            if (type != null && !type.equals(TypeItem.UNBOUNDED) && !type.equals(TypeItem.UNKNOWN)) {
+                srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
+                writer.append(":");
+                type.appendTry(writer, localData);
+            } else {
+                srcData.declaredType = DottedChain.ALL;
+            }
             return writer;
         }
 
-        if (assignment instanceof GetSlotAVM2Item) { //for..in
+        if (assignment instanceof GetSlotAVM2Item) { //for..in / for each
             GetSlotAVM2Item sti = (GetSlotAVM2Item) assignment;
             HighlightData srcData = getSrcData();
             srcData.localName = sti.getNameAsStr(localData);
             srcData.declaration = true;
-            srcData.declaredType = DottedChain.ALL;
             writer.append("var ");
             sti.getName(writer, localData);
+            if (type != null && !type.equals(TypeItem.UNBOUNDED) && !type.equals(TypeItem.UNKNOWN)) {
+                srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
+                writer.append(":");
+                type.appendTry(writer, localData);
+            } else {
+                srcData.declaredType = DottedChain.ALL;
+            }
             return writer;
         }
 
