@@ -858,7 +858,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var c:Boolean = true;\r\n"
                 + "var s:int = 5;\r\n"
                 + "var obj:Object = {};\r\n"
-                + "for each(var name in obj)\r\n"
+                + "for each(var name:String in obj)\r\n"
                 + "{\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
@@ -893,7 +893,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testForEachTry() {
         decompileMethod("classic_air", "testForEachTry", "var list:Object = {};\r\n"
                 + "var b:Boolean = true;\r\n"
-                + "for each(var name in list)\r\n"
+                + "for each(var name:String in list)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -961,7 +961,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testForInIf() {
         decompileMethod("classic_air", "testForInIf", "var arr:Array = [\"a\",\"b\",\"c\"];\r\n"
                 + "var b:int = 5;\r\n"
-                + "for(var a in arr)\r\n"
+                + "for(var a:String in arr)\r\n"
                 + "{\r\n"
                 + "if(b == 5)\r\n"
                 + "{\r\n"
@@ -993,7 +993,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testForInSwitch() {
         decompileMethod("classic_air", "testForInSwitch", "var arr:Array = [\"a\",\"b\",\"c\"];\r\n"
-                + "for(var a in arr)\r\n"
+                + "for(var a:String in arr)\r\n"
                 + "{\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"

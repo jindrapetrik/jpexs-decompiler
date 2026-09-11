@@ -190,7 +190,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testForEachCoerced() {
-        decompileMethod("assembled", "testForEachCoerced", "for each(var _loc6_ in someprop)\r\n"
+        decompileMethod("assembled", "testForEachCoerced", "for each(var _loc6_:SomeClass in someprop)\r\n"
                 + "{\r\n"
                 + "_loc6_.methodname(_loc1_,_loc2_,_loc5_);\r\n"
                 + "}\r\n",
