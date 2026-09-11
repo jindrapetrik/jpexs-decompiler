@@ -351,7 +351,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String instanceInfoName = instanceInfo.getName(abc.constants).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true);
         ClassInfo classInfo = abc.class_info.get(class_info);
 
-        AbcIndexing index = new AbcIndexing(abc.getSwf());
+        AbcIndexing index = abc.getSwf() == null ? new AbcIndexing() : abc.getSwf().getLocalAbcIndex();
         //for simplification of String(this)
         int sIndex = abc.constants.getStringId("", false);
         if (sIndex > -1) {
