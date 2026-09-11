@@ -584,6 +584,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private AbcIndexing abcIndex;
 
     /**
+     * ABC indexing of this SWF only (no playerglobal/airglobal parent).
+     */
+    @Internal
+    private AbcIndexing localAbcIndex;
+
+    /**
      * Number of ABCIndex dependencies.
      */
     @Internal
@@ -769,6 +775,21 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public void resetAbcIndex() {
         abcIndex = null;
+        localAbcIndex = null;
+    }
+
+    /**
+     * Gets ABCIndexing object containing only ABCs of this SWF, without
+     * playerglobal/airglobal parent. It is cached, so it can be used from
+     * decompilation of every class instead of creating a new index each time.
+     *
+     * @return ABCIndexing
+     */
+    public synchronized AbcIndexing getLocalAbcIndex() {
+        if (localAbcIndex == null) {
+            localAbcIndex = new AbcIndexing(this);
+        }
+        return localAbcIndex;
     }
 
     /**
@@ -4659,6 +4680,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public void clearAbcListCache() {
         abcList = null;
+        localAbcIndex = null;
     }
 
     /**
