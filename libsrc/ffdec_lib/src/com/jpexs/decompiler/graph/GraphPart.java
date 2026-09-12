@@ -83,7 +83,7 @@ public class GraphPart implements Serializable {
      * @return True if this part leads to the other part
      * @throws InterruptedException On interrupt
      */
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, VisitedGraphParts visited, List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
@@ -172,8 +172,63 @@ public class GraphPart implements Serializable {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, throwStates, firstCanBeLoopContinue);
+        return leadsTo(localData, gr, code, null /*???*/, part, new VisitedGraphParts(code.size()), loops, throwStates, firstCanBeLoopContinue);
         //return gr.partLeadsTo(localData, this, part, code, loops, throwStates, firstCanBeLoopContinue);
+    }
+
+    /**
+     * Visited set optimized for regular graph parts, whose start is an
+     * instruction index. Unusual synthetic parts and duplicate starts retain
+     * full GraphPart equality through fallback sets.
+     */
+    private static final class VisitedGraphParts {
+
+        private static final int MAX_INDEXED_STARTS = 1 << 16;
+
+        private final int[] endByStart;
+        private HashSet<Long> duplicateStarts;
+        private HashSet<GraphPart> syntheticParts;
+
+        VisitedGraphParts(int codeSize) {
+            endByStart = new int[Math.min(codeSize, MAX_INDEXED_STARTS)];
+        }
+
+        boolean contains(GraphPart part) {
+            if (isRegular(part)) {
+                int storedEnd = endByStart[part.start];
+                if (storedEnd == part.end + 1) {
+                    return true;
+                }
+                return storedEnd != 0 && duplicateStarts != null && duplicateStarts.contains(key(part));
+            }
+            return syntheticParts != null && syntheticParts.contains(part);
+        }
+
+        void add(GraphPart part) {
+            if (isRegular(part)) {
+                if (endByStart[part.start] == 0) {
+                    endByStart[part.start] = part.end + 1;
+                } else if (endByStart[part.start] != part.end + 1) {
+                    if (duplicateStarts == null) {
+                        duplicateStarts = new HashSet<>();
+                    }
+                    duplicateStarts.add(key(part));
+                }
+            } else {
+                if (syntheticParts == null) {
+                    syntheticParts = new HashSet<>();
+                }
+                syntheticParts.add(part);
+            }
+        }
+
+        private boolean isRegular(GraphPart part) {
+            return part.start >= 0 && part.start < endByStart.length && part.end >= 0 && part.end < Integer.MAX_VALUE;
+        }
+
+        private static long key(GraphPart part) {
+            return ((long) part.start << 32) ^ (part.end & 0xffffffffL);
+        }
     }
 
     /**

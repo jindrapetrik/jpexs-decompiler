@@ -46,6 +46,7 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -200,7 +201,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             return -1;
         }
 
-        Set<Integer> visited = new HashSet<>();
+        BitSet visited = new BitSet(code.code.size());
         
         TranslateStack stack = new TranslateStack("deo");
         stack.doNoPushItemsToOutput = true;
@@ -272,7 +273,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
      * @return Register id
      * @throws InterruptedException On interrupt
      */
-    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
+    private int visitCode(Reference<AVM2Instruction> assignment, BitSet visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
 
         Map<Integer, List<ExceptionTargetIpPair>> exceptionStartToTargets = new HashMap<>();
         for (ABCException ex : body.exceptions) {
@@ -306,10 +307,10 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                 if (idx > endIdx) {
                     break;
                 }
-                if (visited.contains(idx)) {
+                if (visited.get(idx)) {
                     break;
                 }
-                visited.add(idx);
+                visited.set(idx);
 
                 if (exceptionStartToTargets.containsKey(idx)) {
                     for (ExceptionTargetIpPair pair : exceptionStartToTargets.get(idx)) {
@@ -433,7 +434,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                     for (int n = 1; n < branches.size(); n++) {
                         //visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, branches.get(n), endIdx, result);
                         int nidx = branches.get(n);
-                        if (visited.contains(nidx)) {
+                        if (visited.get(nidx)) {
                             continue;
                         }
                         toVisit.add(nidx);
