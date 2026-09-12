@@ -516,6 +516,7 @@ public class AVM2Graph extends Graph {
                         finallyThrowPart = switchPart.nextParts.get(1 + finallyThrowPushByte);
                     }
                     localData.finallyThrowParts.put(e, finallyThrowPart);
+                    invalidateReachabilityCache();
                 }
 
                 for (GraphPart r : finallyPart.refs) {
@@ -3539,6 +3540,7 @@ public class AVM2Graph extends Graph {
                 }
                 if (ip < part.end && !isFinally) {
                     //split part into half
+                    invalidateReachabilityCache();
                     GraphPart secondPart = new GraphPart(ip + 1, part.end);
                     part.end = ip;
                     for (GraphPart n : part.nextParts) {
