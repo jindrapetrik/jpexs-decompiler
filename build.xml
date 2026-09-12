@@ -197,8 +197,8 @@
     <target name="archive-no-dist" depends="-loadversion">
         <mkdir dir="${releases.dir}"/>
         <property  name="zip.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip" />
-        <zip destfile="${zip.file}" basedir="${dist.dir}" excludes="${app.script}">
-            <zipfileset dir="${dist.dir}" includes="${app.script}" fullpath="${app.script}" filemode="755"/>
+        <zip destfile="${zip.file}" basedir="${dist.dir}" excludes="*.sh">
+            <zipfileset dir="${dist.dir}" includes="*.sh" filemode="755"/>
         </zip>
     </target>
     
