@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.helpers.CancellableWorker;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
@@ -83,7 +84,9 @@ public class GraphPart implements Serializable {
      * @return True if this part leads to the other part
      * @throws InterruptedException On interrupt
      */
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, VisitedGraphParts visited, List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
+    private boolean hasPathTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev,
+            GraphPart part, VisitedGraphParts visited, BitSet reachableParts, List<Loop> loops,
+            List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
@@ -127,7 +130,9 @@ public class GraphPart implements Serializable {
             }
             visited.add(thisPart);
             for (GraphPart p : thisPart.nextParts) {
-                if (p == part) {
+                if (reachableParts != null) {
+                    reachableParts.set(gr.getReachabilityPartIndex(p));
+                } else if (p == part) {
                     return true;
                 }
                 if (visited.contains(p)) {
@@ -140,7 +145,9 @@ public class GraphPart implements Serializable {
                     if (ts.throwingParts.contains(thisPart)) {
                         GraphPart p = ts.targetPart;
 
-                        if (p == part) {
+                        if (reachableParts != null) {
+                            reachableParts.set(gr.getReachabilityPartIndex(p));
+                        } else if (p == part) {
                             return true;
                         }
                         if (visited.contains(p)) {
@@ -153,6 +160,14 @@ public class GraphPart implements Serializable {
             }
         }
         return false;
+    }
+
+    private BitSet getReachableParts(BaseLocalData localData, Graph gr, GraphSource code,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
+        BitSet reachableParts = new BitSet();
+        hasPathTo(localData, gr, code, null /*???*/, null, new VisitedGraphParts(code.size()),
+                reachableParts, loops, throwStates, firstCanBeLoopContinue);
+        return reachableParts;
     }
 
     /**
@@ -172,7 +187,18 @@ public class GraphPart implements Serializable {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, null /*???*/, part, new VisitedGraphParts(code.size()), loops, throwStates, firstCanBeLoopContinue);
+        BitSet cachedResult = gr.getCachedReachability(localData, this, loops, throwStates, firstCanBeLoopContinue);
+        int partIndex = gr.getReachabilityPartIndex(part);
+        if (cachedResult != null) {
+            return cachedResult.get(partIndex);
+        }
+        if (gr.shouldCacheReachability(localData, this, loops, throwStates, firstCanBeLoopContinue)) {
+            BitSet reachableParts = getReachableParts(localData, gr, code, loops, throwStates, firstCanBeLoopContinue);
+            gr.cacheReachability(localData, this, loops, throwStates, firstCanBeLoopContinue, reachableParts);
+            return reachableParts.get(partIndex);
+        }
+        return hasPathTo(localData, gr, code, null /*???*/, part, new VisitedGraphParts(code.size()),
+                null, loops, throwStates, firstCanBeLoopContinue);
         //return gr.partLeadsTo(localData, this, part, code, loops, throwStates, firstCanBeLoopContinue);
     }
 

@@ -60,11 +60,13 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -112,6 +114,22 @@ public class Graph {
      */
     protected int startIp = 0;
 
+    private static final int MAX_REACHABILITY_CACHE_ROWS = 1 << 12;
+
+    private static final int MAX_REACHABILITY_CONTEXTS = 1 << 10;
+
+    private final Map<ReachabilityContext, ReachabilityCache> reachabilityCaches = new HashMap<>();
+
+    private ReachabilityCache reachabilityCache;
+
+    private final IdentityHashMap<GraphPart, Integer> reachabilityPartIndices = new IdentityHashMap<>();
+
+    private ReachabilityContext reachabilityContext;
+
+    private boolean reachabilityCacheFull;
+
+    private int reachabilityCacheRows;
+
     /**
      * Debug flag to print all parts
      */
@@ -145,6 +163,212 @@ public class Graph {
      */
     public GraphSource getGraphCode() {
         return code;
+    }
+
+    BitSet getCachedReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        BitSet result = reachabilityCache == null ? null
+                : reachabilityCache.reachableBySource.get(new ReachabilitySourceKey(from, firstCanBeLoopContinue));
+        return result;
+    }
+
+    boolean shouldCacheReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        if (reachabilityCacheFull || reachabilityCache == null) {
+            return false;
+        }
+        ReachabilitySourceKey key = new ReachabilitySourceKey(from, firstCanBeLoopContinue);
+        return !reachabilityCache.queriedSources.add(key);
+    }
+
+    void cacheReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue, BitSet reachableParts) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        if (reachabilityCacheFull || reachabilityCache == null) {
+            return;
+        }
+        BitSet oldResult = reachabilityCache.reachableBySource.put(
+                new ReachabilitySourceKey(from, firstCanBeLoopContinue), reachableParts);
+        if (oldResult == null) {
+            reachabilityCacheRows++;
+        }
+        if (reachabilityCacheRows >= MAX_REACHABILITY_CACHE_ROWS) {
+            reachabilityCacheFull = true;
+        }
+    }
+
+    int getReachabilityPartIndex(GraphPart part) {
+        Integer index = reachabilityPartIndices.get(part);
+        if (index == null) {
+            index = reachabilityPartIndices.size();
+            reachabilityPartIndices.put(part, index);
+        }
+        return index;
+    }
+
+    protected final void invalidateReachabilityCache() {
+        reachabilityContext = null;
+        reachabilityCache = null;
+        reachabilityCaches.clear();
+        reachabilityPartIndices.clear();
+        reachabilityCacheFull = false;
+        reachabilityCacheRows = 0;
+    }
+
+    private void prepareReachabilityCache(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+        if (reachabilityContext == null || !reachabilityContext.matches(localData, loops, throwStates)) {
+            reachabilityContext = new ReachabilityContext(localData, loops, throwStates);
+            reachabilityCache = reachabilityCaches.get(reachabilityContext);
+            if (reachabilityCache == null && !reachabilityCacheFull
+                    && reachabilityCaches.size() < MAX_REACHABILITY_CONTEXTS) {
+                reachabilityCache = new ReachabilityCache();
+                reachabilityCaches.put(reachabilityContext, reachabilityCache);
+            }
+        }
+    }
+
+    private static final class ReachabilityCache {
+
+        private final Map<ReachabilitySourceKey, BitSet> reachableBySource = new HashMap<>();
+        private final Set<ReachabilitySourceKey> queriedSources = new HashSet<>();
+    }
+
+    private static final class ReachabilitySourceKey {
+
+        private final GraphPart from;
+        private final boolean firstCanBeLoopContinue;
+
+        ReachabilitySourceKey(GraphPart from, boolean firstCanBeLoopContinue) {
+            this.from = from;
+            this.firstCanBeLoopContinue = firstCanBeLoopContinue;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 59 * hash + System.identityHashCode(from);
+            hash = 59 * hash + (firstCanBeLoopContinue ? 1 : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ReachabilitySourceKey)) {
+                return false;
+            }
+            ReachabilitySourceKey other = (ReachabilitySourceKey) obj;
+            return from == other.from && firstCanBeLoopContinue == other.firstCanBeLoopContinue;
+        }
+    }
+
+    private static final class ReachabilityContext {
+
+        private final BaseLocalData localData;
+        private final List<Loop> loopObjects;
+        private final int[] loopPhases;
+        private final GraphPart[] loopContinues;
+        private final GraphPart[] loopPreContinues;
+        private final List<ThrowState> throwStateObjects;
+        private final int[] throwStateValues;
+        private final GraphPart[] throwTargets;
+        private final List<Set<GraphPart>> throwingParts;
+
+        ReachabilityContext(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+            this.localData = localData;
+            loopObjects = new ArrayList<>(loops);
+            loopPhases = new int[loops.size()];
+            loopContinues = new GraphPart[loops.size()];
+            loopPreContinues = new GraphPart[loops.size()];
+            for (int i = 0; i < loops.size(); i++) {
+                Loop loop = loops.get(i);
+                loopPhases[i] = loop.phase;
+                loopContinues[i] = loop.loopContinue;
+                loopPreContinues[i] = loop.loopPreContinue;
+            }
+
+            throwStateObjects = new ArrayList<>(throwStates);
+            throwStateValues = new int[throwStates.size()];
+            throwTargets = new GraphPart[throwStates.size()];
+            throwingParts = new ArrayList<>(throwStates.size());
+            for (int i = 0; i < throwStates.size(); i++) {
+                ThrowState throwState = throwStates.get(i);
+                throwStateValues[i] = throwState.state;
+                throwTargets[i] = throwState.targetPart;
+                throwingParts.add(new HashSet<>(throwState.throwingParts));
+            }
+        }
+
+        boolean matches(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+            if (this.localData != localData || loops.size() != loopObjects.size()
+                    || throwStates.size() != throwStateObjects.size()) {
+                return false;
+            }
+            for (int i = 0; i < loops.size(); i++) {
+                Loop loop = loops.get(i);
+                if (loop != loopObjects.get(i) || loop.phase != loopPhases[i]
+                        || loop.loopContinue != loopContinues[i]
+                        || loop.loopPreContinue != loopPreContinues[i]) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < throwStates.size(); i++) {
+                ThrowState throwState = throwStates.get(i);
+                if (throwState != throwStateObjects.get(i) || throwState.state != throwStateValues[i]
+                        || throwState.targetPart != throwTargets[i]
+                        || !throwState.throwingParts.equals(throwingParts.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = System.identityHashCode(localData);
+            for (int i = 0; i < loopObjects.size(); i++) {
+                hash = 31 * hash + System.identityHashCode(loopObjects.get(i));
+                hash = 31 * hash + loopPhases[i];
+                hash = 31 * hash + System.identityHashCode(loopContinues[i]);
+                hash = 31 * hash + System.identityHashCode(loopPreContinues[i]);
+            }
+            for (int i = 0; i < throwStateObjects.size(); i++) {
+                hash = 31 * hash + System.identityHashCode(throwStateObjects.get(i));
+                hash = 31 * hash + throwStateValues[i];
+                hash = 31 * hash + System.identityHashCode(throwTargets[i]);
+                hash = 31 * hash + throwingParts.get(i).hashCode();
+            }
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ReachabilityContext)) {
+                return false;
+            }
+            ReachabilityContext other = (ReachabilityContext) obj;
+            if (localData != other.localData || loopObjects.size() != other.loopObjects.size()
+                    || throwStateObjects.size() != other.throwStateObjects.size()) {
+                return false;
+            }
+            for (int i = 0; i < loopObjects.size(); i++) {
+                if (loopObjects.get(i) != other.loopObjects.get(i) || loopPhases[i] != other.loopPhases[i]
+                        || loopContinues[i] != other.loopContinues[i]
+                        || loopPreContinues[i] != other.loopPreContinues[i]) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < throwStateObjects.size(); i++) {
+                if (throwStateObjects.get(i) != other.throwStateObjects.get(i)
+                        || throwStateValues[i] != other.throwStateValues[i]
+                        || throwTargets[i] != other.throwTargets[i]
+                        || !throwingParts.get(i).equals(other.throwingParts.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /**
@@ -182,6 +406,7 @@ public class Graph {
             return;
         }
         heads = makeGraph(code, new ArrayList<>(), exceptions);
+        invalidateReachabilityCache();
     }
 
     /**
