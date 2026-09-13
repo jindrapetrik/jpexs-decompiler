@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
@@ -126,6 +127,11 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             ignoredRegs.add(i);
         }
 
+        // Without branches or removable function literals, deobfuscation cannot
+        // discard a later assignment. Avoid speculative copies of the entire
+        // method for registers that are already known to need a rollback.
+        ignoredRegs.addAll(getRepeatedlyAssignedRegisters(body));
+
         int setReg = 0;
         List<Integer> listedRegs = new ArrayList<>();
         List<MethodBody> listedLastBodies = new ArrayList<>();
@@ -178,6 +184,35 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
         originalBody.exceptions = body.exceptions;
         originalBody.setCode(body.getCode());
+    }
+
+    /**
+     * Finds registers that cannot be inlined in straight-line code.
+     * Control-flow changes must retain the speculative algorithm: an assignment
+     * in a dead branch may disappear after constant folding.
+     *
+     * @param body Method body
+     * @return Registers with repeated assignments, or an empty set for control flow
+     */
+    static Set<Integer> getRepeatedlyAssignedRegisters(MethodBody body) {
+        Set<Integer> assigned = new HashSet<>();
+        Set<Integer> repeated = new HashSet<>();
+        if (body.exceptions.length != 0) {
+            return repeated;
+        }
+        for (AVM2Instruction ins : body.getCode().code) {
+            if (ins.isBranch() || ins.definition instanceof JumpIns
+                    || ins.definition instanceof NewFunctionIns) {
+                return new HashSet<>();
+            }
+            if (ins.definition instanceof SetLocalTypeIns) {
+                int reg = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
+                if (!assigned.add(reg)) {
+                    repeated.add(reg);
+                }
+            }
+        }
+        return repeated;
     }
 
     /**
