@@ -68,6 +68,8 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
     private final MainFrameMenu mainMenu;
 
+    private AffineTransform aeroSnapTransform = new AffineTransform();
+
     public MainFrameRibbon() {
         super();
                 
@@ -242,6 +244,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     posOnScreen.x = MainFrameRibbon.this.getLocationOnScreen().x;
                     posOnScreen.y = MainFrameRibbon.this.getLocationOnScreen().y;
                 }
+                updateAeroSnapMetrics();
             }
         });
         addWindowListener(new WindowAdapter() {
@@ -249,7 +252,6 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             private StdCallLibrary.StdCallCallback newProc;
             private Rectangle dragRect = new Rectangle();
             private Rectangle toggleRect = new Rectangle();
-            private AffineTransform trans;
 
             @Override
             public void windowOpened(WindowEvent e) {
@@ -259,10 +261,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     JComponent titlePane = sui.getTitlePane();
 
                     Window window = MainFrameRibbon.this;
-                    trans = View.getWindowDevice(window).getDefaultConfiguration().getDefaultTransform();
-                    if (trans == null) {
-                        trans = new AffineTransform();
-                    }
+                    updateAeroSnapMetrics();
 
                     ComponentAdapter ad = new ComponentAdapter() {
                         @Override
@@ -276,7 +275,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                         }
 
                         private void updateRect() {
-                            int appButtonSize = (int) Math.round(trans.getScaleX() * Integer.getInteger("peacock.appButtonSize", 24));
+                            int appButtonSize = (int) Math.round(aeroSnapTransform.getScaleX() * Integer.getInteger("peacock.appButtonSize", 24));
                             SubstanceTitlePane.HeapStatusPanel h = new SubstanceTitlePane.HeapStatusPanel();
                             int heapWidth = Configuration.showHeapStatusWidget.get() ? 5 + h.getPreferredWidth() : 0;
                             int titleIconsWidth
@@ -390,8 +389,8 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                                 Point p = new Point(x, y);
 
-                                p.x = (int) Math.round(p.x / trans.getScaleX());
-                                p.y = (int) Math.round(p.y / trans.getScaleY());
+                                p.x = (int) Math.round(p.x / aeroSnapTransform.getScaleX());
+                                p.y = (int) Math.round(p.y / aeroSnapTransform.getScaleY());
 
                                 p.x -= posOnScreen.x;
                                 p.y -= posOnScreen.y;
@@ -429,20 +428,30 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         });
     }
 
+    private void updateAeroSnapMetrics() {
+        GraphicsConfiguration gc = getGraphicsConfiguration();
+        if (gc == null) {
+            gc = View.getWindowDevice(MainFrameRibbon.this.getWindow()).getDefaultConfiguration();
+        }
+
+        AffineTransform defaultTransform = gc.getDefaultTransform();
+        aeroSnapTransform = defaultTransform == null ? new AffineTransform() : new AffineTransform(defaultTransform);
+
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        Rectangle screenBounds = gc.getBounds();
+        Rectangle maxBounds = new Rectangle(
+                screenBounds.x + screenInsets.left,
+                screenBounds.y + screenInsets.top,
+                screenBounds.width - (screenInsets.left + screenInsets.right),
+                screenBounds.height - (screenInsets.top + screenInsets.bottom)
+        );
+        setMaximizedBounds(maxBounds);
+    }
+
     @Override
     public void setExtendedState(int state) {
         if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
-            GraphicsConfiguration gc = View.getWindowDevice(MainFrameRibbon.this.getWindow()).getDefaultConfiguration();
-
-            Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
-            Rectangle screenBounds = gc.getBounds();
-            Rectangle maxBounds = new Rectangle(
-                    screenBounds.x + screenInsets.left,
-                    screenBounds.y + screenInsets.top,
-                    screenBounds.width - (screenInsets.left + screenInsets.right),
-                    screenBounds.height - (screenInsets.top + screenInsets.bottom)
-            );
-            setMaximizedBounds(maxBounds);
+            updateAeroSnapMetrics();
         }
         super.setExtendedState(state);
     }
