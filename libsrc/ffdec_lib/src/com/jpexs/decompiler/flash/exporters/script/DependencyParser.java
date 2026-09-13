@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -240,21 +239,21 @@ public class DependencyParser {
                 parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
             
-            boolean hasNewClass = false;
-            
-            if (classIndex == -1) {
-                for (int i = 0; i < body.getCode().code.size(); i++) {
-                    AVM2Instruction ins = body.getCode().code.get(i);
-                    if (ins.definition instanceof NewClassIns) {
-                        hasNewClass = true;
-                        break;
-                    }                
+            List<AVM2Instruction> instructions = body.getCode().code;
+            // Each getlex used to scan the entire remaining method for a
+            // newclass. A single suffix boundary answers all of those queries.
+            int lastNewClass = -1;
+            for (int i = instructions.size() - 1; i >= 0; i--) {
+                if (instructions.get(i).definition instanceof NewClassIns) {
+                    lastNewClass = i;
+                    break;
                 }
             }
+            boolean hasNewClass = lastNewClass >= 0;
             boolean wasNewClass = false;
             AVM2Instruction prevIns = null;
-            for (int i = 0; i < body.getCode().code.size(); i++) {
-                AVM2Instruction ins = body.getCode().code.get(i);
+            for (int i = 0; i < instructions.size(); i++) {
+                AVM2Instruction ins = instructions.get(i);
                 
                 
                 //Do not parse dependencies from class parent chain
@@ -268,26 +267,10 @@ public class DependencyParser {
                 }
                 
                 //Ignore class parents in script initializer
-                if (ins.definition instanceof GetLexIns) {
-                    boolean foundNewClass = false;
-                    for (int j = i + 1; j < body.getCode().code.size(); j++) {
-                        AVM2Instruction insJ = body.getCode().code.get(j);
-                        if (insJ.definition instanceof NewClassIns) {
-                            foundNewClass = true;
-                            break;
-                        } else if (ins.definition instanceof GetLexIns) {
-                            //continue
-                        } else if (ins.definition instanceof PushScopeIns) {
-                            //continue
-                        } else {
-                            break;
-                        }
-                    }
-                    if (foundNewClass) {
-                        continue;
-                    }
+                if (ins.definition instanceof GetLexIns && i < lastNewClass) {
+                    continue;
                 }
-                
+
                 if (ins.definition instanceof AlchemyTypeIns) {
                     DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.addWithSuffix(ins.definition.instructionName);
                     Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
@@ -327,7 +310,7 @@ public class DependencyParser {
                 // the result is stored in a local (setlocal) — casts like
                 // iterator() as IMapIterator already expose their type via coerce.
                 if (ins.definition instanceof CallPropertyIns && prevIns != null && classIndex > -1
-                        && isFollowedBySetLocal(body.getCode().code, i)) {
+                        && isFollowedBySetLocal(instructions, i)) {
                     parseDependenciesFromCallPropertyReturnType(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, ignorePackage, fullyQualifiedNames, uses, prevIns, ins);
                 }
                 if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
