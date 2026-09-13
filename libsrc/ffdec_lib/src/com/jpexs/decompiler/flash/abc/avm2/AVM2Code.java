@@ -325,6 +325,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -3881,14 +3882,108 @@ public class AVM2Code implements Cloneable {
      * @throws InterruptedException On interrupt
      */
     public void removeIgnored(MethodBody body) throws InterruptedException {
-        //System.err.println("removing ignored...");
+        if (removeIgnoredInBatch(body)) {
+            return;
+        }
+        // Preserve the original offset handling for malformed instruction
+        // addresses and targets that are not instruction boundaries.
         for (int i = 0; i < code.size(); i++) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
             if (code.get(i).isIgnored()) {
                 removeInstruction(i, body);
                 i--;
             }
         }
-        //System.err.println("/ignored removed");
+    }
+
+    /**
+     * Removes ignored instructions with one offset update. Returns false without
+     * changing the code if its addresses require the individual-removal path.
+     *
+     * @param body Method body
+     * @return Whether the instructions were handled
+     * @throws InterruptedException On interrupt
+     */
+    private boolean removeIgnoredInBatch(MethodBody body) throws InterruptedException {
+        boolean found = false;
+        for (AVM2Instruction ins : code) {
+            if (ins.isIgnored()) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return true;
+        }
+
+        final long[] addresses = new long[code.size() + 1];
+        final int[] removedBefore = new int[addresses.length];
+        long address = code.get(0).getAddress();
+        if (address < 0) {
+            return false;
+        }
+        int removed = 0;
+        for (int i = 0; i < code.size(); i++) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
+            AVM2Instruction ins = code.get(i);
+            int length = ins.getBytesLength();
+            if (ins.getAddress() != address || length <= 0) {
+                return false;
+            }
+            addresses[i] = address;
+            removedBefore[i] = removed;
+            address += length;
+            if (ins.isIgnored()) {
+                removed += length;
+            }
+        }
+        addresses[code.size()] = address;
+        removedBefore[code.size()] = removed;
+
+        // Targets at a removed instruction map to the next surviving instruction.
+        // Include the end of the code for exception ranges and trailing removals.
+        for (AVM2Instruction ins : code) {
+            if (ins.definition instanceof IfTypeIns || ins.definition instanceof LookupSwitchIns) {
+                for (long target : ins.getOffsets()) {
+                    if (Arrays.binarySearch(addresses, target) < 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        if (body != null) {
+            for (ABCException ex : body.exceptions) {
+                if (Arrays.binarySearch(addresses, ex.start) < 0
+                        || Arrays.binarySearch(addresses, ex.end) < 0
+                        || Arrays.binarySearch(addresses, ex.target) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        updateOffsets(new OffsetUpdater() {
+            private int shift(long originalAddress) {
+                // updateOffsets uses -1 as the source of exception offsets.
+                return originalAddress == -1 ? 0
+                        : removedBefore[Arrays.binarySearch(addresses, originalAddress)];
+            }
+
+            @Override
+            public long updateInstructionOffset(long originalAddress) {
+                return originalAddress - shift(originalAddress);
+            }
+
+            @Override
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                return offset + shift(insAddr) - shift(targetAddress);
+            }
+        }, body);
+        code.removeIf(AVM2Instruction::isIgnored);
+        return true;
     }
 
     /**

@@ -103,6 +103,7 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,6 +125,47 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
      * Not compile time undefined item
      */
     private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, null, UNDEFINED_ITEM);
+
+    /**
+     * Local registers for independent interpreter attempts. Instruction
+     * translation changes registers through put(); keep all initial entries
+     * available to get() and containsKey(), but reset only the changed ones.
+     */
+    static final class ResettableLocalRegs extends HashMap<Integer, GraphTargetItem> {
+
+        private final int reserved;
+        private final int count;
+        private final Set<Integer> changed = new HashSet<>();
+
+        ResettableLocalRegs(int reserved, int maxRegs) {
+            this.reserved = reserved;
+            this.count = Math.max(reserved, maxRegs);
+            for (int i = 0; i < count; i++) {
+                super.put(i, initialValue(i));
+            }
+        }
+
+        private GraphTargetItem initialValue(int register) {
+            return register < reserved ? NOT_COMPILE_TIME_UNDEFINED_ITEM : UNDEFINED_ITEM;
+        }
+
+        @Override
+        public GraphTargetItem put(Integer key, GraphTargetItem value) {
+            changed.add(key);
+            return super.put(key, value);
+        }
+
+        void reset() {
+            for (Integer key : changed) {
+                if (key != null && key >= 0 && key < count) {
+                    super.put(key, initialValue(key));
+                } else {
+                    super.remove(key);
+                }
+            }
+            changed.clear();
+        }
+    }
 
     /**
      * Execution limit
@@ -208,18 +250,22 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         int localReservedCount = body.getLocalReservedCount();
+        ResettableLocalRegs registers = new ResettableLocalRegs(localReservedCount, body.max_regs);
+        localData.localRegs = registers;
         Set<Long> importantOffsets = code.getImportantOffsets(body, isStatic);
         for (int i = 0; i < code.code.size(); i++) {
             if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 
+            // Every attempt starts with an empty operand stack.
+            if (code.code.get(i).getStackPopCount(localData) > 0) {
+                continue;
+            }
             localData.scopeStack.clear();
             localData.localScopeStack.clear();
-            localData.localRegs.clear();
             localData.localRegAssignmentIps.clear();
-            localData.localRegs.clear();
-            initLocalRegs(localData, localReservedCount, body.max_regs);
+            registers.reset();
             Reference<Integer> minChangedIpRef = new Reference<>(-1);
             if (executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets, minChangedIpRef)) {
                 int minChangedIp = minChangedIpRef.getVal();
