@@ -3,6 +3,7 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
@@ -795,57 +796,88 @@ public class LoopDetector {
             }
         }
 
-        Set<GraphPart> allParts = new LinkedHashSet<>(successors.keySet());
-        Map<GraphPart, Set<GraphPart>> postDominators = new LinkedHashMap<>();
-        for (Map.Entry<GraphPart, List<GraphPart>> entry : successors.entrySet()) {
-            Set<GraphPart> initial = new LinkedHashSet<>();
-            if (entry.getValue().isEmpty()) {
-                initial.add(entry.getKey());
-            } else {
-                initial.addAll(allParts);
+        List<GraphPart> parts = new ArrayList<>(successors.keySet());
+        Map<GraphPart, Integer> indices = new LinkedHashMap<>();
+        int[] allIndices = new int[parts.size()];
+        for (int i = 0; i < parts.size(); i++) {
+            indices.put(parts.get(i), i);
+            allIndices[i] = i;
+        }
+        int[][] nextIndices = new int[parts.size()][];
+        BitSet[] postDominators = new BitSet[parts.size()];
+        // Set iteration order is used to break otherwise equal candidate ties.
+        // Share the initial order, and only copy it when membership changes.
+        int[][] postDominatorOrder = new int[parts.size()][];
+        for (int i = 0; i < parts.size(); i++) {
+            List<GraphPart> nextParts = successors.get(parts.get(i));
+            nextIndices[i] = new int[nextParts.size()];
+            for (int j = 0; j < nextParts.size(); j++) {
+                nextIndices[i][j] = indices.get(nextParts.get(j));
             }
-            postDominators.put(entry.getKey(), initial);
+            BitSet initial = new BitSet(parts.size());
+            if (nextParts.isEmpty()) {
+                initial.set(i);
+                postDominatorOrder[i] = new int[]{i};
+            } else {
+                initial.set(0, parts.size());
+                postDominatorOrder[i] = allIndices;
+            }
+            postDominators[i] = initial;
         }
 
         boolean changed;
         do {
             changed = false;
-            for (Map.Entry<GraphPart, List<GraphPart>> entry : successors.entrySet()) {
-                GraphPart part = entry.getKey();
-                List<GraphPart> nextParts = entry.getValue();
-                Set<GraphPart> updated = new LinkedHashSet<>();
-                updated.add(part);
-
-                if (!nextParts.isEmpty()) {
-                    Set<GraphPart> common = new LinkedHashSet<>(postDominators.get(nextParts.get(0)));
-                    for (int i = 1; i < nextParts.size(); i++) {
-                        common.retainAll(postDominators.get(nextParts.get(i)));
+            for (int i = 0; i < parts.size(); i++) {
+                int[] next = nextIndices[i];
+                BitSet updated = new BitSet(parts.size());
+                if (next.length != 0) {
+                    updated.or(postDominators[next[0]]);
+                    for (int j = 1; j < next.length; j++) {
+                        updated.and(postDominators[next[j]]);
                     }
-                    updated.addAll(common);
                 }
-
-                if (!updated.equals(postDominators.get(part))) {
-                    postDominators.put(part, updated);
+                updated.set(i);
+                if (!updated.equals(postDominators[i])) {
+                    int[] order = new int[updated.cardinality()];
+                    int position = 0;
+                    order[position++] = i;
+                    if (next.length != 0) {
+                        for (int candidate : postDominatorOrder[next[0]]) {
+                            if (candidate != i && updated.get(candidate)) {
+                                order[position++] = candidate;
+                            }
+                        }
+                    }
+                    postDominatorOrder[i] = order;
+                    postDominators[i] = updated;
                     changed = true;
                 }
             }
         } while (changed);
 
-        Set<GraphPart> commonPostDominators = null;
+        BitSet common = null;
+        int[] commonOrder = null;
         for (GraphPart startPart : startParts) {
-            Set<GraphPart> partPostDominators = postDominators.get(startPart);
-            if (partPostDominators == null) {
+            Integer index = indices.get(startPart);
+            if (index == null) {
                 return null;
             }
-            if (commonPostDominators == null) {
-                commonPostDominators = new LinkedHashSet<>(partPostDominators);
+            if (common == null) {
+                common = (BitSet) postDominators[index].clone();
+                commonOrder = postDominatorOrder[index];
             } else {
-                commonPostDominators.retainAll(partPostDominators);
+                common.and(postDominators[index]);
             }
         }
-
-        if (commonPostDominators == null) {
+        if (common == null) {
             return null;
+        }
+        Set<GraphPart> commonPostDominators = new LinkedHashSet<>();
+        for (int candidate : commonOrder) {
+            if (common.get(candidate)) {
+                commonPostDominators.add(parts.get(candidate));
+            }
         }
         commonPostDominators.removeAll(excludedCandidates);
         if (commonPostDominators.isEmpty()) {
