@@ -101,6 +101,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -662,6 +663,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 contextPopupMenu.update(items, false);
                 contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());
             }
+        }
+        if (items.size() == 1 && e.getKeyCode() == KeyEvent.VK_A && !e.isControlDown() && e.isAltDown()) {
+            TreeItem firstItem = items.get(0);
+            if ((firstItem instanceof CharacterTag)) {
+                contextPopupMenu.update(items, false);
+                CharacterTag cht = (CharacterTag) firstItem;
+                if (cht.getSwf().isAS3() && As3ClassLinkageDialog.getParentClassFromCharacter(cht) != null) {
+                    contextPopupMenu.setAs3ClassLinkageActionPerformed(null);
+                }
+                if (!cht.getSwf().isAS3()) {
+                    String ename = cht.getExportName();
+                    if (ename == null || !ename.startsWith("__Packages.")) {
+                        contextPopupMenu.setAsLinkageActionPerformed(null);
+                    }
+                }
+            }            
         }
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
             List<TreeItem> tagItems = new ArrayList<>();

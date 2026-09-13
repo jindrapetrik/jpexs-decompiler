@@ -718,12 +718,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         gotoDocumentClassMenuItem.setIcon(View.getIcon("gotomainclass16"));
         add(gotoDocumentClassMenuItem);
 
-        setAsLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAsLinkage"));
+        setAsLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAsLinkage") + " (ALT+A)");
         setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
         setAsLinkageMenuItem.setIcon(View.getIcon("asclass16"));
         add(setAsLinkageMenuItem);
 
-        setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage"));
+        setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage") + " (ALT+A)");
         setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
         setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclass16"));
         add(setAs3ClassLinkageMenuItem);
@@ -3365,7 +3365,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     New DoInitAction for the DefineSprite in frame 1 is created and it's filled with new cls Class code
     The Exportassets tag is modified with the new linkage identifier
      */
-    private void setAsLinkageActionPerformed(ActionEvent evt) {
+    public void setAsLinkageActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
         SWF swf = ch.getSwf();
         AsLinkageDialog d = new AsLinkageDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
@@ -3535,7 +3535,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     II. if the previous Symbolclass is empty and is not target SymbolClass, remove it
     III. if the new classname is not empty, add new character mapping to new SymbolClass determined
      */
-    private void setAs3ClassLinkageActionPerformed(ActionEvent evt) {
+    public void setAs3ClassLinkageActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
         SWF swf = ch.getSwf();
         As3ClassLinkageDialog d = new As3ClassLinkageDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
