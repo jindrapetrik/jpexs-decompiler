@@ -67,6 +67,74 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="26.3.0" date="2026-09-14">
+			<description>
+				<p>Features</p>
+				<ul>
+					<li>add translation support to the translator (PR269)</li>
+					<li>gnujpdf: allow setting special toUnicode map for fonts (#2736)</li>
+					<li>pdf export: allow multiple glyphs per char - ligatures, etc. (#2736)</li>
+					<li>as1/2 editor: retain register indices and variable names in definefunction2 (#2059)</li>
+					<li>add export shape to AS3 graphics drawing commands (PR270)</li>
+					<li>windows installer: add installDir registry key (#2716)</li>
+					<li>add key shortcut to as linkage menu - alt + a (#2748)</li>
+					<li>add substance skin plugin example (#2757)</li>
+				</ul>
+				<p>Bug Fixes</p>
+				<ul>
+					<li>respect font codeoffset, correct GFX font strip (#2726)</li>
+					<li>correct missing break in switch statement (#2722)</li>
+					<li>correct switch break inside loop (#2723)</li>
+					<li>use clipped fill for image shapes (#2721)</li>
+					<li>improve repeating fill tiling (#2721)</li>
+					<li>add outline for static text tags</li>
+					<li>use outline for clipping (#2737)</li>
+					<li>keep original CharacterTag on duplicate characterId (PR268)</li>
+					<li>pdf export: 0x0 area size clip shape will generate black square (#2471)</li>
+					<li>pdf export: map surrogates to private use area (#2471)</li>
+					<li>as3: fix mixing up ifs with switch leading to gotos (#2741)</li>
+					<li>improve loop detector (#2741)</li>
+					<li>do not use §§push when no §§pop in the method (#2741)</li>
+					<li>do not use "include" for private traits in compound scripts (#2741)</li>
+					<li>place private traits of compound scripts to the class before (#2741)</li>
+					<li>fix nullpointer on breakpoint list when not debugging</li>
+					<li>fix debugging/stepping of swfs with obfuscated names (#2742)</li>
+					<li>debugger: fix handling package names on non-windows os</li>
+					<li>as1/2 editor: do not use DefineFunction2 for SWF version &lt; 7 (#2731)</li>
+					<li>as1/2: use eval for dotted getvariable (#2725)</li>
+					<li>as3: fix colliding imports (#2719)</li>
+					<li>as3 edit: fix compiling fully qualified name (#2719)</li>
+					<li>variable marker: fix highlighting colliding imports (#2719)</li>
+					<li>jsyntaxpane: fix nullpointer when no graphics available (#2743)</li>
+					<li>add better handling of invocationTargetException (#2743)</li>
+					<li>as: fix switch inside loop (#2728)</li>
+					<li>as3: import same-package types for traits outside package block (PR271)</li>
+					<li>as3: keep activation-slot assigns in constructors (PR272)</li>
+					<li>as3: import call return types used to type locals (PR273)</li>
+					<li>as3: promote ctor const inits after leading locals (PR274)</li>
+					<li>as3: rename ASC embed stem$md5-int identifiers to legal stems (PR275)</li>
+					<li>as3: emit [SWF] metadata on document class from SWF header (PR276)</li>
+					<li>windows installer: use registry path with backward slashes (#2716)</li>
+					<li>as3: recover while(cond) instead of labeled continue (PR277)</li>
+					<li>as3: preserve convert/coerce types on for-each and for-in vars (PR280)</li>
+					<li>as3: keep ctor assigns that read unset instance slots (PR278)</li>
+					<li>as1/2: avoid simplifying getTimer function (#2752)</li>
+					<li>add +X permission to translator and soledir.sh on Linux zip (#623)</li>
+					<li>aero snap: fix working on multiple monitors (#2756, #2523)</li>
+				</ul>
+				<p>Performance Improvements</p>
+				<ul>
+					<li>as1/2: improve speed of nested with/ifFrameLoaded clauses (#2718)</li>
+					<li>as3: reuse per-SWF AbcIndexing instead of rebuilding it for every class (PR281)</li>
+					<li>as: optimize visited set of graph parts (#2750)</li>
+					<li>as: optimize reachability index (#2750)</li>
+					<li>as3: optimize deobfuscation and instruction removal (#2750)</li>
+					<li>as: optimize loop detector (#2750)</li>
+					<li>as: optimize dependency parser (#2750)</li>
+					<li>as3: optimize deobfuscation</li>
+				</ul>
+			</description>
+		</release>
 		<release version="26.2.1" date="2026-05-24">
 			<description>
 				<p>Bug Fixes</p>

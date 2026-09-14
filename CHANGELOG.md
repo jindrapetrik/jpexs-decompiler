@@ -1,6 +1,68 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [26.3.0] - 2026-09-14
+### Features
+- add translation support to the translator ([PR269])
+- gnujpdf: allow setting special toUnicode map for fonts ([#2736])
+- pdf export: allow multiple glyphs per char - ligatures, etc. ([#2736])
+- as1/2 editor: retain register indices and variable names in definefunction2 ([#2059])
+- add export shape to AS3 graphics drawing commands ([PR270])
+- windows installer: add installDir registry key ([#2716])
+- add key shortcut to as linkage menu - alt + a ([#2748])
+- add substance skin plugin example ([#2757])
+
+### Bug Fixes
+- respect font codeoffset, correct GFX font strip ([#2726])
+- correct missing break in switch statement ([#2722])
+- correct switch break inside loop ([#2723])
+- use clipped fill for image shapes ([#2721])
+- improve repeating fill tiling ([#2721])
+- add outline for static text tags
+- use outline for clipping ([#2737])
+- keep original CharacterTag on duplicate characterId ([PR268])
+- pdf export: 0x0 area size clip shape will generate black square ([#2471])
+- pdf export: map surrogates to private use area ([#2471])
+- as3: fix mixing up ifs with switch leading to gotos ([#2741])
+- improve loop detector ([#2741])
+- do not use §§push when no §§pop in the method ([#2741])
+- do not use "include" for private traits in compound scripts ([#2741])
+- place private traits of compound scripts to the class before ([#2741])
+- fix nullpointer on breakpoint list when not debugging
+- fix debugging/stepping of swfs with obfuscated names ([#2742])
+- debugger: fix handling package names on non-windows os
+- as1/2 editor: do not use DefineFunction2 for SWF version < 7 ([#2731])
+- as1/2: use eval for dotted getvariable ([#2725])
+- as3: fix colliding imports ([#2719])
+- as3 edit: fix compiling fully qualified name ([#2719])
+- variable marker: fix highlighting colliding imports ([#2719])
+- jsyntaxpane: fix nullpointer when no graphics available ([#2743])
+- add better handling of invocationTargetException ([#2743])
+- as: fix switch inside loop ([#2728])
+- as3: import same-package types for traits outside package block ([PR271])
+- as3: keep activation-slot assigns in constructors ([PR272])
+- as3: import call return types used to type locals ([PR273])
+- as3: promote ctor const inits after leading locals ([PR274])
+- as3: rename ASC embed stem$md5-int identifiers to legal stems ([PR275])
+- as3: emit [SWF] metadata on document class from SWF header ([PR276])
+- windows installer: use registry path with backward slashes ([#2716])
+- as3: recover while(cond) instead of labeled continue ([PR277])
+- as3: preserve convert/coerce types on for-each and for-in vars ([PR280])
+- as3: keep ctor assigns that read unset instance slots ([PR278])
+- as1/2: avoid simplifying getTimer function ([#2752])
+- add +X permission to translator and soledir.sh on Linux zip ([#623])
+- aero snap: fix working on multiple monitors ([#2756], [#2523])
+
+### Performance Improvements
+- as1/2: improve speed of nested with/ifFrameLoaded clauses ([#2718])
+- as3: reuse per-SWF AbcIndexing instead of rebuilding it for every class ([PR281])
+- as: optimize visited set of graph parts ([#2750])
+- as: optimize reachability index ([#2750])
+- as3: optimize deobfuscation and instruction removal ([#2750])
+- as: optimize loop detector ([#2750])
+- as: optimize dependency parser ([#2750])
+- as3: optimize deobfuscation
+
 ## [26.2.1] - 2026-05-24
 ### Bug Fixes
 - fix nullpointer on program start - ui scale ([#2720])
@@ -4103,6 +4165,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[26.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.1...version26.3.0
 [26.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.0...version26.2.1
 [26.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.1.0...version26.2.0
 [26.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.0.0...version26.1.0
@@ -4286,6 +4349,30 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2736]: https://www.free-decompiler.com/flash/issues/2736
+[#2059]: https://www.free-decompiler.com/flash/issues/2059
+[#2716]: https://www.free-decompiler.com/flash/issues/2716
+[#2748]: https://www.free-decompiler.com/flash/issues/2748
+[#2757]: https://www.free-decompiler.com/flash/issues/2757
+[#2726]: https://www.free-decompiler.com/flash/issues/2726
+[#2722]: https://www.free-decompiler.com/flash/issues/2722
+[#2723]: https://www.free-decompiler.com/flash/issues/2723
+[#2721]: https://www.free-decompiler.com/flash/issues/2721
+[#2737]: https://www.free-decompiler.com/flash/issues/2737
+[#2471]: https://www.free-decompiler.com/flash/issues/2471
+[#2741]: https://www.free-decompiler.com/flash/issues/2741
+[#2742]: https://www.free-decompiler.com/flash/issues/2742
+[#2731]: https://www.free-decompiler.com/flash/issues/2731
+[#2725]: https://www.free-decompiler.com/flash/issues/2725
+[#2719]: https://www.free-decompiler.com/flash/issues/2719
+[#2743]: https://www.free-decompiler.com/flash/issues/2743
+[#2728]: https://www.free-decompiler.com/flash/issues/2728
+[#2752]: https://www.free-decompiler.com/flash/issues/2752
+[#623]: https://www.free-decompiler.com/flash/issues/623
+[#2756]: https://www.free-decompiler.com/flash/issues/2756
+[#2523]: https://www.free-decompiler.com/flash/issues/2523
+[#2718]: https://www.free-decompiler.com/flash/issues/2718
+[#2750]: https://www.free-decompiler.com/flash/issues/2750
 [#2720]: https://www.free-decompiler.com/flash/issues/2720
 [#2383]: https://www.free-decompiler.com/flash/issues/2383
 [#2702]: https://www.free-decompiler.com/flash/issues/2702
@@ -4396,7 +4483,6 @@ Major version of SWF to XML export changed to 2.
 [#2526]: https://www.free-decompiler.com/flash/issues/2526
 [#2497]: https://www.free-decompiler.com/flash/issues/2497
 [#2529]: https://www.free-decompiler.com/flash/issues/2529
-[#2471]: https://www.free-decompiler.com/flash/issues/2471
 [#2534]: https://www.free-decompiler.com/flash/issues/2534
 [#2474]: https://www.free-decompiler.com/flash/issues/2474
 [#2480]: https://www.free-decompiler.com/flash/issues/2480
@@ -5269,7 +5355,6 @@ Major version of SWF to XML export changed to 2.
 [#647]: https://www.free-decompiler.com/flash/issues/647
 [#648]: https://www.free-decompiler.com/flash/issues/648
 [#612]: https://www.free-decompiler.com/flash/issues/612
-[#623]: https://www.free-decompiler.com/flash/issues/623
 [#624]: https://www.free-decompiler.com/flash/issues/624
 [#627]: https://www.free-decompiler.com/flash/issues/627
 [#640]: https://www.free-decompiler.com/flash/issues/640
@@ -5611,6 +5696,19 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR269]: https://github.com/jindrapetrik/jpexs-decompiler/pull/269
+[PR270]: https://github.com/jindrapetrik/jpexs-decompiler/pull/270
+[PR268]: https://github.com/jindrapetrik/jpexs-decompiler/pull/268
+[PR271]: https://github.com/jindrapetrik/jpexs-decompiler/pull/271
+[PR272]: https://github.com/jindrapetrik/jpexs-decompiler/pull/272
+[PR273]: https://github.com/jindrapetrik/jpexs-decompiler/pull/273
+[PR274]: https://github.com/jindrapetrik/jpexs-decompiler/pull/274
+[PR275]: https://github.com/jindrapetrik/jpexs-decompiler/pull/275
+[PR276]: https://github.com/jindrapetrik/jpexs-decompiler/pull/276
+[PR277]: https://github.com/jindrapetrik/jpexs-decompiler/pull/277
+[PR280]: https://github.com/jindrapetrik/jpexs-decompiler/pull/280
+[PR278]: https://github.com/jindrapetrik/jpexs-decompiler/pull/278
+[PR281]: https://github.com/jindrapetrik/jpexs-decompiler/pull/281
 [PR258]: https://github.com/jindrapetrik/jpexs-decompiler/pull/258
 [PR257]: https://github.com/jindrapetrik/jpexs-decompiler/pull/257
 [PR253]: https://github.com/jindrapetrik/jpexs-decompiler/pull/253
