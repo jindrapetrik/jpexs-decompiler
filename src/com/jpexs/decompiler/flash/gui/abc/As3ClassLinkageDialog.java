@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagOfTypeDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
@@ -116,21 +118,21 @@ public class As3ClassLinkageDialog extends AppDialog {
     private static final String CREATE_CLASS_CARD = "Create class panel";
     private static final String DO_NOT_CREATE_CLASS_CARD = "Do not create class panel";
 
-    private static final Map<Class<?>, String> tagTypeToParentClass = new HashMap<>();
+    private static final Map<Class<?>, ConfigurationItem<String>> tagTypeToParentClass = new HashMap<>();
 
     static {
-        tagTypeToParentClass.put(SoundTag.class, "flash.media.Sound");
-        tagTypeToParentClass.put(ImageTag.class, "flash.display.Bitmap");
-        tagTypeToParentClass.put(FontTag.class, "flash.text.Font");
-        tagTypeToParentClass.put(DefineFont4Tag.class, "flash.text.Font");
-        tagTypeToParentClass.put(DefineBinaryDataTag.class, "flash.utils.ByteArray");
-        tagTypeToParentClass.put(DefineSpriteTag.class, "flash.display.Sprite");
+        tagTypeToParentClass.put(SoundTag.class, Configuration.as3ClassLinkageDefaultParentSound);
+        tagTypeToParentClass.put(ImageTag.class, Configuration.as3ClassLinkageDefaultParentImage);
+        tagTypeToParentClass.put(FontTag.class, Configuration.as3ClassLinkageDefaultParentFont);
+        tagTypeToParentClass.put(DefineFont4Tag.class, Configuration.as3ClassLinkageDefaultParentFont);
+        tagTypeToParentClass.put(DefineBinaryDataTag.class, Configuration.as3ClassLinkageDefaultParentBinaryData);
+        tagTypeToParentClass.put(DefineSpriteTag.class, Configuration.as3ClassLinkageDefaultParentSprite);
     }
 
     public static String getParentClassFromCharacter(CharacterTag ch) {
         for (Class<?> cls : tagTypeToParentClass.keySet()) {
             if (cls.isAssignableFrom(ch.getClass())) {
-                return tagTypeToParentClass.get(cls);
+                return tagTypeToParentClass.get(cls).get();
             }
         }
         return null;
