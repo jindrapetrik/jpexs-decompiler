@@ -1264,6 +1264,10 @@ public final class Configuration {
     @ConfigurationDefaultString("flash.utils.ByteArray")
     @ConfigurationCategory("script")
     public static ConfigurationItem<String> as3ClassLinkageDefaultParentBinaryData = null;
+    
+    @ConfigurationDefaultString("flash.display.SimpleButton")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentButton = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("gui.avm2.assetPreview.expanded")

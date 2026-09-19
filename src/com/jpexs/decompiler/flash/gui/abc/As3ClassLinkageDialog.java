@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -127,6 +128,7 @@ public class As3ClassLinkageDialog extends AppDialog {
         tagTypeToParentClass.put(DefineFont4Tag.class, Configuration.as3ClassLinkageDefaultParentFont);
         tagTypeToParentClass.put(DefineBinaryDataTag.class, Configuration.as3ClassLinkageDefaultParentBinaryData);
         tagTypeToParentClass.put(DefineSpriteTag.class, Configuration.as3ClassLinkageDefaultParentSprite);
+        tagTypeToParentClass.put(ButtonTag.class, Configuration.as3ClassLinkageDefaultParentButton);        
     }
 
     public static String getParentClassFromCharacter(CharacterTag ch) {
