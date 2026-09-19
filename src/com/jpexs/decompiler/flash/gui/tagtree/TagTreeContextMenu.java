@@ -721,12 +721,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         setAsLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAsLinkage") + " (ALT+A)");
         setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
-        setAsLinkageMenuItem.setIcon(View.getIcon("asclass16"));
+        setAsLinkageMenuItem.setIcon(View.getIcon("asclasslink16"));
         add(setAsLinkageMenuItem);
 
         setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage") + " (ALT+A)");
         setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
-        setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclass16"));
+        setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclasslink16"));
         add(setAs3ClassLinkageMenuItem);
 
         abcExplorerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.abcexplorer"));

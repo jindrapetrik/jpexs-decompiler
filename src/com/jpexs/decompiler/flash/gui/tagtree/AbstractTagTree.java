@@ -234,6 +234,9 @@ public abstract class AbstractTagTree extends JTree {
             if (sp.isDocumentClass()) {
                 return View.getIcon("asclassmain16");
             }
+            if (type == TreeNodeType.AS_CLASS && isLinkedAs3Class(sp)) {
+                return View.getIcon("asclasslink16");
+            }
         }
         
         if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
@@ -246,6 +249,11 @@ public abstract class AbstractTagTree extends JTree {
             return getIconForType(type);
         }
         return null;
+    }
+
+    public static boolean isLinkedAs3Class(ScriptPack scriptPack) {
+        SWF swf = scriptPack.abc.getSwf();
+        return swf != null && swf.getCharacterByClass(scriptPack.getClassPath().toRawString()) != null;
     }
 
     public AbstractTagTree(AbstractTagTreeModel treeModel, MainPanel mainPanel) {
