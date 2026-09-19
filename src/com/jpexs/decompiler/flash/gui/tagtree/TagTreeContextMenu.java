@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.usages.simple.ABCCleaner;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -244,6 +245,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem rawEditMenuItem;
 
     private JMenuItem jumpToCharacterMenuItem;
+
+    private JMenuItem jumpToClassMenuItem;
 
     private JMenuItem exportJavaSourceMenuItem;
 
@@ -492,6 +495,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
         add(jumpToCharacterMenuItem);
+
+        jumpToClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToClass"));
+        jumpToClassMenuItem.addActionListener(this::jumpToClassActionPerformed);
+        jumpToClassMenuItem.setIcon(View.getIcon("jumpto16"));
+        add(jumpToClassMenuItem);
 
         showInFramesFolderMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInFramesFolder"));
         showInFramesFolderMenuItem.addActionListener(this::showInFramesFolderActionPerformed);
@@ -1461,6 +1469,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
+        jumpToClassMenuItem.setVisible(false);
         exportFlaMenuItem.setVisible(false);
         exportFlashDevelopMenuItem.setVisible(false);
         exportIdeaMenuItem.setVisible(false);
@@ -1786,7 +1795,15 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (firstItem instanceof ScriptPack) {
+                ScriptPack scriptPack = (ScriptPack) firstItem;
+                if (scriptPack.getPublicTrait() instanceof TraitClass && AbstractTagTree.isLinkedAs3Class(scriptPack)) {
+                    jumpToCharacterMenuItem.setVisible(true);
+                }
                 abcExplorerMenuItem.setVisible(true);
+            }
+
+            if (firstItem instanceof CharacterTag && getFirstLinkedClass((CharacterTag) firstItem) != null) {
+                jumpToClassMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof AS3Package) {
@@ -3475,13 +3492,56 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void jumpToCharacterActionPerformed(ActionEvent evt) {
-        TreeItem itemj = getCurrentItem();
-        if (itemj == null || !(itemj instanceof HasCharacterId)) {
+        TreeItem item = getCurrentItem();
+        if (item == null) {
             return;
         }
 
-        HasCharacterId hasCharacterId = (HasCharacterId) itemj;
-        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), ((SWF) itemj.getOpenable()).getCharacter(hasCharacterId.getCharacterId()));
+        CharacterTag character = null;
+        if (item instanceof ScriptPack) {
+            ScriptPack scriptPack = (ScriptPack) item;
+            SWF swf = scriptPack.abc.getSwf();
+            if (swf != null) {
+                character = swf.getCharacterByClass(scriptPack.getClassPath().toRawString());
+            }
+        } else if (item instanceof HasCharacterId && item.getOpenable() instanceof SWF) {
+            HasCharacterId hasCharacterId = (HasCharacterId) item;
+            character = ((SWF) item.getOpenable()).getCharacter(hasCharacterId.getCharacterId());
+        }
+
+        if (character != null) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), character);
+        }
+    }
+
+    private void jumpToClassActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        if (!(item instanceof CharacterTag)) {
+            return;
+        }
+
+        ScriptPack scriptPack = getFirstLinkedClass((CharacterTag) item);
+        if (scriptPack != null) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), scriptPack);
+        }
+    }
+
+    private static ScriptPack getFirstLinkedClass(CharacterTag character) {
+        SWF swf = character.getSwf();
+        if (swf == null) {
+            return null;
+        }
+
+        List<ScriptPack> scriptPacks = swf.getAS3Packs();
+        for (String className : character.getClassNames()) {
+            for (ScriptPack scriptPack : scriptPacks) {
+                if (scriptPack.getPublicTrait() instanceof TraitClass
+                        && className.equals(scriptPack.getClassPath().toRawString())) {
+                    return scriptPack;
+                }
+            }
+        }
+        return null;
     }
 
     /*
