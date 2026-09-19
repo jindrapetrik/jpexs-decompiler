@@ -376,13 +376,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (!abc.instance_info.get(class_info).isInterface()) {
                 AbcIndexing.ClassIndex cls = abcIndex.findClass(AbcIndexing.multinameToType(new LinkedHashSet<>(), abc.instance_info.get(class_info).name_index, abc, abc.constants), abc, scriptIndex);
                 List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
-                cls = cls.parent;
-                while (cls != null) {
-                    clsList.add(0, cls);
+                if (cls != null) {      
                     cls = cls.parent;
-                }
-                for (AbcIndexing.ClassIndex cls2 : clsList) {
-                    newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(usedDeobfuscations, cls2.abc, cls2.abc.constants, true)));
+                    while (cls != null) {
+                        clsList.add(0, cls);
+                        cls = cls.parent;
+                    }
+                    for (AbcIndexing.ClassIndex cls2 : clsList) {
+                        newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(usedDeobfuscations, cls2.abc, cls2.abc.constants, true)));
+                    }                    
                 }
             }
 
