@@ -173,6 +173,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String CARDFONTPANEL = "Font card";
 
+    private static final String IMAGE_PREVIEW_CARD = "Image preview";
+
+    private static final String SOUND_PREVIEW_CARD = "Sound preview";
+
     private static final String DISPLAYEDIT_TAG_CARD = "PLACETAG";
 
     private final MainPanel mainPanel;
@@ -182,6 +186,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private File tempFile;
 
     private ImagePanel imagePanel;
+
+    private JPanel mediaPreviewCards;
+
+    private SoundWaveformPanel soundWaveformPanel;
 
     private PlayerControls imagePlayControls;
 
@@ -360,6 +368,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditImagePanel.setTopPanelVisible(false);
         imagePanel.zoomFit();
         displayEditImagePanel.zoomFit();
+        imagePanel.setLoop(true);        
     }
 
     private void hideEmbeddedAssetPreviewChrome(Component component) {
@@ -645,11 +654,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel.setLoop(Configuration.loopMedia.get());
 
         imageTransformPanel = new TransformPanel(imagePanel);
-        previewCnt.add(imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
+        imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
                 imageTransformScrollPane = new FasterScrollPane(imageTransformPanel),
-                Configuration.guiSplitPaneTransform2DividerLocationPercent)
+                Configuration.guiSplitPaneTransform2DividerLocationPercent
         );
         imageTransformScrollPane.setVisible(false);
+
+        mediaPreviewCards = new JPanel(new CardLayout());
+        mediaPreviewCards.add(imageTransformSplitPane, IMAGE_PREVIEW_CARD);
+        soundWaveformPanel = new SoundWaveformPanel();
+        mediaPreviewCards.add(soundWaveformPanel, SOUND_PREVIEW_CARD);
+        previewCnt.add(mediaPreviewCards, BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
@@ -1755,9 +1770,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(IMAGE_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
         activeEmbeddedMedia = imagePanel;
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(true);
         imageTransformButton.setVisible(allowFreeTransform);
         if ((timelined instanceof Tag) && ((Tag) timelined).isReadOnly()) {
             imageTransformButton.setVisible(false);
@@ -1776,11 +1794,30 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(SerializableImage image) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(IMAGE_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
         activeEmbeddedMedia = imagePanel;
         imageTransformButton.setVisible(false);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(true);
         imagePanel.setImage(image);
+    }
+
+    public void showSoundPanel() {
+        showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(SOUND_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
+        activeEmbeddedMedia = imagePanel;
+        parametersPanel.setVisible(false);
+        imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(false);
+        imageTransformButton.setVisible(false);
+    }
+
+    private void showMediaPreviewCard(String card) {
+        CardLayout layout = (CardLayout) mediaPreviewCards.getLayout();
+        layout.show(mediaPreviewCards, card);
     }
 
     public void showTextComparePanel(TextTag textTag, TextTag newTextTag) {
@@ -1791,6 +1828,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         this.media = media;
         activeEmbeddedMedia = media;
         imagePlayControls.setMedia(media);
+        if (media instanceof SoundTagPlayer) {
+            soundWaveformPanel.setPlayer((SoundTagPlayer) media);
+            showMediaPreviewCard(SOUND_PREVIEW_CARD);
+        }
     }
 
     public void showFontPanel(FontTag fontTag) {
@@ -1844,6 +1885,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void clear() {
         imagePanel.clearAll();
         displayEditImagePanel.clearAll();
+        soundWaveformPanel.setPlayer(null);
         if (media != null) {
             try {
                 media.close();

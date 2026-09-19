@@ -213,7 +213,6 @@ import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
-import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -5871,7 +5870,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (t instanceof Tag) {
                 t = dumpTree.getOriginalTag(t);
             }
-            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t));
+            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t), false);
         }
     }
 
@@ -6190,7 +6189,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.closeTag();
     }
 
-    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer) {
+    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer, boolean forceLoop) {
         previewPanel.clear();
         if (treeItem == null) {
             previewPanel.showEmpty();
@@ -6263,11 +6262,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false, true);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
-            previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
+            previewPanel.showSoundPanel();
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((SoundTag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
             if (!(treeItem instanceof SoundStreamHeadTypeTag)) {
                 try {
-                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
+                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, forceLoop || Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                     if (!Configuration.autoPlaySounds.get()) {
                         soundThread.pause();
                     }
@@ -6655,62 +6654,62 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof FolderItem) {
             showFolderPreview((FolderItem) treeItem);
         } else if (treeItem instanceof SWF) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Scene) {
             showFolderPreviewList(treePath);
         } else if (treeItem instanceof MetadataTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Cookie) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof BinaryDataInterface) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof UnknownTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {
             getActionPanel().setSource((ASMSource) treeItem, !forceReload);
             showCard(CARDACTIONSCRIPTPANEL);
         } else if (treeItem instanceof ImageTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag))) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof FontTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof TextTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (frameTreeItem != null) {
-            showPreview(frameTreeItem, previewPanel, -1, null);
+            showPreview(frameTreeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ShowFrameTag) {
-            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem));
+            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem), false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof SoundTag)) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (frameTreeItem != null) {
-            showPreview(frameTreeItem, previewPanel, -1, null);
+            showPreview(frameTreeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof PlaceObjectTypeTag) {
-            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null);
+            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ProductInfoTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);
         } else if (treeItem instanceof BUTTONRECORD) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (!((treeItem instanceof ScriptPack) || ((treeItem instanceof AS3Package) && ((AS3Package) treeItem).isCompoundScript()))) {
             if (treePath == null) {

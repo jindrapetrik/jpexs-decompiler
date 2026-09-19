@@ -339,6 +339,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         //statusTextField.setVisible(!status.isEmpty());
     }
 
+    public void setProgressVisible(boolean visible) {
+        progress.setVisible(visible);
+    }
+
     private String formatMs(long ms) {
         long s = ms / 1000;
         ms %= 1000;

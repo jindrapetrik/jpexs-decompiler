@@ -118,6 +118,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -1747,6 +1748,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         sourceHeaderPanel.add(decLabel, BorderLayout.SOUTH);
         panB.add(sourceHeaderPanel, BorderLayout.NORTH);
         setLinkedAssetPreviewExpanded(Configuration.guiAvm2AssetPreviewExpanded.get(), false);
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == 0) {
+                return;
+            }
+            if (isShowing()) {
+                if (linkedAsset != null && linkedAssetPreviewExpanded) {
+                    showLinkedAssetPreview();
+                }
+            } else {
+                linkedAssetPreviewPanel.clear();
+            }
+        });
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
@@ -2829,7 +2842,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void showLinkedAssetPreview() {
-        MainPanel.showPreview(linkedAsset, linkedAssetPreviewPanel, -1, null);
+        MainPanel.showPreview(linkedAsset, linkedAssetPreviewPanel, -1, null, true);
         linkedAssetPreviewPanel.prepareEmbeddedAssetPreview();
         setLinkedAssetPreviewPlaying(Configuration.guiAvm2AssetPreviewPlaying.get(), false);
     }
