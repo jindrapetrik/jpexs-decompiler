@@ -5221,10 +5221,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         int width = (int) (viewRect.getWidth() * zoom);
         int height = (int) (viewRect.getHeight() * zoom);
-        if (width == 0) {
+        if (width <= 0) {
             width = 1;
         }
-        if (height == 0) {
+        if (height <= 0) {
             height = 1;
         }
 

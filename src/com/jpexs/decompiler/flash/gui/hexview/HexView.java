@@ -267,6 +267,15 @@ public class HexView extends JTable {
         });
     }
 
+    public void showAsciiOnly() {
+        for (int i = 0; i <= bytesInRow + 1; i++) {
+            TableColumn column = columnModel.getColumn(i);
+            column.setMinWidth(0);
+            column.setMaxWidth(0);
+            column.setPreferredWidth(0);
+        }
+    }
+
     @Override
     public HexViewTableModel getModel() {
         TableModel model = super.getModel();

@@ -87,6 +87,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -117,6 +118,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -184,6 +186,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private PlayerControls imagePlayControls;
 
     private MediaDisplay media;
+
+    private MediaDisplay activeEmbeddedMedia;
 
     private BinaryPanel binaryPanel;
 
@@ -345,6 +349,35 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setDividerSize(this.readOnly ? 0 : dividerSize);
         if (readOnly) {
             parametersPanel.setVisible(false);
+        }
+    }
+
+    public void prepareEmbeddedAssetPreview() {
+        setReadOnly(true);
+        binaryPanel.setEmbeddedPreviewMode();
+        hideEmbeddedAssetPreviewChrome(this);
+        imagePanel.setTopPanelVisible(false);
+        displayEditImagePanel.setTopPanelVisible(false);
+        imagePanel.zoomFit();
+        displayEditImagePanel.zoomFit();
+    }
+
+    private void hideEmbeddedAssetPreviewChrome(Component component) {
+        if (component instanceof PlayerControls || component instanceof ButtonsPanel || component instanceof AbstractButton) {
+            component.setVisible(false);
+            return;
+        }
+        if (component instanceof HeaderLabel) {
+            String text = ((HeaderLabel) component).getText();
+            if (mainPanel.translate("swfpreview").equals(text)
+                    || mainPanel.translate("swfpreview.internal").equals(text)) {
+                component.setVisible(false);
+            }
+        }
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                hideEmbeddedAssetPreviewChrome(child);
+            }
         }
     }
 
@@ -1722,6 +1755,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        activeEmbeddedMedia = imagePanel;
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
         imageTransformButton.setVisible(allowFreeTransform);
@@ -1742,6 +1776,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(SerializableImage image) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        activeEmbeddedMedia = imagePanel;
         imageTransformButton.setVisible(false);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
@@ -1754,6 +1789,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void setMedia(MediaDisplay media) {
         this.media = media;
+        activeEmbeddedMedia = media;
         imagePlayControls.setMedia(media);
     }
 
@@ -1815,6 +1851,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 // ignore
             }
         }
+        activeEmbeddedMedia = null;
 
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
@@ -2042,6 +2079,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showDisplayEditTagPanel(Tag tag, int frame) {
         showCardLeft(DISPLAYEDIT_TAG_CARD);
+        activeEmbeddedMedia = displayEditImagePanel;
         displayEditTag = tag;
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
@@ -3179,5 +3217,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void pauseImage() {
         imagePanel.pause();
+    }
+
+    public void setEmbeddedAssetPreviewPlaying(boolean playing, boolean freeze) {
+        if (activeEmbeddedMedia == null) {
+            return;
+        }
+        if (freeze) {
+            activeEmbeddedMedia.setFrozen(!playing);
+        }
+        if (playing) {
+            activeEmbeddedMedia.play();
+        } else {
+            activeEmbeddedMedia.pause();
+        }
     }
 }

@@ -66,9 +66,11 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.OpenableListLoaded;
 import com.jpexs.decompiler.flash.gui.PopupButton;
+import com.jpexs.decompiler.flash.gui.PreviewPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
+import com.jpexs.decompiler.flash.gui.TagInfoPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
@@ -88,7 +90,11 @@ import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
@@ -107,6 +113,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -193,6 +200,28 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
 
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
+
+    private final JPanel linkedAssetPanel;
+
+    private final PreviewPanel linkedAssetPreviewPanel;
+
+    private final JPanel linkedAssetPreviewContainer;
+
+    private final JButton linkedAssetPlaybackButton;
+
+    private final JButton linkedAssetJumpButton;
+
+    private final TagInfoPanel linkedAssetInfoPanel;
+
+    private final JPanel linkedAssetContentPanel;
+
+    private final HeaderLabel linkedAssetHeader;
+
+    private final JPanel linkedAssetHeaderPanel;
+
+    private boolean linkedAssetPreviewExpanded;
+
+    private TreeItem linkedAsset;
 
     public final DetailPanel detailPanel;
 
@@ -1623,7 +1652,101 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         detailPanel = new DetailPanel(this, mainPanel);
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
-        panB.add(decLabel, BorderLayout.NORTH);
+
+        linkedAssetPreviewPanel = new PreviewPanel(mainPanel);
+        linkedAssetPreviewPanel.showEmpty();
+        linkedAssetPreviewPanel.prepareEmbeddedAssetPreview();
+
+        linkedAssetPlaybackButton = new JButton();
+        linkedAssetPlaybackButton.setFocusable(false);
+        linkedAssetPlaybackButton.setBorderPainted(false);
+        linkedAssetPlaybackButton.setContentAreaFilled(false);
+        linkedAssetPlaybackButton.setMargin(new Insets(0, 2, 0, 2));
+        linkedAssetPlaybackButton.setOpaque(false);
+        linkedAssetPlaybackButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        linkedAssetPlaybackButton.addActionListener(e -> setLinkedAssetPreviewPlaying(!Configuration.guiAvm2AssetPreviewPlaying.get(), true));
+        linkedAssetPlaybackButton.setVisible(false);
+
+        linkedAssetJumpButton = new JButton();
+        linkedAssetJumpButton.setFocusable(false);
+        linkedAssetJumpButton.setBorderPainted(false);
+        linkedAssetJumpButton.setContentAreaFilled(false);
+        linkedAssetJumpButton.setMargin(new Insets(0, 2, 0, 2));
+        linkedAssetJumpButton.setOpaque(false);
+        linkedAssetJumpButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        linkedAssetJumpButton.setToolTipText(AppStrings.translate("contextmenu.jumpToCharacter"));
+        linkedAssetJumpButton.addActionListener(e -> jumpToLinkedAsset());
+
+        linkedAssetPreviewContainer = new JPanel(null) {
+            @Override
+            public void doLayout() {
+                linkedAssetPreviewPanel.setBounds(0, 0, getWidth(), getHeight());
+                Dimension playbackSize = linkedAssetPlaybackButton.getPreferredSize();
+                linkedAssetPlaybackButton.setBounds(
+                        getWidth() - playbackSize.width - 4,
+                        getHeight() - playbackSize.height - 4,
+                        playbackSize.width,
+                        playbackSize.height
+                );
+            }
+        };
+        linkedAssetPreviewContainer.setBorder(null);
+        linkedAssetPreviewContainer.add(linkedAssetPreviewPanel);
+        linkedAssetPreviewContainer.add(linkedAssetPlaybackButton);
+        linkedAssetPreviewContainer.setComponentZOrder(linkedAssetPlaybackButton, 0);
+
+        linkedAssetInfoPanel = new TagInfoPanel(mainPanel);
+        linkedAssetInfoPanel.setColumnHeadersVisible(false);
+        linkedAssetInfoPanel.setBorderVisible(false);
+
+        linkedAssetContentPanel = new JPanel(new GridLayout(1, 2));
+        linkedAssetContentPanel.setPreferredSize(new Dimension(1, 125));
+        linkedAssetContentPanel.add(linkedAssetPreviewContainer);
+        linkedAssetContentPanel.add(linkedAssetInfoPanel);
+
+        linkedAssetHeader = new HeaderLabel(AppStrings.translate("panel.linkedAsset"));
+        linkedAssetHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        linkedAssetHeader.setIconAtLeft(true);
+        linkedAssetHeader.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        linkedAssetHeader.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setLinkedAssetPreviewExpanded(!linkedAssetPreviewExpanded, true);
+            }
+        });
+
+        linkedAssetHeaderPanel = new JPanel(null) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension headerSize = linkedAssetHeader.getPreferredSize();
+                int iconHeight = linkedAssetJumpButton.getIcon() == null
+                        ? 0 : linkedAssetJumpButton.getIcon().getIconHeight() + 8;
+                return new Dimension(headerSize.width, Math.max(headerSize.height, iconHeight));
+            }
+
+            @Override
+            public void doLayout() {
+                linkedAssetHeader.setBounds(0, 0, getWidth(), getHeight());
+                Dimension jumpSize = linkedAssetJumpButton.getPreferredSize();
+                int x = getWidth() - jumpSize.width - 4;
+                linkedAssetJumpButton.setBounds(x, (getHeight() - jumpSize.height) / 2, jumpSize.width, jumpSize.height);
+            }
+        };
+        linkedAssetHeaderPanel.add(linkedAssetHeader);
+        linkedAssetHeaderPanel.add(linkedAssetJumpButton);
+        linkedAssetHeaderPanel.setComponentZOrder(linkedAssetJumpButton, 0);
+
+        linkedAssetPanel = new JPanel(new BorderLayout());
+        linkedAssetPanel.add(linkedAssetHeaderPanel, BorderLayout.NORTH);
+        linkedAssetPanel.add(linkedAssetContentPanel, BorderLayout.CENTER);
+        linkedAssetPanel.setVisible(false);
+        updateLinkedAssetHeaderHeight();
+
+        JPanel sourceHeaderPanel = new JPanel(new BorderLayout());
+        sourceHeaderPanel.add(linkedAssetPanel, BorderLayout.CENTER);
+        sourceHeaderPanel.add(decLabel, BorderLayout.SOUTH);
+        panB.add(sourceHeaderPanel, BorderLayout.NORTH);
+        setLinkedAssetPreviewExpanded(Configuration.guiAvm2AssetPreviewExpanded.get(), false);
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
@@ -2176,6 +2299,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decompiledTextArea.addScriptListener(setScriptComplete);
 
         decompiledTextArea.setScript(pack, false);
+        updateLinkedAssetPreview(pack);
     }
 
     public boolean isDirectEditing() {
@@ -2648,5 +2772,123 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decompiledTextArea.setNoTrait();
         setAbc(scriptPack.abc);
         decompiledTextArea.setScript(scriptPack, true);
+        updateLinkedAssetPreview(scriptPack);
+    }
+
+    private void setLinkedAssetPreviewExpanded(boolean expanded, boolean save) {
+        linkedAssetPreviewExpanded = expanded;
+        linkedAssetHeader.setIcon(View.getIcon(expanded ? "expand16" : "collapse16"));
+        linkedAssetContentPanel.setVisible(expanded);
+        linkedAssetPlaybackButton.setVisible(expanded && isLinkedAssetPlaybackAvailable());
+        if (save) {
+            Configuration.guiAvm2AssetPreviewExpanded.set(expanded);
+        }
+        if (expanded && linkedAsset != null) {
+            showLinkedAssetPreview();
+        } else if (!expanded) {
+            linkedAssetPreviewPanel.clear();
+        }
+        linkedAssetPanel.revalidate();
+        linkedAssetPanel.repaint();
+    }
+
+    private void updateLinkedAssetPreview(ScriptPack scriptPack) {
+        SWF swf = scriptPack.abc.getSwf();
+        String className = scriptPack.getClassPath().toRawString();
+        CharacterTag character = swf == null ? null : swf.getCharacterByClass(className);
+        if (character != null) {
+            linkedAsset = character;
+        } else if (swf != null && className.equals(swf.getDocumentClass())) {
+            linkedAsset = swf;
+        } else {
+            linkedAsset = null;
+        }
+
+        linkedAssetPanel.setVisible(linkedAsset != null);
+        linkedAssetJumpButton.setIcon(linkedAsset == null ? null : AbstractTagTree.getIconFor(linkedAsset));
+        updateLinkedAssetHeaderHeight();
+        linkedAssetPlaybackButton.setVisible(linkedAssetPreviewExpanded && isLinkedAssetPlaybackAvailable());
+        updateLinkedAssetInfo();
+        if (linkedAsset != null && linkedAssetPreviewExpanded) {
+            showLinkedAssetPreview();
+        } else {
+            linkedAssetPreviewPanel.clear();
+        }
+        linkedAssetPanel.revalidate();
+        linkedAssetPanel.repaint();
+    }
+
+    private void updateLinkedAssetHeaderHeight() {
+        int headerHeight = linkedAssetHeaderPanel.getPreferredSize().height;
+        Dimension decompiledHeaderSize = decLabel.getPreferredSize();
+        decLabel.setPreferredSize(new Dimension(decompiledHeaderSize.width, headerHeight));
+        Dimension disassembledHeaderSize = asmLabel.getPreferredSize();
+        asmLabel.setPreferredSize(new Dimension(disassembledHeaderSize.width, headerHeight));
+        detailPanel.setHeaderPreferredHeight(headerHeight);
+        linkedAssetHeaderPanel.revalidate();
+    }
+
+    private void showLinkedAssetPreview() {
+        MainPanel.showPreview(linkedAsset, linkedAssetPreviewPanel, -1, null);
+        linkedAssetPreviewPanel.prepareEmbeddedAssetPreview();
+        setLinkedAssetPreviewPlaying(Configuration.guiAvm2AssetPreviewPlaying.get(), false);
+    }
+
+    private void jumpToLinkedAsset() {
+        if (linkedAsset != null) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), linkedAsset);
+        }
+    }
+
+    private boolean isLinkedAssetPlaybackAvailable() {
+        return linkedAsset instanceof SoundTag
+                || linkedAsset instanceof DefineSpriteTag && isAnimatedSprite((DefineSpriteTag) linkedAsset);
+    }
+
+    private boolean isAnimatedSprite(DefineSpriteTag sprite) {
+        if (sprite.getFrameCount() > 1) {
+            return true;
+        }
+
+        LinkedHashSet<Integer> neededCharacters = new LinkedHashSet<>();
+        sprite.getNeededCharactersDeep(neededCharacters, new LinkedHashSet<>());
+        SWF swf = sprite.getSwf();
+        if (swf == null) {
+            return false;
+        }
+        for (int characterId : neededCharacters) {
+            CharacterTag character = swf.getCharacter(characterId);
+            if (character instanceof DefineSpriteTag && ((DefineSpriteTag) character).getFrameCount() > 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void setLinkedAssetPreviewPlaying(boolean playing, boolean save) {
+        linkedAssetPlaybackButton.setIcon(View.getIcon(playing ? "pause16" : "play16"));
+        linkedAssetPlaybackButton.setToolTipText(AppStrings.translate(playing ? "preview.pause" : "preview.play"));
+        if (save) {
+            Configuration.guiAvm2AssetPreviewPlaying.set(playing);
+        }
+        if (isLinkedAssetPlaybackAvailable()) {
+            linkedAssetPreviewPanel.setEmbeddedAssetPreviewPlaying(playing, linkedAsset instanceof DefineSpriteTag);
+        }
+    }
+
+    private void updateLinkedAssetInfo() {
+        if (linkedAsset instanceof Tag) {
+            Tag tag = (Tag) linkedAsset;
+            TagInfo tagInfo = new TagInfo(tag.getSwf());
+            tag.getTagInfo(tagInfo);
+            linkedAssetInfoPanel.setTagInfos(tagInfo);
+        } else if (linkedAsset instanceof SWF) {
+            TagInfo tagInfo = new TagInfo((SWF) linkedAsset);
+            tagInfo.addInfo("general", "tagType", "SWF");
+            tagInfo.addInfo("general", "characterId", 0);
+            linkedAssetInfoPanel.setTagInfos(tagInfo);
+        } else {
+            linkedAssetInfoPanel.clear();
+        }
     }
 }

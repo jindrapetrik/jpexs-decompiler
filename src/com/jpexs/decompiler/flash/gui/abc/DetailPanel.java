@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -192,6 +193,11 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     private void editorTextChanged() {
         setModified(true);
+    }
+
+    public void setHeaderPreferredHeight(int height) {
+        Dimension preferredSize = selectedLabel.getPreferredSize();
+        selectedLabel.setPreferredSize(new Dimension(preferredSize.width, height));
     }
 
     private boolean isModified() {

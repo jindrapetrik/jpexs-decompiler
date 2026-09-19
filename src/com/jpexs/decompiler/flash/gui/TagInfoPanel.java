@@ -48,14 +48,21 @@ public class TagInfoPanel extends JPanel {
 
     private final JEditorPane editorPane = new JEditorPane();
 
+    private final FasterScrollPane scrollPane;
+
     private TagInfo tagInfo = new TagInfo(null);
+
+    private boolean columnHeadersVisible = true;
+
+    private boolean contentBorderVisible = true;
 
     public TagInfoPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
         //JLabel topLabel = new JLabel(AppStrings.translate("taginfo.header"), JLabel.CENTER);
         //add(topLabel, BorderLayout.NORTH);
-        add(new FasterScrollPane(editorPane), BorderLayout.CENTER);
+        scrollPane = new FasterScrollPane(editorPane);
+        add(scrollPane, BorderLayout.CENTER);
 
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
@@ -108,6 +115,21 @@ public class TagInfoPanel extends JPanel {
         this.tagInfo = tagInfo;
         buildHtmlContent();
     }
+
+    public void setColumnHeadersVisible(boolean columnHeadersVisible) {
+        this.columnHeadersVisible = columnHeadersVisible;
+        buildHtmlContent();
+    }
+
+    public void setBorderVisible(boolean borderVisible) {
+        contentBorderVisible = borderVisible;
+        setBorder(borderVisible ? UIManager.getBorder("Panel.border") : null);
+        scrollPane.setBorder(borderVisible ? UIManager.getBorder("ScrollPane.border") : null);
+        scrollPane.setViewportBorder(borderVisible ? UIManager.getBorder("ScrollPane.viewportBorder") : null);
+        scrollPane.getViewport().setBorder(borderVisible ? UIManager.getBorder("Viewport.border") : null);
+        editorPane.setBorder(borderVisible ? UIManager.getBorder("EditorPane.border") : null);
+        buildHtmlContent();
+    }
     
     public void updateTagInfo() {
         buildHtmlContent();
@@ -130,20 +152,22 @@ public class TagInfoPanel extends JPanel {
             items = new ArrayList<>();
         }
         
-        if (View.isOceanic()) {
-            result.append("<tr bgcolor='#FDFDFD'>");
-        } else {
+        if (columnHeadersVisible) {
+            if (View.isOceanic()) {
+                result.append("<tr bgcolor='#FDFDFD'>");
+            } else {
+                result.append("<tr>");
+            }
+            result.append(String.format(
+                    "<td width='50%%' style='text-align:center;'>%s</td>",
+                    mainPanel.translate("tagInfo.header.name")
+            ));
+            result.append(String.format(
+                    "<td width='50%%' style='text-align:center;'>%s</td>",
+                    mainPanel.translate("tagInfo.header.value")
+            ));
             result.append("</tr>");
         }
-        result.append(String.format(
-                "<td width='50%%' style='text-align:center;'>%s</td>",
-                mainPanel.translate("tagInfo.header.name")
-        ));
-        result.append(String.format(
-                "<td width='50%%' style='text-align:center;'>%s</td>",
-                mainPanel.translate("tagInfo.header.value")
-        ));
-        result.append("</tr>");
 
         SWF swf = tagInfo.getSwf();
         for (TagInfo.TagInfoItem item : items) {
@@ -254,7 +278,7 @@ public class TagInfoPanel extends JPanel {
                     + "padding:1px;"
                     + "}"
                     + "td { border: 1px solid #e4e4e4; }"
-                    + "html { border: 1px solid #789AC4; }";
+                    + "html { border: " + (contentBorderVisible ? "1px solid #789AC4" : "none") + "; }";
         } else {
             Color bgColor = UIManager.getColor("Table.background");
             int light = (bgColor.getRed() + bgColor.getGreen() + bgColor.getBlue()) / 3;
@@ -270,7 +294,7 @@ public class TagInfoPanel extends JPanel {
                     + "padding:1px;"
                     + "}"
                     + "td { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
-                    + "html { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
+                    + "html { border: " + (contentBorderVisible ? "1px solid " + getUIColorToHex("Table.gridColor") : "none") + "; }"
                     + "a {color: " + getColorToHex(linkColor) + "}";
         }
 

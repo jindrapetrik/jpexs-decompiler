@@ -1265,6 +1265,16 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<String> as3ClassLinkageDefaultParentBinaryData = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("gui.avm2.assetPreview.expanded")
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> guiAvm2AssetPreviewExpanded = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("gui.avm2.assetPreview.playing")
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> guiAvm2AssetPreviewPlaying = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
