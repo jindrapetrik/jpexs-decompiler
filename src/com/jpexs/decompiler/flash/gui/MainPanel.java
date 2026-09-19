@@ -2081,6 +2081,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         if (n.equals(oldName)) {
                             abc.renameMultiname(m, newName);
                             mulCount++;
+                            ((Tag) cnt).setModified(true);
                         }
                     }
                 }
