@@ -59,6 +59,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -136,7 +137,6 @@ public class EasySwfPanel extends JPanel {
                             setTimelined(stagePanel.getTimelined(), false);
                         }
                     });
-                } else {
                     timelinePanel.setFrame(stagePanel.getFrame(), stagePanel.getSelectedDepths());
                 }
             }
@@ -154,7 +154,8 @@ public class EasySwfPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 List<Integer> depths = stagePanel.getSelectedDepths();
-                timelinePanel.setDepths(depths);
+                //timelinePanel.setDepths(depths);
+                timelinePanel.setFrame(stagePanel.getFrame(), depths);
                 transformPanel.setVisible(!depths.isEmpty());
                 updatePropertiesPanel();
             }
@@ -455,7 +456,8 @@ public class EasySwfPanel extends JPanel {
         timelinePanel.addChangeListener(new Runnable() {
             @Override
             public void run() {
-                stagePanel.repaint();
+                stagePanel.gotoFrame(1 + timelinePanel.getTimelineBodyPanel().getFirstFrame());
+                stagePanel.repaint();              
             }
         });
         timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
@@ -586,7 +588,7 @@ public class EasySwfPanel extends JPanel {
             cl.show(propertiesPanel, PROPERTIES_DOCUMENT);
             return;
         }
-        if (places.size() == 1) {
+        if (places.size() == 1 && places.get(0) != null) {
             int chid = places.get(0).getCharacterId();
             if (chid > -1) {
                 if (places.get(0).getSwf().getCharacter(chid) instanceof TextTag) {
@@ -717,7 +719,11 @@ public class EasySwfPanel extends JPanel {
     }
 
     public int getFrame() {
-        return stagePanel.getFrame();
+        Point p = timelinePanel.getTimelineBodyPanel().cursor.iterator().next();
+        if (p == null) {
+            return 0;
+        }
+        return p.x;
     }
 
     public ImagePanel getStagePanel() {

@@ -4678,6 +4678,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized double getZoomToFit() {
         if (timelined != null) {
             RECT bounds = timelined.getRect();
+            if (bounds == null) {
+                return 1;
+            }
             double w1 = bounds.getWidth() / SWF.unitDivisor;
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 

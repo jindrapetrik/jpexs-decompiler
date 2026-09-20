@@ -274,6 +274,9 @@ public class Timeline {
         if (index >= frames.size()) {
             return null;
         }
+        if (index < 0) {
+            return null;
+        }
         return frames.get(index);
     }
 
