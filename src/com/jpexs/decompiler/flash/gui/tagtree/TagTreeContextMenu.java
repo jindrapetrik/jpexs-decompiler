@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
 import com.jpexs.decompiler.flash.gui.ConvertPlaceObjectTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertShapeTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertTextTypeDialog;
+import com.jpexs.decompiler.flash.gui.CreateTweenDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
@@ -57,6 +58,7 @@ import com.jpexs.decompiler.flash.gui.SaveFileMode;
 import com.jpexs.decompiler.flash.gui.SelectFramePositionDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
+import com.jpexs.decompiler.flash.gui.TweenEasing;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
@@ -396,6 +398,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem convertPlaceObjectTypeMenuItem;
 
+    private JMenuItem createTweenMenuItem;
+
     private JMenuItem convertTextTypeMenuItem;
     
     private JMenuItem normalizeFontsMenuItem;
@@ -689,6 +693,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         convertPlaceObjectTypeMenuItem.addActionListener(this::convertPlaceObjectTypeActionPerformed);
         convertPlaceObjectTypeMenuItem.setIcon(View.getIcon("placeobject16"));
         add(convertPlaceObjectTypeMenuItem);
+
+        createTweenMenuItem = new JMenuItem(mainPanel.translate("contextmenu.createTween"));
+        createTweenMenuItem.addActionListener(this::createTweenActionPerformed);
+        createTweenMenuItem.setIcon(View.getIcon("tween16"));
+        add(createTweenMenuItem);
         
         convertTextTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertTextType"));
         convertTextTypeMenuItem.addActionListener(this::convertTextTypeActionPerformed);
@@ -1463,6 +1472,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setVisible(false);
         convertShapeTypeMenuItem.setVisible(false);
         convertPlaceObjectTypeMenuItem.setVisible(false);
+        createTweenMenuItem.setVisible(false);
         convertTextTypeMenuItem.setVisible(false);
         normalizeFontsMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
@@ -1975,6 +1985,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsPlaceObject) {
             convertPlaceObjectTypeMenuItem.setVisible(true);
+        }
+
+        if (items.size() == 1 && items.get(0) instanceof PlaceObjectTypeTag) {
+            createTweenMenuItem.setVisible(findTweenTarget((PlaceObjectTypeTag) items.get(0)) != null);
         }
         
         if (allSelectedIsText) {
@@ -3175,6 +3189,127 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.refreshTree();
         if (itemr.size() == 1) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), lastConverted);
+        }
+    }
+
+    private TweenTarget findTweenTarget(PlaceObjectTypeTag source) {
+        Timelined timelined = source.getTimelined();
+        if (timelined == null) {
+            return null;
+        }
+        Timeline timeline = timelined.getTimeline();
+        int sourceFrame = -1;
+        for (int frameIndex = 0; frameIndex < timeline.getFrameCount(); frameIndex++) {
+            if (timeline.getFrame(frameIndex).innerTags.contains(source)) {
+                sourceFrame = frameIndex;
+                break;
+            }
+        }
+        if (sourceFrame < 0) {
+            return null;
+        }
+
+        DepthState sourceState = timeline.getFrame(sourceFrame).layers.get(source.getDepth());
+        if (sourceState == null || sourceState.characterId < 0) {
+            return null;
+        }
+        MATRIX startMatrix = sourceState.matrix == null ? new MATRIX() : new MATRIX(sourceState.matrix);
+
+        for (int frameIndex = sourceFrame + 1; frameIndex < timeline.getFrameCount(); frameIndex++) {
+            Frame frame = timeline.getFrame(frameIndex);
+            for (Tag tag : frame.innerTags) {
+                if (tag instanceof DepthTag && ((DepthTag) tag).getDepth() == source.getDepth()
+                        && !(tag instanceof PlaceObjectTypeTag)) {
+                    return null;
+                }
+                if (!(tag instanceof PlaceObjectTypeTag)) {
+                    continue;
+                }
+                PlaceObjectTypeTag candidate = (PlaceObjectTypeTag) tag;
+                if (candidate.getDepth() != source.getDepth()) {
+                    continue;
+                }
+
+                boolean sameCharacter = candidate.getCharacterId() == sourceState.characterId;
+                boolean moveWithoutCharacter = candidate.flagMove() && candidate.getCharacterId() == -1;
+                if (!sameCharacter && !moveWithoutCharacter) {
+                    return null;
+                }
+                if (frameIndex <= sourceFrame + 1) {
+                    return null;
+                }
+                DepthState targetState = frame.layers.get(source.getDepth());
+                if (targetState == null) {
+                    return null;
+                }
+                return new TweenTarget(timelined, sourceFrame, frameIndex, source.getDepth(),
+                        sourceState.characterId, startMatrix,
+                        targetState.matrix == null ? new MATRIX() : new MATRIX(targetState.matrix));
+            }
+        }
+        return null;
+    }
+
+    private void createTweenActionPerformed(ActionEvent evt) {
+        TreeItem selected = getCurrentItem();
+        if (!(selected instanceof PlaceObjectTypeTag)) {
+            return;
+        }
+        TweenTarget target = findTweenTarget((PlaceObjectTypeTag) selected);
+        if (target == null) {
+            return;
+        }
+
+        int tweenFrameCount = target.targetFrame - target.sourceFrame + 1;
+        CreateTweenDialog dialog = new CreateTweenDialog(Main.getDefaultDialogsOwner(),
+                ((PlaceObjectTypeTag) selected).getSwf(), target.characterId, tweenFrameCount,
+                target.startMatrix, target.endMatrix);
+        if (dialog.showDialog() != CreateTweenDialog.OK_OPTION) {
+            return;
+        }
+
+        SWF swf = ((PlaceObjectTypeTag) selected).getSwf();
+        Timeline timeline = target.timelined.getTimeline();
+        for (int frameIndex = target.sourceFrame + 1; frameIndex < target.targetFrame; frameIndex++) {
+            double progress = (double) (frameIndex - target.sourceFrame)
+                    / (target.targetFrame - target.sourceFrame);
+            MATRIX matrix = TweenEasing.interpolate(
+                    target.startMatrix, target.endMatrix, dialog.getEasedProgress(progress));
+            PlaceObject2Tag place = new PlaceObject2Tag(swf, true, target.depth, -1,
+                    matrix, null, -1, null, -1, null);
+            place.setTimelined(target.timelined);
+            place.setModified(true);
+            Frame frame = timeline.getFrame(frameIndex);
+            int insertIndex = frame.showFrameTag == null
+                    ? target.timelined.getTags().size()
+                    : target.timelined.indexOfTag(frame.showFrameTag);
+            target.timelined.addTag(insertIndex, place);
+        }
+        target.timelined.resetTimeline();
+        swf.resetTimelines(target.timelined);
+        swf.setModified(true);
+        mainPanel.refreshTree(swf);
+    }
+
+    private static class TweenTarget {
+
+        private final Timelined timelined;
+        private final int sourceFrame;
+        private final int targetFrame;
+        private final int depth;
+        private final int characterId;
+        private final MATRIX startMatrix;
+        private final MATRIX endMatrix;
+
+        TweenTarget(Timelined timelined, int sourceFrame, int targetFrame, int depth,
+                int characterId, MATRIX startMatrix, MATRIX endMatrix) {
+            this.timelined = timelined;
+            this.sourceFrame = sourceFrame;
+            this.targetFrame = targetFrame;
+            this.depth = depth;
+            this.characterId = characterId;
+            this.startMatrix = startMatrix;
+            this.endMatrix = endMatrix;
         }
     }
     

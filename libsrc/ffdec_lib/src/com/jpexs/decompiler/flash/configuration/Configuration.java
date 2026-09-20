@@ -1279,6 +1279,18 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> guiAvm2AssetPreviewPlaying = null;
 
+    @ConfigurationDefaultInt(0)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastTweenEasingMode = null;
+
+    @ConfigurationDefaultInt(0)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastTweenEasingValue = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationInternal
+    public static ConfigurationItem<String> lastTweenCustomEase = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
