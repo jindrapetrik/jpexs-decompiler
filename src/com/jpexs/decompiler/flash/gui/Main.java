@@ -2149,8 +2149,10 @@ public class Main {
                         }
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
-                    if (fswf != null) {
-                        mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                    if (isInited()) {                    
+                        if (fswf != null) {
+                            mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                        }
                     }
                 }
 
