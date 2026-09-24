@@ -101,7 +101,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify" />
+            <!--<jvmarg value="-noverify" />-->
             <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
             
         </testng>      

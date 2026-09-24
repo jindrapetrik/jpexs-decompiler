@@ -156,7 +156,7 @@
                     <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                     <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
                 </classpath>
-                <jvmarg value="-noverify" />
+                <!--<jvmarg value="-noverify" />-->
                 <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
             </testng>
         </jacoco:coverage>
@@ -743,7 +743,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/*-fix.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify" />
+            <!--<jvmarg value="-noverify" />-->
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
