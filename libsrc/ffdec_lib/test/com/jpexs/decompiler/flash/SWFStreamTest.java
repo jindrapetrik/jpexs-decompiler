@@ -161,6 +161,20 @@ public class SWFStreamTest {
     }
 
     @Test
+    public void testEncodedU32RoundTrip() throws IOException {
+        long[] values = new long[]{0, 0x7f, 0x80, 0x7fffffffL, 0x80000000L, 0xffffffffL};
+        for (long value : values) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+                sos.writeEncodedU32(value);
+            }
+            try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
+                assertEquals(sis.readEncodedU32("test"), value);
+            }
+        }
+    }
+
+    @Test
     public void testFIXEDandFIXED8() throws IOException {
         //example from specification
         byte[] data = new byte[]{(byte) 0x00, (byte) 0x80, (byte) 0x07, (byte) 0x00};

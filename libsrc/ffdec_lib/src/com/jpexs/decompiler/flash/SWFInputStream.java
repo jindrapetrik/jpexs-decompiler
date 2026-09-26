@@ -1184,27 +1184,27 @@ public class SWFInputStream implements AutoCloseable {
      */
     public long readEncodedU32(String name) throws IOException {
         newDumpLevel(name, "encodedU32");
-        int result = readEx();
+        long result = readEx();
         if ((result & 0x00000080) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0000007f) | (readEx()) << 7;
+        result = (result & 0x0000007fL) | ((long) readEx()) << 7;
         if ((result & 0x00004000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x00003fff) | (readEx()) << 14;
+        result = (result & 0x00003fffL) | ((long) readEx()) << 14;
         if ((result & 0x00200000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x001fffff) | (readEx()) << 21;
+        result = (result & 0x001fffffL) | ((long) readEx()) << 21;
         if ((result & 0x10000000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0fffffff) | (readEx()) << 28;
+        result = (result & 0x0fffffffL) | ((long) (readEx() & 0x0f)) << 28;
         endDumpLevel(result);
         return result;
     }

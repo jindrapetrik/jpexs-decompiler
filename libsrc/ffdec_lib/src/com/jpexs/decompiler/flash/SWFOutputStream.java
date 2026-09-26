@@ -480,7 +480,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeEncodedU32(long value) throws IOException {
         boolean loop = true;
-        value &= 0xFFFFFFFF;
+        value &= 0xFFFFFFFFL;
         do {
             int ret = (int) (value & 0x7F);
             if (value < 0x80) {
@@ -490,7 +490,7 @@ public class SWFOutputStream extends OutputStream {
                 ret += 0x80;
             }
             write(ret);
-            value >>= 7;
+            value >>>= 7;
         } while (loop);
     }
 
