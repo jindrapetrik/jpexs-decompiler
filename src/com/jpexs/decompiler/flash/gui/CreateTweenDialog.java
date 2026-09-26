@@ -13,6 +13,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -39,6 +40,12 @@ public class CreateTweenDialog extends AppDialog {
     private final int frameCount;
     private final MATRIX startMatrix;
     private final MATRIX endMatrix;
+    private final CXFORMWITHALPHA startColorTransform;
+    private final CXFORMWITHALPHA endColorTransform;
+    private final boolean tweenColorTransform;
+    private final int startRatio;
+    private final int endRatio;
+    private final boolean tweenRatio;
     private final ImagePanel previewPanel = new ImagePanel();
     private final JSpinner easingSpinner = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1));
     private final JLabel easingDirectionLabel = new JLabel();
@@ -49,13 +56,21 @@ public class CreateTweenDialog extends AppDialog {
     private int result = CANCEL_OPTION;
 
     public CreateTweenDialog(Window owner, SWF swf, int characterId, int frameCount,
-            MATRIX startMatrix, MATRIX endMatrix) {
+            MATRIX startMatrix, MATRIX endMatrix, CXFORMWITHALPHA startColorTransform,
+            CXFORMWITHALPHA endColorTransform, boolean tweenColorTransform,
+            int startRatio, int endRatio, boolean tweenRatio) {
         super(owner);
         this.swf = swf;
         this.characterId = characterId;
         this.frameCount = frameCount;
         this.startMatrix = new MATRIX(startMatrix);
         this.endMatrix = new MATRIX(endMatrix);
+        this.startColorTransform = startColorTransform == null ? null : startColorTransform.clone();
+        this.endColorTransform = endColorTransform == null ? null : endColorTransform.clone();
+        this.tweenColorTransform = tweenColorTransform;
+        this.startRatio = startRatio;
+        this.endRatio = endRatio;
+        this.tweenRatio = tweenRatio;
 
         setTitle(translate("dialog.title"));
         setLayout(new BorderLayout(8, 8));
@@ -165,9 +180,16 @@ public class CreateTweenDialog extends AppDialog {
         for (int frame = 0; frame < frameCount; frame++) {
             double progress = frameCount == 1 ? 1 : (double) frame / (frameCount - 1);
             double eased = getEasedProgress(progress);
+            CXFORMWITHALPHA colorTransform = frame == 0 && !tweenColorTransform
+                    ? startColorTransform
+                    : tweenColorTransform
+                            ? TweenEasing.interpolate(startColorTransform, endColorTransform, eased) : null;
+            int ratio = frame == 0 && !tweenRatio ? startRatio
+                    : tweenRatio ? TweenEasing.interpolate(startRatio, endRatio, eased) : -1;
             PlaceObject2Tag place = new PlaceObject2Tag(swf, frame > 0, 1,
                     frame == 0 ? characterId : -1,
-                    TweenEasing.interpolate(startMatrix, endMatrix, eased), null, -1, null, -1, null);
+                    TweenEasing.interpolate(startMatrix, endMatrix, eased), colorTransform,
+                    ratio, null, -1, null);
             place.setTimelined(preview);
             preview.addTag(place);
             ShowFrameTag showFrame = new ShowFrameTag(swf);

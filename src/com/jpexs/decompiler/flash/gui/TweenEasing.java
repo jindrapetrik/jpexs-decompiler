@@ -8,6 +8,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 
 /**
@@ -71,11 +73,38 @@ public final class TweenEasing {
         return result;
     }
 
+    public static CXFORMWITHALPHA interpolate(ColorTransform start, ColorTransform end, double progress) {
+        ColorTransform effectiveStart = start == null ? new ColorTransform() : start;
+        ColorTransform effectiveEnd = end == null ? new ColorTransform() : end;
+        CXFORMWITHALPHA result = new CXFORMWITHALPHA();
+        result.redAddTerm = lerp(effectiveStart.getRedAdd(), effectiveEnd.getRedAdd(), progress);
+        result.greenAddTerm = lerp(effectiveStart.getGreenAdd(), effectiveEnd.getGreenAdd(), progress);
+        result.blueAddTerm = lerp(effectiveStart.getBlueAdd(), effectiveEnd.getBlueAdd(), progress);
+        result.alphaAddTerm = lerp(effectiveStart.getAlphaAdd(), effectiveEnd.getAlphaAdd(), progress);
+        result.redMultTerm = lerp(effectiveStart.getRedMulti(), effectiveEnd.getRedMulti(), progress);
+        result.greenMultTerm = lerp(effectiveStart.getGreenMulti(), effectiveEnd.getGreenMulti(), progress);
+        result.blueMultTerm = lerp(effectiveStart.getBlueMulti(), effectiveEnd.getBlueMulti(), progress);
+        result.alphaMultTerm = lerp(effectiveStart.getAlphaMulti(), effectiveEnd.getAlphaMulti(), progress);
+        result.hasAddTerms = result.redAddTerm != 0 || result.greenAddTerm != 0
+                || result.blueAddTerm != 0 || result.alphaAddTerm != 0;
+        result.hasMultTerms = result.redMultTerm != 256 || result.greenMultTerm != 256
+                || result.blueMultTerm != 256 || result.alphaMultTerm != 256;
+        return result;
+    }
+
+    public static int interpolate(int start, int end, double progress) {
+        return lerp(start, end, progress);
+    }
+
     private static float lerp(float start, float end, double progress) {
         return (float) (start + (end - start) * progress);
     }
 
     private static double lerp(double start, double end, double progress) {
         return start + (end - start) * progress;
+    }
+
+    private static int lerp(int start, int end, double progress) {
+        return (int) Math.round(start + (end - start) * progress);
     }
 }

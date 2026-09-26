@@ -8,6 +8,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.event.MouseEvent;
 import static org.testng.Assert.assertEquals;
@@ -94,5 +95,35 @@ public class TweenEasingTest {
         MATRIX identity = TweenEasing.interpolate(new MATRIX(), new MATRIX(), 0.5);
         assertFalse(identity.hasScale);
         assertFalse(identity.hasRotate);
+    }
+
+    @Test
+    public void interpolatesColorTransformFromIdentity() {
+        CXFORMWITHALPHA end = new CXFORMWITHALPHA();
+        end.hasAddTerms = true;
+        end.redAddTerm = 100;
+        end.alphaAddTerm = -40;
+        end.hasMultTerms = true;
+        end.redMultTerm = 128;
+        end.greenMultTerm = 64;
+        end.blueMultTerm = 256;
+        end.alphaMultTerm = 0;
+
+        CXFORMWITHALPHA middle = TweenEasing.interpolate(null, end, 0.5);
+        assertEquals(middle.redAddTerm, 50);
+        assertEquals(middle.alphaAddTerm, -20);
+        assertEquals(middle.redMultTerm, 192);
+        assertEquals(middle.greenMultTerm, 160);
+        assertEquals(middle.blueMultTerm, 256);
+        assertEquals(middle.alphaMultTerm, 128);
+        assertTrue(middle.hasAddTerms);
+        assertTrue(middle.hasMultTerms);
+    }
+
+    @Test
+    public void interpolatesRatio() {
+        assertEquals(TweenEasing.interpolate(0, 65535, 0), 0);
+        assertEquals(TweenEasing.interpolate(0, 65535, 0.5), 32768);
+        assertEquals(TweenEasing.interpolate(0, 65535, 1), 65535);
     }
 }
