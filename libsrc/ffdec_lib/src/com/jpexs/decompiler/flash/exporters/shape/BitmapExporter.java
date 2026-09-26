@@ -480,6 +480,11 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
+        if (colors.isEmpty()) {
+            colors.add(Color.RED);
+            ratios.add(0f);
+        }
+        
         if (colors.size() == 1) {
             colors.add(colors.get(0));
             ratios.set(0, 0f);
