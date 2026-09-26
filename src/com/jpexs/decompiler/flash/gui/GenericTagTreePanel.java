@@ -803,6 +803,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return parentObject;
         }
 
+        public Tag getTag() {
+            return tag;
+        }
+
         public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index, SWF swf) {
             this.tag = tag;
             this.obj = obj;

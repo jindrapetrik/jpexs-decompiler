@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
@@ -65,8 +66,16 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -75,6 +84,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -86,8 +96,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
@@ -102,6 +114,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1492,6 +1505,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     displayEditImagePanel.setHilightedEdge(null);
                     return;
                 }
+                if (highlightSelectedMorphFillStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedMorphLineStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedFillStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedLineStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                displayEditImagePanel.setHilightedFill(null);
                 JTree tree = (JTree) e.getSource();
                 Object obj = e.getPath().getLastPathComponent();
                 if (obj instanceof GenericTagTreePanel.FieldNode) {
@@ -1637,6 +1667,295 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
 
         return displayEditTagCard;
+    }
+
+    private boolean highlightSelectedFillStyle(javax.swing.tree.TreePath path) {
+        FILLSTYLE selectedFillStyle = null;
+        ShapeTag shapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof FILLSTYLE) {
+                selectedFillStyle = (FILLSTYLE) value;
+                break;
+            }
+        }
+        if (selectedFillStyle == null || shapeTag == null) {
+            return false;
+        }
+
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int fillStyleIndex = getFillStyleIndex(shapes, selectedFillStyle);
+        if (fillStyleIndex < 1) {
+            return false;
+        }
+        GeneralPath fillPath = PathExporter.exportFillStyle(
+                shapeTag.getWindingRule(),
+                shapeTag.getShapeNum(),
+                shapeTag.getSwf(),
+                shapes,
+                fillStyleIndex
+        );
+        displayEditImagePanel.setHilightedFill(fillPath.getCurrentPoint() == null ? null : fillPath);
+        return true;
+    }
+
+    private int getFillStyleIndex(SHAPEWITHSTYLE shapes, FILLSTYLE selectedFillStyle) {
+        int fillStyleIndex = 0;
+        for (FILLSTYLE fillStyle : shapes.fillStyles.fillStyles) {
+            fillStyleIndex++;
+            if (fillStyle == selectedFillStyle) {
+                return fillStyleIndex;
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            for (FILLSTYLE fillStyle : styleChangeRecord.fillStyles.fillStyles) {
+                fillStyleIndex++;
+                if (fillStyle == selectedFillStyle) {
+                    return fillStyleIndex;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean highlightSelectedLineStyle(javax.swing.tree.TreePath path) {
+        Object selectedLineStyle = null;
+        ShapeTag shapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof LINESTYLE || value instanceof LINESTYLE2) {
+                selectedLineStyle = value;
+                break;
+            }
+        }
+        if (selectedLineStyle == null || shapeTag == null) {
+            return false;
+        }
+
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int lineStyleIndex = getLineStyleIndex(shapes, shapeTag.getShapeNum(), selectedLineStyle);
+        if (lineStyleIndex < 1) {
+            return false;
+        }
+        GeneralPath linePath = PathExporter.exportLineStyle(
+                shapeTag.getWindingRule(),
+                shapeTag.getShapeNum(),
+                shapeTag.getSwf(),
+                shapes,
+                lineStyleIndex
+        );
+        Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, (ILINESTYLE) selectedLineStyle);
+        displayEditImagePanel.setHilightedLine(lineArea);
+        return true;
+    }
+
+    private int getLineStyleIndex(SHAPEWITHSTYLE shapes, int shapeNum, Object selectedLineStyle) {
+        int lineStyleIndex = 0;
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                lineStyleIndex++;
+                if (lineStyle == selectedLineStyle) {
+                    return lineStyleIndex;
+                }
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                lineStyleIndex++;
+                if (lineStyle == selectedLineStyle) {
+                    return lineStyleIndex;
+                }
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    lineStyleIndex++;
+                    if (lineStyle == selectedLineStyle) {
+                        return lineStyleIndex;
+                    }
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    lineStyleIndex++;
+                    if (lineStyle == selectedLineStyle) {
+                        return lineStyleIndex;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean highlightSelectedMorphFillStyle(javax.swing.tree.TreePath path) {
+        MORPHFILLSTYLE selectedFillStyle = null;
+        MorphShapeTag morphShapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof MORPHFILLSTYLE) {
+                selectedFillStyle = (MORPHFILLSTYLE) value;
+                break;
+            }
+        }
+        if (selectedFillStyle == null || morphShapeTag == null) {
+            return false;
+        }
+
+        int fillStyleIndex = -1;
+        for (int i = 0; i < morphShapeTag.morphFillStyles.fillStyles.length; i++) {
+            if (morphShapeTag.morphFillStyles.fillStyles[i] == selectedFillStyle) {
+                fillStyleIndex = i + 1;
+                break;
+            }
+        }
+        if (fillStyleIndex < 1) {
+            return false;
+        }
+
+        final MorphShapeTag selectedMorphShape = morphShapeTag;
+        final int selectedFillStyleIndex = fillStyleIndex;
+        final int shapeNum = getMorphShapeNum(morphShapeTag);
+        Map<Integer, GeneralPath> pathsByRatio = new HashMap<>();
+        displayEditImagePanel.setHilightedFillProvider(ratio -> pathsByRatio.computeIfAbsent(ratio, currentRatio ->
+                PathExporter.exportFillStyle(
+                        ShapeTag.WIND_EVEN_ODD,
+                        shapeNum,
+                        null,
+                        selectedMorphShape.getShapeAtRatio(currentRatio),
+                        selectedFillStyleIndex
+                )
+        ));
+        return true;
+    }
+
+    private boolean highlightSelectedMorphLineStyle(javax.swing.tree.TreePath path) {
+        Object selectedLineStyle = null;
+        MorphShapeTag morphShapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof MORPHLINESTYLE || value instanceof MORPHLINESTYLE2) {
+                selectedLineStyle = value;
+                break;
+            }
+        }
+        if (selectedLineStyle == null || morphShapeTag == null) {
+            return false;
+        }
+
+        int lineStyleIndex = -1;
+        if (morphShapeTag.getShapeNum() == 1) {
+            for (int i = 0; i < morphShapeTag.morphLineStyles.lineStyles.length; i++) {
+                if (morphShapeTag.morphLineStyles.lineStyles[i] == selectedLineStyle) {
+                    lineStyleIndex = i + 1;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < morphShapeTag.morphLineStyles.lineStyles2.length; i++) {
+                if (morphShapeTag.morphLineStyles.lineStyles2[i] == selectedLineStyle) {
+                    lineStyleIndex = i + 1;
+                    break;
+                }
+            }
+        }
+        if (lineStyleIndex < 1) {
+            return false;
+        }
+
+        final MorphShapeTag selectedMorphShape = morphShapeTag;
+        final int selectedLineStyleIndex = lineStyleIndex;
+        final int shapeNum = getMorphShapeNum(morphShapeTag);
+        Map<Integer, Shape> pathsByRatio = new HashMap<>();
+        displayEditImagePanel.setHilightedLineProvider(ratio -> pathsByRatio.computeIfAbsent(ratio, currentRatio -> {
+            SHAPEWITHSTYLE currentShape = selectedMorphShape.getShapeAtRatio(currentRatio);
+            GeneralPath linePath = PathExporter.exportLineStyle(
+                    ShapeTag.WIND_EVEN_ODD,
+                    shapeNum,
+                    null,
+                    currentShape,
+                    selectedLineStyleIndex
+            );
+            ILINESTYLE currentLineStyle = shapeNum <= 3
+                    ? currentShape.lineStyles.lineStyles[selectedLineStyleIndex - 1]
+                    : currentShape.lineStyles.lineStyles2[selectedLineStyleIndex - 1];
+            return createLineStyleArea(linePath, currentLineStyle);
+        }));
+        return true;
+    }
+
+    private Shape createLineStyleArea(GeneralPath linePath, ILINESTYLE lineStyle) {
+        int cap = BasicStroke.CAP_ROUND;
+        int join = BasicStroke.JOIN_ROUND;
+        float miterLimit = 10f;
+        if (lineStyle instanceof LINESTYLE2) {
+            LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
+            cap = lineStyle2.startCapStyle == LINESTYLE2.NO_CAP
+                    ? BasicStroke.CAP_BUTT
+                    : lineStyle2.startCapStyle == LINESTYLE2.SQUARE_CAP
+                            ? BasicStroke.CAP_SQUARE
+                            : BasicStroke.CAP_ROUND;
+            join = lineStyle2.joinStyle == LINESTYLE2.BEVEL_JOIN
+                    ? BasicStroke.JOIN_BEVEL
+                    : lineStyle2.joinStyle == LINESTYLE2.MITER_JOIN
+                            ? BasicStroke.JOIN_MITER
+                            : BasicStroke.JOIN_ROUND;
+            miterLimit = Math.max(1f, lineStyle2.miterLimitFactor);
+        }
+        float width = Math.max(1f, lineStyle.getWidth());
+        return new BasicStroke(width, cap, join, miterLimit).createStrokedShape(linePath);
+    }
+
+    private int getMorphShapeNum(MorphShapeTag morphShapeTag) {
+        return morphShapeTag.getShapeNum() == 2 ? 4 : 1;
     }
 
     private JPanel createDisplayEditTagButtonsPanel() {

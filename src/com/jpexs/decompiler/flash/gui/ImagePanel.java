@@ -126,6 +126,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.IntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -305,6 +306,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
 
     private Point[] hilightedEdge = null;
+
+    private Shape hilightedFill = null;
+
+    private Shape hilightedLine = null;
+
+    private IntFunction<Shape> hilightedFillProvider = null;
+
+    private IntFunction<Shape> hilightedLineProvider = null;
+
+    private int lastHilightedShapeRatio = -1;
+
+    private javax.swing.Timer hilightedShapeTimer;
 
     private List<DisplayPoint> hilightedPoints = null;
 
@@ -664,6 +677,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
         hilightedEdge = null;
+        setHilightedFillInternal(null);
+        setHilightedLineInternal(null);
         selectedPoints = new ArrayList<>();
         calculatePointsXY();
         this.hilightedPoints = hilightedPoints;
@@ -673,10 +688,112 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setHilightedEdge(Point[] hilightedEdge) {
         this.hilightedEdge = hilightedEdge;
+        setHilightedFillInternal(null);
+        setHilightedLineInternal(null);
         hilightedPoints = null;
         hilightEdgeColor = 255;
         pointEditPanel.setVisible(false);
         redraw();
+    }
+
+    public void setHilightedFill(Shape hilightedFill) {
+        this.hilightedEdge = null;
+        this.hilightedPoints = null;
+        setHilightedLineInternal(null);
+        pointEditPanel.setVisible(false);
+        setHilightedFillInternal(hilightedFill);
+        hilightEdgeColor = 255;
+        redraw();
+    }
+
+    private void setHilightedFillInternal(Shape hilightedFill) {
+        this.hilightedFillProvider = null;
+        this.hilightedFill = hilightedFill;
+        updateHilightedShapeTimer();
+    }
+
+    public void setHilightedFillProvider(IntFunction<Shape> hilightedFillProvider) {
+        this.hilightedEdge = null;
+        this.hilightedPoints = null;
+        setHilightedLineInternal(null);
+        pointEditPanel.setVisible(false);
+        this.hilightedFillProvider = hilightedFillProvider;
+        this.hilightedFill = null;
+        this.lastHilightedShapeRatio = -1;
+        updateHilightedProviderShapes();
+        updateHilightedShapeTimer();
+        redraw();
+    }
+
+    public void setHilightedLine(Shape hilightedLine) {
+        this.hilightedEdge = null;
+        this.hilightedPoints = null;
+        setHilightedFillInternal(null);
+        pointEditPanel.setVisible(false);
+        setHilightedLineInternal(hilightedLine);
+        hilightEdgeColor = 255;
+        redraw();
+    }
+
+    private void setHilightedLineInternal(Shape hilightedLine) {
+        this.hilightedLineProvider = null;
+        this.hilightedLine = hilightedLine;
+        updateHilightedShapeTimer();
+    }
+
+    public void setHilightedLineProvider(IntFunction<Shape> hilightedLineProvider) {
+        this.hilightedEdge = null;
+        this.hilightedPoints = null;
+        setHilightedFillInternal(null);
+        pointEditPanel.setVisible(false);
+        this.hilightedLineProvider = hilightedLineProvider;
+        this.hilightedLine = null;
+        this.lastHilightedShapeRatio = -1;
+        updateHilightedProviderShapes();
+        updateHilightedShapeTimer();
+        redraw();
+    }
+
+    private void updateHilightedProviderShapes() {
+        if (hilightedFillProvider == null && hilightedLineProvider == null) {
+            return;
+        }
+        int ratio = getCurrentHilightedShapeRatio();
+        if (ratio == lastHilightedShapeRatio) {
+            return;
+        }
+        lastHilightedShapeRatio = ratio;
+        if (hilightedFillProvider != null) {
+            hilightedFill = hilightedFillProvider.apply(ratio);
+        }
+        if (hilightedLineProvider != null) {
+            hilightedLine = hilightedLineProvider.apply(ratio);
+        }
+    }
+
+    private int getCurrentHilightedShapeRatio() {
+        if (timelined == null) {
+            return 0;
+        }
+        Timeline timeline = timelined.getTimeline();
+        int frameIndex = Math.max(0, Math.min(frame, timeline.getFrameCount() - 1));
+        DepthState state = timeline.getDepthState(frameIndex, 1);
+        return state == null ? 0 : state.ratio;
+    }
+
+    private void updateHilightedShapeTimer() {
+        if (hilightedFill == null && hilightedLine == null && hilightedFillProvider == null && hilightedLineProvider == null) {
+            if (hilightedShapeTimer != null) {
+                hilightedShapeTimer.stop();
+            }
+            return;
+        }
+        if (hilightedShapeTimer == null) {
+            hilightedShapeTimer = new javax.swing.Timer(40, e -> iconPanel.repaint());
+        }
+        if (!hilightedShapeTimer.isRunning()) {
+            hilightedShapeTimer.start();
+        }
     }
 
     public void setStatus(String status) {
@@ -956,6 +1073,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         selectedDepths = new ArrayList<>(depths);
         doFreeTransform = !depths.isEmpty();
         hilightedEdge = null;
+        setHilightedFillInternal(null);
+        setHilightedLineInternal(null);
         hilightedPoints = null;
         pointEditPanel.setVisible(false);
         registrationPoint = null;
@@ -3661,6 +3780,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         protected void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
 
+            updateHilightedProviderShapes();
+
             VolatileImage ri = this.renderImage;
             if (ri != null) {
                 if (ri.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
@@ -3670,6 +3791,81 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 if (ri != null) {
                     g2d.drawImage(ri, 0, 0, null);
+                }
+            }
+
+            if ((hilightedFill != null || hilightedLine != null) && timelined != null) {
+                hilightEdgeColor += hilightEdgeColorStep;
+                if (hilightEdgeColor < 100 || hilightEdgeColor > 255) {
+                    hilightEdgeColorStep = -hilightEdgeColorStep;
+                    hilightEdgeColor += hilightEdgeColorStep * 2;
+                }
+                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                AffineTransform hilightTransform = new AffineTransform();
+                hilightTransform.translate(offsetPoint.getX(), offsetPoint.getY());
+                hilightTransform.scale(zoomDouble / SWF.unitDivisor, zoomDouble / SWF.unitDivisor);
+                double colorRatio = (hilightEdgeColor - 100) / 155.0;
+                Color dotColor = new Color(
+                        (int) Math.round(0 + colorRatio * 255),
+                        (int) Math.round(190 + colorRatio * 6),
+                        (int) Math.round(255 - colorRatio * 255),
+                        220
+                );
+
+                if (hilightedFill != null) {
+                    Shape displayedFill = hilightTransform.createTransformedShape(hilightedFill);
+                    Rectangle fillBounds = displayedFill.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
+                    Graphics2D fillGraphics = (Graphics2D) g2d.create();
+                    fillGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    fillGraphics.clip(displayedFill);
+                    fillGraphics.setPaint(dotColor);
+                    int dotSpacing = 9;
+                    double dotSize = 2;
+                    int firstY = Math.floorDiv(fillBounds.y, dotSpacing) * dotSpacing;
+                    for (int y = firstY; y <= fillBounds.y + fillBounds.height; y += dotSpacing) {
+                        int row = Math.floorDiv(y, dotSpacing);
+                        int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
+                        int firstX = Math.floorDiv(fillBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
+                        for (int x = firstX; x <= fillBounds.x + fillBounds.width; x += dotSpacing) {
+                            fillGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
+                        }
+                    }
+                    fillGraphics.dispose();
+
+                    Graphics2D outlineGraphics = (Graphics2D) g2d.create();
+                    outlineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    outlineGraphics.setPaint(dotColor);
+                    outlineGraphics.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{1f, 6f}, 0f));
+                    outlineGraphics.draw(displayedFill);
+                    outlineGraphics.dispose();
+                }
+
+                if (hilightedLine != null) {
+                    Shape displayedLineArea = hilightTransform.createTransformedShape(hilightedLine);
+                    Rectangle lineBounds = displayedLineArea.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
+                    Graphics2D lineGraphics = (Graphics2D) g2d.create();
+                    lineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    lineGraphics.clip(displayedLineArea);
+                    lineGraphics.setPaint(dotColor);
+                    int dotSpacing = 9;
+                    double dotSize = 2;
+                    int firstY = Math.floorDiv(lineBounds.y, dotSpacing) * dotSpacing;
+                    for (int y = firstY; y <= lineBounds.y + lineBounds.height; y += dotSpacing) {
+                        int row = Math.floorDiv(y, dotSpacing);
+                        int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
+                        int firstX = Math.floorDiv(lineBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
+                        for (int x = firstX; x <= lineBounds.x + lineBounds.width; x += dotSpacing) {
+                            lineGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
+                        }
+                    }
+                    lineGraphics.dispose();
+
+                    Graphics2D lineOutlineGraphics = (Graphics2D) g2d.create();
+                    lineOutlineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    lineOutlineGraphics.setPaint(dotColor);
+                    lineOutlineGraphics.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{1f, 6f}, 0f));
+                    lineOutlineGraphics.draw(displayedLineArea);
+                    lineOutlineGraphics.dispose();
                 }
             }
 
@@ -4831,6 +5027,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;
+            setHilightedFillInternal(null);
+            setHilightedLineInternal(null);
             hilightedPoints = null;
             selectedDepths = new ArrayList<>();
             selectedPoints = new ArrayList<>();
@@ -5035,6 +5233,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stillFrame = true;
         zoomAvailable = false;
         hilightedEdge = null;
+        setHilightedFillInternal(null);
+        setHilightedLineInternal(null);
         hilightedPoints = null;
         pointEditPanel.setVisible(false);
         iconPanel.setImg(image);
@@ -5098,6 +5298,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void clearImagePanel() {
+        setHilightedFillInternal(null);
+        setHilightedLineInternal(null);
         iconPanel.setImg(null);
     }
 
