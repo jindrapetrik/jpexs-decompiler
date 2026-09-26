@@ -20,16 +20,20 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import javax.swing.BorderFactory;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 import javax.swing.text.DefaultFormatter;
 
 /**
@@ -69,8 +73,6 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
     }
 
     public NumberEditor(String fieldName, Object obj, Field field, int index, Class<?> type, SWFType swfType) {
-        setSize(100, getSize().height);
-        setMaximumSize(getSize());
         this.obj = obj;
         this.field = field;
         this.index = index;
@@ -79,10 +81,18 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
         this.fieldName = fieldName;
         spinner = new JSpinner();
 
+        Dimension dim = new Dimension(75, spinner.getPreferredSize().height);
+        spinner.setPreferredSize(dim);
+        
+        JSpinner.DefaultEditor editor =
+        (JSpinner.DefaultEditor) spinner.getEditor();
+        editor.getTextField().setBorder(BorderFactory.createEmptyBorder());
+        spinner.setBorder(BorderFactory.createLineBorder(getForeground()));
+        
         setLayout(new BorderLayout());
         add(spinner, BorderLayout.WEST);
         setOpaque(false);
-
+                        
         reset();
         ((JSpinner.NumberEditor) spinner.getEditor()).getFormat().setGroupingUsed(false);
         JFormattedTextField jtf = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();

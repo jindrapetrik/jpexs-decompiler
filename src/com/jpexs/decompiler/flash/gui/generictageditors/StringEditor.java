@@ -26,6 +26,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
 
 /**
@@ -49,7 +50,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     @Override
     public boolean getScrollableTracksViewportWidth() {
         return true;
-    }
+    }    
 
     @Override
     public Dimension getPreferredSize() {
@@ -77,6 +78,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
         this.fieldName = fieldName;
         this.multiline = multiline;
         this.swf = swf;
+        setBorder(BorderFactory.createLineBorder(getForeground()));
         if (multiline) {
             Dimension d = new Dimension(500, 200);
             setPreferredSize(d);
