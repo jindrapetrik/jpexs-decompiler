@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -67,11 +68,13 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHFOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -1501,10 +1504,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
+                    displayEditImagePanel.clearGradientTransform();
                     displayEditImagePanel.setStatus("");
                     displayEditImagePanel.setHilightedEdge(null);
                     return;
                 }
+                updateSelectedFillTransform(e.getNewLeadSelectionPath());
                 if (highlightSelectedMorphFillStyle(e.getPath())) {
                     displayEditImagePanel.setStatus("");
                     return;
@@ -1667,6 +1672,222 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
 
         return displayEditTagCard;
+    }
+
+    private void updateSelectedFillTransform(javax.swing.tree.TreePath path) {
+        displayEditImagePanel.clearGradientTransform();
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        if (!treePanel.isEditMode()) {
+            return;
+        }
+
+        FILLSTYLE selectedFillStyle = null;
+        MORPHFILLSTYLE selectedMorphFillStyle = null;
+        ShapeTag shapeTag = null;
+        MorphShapeTag morphShapeTag = null;
+        boolean gradientMatrixSelected = false;
+        boolean bitmapMatrixSelected = false;
+        String selectedMatrixName = null;
+        for (Object component : path.getPath()) {
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if ("gradientMatrix".equals(fieldNode.getName(0))) {
+                gradientMatrixSelected = true;
+            }
+            if ("bitmapMatrix".equals(fieldNode.getName(0))) {
+                bitmapMatrixSelected = true;
+            }
+            String fieldName = fieldNode.getName(0);
+            if ("startGradientMatrix".equals(fieldName)
+                    || "endGradientMatrix".equals(fieldName)
+                    || "startBitmapMatrix".equals(fieldName)
+                    || "endBitmapMatrix".equals(fieldName)) {
+                selectedMatrixName = fieldName;
+            }
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof FILLSTYLE) {
+                selectedFillStyle = (FILLSTYLE) value;
+            }
+            if (value instanceof MORPHFILLSTYLE) {
+                selectedMorphFillStyle = (MORPHFILLSTYLE) value;
+            }
+        }
+
+        if (selectedMorphFillStyle != null && selectedMatrixName != null && morphShapeTag != null) {
+            updateSelectedMorphFillTransform(
+                    treePanel,
+                    path,
+                    morphShapeTag,
+                    selectedMorphFillStyle,
+                    selectedMatrixName
+            );
+            return;
+        }
+
+        if (selectedFillStyle == null) {
+            return;
+        }
+
+        final FILLSTYLE fillStyle = selectedFillStyle;
+        final javax.swing.tree.TreePath selectedPath = path;
+        if (gradientMatrixSelected && fillStyle.gradientMatrix != null
+                && (fillStyle.fillStyleType == FILLSTYLE.LINEAR_GRADIENT
+                || fillStyle.fillStyleType == FILLSTYLE.RADIAL_GRADIENT
+                || fillStyle.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
+            if (fillStyle.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT
+                    && fillStyle.gradient instanceof FOCALGRADIENT) {
+                FOCALGRADIENT focalGradient = (FOCALGRADIENT) fillStyle.gradient;
+                displayEditImagePanel.setFocalGradientTransform(
+                        fillStyle.gradientMatrix,
+                        focalGradient.focalPoint,
+                        updatedMatrix -> {
+                            copyMatrix(updatedMatrix, fillStyle.gradientMatrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        },
+                        updatedFocalPoint -> {
+                            focalGradient.focalPoint = updatedFocalPoint;
+                            treePanel.notifyNodeChanged(selectedPath);
+                        }
+                );
+            } else {
+                displayEditImagePanel.setGradientTransform(
+                        fillStyle.gradientMatrix,
+                        fillStyle.fillStyleType == FILLSTYLE.LINEAR_GRADIENT,
+                        updatedMatrix -> {
+                            copyMatrix(updatedMatrix, fillStyle.gradientMatrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        }
+                );
+            }
+            return;
+        }
+
+        if (!bitmapMatrixSelected || fillStyle.bitmapMatrix == null || shapeTag == null
+                || (fillStyle.fillStyleType != FILLSTYLE.REPEATING_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.CLIPPED_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+            return;
+        }
+        ImageTag imageTag = shapeTag.getSwf().getImage(fillStyle.bitmapId);
+        if (imageTag == null) {
+            return;
+        }
+        Dimension imageDimension = imageTag.getImageDimension();
+        if (imageDimension == null || imageDimension.width <= 0 || imageDimension.height <= 0) {
+            return;
+        }
+        displayEditImagePanel.setBitmapTransform(
+                fillStyle.bitmapMatrix,
+                imageDimension.width,
+                imageDimension.height,
+                updatedMatrix -> {
+                    copyMatrix(updatedMatrix, fillStyle.bitmapMatrix);
+                    treePanel.notifyNodeChanged(selectedPath);
+                }
+        );
+    }
+
+    private void updateSelectedMorphFillTransform(
+            GenericTagTreePanel treePanel,
+            javax.swing.tree.TreePath selectedPath,
+            MorphShapeTag morphShapeTag,
+            MORPHFILLSTYLE fillStyle,
+            String matrixName
+    ) {
+        boolean startMatrix = matrixName.startsWith("start");
+        boolean gradientMatrix = matrixName.endsWith("GradientMatrix");
+        MATRIX matrix;
+        if (gradientMatrix) {
+            matrix = startMatrix ? fillStyle.startGradientMatrix : fillStyle.endGradientMatrix;
+        } else {
+            matrix = startMatrix ? fillStyle.startBitmapMatrix : fillStyle.endBitmapMatrix;
+        }
+        if (matrix == null) {
+            return;
+        }
+
+        if (gradientMatrix) {
+            if (fillStyle.fillStyleType != MORPHFILLSTYLE.LINEAR_GRADIENT
+                    && fillStyle.fillStyleType != MORPHFILLSTYLE.RADIAL_GRADIENT
+                    && fillStyle.fillStyleType != MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+                return;
+            }
+            if (fillStyle.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT
+                    && fillStyle.gradient instanceof MORPHFOCALGRADIENT) {
+                MORPHFOCALGRADIENT focalGradient = (MORPHFOCALGRADIENT) fillStyle.gradient;
+                float focalPoint = startMatrix ? focalGradient.startFocalPoint : focalGradient.endFocalPoint;
+                displayEditImagePanel.setFocalGradientTransform(
+                        matrix,
+                        focalPoint,
+                        updatedMatrix -> {
+                            copyMatrix(updatedMatrix, matrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        },
+                        updatedFocalPoint -> {
+                            if (startMatrix) {
+                                focalGradient.startFocalPoint = updatedFocalPoint;
+                            } else {
+                                focalGradient.endFocalPoint = updatedFocalPoint;
+                            }
+                            treePanel.notifyNodeChanged(selectedPath);
+                        }
+                );
+            } else {
+                displayEditImagePanel.setGradientTransform(
+                        matrix,
+                        fillStyle.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT,
+                        updatedMatrix -> {
+                            copyMatrix(updatedMatrix, matrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        }
+                );
+            }
+            return;
+        }
+
+        if (fillStyle.fillStyleType != MORPHFILLSTYLE.REPEATING_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.CLIPPED_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP) {
+            return;
+        }
+        ImageTag imageTag = morphShapeTag.getSwf().getImage(fillStyle.bitmapId);
+        if (imageTag == null) {
+            return;
+        }
+        Dimension imageDimension = imageTag.getImageDimension();
+        if (imageDimension == null || imageDimension.width <= 0 || imageDimension.height <= 0) {
+            return;
+        }
+        displayEditImagePanel.setBitmapTransform(
+                matrix,
+                imageDimension.width,
+                imageDimension.height,
+                updatedMatrix -> {
+                    copyMatrix(updatedMatrix, matrix);
+                    treePanel.notifyNodeChanged(selectedPath);
+                }
+        );
+    }
+
+    private void copyMatrix(MATRIX source, MATRIX target) {
+        target.hasScale = source.hasScale;
+        target.scaleX = source.scaleX;
+        target.scaleY = source.scaleY;
+        target.hasRotate = source.hasRotate;
+        target.rotateSkew0 = source.rotateSkew0;
+        target.rotateSkew1 = source.rotateSkew1;
+        target.translateX = source.translateX;
+        target.translateY = source.translateY;
     }
 
     private boolean highlightSelectedFillStyle(javax.swing.tree.TreePath path) {
@@ -2508,6 +2729,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTag = tag;
         displayEditFrame = frame;
         displayEditMode = EDIT_RAW;
+        displayEditImagePanel.clearGradientTransform();
         setDisplayEditPropertiesVisible(true);
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);

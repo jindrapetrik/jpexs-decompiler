@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
@@ -126,6 +127,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -317,6 +319,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int lastHilightedShapeRatio = -1;
 
+    private static final double GRADIENT_UNIT = 16384.0;
+    private static final double GRADIENT_HANDLE_RADIUS = 6.0;
+    private static final double GRADIENT_HANDLE_HIT_RADIUS = 10.0;
+    private static final int GRADIENT_HANDLE_NONE = 0;
+    private static final int GRADIENT_HANDLE_CENTER = 1;
+    private static final int GRADIENT_HANDLE_START = 2;
+    private static final int GRADIENT_HANDLE_END = 3;
+    private static final int GRADIENT_HANDLE_Y_AXIS = 4;
+    private static final int GRADIENT_HANDLE_FOCAL_POINT = 5;
+
+    private Matrix gradientTransform = null;
+    private boolean linearGradientTransform = false;
+    private boolean bitmapTransform = false;
+    private double bitmapTransformWidth = 0;
+    private double bitmapTransformHeight = 0;
+    private boolean focalGradientTransform = false;
+    private float focalGradientPoint = 0;
+    private Consumer<MATRIX> gradientTransformListener = null;
+    private Consumer<Float> focalGradientPointListener = null;
+    private int activeGradientHandle = GRADIENT_HANDLE_NONE;
+    private Matrix gradientTransformDragStart = null;
+    private Point2D gradientHandleDragOffset = null;
+
     private javax.swing.Timer hilightedShapeTimer;
 
     private List<DisplayPoint> hilightedPoints = null;
@@ -351,6 +376,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int hilightEdgeColorStep = 10;
     private int hilightEdgeColor = 0;
+
+    private synchronized int nextHilightEdgeColor() {
+        int nextColor = hilightEdgeColor + hilightEdgeColorStep;
+        if (nextColor >= 255) {
+            nextColor = 255;
+            hilightEdgeColorStep = -Math.abs(hilightEdgeColorStep);
+        } else if (nextColor <= 100) {
+            nextColor = 100;
+            hilightEdgeColorStep = Math.abs(hilightEdgeColorStep);
+        }
+        hilightEdgeColor = nextColor;
+        return nextColor;
+    }
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##");
 
@@ -752,6 +790,393 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         updateHilightedProviderShapes();
         updateHilightedShapeTimer();
         redraw();
+    }
+
+    public void setGradientTransform(MATRIX matrix, boolean linear, Consumer<MATRIX> listener) {
+        gradientTransform = matrix == null ? null : new Matrix(matrix);
+        linearGradientTransform = linear;
+        bitmapTransform = false;
+        bitmapTransformWidth = 0;
+        bitmapTransformHeight = 0;
+        focalGradientTransform = false;
+        focalGradientPoint = 0;
+        gradientTransformListener = listener;
+        focalGradientPointListener = null;
+        activeGradientHandle = GRADIENT_HANDLE_NONE;
+        gradientTransformDragStart = null;
+        gradientHandleDragOffset = null;
+        iconPanel.repaint();
+    }
+
+    public void setFocalGradientTransform(
+            MATRIX matrix,
+            float focalPoint,
+            Consumer<MATRIX> matrixListener,
+            Consumer<Float> focalPointListener
+    ) {
+        setGradientTransform(matrix, false, matrixListener);
+        focalGradientTransform = true;
+        focalGradientPoint = focalPoint;
+        focalGradientPointListener = focalPointListener;
+        iconPanel.repaint();
+    }
+
+    public void setBitmapTransform(MATRIX matrix, double width, double height, Consumer<MATRIX> listener) {
+        setGradientTransform(matrix, false, listener);
+        bitmapTransform = true;
+        bitmapTransformWidth = width;
+        bitmapTransformHeight = height;
+        iconPanel.repaint();
+    }
+
+    public void clearGradientTransform() {
+        setGradientTransform(null, false, null);
+        iconPanel.setCursor(defaultCursor);
+    }
+
+    private Point2D gradientPointToPanel(double x, double y) {
+        Point2D shapePoint = gradientTransform.transform(new Point2D.Double(x, y));
+        double zoomDouble = getRealZoom();
+        return new Point2D.Double(
+                offsetPoint.getX() + shapePoint.getX() * zoomDouble / SWF.unitDivisor,
+                offsetPoint.getY() + shapePoint.getY() * zoomDouble / SWF.unitDivisor
+        );
+    }
+
+    private Point2D panelPointToShape(Point2D panelPoint) {
+        double zoomDouble = getRealZoom();
+        return new Point2D.Double(
+                (panelPoint.getX() - offsetPoint.getX()) * SWF.unitDivisor / zoomDouble,
+                (panelPoint.getY() - offsetPoint.getY()) * SWF.unitDivisor / zoomDouble
+        );
+    }
+
+    private Point2D getGradientHandleShapePoint(int handle) {
+        if (bitmapTransform) {
+            switch (handle) {
+                case GRADIENT_HANDLE_CENTER:
+                    return gradientTransform.transform(new Point2D.Double(bitmapTransformWidth / 2, bitmapTransformHeight / 2));
+                case GRADIENT_HANDLE_END:
+                    return gradientTransform.transform(new Point2D.Double(bitmapTransformWidth, 0));
+                case GRADIENT_HANDLE_Y_AXIS:
+                    return gradientTransform.transform(new Point2D.Double(0, bitmapTransformHeight));
+                default:
+                    return null;
+            }
+        }
+        switch (handle) {
+            case GRADIENT_HANDLE_CENTER:
+                return gradientTransform.transform(new Point2D.Double(0, 0));
+            case GRADIENT_HANDLE_START:
+                return gradientTransform.transform(new Point2D.Double(-GRADIENT_UNIT, 0));
+            case GRADIENT_HANDLE_END:
+                return gradientTransform.transform(new Point2D.Double(GRADIENT_UNIT, 0));
+            case GRADIENT_HANDLE_Y_AXIS:
+                return gradientTransform.transform(new Point2D.Double(0, GRADIENT_UNIT));
+            case GRADIENT_HANDLE_FOCAL_POINT:
+                return gradientTransform.transform(new Point2D.Double(focalGradientPoint * GRADIENT_UNIT, 0));
+            default:
+                return null;
+        }
+    }
+
+    private int getGradientHandleAt(Point2D point) {
+        if (gradientTransform == null) {
+            return GRADIENT_HANDLE_NONE;
+        }
+        if (focalGradientTransform && getFocalGradientHandleShape().contains(point)) {
+            return GRADIENT_HANDLE_FOCAL_POINT;
+        }
+        int[] handles = linearGradientTransform
+                ? new int[]{GRADIENT_HANDLE_CENTER, GRADIENT_HANDLE_START, GRADIENT_HANDLE_END}
+                : new int[]{GRADIENT_HANDLE_CENTER, GRADIENT_HANDLE_END, GRADIENT_HANDLE_Y_AXIS};
+        for (int handle : handles) {
+            Point2D shapePoint = getGradientHandleShapePoint(handle);
+            Point2D panelPoint = new Point2D.Double(
+                    offsetPoint.getX() + shapePoint.getX() * getRealZoom() / SWF.unitDivisor,
+                    offsetPoint.getY() + shapePoint.getY() * getRealZoom() / SWF.unitDivisor
+            );
+            if (panelPoint.distance(point) <= GRADIENT_HANDLE_HIT_RADIUS) {
+                return handle;
+            }
+        }
+        return GRADIENT_HANDLE_NONE;
+    }
+
+    private Shape getFocalGradientHandleShape() {
+        Point2D focalPoint = gradientPointToPanel(focalGradientPoint * GRADIENT_UNIT, 0);
+        Point2D center = gradientPointToPanel(0, 0);
+        Point2D axisEnd = gradientPointToPanel(GRADIENT_UNIT, 0);
+        double axisX = axisEnd.getX() - center.getX();
+        double axisY = axisEnd.getY() - center.getY();
+        double axisLength = Math.hypot(axisX, axisY);
+        if (axisLength < 1e-6) {
+            axisX = 1;
+            axisY = 0;
+            axisLength = 1;
+        }
+        double tangentX = axisX / axisLength;
+        double tangentY = axisY / axisLength;
+        double normalX = -tangentY;
+        double normalY = tangentX;
+        double baseDistance = 15;
+        double halfBase = 7;
+        GeneralPath triangle = new GeneralPath();
+        triangle.moveTo(focalPoint.getX(), focalPoint.getY());
+        triangle.lineTo(
+                focalPoint.getX() + normalX * baseDistance - tangentX * halfBase,
+                focalPoint.getY() + normalY * baseDistance - tangentY * halfBase
+        );
+        triangle.lineTo(
+                focalPoint.getX() + normalX * baseDistance + tangentX * halfBase,
+                focalPoint.getY() + normalY * baseDistance + tangentY * halfBase
+        );
+        triangle.closePath();
+        return triangle;
+    }
+
+    private boolean startGradientTransformDrag(MouseEvent e) {
+        if (!SwingUtilities.isLeftMouseButton(e) || gradientTransform == null) {
+            return false;
+        }
+        int handle = getGradientHandleAt(e.getPoint());
+        if (handle == GRADIENT_HANDLE_NONE) {
+            iconPanel.setCursor(defaultCursor);
+            return false;
+        }
+        activeGradientHandle = handle;
+        gradientTransformDragStart = gradientTransform.clone();
+        Point2D mouseShapePoint = panelPointToShape(e.getPoint());
+        Point2D handleShapePoint = getGradientHandleShapePoint(handle);
+        gradientHandleDragOffset = new Point2D.Double(
+                handleShapePoint.getX() - mouseShapePoint.getX(),
+                handleShapePoint.getY() - mouseShapePoint.getY()
+        );
+        iconPanel.setCursor(handle == GRADIENT_HANDLE_CENTER
+                ? Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
+                : Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        return true;
+    }
+
+    private boolean dragGradientTransform(MouseEvent e) {
+        if (activeGradientHandle == GRADIENT_HANDLE_NONE || gradientTransformDragStart == null) {
+            return false;
+        }
+        Point2D mouseShapePoint = panelPointToShape(e.getPoint());
+        double targetX = mouseShapePoint.getX() + gradientHandleDragOffset.getX();
+        double targetY = mouseShapePoint.getY() + gradientHandleDragOffset.getY();
+        Matrix start = gradientTransformDragStart;
+        if (activeGradientHandle == GRADIENT_HANDLE_FOCAL_POINT) {
+            double determinant = start.scaleX * start.scaleY - start.rotateSkew1 * start.rotateSkew0;
+            if (Math.abs(determinant) < 1e-12) {
+                return true;
+            }
+            Point2D gradientPoint = start.inverse().transform(new Point2D.Double(targetX, targetY));
+            focalGradientPoint = (float) Math.max(-1, Math.min(1, gradientPoint.getX() / GRADIENT_UNIT));
+            if (focalGradientPointListener != null) {
+                focalGradientPointListener.accept(focalGradientPoint);
+            }
+            iconPanel.repaint();
+            return true;
+        }
+        Matrix updated = start.clone();
+
+        if (activeGradientHandle == GRADIENT_HANDLE_CENTER) {
+            if (bitmapTransform) {
+                updated.translateX = targetX
+                        - start.scaleX * bitmapTransformWidth / 2
+                        - start.rotateSkew1 * bitmapTransformHeight / 2;
+                updated.translateY = targetY
+                        - start.rotateSkew0 * bitmapTransformWidth / 2
+                        - start.scaleY * bitmapTransformHeight / 2;
+            } else {
+                updated.translateX = targetX;
+                updated.translateY = targetY;
+            }
+        } else if (activeGradientHandle == GRADIENT_HANDLE_Y_AXIS) {
+            double yUnit = bitmapTransform ? bitmapTransformHeight : GRADIENT_UNIT;
+            updated.rotateSkew1 = (targetX - start.translateX) / yUnit;
+            updated.scaleY = (targetY - start.translateY) / yUnit;
+        } else {
+            double newScaleX;
+            double newRotateSkew0;
+            if (bitmapTransform) {
+                newScaleX = (targetX - start.translateX) / bitmapTransformWidth;
+                newRotateSkew0 = (targetY - start.translateY) / bitmapTransformWidth;
+            } else if (linearGradientTransform) {
+                double fixedX;
+                double fixedY;
+                if (activeGradientHandle == GRADIENT_HANDLE_START) {
+                    fixedX = start.translateX + start.scaleX * GRADIENT_UNIT;
+                    fixedY = start.translateY + start.rotateSkew0 * GRADIENT_UNIT;
+                    newScaleX = (fixedX - targetX) / (2 * GRADIENT_UNIT);
+                    newRotateSkew0 = (fixedY - targetY) / (2 * GRADIENT_UNIT);
+                } else {
+                    fixedX = start.translateX - start.scaleX * GRADIENT_UNIT;
+                    fixedY = start.translateY - start.rotateSkew0 * GRADIENT_UNIT;
+                    newScaleX = (targetX - fixedX) / (2 * GRADIENT_UNIT);
+                    newRotateSkew0 = (targetY - fixedY) / (2 * GRADIENT_UNIT);
+                }
+                updated.translateX = (targetX + fixedX) / 2;
+                updated.translateY = (targetY + fixedY) / 2;
+            } else {
+                newScaleX = (targetX - start.translateX) / GRADIENT_UNIT;
+                newRotateSkew0 = (targetY - start.translateY) / GRADIENT_UNIT;
+            }
+            double oldLengthSquared = start.scaleX * start.scaleX + start.rotateSkew0 * start.rotateSkew0;
+            if (bitmapTransform || oldLengthSquared < 1e-12) {
+                updated.scaleX = newScaleX;
+                updated.rotateSkew0 = newRotateSkew0;
+            } else {
+                double real = (newScaleX * start.scaleX + newRotateSkew0 * start.rotateSkew0) / oldLengthSquared;
+                double imaginary = (newRotateSkew0 * start.scaleX - newScaleX * start.rotateSkew0) / oldLengthSquared;
+                updated.scaleX = newScaleX;
+                updated.rotateSkew0 = newRotateSkew0;
+                updated.rotateSkew1 = real * start.rotateSkew1 - imaginary * start.scaleY;
+                updated.scaleY = imaginary * start.rotateSkew1 + real * start.scaleY;
+            }
+        }
+
+        gradientTransform = updated;
+        if (gradientTransformListener != null) {
+            gradientTransformListener.accept(updated.toMATRIX());
+        }
+        iconPanel.repaint();
+        return true;
+    }
+
+    private boolean finishGradientTransformDrag() {
+        if (activeGradientHandle == GRADIENT_HANDLE_NONE) {
+            return false;
+        }
+        activeGradientHandle = GRADIENT_HANDLE_NONE;
+        gradientTransformDragStart = null;
+        gradientHandleDragOffset = null;
+        return true;
+    }
+
+    private boolean updateGradientTransformCursor(MouseEvent e) {
+        if (gradientTransform == null) {
+            return false;
+        }
+        int handle = getGradientHandleAt(e.getPoint());
+        if (handle == GRADIENT_HANDLE_NONE) {
+            iconPanel.setCursor(defaultCursor);
+            return false;
+        }
+        iconPanel.setCursor(handle == GRADIENT_HANDLE_CENTER
+                ? Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
+                : Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        return true;
+    }
+
+    private void paintGradientTransform(Graphics2D graphics) {
+        if (gradientTransform == null) {
+            return;
+        }
+        Graphics2D g = (Graphics2D) graphics.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Point2D center = bitmapTransform
+                ? gradientPointToPanel(bitmapTransformWidth / 2, bitmapTransformHeight / 2)
+                : gradientPointToPanel(0, 0);
+        Point2D start = bitmapTransform
+                ? gradientPointToPanel(0, 0)
+                : gradientPointToPanel(-GRADIENT_UNIT, 0);
+        Point2D end = bitmapTransform
+                ? gradientPointToPanel(bitmapTransformWidth, 0)
+                : gradientPointToPanel(GRADIENT_UNIT, 0);
+        Point2D yAxis = bitmapTransform
+                ? gradientPointToPanel(0, bitmapTransformHeight)
+                : gradientPointToPanel(0, GRADIENT_UNIT);
+        Color lineColor = new Color(0, 145, 220);
+        Color secondaryColor = new Color(255, 145, 0);
+
+        if (!linearGradientTransform && !bitmapTransform) {
+            AffineTransform gradientToPanel = new AffineTransform();
+            gradientToPanel.translate(offsetPoint.getX(), offsetPoint.getY());
+            double displayScale = getRealZoom() / SWF.unitDivisor;
+            gradientToPanel.scale(displayScale, displayScale);
+            gradientToPanel.concatenate(gradientTransform.toTransform());
+            Shape radialOutline = gradientToPanel.createTransformedShape(
+                    new Ellipse2D.Double(-GRADIENT_UNIT, -GRADIENT_UNIT, 2 * GRADIENT_UNIT, 2 * GRADIENT_UNIT)
+            );
+            g.setColor(new Color(255, 255, 255, 210));
+            g.setStroke(new BasicStroke(4f));
+            g.draw(radialOutline);
+            g.setColor(lineColor);
+            g.setStroke(new BasicStroke(1.5f));
+            g.draw(radialOutline);
+        }
+
+        if (bitmapTransform) {
+            Point2D oppositeCorner = gradientPointToPanel(bitmapTransformWidth, bitmapTransformHeight);
+            GeneralPath bitmapOutline = new GeneralPath();
+            bitmapOutline.moveTo(start.getX(), start.getY());
+            bitmapOutline.lineTo(end.getX(), end.getY());
+            bitmapOutline.lineTo(oppositeCorner.getX(), oppositeCorner.getY());
+            bitmapOutline.lineTo(yAxis.getX(), yAxis.getY());
+            bitmapOutline.closePath();
+            g.setColor(new Color(255, 255, 255, 210));
+            g.setStroke(new BasicStroke(4f));
+            g.draw(bitmapOutline);
+            g.setColor(new Color(70, 70, 70, 210));
+            g.setStroke(new BasicStroke(1.25f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{5f, 4f}, 0f));
+            g.draw(bitmapOutline);
+        }
+
+        g.setColor(new Color(255, 255, 255, 220));
+        g.setStroke(new BasicStroke(4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.draw(new java.awt.geom.Line2D.Double(linearGradientTransform || bitmapTransform ? start : center, end));
+        if (!linearGradientTransform) {
+            g.draw(new java.awt.geom.Line2D.Double(center, yAxis));
+        }
+        g.setColor(lineColor);
+        g.setStroke(new BasicStroke(1.75f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.draw(new java.awt.geom.Line2D.Double(linearGradientTransform || bitmapTransform ? start : center, end));
+        if (!linearGradientTransform) {
+            g.setColor(secondaryColor);
+            g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{5f, 4f}, 0f));
+            g.draw(new java.awt.geom.Line2D.Double(center, yAxis));
+        }
+
+        if (linearGradientTransform) {
+            paintGradientHandle(g, start, lineColor, false);
+        }
+        paintGradientHandle(g, end, lineColor, false);
+        if (!linearGradientTransform) {
+            paintGradientHandle(g, yAxis, secondaryColor, false);
+        }
+        paintGradientHandle(g, center, lineColor, true);
+        if (focalGradientTransform) {
+            Shape focalHandle = getFocalGradientHandleShape();
+            Color focalColor = new Color(190, 60, 210);
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.draw(focalHandle);
+            g.setColor(new Color(focalColor.getRed(), focalColor.getGreen(), focalColor.getBlue(), 210));
+            g.fill(focalHandle);
+            g.setColor(focalColor);
+            g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.draw(focalHandle);
+        }
+        g.dispose();
+    }
+
+    private void paintGradientHandle(Graphics2D g, Point2D point, Color color, boolean center) {
+        double radius = GRADIENT_HANDLE_RADIUS;
+        Shape handle = center
+                ? new Ellipse2D.Double(point.getX() - radius, point.getY() - radius, radius * 2, radius * 2)
+                : new Rectangle2D.Double(point.getX() - radius, point.getY() - radius, radius * 2, radius * 2);
+        g.setColor(Color.WHITE);
+        g.fill(handle);
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f));
+        g.draw(handle);
+        if (!center) {
+            double innerRadius = 2;
+            g.fill(new Ellipse2D.Double(point.getX() - innerRadius, point.getY() - innerRadius, innerRadius * 2, innerRadius * 2));
+        }
     }
 
     private void updateHilightedProviderShapes() {
@@ -1404,11 +1829,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         if (hilightedEdge != null || hilightedPoints != null) {
-                            hilightEdgeColor += hilightEdgeColorStep;
-                            if (hilightEdgeColor < 100 || hilightEdgeColor > 255) {
-                                hilightEdgeColorStep = -hilightEdgeColorStep;
-                                hilightEdgeColor += hilightEdgeColorStep * 2;
-                            }
+                            int currentHilightEdgeColor = nextHilightEdgeColor();
                             RECT timRect = timelined.getRect();
                             AffineTransform trans = new AffineTransform();
                             trans.translate(offsetPoint.getX(), offsetPoint.getY());
@@ -1419,7 +1840,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             if (hilightedEdge != null) {
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
-                                g2.setPaint(new Color(hilightEdgeColor, hilightEdgeColor, hilightEdgeColor));
+                                g2.setPaint(new Color(currentHilightEdgeColor, currentHilightEdgeColor, currentHilightEdgeColor));
                                 Point[] edge = hilightedEdge;
                                 GeneralPath path = new GeneralPath();
                                 if (edge.length == 2) {
@@ -1990,6 +2411,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    if (startGradientTransformDrag(e)) {
+                        requestFocusInWindow();
+                        return;
+                    }
                     if (SwingUtilities.isLeftMouseButton(e)) {
 
                         if (altDown || selectionMode) {
@@ -2192,6 +2617,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (finishGradientTransformDrag()) {
+                        return;
+                    }
                     if (SwingUtilities.isLeftMouseButton(e)) {
 
                         if (hilightedPoints != null) {
@@ -2340,6 +2768,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    if (dragGradientTransform(e)) {
+                        return;
+                    }
                     List<DisplayPoint> points = hilightedPoints;
 
                     if (dragStart != null && multiSelect && !inMoving && mode == Cursor.DEFAULT_CURSOR) {
@@ -3379,6 +3810,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    if (updateGradientTransformCursor(e)) {
+                        return;
+                    }
                     List<DisplayPoint> points = hilightedPoints;
                     if (points != null) {
                         int maxDistance = 5;
@@ -3795,16 +4229,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             if ((hilightedFill != null || hilightedLine != null) && timelined != null) {
-                hilightEdgeColor += hilightEdgeColorStep;
-                if (hilightEdgeColor < 100 || hilightEdgeColor > 255) {
-                    hilightEdgeColorStep = -hilightEdgeColorStep;
-                    hilightEdgeColor += hilightEdgeColorStep * 2;
-                }
+                int currentHilightEdgeColor = nextHilightEdgeColor();
                 double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                 AffineTransform hilightTransform = new AffineTransform();
                 hilightTransform.translate(offsetPoint.getX(), offsetPoint.getY());
                 hilightTransform.scale(zoomDouble / SWF.unitDivisor, zoomDouble / SWF.unitDivisor);
-                double colorRatio = (hilightEdgeColor - 100) / 155.0;
+                double colorRatio = (currentHilightEdgeColor - 100) / 155.0;
                 Color dotColor = new Color(
                         (int) Math.round(0 + colorRatio * 255),
                         (int) Math.round(190 + colorRatio * 6),
@@ -3868,6 +4298,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lineOutlineGraphics.dispose();
                 }
             }
+
+            paintGradientTransform(g2d);
 
             g2d.setColor(Configuration.guidesColor.get());
             if (draggingGuideX && lastMouseEvent != null) {
@@ -4188,6 +4620,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 leftRuler.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
                 if (c != iconPanel) {
+                    finishGradientTransformDrag();
                     return;
                 }
                 for (MouseListener l : iconPanel.mouseListeners) {

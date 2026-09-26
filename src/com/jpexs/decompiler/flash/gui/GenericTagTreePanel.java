@@ -149,6 +149,18 @@ public class GenericTagTreePanel extends GenericTagPanel {
         ((DefaultTreeModel) tree.getModel()).removeTreeModelListener(listener);
     }
 
+    public boolean isEditMode() {
+        return tree.isEditable();
+    }
+
+    public void notifyNodeChanged(TreePath path) {
+        if (path == null || !(tree.getModel() instanceof MyTreeModel)) {
+            return;
+        }
+        ((MyTreeModel) tree.getModel()).vchanged(path);
+        tree.repaint();
+    }
+
     private class MyTree extends JTree {
 
         public MyTree() {
