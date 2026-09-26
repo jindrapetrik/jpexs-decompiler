@@ -927,6 +927,17 @@ public class SWFInputStream implements AutoCloseable {
     public float readFLOAT16(String name) throws IOException {
         newDumpLevel(name, "FLOAT16");
         int val = readUI16Internal();
+        float ret = SWFInputStream.int16BitsToFloat(val);
+        endDumpLevel(ret);
+        return ret;
+    }
+    
+    /**
+     * Converts 16-bit int to FLOAT16
+     * @param val 16-bit int
+     * @return FLOAT16 value
+     */
+    public static float int16BitsToFloat(int val) {
         int sign = (val & 0x8000) << 16;
         int mantissa = val & 0x3FF;
         int exp = (val >> 10) & 0x1F;
@@ -948,9 +959,7 @@ public class SWFInputStream implements AutoCloseable {
         } else {
             floatBits = sign | ((exp + 127 - 15) << 23) | (mantissa << 13);
         }
-        float ret = Float.intBitsToFloat(floatBits);
-        endDumpLevel(ret);
-        return ret;
+        return Float.intBitsToFloat(floatBits);
     }
 
     /**
@@ -3644,8 +3653,8 @@ public class SWFInputStream implements AutoCloseable {
     public ZONEDATA readZONEDATA(String name) throws IOException {
         ZONEDATA ret = new ZONEDATA();
         newDumpLevel(name, "ZONEDATA");
-        ret.alignmentCoordinate = readUI16("alignmentCoordinate");
-        ret.range = readUI16("range");
+        ret.alignmentCoordinate = readFLOAT16("alignmentCoordinate");
+        ret.range = readFLOAT16("range");
         endDumpLevel();
         return ret;
     }

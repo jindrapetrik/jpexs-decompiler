@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCVersion;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -37,7 +38,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
-import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
@@ -157,13 +157,18 @@ public class SwfXmlImporter {
     /**
      * Maximum XML import version major.
      */
-    public static final int MAX_XML_IMPORT_VERSION_MAJOR = 3;
+    public static final int MAX_XML_IMPORT_VERSION_MAJOR = 4;
     
     /**
      * Minimum version for using external files - attributes _externalActions, _externalFile
      */
     public static final int XML_IMPORT_VERSION_MAJOR_WITH_EXTERNAL_FILES = 3;
 
+    /**
+     * Minimum version for using FLOAT16 values as floats
+     */
+    public static final int XML_IMPORT_VERSION_MAJOR_WITH_FLOAT16_FLOAT = 4;
+    
     private static final Logger logger = Logger.getLogger(SwfXmlImporter.class.getName());
 
     private static final Map<String, Class> swfTags;
@@ -451,6 +456,13 @@ public class SwfXmlImporter {
             }
             if (name.equals("reserved3") && "FileAttributesTag".equals(attributes.get("type"))) {
                 name = "reservedB";
+            }
+            if (
+                    (name.equals("alignmentCoordinate") || name.equals("range")) 
+                    && "ZONEDATA".equals(attributes.get("type"))
+                    && xmlExportMajor < XML_IMPORT_VERSION_MAJOR_WITH_FLOAT16_FLOAT
+                ) {
+                val = "" + SWFInputStream.int16BitsToFloat(Integer.parseInt(val));
             }
                         
             if (name.equals("_externalActions")) {

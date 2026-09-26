@@ -420,7 +420,16 @@ public class SWFOutputStream extends OutputStream {
      * @param value FLOAT16 value
      * @throws IOException On I/O error
      */
-    public void writeFLOAT16(float value) throws IOException {
+    public void writeFLOAT16(float value) throws IOException {        
+        writeUI16(floatToRawInt16Bits(value));
+    }
+
+    /**
+     * Converts float to 16-bit int
+     * @param value FLOAT16 value
+     * @return 16-bit int
+     */
+    public static int floatToRawInt16Bits(float value) {
         int bits = Float.floatToRawIntBits(value);
         int sign = (bits >>> 16) & 0x8000;
         int exponent = (bits >>> 23) & 0xFF;
@@ -461,17 +470,16 @@ public class SWFOutputStream extends OutputStream {
                         halfMantissa = 0;
                         halfExponent++;
                         if (halfExponent == 0x1F) {
-                            writeUI16(sign | 0x7C00);
-                            return;
+                            return sign | 0x7C00;
                         }
                     }
                 }
                 halfBits = sign | (halfExponent << 10) | halfMantissa;
             }
         }
-        writeUI16(halfBits);
+        return halfBits;
     }
-
+    
     /**
      * Writes EncodedU32 (Encoded unsigned 32bit value) value to the stream.
      *
@@ -2048,8 +2056,8 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException On I/O error
      */
     public void writeZONEDATA(ZONEDATA value) throws IOException {
-        writeUI16(value.alignmentCoordinate);
-        writeUI16(value.range);
+        writeFLOAT16(value.alignmentCoordinate);
+        writeFLOAT16(value.range);
     }
 
     /**

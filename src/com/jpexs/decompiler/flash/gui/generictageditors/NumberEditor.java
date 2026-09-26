@@ -179,7 +179,6 @@ public class NumberEditor extends JPanel implements GenericTagEditor {
                 m = new SpinnerNumberModel(toInt(value), -0x80, 0x7f, 1);
                 break;
             case SI16:
-            case FLOAT16:
                 m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
                 break;
             case SB:

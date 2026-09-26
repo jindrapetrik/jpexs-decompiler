@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
-import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -63,7 +61,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -83,9 +80,7 @@ public class SwfXmlExporter {
     /**
      * XML export version major.
      */
-    public static final int XML_EXPORT_VERSION_MAJOR = 2;
-
-    public static final int XML_EXPORT_VERSION_MAJOR_WITH_EXTERNAL_FILES = 3;
+    public static final int XML_EXPORT_VERSION_MAJOR = 4;
 
     /**
      * XML export version minor.
@@ -258,7 +253,7 @@ public class SwfXmlExporter {
             XMLStreamWriter writer
     ) throws IOException, XMLStreamException {
         generateXml(
-                asmExternalFiles.isEmpty() && tagExternalFiles.isEmpty() ? XML_EXPORT_VERSION_MAJOR : XML_EXPORT_VERSION_MAJOR_WITH_EXTERNAL_FILES,
+                XML_EXPORT_VERSION_MAJOR,
                 asmExternalFiles,
                 tagExternalFiles,
                 swf,
