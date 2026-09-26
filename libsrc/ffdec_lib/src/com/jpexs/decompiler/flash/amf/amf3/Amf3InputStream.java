@@ -351,13 +351,29 @@ public class Amf3InputStream extends InputStream {
         newDumpLevel(name, "UTF8-char");
 
         byte[] buf = new byte[(int) byteLength]; //how about long strings(?), will the int length be enough?
-        int cnt = is.read(buf);
-        if (cnt < buf.length) {
-            throw new EndOfStreamException();
-        }
+        readFully(buf);
         String retString = new String(buf, "UTF-8");
         endDumpLevel("\"" + Helper.escapeActionScriptString(retString) + "\"");
         return retString;
+    }
+
+    private void readFully(byte[] buffer) throws IOException {
+        int offset = 0;
+        while (offset < buffer.length) {
+            int count = is.read(buffer, offset, buffer.length - offset);
+            if (count < 0) {
+                throw new EndOfStreamException();
+            }
+            if (count == 0) {
+                int value = is.read();
+                if (value < 0) {
+                    throw new EndOfStreamException();
+                }
+                buffer[offset++] = (byte) value;
+            } else {
+                offset += count;
+            }
+        }
     }
 
     /**
@@ -763,9 +779,7 @@ public class Amf3InputStream extends InputStream {
                         int byteArrayLength = (int) (byteArrayU29 >> 1);
                         newDumpLevel("bytes", "U8[]");
                         byte[] byteArrayBuf = new byte[byteArrayLength];
-                        if (is.read(byteArrayBuf) != byteArrayLength) {
-                            throw new EndOfStreamException();
-                        }
+                        readFully(byteArrayBuf);
                         endDumpLevel();
 
                         LOGGER.log(Level.FINER, "ByteArray value: bytes[{0}]", byteArrayLength);

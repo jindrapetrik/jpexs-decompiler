@@ -21,10 +21,14 @@ import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.FakeMemoryInputStream;
 import com.jpexs.helpers.MemoryInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static org.testng.Assert.*;
@@ -171,5 +175,18 @@ public class Amf3InputStreamTest {
         final int UNSUPPORTED_MARKER = 100;
         is = new Amf3InputStream(new MemoryInputStream(new byte[]{UNSUPPORTED_MARKER}));
         is.readValue("testValue");
+    }
+
+    @Test
+    public void testReadStringFromShortReadingStream() throws IOException {
+        byte[] data = new byte[]{7, 'a', 'b', 'c'};
+        InputStream shortReadingStream = new FilterInputStream(new ByteArrayInputStream(data)) {
+            @Override
+            public int read(byte[] buffer, int offset, int length) throws IOException {
+                return super.read(buffer, offset, Math.min(length, 1));
+            }
+        };
+        is = new Amf3InputStream(new FakeMemoryInputStream(shortReadingStream));
+        assertEquals(is.readUtf8Vr("test", new ArrayList<String>()), "abc");
     }
 }
