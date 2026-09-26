@@ -1990,8 +1990,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 shapes,
                 lineStyleIndex
         );
-        Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, (ILINESTYLE) selectedLineStyle);
-        displayEditImagePanel.setHilightedLine(lineArea);
+        ILINESTYLE lineStyle = (ILINESTYLE) selectedLineStyle;
+        Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, lineStyle);
+        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle.getWidth());
         return true;
     }
 
@@ -2135,7 +2136,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         final MorphShapeTag selectedMorphShape = morphShapeTag;
         final int selectedLineStyleIndex = lineStyleIndex;
         final int shapeNum = getMorphShapeNum(morphShapeTag);
-        Map<Integer, Shape> pathsByRatio = new HashMap<>();
+        Map<Integer, ImagePanel.LineHilight> pathsByRatio = new HashMap<>();
         displayEditImagePanel.setHilightedLineProvider(ratio -> pathsByRatio.computeIfAbsent(ratio, currentRatio -> {
             SHAPEWITHSTYLE currentShape = selectedMorphShape.getShapeAtRatio(currentRatio);
             GeneralPath linePath = PathExporter.exportLineStyle(
@@ -2148,7 +2149,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             ILINESTYLE currentLineStyle = shapeNum <= 3
                     ? currentShape.lineStyles.lineStyles[selectedLineStyleIndex - 1]
                     : currentShape.lineStyles.lineStyles2[selectedLineStyleIndex - 1];
-            return createLineStyleArea(linePath, currentLineStyle);
+            return new ImagePanel.LineHilight(
+                    createLineStyleArea(linePath, currentLineStyle),
+                    linePath,
+                    currentLineStyle.getWidth()
+            );
         }));
         return true;
     }

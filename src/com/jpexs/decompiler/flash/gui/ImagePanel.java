@@ -313,9 +313,26 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Shape hilightedLine = null;
 
+    private Shape hilightedLineCenter = null;
+
+    private double hilightedLineWidth = 0;
+
     private IntFunction<Shape> hilightedFillProvider = null;
 
-    private IntFunction<Shape> hilightedLineProvider = null;
+    private IntFunction<LineHilight> hilightedLineProvider = null;
+
+    public static class LineHilight {
+
+        private final Shape area;
+        private final Shape center;
+        private final double width;
+
+        public LineHilight(Shape area, Shape center, double width) {
+            this.area = area;
+            this.center = center;
+            this.width = width;
+        }
+    }
 
     private int lastHilightedShapeRatio = -1;
 
@@ -763,23 +780,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         redraw();
     }
 
-    public void setHilightedLine(Shape hilightedLine) {
+    public void setHilightedLine(Shape hilightedLine, Shape hilightedLineCenter, double hilightedLineWidth) {
         this.hilightedEdge = null;
         this.hilightedPoints = null;
         setHilightedFillInternal(null);
         pointEditPanel.setVisible(false);
-        setHilightedLineInternal(hilightedLine);
+        setHilightedLineDataInternal(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth));
         hilightEdgeColor = 255;
         redraw();
     }
 
     private void setHilightedLineInternal(Shape hilightedLine) {
+        setHilightedLineDataInternal(hilightedLine == null ? null : new LineHilight(hilightedLine, null, 0));
+    }
+
+    private void setHilightedLineDataInternal(LineHilight hilight) {
         this.hilightedLineProvider = null;
-        this.hilightedLine = hilightedLine;
+        this.hilightedLine = hilight == null ? null : hilight.area;
+        this.hilightedLineCenter = hilight == null ? null : hilight.center;
+        this.hilightedLineWidth = hilight == null ? 0 : hilight.width;
         updateHilightedShapeTimer();
     }
 
-    public void setHilightedLineProvider(IntFunction<Shape> hilightedLineProvider) {
+    public void setHilightedLineProvider(IntFunction<LineHilight> hilightedLineProvider) {
         this.hilightedEdge = null;
         this.hilightedPoints = null;
         setHilightedFillInternal(null);
@@ -1192,7 +1215,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             hilightedFill = hilightedFillProvider.apply(ratio);
         }
         if (hilightedLineProvider != null) {
-            hilightedLine = hilightedLineProvider.apply(ratio);
+            LineHilight hilight = hilightedLineProvider.apply(ratio);
+            hilightedLine = hilight == null ? null : hilight.area;
+            hilightedLineCenter = hilight == null ? null : hilight.center;
+            hilightedLineWidth = hilight == null ? 0 : hilight.width;
         }
     }
 
@@ -4261,41 +4287,35 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
                     fillGraphics.dispose();
-
-                    Graphics2D outlineGraphics = (Graphics2D) g2d.create();
-                    outlineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    outlineGraphics.setPaint(dotColor);
-                    outlineGraphics.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{1f, 6f}, 0f));
-                    outlineGraphics.draw(displayedFill);
-                    outlineGraphics.dispose();
                 }
 
                 if (hilightedLine != null) {
                     Shape displayedLineArea = hilightTransform.createTransformedShape(hilightedLine);
-                    Rectangle lineBounds = displayedLineArea.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
                     Graphics2D lineGraphics = (Graphics2D) g2d.create();
                     lineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    lineGraphics.clip(displayedLineArea);
                     lineGraphics.setPaint(dotColor);
                     int dotSpacing = 9;
                     double dotSize = 2;
-                    int firstY = Math.floorDiv(lineBounds.y, dotSpacing) * dotSpacing;
-                    for (int y = firstY; y <= lineBounds.y + lineBounds.height; y += dotSpacing) {
-                        int row = Math.floorDiv(y, dotSpacing);
-                        int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
-                        int firstX = Math.floorDiv(lineBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
-                        for (int x = firstX; x <= lineBounds.x + lineBounds.width; x += dotSpacing) {
-                            lineGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
+                    double displayedLineWidth = hilightedLineWidth * zoomDouble / SWF.unitDivisor;
+                    if (hilightedLineCenter != null && displayedLineWidth < dotSpacing + dotSize) {
+                        Shape displayedLineCenter = hilightTransform.createTransformedShape(hilightedLineCenter);
+                        lineGraphics.setStroke(new BasicStroke((float) dotSize, BasicStroke.CAP_ROUND,
+                                BasicStroke.JOIN_ROUND, 10f, new float[]{0.1f, dotSpacing}, 0));
+                        lineGraphics.draw(displayedLineCenter);
+                    } else {
+                        Rectangle lineBounds = displayedLineArea.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
+                        lineGraphics.clip(displayedLineArea);
+                        int firstY = Math.floorDiv(lineBounds.y, dotSpacing) * dotSpacing;
+                        for (int y = firstY; y <= lineBounds.y + lineBounds.height; y += dotSpacing) {
+                            int row = Math.floorDiv(y, dotSpacing);
+                            int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
+                            int firstX = Math.floorDiv(lineBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
+                            for (int x = firstX; x <= lineBounds.x + lineBounds.width; x += dotSpacing) {
+                                lineGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
+                            }
                         }
                     }
                     lineGraphics.dispose();
-
-                    Graphics2D lineOutlineGraphics = (Graphics2D) g2d.create();
-                    lineOutlineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    lineOutlineGraphics.setPaint(dotColor);
-                    lineOutlineGraphics.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f, new float[]{1f, 6f}, 0f));
-                    lineOutlineGraphics.draw(displayedLineArea);
-                    lineOutlineGraphics.dispose();
                 }
             }
 
