@@ -123,6 +123,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -274,6 +275,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton displayEditSaveButton;
 
     private JButton displayEditCancelButton;
+
+    private JCheckBox displayEditAutoPreviewCheckBox;
 
     private JButton displayEditOperationSaveButton;
 
@@ -1659,6 +1662,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
+        displayEditAutoPreviewCheckBox = new JCheckBox(mainPanel.translate("checkbox.autoPreview"));
+        displayEditAutoPreviewCheckBox.addActionListener(this::displayEditAutoPreviewActionPerformed);
 
         displayEditOperationSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         displayEditOperationSaveButton.setMargin(new Insets(3, 3, 3, 10));
@@ -1747,10 +1752,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
         } else {
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         /*JButton fixPathsButton = new JButton("Fix paths");
@@ -1787,6 +1794,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditEditButtonsPanel.add(displayEditEditButton);
         displayEditEditButtonsPanel.add(displayEditSaveButton);
         displayEditEditButtonsPanel.add(displayEditCancelButton);
+        displayEditEditButtonsPanel.add(displayEditAutoPreviewCheckBox);
 
         ButtonsPanel displayEditButtonsPanel = new ButtonsPanel();
         displayEditButtonsPanel.add(displayEditTransformButton);
@@ -2109,6 +2117,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     replaceMorphShapeButton.setVisible(false);
                     replaceMorphShapeUpdateBoundsButton.setVisible(false);
                 }
+                if (displayEditAutoPreviewCheckBox.isSelected()) {
+                    applyDisplayEditAutoPreview();
+                }
             }
 
             @Override
@@ -2200,12 +2211,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(!tag.isReadOnly());
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(!tag.isReadOnly() && !readOnly);
         } else {
             displayEditGenericPanel.setEditMode(false, tag);
             displayEditEditButton.setVisible(!tag.isReadOnly() && !readOnly);
             displayEditEditButton.setEnabled(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         displayEditImagePanel.selectDepth(-1);
@@ -2240,6 +2253,53 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         parametersPanel.setVisible(false);
         displayEditTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
+    }
+
+    private void displayEditAutoPreviewActionPerformed(ActionEvent evt) {
+        if (displayEditAutoPreviewCheckBox.isSelected()) {
+            applyDisplayEditAutoPreview();
+        } else if (((GenericTagTreePanel) displayEditGenericPanel).restorePreview()) {
+            refreshDisplayEditPreview();
+        }
+    }
+
+    private void applyDisplayEditAutoPreview() {
+        if (((GenericTagTreePanel) displayEditGenericPanel).preview()) {
+            refreshDisplayEditPreview();
+        }
+    }
+
+    private void refreshDisplayEditPreview() {
+        if (displayEditTag == null) {
+            return;
+        }
+        SWF swf = displayEditTag.getSwf();
+        swf.clearImageCache();
+        swf.clearShapeCache();
+        displayEditTag.getTimelined().resetTimeline();
+
+        if (displayEditTag instanceof ShapeTag) {
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            shape.shapes.clearCachedOutline();
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            displayEditImagePanel.setTimelined(tim, swf, 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof MorphShapeTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            int frame = morphDisplayMode == MORPH_START ? 0 : morphDisplayMode == MORPH_END ? tim.getFrameCount() - 1 : -1;
+            displayEditImagePanel.setTimelined(tim, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof PlaceObjectTypeTag) {
+            displayEditImagePanel.setTimelined(displayEditTag.getTimelined(), swf, displayEditFrame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true, true);
+            Timelined tim = displayEditTag.getTimelined();
+            if (tim instanceof Tag) {
+                displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) tim).getCharacterId());
+            } else {
+                displayEditImagePanel.setGuidesCharacter(swf, -1);
+            }
+            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        }
+        displayEditImagePanel.repaint();
     }
 
     private void updateEffectivePlaceObjectPanel() {
@@ -2721,6 +2781,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 hilightTag = tag;
             }
             displayEditGenericPanel.setEditMode(false, null);
+            refreshDisplayEditPreview();
         }
 
         if (displayEditTag instanceof ShapeTag) {
@@ -2751,11 +2812,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
             displayEditTransformButton.setVisible(true);
         } else {
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         if (displayEditMode == EDIT_RAW && refreshTree && swf != null) {
@@ -2791,6 +2854,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
+        displayEditAutoPreviewCheckBox.setVisible(true);
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
@@ -3257,19 +3321,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (Configuration.editorMode.get()) {
             if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(true, null);
+                refreshDisplayEditPreview();
             }
             displayEditEditButton.setVisible(false);
             displayEditSaveButton.setVisible(true);
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
         } else {
             if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(false, null);
+                refreshDisplayEditPreview();
             }
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         if (displayEditTag instanceof ShapeTag) {

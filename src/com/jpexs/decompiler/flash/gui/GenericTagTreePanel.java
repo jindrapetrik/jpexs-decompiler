@@ -123,6 +123,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private Tag editedTag;
 
+    private Tag previewOriginalTag;
+
     private static final Map<Class, List<Field>> fieldCache = new HashMap<>();
 
     private static final int FIELD_INDEX = 0;
@@ -764,6 +766,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void clear() {
+        restorePreview();
         tag = null;
         editedTag = null;
         tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("root")));
@@ -1302,6 +1305,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void setEditMode(boolean edit, Tag tag) {
+        restorePreview();
         if (tag == null) {
             tag = this.tag;
         }
@@ -1334,6 +1338,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         SWF swf = tag.getSwf();
         assignTag(tag, editedTag);
+        previewOriginalTag = null;
         tag.setModified(true);
         tag.setSwf(swf);
         if (tag instanceof Timelined) {
@@ -1348,6 +1353,37 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         swf.computeDependentCharacters();
         swf.computeDependentFrames();
+        return true;
+    }
+
+    public boolean preview() {
+        if (tree.isEditing() && !tree.stopEditing()) {
+            return false;
+        }
+        if (tag == null || editedTag == null) {
+            return true;
+        }
+        if (previewOriginalTag == null) {
+            try {
+                previewOriginalTag = tag.cloneTag();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return false;
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+        assignTag(tag, editedTag);
+        return true;
+    }
+
+    public boolean restorePreview() {
+        if (previewOriginalTag == null || tag == null) {
+            return false;
+        }
+        assignTag(tag, previewOriginalTag);
+        previewOriginalTag = null;
         return true;
     }
 
