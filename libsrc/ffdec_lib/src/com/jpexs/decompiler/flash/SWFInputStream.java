@@ -927,10 +927,28 @@ public class SWFInputStream implements AutoCloseable {
     public float readFLOAT16(String name) throws IOException {
         newDumpLevel(name, "FLOAT16");
         int val = readUI16Internal();
-        int sign = val >> 15;
+        int sign = (val & 0x8000) << 16;
         int mantissa = val & 0x3FF;
         int exp = (val >> 10) & 0x1F;
-        float ret = (sign == 1 ? -1 : 1) * (float) Math.pow(2, exp) * (1 + ((mantissa) / (float) (1 << 10)));
+        int floatBits;
+        if (exp == 0) {
+            if (mantissa == 0) {
+                floatBits = sign;
+            } else {
+                int unbiasedExp = -14;
+                while ((mantissa & 0x400) == 0) {
+                    mantissa <<= 1;
+                    unbiasedExp--;
+                }
+                mantissa &= 0x3FF;
+                floatBits = sign | ((unbiasedExp + 127) << 23) | (mantissa << 13);
+            }
+        } else if (exp == 0x1F) {
+            floatBits = sign | 0x7F800000 | (mantissa << 13);
+        } else {
+            floatBits = sign | ((exp + 127 - 15) << 23) | (mantissa << 13);
+        }
+        float ret = Float.intBitsToFloat(floatBits);
         endDumpLevel(ret);
         return ret;
     }

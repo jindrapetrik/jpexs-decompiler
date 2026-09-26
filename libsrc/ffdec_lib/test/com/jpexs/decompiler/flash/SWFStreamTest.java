@@ -131,6 +131,36 @@ public class SWFStreamTest {
     }
 
     @Test
+    public void testFLOAT16KnownValues() throws IOException {
+        assertFLOAT16Bits(0x0000, 0.0f);
+        assertFLOAT16Bits(0x8000, -0.0f);
+        assertFLOAT16Bits(0x3c00, 1.0f);
+        assertFLOAT16Bits(0xc000, -2.0f);
+        assertFLOAT16Bits(0x0001, 0x1.0p-24f);
+        assertFLOAT16Bits(0x7bff, 65504.0f);
+        assertFLOAT16Bits(0x7c00, Float.POSITIVE_INFINITY);
+        assertFLOAT16Bits(0xfc00, Float.NEGATIVE_INFINITY);
+
+        try (SWFInputStream sis = new SWFInputStream(null, new byte[]{0x00, 0x7e})) {
+            assertTrue(Float.isNaN(sis.readFLOAT16("test")));
+        }
+    }
+
+    private void assertFLOAT16Bits(int expectedBits, float value) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+            sos.writeFLOAT16(value);
+        }
+        byte[] data = baos.toByteArray();
+        assertEquals(data.length, 2);
+        int actualBits = (data[0] & 0xff) | ((data[1] & 0xff) << 8);
+        assertEquals(actualBits, expectedBits);
+        try (SWFInputStream sis = new SWFInputStream(null, data)) {
+            assertEquals(Float.floatToRawIntBits(sis.readFLOAT16("test")), Float.floatToRawIntBits(value));
+        }
+    }
+
+    @Test
     public void testFIXEDandFIXED8() throws IOException {
         //example from specification
         byte[] data = new byte[]{(byte) 0x00, (byte) 0x80, (byte) 0x07, (byte) 0x00};
