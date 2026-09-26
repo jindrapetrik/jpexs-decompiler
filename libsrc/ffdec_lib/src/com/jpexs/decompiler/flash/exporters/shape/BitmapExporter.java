@@ -299,6 +299,11 @@ public class BitmapExporter extends ShapeExporterBase {
                 break;
             }
         }
+        
+        if (colors.isEmpty()) {
+            colors.add(Color.red);
+            ratios.add(0f);
+        }
 
         if (colors.size() == 1) {
             colors.add(colors.get(0));
