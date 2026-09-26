@@ -39,7 +39,7 @@ public class Distances {
     public static double getBatchDistance(List<BezierEdge> batch1, List<BezierEdge> batch2) {
         Area a1 = batchToArea(batch1);
         Area a2 = batchToArea(batch2);
-        return areaDist(a1, a2);
+        return Math.max(areaDist(a1, a2), areaDist(a2, a1));
     }
 
     private static Area batchToArea(List<BezierEdge> batch) {
@@ -65,7 +65,6 @@ public class Distances {
     private static double areaDist(Area a1, Area a2) {
         List<Point2D> points1 = getAreaPoints(a1);
         List<Point2D> points2 = getAreaPoints(a2);
-        double minDist = Double.MAX_VALUE;
         double maxDist = 0;
         for (Point2D p : points1) {
             double dist = Double.MAX_VALUE;
@@ -74,9 +73,6 @@ public class Distances {
                 if (d < dist) {
                     dist = d;
                 }
-            }
-            if (dist < minDist) {
-                minDist = dist;
             }
             if (dist > maxDist) {
                 maxDist = dist;
@@ -100,39 +96,34 @@ public class Distances {
                 case PathIterator.SEG_MOVETO:
                     xBegin = coords[0];
                     yBegin = coords[1];
+                    xPrev = xBegin;
+                    yPrev = yBegin;
                     points.add(new Point2D.Double(xBegin, yBegin));
                     break;
                 case PathIterator.SEG_LINETO:
-                    //coords[0], coords[1]
-                    //Point2D np = new Point2D.Double(coords[0], coords[1]);
-                    double dx = coords[0] - xPrev;
-                    double dy = coords[1] - yPrev;
-                    double dz = Math.sqrt(dx * dx + dy * dy);
-                    double divisor;
-                    /*if (dy > dx) {
-                        divisor = dy / F;
-                    } else {
-                        divisor = dx / F;
-                    }*/
-                    divisor = dz / F;
-                    for (int d = 1; d <= divisor; d++) {
-                        Point2D p2 = new Point2D.Double(xPrev + d * dx / divisor, yPrev + d * dy / divisor);
-                        points.add(p2);
-                    }
-                    //points.add(np);
-                    //System.err.println("dx, dy: "+dx+", "+dy);
+                    addLinePoints(points, xPrev, yPrev, coords[0], coords[1], F);
+                    xPrev = coords[0];
+                    yPrev = coords[1];
                     break;
                 case PathIterator.SEG_CLOSE:
-
+                    addLinePoints(points, xPrev, yPrev, xBegin, yBegin, F);
+                    xPrev = xBegin;
+                    yPrev = yBegin;
                     break;
                 default:
                     throw new RuntimeException("Curved edge not expected");
             }
-            xPrev = coords[0];
-            yPrev = coords[1];
-            //System.err.println("pos: "+xPrev+", "+ yPrev);
             pi.next();
         }
         return points;
+    }
+
+    private static void addLinePoints(List<Point2D> points, double x1, double y1, double x2, double y2, double spacing) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        int steps = Math.max(1, (int) Math.ceil(Math.sqrt(dx * dx + dy * dy) / spacing));
+        for (int step = 1; step <= steps; step++) {
+            points.add(new Point2D.Double(x1 + step * dx / steps, y1 + step * dy / steps));
+        }
     }
 }
