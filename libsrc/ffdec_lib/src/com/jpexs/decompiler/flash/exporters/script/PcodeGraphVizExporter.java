@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;

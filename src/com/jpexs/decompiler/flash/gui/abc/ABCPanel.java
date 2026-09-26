@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.debugger.flash.DebuggerCommands;
-import com.jpexs.debugger.flash.DebuggerMessage;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
@@ -130,7 +129,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

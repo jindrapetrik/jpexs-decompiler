@@ -104,7 +104,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 import org.w3c.dom.Element;
 
 /**

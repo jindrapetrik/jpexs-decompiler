@@ -16,14 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import static org.testng.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 public class SoundWaveformPanelTest {

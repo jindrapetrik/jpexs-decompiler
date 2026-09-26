@@ -49,7 +49,6 @@ import com.jpexs.decompiler.flash.xfl.XFLXmlWriter;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

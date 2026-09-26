@@ -187,7 +187,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;

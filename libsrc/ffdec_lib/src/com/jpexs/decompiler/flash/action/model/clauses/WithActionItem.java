@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;

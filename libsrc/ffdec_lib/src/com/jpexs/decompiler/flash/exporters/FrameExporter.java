@@ -109,7 +109,6 @@ import net.kroo.elliot.GifSequenceWriter;
 import net.weiner.kevin.AnimatedGifEncoder;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
-import org.w3c.dom.Element;
 
 /**
  * Frame exporter.
