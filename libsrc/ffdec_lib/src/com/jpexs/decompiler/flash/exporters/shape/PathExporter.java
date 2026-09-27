@@ -71,6 +71,11 @@ public class PathExporter extends ShapeExporterBase {
         strokes.addAll(exporter.strokes);
         return exporter.paths;
     }
+    
+    @Override
+    public void export() {
+        super.export();
+    }
 
     /**
      * Exports the filled area which uses the specified one-based fill style
@@ -146,12 +151,7 @@ public class PathExporter extends ShapeExporterBase {
      */
     protected PathExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
-    }
-
-    @Override
-    public void export() {
-        super.export();
-    }
+    }   
 
     @Override
     public void beginShape() {
