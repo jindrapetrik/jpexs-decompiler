@@ -1613,6 +1613,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return true;
     }
 
+    Tag getEditedTagForPreview() {
+        if (tree.isEditing() && !tree.stopEditing()) {
+            return null;
+        }
+        return editedTag;
+    }
+
     public boolean restorePreview() {
         if (previewOriginalTag == null || tag == null) {
             return false;

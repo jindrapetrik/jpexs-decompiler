@@ -277,6 +277,12 @@ public class TimelinedMaker {
                     Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f, f);
                     ds.depth = 1;
+                    //Special case for button preview to work,
+                    // timeline uses cloned character instead of original
+                    // via character id
+                    if (tag instanceof CharacterTag) {
+                        ds.manualCharacter = (CharacterTag) tag;
+                    }
                     ds.characterId = fChId;
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);

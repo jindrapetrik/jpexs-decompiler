@@ -3045,6 +3045,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             morphDisplayMode = MORPH_ANIMATE;
             displayEditShowAnimationButton.setSelected(true);
         }
+        if (tag instanceof ButtonTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(tag);
+            displayEditImagePanel.setTimelined(tim, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
+            displayEditImagePanel.setGuidesCharacter(tag.getSwf(), ((CharacterTag) tag).getCharacterId());
+        }
         if (tag instanceof PlaceObjectTypeTag) {
             displayEditImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true, true);
             Timelined tim = ((Tag) tag).getTimelined();
@@ -3069,15 +3074,35 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void displayEditAutoPreviewActionPerformed(ActionEvent evt) {
         if (displayEditAutoPreviewCheckBox.isSelected()) {
             applyDisplayEditAutoPreview();
+        } else if (displayEditTag instanceof ButtonTag) {
+            refreshDisplayEditPreview();
         } else if (((GenericTagTreePanel) displayEditGenericPanel).restorePreview()) {
             refreshDisplayEditPreview();
         }
     }
 
     private void applyDisplayEditAutoPreview() {
-        if (((GenericTagTreePanel) displayEditGenericPanel).preview()) {
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        if (displayEditTag instanceof ButtonTag) {
+            Tag previewTag = treePanel.getEditedTagForPreview();
+            if (previewTag instanceof ButtonTag) {
+                refreshDisplayEditButtonPreview((ButtonTag) previewTag);
+            }
+        } else if (treePanel.preview()) {
             refreshDisplayEditPreview();
         }
+    }
+
+    private void refreshDisplayEditButtonPreview(ButtonTag buttonTag) {
+        SWF swf = buttonTag.getSwf();
+        swf.clearImageCache();
+        swf.clearShapeCache();
+        buttonTag.resetTimeline();
+        boolean previewDisplayed = displayEditImagePanel.isDisplayed();
+        Timelined tim = TimelinedMaker.makeTimelined(buttonTag);
+        displayEditImagePanel.setTimelined(tim, swf, -1, true, previewDisplayed, false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
+        displayEditImagePanel.setGuidesCharacter(swf, buttonTag.getCharacterId());
+        displayEditImagePanel.repaint();
     }
 
     private void refreshDisplayEditPreview() {
@@ -3088,6 +3113,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         swf.clearImageCache();
         swf.clearShapeCache();
         displayEditTag.getTimelined().resetTimeline();
+        if (displayEditTag instanceof ButtonTag) {
+            ((ButtonTag) displayEditTag).resetTimeline();
+        }
 
         if (displayEditTag instanceof ShapeTag) {
             ShapeTag shape = (ShapeTag) displayEditTag;
@@ -3099,6 +3127,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
             int frame = morphDisplayMode == MORPH_START ? 0 : morphDisplayMode == MORPH_END ? tim.getFrameCount() - 1 : -1;
             displayEditImagePanel.setTimelined(tim, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof ButtonTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            displayEditImagePanel.setTimelined(tim, swf, -1, true, Configuration.autoPlayPreviews.get(), false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
             displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
         } else if (displayEditTag instanceof PlaceObjectTypeTag) {
             displayEditImagePanel.setTimelined(displayEditTag.getTimelined(), swf, displayEditFrame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true, true);

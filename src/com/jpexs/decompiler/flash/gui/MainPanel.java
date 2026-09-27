@@ -6209,6 +6209,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof MorphShapeTag) {
             previewPanel.showDisplayEditTagPanel((MorphShapeTag) treeItem, 0);
             previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, !((Tag) treeItem).isReadOnly(), false);
+        } else if (treeItem instanceof ButtonTag) {
+            previewPanel.showDisplayEditTagPanel((ButtonTag) treeItem, 0);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, false);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
