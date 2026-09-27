@@ -1007,7 +1007,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditImagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (!SwingUtilities.isLeftMouseButton(e)) {
+                if (!SwingUtilities.isLeftMouseButton(e) || displayEditMode != EDIT_RAW) {
                     return;
                 }
                 Point2D shapePoint = displayEditImagePanel.toTimelinedPoint(e.getPoint());
