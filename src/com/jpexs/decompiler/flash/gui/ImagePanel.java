@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -2304,7 +2305,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                     for (GLYPHENTRY g : r.glyphEntries) {
                                         if (text == textSelectionText && pos >= selStart && pos < selEnd) {
-                                            sb.append(font.glyphToChar(g.glyphIndex));
+                                            if (g instanceof DynamicTextGlyphEntry) {
+                                                DynamicTextGlyphEntry dynamicGlyphEntry = (DynamicTextGlyphEntry) g;
+                                                sb.append(dynamicGlyphEntry.character);
+                                            } else {
+                                                sb.append(font.glyphToChar(g.glyphIndex));
+                                            }
                                         }
                                         pos++;
                                     }
