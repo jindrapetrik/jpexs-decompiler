@@ -35,16 +35,20 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
@@ -60,6 +64,8 @@ import com.jpexs.decompiler.flash.types.annotations.UUID;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.Helper;
@@ -159,6 +165,93 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         ((MyTreeModel) tree.getModel()).vchanged(path);
         tree.repaint();
+    }
+
+    /**
+     * Selects the tree node whose value is the supplied object.
+     *
+     * @param value Value to find using object identity
+     * @return Whether a matching node was found
+     */
+    public boolean selectNodeByValue(Object value) {
+        TreeModel model = tree.getModel();
+        TreePath path = findPathByValue(model, new TreePath(model.getRoot()), value);
+        if (path == null) {
+            return false;
+        }
+        tree.setSelectionPath(path);
+        tree.scrollPathToVisible(path);
+        return true;
+    }
+
+    /**
+     * Selects a shape fill style using its one-based global index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param fillStyleIndex One-based global fill style index
+     * @return Whether a matching fill style node was found
+     */
+    public boolean selectShapeFillStyle(int fillStyleIndex) {
+        if (fillStyleIndex < 1 || !(editedTag instanceof ShapeTag)) {
+            return false;
+        }
+        SHAPEWITHSTYLE shapes = ((ShapeTag) editedTag).getShapes();
+        int currentIndex = 0;
+        for (FILLSTYLE fillStyle : shapes.fillStyles.fillStyles) {
+            currentIndex++;
+            if (currentIndex == fillStyleIndex) {
+                return selectNodeByValue(fillStyle);
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            for (FILLSTYLE fillStyle : styleChangeRecord.fillStyles.fillStyles) {
+                currentIndex++;
+                if (currentIndex == fillStyleIndex) {
+                    return selectNodeByValue(fillStyle);
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects a morph shape fill style using its one-based index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param fillStyleIndex One-based morph fill style index
+     * @return Whether a matching fill style node was found
+     */
+    public boolean selectMorphShapeFillStyle(int fillStyleIndex) {
+        if (fillStyleIndex < 1 || !(editedTag instanceof MorphShapeTag)) {
+            return false;
+        }
+        MORPHFILLSTYLE[] fillStyles = ((MorphShapeTag) editedTag).morphFillStyles.fillStyles;
+        if (fillStyleIndex > fillStyles.length) {
+            return false;
+        }
+        return selectNodeByValue(fillStyles[fillStyleIndex - 1]);
+    }
+
+    private TreePath findPathByValue(TreeModel model, TreePath path, Object value) {
+        Object node = path.getLastPathComponent();
+        if (node instanceof FieldNode && ((FieldNode) node).getValue(FIELD_INDEX) == value) {
+            return path;
+        }
+        int childCount = model.getChildCount(node);
+        for (int i = 0; i < childCount; i++) {
+            TreePath result = findPathByValue(model, path.pathByAddingChild(model.getChild(node, i)), value);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     private class MyTree extends JTree {

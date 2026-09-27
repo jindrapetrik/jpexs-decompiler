@@ -222,6 +222,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean showObjectsUnderCursor;
 
+    private boolean altSelectionEnabled = true;
+
     private int msPerFrame;
 
     private final boolean lowQuality = false;
@@ -1206,7 +1208,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (hilightedFillProvider == null && hilightedLineProvider == null) {
             return;
         }
-        int ratio = getCurrentHilightedShapeRatio();
+        int ratio = getCurrentShapeRatio();
         if (ratio == lastHilightedShapeRatio) {
             return;
         }
@@ -1222,7 +1224,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private int getCurrentHilightedShapeRatio() {
+    /**
+     * Gets the morph ratio of the shape displayed at depth one in the current
+     * frame.
+     *
+     * @return Morph ratio in the range 0 to 65535
+     */
+    public int getCurrentShapeRatio() {
         if (timelined == null) {
             return 0;
         }
@@ -2396,7 +2404,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     calculatePointsXY();
 
-                    if (altDown || selectionMode) {
+                    if ((altDown && altSelectionEnabled) || selectionMode) {
                         if (depthStateUnderCursor != null) {
 
                             List<Integer> newSelectedDepths = new ArrayList<>();
@@ -2443,7 +2451,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     if (SwingUtilities.isLeftMouseButton(e)) {
 
-                        if (altDown || selectionMode) {
+                        if ((altDown && altSelectionEnabled) || selectionMode) {
                             if (depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth)) {
                                 inMoving = selectionMode;
                                 calculateFreeOrSelectionTransform();
@@ -5539,6 +5547,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
+    /**
+     * Enables selecting and navigating to the display object under the cursor
+     * with Alt+click.
+     *
+     * @param altSelectionEnabled Whether Alt+click selection is enabled
+     */
+    public void setAltSelectionEnabled(boolean altSelectionEnabled) {
+        this.altSelectionEnabled = altSelectionEnabled;
+    }
+
     @Override
     public synchronized void clearGuides() {
         clearGuidesInternal();
@@ -6593,7 +6611,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     newCursor = guideXCursor;
                                 } else if (mode == MODE_GUIDE_Y) {
                                     newCursor = guideYCursor;
-                                } else if (iconPanel.isAltDown() && !selectionMode && !doFreeTransform) {
+                                } else if (iconPanel.isAltDown() && altSelectionEnabled && !selectionMode && !doFreeTransform) {
                                     if (depthStateUnderCursor == null) {
                                         newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {
@@ -7123,6 +7141,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Point2D ret = new Point2D.Double(rx, ry);
         ret = getParentMatrix().inverse().transform(ret);
         return ret;
+    }
+
+    /**
+     * Converts a point in the preview panel to the coordinate system of the
+     * displayed timeline.
+     *
+     * @param point Point in preview panel coordinates
+     * @return Point in timeline coordinates (twips)
+     */
+    public Point2D toTimelinedPoint(Point2D point) {
+        return toTransformPoint(point);
     }
 
     private Matrix toImageMatrix(Matrix transform) {

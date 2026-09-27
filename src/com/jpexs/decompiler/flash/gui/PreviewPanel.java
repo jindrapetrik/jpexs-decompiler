@@ -102,6 +102,8 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -139,6 +141,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -998,6 +1001,33 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         displayEditImagePanel = new ImagePanel();
+
+        displayEditImagePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!e.isAltDown() || !SwingUtilities.isLeftMouseButton(e)) {
+                    return;
+                }
+                Point2D shapePoint = displayEditImagePanel.toTimelinedPoint(e.getPoint());
+                GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+                if (displayEditTag instanceof ShapeTag) {
+                    int fillStyleIndex = getFillStyleIndexAt((ShapeTag) displayEditTag, shapePoint);
+                    if (fillStyleIndex > 0) {
+                        treePanel.selectShapeFillStyle(fillStyleIndex);
+                    }
+                } else if (displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShapeTag = (MorphShapeTag) displayEditTag;
+                    int fillStyleIndex = getMorphFillStyleIndexAt(
+                            morphShapeTag,
+                            displayEditImagePanel.getCurrentShapeRatio(),
+                            shapePoint
+                    );
+                    if (fillStyleIndex > 0) {
+                        treePanel.selectMorphShapeFillStyle(fillStyleIndex);
+                    }
+                }
+            }
+        });
 
         displayEditImagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
@@ -1955,6 +1985,53 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return -1;
     }
 
+    private int getFillStyleIndexAt(ShapeTag shapeTag, Point2D point) {
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int fillStyleCount = shapes.fillStyles.fillStyles.length;
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            fillStyleCount += styleChangeRecord.fillStyles.fillStyles.length;
+        }
+        for (int fillStyleIndex = fillStyleCount; fillStyleIndex >= 1; fillStyleIndex--) {
+            GeneralPath fillPath = PathExporter.exportFillStyle(
+                    shapeTag.getWindingRule(),
+                    shapeTag.getShapeNum(),
+                    shapeTag.getSwf(),
+                    shapes,
+                    fillStyleIndex
+            );
+            if (fillPath.contains(point)) {
+                return fillStyleIndex;
+            }
+        }
+        return -1;
+    }
+
+    private int getMorphFillStyleIndexAt(MorphShapeTag morphShapeTag, int ratio, Point2D point) {
+        SHAPEWITHSTYLE shape = morphShapeTag.getShapeAtRatio(ratio);
+        for (int fillStyleIndex = morphShapeTag.morphFillStyles.fillStyles.length;
+                fillStyleIndex >= 1;
+                fillStyleIndex--) {
+            GeneralPath fillPath = PathExporter.exportFillStyle(
+                    ShapeTag.WIND_EVEN_ODD,
+                    getMorphShapeNum(morphShapeTag),
+                    null,
+                    shape,
+                    fillStyleIndex
+            );
+            if (fillPath.contains(point)) {
+                return fillStyleIndex;
+            }
+        }
+        return -1;
+    }
+
     private boolean highlightSelectedLineStyle(javax.swing.tree.TreePath path) {
         Object selectedLineStyle = null;
         ShapeTag shapeTag = null;
@@ -2387,6 +2464,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         imageTransformSaveButton.setVisible(false);
         imageTransformCancelButton.setVisible(false);
+        imagePanel.setAltSelectionEnabled(true);
         imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom, frozenButtons, canHaveRuler);
         if (canHaveRuler) {
             if (timelined instanceof Tag) {
@@ -2458,6 +2536,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false, true, false);
+        imagePanel.setAltSelectionEnabled(false);
     }
 
     public static int getFontPageCount(FontTag fontTag) {
@@ -2475,6 +2554,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true, true, true);
+        imagePanel.setAltSelectionEnabled(false);
 
         showCardRight(CARDTEXTPANEL);
         if (!readOnly) {
@@ -2758,6 +2838,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
+        displayEditImagePanel.setAltSelectionEnabled(tag instanceof PlaceObjectTypeTag);
         displayEditImagePanel.selectDepth(-1);
         if (tag instanceof ShapeTag) {
             Timelined tim = TimelinedMaker.makeTimelined(tag);
