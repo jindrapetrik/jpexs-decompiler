@@ -282,6 +282,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor guideXCursor;
     private static Cursor guideYCursor;
     private static Cursor textCursor;
+    private static Cursor moveCanvasCursor;
+    private static Cursor handCursor;
 
     private Point2D offsetPoint = new Point2D.Double(0, 0);
 
@@ -1363,6 +1365,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             guideXCursor = loadCursor("guide_x", 0, 0);
             guideYCursor = loadCursor("guide_y", 0, 0);
             textCursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+            moveCanvasCursor = loadCursor("move_canvas", 8, 8);
+            handCursor = loadCursor("hand", 3, 1);
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -4651,8 +4655,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 guideDragX = -1;
                 guideDragY = -1;
 
-                topRuler.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                leftRuler.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                topRuler.setCursor(defaultCursor);
+                leftRuler.setCursor(defaultCursor);
 
                 if (c != iconPanel) {
                     finishGradientTransformDrag();
@@ -4794,6 +4798,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         };
         topRuler.setPreferredSize(new Dimension(1, GUIDE_THICKNESS));
+        topRuler.setCursor(defaultCursor);                
         topPanel.add(topRuler);
 
         leftRuler = new JPanel() {
@@ -4876,6 +4881,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         };
         leftRuler.setPreferredSize(new Dimension(GUIDE_THICKNESS, 1));
+        leftRuler.setCursor(defaultCursor);
         add(leftRuler, BorderLayout.WEST);
 
         super.addMouseMotionListener(new MouseAdapter() {
@@ -6532,7 +6538,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozenButtons;
+            boolean hasHandCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozenButtons;
 
             if (autoPlayed) {
                 if (!renderContext.stateUnderCursor.isEmpty()) {
@@ -6620,18 +6626,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     newCursor = guideYCursor;
                                 } else if (iconPanel.isAltDown() && altSelectionEnabled && !selectionMode && !doFreeTransform) {
                                     if (depthStateUnderCursor == null) {
-                                        newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                        newCursor = defaultCursor; //Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {
-                                        newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+                                        newCursor = handCursor; //Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
                                     }
-                                } else if (handCursor) {
-                                    newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+                                } else if (hasHandCursor) {
+                                    newCursor = handCursor; //Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
                                 } else if (!selectionMode && !doFreeTransform && (selectingText || (iconPanel.mouseOverText != null && (allowSelectAllTextTypes || (iconPanel.mouseOverText instanceof DefineEditTextTag && !((DefineEditTextTag) iconPanel.mouseOverText).noSelect))))) {
                                     newCursor = textCursor;
                                 } else if (zoomAvailable && iconPanel.hasAllowMove()) {
-                                    newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+                                    newCursor = moveCanvasCursor; //Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
                                 } else {
-                                    newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                    newCursor = defaultCursor; //Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                 }
                                 if (iconPanel.getCursor() != newCursor) { //call setcursor only when needed to avoid cursor flickering when dragging in the tree
                                     iconPanel.setCursor(newCursor);
