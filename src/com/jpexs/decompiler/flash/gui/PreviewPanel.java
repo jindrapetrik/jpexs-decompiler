@@ -294,6 +294,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton displayEditOperationCancelButton;
 
+    private MATRIX displayEditPlaceMatrix;
+
+    private javax.swing.tree.TreePath displayEditPlaceMatrixPath;
+
+    private Matrix displayEditPlaceMatrixBase;
+
     private JButton displayEditEditPointsButton;
 
     private JPanel morphShowPanel;
@@ -1069,6 +1075,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             });
         }
 
+        displayEditImagePanel.addTransformChangeListener(new Runnable() {
+            @Override
+            public void run() {
+                if (displayEditMode != EDIT_RAW
+                        || displayEditPlaceMatrix == null
+                        || displayEditPlaceMatrixPath == null
+                        || displayEditPlaceMatrixBase == null) {
+                    return;
+                }
+                Matrix matrix = displayEditImagePanel.getNewMatrix().concatenate(displayEditPlaceMatrixBase);
+                copyMatrix(matrix.toMATRIX(), displayEditPlaceMatrix);
+                ((GenericTagTreePanel) displayEditGenericPanel).notifyNodeChanged(displayEditPlaceMatrixPath);
+            }
+        });
+
         displayEditImagePanel.addPointUpdateListener(new PointUpdateListener() {
             @Override
             public void pointsUpdated(List<DisplayPoint> points) {
@@ -1552,10 +1573,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
                     displayEditImagePanel.clearGradientTransform();
+                    clearSelectedPlaceMatrixTransform();
                     displayEditImagePanel.setStatus("");
                     displayEditImagePanel.setHilightedEdge(null);
                     return;
                 }
+                updateSelectedPlaceMatrixTransform(e.getNewLeadSelectionPath());
                 updateSelectedFillTransform(e.getNewLeadSelectionPath());
                 if (highlightSelectedMorphFillStyle(e.getPath())) {
                     displayEditImagePanel.setStatus("");
@@ -1719,6 +1742,52 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
 
         return displayEditTagCard;
+    }
+
+    private void clearSelectedPlaceMatrixTransform() {
+        displayEditPlaceMatrix = null;
+        displayEditPlaceMatrixPath = null;
+        displayEditPlaceMatrixBase = null;
+        if (displayEditMode == EDIT_RAW && displayEditTag instanceof PlaceObjectTypeTag) {
+            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        }
+    }
+
+    private void updateSelectedPlaceMatrixTransform(javax.swing.tree.TreePath path) {
+        clearSelectedPlaceMatrixTransform();
+        if (displayEditMode != EDIT_RAW || !(displayEditTag instanceof PlaceObjectTypeTag)) {
+            return;
+        }
+
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        if (!treePanel.isEditMode()) {
+            return;
+        }
+
+        Object component = path.getLastPathComponent();
+        if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+            return;
+        }
+        GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+        Object value = fieldNode.getValue(0);
+        if (!"matrix".equals(fieldNode.getName(0)) || !(value instanceof MATRIX)) {
+            return;
+        }
+
+        displayEditPlaceMatrix = (MATRIX) value;
+        displayEditPlaceMatrixPath = path;
+        displayEditPlaceMatrixBase = new Matrix(displayEditPlaceMatrix);
+        displayEditImagePanel.freeTransformDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+    }
+
+    private void refreshSelectedPlaceMatrixTransform() {
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        javax.swing.tree.TreePath selectedPath = treePanel.getSelectionPath();
+        if (selectedPath == null) {
+            clearSelectedPlaceMatrixTransform();
+            return;
+        }
+        updateSelectedPlaceMatrixTransform(selectedPath);
     }
 
     private void updateSelectedFillTransform(javax.swing.tree.TreePath path) {
@@ -3091,6 +3160,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         } else if (treePanel.preview()) {
             refreshDisplayEditPreview();
         }
+        refreshSelectedPlaceMatrixTransform();
     }
 
     private void refreshDisplayEditButtonPreview(ButtonTag buttonTag) {
