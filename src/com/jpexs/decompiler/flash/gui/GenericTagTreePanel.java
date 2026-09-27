@@ -1358,6 +1358,29 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return null;
         }
 
+        public TreePath getTreePathByName(String pathName) {
+            if (pathName == null || pathName.isEmpty()) {
+                return null;
+            }
+            String[] pathParts = pathName.split("\\.");
+            List<Object> path = new ArrayList<>();
+            String currentPath = pathParts[0];
+            Object node = getNodeByPath(currentPath);
+            if (node == null) {
+                return null;
+            }
+            path.add(node);
+            for (int i = 1; i < pathParts.length; i++) {
+                currentPath += "." + pathParts[i];
+                node = getNodeByPath(currentPath);
+                if (node == null) {
+                    return null;
+                }
+                path.add(node);
+            }
+            return new TreePath(path.toArray());
+        }
+
         public List<FieldNode> getDependentFields(FieldNode fnode) {
             List<FieldNode> ret = new ArrayList<>();
             getDependentFields(getNodePathName(fnode), mtroot.getClass().getSimpleName(), mtroot, ret);
@@ -1505,6 +1528,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void setEditMode(boolean edit, Tag tag) {
+        String selectedPathName = null;
+        TreePath selectedPath = tree.getSelectionPath();
+        if (selectedPath != null && tree.getModel() instanceof MyTreeModel) {
+            selectedPathName = ((MyTreeModel) tree.getModel()).getNodePathName(selectedPath.getLastPathComponent());
+        }
         restorePreview();
         if (tag == null) {
             tag = this.tag;
@@ -1525,6 +1553,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tree.setCellEditor(new MyTreeCellEditor(tree, editedTag.getSwf()));
         }
         refreshTree();
+        if (selectedPathName != null && tree.getModel() instanceof MyTreeModel) {
+            TreePath restoredPath = ((MyTreeModel) tree.getModel()).getTreePathByName(selectedPathName);
+            if (restoredPath != null) {
+                tree.setSelectionPath(restoredPath);
+                tree.scrollPathToVisible(restoredPath);
+            }
+        }
     }
 
     @Override
