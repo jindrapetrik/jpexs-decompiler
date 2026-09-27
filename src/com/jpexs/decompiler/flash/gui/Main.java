@@ -2961,13 +2961,19 @@ public class Main {
     }
 
     private static void initGui() {
+        System.setProperty("sun.java2d.d3d", "false");
+        System.setProperty("sun.java2d.noddraw", "true");
+        
+        if (Configuration.hwAcceleratedGraphics.get()) {
+            System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
+        } else {
+            System.setProperty("sun.java2d.opengl", "false");
+        }
+        
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
             exit();
-        }
-
-        System.setProperty("sun.java2d.d3d", "false");
-        System.setProperty("sun.java2d.noddraw", "true");
+        }       
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.
             Double scaleToUse = Configuration.uiScale.get();
@@ -2984,13 +2990,7 @@ public class Main {
                 }
             }
             System.setProperty("sun.java2d.uiScale", "" + scaleToUse);
-        }
-
-        if (Configuration.hwAcceleratedGraphics.get()) {
-            System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
-        } else {
-            System.setProperty("sun.java2d.opengl", "false");
-        }
+        }       
 
         initUiLang();
 

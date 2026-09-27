@@ -75,17 +75,24 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.JTable;
+import javax.swing.JToolTip;
 import javax.swing.JTree;
+import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.basic.BasicColorChooserUI;
+import javax.swing.plaf.basic.BasicLookAndFeel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
@@ -107,6 +114,9 @@ import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.fonts.FontPolicy;
 import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
+import org.pushingpixels.substance.internal.contrib.jgoodies.looks.Options;
+import org.pushingpixels.substance.internal.contrib.jgoodies.looks.common.FixedShadowPopupFactory;
+import org.pushingpixels.substance.internal.contrib.jgoodies.looks.common.ShadowPopup;
 import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
 
 /**
@@ -182,7 +192,7 @@ public class View {
             if (!(oldLookAndFeel instanceof SubstanceOfficeBlue2007LookAndFeel)) {
                 UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
                 oldLookAndFeel.uninitialize();
-            }
+            }                        
 
             SubstanceSkin currentSkin = SubstanceLookAndFeel.getCurrentSkin();
             if (currentSkin != null) {
@@ -197,6 +207,11 @@ public class View {
             }
 
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999); //This works for not changing labels color and not changing Dialogs title
+            
+            UIManager.put("ToolTipUI", MySubstanceToolTipUI.class.getName());            
+            
+            //Fix for missing tooltips/popups            
+            PopupFactory.setSharedInstance(new FixedShadowPopupFactory(PopupFactory.getSharedInstance()));                
             
             if (Configuration.showHeapStatusWidget.get() && !heapWidgetInited) {
                 SubstanceLookAndFeel.setWidgetVisible(null, true, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
