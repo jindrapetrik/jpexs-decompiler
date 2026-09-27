@@ -105,6 +105,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
@@ -1005,17 +1007,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditImagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (!e.isAltDown() || !SwingUtilities.isLeftMouseButton(e)) {
+                if (!SwingUtilities.isLeftMouseButton(e)) {
                     return;
                 }
                 Point2D shapePoint = displayEditImagePanel.toTimelinedPoint(e.getPoint());
                 GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
-                if (displayEditTag instanceof ShapeTag) {
+                if (e.isAltDown() && displayEditTag instanceof ShapeTag) {
                     int fillStyleIndex = getFillStyleIndexAt((ShapeTag) displayEditTag, shapePoint);
                     if (fillStyleIndex > 0) {
                         treePanel.selectShapeFillStyle(fillStyleIndex);
                     }
-                } else if (displayEditTag instanceof MorphShapeTag) {
+                } else if (e.isAltDown() && displayEditTag instanceof MorphShapeTag) {
                     MorphShapeTag morphShapeTag = (MorphShapeTag) displayEditTag;
                     int fillStyleIndex = getMorphFillStyleIndexAt(
                             morphShapeTag,
@@ -1024,6 +1026,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     );
                     if (fillStyleIndex > 0) {
                         treePanel.selectMorphShapeFillStyle(fillStyleIndex);
+                    }
+                } else if (e.isControlDown() && displayEditTag instanceof ShapeTag) {
+                    int lineStyleIndex = getLineStyleIndexAt((ShapeTag) displayEditTag, shapePoint);
+                    if (lineStyleIndex > 0) {
+                        treePanel.selectShapeLineStyle(lineStyleIndex);
+                    }
+                } else if (e.isControlDown() && displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShapeTag = (MorphShapeTag) displayEditTag;
+                    int lineStyleIndex = getMorphLineStyleIndexAt(
+                            morphShapeTag,
+                            displayEditImagePanel.getCurrentShapeRatio(),
+                            shapePoint
+                    );
+                    if (lineStyleIndex > 0) {
+                        treePanel.selectMorphShapeLineStyle(lineStyleIndex);
                     }
                 }
             }
@@ -2030,6 +2047,146 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         }
         return -1;
+    }
+
+    private int getLineStyleIndexAt(ShapeTag shapeTag, Point2D point) {
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int shapeNum = shapeTag.getShapeNum();
+        List<ILINESTYLE> lineStyles = new ArrayList<>();
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                lineStyles.add(lineStyle);
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                lineStyles.add(lineStyle);
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    lineStyles.add(lineStyle);
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    lineStyles.add(lineStyle);
+                }
+            }
+        }
+        return getNearestLineStyleIndex(
+                shapeTag.getWindingRule(),
+                shapeNum,
+                shapeTag.getSwf(),
+                shapes,
+                lineStyles,
+                point
+        );
+    }
+
+    private int getMorphLineStyleIndexAt(MorphShapeTag morphShapeTag, int ratio, Point2D point) {
+        SHAPEWITHSTYLE shape = morphShapeTag.getShapeAtRatio(ratio);
+        int shapeNum = getMorphShapeNum(morphShapeTag);
+        List<ILINESTYLE> lineStyles = new ArrayList<>();
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shape.lineStyles.lineStyles) {
+                lineStyles.add(lineStyle);
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shape.lineStyles.lineStyles2) {
+                lineStyles.add(lineStyle);
+            }
+        }
+        return getNearestLineStyleIndex(
+                ShapeTag.WIND_EVEN_ODD,
+                shapeNum,
+                null,
+                shape,
+                lineStyles,
+                point
+        );
+    }
+
+    private int getNearestLineStyleIndex(
+            int windingRule,
+            int shapeNum,
+            SWF swf,
+            SHAPEWITHSTYLE shape,
+            List<ILINESTYLE> lineStyles,
+            Point2D point
+    ) {
+        int nearestIndex = -1;
+        double nearestDistance = Double.POSITIVE_INFINITY;
+        for (int lineStyleIndex = lineStyles.size(); lineStyleIndex >= 1; lineStyleIndex--) {
+            GeneralPath linePath = PathExporter.exportLineStyle(
+                    windingRule,
+                    shapeNum,
+                    swf,
+                    shape,
+                    lineStyleIndex
+            );
+            double distance = getPathDistance(linePath, point);
+            if (Double.isInfinite(distance)) {
+                continue;
+            }
+            distance = Math.max(0, distance - lineStyles.get(lineStyleIndex - 1).getWidth() / 2.0);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestIndex = lineStyleIndex;
+            }
+        }
+        return nearestIndex;
+    }
+
+    private double getPathDistance(GeneralPath path, Point2D point) {
+        PathIterator iterator = path.getPathIterator(null, 1.0);
+        double[] coordinates = new double[6];
+        double startX = 0;
+        double startY = 0;
+        double lastX = 0;
+        double lastY = 0;
+        boolean hasLastPoint = false;
+        double minimumDistance = Double.POSITIVE_INFINITY;
+        while (!iterator.isDone()) {
+            int segmentType = iterator.currentSegment(coordinates);
+            if (segmentType == PathIterator.SEG_MOVETO) {
+                startX = coordinates[0];
+                startY = coordinates[1];
+                lastX = startX;
+                lastY = startY;
+                hasLastPoint = true;
+            } else if (segmentType == PathIterator.SEG_LINETO && hasLastPoint) {
+                minimumDistance = Math.min(minimumDistance, Line2D.ptSegDist(
+                        lastX,
+                        lastY,
+                        coordinates[0],
+                        coordinates[1],
+                        point.getX(),
+                        point.getY()
+                ));
+                lastX = coordinates[0];
+                lastY = coordinates[1];
+            } else if (segmentType == PathIterator.SEG_CLOSE && hasLastPoint) {
+                minimumDistance = Math.min(minimumDistance, Line2D.ptSegDist(
+                        lastX,
+                        lastY,
+                        startX,
+                        startY,
+                        point.getX(),
+                        point.getY()
+                ));
+                lastX = startX;
+                lastY = startY;
+            }
+            iterator.next();
+        }
+        return minimumDistance;
     }
 
     private boolean highlightSelectedLineStyle(javax.swing.tree.TreePath path) {

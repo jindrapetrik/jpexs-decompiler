@@ -45,7 +45,11 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -237,6 +241,89 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return false;
         }
         return selectNodeByValue(fillStyles[fillStyleIndex - 1]);
+    }
+
+    /**
+     * Selects a shape line style using its one-based global index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param lineStyleIndex One-based global line style index
+     * @return Whether a matching line style node was found
+     */
+    public boolean selectShapeLineStyle(int lineStyleIndex) {
+        if (lineStyleIndex < 1 || !(editedTag instanceof ShapeTag)) {
+            return false;
+        }
+        ShapeTag shapeTag = (ShapeTag) editedTag;
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int shapeNum = shapeTag.getShapeNum();
+        int currentIndex = 0;
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                currentIndex++;
+                if (currentIndex == lineStyleIndex) {
+                    return selectNodeByValue(lineStyle);
+                }
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                currentIndex++;
+                if (currentIndex == lineStyleIndex) {
+                    return selectNodeByValue(lineStyle);
+                }
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    currentIndex++;
+                    if (currentIndex == lineStyleIndex) {
+                        return selectNodeByValue(lineStyle);
+                    }
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    currentIndex++;
+                    if (currentIndex == lineStyleIndex) {
+                        return selectNodeByValue(lineStyle);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects a morph shape line style using its one-based index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param lineStyleIndex One-based morph line style index
+     * @return Whether a matching line style node was found
+     */
+    public boolean selectMorphShapeLineStyle(int lineStyleIndex) {
+        if (lineStyleIndex < 1 || !(editedTag instanceof MorphShapeTag)) {
+            return false;
+        }
+        MorphShapeTag morphShapeTag = (MorphShapeTag) editedTag;
+        if (morphShapeTag.getShapeNum() == 1) {
+            MORPHLINESTYLE[] lineStyles = morphShapeTag.morphLineStyles.lineStyles;
+            if (lineStyleIndex > lineStyles.length) {
+                return false;
+            }
+            return selectNodeByValue(lineStyles[lineStyleIndex - 1]);
+        }
+        MORPHLINESTYLE2[] lineStyles = morphShapeTag.morphLineStyles.lineStyles2;
+        if (lineStyleIndex > lineStyles.length) {
+            return false;
+        }
+        return selectNodeByValue(lineStyles[lineStyleIndex - 1]);
     }
 
     private TreePath findPathByValue(TreeModel model, TreePath path, Object value) {
