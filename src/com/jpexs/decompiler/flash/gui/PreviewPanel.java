@@ -2468,6 +2468,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
         displayEditAutoPreviewCheckBox = new JCheckBox(mainPanel.translate("checkbox.autoPreview"));
+        displayEditAutoPreviewCheckBox.setSelected(true);
         displayEditAutoPreviewCheckBox.addActionListener(this::displayEditAutoPreviewActionPerformed);
 
         displayEditOperationSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
@@ -3664,7 +3665,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
-        displayEditAutoPreviewCheckBox.setVisible(true);
+        displayEditAutoPreviewCheckBox.setVisible(true);        
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
