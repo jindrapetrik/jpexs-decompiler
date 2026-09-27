@@ -355,6 +355,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private double bitmapTransformHeight = 0;
     private boolean focalGradientTransform = false;
     private float focalGradientPoint = 0;
+    private boolean gradientTransformEditable = false;
     private Consumer<MATRIX> gradientTransformListener = null;
     private Consumer<Float> focalGradientPointListener = null;
     private int activeGradientHandle = GRADIENT_HANDLE_NONE;
@@ -825,6 +826,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         bitmapTransformHeight = 0;
         focalGradientTransform = false;
         focalGradientPoint = 0;
+        gradientTransformEditable = listener != null;
         gradientTransformListener = listener;
         focalGradientPointListener = null;
         activeGradientHandle = GRADIENT_HANDLE_NONE;
@@ -843,6 +845,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         focalGradientTransform = true;
         focalGradientPoint = focalPoint;
         focalGradientPointListener = focalPointListener;
+        gradientTransformEditable = matrixListener != null || focalPointListener != null;
         iconPanel.repaint();
     }
 
@@ -961,7 +964,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private boolean startGradientTransformDrag(MouseEvent e) {
-        if (!SwingUtilities.isLeftMouseButton(e) || gradientTransform == null) {
+        if (!gradientTransformEditable || !SwingUtilities.isLeftMouseButton(e) || gradientTransform == null) {
             return false;
         }
         int handle = getGradientHandleAt(e.getPoint());
@@ -1084,6 +1087,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (gradientTransform == null) {
             return false;
         }
+        if (!gradientTransformEditable) {
+            iconPanel.setCursor(defaultCursor);
+            return false;
+        }
         int handle = getGradientHandleAt(e.getPoint());
         if (handle == GRADIENT_HANDLE_NONE) {
             iconPanel.setCursor(defaultCursor);
@@ -1114,8 +1121,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Point2D yAxis = bitmapTransform
                 ? gradientPointToPanel(0, bitmapTransformHeight)
                 : gradientPointToPanel(0, GRADIENT_UNIT);
-        Color lineColor = new Color(0, 145, 220);
-        Color secondaryColor = new Color(255, 145, 0);
+        Color lineColor = gradientTransformEditable ? new Color(0, 145, 220) : new Color(125, 125, 125);
+        Color secondaryColor = gradientTransformEditable ? new Color(255, 145, 0) : new Color(165, 165, 165);
 
         if (!linearGradientTransform && !bitmapTransform) {
             AffineTransform gradientToPanel = new AffineTransform();
@@ -1175,8 +1182,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         paintGradientHandle(g, center, lineColor, true);
         if (focalGradientTransform) {
             Shape focalHandle = getFocalGradientHandleShape();
-            Color focalColor = new Color(190, 60, 210);
-            g.setColor(Color.WHITE);
+            Color focalColor = gradientTransformEditable ? new Color(190, 60, 210) : new Color(145, 145, 145);
+            g.setColor(gradientTransformEditable ? Color.WHITE : new Color(225, 225, 225));
             g.setStroke(new BasicStroke(4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(focalHandle);
             g.setColor(new Color(focalColor.getRed(), focalColor.getGreen(), focalColor.getBlue(), 210));
@@ -1193,7 +1200,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Shape handle = center
                 ? new Ellipse2D.Double(point.getX() - radius, point.getY() - radius, radius * 2, radius * 2)
                 : new Rectangle2D.Double(point.getX() - radius, point.getY() - radius, radius * 2, radius * 2);
-        g.setColor(Color.WHITE);
+        g.setColor(gradientTransformEditable ? Color.WHITE : new Color(225, 225, 225));
         g.fill(handle);
         g.setColor(color);
         g.setStroke(new BasicStroke(2f));

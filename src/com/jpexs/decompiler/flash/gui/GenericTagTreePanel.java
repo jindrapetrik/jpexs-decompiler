@@ -163,6 +163,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return tree.isEditable();
     }
 
+    public TreePath getSelectionPath() {
+        return tree.getSelectionPath();
+    }
+
     public void notifyNodeChanged(TreePath path) {
         if (path == null || !(tree.getModel() instanceof MyTreeModel)) {
             return;
