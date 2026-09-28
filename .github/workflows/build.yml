@@ -215,14 +215,14 @@ jobs:
           echo "debug=${{ steps.vars.outputs.verDebug }}">>$VERSION_PROP_FILE
 
       - name: Upload CHANGELOG.md artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: steps.vars.outputs.doRelease == 'true'
         with:
           name: changelog_md
           path: CHANGELOG.md
           
       - name: Upload version.properties artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: version_properties
           path: version.properties         
@@ -235,7 +235,7 @@ jobs:
     needs: compute-version
     steps:
       - name: Checkout
-        uses: actions/checkout@v3    
+        uses: actions/checkout@v7    
         
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -283,19 +283,19 @@ jobs:
                   
       - name: Upload lib javadoc artifact
         if: needs.compute-version.outputs.doRelease == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: lib_javadoc
             path: releases/ffdec_lib_javadoc_${{ needs.compute-version.outputs.verShort }}.zip
         
       - name: Upload dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
           
       - name: Upload lib dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lib_dist
           path: libsrc/ffdec_lib/dist
@@ -311,7 +311,7 @@ jobs:
       if: needs.compute-version.outputs.doRelease == 'true'
       steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -380,7 +380,7 @@ jobs:
           cp $WINEPREFIX/ffdec.exe resources/ffdec.exe
       
       - name: Upload EXE
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned_exe
           path: resources/ffdec.exe
@@ -404,7 +404,7 @@ jobs:
           cp $WINEPREFIX/ffdec-cli.exe resources/ffdec-cli.exe
       
       - name: Upload CLI EXE
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned_cli_exe
           path: resources/ffdec-cli.exe
@@ -417,7 +417,7 @@ jobs:
 #    if: needs.compute-version.outputs.doRelease == 'true'
 #    steps:
 #    - name: Checkout
-#      uses: actions/checkout@v3
+#      uses: actions/checkout@v7
 #    - name: Set up JDK
 #      uses: actions/setup-java@v5
 #      with:
@@ -470,7 +470,7 @@ jobs:
 #        & $resource_hacker -open versioninfo.rc -save versioninfo.res -action compile
 #        & $resource_hacker -open resources/ffdec.exe -save resources/ffdec.exe -action addoverwrite -res versioninfo.res -mask "Version Info,1"                
 #    - name: Upload EXE
-#      uses: actions/upload-artifact@v4
+#      uses: actions/upload-artifact@v7
 #      with:
 #        name: unsigned_exe
 #        path: resources/ffdec.exe
@@ -497,7 +497,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         
       - name: Download dist artifact
         uses: actions/download-artifact@v8
@@ -596,7 +596,7 @@ jobs:
         run: jarsigner.exe -verify -strict dist/ffdec.jar
           
       - name: Upload signed JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: signed_jar
             path: dist/ffdec.jar
@@ -613,7 +613,7 @@ jobs:
         run: jarsigner.exe -verify -strict libsrc/ffdec_lib/dist/ffdec_lib.jar
         
       - name: Upload signed lib JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: signed_lib_jar
             path: libsrc/ffdec_lib/dist/ffdec_lib.jar
@@ -871,13 +871,13 @@ jobs:
           & $signtool verify /pa /v "wix/bin/Release/FFDec.msi"
             
       - name: Upload signed EXE artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: signed_exe
             path: dist/ffdec.exe
       
       - name: Upload signed CLI EXE artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: signed_cli_exe
             path: dist/ffdec-cli.exe
@@ -889,7 +889,7 @@ jobs:
           move wix\bin\Release\FFDec.msi releases\ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             
       - name: Upload signed MSI artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: signed_msi
           path: releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
@@ -907,7 +907,7 @@ jobs:
     if: needs.compute-version.outputs.doRelease == 'true'
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v7
       
     - name: Download dist artifact
       uses: actions/download-artifact@v8
@@ -986,7 +986,7 @@ jobs:
     
     - name: Upload Dockerfile
       if: needs.compute-version.outputs.verDebug == 'false'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: dockerfile
         path: Dockerfile  
@@ -1000,7 +1000,7 @@ jobs:
     
     - name: Upload metainfo
       if: needs.compute-version.outputs.verDebug == 'false'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: metainfo
         path: resources/com.jpexs.decompiler.flash.metainfo.xml 
@@ -1009,7 +1009,7 @@ jobs:
       run: ant new-version-set release-no-dist
     
     - name: Upload packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: packages
         path: releases                   
@@ -1027,7 +1027,7 @@ jobs:
       - packages
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Set up PHP
         run: |
@@ -1084,7 +1084,7 @@ jobs:
           git push origin master
 
       - name: Upload release notes artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release_notes
           path: ./release_notes.md
@@ -1106,7 +1106,7 @@ jobs:
           git push origin "$TAG"
           
       - name: Create GitHub Release + upload assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.compute-version.outputs.verTag }}
           name: ${{ needs.compute-version.outputs.verTitle }}
