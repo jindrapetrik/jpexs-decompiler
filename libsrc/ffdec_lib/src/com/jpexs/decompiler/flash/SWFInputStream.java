@@ -222,6 +222,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.tags.profiles.bioshock.BioshockImage;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
@@ -1834,6 +1835,9 @@ public class SWFInputStream implements AutoCloseable {
                     break;
                 case 94:
                     ret = new PlaceObject4Tag(sis, data);
+                    break;
+                case 512:
+                    ret = new BioshockImage(sis, data);
                     break;
                 default:
                     if (swf.gfx) { // GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
