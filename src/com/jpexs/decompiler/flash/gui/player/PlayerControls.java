@@ -97,6 +97,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final JPanel playbackControls;
 
+    private boolean playbackControlsEnabled = true;
+
     private final JPanel frameControls;
 
     //private boolean zoomToFit = false;
@@ -343,6 +345,13 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         progress.setVisible(visible);
     }
 
+    public void setPlaybackControlsEnabled(boolean enabled) {
+        playbackControlsEnabled = enabled;
+        playbackControls.setVisible(enabled && display.getTotalFrames() > 1);
+        revalidate();
+        repaint();
+    }
+
     private String formatMs(long ms) {
         long s = ms / 1000;
         ms %= 1000;
@@ -421,10 +430,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
                 timeLabel.setText("(" + formatMs((int) ((currentFrame - 1) * 1000.0 / frameRate)) + ")");
                 totalTimeLabel.setText("(" + formatMs((int) (totalFrames * 1000.0 / frameRate)) + ")");
             }
-            if (totalFrames <= 1 && playbackControls.isVisible()) {
+            if ((totalFrames <= 1 || !playbackControlsEnabled) && playbackControls.isVisible()) {
                 playbackControls.setVisible(false);
             }
-            if (totalFrames > 1 && !playbackControls.isVisible()) {
+            if (totalFrames > 1 && playbackControlsEnabled && !playbackControls.isVisible()) {
                 playbackControls.setVisible(true);
             }
             boolean paused1 = !display.isPlaying();

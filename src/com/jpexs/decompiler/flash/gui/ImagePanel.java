@@ -442,6 +442,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private List<Integer> selectedDepths = new ArrayList<>();
 
+    private Integer isolatedDepth = null;
+
     private final List<Integer> parentFrames = new ArrayList<>();
 
     private final List<Integer> parentDepths = new ArrayList<>();
@@ -1480,6 +1482,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public List<Integer> getSelectedDepths() {
         return new ArrayList<>(selectedDepths);
+    }
+
+    public synchronized void setIsolatedDepth(Integer depth) {
+        isolatedDepth = depth;
+        redraw();
     }
 
     private void calculateFreeOrSelectionTransform() {
@@ -4199,10 +4206,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         dx = 0;
                         dy = 0;
                     } else {
-                        w1 = (int) (topTimelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
-                        h1 = (int) (topTimelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
-                        dx = (int) (topTimelined.getRect().Xmin * zoomDouble / SWF.unitDivisor);
-                        dy = (int) (topTimelined.getRect().Ymin * zoomDouble / SWF.unitDivisor);
+                        RECT topRect = topTimelined.getRect();
+                        if (topRect == null) {
+                            return;
+                        }
+                        w1 = (int) (topRect.getWidth() * zoomDouble / SWF.unitDivisor);
+                        h1 = (int) (topRect.getHeight() * zoomDouble / SWF.unitDivisor);
+                        dx = (int) (topRect.Xmin * zoomDouble / SWF.unitDivisor);
+                        dy = (int) (topRect.Ymin * zoomDouble / SWF.unitDivisor);
                     }
 
                     //HERE
@@ -5455,6 +5466,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
+            this.isolatedDepth = null;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
             this.parentDepths.clear();
@@ -5905,7 +5917,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return frame;
     }
 
-    private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
+    private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, Integer isolatedDepth, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
             List<Timelined> parentTimelineds, List<Integer> parentDepths, List<Integer> parentFrames,
             Matrix parentMatrix
     ) {
@@ -5990,6 +6002,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(new Color(255, 255, 255, 128));
             g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
+        }
+
+        if (isolatedDepth != null) {
+            for (Integer depth : fr.layers.keySet()) {
+                if (!isolatedDepth.equals(depth)) {
+                    ignoreDepths.add(depth);
+                }
+            }
         }
 
         timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths, aaScale);
@@ -6321,6 +6341,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Point2D cursorPosition;
         int mouseButton;
         List<Integer> selectedDepths;
+        Integer isolatedDepth;
         Zoom zoom;
         SWF swf;
 
@@ -6348,6 +6369,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             mouseButton = this.mouseButton;
             selectedDepths = this.selectedDepths;
+            isolatedDepth = this.isolatedDepth;
             zoom = this.zoom;
             swf = this.swf;
         }
@@ -6465,7 +6487,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                     img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                 } else {
-                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
                 }
 
                 synchronized (ImagePanel.this) {

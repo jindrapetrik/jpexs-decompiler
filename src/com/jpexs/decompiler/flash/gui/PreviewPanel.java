@@ -207,6 +207,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private PlayerControls imagePlayControls;
 
+    private PlayerControls displayEditPlayerControls;
+
     private MediaDisplay media;
 
     private MediaDisplay activeEmbeddedMedia;
@@ -294,11 +296,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton displayEditOperationCancelButton;
 
-    private MATRIX displayEditPlaceMatrix;
+    private MATRIX displayEditAttributeMatrix;
 
-    private javax.swing.tree.TreePath displayEditPlaceMatrixPath;
+    private javax.swing.tree.TreePath displayEditAttributeMatrixPath;
 
-    private Matrix displayEditPlaceMatrixBase;
+    private Matrix displayEditAttributeMatrixBase;
 
     private JButton displayEditEditPointsButton;
 
@@ -1079,14 +1081,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             @Override
             public void run() {
                 if (displayEditMode != EDIT_RAW
-                        || displayEditPlaceMatrix == null
-                        || displayEditPlaceMatrixPath == null
-                        || displayEditPlaceMatrixBase == null) {
+                        || displayEditAttributeMatrix == null
+                        || displayEditAttributeMatrixPath == null
+                        || displayEditAttributeMatrixBase == null) {
                     return;
                 }
-                Matrix matrix = displayEditImagePanel.getNewMatrix().concatenate(displayEditPlaceMatrixBase);
-                copyMatrix(matrix.toMATRIX(), displayEditPlaceMatrix);
-                ((GenericTagTreePanel) displayEditGenericPanel).notifyNodeChanged(displayEditPlaceMatrixPath);
+                Matrix matrix = displayEditImagePanel.getNewMatrix().concatenate(displayEditAttributeMatrixBase);
+                copyMatrix(matrix.toMATRIX(), displayEditAttributeMatrix);
+                ((GenericTagTreePanel) displayEditGenericPanel).notifyNodeChanged(displayEditAttributeMatrixPath);
             }
         });
 
@@ -1521,12 +1523,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 displayEditImagePanel,
                 displayEditTransformScrollPane = new FasterScrollPane(displayEditTransformPanel),
                 Configuration.guiSplitPaneTransform1DividerLocationPercent));
-        PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, displayEditImagePanel, null);
-        previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
+        displayEditPlayerControls = new PlayerControls(mainPanel, displayEditImagePanel, null);
+        previewCnt.add(displayEditPlayerControls, BorderLayout.SOUTH);
         Dimension transDimension = displayEditTransformPanel.getPreferredSize();
         displayEditTransformScrollPane.setPreferredSize(new Dimension(transDimension.width + UIManager.getInt("ScrollBar.width") + 2, transDimension.height));
         displayEditTransformScrollPane.setVisible(false);
-        placeImagePlayControls.setMedia(displayEditImagePanel);
+        displayEditPlayerControls.setMedia(displayEditImagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1573,12 +1575,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
                     displayEditImagePanel.clearGradientTransform();
-                    clearSelectedPlaceMatrixTransform();
+                    updateSelectedButtonRecordPreview(null);
+                    clearSelectedAttributeMatrixTransform();
                     displayEditImagePanel.setStatus("");
                     displayEditImagePanel.setHilightedEdge(null);
                     return;
                 }
-                updateSelectedPlaceMatrixTransform(e.getNewLeadSelectionPath());
+                updateSelectedButtonRecordPreview(e.getNewLeadSelectionPath());
+                updateSelectedAttributeMatrixTransform(e.getNewLeadSelectionPath());
                 updateSelectedFillTransform(e.getNewLeadSelectionPath());
                 if (highlightSelectedMorphFillStyle(e.getPath())) {
                     displayEditImagePanel.setStatus("");
@@ -1744,18 +1748,96 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return displayEditTagCard;
     }
 
-    private void clearSelectedPlaceMatrixTransform() {
-        displayEditPlaceMatrix = null;
-        displayEditPlaceMatrixPath = null;
-        displayEditPlaceMatrixBase = null;
-        if (displayEditMode == EDIT_RAW && displayEditTag instanceof PlaceObjectTypeTag) {
-            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+    private BUTTONRECORD getSelectedButtonRecord(javax.swing.tree.TreePath path) {
+        if (path == null) {
+            return null;
+        }
+        BUTTONRECORD buttonRecord = null;
+        for (Object pathComponent : path.getPath()) {
+            if (pathComponent instanceof GenericTagTreePanel.FieldNode) {
+                Object pathValue = ((GenericTagTreePanel.FieldNode) pathComponent).getValue(0);
+                if (pathValue instanceof BUTTONRECORD) {
+                    buttonRecord = (BUTTONRECORD) pathValue;
+                }
+            }
+        }
+        return buttonRecord;
+    }
+
+    private int getButtonRecordFrame(BUTTONRECORD buttonRecord) {
+        if (buttonRecord.buttonStateUp) {
+            return ButtonTag.FRAME_UP;
+        }
+        if (buttonRecord.buttonStateOver) {
+            return ButtonTag.FRAME_OVER;
+        }
+        if (buttonRecord.buttonStateDown) {
+            return ButtonTag.FRAME_DOWN;
+        }
+        if (buttonRecord.buttonStateHitTest) {
+            return ButtonTag.FRAME_HITTEST;
+        }
+        return -1;
+    }
+
+    private void updateSelectedButtonRecordPreview(javax.swing.tree.TreePath path) {
+        if (!(displayEditTag instanceof ButtonTag)) {
+            return;
+        }
+
+        BUTTONRECORD buttonRecord = getSelectedButtonRecord(path);
+        int buttonFrame = buttonRecord == null ? -1 : getButtonRecordFrame(buttonRecord);
+        if (buttonFrame < 0) {
+            displayEditPlayerControls.setPlaybackControlsEnabled(true);
+            if (displayEditImagePanel.getTimelined() instanceof ButtonTag) {
+                ButtonTag previewButton = (ButtonTag) displayEditTag;
+                GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+                if (treePanel.isEditMode() && displayEditAutoPreviewCheckBox.isSelected()) {
+                    Tag editedTag = treePanel.getEditedTagForPreview();
+                    if (editedTag instanceof ButtonTag) {
+                        previewButton = (ButtonTag) editedTag;
+                    }
+                }
+                refreshDisplayEditButtonPreview(previewButton);
+            }
+            return;
+        }
+
+        if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+            ButtonTag previewButton = (ButtonTag) displayEditTag;
+            GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+            if (treePanel.isEditMode()) {
+                Tag editedTag = treePanel.getEditedTagForPreview();
+                if (editedTag instanceof ButtonTag) {
+                    previewButton = (ButtonTag) editedTag;
+                }
+            }
+            refreshDisplayEditButtonPreview(previewButton);
+            // TimelinedMaker wraps the button at depth 1.
+            displayEditImagePanel.openDepth(0, 1);
+        }
+        if (displayEditImagePanel.getTimelined() instanceof ButtonTag) {
+            displayEditPlayerControls.setPlaybackControlsEnabled(false);
+            displayEditImagePanel.setFrozenButtons(true);
+            displayEditImagePanel.gotoFrame(buttonFrame + 1);
+            displayEditImagePanel.setIsolatedDepth(buttonRecord.placeDepth);
         }
     }
 
-    private void updateSelectedPlaceMatrixTransform(javax.swing.tree.TreePath path) {
-        clearSelectedPlaceMatrixTransform();
-        if (displayEditMode != EDIT_RAW || !(displayEditTag instanceof PlaceObjectTypeTag)) {
+    private void clearSelectedAttributeMatrixTransform() {
+        displayEditAttributeMatrix = null;
+        displayEditAttributeMatrixPath = null;
+        displayEditAttributeMatrixBase = null;
+        if (displayEditMode == EDIT_RAW && displayEditTag instanceof PlaceObjectTypeTag) {
+            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        } else if (displayEditMode == EDIT_RAW && displayEditTag instanceof ButtonTag) {
+            displayEditImagePanel.selectDepth(-1);
+        }
+    }
+
+    private void updateSelectedAttributeMatrixTransform(javax.swing.tree.TreePath path) {
+        clearSelectedAttributeMatrixTransform();
+        if (displayEditMode != EDIT_RAW) {
             return;
         }
 
@@ -1770,24 +1852,51 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
         Object value = fieldNode.getValue(0);
-        if (!"matrix".equals(fieldNode.getName(0)) || !(value instanceof MATRIX)) {
+        if (!(value instanceof MATRIX)) {
             return;
         }
 
-        displayEditPlaceMatrix = (MATRIX) value;
-        displayEditPlaceMatrixPath = path;
-        displayEditPlaceMatrixBase = new Matrix(displayEditPlaceMatrix);
-        displayEditImagePanel.freeTransformDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        int depth;
+        if (displayEditTag instanceof PlaceObjectTypeTag && "matrix".equals(fieldNode.getName(0))) {
+            depth = ((PlaceObjectTypeTag) displayEditTag).getDepth();
+        } else if (displayEditTag instanceof ButtonTag && "placeMatrix".equals(fieldNode.getName(0))) {
+            BUTTONRECORD buttonRecord = getSelectedButtonRecord(path);
+            if (buttonRecord == null) {
+                return;
+            }
+            if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+                displayEditImagePanel.openDepth(0, 1);
+            }
+            if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+                return;
+            }
+            depth = buttonRecord.placeDepth;
+            int buttonFrame = getButtonRecordFrame(buttonRecord);
+            if (buttonFrame < 0) {
+                return;
+            }
+            displayEditImagePanel.setFrozenButtons(true);
+            displayEditImagePanel.gotoFrame(buttonFrame + 1);
+            displayEditImagePanel.setIsolatedDepth(depth);
+        } else {
+            return;
+        }
+
+        displayEditAttributeMatrix = (MATRIX) value;
+        displayEditAttributeMatrixPath = path;
+        displayEditAttributeMatrixBase = new Matrix(displayEditAttributeMatrix);
+        displayEditImagePanel.freeTransformDepth(depth);
     }
 
-    private void refreshSelectedPlaceMatrixTransform() {
+    private void refreshSelectedAttributeMatrixTransform() {
         GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
         javax.swing.tree.TreePath selectedPath = treePanel.getSelectionPath();
         if (selectedPath == null) {
-            clearSelectedPlaceMatrixTransform();
+            clearSelectedAttributeMatrixTransform();
             return;
         }
-        updateSelectedPlaceMatrixTransform(selectedPath);
+        updateSelectedButtonRecordPreview(selectedPath);
+        updateSelectedAttributeMatrixTransform(selectedPath);
     }
 
     private void updateSelectedFillTransform(javax.swing.tree.TreePath path) {
@@ -3077,6 +3186,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditFrame = frame;
         displayEditMode = EDIT_RAW;
         displayEditImagePanel.clearGradientTransform();
+        displayEditPlayerControls.setPlaybackControlsEnabled(true);
         setDisplayEditPropertiesVisible(true);
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
@@ -3136,6 +3246,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             effectivePlaceObjectPanel.clear();
             setEffectivePlaceObjectVisible(false);
         }
+        if (tag instanceof ButtonTag) {
+            refreshSelectedAttributeMatrixTransform();
+        }
         parametersPanel.setVisible(false);
         displayEditTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
     }
@@ -3147,6 +3260,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             refreshDisplayEditPreview();
         } else if (((GenericTagTreePanel) displayEditGenericPanel).restorePreview()) {
             refreshDisplayEditPreview();
+        }
+        if (displayEditTag instanceof ButtonTag && !displayEditAutoPreviewCheckBox.isSelected()) {
+            refreshSelectedAttributeMatrixTransform();
         }
     }
 
@@ -3160,7 +3276,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         } else if (treePanel.preview()) {
             refreshDisplayEditPreview();
         }
-        refreshSelectedPlaceMatrixTransform();
+        refreshSelectedAttributeMatrixTransform();
     }
 
     private void refreshDisplayEditButtonPreview(ButtonTag buttonTag) {
