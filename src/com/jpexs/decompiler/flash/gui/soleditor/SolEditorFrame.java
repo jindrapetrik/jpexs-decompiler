@@ -33,6 +33,13 @@ import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -41,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
@@ -186,6 +194,53 @@ public class SolEditorFrame extends AppFrame {
         editor.setText("{\r\n\r\n}");
         setSize(800, 600);
 
+        DropTargetAdapter solDropTargetAdapter = new DropTargetAdapter() {
+            @Override
+            public void dragEnter(DropTargetDragEvent dtde) {
+                updateDropAction(dtde);
+            }
+
+            @Override
+            public void dragOver(DropTargetDragEvent dtde) {
+                updateDropAction(dtde);
+            }
+
+            private void updateDropAction(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                } else {
+                    dtde.rejectDrag();
+                }
+            }
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                if (!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dtde.rejectDrop();
+                    return;
+                }
+
+                boolean opened = false;
+                try {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                    @SuppressWarnings("unchecked")
+                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File droppedFile : droppedFiles) {
+                        if (isSolFile(droppedFile)) {
+                            opened = openFile(droppedFile);
+                            break;
+                        }
+                    }
+                } catch (UnsupportedFlavorException | IOException ex) {
+                    // The drop cannot be imported.
+                } finally {
+                    dtde.dropComplete(opened);
+                }
+            }
+        };
+        new DropTarget(this, solDropTargetAdapter);
+        new DropTarget(editor, solDropTargetAdapter);
+
         View.centerScreen(this);
         View.setWindowIcon(this, "soleditor");
     }
@@ -237,6 +292,14 @@ public class SolEditorFrame extends AppFrame {
         }
         File newFile = Helper.fixDialogFile(fileChooser.getSelectedFile());
 
+        openFile(newFile);
+    }
+
+    private static boolean isSolFile(File file) {
+        return file.isFile() && file.getName().toLowerCase().endsWith(".sol");
+    }
+
+    private boolean openFile(File newFile) {
         try (FileInputStream fis = new FileInputStream(newFile)) {
             SolFile solFile = new SolFile(fis);
             Map<String, Object> values = solFile.getAmfValues();
@@ -257,7 +320,7 @@ public class SolEditorFrame extends AppFrame {
             amfVersionLabel.setText("" + newAmfVersion);
         } catch (IOException | IllegalArgumentException ex) {
             ViewMessages.showMessageDialog(this, translate("error.cannotOpen") + " " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            return;
+            return false;
         }
         modified = false;
         openedFile = newFile;
@@ -268,6 +331,7 @@ public class SolEditorFrame extends AppFrame {
         amfVersionComboBox.setEnabled(false);
         amfVersionComboBox.setVisible(false);
         amfVersionLabel.setVisible(true);
+        return true;
     }
 
     private void updateTitle() {
