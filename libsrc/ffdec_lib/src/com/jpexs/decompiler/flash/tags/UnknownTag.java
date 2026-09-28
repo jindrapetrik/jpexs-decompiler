@@ -45,8 +45,7 @@ public class UnknownTag extends Tag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        unknownData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
-        sis.skipBytes(sis.available());
+        unknownData = sis.readByteRangeEx(sis.available(), "unknownData");        
     }
 
     /**
