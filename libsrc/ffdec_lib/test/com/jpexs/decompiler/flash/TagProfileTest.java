@@ -19,9 +19,6 @@ package com.jpexs.decompiler.flash;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
-import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.profiles.BioshockTagProfile;
 import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
@@ -53,15 +50,18 @@ public class TagProfileTest {
         assertEquals(matchingProfiles.get(0).getId(), BioshockTagProfile.ID);
 
         String profiledTitle = titlePrefix + "-bioshock.swf";
-        SwfSpecificCustomConfiguration configuration = Configuration.getOrCreateSwfSpecificCustomConfiguration(profiledTitle);
-        configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, BioshockTagProfile.ID);
-        try {
-            SWF profiledSwf = new SWF(new ByteArrayInputStream(swfData), profiledTitle, profiledTitle, false);
-            assertEquals(profiledSwf.getTagProfile().getId(), BioshockTagProfile.ID);
-            assertTrue(profiledSwf.getTags().get(0) instanceof BioshockImage);
-        } finally {
-            configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, "");
-        }
+        SWF profiledSwf = new SWF(new ByteArrayInputStream(swfData), profiledTitle, profiledTitle, false, "WINDOWS-1252", TagProfiles.getProfile(BioshockTagProfile.ID));
+        assertEquals(profiledSwf.getTagProfile().getId(), BioshockTagProfile.ID);
+        assertTrue(profiledSwf.getTags().get(0) instanceof BioshockImage);
+    }
+
+    @Test
+    public void testNullProfileUsesStandardTags() throws Exception {
+        byte[] swfData = createSwfWithTag512();
+        String title = "tag-profile-null-test-" + UUID.randomUUID() + ".swf";
+        SWF standardSwf = new SWF(new ByteArrayInputStream(swfData), title, title, false, "WINDOWS-1252", null);
+        assertEquals(standardSwf.getTagProfile(), null);
+        assertTrue(standardSwf.getTags().get(0) instanceof UnknownTag);
     }
 
     private byte[] createSwfWithTag512() throws Exception {

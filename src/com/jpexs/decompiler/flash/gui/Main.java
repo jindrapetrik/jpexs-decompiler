@@ -1327,6 +1327,14 @@ public class Main {
     }
 
     public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo) throws Exception {
+        return parseOpenable(sourceInfo, null, false);
+    }
+
+    public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile tagProfile) throws Exception {
+        return parseOpenable(sourceInfo, tagProfile, true);
+    }
+
+    private static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile requestedTagProfile, boolean tagProfileSpecified) throws Exception {
         OpenableList result = new OpenableList();
 
         InputStream inputStream = sourceInfo.getInputStream();
@@ -1403,6 +1411,7 @@ public class Main {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
 
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                            TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
                             SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
@@ -1415,7 +1424,7 @@ public class Main {
                                         startWork(AppStrings.translate("work.renaming.identifiers"), worker, true);
                                     }
                                 }
-                            }, Configuration.parallelSpeedUp.get(), charset);
+                            }, Configuration.parallelSpeedUp.get(), charset, tagProfile);
                             return swf;
                         }
                     };
@@ -1482,6 +1491,7 @@ public class Main {
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
                         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
+                        TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
                         List<String> loadedUrls = new ArrayList<>();
                         List<String> loadedStatus = new ArrayList<>();
 
@@ -1689,7 +1699,7 @@ public class Main {
                                 });
                                 return ret.getVal();
                             }
-                        }, charset);
+                        }, charset, tagProfile);
 
                         if (!loadedUrls.isEmpty()) {
                             SwfSpecificCustomConfiguration cc2 = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
