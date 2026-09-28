@@ -43,16 +43,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: adopt
+          distribution: temurin
           architecture: x64
-          java-version: 8                
+          java-version: 23         
           
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -238,24 +238,22 @@ jobs:
         uses: actions/checkout@v3    
         
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: adopt
+          distribution: temurin
           architecture: x64
-          java-version: |
-            8
-            21
+          java-version: 23
       
-      - name: Set Java 8
-        shell: pwsh
-        run: |
-          echo "JAVA_HOME=$env:JAVA_HOME_8_X64" >> $env:GITHUB_ENV
+      #- name: Set Java 8
+      #  shell: pwsh
+      #  run: |
+      #    echo "JAVA_HOME=$env:JAVA_HOME_8_X64" >> $env:GITHUB_ENV
       
       - name: Set up Ant
         run: choco install ant -y
       
       - name: Download version.properties artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
             name: version_properties
 
@@ -273,11 +271,11 @@ jobs:
         if: needs.compute-version.outputs.doRelease == 'false'
         run: ant build test
       
-      - name: Set Java 21
-        if: needs.compute-version.outputs.doRelease == 'true'
-        shell: pwsh
-        run: |
-          echo "JAVA_HOME=$env:JAVA_HOME_21_X64" >> $env:GITHUB_ENV          
+      #- name: Set Java 21
+      #  if: needs.compute-version.outputs.doRelease == 'true'
+      #  shell: pwsh
+      #  run: |
+      #    echo "JAVA_HOME=$env:JAVA_HOME_21_X64" >> $env:GITHUB_ENV          
       
       - name: Javadoc
         if: needs.compute-version.outputs.doRelease == 'true'
@@ -315,11 +313,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: adopt
+          distribution: temurin
           architecture: x64
-          java-version: 8
+          java-version: 23
 
       # Wine must be used since Windows runner cannot run Resource hacker
       - name: Install Wine
@@ -421,7 +419,7 @@ jobs:
 #    - name: Checkout
 #      uses: actions/checkout@v3
 #    - name: Set up JDK
-#      uses: actions/setup-java@v4
+#      uses: actions/setup-java@v5
 #      with:
 #        distribution: adopt
 #        architecture: x64
@@ -502,33 +500,33 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Download dist artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
           
       - name: Download lib_dist artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: lib_dist
           path: libsrc/ffdec_lib/dist/
         
       - name: Download unsigned EXE artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: unsigned_exe
           path: dist/
       
       - name: Download unsigned CLI EXE artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: unsigned_cli_exe
           path: dist/          
           
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: adopt
+          distribution: temurin
           architecture: x64
           java-version: 23
           
@@ -912,25 +910,25 @@ jobs:
       uses: actions/checkout@v3
       
     - name: Download dist artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: dist
           path: dist/
     
     - name: Download signed jar artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: signed_jar
           path: dist/    
     
     - name: Download lib dist artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: lib_dist
           path: libsrc/ffdec_lib/dist/
     
     - name: Download signed lib jar artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: signed_lib_jar
           path: libsrc/ffdec_lib/dist/
@@ -939,29 +937,29 @@ jobs:
       run: cp libsrc/ffdec_lib/dist/ffdec_lib.jar dist/lib/ffdec_lib.jar
           
     - name: Download signed EXE artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: signed_exe
           path: dist/
     
     - name: Download signed CLI EXE artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: signed_cli_exe
           path: dist/
     
     - name: Download signed MSI artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: signed_msi
         path: releases/
           
     - name: Set up JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
-        distribution: adopt
+        distribution: temurin
         architecture: x64
-        java-version: 8        
+        java-version: 23
     
     - name: Set up Ant
       run: |
@@ -969,12 +967,12 @@ jobs:
         sudo apt-get install -y -qq ant 
     
     - name: Download CHANGELOG.md artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: changelog_md
     
     - name: Download version.properties artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
           name: version_properties
     
@@ -1037,19 +1035,19 @@ jobs:
           sudo apt-get install -y -qq php
           
       - name: Download packages artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: packages
           path: releases/
       
       - name: Download lib javadoc artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: lib_javadoc
           path: releases/
           
       - name: Download CHANGELOG.md artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: changelog_md
           
@@ -1063,13 +1061,13 @@ jobs:
       
       - name: Download Dockerfile artifact
         if: needs.compute-version.outputs.verDebug == 'false'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dockerfile
      
       - name: Download metainfo artifact
         if: needs.compute-version.outputs.verDebug == 'false'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: metainfo
           path: resources/
