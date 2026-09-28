@@ -29,7 +29,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -68,7 +67,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -1032,16 +1030,7 @@ public class View {
         }
     }
 
-    public static JFileChooser getFileChooserWithIcon(String iconName) {
-        return new JFileChooser() {
-
-            @Override
-            protected JDialog createDialog(Component parent) throws HeadlessException {
-                JDialog dialog = super.createDialog(parent);
-                setWindowIcon(dialog, iconName);
-                dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-                return dialog;
-            }
-        };
+    public static FileChooser getFileChooserWithIcon(String iconName) {
+        return new FileChooser(iconName);
     }
 }

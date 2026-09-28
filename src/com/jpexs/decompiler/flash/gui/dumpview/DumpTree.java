@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.gui.FileChooser;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -561,7 +562,7 @@ public class DumpTree extends JTree {
     private void saveToFileButtonActionPerformed(boolean decompress) {
         TreePath[] paths = getSelectionPaths();
         DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
-        JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {

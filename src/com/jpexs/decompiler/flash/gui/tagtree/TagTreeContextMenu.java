@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.gui.ConvertPlaceObjectTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertShapeTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertTextTypeDialog;
 import com.jpexs.decompiler.flash.gui.CreateTweenDialog;
+import com.jpexs.decompiler.flash.gui.FileChooser;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
@@ -3609,7 +3610,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void prepareDebugActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         SWF swf = (SWF) item.getOpenable();
-        JFileChooser chooser = View.getFileChooserWithIcon("debug");
+        FileChooser chooser = View.getFileChooserWithIcon("debug");
         if (swf.getFile() != null) {
             File dir = new File(swf.getFile()).getParentFile();
             chooser.setCurrentDirectory(dir);
@@ -3645,7 +3646,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void prepareDebugPCodeActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         SWF swf = (SWF) item.getOpenable();
-        JFileChooser chooser = View.getFileChooserWithIcon("debug");
+        FileChooser chooser = View.getFileChooserWithIcon("debug");
         if (swf.getFile() != null) {
             File dir = new File(swf.getFile()).getParentFile();
             chooser.setCurrentDirectory(dir);
@@ -7003,7 +7004,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 return AppStrings.translate("filter.abc");
             }
         };
-        JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         fc.setFileFilter(abcFilter);
         fc.setAcceptAllFileFilterUsed(false);

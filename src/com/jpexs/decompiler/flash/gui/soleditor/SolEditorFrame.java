@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
+import com.jpexs.decompiler.flash.gui.FileChooser;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
@@ -273,7 +274,7 @@ public class SolEditorFrame extends AppFrame {
     }
 
     private void openDirectory(File directory) {
-        JFileChooser fileChooser = new JFileChooser();
+        FileChooser fileChooser = new FileChooser();
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setFileFilter(new FileFilter() {
             @Override
@@ -386,7 +387,7 @@ public class SolEditorFrame extends AppFrame {
     }
 
     private void saveAsActionPerformed(ActionEvent e) {
-        JFileChooser fileChooser = new JFileChooser();
+        FileChooser fileChooser = new FileChooser();
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setFileFilter(new FileFilter() {
             @Override

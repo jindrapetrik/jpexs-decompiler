@@ -1291,6 +1291,10 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<String> lastTweenCustomEase = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> useNativeFileDialogs = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 

@@ -1613,7 +1613,7 @@ public class Main {
 
                                         while (JOptionPane.YES_OPTION == ViewMessages.showConfirmDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf.manually").replace("%url%", url), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE)) {
 
-                                            JFileChooser fc = new JFileChooser();
+                                            FileChooser fc = new FileChooser();
                                             fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                                             FileFilter allSupportedFilter = new FileFilter() {
                                                 private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx"};
@@ -2538,7 +2538,7 @@ public class Main {
     }
 
     public static boolean saveSwc(SWF swf) {
-        JFileChooser fc = View.getFileChooserWithIcon("bundleswc");
+        FileChooser fc = View.getFileChooserWithIcon("bundleswc");
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
         String fileTitle = swf.getShortFileName();
         if (fileTitle != null) {
@@ -2610,7 +2610,7 @@ public class Main {
         if (mode == SaveFileMode.EXE) {
             icon = "saveasexe";
         }
-        JFileChooser fc = View.getFileChooserWithIcon(icon);
+        FileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
 
         FileFilter swfFilter = new FileFilter() {
@@ -2858,7 +2858,7 @@ public class Main {
     public static boolean openFileDialog() {
         View.checkAccess();
 
-        JFileChooser fc = View.getFileChooserWithIcon("open");
+        FileChooser fc = View.getFileChooserWithIcon("open");
         if (Configuration.openMultipleFiles.get()) {
             fc.setMultiSelectionEnabled(true);
         }
@@ -3514,7 +3514,7 @@ public class Main {
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        JFileChooser fc = new JFileChooser();
+                        FileChooser fc = new FileChooser();
                         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                         fc.setDialogTitle("Select new temporary directory without Unicode characters in its path");
                         if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {

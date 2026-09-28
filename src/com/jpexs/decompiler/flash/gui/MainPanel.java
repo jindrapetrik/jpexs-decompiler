@@ -3576,7 +3576,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
+        FileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3697,7 +3697,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser chooser = View.getFileChooserWithIcon("exportidea");
+        FileChooser chooser = View.getFileChooserWithIcon("exportidea");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3770,7 +3770,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser chooser = View.getFileChooserWithIcon("exportvscode");
+        FileChooser chooser = View.getFileChooserWithIcon("exportvscode");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3850,7 +3850,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         FLAVersion version = exportDialog.getFlaVersion();
         boolean compressed = exportDialog.isCompressed();
         
-        JFileChooser fc = View.getFileChooserWithIcon("exportfla");
+        FileChooser fc = View.getFileChooserWithIcon("exportfla");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3973,7 +3973,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importMovie(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importMovies2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportMovieInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importmovie");
+        FileChooser chooser = View.getFileChooserWithIcon("importmovie");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4033,7 +4033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSound(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSounds2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSoundInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importsound");
+        FileChooser chooser = View.getFileChooserWithIcon("importsound");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4093,7 +4093,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSprite(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSprites"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSpriteInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importsprite");
+        FileChooser chooser = View.getFileChooserWithIcon("importsprite");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4152,7 +4152,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importShape(final SWF swf, boolean noFill) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importshape");
+        FileChooser chooser = View.getFileChooserWithIcon("importshape");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4212,7 +4212,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importImage(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importimage");
+        FileChooser chooser = View.getFileChooserWithIcon("importimage");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4270,7 +4270,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importText(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importtext");
+        FileChooser chooser = View.getFileChooserWithIcon("importtext");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4368,7 +4368,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
 
-        JFileChooser chooser = View.getFileChooserWithIcon("importscript");
+        FileChooser chooser = View.getFileChooserWithIcon("importscript");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4462,7 +4462,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void importSymbolClass(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSymbolClass").replace("%file%", SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSymbolClassInfo);
 
-        JFileChooser chooser = View.getFileChooserWithIcon("importsymbolclass");
+        FileChooser chooser = View.getFileChooserWithIcon("importsymbolclass");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4479,7 +4479,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private String selectExportDir(String icon) {
-        JFileChooser chooser = View.getFileChooserWithIcon(icon);
+        FileChooser chooser = View.getFileChooserWithIcon(icon);
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4547,7 +4547,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportXaml(SWF swf) {
-        JFileChooser fc = View.getFileChooserWithIcon("exportxml");
+        FileChooser fc = View.getFileChooserWithIcon("exportxml");
         fc.setDialogTitle(AppStrings.translate("menu.file.export.xaml"));
         String selDir = Configuration.lastExportDir.get();
         fc.setCurrentDirectory(new File(selDir));
@@ -4672,7 +4672,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return;
             }
         } else {
-            JFileChooser fc = View.getFileChooserWithIcon("exportxml");
+            FileChooser fc = View.getFileChooserWithIcon("exportxml");
             fc.setDialogTitle(AppStrings.translate("menu.file.export.xml"));
             String selDir = Configuration.lastExportDir.get();
             fc.setCurrentDirectory(new File(selDir));
@@ -5711,10 +5711,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public File showImportFileChooser(String filter, boolean imagePreview, String title, String icon) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
-        JFileChooser fc = View.getFileChooserWithIcon(icon);
+        FileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         if (imagePreview) {
-            fc.setAccessory(new FileChooserImagePreview(fc));
+            fc.setAccessory(new FileChooserImagePreview(fc.getSwingChooser()));
             Dimension preferredSize = new Dimension(fc.getPreferredSize());
             preferredSize.width += FileChooserImagePreview.PREVIEW_SIZE;
             fc.setPreferredSize(preferredSize);
