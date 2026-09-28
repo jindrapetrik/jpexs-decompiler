@@ -72,6 +72,8 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -155,6 +157,7 @@ import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -2155,6 +2158,8 @@ public class Main {
                 if (executeAfterOpen != null && fopenable != null) {
                     executeAfterOpen.opened(fopenable);
                 }
+
+                SwingUtilities.invokeLater(() -> offerCustomTagProfiles(openableLists));
             });
 
             return true;
@@ -2452,6 +2457,57 @@ public class Main {
             if (file.equals(new File(info.getFile()))) {
                 openFile(info, null, i, true);
             }
+        }
+    }
+
+    private static void offerCustomTagProfiles(List<OpenableList> openableLists) {
+        Set<OpenableList> openableListsToReload = new LinkedHashSet<>();
+        for (OpenableList openableList : openableLists) {
+            for (Openable openable : openableList) {
+                if (!(openable instanceof SWF)) {
+                    continue;
+                }
+
+                SWF swf = (SWF) openable;
+                SwfSpecificCustomConfiguration configuration = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                if (configuration != null && configuration.getAllCustomData().containsKey(CustomConfigurationKeys.KEY_TAG_PROFILE)) {
+                    continue;
+                }
+
+                List<TagProfile> matchingProfiles = TagProfiles.getMatchingProfiles(swf);
+                if (matchingProfiles.isEmpty()) {
+                    continue;
+                }
+
+                configuration = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, "");
+
+                Object[] options = new Object[matchingProfiles.size() + 1];
+                for (int i = 0; i < matchingProfiles.size(); i++) {
+                    options[i] = matchingProfiles.get(i).getName();
+                }
+                options[matchingProfiles.size()] = AppStrings.translate("contextmenu.customTagProfile.standard");
+
+                String message = AppStrings.translate("message.customTagProfile.detected").replace("{swfName}", swf.getTitleOrShortFileName());
+                int selectedOption = ViewMessages.showOptionDialog(
+                        getDefaultMessagesComponent(),
+                        message,
+                        AppStrings.translate("contextmenu.customTagProfile"),
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]
+                );
+                if (selectedOption >= 0 && selectedOption < matchingProfiles.size()) {
+                    configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, matchingProfiles.get(selectedOption).getId());
+                    openableListsToReload.add(openableList);
+                }
+            }
+        }
+
+        for (OpenableList openableList : openableListsToReload) {
+            reloadFile(openableList);
         }
     }
 

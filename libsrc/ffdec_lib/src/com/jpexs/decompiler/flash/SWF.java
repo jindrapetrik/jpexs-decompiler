@@ -143,6 +143,8 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
@@ -324,6 +326,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Whether this file is ScaleForm GFx.
      */
     public boolean gfx = false;
+
+    private TagProfile tagProfile;
 
     /**
      * Whether the file uses HARMAN encryption.
@@ -2348,6 +2352,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         encrypted = header.encrypted;
         compression = header.compression;
         lzmaProperties = header.lzmaProperties;
+        SwfSpecificCustomConfiguration customConfiguration = Configuration.getSwfSpecificCustomConfiguration(getShortPathTitle());
+        if (customConfiguration != null) {
+            TagProfile configuredTagProfile = TagProfiles.getProfile(customConfiguration.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
+            if (configuredTagProfile != null && configuredTagProfile.supportsSwf(this)) {
+                tagProfile = configuredTagProfile;
+            }
+        }
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
 
@@ -2420,6 +2431,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         getASMs(true); // Add scriptNames to ASMs                     
+    }
+
+    /**
+     * Gets the custom tag profile used to parse this SWF.
+     *
+     * @return Custom tag profile, or null for standard SWF tags
+     */
+    public TagProfile getTagProfile() {
+        return tagProfile;
     }
 
     /**
