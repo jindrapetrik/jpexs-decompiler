@@ -2156,9 +2156,11 @@ public class Graph {
                 }
             }
         }
-        // ASC often merges "break" from an inner search loop with the outer
-        // for/for-each continue target. That yields:
+        // Compilers often merge "break" from an inner search loop with the
+        // outer loop's continue target. That yields either:
         //   while (true) { if (fail) continue outer; ... if (match) break; }
+        // or:
+        //   while (true) { if (cond) { ... } increment; continue outer; }
         //   after; // only reached via break
         // Recover while (cond) and move "after" back before breaks so labels
         // are not required.
@@ -2166,9 +2168,10 @@ public class Graph {
     }
 
     /**
-     * Restructures {@code while (true) { if (cond) continue outer; ... }}
-     * followed by break-only trailing statements into
-     * {@code while (!cond) { ... trailing before break; }}.
+     * Restructures an inner {@code while (true)} whose condition is expressed
+     * by a continue of an outer loop. Break-only trailing statements are moved
+     * before the inner break and the outer-loop continuation stays after the
+     * recovered conditional while, so no multilevel continue is needed.
      *
      * @param list Commands in the current block
      */
@@ -2189,6 +2192,7 @@ public class Graph {
             ContinueItem outerContinue = null;
             boolean invertCond = false;
             List<GraphTargetItem> bodyFromIf = null;
+            List<GraphTargetItem> outerContinuation = null;
 
             if (ifi.onFalse.isEmpty()
                     && ifi.onTrue.size() == 1
@@ -2212,6 +2216,23 @@ public class Graph {
                 outerContinue = (ContinueItem) ifi.onFalse.get(0);
                 invertCond = false;
                 bodyFromIf = ifi.onTrue;
+            } else if (whi.commands.size() > 1
+                    && whi.commands.get(whi.commands.size() - 1) instanceof ContinueItem) {
+                ContinueItem trailingContinue = (ContinueItem) whi.commands.get(whi.commands.size() - 1);
+                if (trailingContinue.loopId != whi.loop.id) {
+                    if (ifi.onFalse.isEmpty() && !ifi.onTrue.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = false;
+                        bodyFromIf = ifi.onTrue;
+                    } else if (ifi.onTrue.isEmpty() && !ifi.onFalse.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = true;
+                        bodyFromIf = ifi.onFalse;
+                    }
+                    if (outerContinue != null) {
+                        outerContinuation = new ArrayList<>(whi.commands.subList(1, whi.commands.size() - 1));
+                    }
+                }
             }
 
             if (outerContinue == null || outerContinue.loopId == whi.loop.id) {
@@ -2228,9 +2249,14 @@ public class Graph {
                 after.remove(after.size() - 1);
             }
 
-            whi.commands.remove(0);
-            if (bodyFromIf != null) {
-                whi.commands.addAll(0, bodyFromIf);
+            if (outerContinuation == null) {
+                whi.commands.remove(0);
+                if (bodyFromIf != null) {
+                    whi.commands.addAll(0, bodyFromIf);
+                }
+            } else {
+                whi.commands.clear();
+                whi.commands.addAll(bodyFromIf);
             }
 
             // Continues to the same outer target are equivalent to breaking
@@ -2263,6 +2289,9 @@ public class Graph {
 
             while (list.size() > i + 1) {
                 list.remove(list.size() - 1);
+            }
+            if (outerContinuation != null) {
+                list.addAll(outerContinuation);
             }
         }
     }
@@ -2298,6 +2327,8 @@ public class Graph {
      * @param cloneItems When true, clone items for each break; otherwise move once
      */
     private void insertBeforeBreaksOfLoop(List<GraphTargetItem> commands, long loopId, List<GraphTargetItem> toInsert, boolean cloneItems) {
+        boolean insertedCodeExits = !toInsert.isEmpty()
+                && toInsert.get(toInsert.size() - 1) instanceof ExitItem;
         for (int i = 0; i < commands.size(); i++) {
             GraphTargetItem ti = commands.get(i);
             if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
@@ -2305,7 +2336,12 @@ public class Graph {
                     GraphTargetItem ins = toInsert.get(j);
                     commands.add(i + j, cloneItems ? ins.clone() : ins);
                 }
-                i += toInsert.size();
+                if (insertedCodeExits) {
+                    commands.remove(i + toInsert.size());
+                    i += toInsert.size() - 1;
+                } else {
+                    i += toInsert.size();
+                }
                 if (!cloneItems) {
                     return;
                 }
