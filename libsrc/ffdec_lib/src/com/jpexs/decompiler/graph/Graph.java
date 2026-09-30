@@ -2165,6 +2165,65 @@ public class Graph {
         // Recover while (cond) and move "after" back before breaks so labels
         // are not required.
         restructureWhileTrueContinueOuter(list);
+        if (level == 0) {
+            eliminateRedundantLabeledBreaks(list, new HashSet<>(), null, new HashSet<>());
+        }
+    }
+
+    /**
+     * Replaces breaks to an outer loop with breaks to the nearest switch when
+     * leaving that switch reaches the same destination without executing code.
+     * A case that can fall through does not inherit the switch's exit targets.
+     * Real loop bodies and other blocks are conservatively treated as barriers.
+     *
+     * @param commands Commands in the current block
+     * @param endTargets Break destinations equivalent to reaching the block's end
+     * @param loopId Nearest enclosing loop or switch id, or null
+     * @param exitTargets Break destinations equivalent to leaving that loop or switch
+     */
+    private void eliminateRedundantLabeledBreaks(List<GraphTargetItem> commands,
+            Set<Long> endTargets, Long loopId, Set<Long> exitTargets) {
+        Set<Long> continuationTargets = new HashSet<>(endTargets);
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = commands.get(i);
+            if (item instanceof BreakItem) {
+                BreakItem breakItem = (BreakItem) item;
+                if (loopId != null && exitTargets.contains(breakItem.loopId)) {
+                    breakItem.loopId = loopId;
+                }
+                continuationTargets = new HashSet<>();
+                continuationTargets.add(breakItem.loopId);
+                if (loopId != null && breakItem.loopId == loopId.longValue()) {
+                    continuationTargets.addAll(exitTargets);
+                }
+                continue;
+            }
+            if (item instanceof SwitchItem) {
+                SwitchItem switchItem = (SwitchItem) item;
+                Set<Long> switchExitTargets = new HashSet<>(continuationTargets);
+                for (int c = 0; c < switchItem.caseCommands.size(); c++) {
+                    Set<Long> caseEndTargets = new HashSet<>();
+                    if (c == switchItem.caseCommands.size() - 1) {
+                        caseEndTargets.add(switchItem.loop.id);
+                        caseEndTargets.addAll(switchExitTargets);
+                    }
+                    eliminateRedundantLabeledBreaks(switchItem.caseCommands.get(c),
+                            caseEndTargets, switchItem.loop.id, switchExitTargets);
+                }
+                fixSwitchEnd(switchItem);
+            } else if (item instanceof IfItem) {
+                IfItem ifItem = (IfItem) item;
+                eliminateRedundantLabeledBreaks(ifItem.onTrue, continuationTargets, loopId, exitTargets);
+                eliminateRedundantLabeledBreaks(ifItem.onFalse, continuationTargets, loopId, exitTargets);
+            } else if (item instanceof Block) {
+                Long nestedLoopId = item instanceof LoopItem ? ((LoopItem) item).loop.id : null;
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    eliminateRedundantLabeledBreaks(sub, new HashSet<>(), nestedLoopId, new HashSet<>());
+                }
+            }
+            // Any statement may have effects or fall through to another case.
+            continuationTargets = new HashSet<>();
+        }
     }
 
     /**
