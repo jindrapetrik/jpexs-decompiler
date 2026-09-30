@@ -886,7 +886,8 @@ public abstract class TextTag extends DrawableTag {
                 y = rec.yOffset;
             }
 
-            double rat = textHeight / 1024.0 / (font == null ? 1 : font.getDivider());
+            double div = (font == null ? 1 : font.getDivider());
+            double rat = textHeight / 1024.0 / div;
 
             int leading = 0;
 
@@ -911,7 +912,7 @@ public abstract class TextTag extends DrawableTag {
                     ExportRectangle glyphBounds = new ExportRectangle(shape.getBounds(1)); // shapeNum: 1
 
                     if (font.hasLayout()) {
-                        glyphBounds = new ExportRectangle(0, -font.getAscent(), entry.glyphAdvance / rat, font.getDescent() + leading);
+                        glyphBounds = new ExportRectangle(0, Math.min(glyphBounds.yMin, -font.getAscent()), entry.glyphAdvance / rat, Math.max(glyphBounds.yMax, font.getDescent() + leading));
                     } else {
                         double glyphWidth = glyphBounds.getWidth();
                         double glyphHeight = glyphBounds.getHeight();
