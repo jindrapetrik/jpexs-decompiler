@@ -39,13 +39,18 @@ import java.util.logging.Logger;
 public class PDFStringHelper {
 
     /**
-     * This converts a string into PDF. It prefixes ( or ) with \ and wraps the
-     * string in a ( ) pair.
+     * This converts a string into PDF. It prefixes \ with \, prefixes ( or )
+     * with \ and wraps the string in a ( ) pair.
      *
      * @param s String to convert
      * @return String that can be placed in a PDF (or Postscript) stream
      */
     public static String makePDFString(String s) {
+        //escape backslashes first, otherwise backslashes inserted below would be escaped again
+        if (s.indexOf("\\") > -1) {
+            s = replace(s, "\\", "\\\\");
+        }
+
         if (s.indexOf("(") > -1) {
             s = replace(s, "(", "\\(");
         }
