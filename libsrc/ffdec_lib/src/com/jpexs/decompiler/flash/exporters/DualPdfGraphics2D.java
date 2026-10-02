@@ -701,8 +701,19 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         Color textColor2 = new Color(textColor, true);
         g.setColor(textColor2);
         
-        text = text.replaceAll("\\p{Cc}", " "); //Replace control characters with space
-        
+        //Replace control characters with space only when the font has no glyph for them;
+        //otherwise the code (e.g. DEL 0x7F) is a real font code and must be drawn as is
+        StringBuilder cleaned = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isISOControl(c) && !font.containsChar(c)) {
+                cleaned.append(' ');
+            } else {
+                cleaned.append(c);
+            }
+        }
+        text = cleaned.toString();
+
         g.drawString(text, (float) x, (float) y);
     }
 
