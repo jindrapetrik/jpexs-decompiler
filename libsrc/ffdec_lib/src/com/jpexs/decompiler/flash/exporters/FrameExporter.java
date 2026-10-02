@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
@@ -811,55 +810,6 @@ public class FrameExporter {
         }
 
         return ret;
-    }
-
-    private static void drawText(SWF swf, float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
-        int fontId = swf.getCharacterId(font);
-        PDFGraphics g2 = (PDFGraphics) g;
-        if (existingFonts.containsKey(fontId)) {
-            g2.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));
-        } else {
-            if (font.getCharacterCount() < 1) {
-                String fontName = font.getFontName();
-                File fontFile = FontTag.fontNameToFile(fontName);
-                if (fontFile == null) {
-                    fontFile = FontTag.fontNameToFile("Times New Roman");
-                }
-                if (fontFile == null) {
-                    fontFile = FontTag.fontNameToFile("Arial");
-                }
-                if (fontFile == null) {
-                    throw new RuntimeException("Font " + fontName + " not found in your system");
-                }
-                Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
-                existingFonts.put(fontId, f);
-                try {
-                    g2.setTtfFont(f, fontFile);
-                } catch (IOException ex) {
-                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                FontExporter fe = new FontExporter();
-                File tempFile = null;
-                try {
-                    tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
-                    fe.exportFont(font, FontExportMode.TTF, tempFile);
-                    Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
-                    existingFonts.put(fontId, f);
-                    g2.setTtfFont(f, tempFile);
-                } catch (IOException ex) {
-                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                if (tempFile != null && tempFile.exists()) {
-                    tempFile.delete();
-                }
-            }
-        }
-
-        g2.setTransform(trans.toTransform());
-        Color textColor2 = new Color(textColor, true);
-        g2.setColor(textColor2);
-        g2.drawTransparentString(text, (float) x, (float) y);
     }
 
     private static String jsArrColor(RGB rgb) {
