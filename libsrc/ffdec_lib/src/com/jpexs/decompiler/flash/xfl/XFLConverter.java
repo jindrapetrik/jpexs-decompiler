@@ -2604,6 +2604,7 @@ public class XFLConverter {
         boolean shapeTween = false;
         MorphShapeTag shapeTweener = null;
         List<Integer> morphShapeRatios = new ArrayList<>();
+        Set<Integer> classicTweenInstanceStarts = new HashSet<>();
         MorphShapeTag standaloneShapeTweener = null;
         MATRIX standaloneShapeTweenerMatrix = null;
 
@@ -2627,6 +2628,9 @@ public class XFLConverter {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 if (po.getDepth() == depth) {
+                    if (!po.flagMove()) {
+                        classicTweenInstanceStarts.add(frame + 1);
+                    }
                     int newCharId = po.getCharacterId();
                     String newCharCls = po.getClassName();
                     CharacterTag newCharacter = null;
@@ -2715,6 +2719,7 @@ public class XFLConverter {
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 if (rt.getDepth() == depth) {
+                    classicTweenInstanceStarts.add(frame + 1);
                     if (shapeTween && character != null) {
                         MorphShapeTag m = (MorphShapeTag) character;
                         shapeTweener = m;
@@ -2849,7 +2854,7 @@ public class XFLConverter {
                 }
 
                 String elements = elementsWriter.toString();
-                if (!elements.equals(lastElements) && frame > 0) {
+                if ((!elements.equals(lastElements) || classicTweenInstanceStarts.contains(frame)) && frame > 0) {
                     convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
                     duration = 1;
                 } else if (frame == 0) {
@@ -2873,7 +2878,7 @@ public class XFLConverter {
 
         if (writer2.length() > 0) {
             writer.writeCharactersRaw(prevStr);
-            writer.writeCharactersRaw(writer2.toString());
+            writer.writeCharactersRaw(ClassicTweenDetector.detect(writer2.toString(), classicTweenInstanceStarts));
             writer.writeCharactersRaw(afterStr);
         }
     }
