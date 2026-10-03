@@ -109,6 +109,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.helpers.LRULinkedHashMap;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -116,9 +117,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -1194,13 +1197,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         localData.activationReg = 0;
 
+        UnresolvedAVM2Item.ResolveAccelerator accelerator = new UnresolvedAVM2Item.ResolveAccelerator(subvariables);
+
         for (int i = 0; i < subvariables.size(); i++) {
             AssignableAVM2Item an = subvariables.get(i);
             if (an instanceof UnresolvedAVM2Item) {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1217,7 +1222,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     paramTypes.set(t, res);
                 }
             }
@@ -2539,7 +2544,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @return True if found
      */
     public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
-        
         AVM2ConstantPool constants = abc.getSelectedAbc().constants;
         int publicNs = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, false);
         
@@ -2580,12 +2584,66 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
     }
 
+    private static LinkedHashMap<AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LRULinkedHashMap<>(100);
+
+    private static class AbcFindPropertyKey {
+        public AbcIndexing abc;
+        public String propertyName;
+        public DottedChain pkg;
+        public String obj;
+        public ABC selectedAbc;
+        public int selectedNs;
+        public boolean instanceOnly;
+
+        public AbcFindPropertyKey(AbcIndexing abc, String propertyName, DottedChain pkg, String obj, ABC selectedAbc, int selectedNs, boolean instanceOnly) {
+            this.abc = abc;
+            this.propertyName = propertyName;
+            this.pkg = pkg;
+            this.obj = obj;
+            this.selectedAbc = selectedAbc;
+            this.selectedNs = selectedNs;
+            this.instanceOnly = instanceOnly;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            AbcFindPropertyKey that = (AbcFindPropertyKey) o;
+            return this.abc == that.abc
+                    && this.selectedAbc == that.selectedAbc
+                    && this.selectedNs == that.selectedNs
+                    && this.instanceOnly == that.instanceOnly
+                    && Objects.equals(this.propertyName, that.propertyName)
+                    && Objects.equals(this.pkg, that.pkg)
+                    && Objects.equals(this.obj, that.obj);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(abc, propertyName, pkg, obj, selectedAbc, selectedNs, instanceOnly);
+        }
+    }
+
     private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
         isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
+
         if (sp == null) {
-            Reference<Boolean> foundStatic = new Reference<>(null);               
-            sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
+            AbcFindPropertyKey key = new AbcFindPropertyKey(abc, propertyName, pkg, obj, abc.getSelectedAbc(), selectedNs, instanceOnly);
+
+            if (abcFindPropertyCache.containsKey(key)) {
+                sp = abcFindPropertyCache.get(key);
+            } else {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+
+                sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
+                abcFindPropertyCache.put(key, sp);
+            }
         }
         if (sp != null) {
             if (sp.trait instanceof TraitClass) {
