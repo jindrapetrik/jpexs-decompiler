@@ -62,7 +62,9 @@ public class FileChooser {
             @Override
             protected javax.swing.JDialog createDialog(Component parent) {
                 javax.swing.JDialog dialog = super.createDialog(parent);
-                View.setWindowIcon(dialog, iconName);
+                if (iconName != null) {
+                    View.setWindowIcon(dialog, iconName);
+                }
                 dialog.getRootPane().setWindowDecorationStyle(javax.swing.JRootPane.FRAME);
                 return dialog;
             }
