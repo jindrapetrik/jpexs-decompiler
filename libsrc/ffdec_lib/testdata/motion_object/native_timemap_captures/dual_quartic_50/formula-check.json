@@ -1,0 +1,7 @@
+{
+  "type": "DualQuartic",
+  "strength": 50,
+  "description": "50% out/in polynomial blend",
+  "maxRoundedXErrorTwips": 1,
+  "maxUnroundedXErrorPixels": 0.05
+}

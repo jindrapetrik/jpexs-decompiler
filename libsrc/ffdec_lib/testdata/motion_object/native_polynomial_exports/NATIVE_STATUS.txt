@@ -1,0 +1,6 @@
+OK cubic_50
+OK quartic_50
+OK quintic_50
+OK dual_cubic_50
+OK dual_quartic_50
+OK dual_quintic_50

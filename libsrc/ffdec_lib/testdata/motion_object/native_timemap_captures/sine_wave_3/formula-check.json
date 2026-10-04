@@ -1,0 +1,7 @@
+{
+  "type": "SineWave",
+  "strength": 3,
+  "description": "3 half-cycles of cosine-derived wave",
+  "maxRoundedXErrorTwips": 1,
+  "maxUnroundedXErrorPixels": 0.050515722632098914
+}

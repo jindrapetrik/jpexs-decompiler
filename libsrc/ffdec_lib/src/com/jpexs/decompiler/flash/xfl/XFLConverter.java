@@ -99,6 +99,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonAction;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
@@ -1240,7 +1241,7 @@ public class XFLConverter {
                 writer.writeAttribute("knockout", true);
             }
             writer.writeAttribute("quality", dsf.passes);
-            writer.writeAttribute("strength", doubleToString(dsf.strength, 2));
+            writer.writeAttribute("strength", doubleToString(dsf.strength));
             writer.writeEndElement();
         } else if (filter instanceof BLURFILTER) {
             BLURFILTER bf = (BLURFILTER) filter;
@@ -1266,7 +1267,7 @@ public class XFLConverter {
                 writer.writeAttribute("knockout", true);
             }
             writer.writeAttribute("quality", gf.passes);
-            writer.writeAttribute("strength", doubleToString(gf.strength, 2));
+            writer.writeAttribute("strength", doubleToString(gf.strength));
             writer.writeEndElement();
         } else if (filter instanceof BEVELFILTER) {
             BEVELFILTER bf = (BEVELFILTER) filter;
@@ -1287,7 +1288,7 @@ public class XFLConverter {
                 writer.writeAttribute("shadowAlpha", bf.shadowColor.getAlphaFloat());
             }
             writer.writeAttribute("shadowColor", bf.shadowColor.toHexRGB());
-            writer.writeAttribute("strength", doubleToString(bf.strength, 2));
+            writer.writeAttribute("strength", doubleToString(bf.strength));
             if (bf.onTop && !bf.innerShadow) {
                 writer.writeAttribute("type", "full");
             } else if (!bf.innerShadow) {
@@ -1306,7 +1307,7 @@ public class XFLConverter {
             if (ggf.knockout) {
                 writer.writeAttribute("knockout", true);
             }
-            writer.writeAttribute("strength", doubleToString(ggf.strength, 2));
+            writer.writeAttribute("strength", doubleToString(ggf.strength));
             if (ggf.onTop && !ggf.innerShadow) {
                 writer.writeAttribute("type", "full");
             } else if (!ggf.innerShadow) {
@@ -1334,7 +1335,7 @@ public class XFLConverter {
             if (gbf.knockout) {
                 writer.writeAttribute("knockout", true);
             }
-            writer.writeAttribute("strength", doubleToString(gbf.strength, 2));
+            writer.writeAttribute("strength", doubleToString(gbf.strength));
             if (gbf.onTop && !gbf.innerShadow) {
                 writer.writeAttribute("type", "full");
             } else if (!gbf.innerShadow) {
@@ -2605,6 +2606,7 @@ public class XFLConverter {
         MorphShapeTag shapeTweener = null;
         List<Integer> morphShapeRatios = new ArrayList<>();
         Set<Integer> classicTweenInstanceStarts = new HashSet<>();
+        Map<String, double[]> motionRegistrationPoints = new HashMap<>();
         MorphShapeTag standaloneShapeTweener = null;
         MATRIX standaloneShapeTweenerMatrix = null;
 
@@ -2854,6 +2856,16 @@ public class XFLConverter {
                 }
 
                 String elements = elementsWriter.toString();
+                if (flaVersion.ordinal() >= FLAVersion.CS5.ordinal() && character instanceof BoundedTag
+                        && elements.contains("<DOMSymbolInstance")) {
+                    String itemName = getSymbolName(lastImportedId, characterNameMap, swf, character);
+                    if (!motionRegistrationPoints.containsKey(itemName)) {
+                        RECT bounds = ((BoundedTag) character).getRect();
+                        motionRegistrationPoints.put(itemName, new double[]{
+                            bounds.getWidth() == 0 ? 0 : -bounds.Xmin / (double) bounds.getWidth(),
+                            bounds.getHeight() == 0 ? 0 : -bounds.Ymin / (double) bounds.getHeight()});
+                    }
+                }
                 if ((!elements.equals(lastElements) || classicTweenInstanceStarts.contains(frame)) && frame > 0) {
                     convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
                     duration = 1;
@@ -2877,8 +2889,17 @@ public class XFLConverter {
         afterStr = "</frames>" + afterStr;
 
         if (writer2.length() > 0) {
+            String framesXml = ClassicTweenDetector.detect(writer2.toString(), classicTweenInstanceStarts,
+                    flaVersion.ordinal() >= FLAVersion.CS5.ordinal() ? swf.frameRate : 0, motionRegistrationPoints);
+            if (framesXml.contains("tweenType=\"motion object\"")) {
+                if (prevStr.contains("<DOMLayer")) {
+                    prevStr = prevStr.replaceFirst("<DOMLayer", "<DOMLayer animationType=\"motion object\"");
+                } else {
+                    writer.writeAttribute("animationType", "motion object");
+                }
+            }
             writer.writeCharactersRaw(prevStr);
-            writer.writeCharactersRaw(ClassicTweenDetector.detect(writer2.toString(), classicTweenInstanceStarts));
+            writer.writeCharactersRaw(framesXml);
             writer.writeCharactersRaw(afterStr);
         }
     }

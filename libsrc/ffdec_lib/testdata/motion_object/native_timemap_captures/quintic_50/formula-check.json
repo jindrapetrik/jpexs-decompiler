@@ -1,0 +1,7 @@
+{
+  "type": "Quintic",
+  "strength": 50,
+  "description": "50% ease-out polynomial blend",
+  "maxRoundedXErrorTwips": 1,
+  "maxUnroundedXErrorPixels": 0.05229669495884082
+}

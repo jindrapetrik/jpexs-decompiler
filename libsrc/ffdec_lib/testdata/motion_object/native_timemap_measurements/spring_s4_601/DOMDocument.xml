@@ -1,0 +1,99 @@
+<DOMDocument xmlns="http://ns.adobe.com/xfl/2008/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" autoSaveHasPrompted="true" backgroundColor="#f0f0f0" buildNumber="" creatorInfo="FFDec" currentTimeline="1" frameRate="30" height="360" majorVersion="1" nextSceneIdentifier="2" platform="Windows" playOptionsPlayFrameActions="false" playOptionsPlayLoop="false" playOptionsPlayPages="false" versionInfo="Saved by FFDec" width="1600" xflVersion="2.2">
+    <symbols>
+        <Include href="Symbol 2.xml" itemID="6ac24f80-00000001" lastModified="1791119223" loadImmediate="false"/>
+    </symbols>
+    <timelines>
+        <DOMTimeline name="Scene 1">
+            <layers>
+                <DOMLayer animationType="motion object" color="#9fe08c" current="true" isSelected="true" name="Layer 1">
+                    <frames>
+                        <DOMFrame duration="601" index="0" isMotionObject="true" keyMode="8195" motionTweenRotate="none" motionTweenScale="false" tweenType="motion object" visibleAnimationKeyframes="2097151">
+                            <motionObjectXML>
+                                <AnimationCore TimeScale="30000" Version="1" duration="601000">
+                                    <TimeMap strength="0" type="Quadratic"/>
+                                    <TimeMap strength="4" type="Spring"/>
+                                    <metadata>
+                                        <names>
+                                            <name langID="en_US" value=""/>
+                                        </names>
+                                        <Settings orientToPath="0" xformPtXOffsetPct="0.0" xformPtYOffsetPct="0.0" xformPtZOffsetPixels="0"/>
+                                    </metadata>
+                                    <PropertyContainer id="headContainer">
+                                        <PropertyContainer id="Basic_Motion">
+                                            <Property TimeMapIndex="1" enabled="1" id="Motion_X" ignoreTimeMap="0" readonly="0" visible="1">
+                                                <Keyframe anchor="0,0.0" next="200000.0,333.3333333333333" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                                <Keyframe anchor="0,1000.0" next="0.0,1000.0" previous="-200000.0,666.6666666666666" roving="0" timevalue="600000"/>
+                                            </Property>
+                                            <Property enabled="1" id="Motion_Y" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                            <Property enabled="1" id="Rotation_Z" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                        </PropertyContainer>
+                                        <PropertyContainer id="Transformation">
+                                            <Property enabled="1" id="Skew_X" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                            <Property enabled="1" id="Scale_X" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                            <Property enabled="1" id="Scale_Y" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                            <Property enabled="1" id="Skew_Y" ignoreTimeMap="1" readonly="0" visible="1">
+                                                <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                            </Property>
+                                        </PropertyContainer>
+                                        <PropertyContainer id="Colors">
+                                            <PropertyContainer id="Advanced_ColorXform">
+                                                <Property enabled="1" id="AdvClr_R_Pct" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_G_Pct" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_B_Pct" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_A_Pct" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,100.0" next="0.0,100.0" previous="0.0,100.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_R_Offset" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_G_Offset" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_B_Offset" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                                <Property enabled="1" id="AdvClr_A_Offset" ignoreTimeMap="1" readonly="0" visible="1">
+                                                    <Keyframe anchor="0,0.0" next="0.0,0.0" previous="0.0,0.0" roving="0" timevalue="0"/>
+                                                </Property>
+                                            </PropertyContainer>
+                                        </PropertyContainer>
+                                        <PropertyContainer id="Filters"/>
+                                    </PropertyContainer>
+                                </AnimationCore>
+                            </motionObjectXML>
+                            <elements>
+                                <DOMSymbolInstance centerPoint3DX="200.0" centerPoint3DY="120.0" libraryItemName="Symbol 2" name="Demo">
+                                    <matrix>
+                                        <Matrix a="1" d="1" tx="100" ty="160"/>
+                                    </matrix>
+                                    <transformationPoint>
+                                        <Point/>
+                                    </transformationPoint>
+                                    <color>
+                                        <Color/>
+                                    </color>
+                                </DOMSymbolInstance>
+                            </elements>
+                        </DOMFrame>
+                    </frames>
+                </DOMLayer>
+            </layers>
+        </DOMTimeline>
+    </timelines>
+</DOMDocument>

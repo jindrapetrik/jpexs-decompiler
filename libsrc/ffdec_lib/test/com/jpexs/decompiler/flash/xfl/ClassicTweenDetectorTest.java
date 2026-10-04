@@ -132,7 +132,7 @@ public class ClassicTweenDetectorTest {
             for (int f = 0; f <= 20; f++) {
                 double t = f / 20.0;
                 double p = t + ease / 100.0 * t * (1 - t);
-                double angle = p * Math.PI / 3;
+                double angle = 0;
                 double sx = 1 + p;
                 double sy = 1 + p / 2;
                 String matrix = "tx=\"" + Math.round(p * 2000) / 20.0 + "\" a=\""
@@ -150,6 +150,21 @@ public class ClassicTweenDetectorTest {
         }
     }
 
+    @Test
+    public void preservesRotatedAndSkewedMatricesWithoutClassicFallback() throws Exception {
+        for (boolean animated : new boolean[]{false, true}) {
+            StringBuilder xml = new StringBuilder();
+            for (int f = 0; f <= 20; f++) {
+                double t = f / 20.0;
+                double angle = Math.toRadians(25 + (animated ? 90 * t : 0));
+                String matrix = "tx=\"" + 100 * t + "\" a=\"" + Math.cos(angle)
+                        + "\" b=\"" + Math.sin(angle) + "\" c=\"" + -Math.sin(angle - 0.2)
+                        + "\" d=\"" + Math.cos(angle - 0.2) + "\"";
+                xml.append(frame(f, 1, "Symbol 1", matrix, ""));
+            }
+            Assert.assertEquals(ClassicTweenDetector.detect(xml.toString()), xml.toString());
+        }
+    }
     @Test
     public void preservesChangesOfSymbolAndDiscreteProperties() throws Exception {
         StringBuilder xml = new StringBuilder();

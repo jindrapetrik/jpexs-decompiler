@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ final class ClassicTweenDetector {
     private ClassicTweenDetector() {
     }
 
-    private static final class Sample {
+    static final class Sample {
         String xml;
         int index;
         int duration;
@@ -54,6 +55,7 @@ final class ClassicTweenDetector {
         // Translation, two scales, two axis angles, then color multipliers/offsets.
         double[] values = new double[14];
         double[] matrix = new double[4];
+        List<FilterTweenDetector.Filter> filters = Collections.emptyList();
     }
 
     static String detect(String frames) throws XMLStreamException {
@@ -61,6 +63,11 @@ final class ClassicTweenDetector {
     }
 
     static String detect(String frames, Set<Integer> instanceStarts) throws XMLStreamException {
+        return detect(frames, instanceStarts, 0, Collections.emptyMap());
+    }
+
+    static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
+            Map<String, double[]> registrationPoints) throws XMLStreamException {
         // Do not remove frames carrying clip actions, including script CDATA
         // which may itself contain XML-looking text.
         if (!frames.contains("<DOMSymbolInstance") || frames.contains("<Actionscript")) {
@@ -109,8 +116,8 @@ final class ClassicTweenDetector {
             if (i + 1 < samples.size()) {
                 Sample current = samples.get(i);
                 Sample next = samples.get(i + 1);
-                if (current.duration == 1 && current.identity != null && next.identity != null
-                        && next.index == current.index + 1 && !instanceStarts.contains(next.index)
+                if ((current.duration == 1 || motionFrameRate > 0) && current.identity != null && next.identity != null
+                        && next.index == current.index + current.duration && !instanceStarts.contains(next.index)
                         && current.identity.isEqualNode(next.identity)) {
                     runEnds[i] = runEnds[i + 1];
                 }
@@ -122,6 +129,7 @@ final class ClassicTweenDetector {
             Sample first = samples.get(start);
             int limit = runEnds[start];
             Integer acceleration = null;
+            String motion = null;
             int end = limit;
             // At least two intermediate samples are required to distinguish a
             // tween from an arbitrary change between adjacent keyframes.
@@ -130,15 +138,47 @@ final class ClassicTweenDetector {
                 if (acceleration != null) {
                     break;
                 }
+                double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
+                if (motionFrameRate > 0 && registrationPoint != null) {
+                    motion = MotionTweenDetector.fit(samples, start, end, motionFrameRate, registrationPoint);
+                    if (motion != null) {
+                        break;
+                    }
+                }
                 end--;
             }
-            if (acceleration == null) {
+            if (motion != null) {
+                changed = true;
+                Sample endpoint = samples.get(end);
+                int duration = endpoint.index - first.index + 1;
+                java.util.regex.Matcher coreDuration = java.util.regex.Pattern.compile(
+                        "<AnimationCore\\b[^>]*\\bduration=\"([0-9]+)\"").matcher(motion);
+                if (coreDuration.find()) {
+                    duration = Integer.parseInt(coreDuration.group(1)) / 1000;
+                }
+                String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
+                        "keyMode=\"" + XFLConverter.KEY_MODE_MOTION_TWEEN + "\"");
+                xml = xml.replaceFirst("<DOMFrame", "<DOMFrame tweenType=\"motion object\""
+                        + " isMotionObject=\"true\" visibleAnimationKeyframes=\"2097151\""
+                        + " motionTweenRotate=\"none\" motionTweenScale=\"false\" duration=\"" + duration + "\"");
+                // Property curves include the last sample, unlike classic tweens.
+                int elementsStart = xml.indexOf("<elements");
+                xml = xml.substring(0, elementsStart) + motion + xml.substring(elementsStart);
+                result.append(xml).append('\n');
+                int remainingHold = endpoint.index + endpoint.duration - first.index - duration;
+                if (remainingHold > 0) {
+                    String hold = endpoint.xml.replaceFirst("index=\"[0-9]+\"", "index=\"" + (first.index + duration) + "\"")
+                            .replaceFirst(" duration=\"[0-9]+\"", " duration=\"" + remainingHold + "\"");
+                    result.append(hold).append('\n');
+                }
+                start = end + 1;
+            } else if (acceleration == null) {
                 result.append(first.xml).append('\n');
                 start++;
             } else {
                 changed = true;
                 int duration = samples.get(end).index - first.index;
-                String xml = first.xml.replaceFirst("keyMode=\"[0-9]+\"",
+                String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_CLASSIC_TWEEN + "\"");
                 xml = xml.replaceFirst("<DOMFrame", "<DOMFrame tweenType=\"motion\" motionTweenScale=\"true\""
                         + " acceleration=\"" + acceleration + "\" duration=\"" + duration + "\"");
@@ -173,25 +213,38 @@ final class ClassicTweenDetector {
         double b = number(matrix, "b", 0);
         double c = number(matrix, "c", 0);
         double d = number(matrix, "d", 1);
-        // Singular and reflected matrices require a different decomposition.
-        if (a * d - b * c <= 0) {
+        // A collapsed axis has no recoverable angle. Keep such frames explicit.
+        if (a * d - b * c == 0) {
             return sample;
         }
         sample.matrix = new double[]{a, b, c, d};
         sample.values[0] = number(matrix, "tx", 0);
         sample.values[1] = number(matrix, "ty", 0);
         sample.values[2] = Math.hypot(a, b);
-        sample.values[3] = Math.hypot(c, d);
+        // Put the reflection into the Y scale; this keeps rotation continuous.
+        sample.values[3] = Math.copySign(Math.hypot(c, d), a * d - b * c);
         sample.values[4] = Math.atan2(b, a);
-        sample.values[5] = Math.atan2(-c, d);
+        sample.values[5] = Math.atan2(-c / sample.values[3], d / sample.values[3]);
         Element colorContainer = child(instance, "color");
         Element color = colorContainer == null ? null : child(colorContainer, "Color");
         for (int i = 0; i < COLOR_ATTRIBUTES.length; i++) {
             sample.values[6 + i] = number(color, COLOR_ATTRIBUTES[i], i < 4 ? 1 : 0);
         }
+        List<FilterTweenDetector.Filter> filters = FilterTweenDetector.read(child(instance, "filters"));
+        if (filters != null && !filters.isEmpty()) {
+            sample.filters = filters;
+            FilterTweenDetector.Filter last = filters.get(filters.size() - 1);
+            sample.values = java.util.Arrays.copyOf(sample.values, last.offset + last.values.length);
+            for (FilterTweenDetector.Filter filter : filters) {
+                System.arraycopy(filter.values, 0, sample.values, filter.offset, filter.values.length);
+            }
+        }
         Element identity = (Element) instance.cloneNode(true);
         removeChild(identity, "matrix");
         removeChild(identity, "color");
+        if (!sample.filters.isEmpty()) {
+            FilterTweenDetector.normalizeIdentity(child(identity, "filters"), sample.filters);
+        }
         // Exported sprite centers follow translation; they are not instance identity.
         identity.removeAttribute("centerPoint3DX");
         identity.removeAttribute("centerPoint3DY");
@@ -201,6 +254,24 @@ final class ClassicTweenDetector {
     }
 
     private static Integer fit(List<Sample> samples, int start, int end) {
+        // Animated filters need native motion-object channels, not an implicit
+        // classic tween between two instance filter lists.
+        if (FilterTweenDetector.changing(samples, start, end)) {
+            return null;
+        }
+        // Native CS6 classic tweens also distort rotated/skewed matrices,
+        // including constant skew during translation. Keep those samples
+        // explicit; rejecting only motion-object fitting is insufficient.
+        for (int f = start; f <= end; f++) {
+            if (samples.get(f).matrix[1] != 0 || samples.get(f).matrix[2] != 0) {
+                return null;
+            }
+        }
+        for (int f = start; f < end; f++) {
+            if (samples.get(f).duration != 1) {
+                return null;
+            }
+        }
         double[] first = samples.get(start).values;
         double[] last = samples.get(end).values;
         // Automatic rotation uses the shortest path.

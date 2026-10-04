@@ -1,0 +1,7 @@
+{
+  "type": "SawtoothWave",
+  "strength": 3,
+  "description": "3 half-cycles of triangular wave",
+  "maxRoundedXErrorTwips": 1,
+  "maxUnroundedXErrorPixels": 0.05000000000009095
+}
