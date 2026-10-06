@@ -395,6 +395,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new CompilationException("Cannot assign", line);
     }
 
+    /**
+     * Cross-call scratch state for resolve loops - caches variables list, constant-pool indices,
+     * AbcIndexing/ABC identity. will be invalid if any of those change while using accelerator.
+     */
     public static class ResolveAccelerator {
         public HashMap<String, NameAVM2Item> definitionNameIndex = new HashMap<>();
         public PropertyAVM2Item.ResolveAccelerator propertyResolveAccelerator = new PropertyAVM2Item.ResolveAccelerator();
@@ -403,6 +407,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             for (AssignableAVM2Item an : variables) {
                 if (an instanceof NameAVM2Item) {
                     NameAVM2Item n = (NameAVM2Item) an;
+                    // first-wins ordering as in original loop code
                     if (n.isDefinition() && !definitionNameIndex.containsKey(n.getVariableName())) {
                         definitionNameIndex.put(n.getVariableName(), n);
                     }
