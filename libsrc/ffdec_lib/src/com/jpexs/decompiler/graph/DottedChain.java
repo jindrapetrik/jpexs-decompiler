@@ -73,6 +73,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     public static final DottedChain ALL = new DottedChain(new String[]{"*"});
 
+    // precompiled pattern for performance
+    private static final Pattern NAME_PATTERN = Pattern.compile(".*#[0-9]+$");
+
     /**
      * Parts of the chain.
      */
@@ -364,8 +367,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         return subChain(parts.size() - 1);
     }
-
-    private static final Pattern NAME_PATTERN = Pattern.compile(".*#[0-9]+$");
 
     /**
      * Adds a part to the chain with a suffix.
