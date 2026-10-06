@@ -40,17 +40,14 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.LRULinkedHashMap;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -548,8 +545,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
     
     public static class ResolveAccelerator {
-        public LinkedHashMap<ResolveNameIndexKey, Integer> multinameIndexCache = new LRULinkedHashMap<>(100);
-        public LinkedHashMap<AVM2SourceGenerator.AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LRULinkedHashMap<>(100);
+        public HashMap<ResolveNameIndexKey, Integer> multinameIndexCache = new HashMap<>();
+        public HashMap<AVM2SourceGenerator.AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new HashMap<>();
     }
 
     private int resolveNameIndex(
