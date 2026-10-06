@@ -436,24 +436,24 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         boolean isResolved = false;
 
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
-            isResolved = resolve1(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+            isResolved = resolveLocalVariable(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
             if (isResolved) {
                 return resolvedRoot;
             }
         }
 
         if ((paramNames.contains(name.get(0)) || name.get(0).equals("arguments"))) {
-            isResolved = resolve2(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveParameter(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
         }
 
-        boolean isProperty = resolve3(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+        boolean isProperty = isScopeProperty(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
 
         //search same package classes
         if (currentClassFullName != null && !isProperty) {
-            isResolved = resolve4(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveSamePackageClass(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
@@ -461,7 +461,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
         //Search toplevel classes
         if (currentClassFullName != null && !isProperty) {
-            isResolved = resolve5(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveTopLevelClass(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
@@ -469,7 +469,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
         //Search for types in imported classes
         if (!isProperty) {
-            isResolved = resolve6(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveImport(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
@@ -477,12 +477,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
         //Search all fully qualified types
         if (!isProperty) {
-            isResolved = resolve7(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveFullyQualifiedType(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
 
-            isResolved = resolve8(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveInOpenedNamespaces(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
@@ -493,7 +493,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 throw new CompilationException("Cannot use this in that context", line);
             }
 
-            isResolved = resolve9(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            isResolved = resolveThisOrSuper(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
             if (isResolved) {
                 return resolvedRoot;
             }
@@ -509,11 +509,11 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             throw new CompilationException(name.toPrintableString(new LinkedHashSet<>(), abcIndex.getSelectedAbc().getSwf(), true) + " is not an existing type", line);
         }
 
-        resolve10(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+        resolveAsMultinameProperty(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
         return resolvedRoot;
     }
 
-    private boolean resolve1(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
+    private boolean resolveLocalVariable(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         //search for variable
         NameAVM2Item n = accelerator.definitionNameIndex.get(name.get(0));
         if (n == null) {
@@ -539,7 +539,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    private boolean resolve2(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveParameter(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         int ind = paramNames.indexOf(name.get(0));
         GraphTargetItem t = TypeItem.UNBOUNDED;
         if (ind == -1) {
@@ -563,7 +563,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    private boolean resolve3(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
+    private boolean isScopeProperty(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         boolean isProperty = false;
         if (localData != null) { //resolve can be called without localData
             PropertyAVM2Item resolvedx = new PropertyAVM2Item(null, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), abc, openedNamespaces, callStack, false, null, line, this.thisType);
@@ -587,7 +587,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return isProperty;
     }
 
-    private boolean resolve4(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveSamePackageClass(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
         DottedChain pkg = classChain.getWithoutLast();
 
@@ -611,7 +611,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     }
 
 
-    private boolean resolve5(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveTopLevelClass(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         DottedChain pkg = DottedChain.TOPLEVEL;
 
         TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
@@ -638,7 +638,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return false;
     }
 
-    private boolean resolve6(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveImport(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         for (DottedChain imp : importedClasses) {
             if (imp.equals(name)) {
                 TypeItem importedItem = new TypeItem(imp);
@@ -690,7 +690,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return false;
     }
 
-    private boolean resolve7(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveFullyQualifiedType(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         for (int i = 0; i < name.size(); i++) {
             DottedChain fname = name.subChain(i + 1);
             AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), localData != null ? abc.getSelectedAbc() : null, localData != null ? localData.scriptIndex : null);
@@ -718,7 +718,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return false;
     }
     
-    private boolean resolve8(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveInOpenedNamespaces(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
         DottedChain pkg = classChain.getWithoutLast();
 
@@ -751,7 +751,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return false;
     }
 
-    private boolean resolve9(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveThisOrSuper(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         boolean isSuper = name.get(0).equals("super");
         GraphTargetItem ntype = thisType;
         if (isSuper) {
@@ -782,7 +782,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    private boolean resolve10(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    private boolean resolveAsMultinameProperty(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         resolved = null;
         GraphTargetItem ret = null;
         for (int i = 0; i < name.size(); i++) {
