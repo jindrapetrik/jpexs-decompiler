@@ -815,6 +815,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         int cinit_index = method(null, true, str(""), false, false, false, new ArrayList<>(), pkg, cinitNeedsActivation, cinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : baseClassName, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), commands, TypeItem.UNBOUNDED);
         MethodBody cinitBody = abcIndex.getSelectedAbc().findBody(cinit_index);
 
+        UnresolvedAVM2Item.ResolveAccelerator accelerator = new UnresolvedAVM2Item.ResolveAccelerator(cinitVariables);
+        
         for (int i = 0; i < cinitVariables.size(); i++) {
             AssignableAVM2Item an = cinitVariables.get(i);
             if (an instanceof UnresolvedAVM2Item) {
@@ -823,7 +825,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     String fullClass = localData.getFullClass();
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(cinitBody);
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, callStack, cinitVariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, callStack, cinitVariables, accelerator);
                     if (res instanceof AssignableAVM2Item) {
                         cinitVariables.set(i, (AssignableAVM2Item) res);
                     } else {
