@@ -109,7 +109,6 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import com.jpexs.helpers.LRULinkedHashMap;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -117,7 +116,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -2541,52 +2539,51 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param outPropValue Out property value
      * @param outPropValueAbc Out property value ABC
      * @param isType Is type
+     * @param accelerator Resolve accelerator
      * @return True if found
      */
-    public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
+    public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait, PropertyAVM2Item.ResolveAccelerator accelerator) {
         AVM2ConstantPool constants = abc.getSelectedAbc().constants;
         int publicNs = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, false);
         
         if (nsKeyword != null) {
             switch (nsKeyword) {
                 case "public":
-                    return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);            
+                    return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);            
                 case "protected":
-                    if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+                    if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                         return true;
                     }
-                    return searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                    
+                    return searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                    
                 case "private":
-                    return searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                               
+                    return searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                                               
                 case "internal":
-                    return searchPrototypeChain(internalNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                                               
+                    return searchPrototypeChain(internalNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                                                               
             }            
         }
         // private and protected namespaces first so we find overriding functions before overridden functions
         if (namespaceSuffix != null) {
-            if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+            if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                 return true;
             }
         }
-        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
             return true;
         }
-        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
             return true;
         }
 
         for (int ns : otherNs) {
-            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                 return true;
             }
         }
 
-        return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
+        return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);
     }
 
-    private static LinkedHashMap<AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LRULinkedHashMap<>(100);
-
-    private static class AbcFindPropertyKey {
+    public static class AbcFindPropertyKey {
         public AbcIndexing abc;
         public String propertyName;
         public DottedChain pkg;
@@ -2629,20 +2626,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
-    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
+    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait, PropertyAVM2Item.ResolveAccelerator accelerator) {
         isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
 
         if (sp == null) {
             AbcFindPropertyKey key = new AbcFindPropertyKey(abc, propertyName, pkg, obj, abc.getSelectedAbc(), selectedNs, instanceOnly);
 
-            if (abcFindPropertyCache.containsKey(key)) {
-                sp = abcFindPropertyCache.get(key);
+            if (accelerator.abcFindPropertyCache.containsKey(key)) {
+                sp = accelerator.abcFindPropertyCache.get(key);
             } else {
                 Reference<Boolean> foundStatic = new Reference<>(null);
 
                 sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
-                abcFindPropertyCache.put(key, sp);
+                accelerator.abcFindPropertyCache.put(key, sp);
             }
         }
         if (sp != null) {

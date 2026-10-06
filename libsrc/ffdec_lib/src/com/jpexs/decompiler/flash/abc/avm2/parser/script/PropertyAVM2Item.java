@@ -322,7 +322,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 propTrait = sp.trait;
                             }
                         }                        
-                        if (propType == null && AVM2SourceGenerator.searchPrototypeChain(nsKeyword, namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, localData.staticProtectedNs, localData.internalNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+                        if (propType == null && AVM2SourceGenerator.searchPrototypeChain(nsKeyword, namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, localData.staticProtectedNs, localData.internalNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                             objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                             propType = outPropType.getVal();
                             propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -499,7 +499,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             otherns.add(n.getCpoolIndex(abcIndex));
                         }
                     }*/
-                    if (AVM2SourceGenerator.searchPrototypeChain(nsKeyword, namespaceSuffixInt, otherns, localData.privateNs, localData.protectedNs, localData.staticProtectedNs, localData.internalNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+                    if (AVM2SourceGenerator.searchPrototypeChain(nsKeyword, namespaceSuffixInt, otherns, localData.privateNs, localData.protectedNs, localData.staticProtectedNs, localData.internalNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                         GraphTargetItem objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                         GraphTargetItem propType = p.returnType;
                         int propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -549,6 +549,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     
     public static class ResolveAccelerator {
         public LinkedHashMap<ResolveNameIndexKey, Integer> multinameIndexCache = new LRULinkedHashMap<>(100);
+        public LinkedHashMap<AVM2SourceGenerator.AbcFindPropertyKey, AbcIndexing.TraitIndex> abcFindPropertyCache = new LRULinkedHashMap<>(100);
     }
 
     private int resolveNameIndex(
