@@ -94,7 +94,8 @@ When a commit is pushed/merged into `dev` branch, a new prerelease version is cr
 These prerelease versions are called nightly builds. On releasing a new nightly build, the previous nightly build is removed.
 
 ### Stable versions
-A new stable version is created automatically by the GitHub Actions CI when marking a revision in `master` branch with a tag in format `versionx.y.z`.
+A new stable version is created automatically by the GitHub Actions CI when merging  `dev` branch into `master`.
+To such version a tag is added in format `versionx.y.z`.
 
 ## Contributing
 
@@ -104,6 +105,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 Versions are in format `x.y.z`, for example `9.1.2`.
 For the versions available, see the [tags on this repository](https://github.com/jindrapetrik/jpexs-decompiler/tags).
+We try to use semantic versioning.
 
 Nightly builds have additional suffix `_nightlyN` where `N` is number which increments with every (automatic) nightly release
 and does not depend on the `x.y.z` numbers. (This means nightly number is *NOT* reset to 0 when releasing stable)

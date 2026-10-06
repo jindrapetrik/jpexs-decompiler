@@ -93,7 +93,8 @@ docker run --rm -v ./input:/work/input -v ./output:/work/output ffdec [args]
 这些预发布版本被称为 每夜构建（nightly build）。在发布新的每夜构建版本后，之前的每夜构建版本就会被移除。
 
 ### 稳定版本
-当在 master 分支中使用 `versionx.y.z` 格式的标签标记修订版本时，GitHub Actions CI 会自动创建一个新的稳定版本。
+当 `dev` 分支合并到 `master` 分支时，GitHub Actions CI 会自动创建一个新的稳定版本。
+将会为此版本填补加一个格式为 `versionx.y.z` 的标签。
 
 ## 贡献
 
@@ -103,6 +104,7 @@ docker run --rm -v ./input:/work/input -v ./output:/work/output ffdec [args]
 
 版本号采用 `x.y.z` 格式，例如 `9.1.2`。
 有关可用版本，请参阅 [此存储库上的标签](https://github.com/jindrapetrik/jpexs-decompiler/tags)。
+我们尝试使用语义化版本控制。
 
 每夜构建版本带有额外的 `_nightlyN` 后缀，其中 `N` 是一个数字，每次（自动）发布每夜构建版本时都会递增，并且与 `x.y.z` 编号无关（这意味着发布稳定版本时，每夜构建版本的编号不会重置为 0）。
 较早的每夜构建版本 *无法* 通过 Git 标签获取。

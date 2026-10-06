@@ -53,7 +53,7 @@ public class GetTimeActionItem extends ActionItem {
 
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
-        return true;
+        return false;
     }
 
     @Override

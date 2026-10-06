@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.exporters.RequiresNormalizedFonts;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.ColorTransform;

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
-import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
@@ -279,10 +278,10 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -310,7 +309,6 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -324,6 +322,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -2662,6 +2661,27 @@ public class AVM2Code implements Cloneable {
             }
             initClassMultinames.put(-1, initTraits);
 
+            // Activation slots (NEED_ACTIVATION) are method-local; values that
+            // read them must not be promoted to field initializers.
+            List<Multiname> activationMultinames = new ArrayList<>();
+            if (body != null && body.traits != null) {
+                for (Trait t : body.traits.traits) {
+                    if (t.name_index > 0) {
+                        activationMultinames.add(abc.constants.getMultiname(t.name_index));
+                    }
+                }
+            }
+
+            // Inherited instance slots with no ABC constant are still at default
+            // when child field inits run (before super()). Collected once — they
+            // are never promoted while decompiling this class.
+            List<Multiname> uninitializedInheritedSlots = new ArrayList<>();
+            Set<Integer> uninitializedInheritedSlotNameIndices = new HashSet<>();
+            if (!isStatic) {
+                collectUninitializedInheritedInstanceSlots(abc, classIndex, convertData,
+                        uninitializedInheritedSlots, uninitializedInheritedSlotNameIndices);
+            }
+
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -2742,18 +2762,36 @@ public class AVM2Code implements Cloneable {
                                                     laterMultinames.add(tMultiname);
                                                 }
                                             }
+                                            // Same-class slots: rebuild each time so already-promoted
+                                            // traits (e.g. i_b before i_c = i_a + i_b) no longer block.
+                                            List<Multiname> uninitializedInstanceSlots = new ArrayList<>();
+                                            Set<Integer> uninitializedInstanceSlotNameIndices = new HashSet<>();
+                                            collectUninitializedInstanceSlots(abc, initTraits, convertData,
+                                                    uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices);
+                                            uninitializedInstanceSlots.addAll(uninitializedInheritedSlots);
+                                            uninitializedInstanceSlotNameIndices.addAll(uninitializedInheritedSlotNameIndices);
                                             for (GraphTargetItem item : subItems) {
 
                                                 //if later slot is referenced, we must add it in constructor instead of direct assignment
                                                 if (item instanceof GetPropertyAVM2Item) {
                                                     Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
-                                                    if (laterMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
+                                                            || refersToUninitializedInstanceSlot(multiName, uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices)) {
+                                                        continue loopi;
+                                                    }
+                                                    if (((GetPropertyAVM2Item) item).object instanceof NewActivationAVM2Item) {
                                                         continue loopi;
                                                     }
                                                 }
                                                 if (item instanceof GetLexAVM2Item) {
                                                     Multiname multiName = ((GetLexAVM2Item) item).propertyName;
-                                                    if (laterMultinames.contains(multiName)) {
+                                                    if (laterMultinames.contains(multiName) || activationMultinames.contains(multiName)
+                                                            || refersToUninitializedInstanceSlot(multiName, uninitializedInstanceSlots, uninitializedInstanceSlotNameIndices)) {
+                                                        continue loopi;
+                                                    }
+                                                }
+                                                if (item instanceof GetSlotAVM2Item) {
+                                                    if (((GetSlotAVM2Item) item).slotObject instanceof NewActivationAVM2Item) {
                                                         continue loopi;
                                                     }
                                                 }
@@ -2782,8 +2820,16 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 } else if (!isStatic) {
-                    //We will ignore the fact, that in obfuscated code, the constructor can
-                    //start with SetLocal in favor of turning on the deobfuscation...
+                    // Locals before field inits (e.g. pushbyte 0 / setlocal) must not
+                    // abort promotion — but only in the real instance constructor.
+                    // Call sites such as decompileMethod also pass instance_traits as
+                    // initTraits for ordinary methods (initializerType == 0); skipping
+                    // locals there would incorrectly promote later SetProperty.
+                    if (initializerType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER
+                            && ((ti instanceof SetLocalAVM2Item) || (ti instanceof DeclarationAVM2Item))) {
+                        continue loopi;
+                    }
+                    // Stop once real constructor body starts (calls, super, control flow, …).
                     break;
                 }
             }
@@ -3013,6 +3059,91 @@ public class AVM2Code implements Cloneable {
         injectDeclarations(usedDeobfuscations, 0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
         uniteLocalsDeclarationTypes(d, list);
         return list;
+    }
+
+    /**
+     * Collects instance slot/const traits that still have no initializer
+     * (neither ABC constant nor already promoted).
+     */
+    private static void collectUninitializedInstanceSlots(ABC abc, Traits traits, ConvertData convertData,
+            List<Multiname> outSlots, Set<Integer> outNameIndices) {
+        if (traits == null) {
+            return;
+        }
+        for (Trait ut : traits.traits) {
+            if (!(ut instanceof TraitSlotConst)) {
+                continue;
+            }
+            TraitSlotConst utsc = (TraitSlotConst) ut;
+            if (convertData.assignedValues.containsKey(utsc)) {
+                continue;
+            }
+            if (utsc.value_kind != 0) {
+                continue;
+            }
+            if (ut.name_index > 0) {
+                Multiname mn = abc.constants.getMultiname(ut.name_index);
+                outSlots.add(mn);
+                if (mn.name_index > 0) {
+                    outNameIndices.add(mn.name_index);
+                }
+            }
+        }
+    }
+
+    /**
+     * Walks the superclass chain in the same ABC and collects uninitialized
+     * instance slots. Child field inits run before {@code super()}, so parent
+     * slots without an ABC constant are still at default there.
+     * <p>
+     * Only same-ABC parents are considered: name indices are pool-local, so
+     * matching against traits from another ABC (e.g. playerglobal) would be
+     * meaningless.
+     */
+    private static void collectUninitializedInheritedInstanceSlots(
+            ABC abc, int classIndex, ConvertData convertData,
+            List<Multiname> outSlots, Set<Integer> outNameIndices) {
+        if (classIndex < 0 || classIndex >= abc.instance_info.size()) {
+            return;
+        }
+        Set<Integer> visited = new HashSet<>();
+        int walkClassIndex = classIndex;
+        while (walkClassIndex >= 0 && walkClassIndex < abc.instance_info.size() && visited.add(walkClassIndex)) {
+            InstanceInfo ii = abc.instance_info.get(walkClassIndex);
+            if (walkClassIndex != classIndex) {
+                collectUninitializedInstanceSlots(abc, ii.instance_traits, convertData, outSlots, outNameIndices);
+            }
+            if (ii.super_index <= 0) {
+                break;
+            }
+            Multiname superName = abc.constants.getMultiname(ii.super_index);
+            int parentClassIndex = -1;
+            for (int ci = 0; ci < abc.instance_info.size(); ci++) {
+                if (abc.constants.getMultiname(abc.instance_info.get(ci).name_index).equals(superName)) {
+                    parentClassIndex = ci;
+                    break;
+                }
+            }
+            if (parentClassIndex < 0) {
+                break;
+            }
+            walkClassIndex = parentClassIndex;
+        }
+    }
+
+    /**
+     * Inherited protected/private slots often use a different Multiname
+     * (namespace) than the declaring trait; matching by name index covers that.
+     */
+    private static boolean refersToUninitializedInstanceSlot(Multiname multiName,
+            List<Multiname> uninitializedSlots, Set<Integer> uninitializedNameIndices) {
+        if (multiName == null) {
+            return false;
+        }
+        if (uninitializedSlots.contains(multiName)) {
+            return true;
+        }
+        return multiName.name_index > 0 && uninitializedNameIndices.contains(multiName.name_index);
     }
 
     private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {
@@ -3748,14 +3879,108 @@ public class AVM2Code implements Cloneable {
      * @throws InterruptedException On interrupt
      */
     public void removeIgnored(MethodBody body) throws InterruptedException {
-        //System.err.println("removing ignored...");
+        if (removeIgnoredInBatch(body)) {
+            return;
+        }
+        // Preserve the original offset handling for malformed instruction
+        // addresses and targets that are not instruction boundaries.
         for (int i = 0; i < code.size(); i++) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
             if (code.get(i).isIgnored()) {
                 removeInstruction(i, body);
                 i--;
             }
         }
-        //System.err.println("/ignored removed");
+    }
+
+    /**
+     * Removes ignored instructions with one offset update. Returns false without
+     * changing the code if its addresses require the individual-removal path.
+     *
+     * @param body Method body
+     * @return Whether the instructions were handled
+     * @throws InterruptedException On interrupt
+     */
+    private boolean removeIgnoredInBatch(MethodBody body) throws InterruptedException {
+        boolean found = false;
+        for (AVM2Instruction ins : code) {
+            if (ins.isIgnored()) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return true;
+        }
+
+        final long[] addresses = new long[code.size() + 1];
+        final int[] removedBefore = new int[addresses.length];
+        long address = code.get(0).getAddress();
+        if (address < 0) {
+            return false;
+        }
+        int removed = 0;
+        for (int i = 0; i < code.size(); i++) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
+            AVM2Instruction ins = code.get(i);
+            int length = ins.getBytesLength();
+            if (ins.getAddress() != address || length <= 0) {
+                return false;
+            }
+            addresses[i] = address;
+            removedBefore[i] = removed;
+            address += length;
+            if (ins.isIgnored()) {
+                removed += length;
+            }
+        }
+        addresses[code.size()] = address;
+        removedBefore[code.size()] = removed;
+
+        // Targets at a removed instruction map to the next surviving instruction.
+        // Include the end of the code for exception ranges and trailing removals.
+        for (AVM2Instruction ins : code) {
+            if (ins.definition instanceof IfTypeIns || ins.definition instanceof LookupSwitchIns) {
+                for (long target : ins.getOffsets()) {
+                    if (Arrays.binarySearch(addresses, target) < 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        if (body != null) {
+            for (ABCException ex : body.exceptions) {
+                if (Arrays.binarySearch(addresses, ex.start) < 0
+                        || Arrays.binarySearch(addresses, ex.end) < 0
+                        || Arrays.binarySearch(addresses, ex.target) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        updateOffsets(new OffsetUpdater() {
+            private int shift(long originalAddress) {
+                // updateOffsets uses -1 as the source of exception offsets.
+                return originalAddress == -1 ? 0
+                        : removedBefore[Arrays.binarySearch(addresses, originalAddress)];
+            }
+
+            @Override
+            public long updateInstructionOffset(long originalAddress) {
+                return originalAddress - shift(originalAddress);
+            }
+
+            @Override
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                return offset + shift(insAddr) - shift(targetAddress);
+            }
+        }, body);
+        code.removeIf(AVM2Instruction::isIgnored);
+        return true;
     }
 
     /**

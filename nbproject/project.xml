@@ -278,6 +278,9 @@
                         <location>CHANGELOG.md</location>
                     </source-file>
                     <source-file>
+                        <location>SECURITY.md</location>
+                    </source-file>
+                    <source-file>
                         <location>.gitignore</location>
                     </source-file>
                     <source-file>

@@ -232,7 +232,7 @@ public class DebugPanel extends JPanel {
                     JMenu exportMenu = new JMenu(AppStrings.translate("debug.export").replace("%name%", v.name));
                     JMenuItem exportByteArrayMenuItem = new JMenuItem(AppStrings.translate("debug.export.bytearray"));
                     exportByteArrayMenuItem.addActionListener((ActionEvent e1) -> {
-                        JFileChooser fc = new JFileChooser();
+                        FileChooser fc = new FileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
                         if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
                             File file = Helper.fixDialogFile(fc.getSelectedFile());
@@ -302,7 +302,7 @@ public class DebugPanel extends JPanel {
                     JMenu importMenu = new JMenu(AppStrings.translate("debug.import").replace("%name%", v.name));
                     JMenuItem importByteArrayMenuItem = new JMenuItem(AppStrings.translate("debug.import.bytearray"));
                     importByteArrayMenuItem.addActionListener((ActionEvent e1) -> {
-                        JFileChooser fc = new JFileChooser();
+                        FileChooser fc = new FileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                         if (fc.showOpenDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
                             File file = Helper.fixDialogFile(fc.getSelectedFile());

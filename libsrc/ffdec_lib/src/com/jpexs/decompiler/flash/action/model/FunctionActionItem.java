@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
@@ -26,6 +25,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -35,7 +35,6 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -44,6 +43,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import natorder.NaturalOrderComparator;
 
 /**
  * Function.
@@ -390,6 +392,7 @@ public class FunctionActionItem extends ActionItem {
     }        
 
     @Override
+    @SuppressWarnings("unchecked")            
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
@@ -416,56 +419,60 @@ public class FunctionActionItem extends ActionItem {
         boolean suppressThisFlag = false;
 
         boolean needsFun2 = false;
-
+        
+        boolean canFun2 = asGenerator.getSwfVersion() >= 7;
+        
         List<String> registerNames = new ArrayList<>();
-        registerNames.add("***** ZERO *****");
-        if (usedNames.contains("this")) {
-            needsFun2 = true;
-            preloadThisFlag = true;
-            registerNames.add("this");
-        } else {
-            suppressThisFlag = true;
-        }
-        if (usedNames.contains("arguments")) {
-            preloadArgumentsFlag = true;
-            needsFun2 = true;
-            registerNames.add("arguments");
-        } else {
-            suppressArgumentsFlag = true;
-        }
-        if (usedNames.contains("super")) {
-            preloadSuperFlag = true;
-            needsFun2 = true;
-            registerNames.add("super");
-        } else {
-            suppressSuperFlag = true;
-        }
+        if (canFun2) {
+            registerNames.add("***** ZERO *****");
+            if (usedNames.contains("this")) {
+                needsFun2 = true;
+                preloadThisFlag = true;
+                registerNames.add("this");
+            } else {
+                suppressThisFlag = true;
+            }
+            if (usedNames.contains("arguments")) {
+                preloadArgumentsFlag = true;
+                needsFun2 = true;
+                registerNames.add("arguments");
+            } else {
+                suppressArgumentsFlag = true;
+            }
+            if (usedNames.contains("super")) {
+                preloadSuperFlag = true;
+                needsFun2 = true;
+                registerNames.add("super");
+            } else {
+                suppressSuperFlag = true;
+            }
 
-        if (usedNames.contains("_root")) {
-            preloadRootFlag = true;
-            needsFun2 = true;
-            registerNames.add("_root");
-        }
-        if (usedNames.contains("_parent")) {
-            preloadParentFlag = true;
-            needsFun2 = true;
-            registerNames.add("_parent");
-        }
-        if (usedNames.contains("_global")) {
-            needsFun2 = true;
-            preloadGlobalFlag = true;
-            registerNames.add("_global");
-        }
-
-        int preloadedNumber = registerNames.size();
-        if (!paramNames.isEmpty()) {
-            needsFun2 = true;
-        }
-        if (localData.inMethod) {
-            //needsFun2 = true;
-        }
-        if (localData.inFunction > 1) {
-            needsFun2 = true;
+            if (usedNames.contains("_root")) {
+                preloadRootFlag = true;
+                needsFun2 = true;
+                registerNames.add("_root");
+            }
+            if (usedNames.contains("_parent")) {
+                preloadParentFlag = true;
+                needsFun2 = true;
+                registerNames.add("_parent");
+            }
+            if (usedNames.contains("_global")) {
+                needsFun2 = true;
+                preloadGlobalFlag = true;
+                registerNames.add("_global");
+            }
+        
+            //int preloadedNumber = registerNames.size();
+            if (!paramNames.isEmpty()) {
+                needsFun2 = true;
+            }
+            if (localData.inMethod) {
+                //needsFun2 = true;
+            }
+            if (localData.inFunction > 1) {
+                needsFun2 = true;
+            }        
         }
 
         //If the function parameter or local variable is used in inner function, 
@@ -484,13 +491,80 @@ public class FunctionActionItem extends ActionItem {
             getDeeplyUsedVariableNames(topLevelVariableNames, fun, deeplyUsedVariableNames);
         }
 
-        if (needsFun2) {
-            for (int i = 0; i < paramNames.size(); i++) {
-                if (deeplyUsedVariableNames.contains(paramNames.get(i))) {
-                    paramRegs.add(0); //this will be variable, no register
-                } else {
-                    paramRegs.add(registerNames.size());
-                    registerNames.add(paramNames.get(i));
+        for (int i = 0; i < paramNames.size(); i++) {
+            paramRegs.add(0); //0 = use variable, no reg
+        }
+        
+        if (needsFun2 && !hasEval) {
+            String registerNameMask = Configuration.registerNameFormat.get();
+            Pattern registerNamePattern = Pattern.compile(registerNameMask.replace("%d", "(?<regnum>[0-9]+)"));
+            
+            List<String> newRegisterNames = new ArrayList<>();
+            for (VariableActionItem v : variables) {
+                String varName = v.getVariableName();
+                if (v.isDefinition() 
+                        && !registerNames.contains(varName) 
+                        && !paramNames.contains(varName)
+                        && !newRegisterNames.contains(varName)
+                        && !deeplyUsedVariableNames.contains(varName)                        
+                    ) {
+                    Matcher m = registerNamePattern.matcher(varName);
+                    if (m.matches()) {
+                        newRegisterNames.add(varName);                                                  
+                    }
+                }
+            }
+            
+            for (int i = 0; i < paramNames.size(); i++) {    
+                String varName = paramNames.get(i);
+                if (newRegisterNames.contains(varName)) {
+                    continue;
+                }
+                Matcher m = registerNamePattern.matcher(varName);
+                if (m.matches()) {
+                    int regNum = Integer.parseInt(m.group("regnum"));  
+                    
+                    while (registerNames.size() <= regNum) {
+                        registerNames.add("**EMPTY**");
+                    }                   
+                    registerNames.set(regNum, varName);
+                    
+                    paramNames.set(i, "");
+                    paramRegs.set(i, regNum);
+                }
+            }
+            
+            newRegisterNames.sort(new NaturalOrderComparator());
+            
+            int numRegistersBeforeParams = registerNames.size();
+            
+            for (String varName : newRegisterNames) {
+                Matcher m = registerNamePattern.matcher(varName);
+                if (m.matches()) {
+                    int regNum = Integer.parseInt(m.group("regnum"));                    
+                    while (registerNames.size() <= regNum) {
+                        registerNames.add("**EMPTY**");
+                    }                   
+                    registerNames.set(regNum, varName);
+                }
+            }
+            
+            int posReg = numRegistersBeforeParams;
+            for (int i = 0; i < paramNames.size(); i++) {                
+                if (paramRegs.get(i) != 0) {
+                    continue;
+                }
+                if (!deeplyUsedVariableNames.contains(paramNames.get(i))) {
+                    while (posReg < registerNames.size() 
+                            && !registerNames.get(posReg).equals("**EMPTY**")) {
+                        posReg++;
+                    }
+                    while (registerNames.size() <= posReg) {
+                        registerNames.add("**EMPTY**");
+                    }
+
+                    paramRegs.set(i, posReg);                                        
+                    registerNames.set(posReg, paramNames.get(i));
                 }
             }
         }
@@ -499,15 +573,15 @@ public class FunctionActionItem extends ActionItem {
         
         localDataCopy.inFunction++;
 
+        
         for (VariableActionItem v : variables) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
-            if (needsFun2) {
-                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)
-                        && !hasEval) {
+            /*if (needsFun2 && !hasEval) {
+                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
                     registerNames.add(varName);
                 }
-            }
+            }*/
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {
@@ -547,12 +621,12 @@ public class FunctionActionItem extends ActionItem {
                 }
             }
         }        
-        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
+        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, asGenerator.getSwfVersion()).length;
         if (len > 0xFFFF) {
             throw new CompilationException("Function body is too large to fit into UI16.", line);
         }
-        if (!needsFun2 && paramNames.isEmpty()) {
-            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION, charset));
+        if (!needsFun2) {
+            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, charset));
         } else {
             ret.add(0, new ActionDefineFunction2(functionName,
                     preloadParentFlag,
@@ -564,7 +638,7 @@ public class FunctionActionItem extends ActionItem {
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    regCount, len, SWF.DEFAULT_VERSION, paramNames, paramRegs, charset));
+                    regCount, len, paramNames, paramRegs, charset));
         }
 
         return ret;

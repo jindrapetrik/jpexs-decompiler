@@ -35,16 +35,24 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.DottedIdentifier;
@@ -60,6 +68,8 @@ import com.jpexs.decompiler.flash.types.annotations.UUID;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.Helper;
@@ -123,6 +133,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private Tag editedTag;
 
+    private Tag previewOriginalTag;
+
     private static final Map<Class, List<Field>> fieldCache = new HashMap<>();
 
     private static final int FIELD_INDEX = 0;
@@ -145,6 +157,192 @@ public class GenericTagTreePanel extends GenericTagPanel {
     public void removeTreeModelListener(TreeModelListener listener) {
         modelListeners.remove(listener);
         ((DefaultTreeModel) tree.getModel()).removeTreeModelListener(listener);
+    }
+
+    public boolean isEditMode() {
+        return tree.isEditable();
+    }
+
+    public TreePath getSelectionPath() {
+        return tree.getSelectionPath();
+    }
+
+    public void notifyNodeChanged(TreePath path) {
+        if (path == null || !(tree.getModel() instanceof MyTreeModel)) {
+            return;
+        }
+        ((MyTreeModel) tree.getModel()).vchanged(path);
+        tree.repaint();
+    }
+
+    /**
+     * Selects the tree node whose value is the supplied object.
+     *
+     * @param value Value to find using object identity
+     * @return Whether a matching node was found
+     */
+    public boolean selectNodeByValue(Object value) {
+        TreeModel model = tree.getModel();
+        TreePath path = findPathByValue(model, new TreePath(model.getRoot()), value);
+        if (path == null) {
+            return false;
+        }
+        tree.setSelectionPath(path);
+        tree.scrollPathToVisible(path);
+        return true;
+    }
+
+    /**
+     * Selects a shape fill style using its one-based global index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param fillStyleIndex One-based global fill style index
+     * @return Whether a matching fill style node was found
+     */
+    public boolean selectShapeFillStyle(int fillStyleIndex) {
+        if (fillStyleIndex < 1 || !(editedTag instanceof ShapeTag)) {
+            return false;
+        }
+        SHAPEWITHSTYLE shapes = ((ShapeTag) editedTag).getShapes();
+        int currentIndex = 0;
+        for (FILLSTYLE fillStyle : shapes.fillStyles.fillStyles) {
+            currentIndex++;
+            if (currentIndex == fillStyleIndex) {
+                return selectNodeByValue(fillStyle);
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            for (FILLSTYLE fillStyle : styleChangeRecord.fillStyles.fillStyles) {
+                currentIndex++;
+                if (currentIndex == fillStyleIndex) {
+                    return selectNodeByValue(fillStyle);
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects a morph shape fill style using its one-based index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param fillStyleIndex One-based morph fill style index
+     * @return Whether a matching fill style node was found
+     */
+    public boolean selectMorphShapeFillStyle(int fillStyleIndex) {
+        if (fillStyleIndex < 1 || !(editedTag instanceof MorphShapeTag)) {
+            return false;
+        }
+        MORPHFILLSTYLE[] fillStyles = ((MorphShapeTag) editedTag).morphFillStyles.fillStyles;
+        if (fillStyleIndex > fillStyles.length) {
+            return false;
+        }
+        return selectNodeByValue(fillStyles[fillStyleIndex - 1]);
+    }
+
+    /**
+     * Selects a shape line style using its one-based global index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param lineStyleIndex One-based global line style index
+     * @return Whether a matching line style node was found
+     */
+    public boolean selectShapeLineStyle(int lineStyleIndex) {
+        if (lineStyleIndex < 1 || !(editedTag instanceof ShapeTag)) {
+            return false;
+        }
+        ShapeTag shapeTag = (ShapeTag) editedTag;
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int shapeNum = shapeTag.getShapeNum();
+        int currentIndex = 0;
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                currentIndex++;
+                if (currentIndex == lineStyleIndex) {
+                    return selectNodeByValue(lineStyle);
+                }
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                currentIndex++;
+                if (currentIndex == lineStyleIndex) {
+                    return selectNodeByValue(lineStyle);
+                }
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    currentIndex++;
+                    if (currentIndex == lineStyleIndex) {
+                        return selectNodeByValue(lineStyle);
+                    }
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    currentIndex++;
+                    if (currentIndex == lineStyleIndex) {
+                        return selectNodeByValue(lineStyle);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects a morph shape line style using its one-based index. The lookup
+     * is performed in the tag clone displayed by this editor.
+     *
+     * @param lineStyleIndex One-based morph line style index
+     * @return Whether a matching line style node was found
+     */
+    public boolean selectMorphShapeLineStyle(int lineStyleIndex) {
+        if (lineStyleIndex < 1 || !(editedTag instanceof MorphShapeTag)) {
+            return false;
+        }
+        MorphShapeTag morphShapeTag = (MorphShapeTag) editedTag;
+        if (morphShapeTag.getShapeNum() == 1) {
+            MORPHLINESTYLE[] lineStyles = morphShapeTag.morphLineStyles.lineStyles;
+            if (lineStyleIndex > lineStyles.length) {
+                return false;
+            }
+            return selectNodeByValue(lineStyles[lineStyleIndex - 1]);
+        }
+        MORPHLINESTYLE2[] lineStyles = morphShapeTag.morphLineStyles.lineStyles2;
+        if (lineStyleIndex > lineStyles.length) {
+            return false;
+        }
+        return selectNodeByValue(lineStyles[lineStyleIndex - 1]);
+    }
+
+    private TreePath findPathByValue(TreeModel model, TreePath path, Object value) {
+        Object node = path.getLastPathComponent();
+        if (node instanceof FieldNode && ((FieldNode) node).getValue(FIELD_INDEX) == value) {
+            return path;
+        }
+        int childCount = model.getChildCount(node);
+        for (int i = 0; i < childCount; i++) {
+            TreePath result = findPathByValue(model, path.pathByAddingChild(model.getChild(node, i)), value);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     private class MyTree extends JTree {
@@ -764,6 +962,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void clear() {
+        restorePreview();
         tag = null;
         editedTag = null;
         tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("root")));
@@ -798,6 +997,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         public Object getParentObject() {
             return parentObject;
+        }
+
+        public Tag getTag() {
+            return tag;
         }
 
         public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index, SWF swf) {
@@ -1155,6 +1358,29 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return null;
         }
 
+        public TreePath getTreePathByName(String pathName) {
+            if (pathName == null || pathName.isEmpty()) {
+                return null;
+            }
+            String[] pathParts = pathName.split("\\.");
+            List<Object> path = new ArrayList<>();
+            String currentPath = pathParts[0];
+            Object node = getNodeByPath(currentPath);
+            if (node == null) {
+                return null;
+            }
+            path.add(node);
+            for (int i = 1; i < pathParts.length; i++) {
+                currentPath += "." + pathParts[i];
+                node = getNodeByPath(currentPath);
+                if (node == null) {
+                    return null;
+                }
+                path.add(node);
+            }
+            return new TreePath(path.toArray());
+        }
+
         public List<FieldNode> getDependentFields(FieldNode fnode) {
             List<FieldNode> ret = new ArrayList<>();
             getDependentFields(getNodePathName(fnode), mtroot.getClass().getSimpleName(), mtroot, ret);
@@ -1302,6 +1528,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void setEditMode(boolean edit, Tag tag) {
+        String selectedPathName = null;
+        TreePath selectedPath = tree.getSelectionPath();
+        if (selectedPath != null && tree.getModel() instanceof MyTreeModel) {
+            selectedPathName = ((MyTreeModel) tree.getModel()).getNodePathName(selectedPath.getLastPathComponent());
+        }
+        restorePreview();
         if (tag == null) {
             tag = this.tag;
         }
@@ -1321,6 +1553,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tree.setCellEditor(new MyTreeCellEditor(tree, editedTag.getSwf()));
         }
         refreshTree();
+        if (selectedPathName != null && tree.getModel() instanceof MyTreeModel) {
+            TreePath restoredPath = ((MyTreeModel) tree.getModel()).getTreePathByName(selectedPathName);
+            if (restoredPath != null) {
+                tree.setSelectionPath(restoredPath);
+                tree.scrollPathToVisible(restoredPath);
+            }
+        }
     }
 
     @Override
@@ -1334,6 +1573,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         SWF swf = tag.getSwf();
         assignTag(tag, editedTag);
+        previewOriginalTag = null;
         tag.setModified(true);
         tag.setSwf(swf);
         if (tag instanceof Timelined) {
@@ -1348,6 +1588,44 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         swf.computeDependentCharacters();
         swf.computeDependentFrames();
+        return true;
+    }
+
+    public boolean preview() {
+        if (tree.isEditing() && !tree.stopEditing()) {
+            return false;
+        }
+        if (tag == null || editedTag == null) {
+            return true;
+        }
+        if (previewOriginalTag == null) {
+            try {
+                previewOriginalTag = tag.cloneTag();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return false;
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+        assignTag(tag, editedTag);
+        return true;
+    }
+
+    Tag getEditedTagForPreview() {
+        if (tree.isEditing() && !tree.stopEditing()) {
+            return null;
+        }
+        return editedTag;
+    }
+
+    public boolean restorePreview() {
+        if (previewOriginalTag == null || tag == null) {
+            return false;
+        }
+        assignTag(tag, previewOriginalTag);
+        previewOriginalTag = null;
         return true;
     }
 

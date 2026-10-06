@@ -88,6 +88,8 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
         this.type = type;
         this.fieldName = fieldName;
 
+        setOpaque(false);
+        
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -101,15 +103,14 @@ public class FloatEditor extends JPanel implements GenericTagEditor {
             @Override
             public boolean getScrollableTracksViewportWidth() {
                 return true;
-            }
+            }                                 
         };
 
-        textField.setBorder(BorderFactory.createEmptyBorder());
+        textField.setBorder(BorderFactory.createLineBorder(getForeground()));
         
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        textField.setPreferredSize(new Dimension(50, textField.getPreferredSize().height));
-        textField.setMaximumSize(textField.getPreferredSize());
-                        
+        textField.setPreferredSize(new Dimension(75, textField.getPreferredSize().height));
+                
         add(textField);
         linkLabel = new JLabel(View.getIcon("link16"));
         add(linkLabel);

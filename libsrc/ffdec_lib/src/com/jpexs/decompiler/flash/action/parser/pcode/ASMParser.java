@@ -176,7 +176,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("ToggleQuality") == 0) {
             a = new ActionToggleQuality();
         } else if (instructionName.compareToIgnoreCase("WaitForFrame") == 0) {
-            a = new ActionWaitForFrame(lexer, charset);
+            a = new ActionWaitForFrame(lexer, charset, version);
         } else if (instructionName.compareToIgnoreCase("Add") == 0) {
             a = new ActionAdd();
         } else if (instructionName.compareToIgnoreCase("And") == 0) {
@@ -258,7 +258,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("Trace") == 0) {
             a = new ActionTrace();
         } else if (instructionName.compareToIgnoreCase("WaitForFrame2") == 0) {
-            a = new ActionWaitForFrame2(lexer, charset);
+            a = new ActionWaitForFrame2(lexer, charset, version);
         } else if (instructionName.compareToIgnoreCase("Add2") == 0) {
             a = new ActionAdd2();
         } else if (instructionName.compareToIgnoreCase("BitAnd") == 0) {
@@ -432,7 +432,7 @@ public class ASMParser {
      * @throws ActionParseException On parse error
      */
     public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
-        ActionList list = new ActionList(charset);
+        ActionList list = new ActionList(charset, version);
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
         if (!constantPool.isEmpty()) {

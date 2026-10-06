@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -44,7 +43,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -642,6 +640,21 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     private boolean resolve6(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         for (DottedChain imp : importedClasses) {
+            if (imp.equals(name)) {
+                TypeItem importedItem = new TypeItem(imp);
+                AbcIndexing.ClassIndex ci = abc.findClass(importedItem, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
+                if (ci == null) {
+                    AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                    if (ti != null) {
+                        ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(importedItem);
+                        ret.assignedValue = assignedValue;
+                        resolved = ret;
+                        resolvedRoot = ret;
+                        return true;
+                    }
+                }
+            }
+
             String impName = imp.getLast();
 
             if (impName.equals(name.get(0))) {

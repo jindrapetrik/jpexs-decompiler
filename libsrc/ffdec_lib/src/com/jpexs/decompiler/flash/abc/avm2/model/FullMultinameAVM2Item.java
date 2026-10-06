@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -31,7 +30,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
@@ -209,7 +207,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             writer.append("]");
         } else {
             AVM2ConstantPool constants = localData.constantsAvm2;
-            List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
+            List<DottedChain> fullyQualifiedNames = afterDot ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
                 String simpleName = constants.getMultiname(multinameIndex).getName(new HashSet<>(), localData.abc, constants, fullyQualifiedNames, true, false);
                 if ("*".equals(simpleName)) {

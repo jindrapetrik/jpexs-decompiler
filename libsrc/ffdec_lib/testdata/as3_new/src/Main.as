@@ -175,6 +175,7 @@ package
         TestThisOutsideClass;
         TestImports;
         TestImports2;
+        TestImports3;
         TestInitializer;
         TestRegexpHilight;
         TestScriptInitializer;

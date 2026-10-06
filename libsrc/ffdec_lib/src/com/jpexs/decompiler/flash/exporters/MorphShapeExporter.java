@@ -46,14 +46,12 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -377,9 +375,7 @@ public class MorphShapeExporter {
                 Set<String> classNames = mst.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), mst.getSwf(), true);
-                        }
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), mst.getSwf(), true);
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
                         File classFileStart = new File(outdir + File.separator + Helper.makeFileName(className + ".start" + settings.getFileExtension()));
                         File classFileEnd = new File(outdir + File.separator + Helper.makeFileName(className + ".end" + settings.getFileExtension()));

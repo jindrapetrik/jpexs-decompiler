@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.taglistview;
 
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
@@ -91,7 +93,13 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
             JLabel lab = (JLabel) renderer;
 
             if (value instanceof TreeItem) {
-                lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem) value)));
+                TreeNodeType type = TagTree.getTreeNodeType((TreeItem) value);
+                lab.setIcon(TagTree.getIconForType(type));
+                if (type == TreeNodeType.AS_CLASS
+                        && value instanceof ScriptPack
+                        && AbstractTagTree.isLinkedAs3Class((ScriptPack) value)) {
+                    lab.setIcon(View.getIcon("asclasslink16"));
+                }
 
                 boolean isReadOnly = false;
                 if (val instanceof Tag) {

@@ -105,7 +105,7 @@ public class GetVariableActionItem extends ActionItem {
             writer.append(IdentifiersDeobfuscation.printIdentifier(localData.swf, localData.usedDeobfuscations, false, sb.toString()));
             return writer;
         }
-        if ((name instanceof DirectValueActionItem) && (((DirectValueActionItem) name).isString()) && (printObfuscatedName || IdentifiersDeobfuscation.isValidNameWithDot(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+        if ((name instanceof DirectValueActionItem) && (((DirectValueActionItem) name).isString()) && (printObfuscatedName || IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
             return stripQuotes(name, localData, writer);

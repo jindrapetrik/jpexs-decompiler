@@ -288,11 +288,8 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
 
     @Override
     public String getClassExportFileName(String className) {
-        
-        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-            return DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
-        }
-        return className;
+        // Always printable: embed stem$md5-int → stem (same as [Embed] source / class name)
+        return DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), swf, true);
     }
     
     @Override

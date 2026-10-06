@@ -166,7 +166,7 @@ public class AdobeFlashExecutor {
                     codeSize += actionsToExecute.getBytesLength();
                 }
 
-                actions2.add(new ActionDefineFunction("testRun" + i, new ArrayList<>(), codeSize, swf.version, swf.getCharset()));
+                actions2.add(new ActionDefineFunction("testRun" + i, new ArrayList<>(), codeSize, swf.getCharset()));
                 actions2.addAll(task.actions);
                 actions2.add(new ActionReturn());
 

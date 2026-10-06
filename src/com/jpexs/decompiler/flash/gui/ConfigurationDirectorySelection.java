@@ -56,7 +56,7 @@ public class ConfigurationDirectorySelection extends JPanel {
     }
 
     private static String selectConfigDirectory(ConfigurationItem config, String current) {
-        JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
         fc.setSelectedFile(new File(current));
         fc.setMultiSelectionEnabled(false);
         fc.setCurrentDirectory(new File((String) config.get()));

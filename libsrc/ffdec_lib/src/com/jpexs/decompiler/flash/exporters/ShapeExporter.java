@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.shape.AS3ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -43,18 +44,11 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import dev.matrixlab.webp4j.WebPCodec;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -182,6 +176,14 @@ public class ShapeExporter {
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }
                             break;
+                        case AS3:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                SHAPE shp = st.getShapes();
+                                AS3ShapeExporter exporter = new AS3ShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), 0, 0);
+                                exporter.export();
+                                fos.write(Utf8Helper.getBytes(exporter.getShapeData()));
+                            }
+                            break;
                         case SWF:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 try {
@@ -198,9 +200,7 @@ public class ShapeExporter {
                 Set<String> classNames = st.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), st.getSwf(), true);
-                        }
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), st.getSwf(), true);
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

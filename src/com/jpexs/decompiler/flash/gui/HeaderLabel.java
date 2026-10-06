@@ -38,6 +38,8 @@ import org.pushingpixels.substance.internal.utils.SubstanceOutlineUtilities;
  */
 public class HeaderLabel extends JLabel {
 
+    private boolean iconAtLeft;
+
     public HeaderLabel(String text) {
         super(text);
         //setBorder(BorderFactory.createRaisedBevelBorder());
@@ -65,6 +67,11 @@ public class HeaderLabel extends JLabel {
          return false;
          }
          });*/
+    }
+
+    public void setIconAtLeft(boolean iconAtLeft) {
+        this.iconAtLeft = iconAtLeft;
+        repaint();
     }
 
     @Override
@@ -99,9 +106,14 @@ public class HeaderLabel extends JLabel {
                     contour, contourInner, skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED));
         }
 
-        JLabel lab = new JLabel(getText(), JLabel.CENTER);
+        JLabel lab = new JLabel(getText(), iconAtLeft ? null : getIcon(), getHorizontalAlignment());
+        lab.setHorizontalTextPosition(getHorizontalTextPosition());
+        lab.setIconTextGap(getIconTextGap());
         lab.setSize(getSize());
         lab.setForeground(foregroundColor);
         lab.paint(g);
+        if (iconAtLeft && getIcon() != null) {
+            getIcon().paintIcon(this, g, 4, (getHeight() - getIcon().getIconHeight()) / 2);
+        }
     }
 }

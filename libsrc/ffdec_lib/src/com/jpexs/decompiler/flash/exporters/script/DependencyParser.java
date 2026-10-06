@@ -25,10 +25,15 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -39,6 +44,7 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
@@ -152,6 +158,47 @@ public class DependencyParser {
     }
 
     /**
+     * Parses dependencies from nested newfunction bodies in a method only.
+     * Used for script initializers: file-private script functions are wired via
+     * newfunction there, while the rest of script_init only registers the public
+     * class and must not contribute imports.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abcIndex AbcIndexing
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param method_index Method index
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @param numberContextRef Number context reference
+     * @throws InterruptedException On interrupt
+     */
+    public static void parseDependenciesFromNewFunctionsInMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        if ((method_index < 0) || (method_index >= abc.method_info.size())) {
+            return;
+        }
+        MethodBody body = abc.findBody(method_index);
+        if (body == null || body.convertException != null) {
+            return;
+        }
+        body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
+        List<Integer> visitedMethods = new ArrayList<>();
+        for (AVM2Instruction ins : body.getCode().code) {
+            if (ins.definition instanceof NewFunctionIns) {
+                if (ins.operands[0] != method_index && !visitedMethods.contains(ins.operands[0])) {
+                    parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                }
+            }
+        }
+    }
+
+    /**
      * Parses dependencies from method info.
      * 
      * @param usedDeobfuscations Used deobfuscations
@@ -192,21 +239,21 @@ public class DependencyParser {
                 parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
             
-            boolean hasNewClass = false;
-            
-            if (classIndex == -1) {
-                for (int i = 0; i < body.getCode().code.size(); i++) {
-                    AVM2Instruction ins = body.getCode().code.get(i);
-                    if (ins.definition instanceof NewClassIns) {
-                        hasNewClass = true;
-                        break;
-                    }                
+            List<AVM2Instruction> instructions = body.getCode().code;
+            // Each getlex used to scan the entire remaining method for a
+            // newclass. A single suffix boundary answers all of those queries.
+            int lastNewClass = -1;
+            for (int i = instructions.size() - 1; i >= 0; i--) {
+                if (instructions.get(i).definition instanceof NewClassIns) {
+                    lastNewClass = i;
+                    break;
                 }
             }
+            boolean hasNewClass = lastNewClass >= 0;
             boolean wasNewClass = false;
             AVM2Instruction prevIns = null;
-            for (int i = 0; i < body.getCode().code.size(); i++) {
-                AVM2Instruction ins = body.getCode().code.get(i);
+            for (int i = 0; i < instructions.size(); i++) {
+                AVM2Instruction ins = instructions.get(i);
                 
                 
                 //Do not parse dependencies from class parent chain
@@ -220,26 +267,10 @@ public class DependencyParser {
                 }
                 
                 //Ignore class parents in script initializer
-                if (ins.definition instanceof GetLexIns) {
-                    boolean foundNewClass = false;
-                    for (int j = i + 1; j < body.getCode().code.size(); j++) {
-                        AVM2Instruction insJ = body.getCode().code.get(j);
-                        if (insJ.definition instanceof NewClassIns) {
-                            foundNewClass = true;
-                            break;
-                        } else if (ins.definition instanceof GetLexIns) {
-                            //continue
-                        } else if (ins.definition instanceof PushScopeIns) {
-                            //continue
-                        } else {
-                            break;
-                        }
-                    }
-                    if (foundNewClass) {
-                        continue;
-                    }
+                if (ins.definition instanceof GetLexIns && i < lastNewClass) {
+                    continue;
                 }
-                
+
                 if (ins.definition instanceof AlchemyTypeIns) {
                     DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.addWithSuffix(ins.definition.instructionName);
                     Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
@@ -273,6 +304,14 @@ public class DependencyParser {
                             dependencies.add(dep);
                         }
                     }
+                }
+                // callproperty return types are often used to type locals (var x:Ret
+                // = obj.method()) even when the ABC has no coerce to Ret. Only when
+                // the result is stored in a local (setlocal) — casts like
+                // iterator() as IMapIterator already expose their type via coerce.
+                if (ins.definition instanceof CallPropertyIns && prevIns != null && classIndex > -1
+                        && isFollowedBySetLocal(instructions, i)) {
+                    parseDependenciesFromCallPropertyReturnType(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, ignorePackage, fullyQualifiedNames, uses, prevIns, ins);
                 }
                 if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
                     if (ins.operands[0] > 0) { //first is global
@@ -312,6 +351,103 @@ public class DependencyParser {
                     }
                 }
                 prevIns = ins;
+            }
+        }
+    }
+
+    /**
+     * When {@code getlex}/{@code getproperty} is followed by {@code callproperty},
+     * the call's return type may appear in decompiled local declarations without
+     * a matching {@code coerce} multiname. Resolve that return type and import it.
+     */
+    private static void parseDependenciesFromCallPropertyReturnType(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, AVM2Instruction prevIns, AVM2Instruction callIns) {
+        GraphTargetItem receiverType = null;
+        if (prevIns.definition instanceof GetLexIns || prevIns.definition instanceof GetPropertyIns) {
+            Multiname receiverMn = abc.constants.getMultiname(prevIns.operands[0]);
+            if (receiverMn == null) {
+                return;
+            }
+            String receiverName = receiverMn.getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
+            if (receiverName == null || receiverName.isEmpty()) {
+                return;
+            }
+            DottedChain currentClass = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true);
+            Reference<Boolean> foundStatic = new Reference<>(false);
+            GraphTargetItem currentType = new TypeItem(currentClass);
+            int receiverNs = receiverMn.namespace_index;
+            receiverType = abcIndex.findPropertyType(abc, currentType, receiverName, receiverNs, true, true, true, foundStatic);
+            if (receiverType == TypeItem.UNBOUNDED || receiverType == TypeItem.UNKNOWN) {
+                // getlex of a class itself (static call): treat multiname as the type
+                receiverType = AbcIndexing.multinameToType(usedDeobfuscations, prevIns.operands[0], abc, abc.constants);
+            }
+        }
+        if (receiverType == null || receiverType == TypeItem.UNBOUNDED || receiverType == TypeItem.UNKNOWN) {
+            return;
+        }
+        // AbcIndexing.findProperty* only accepts plain TypeItem (not ApplyTypeAVM2Item).
+        GraphTargetItem lookupType = receiverType;
+        if (lookupType instanceof ApplyTypeAVM2Item) {
+            lookupType = ((ApplyTypeAVM2Item) lookupType).object;
+        }
+        if (!(lookupType instanceof TypeItem) || lookupType == TypeItem.UNBOUNDED || lookupType == TypeItem.UNKNOWN) {
+            return;
+        }
+        Multiname callMn = abc.constants.getMultiname(callIns.operands[0]);
+        if (callMn == null) {
+            return;
+        }
+        String propName = callMn.getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
+        if (propName == null || propName.isEmpty()) {
+            return;
+        }
+        Reference<Boolean> foundStatic = new Reference<>(false);
+        GraphTargetItem callType = abcIndex.findPropertyCallType(abc, lookupType, propName, 0, true, true, true, foundStatic);
+        parseDependenciesFromTypeItem(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, callType);
+    }
+
+    /**
+     * True if the next non-debug instruction after {@code callIndex} stores the
+     * value in a local register.
+     */
+    private static boolean isFollowedBySetLocal(List<AVM2Instruction> code, int callIndex) {
+        for (int j = callIndex + 1; j < code.size(); j++) {
+            Object def = code.get(j).definition;
+            if (def instanceof DebugLineIns || def instanceof DebugFileIns || def instanceof DebugIns) {
+                continue;
+            }
+            return def instanceof SetLocalTypeIns;
+        }
+        return false;
+    }
+
+    private static void parseDependenciesFromTypeItem(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, GraphTargetItem type) {
+        if (type == null || type == TypeItem.UNBOUNDED || type == TypeItem.UNKNOWN) {
+            return;
+        }
+        if (type instanceof ApplyTypeAVM2Item) {
+            ApplyTypeAVM2Item at = (ApplyTypeAVM2Item) type;
+            parseDependenciesFromTypeItem(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, at.object);
+            if (at.params != null) {
+                for (GraphTargetItem p : at.params) {
+                    parseDependenciesFromTypeItem(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, p);
+                }
+            }
+            return;
+        }
+        if (type instanceof TypeItem) {
+            DottedChain full = ((TypeItem) type).fullTypeName;
+            if (full == null || full.isEmpty()) {
+                return;
+            }
+            if ("*".equals(full.getLast()) && full.size() <= 1) {
+                return;
+            }
+            if (full.getWithoutLast().equals(InitVectorAVM2Item.VECTOR_PACKAGE)) {
+                return;
+            }
+            Dependency dep = new Dependency(full, DependencyType.EXPRESSION);
+            if ((ignorePackage == null || !full.getWithoutLast().equals(ignorePackage)) && !dependencies.contains(dep)) {
+                dependencies.add(dep);
             }
         }
     }

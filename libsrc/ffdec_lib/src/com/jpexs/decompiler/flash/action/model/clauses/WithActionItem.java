@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
@@ -99,7 +98,7 @@ public class WithActionItem extends ActionItem {
                 dataA.add((Action) s);
             }
         }
-        int codeLen = Action.actionsToBytes(dataA, false, SWF.DEFAULT_VERSION).length;
+        int codeLen = Action.actionsToBytes(dataA, false, asGenerator.getSwfVersion()).length;
         return toSourceMerge(localData, generator, scope, new ActionWith(codeLen, charset), data);
     }
 

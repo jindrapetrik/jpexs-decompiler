@@ -174,9 +174,14 @@ public class DepthState {
     public boolean hasImage = false;
 
     /**
+     * Manually set character - special character that is outside current swf
+     */
+    public CharacterTag manualCharacter = null;
+    
+    /**
      * Instance ids counter
      */
-    private static AtomicLong lastInstanceId = new AtomicLong(0);
+    private static AtomicLong lastInstanceId = new AtomicLong(0);        
 
     /**
      * Gets new instance id.
@@ -287,6 +292,10 @@ public class DepthState {
      * @return Character tag
      */
     public CharacterTag getCharacter() {
+        if (manualCharacter != null) {
+            return manualCharacter;
+        }
+        
         if (characterId == -1) {
 
             if (className != null) {

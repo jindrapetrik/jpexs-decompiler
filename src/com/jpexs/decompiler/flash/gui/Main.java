@@ -72,6 +72,8 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -108,7 +110,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -124,8 +125,6 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,7 +143,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -159,6 +157,7 @@ import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -1328,6 +1327,14 @@ public class Main {
     }
 
     public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo) throws Exception {
+        return parseOpenable(sourceInfo, null, false);
+    }
+
+    public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile tagProfile) throws Exception {
+        return parseOpenable(sourceInfo, tagProfile, true);
+    }
+
+    private static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile requestedTagProfile, boolean tagProfileSpecified) throws Exception {
         OpenableList result = new OpenableList();
 
         InputStream inputStream = sourceInfo.getInputStream();
@@ -1404,6 +1411,7 @@ public class Main {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
 
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                            TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
                             SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
@@ -1416,7 +1424,7 @@ public class Main {
                                         startWork(AppStrings.translate("work.renaming.identifiers"), worker, true);
                                     }
                                 }
-                            }, Configuration.parallelSpeedUp.get(), charset);
+                            }, Configuration.parallelSpeedUp.get(), charset, tagProfile);
                             return swf;
                         }
                     };
@@ -1483,6 +1491,7 @@ public class Main {
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
                         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
+                        TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
                         List<String> loadedUrls = new ArrayList<>();
                         List<String> loadedStatus = new ArrayList<>();
 
@@ -1604,7 +1613,7 @@ public class Main {
 
                                         while (JOptionPane.YES_OPTION == ViewMessages.showConfirmDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf.manually").replace("%url%", url), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE)) {
 
-                                            JFileChooser fc = new JFileChooser();
+                                            FileChooser fc = new FileChooser();
                                             fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                                             FileFilter allSupportedFilter = new FileFilter() {
                                                 private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx"};
@@ -1690,7 +1699,7 @@ public class Main {
                                 });
                                 return ret.getVal();
                             }
-                        }, charset);
+                        }, charset, tagProfile);
 
                         if (!loadedUrls.isEmpty()) {
                             SwfSpecificCustomConfiguration cc2 = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
@@ -2149,14 +2158,18 @@ public class Main {
                         }
                     }
                     mainFrame.getPanel().updateMissingNeededCharacters();
-                    if (fswf != null) {
-                        mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                    if (isInited()) {                    
+                        if (fswf != null) {
+                            mainFrame.getPanel().easyPanel.setTimelined(fswf);
+                        }
                     }
                 }
 
                 if (executeAfterOpen != null && fopenable != null) {
                     executeAfterOpen.opened(fopenable);
                 }
+
+                SwingUtilities.invokeLater(() -> offerCustomTagProfiles(openableLists));
             });
 
             return true;
@@ -2457,6 +2470,57 @@ public class Main {
         }
     }
 
+    private static void offerCustomTagProfiles(List<OpenableList> openableLists) {
+        Set<OpenableList> openableListsToReload = new LinkedHashSet<>();
+        for (OpenableList openableList : openableLists) {
+            for (Openable openable : openableList) {
+                if (!(openable instanceof SWF)) {
+                    continue;
+                }
+
+                SWF swf = (SWF) openable;
+                SwfSpecificCustomConfiguration configuration = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                if (configuration != null && configuration.getAllCustomData().containsKey(CustomConfigurationKeys.KEY_TAG_PROFILE)) {
+                    continue;
+                }
+
+                List<TagProfile> matchingProfiles = TagProfiles.getMatchingProfiles(swf);
+                if (matchingProfiles.isEmpty()) {
+                    continue;
+                }
+
+                configuration = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, "");
+
+                Object[] options = new Object[matchingProfiles.size() + 1];
+                for (int i = 0; i < matchingProfiles.size(); i++) {
+                    options[i] = matchingProfiles.get(i).getName();
+                }
+                options[matchingProfiles.size()] = AppStrings.translate("contextmenu.customTagProfile.standard");
+
+                String message = AppStrings.translate("message.customTagProfile.detected").replace("{swfName}", swf.getTitleOrShortFileName());
+                int selectedOption = ViewMessages.showOptionDialog(
+                        getDefaultMessagesComponent(),
+                        message,
+                        AppStrings.translate("contextmenu.customTagProfile"),
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]
+                );
+                if (selectedOption >= 0 && selectedOption < matchingProfiles.size()) {
+                    configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, matchingProfiles.get(selectedOption).getId());
+                    openableListsToReload.add(openableList);
+                }
+            }
+        }
+
+        for (OpenableList openableList : openableListsToReload) {
+            reloadFile(openableList);
+        }
+    }
+
     public static boolean closeAll(boolean onExit) {
         View.checkAccess();
 
@@ -2474,7 +2538,7 @@ public class Main {
     }
 
     public static boolean saveSwc(SWF swf) {
-        JFileChooser fc = View.getFileChooserWithIcon("bundleswc");
+        FileChooser fc = View.getFileChooserWithIcon("bundleswc");
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
         String fileTitle = swf.getShortFileName();
         if (fileTitle != null) {
@@ -2546,7 +2610,7 @@ public class Main {
         if (mode == SaveFileMode.EXE) {
             icon = "saveasexe";
         }
-        JFileChooser fc = View.getFileChooserWithIcon(icon);
+        FileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
 
         FileFilter swfFilter = new FileFilter() {
@@ -2794,7 +2858,7 @@ public class Main {
     public static boolean openFileDialog() {
         View.checkAccess();
 
-        JFileChooser fc = View.getFileChooserWithIcon("open");
+        FileChooser fc = View.getFileChooserWithIcon("open");
         if (Configuration.openMultipleFiles.get()) {
             fc.setMultiSelectionEnabled(true);
         }
@@ -2963,13 +3027,19 @@ public class Main {
     }
 
     private static void initGui() {
+        System.setProperty("sun.java2d.d3d", "false");
+        System.setProperty("sun.java2d.noddraw", "true");
+        
+        if (Configuration.hwAcceleratedGraphics.get()) {
+            System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
+        } else {
+            System.setProperty("sun.java2d.opengl", "false");
+        }
+        
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
             exit();
-        }
-
-        System.setProperty("sun.java2d.d3d", "false");
-        System.setProperty("sun.java2d.noddraw", "true");
+        }       
 
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.
             Double scaleToUse = Configuration.uiScale.get();
@@ -2986,13 +3056,7 @@ public class Main {
                 }
             }
             System.setProperty("sun.java2d.uiScale", "" + scaleToUse);
-        }
-
-        if (Configuration.hwAcceleratedGraphics.get()) {
-            System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
-        } else {
-            System.setProperty("sun.java2d.opengl", "false");
-        }
+        }       
 
         initUiLang();
 
@@ -3450,7 +3514,7 @@ public class Main {
                 View.execInEventDispatch(new Runnable() {
                     @Override
                     public void run() {
-                        JFileChooser fc = new JFileChooser();
+                        FileChooser fc = new FileChooser();
                         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                         fc.setDialogTitle("Select new temporary directory without Unicode characters in its path");
                         if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {

@@ -325,7 +325,7 @@ public class Helper {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '\\') {
-                if (i + 1 < s.length() - 1) {
+                if (i + 1 < s.length()) {
                     i++;
                     c = s.charAt(i);
                     if (c == 'n') {

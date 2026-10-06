@@ -67,10 +67,9 @@ public class ActionConstantPool extends Action {
      *
      * @param actionLength Action length
      * @param sis SWF input stream
-     * @param version SWF version
      * @throws IOException On I/O error
      */
-    public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionConstantPool(int actionLength, SWFInputStream sis) throws IOException {
         super(0x88, actionLength, sis.getCharset());
         //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
         int count = sis.readUI16("count");

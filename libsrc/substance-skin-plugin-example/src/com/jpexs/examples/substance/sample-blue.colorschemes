@@ -1,0 +1,76 @@
+Sample Blue Active {
+    kind=Light
+    colorUltraLight=#D7ECFF
+    colorExtraLight=#B8DFFF
+    colorLight=#8DCAFF
+    colorMid=#56AEF5
+    colorDark=#2D8DD4
+    colorUltraDark=#17669D
+    colorForeground=#102C40
+}
+
+Sample Blue Enabled {
+    kind=Light
+    colorUltraLight=#FAFCFE
+    colorExtraLight=#F0F5F9
+    colorLight=#E4EDF4
+    colorMid=#D4E1EB
+    colorDark=#B8C9D6
+    colorUltraDark=#849AA9
+    colorForeground=#172630
+}
+
+Sample Blue Disabled {
+    kind=Light
+    colorUltraLight=#FAFAFA
+    colorExtraLight=#F3F3F3
+    colorLight=#E9E9E9
+    colorMid=#DDDDDD
+    colorDark=#C8C8C8
+    colorUltraDark=#A5A5A5
+    colorForeground=#777777
+}
+
+Sample Blue Selected {
+    kind=Light
+    colorUltraLight=#FFF2C2
+    colorExtraLight=#FFE89B
+    colorLight=#FFDA69
+    colorMid=#F7C643
+    colorDark=#DDAA20
+    colorUltraDark=#A97808
+    colorForeground=#3A2900
+}
+
+Sample Blue Rollover {
+    kind=Light
+    colorUltraLight=#EAF7FF
+    colorExtraLight=#D5EEFF
+    colorLight=#B8E2FF
+    colorMid=#8ED0FC
+    colorDark=#5DB5EE
+    colorUltraDark=#2C82B9
+    colorForeground=#123B55
+}
+
+Sample Blue Border {
+    kind=Light
+    colorUltraLight=#8CA9BC
+    colorExtraLight=#7395AC
+    colorLight=#5C829B
+    colorMid=#486F89
+    colorDark=#365B73
+    colorUltraDark=#234153
+    colorForeground=#FFFFFF
+}
+
+Sample Blue Header {
+    kind=Dark
+    colorUltraLight=#3C7198
+    colorExtraLight=#326487
+    colorLight=#285675
+    colorMid=#204A66
+    colorDark=#193E56
+    colorUltraDark=#112E41
+    colorForeground=#F4FAFF
+}

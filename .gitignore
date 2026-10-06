@@ -120,3 +120,9 @@ wix/obj/
 *.msi
 *.wixpdb
 /altsigner/target/
+/libsrc/substance-skin-plugin-example/nbproject/private/
+/libsrc/substance-skin-plugin-example/dist/
+/libsrc/substance-skin-plugin-example/build/
+/libsrc/ddsreader/nbproject/private/
+/libsrc/ddsreader/dist/
+/libsrc/ddsreader/build/

@@ -143,6 +143,7 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
@@ -161,7 +162,6 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.sound.SoundInfoSoundCacheEntry;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
@@ -178,10 +178,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ImageResizer;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
-import com.jpexs.helpers.PosMarkedInputStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
@@ -190,12 +188,9 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -330,6 +325,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Whether this file is ScaleForm GFx.
      */
     public boolean gfx = false;
+
+    private TagProfile tagProfile;
 
     /**
      * Whether the file uses HARMAN encryption.
@@ -584,6 +581,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private AbcIndexing abcIndex;
 
     /**
+     * ABC indexing of this SWF only (no playerglobal/airglobal parent).
+     */
+    @Internal
+    private AbcIndexing localAbcIndex;
+
+    /**
      * Number of ABCIndex dependencies.
      */
     @Internal
@@ -769,6 +772,21 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public void resetAbcIndex() {
         abcIndex = null;
+        localAbcIndex = null;
+    }
+
+    /**
+     * Gets ABCIndexing object containing only ABCs of this SWF, without
+     * playerglobal/airglobal parent. It is cached, so it can be used from
+     * decompilation of every class instead of creating a new index each time.
+     *
+     * @return ABCIndexing
+     */
+    public synchronized AbcIndexing getLocalAbcIndex() {
+        if (localAbcIndex == null) {
+            localAbcIndex = new AbcIndexing(this);
+        }
+        return localAbcIndex;
     }
 
     /**
@@ -1729,10 +1747,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                             CharacterTag ct = (CharacterTag) t;
                             CharacterTag oldCt = characters.get(characterId);
                             logger.log(Level.SEVERE, "SWF already contains characterId={0} of type {1}, tried to add type {2}", new Object[]{characterId, oldCt.getTagName(), ct.getTagName()});
+                        } else {
+                            characters.put(characterId, (CharacterTag) t);
+                            characterIdTags.put(characterId, new ArrayList<>());
                         }
-
-                        characters.put(characterId, (CharacterTag) t);
-                        characterIdTags.put(characterId, new ArrayList<>());
                     } else if (characterIdTags.containsKey(characterId)) {
                         characterIdTags.get(characterId).add((CharacterIdTag) t);
                     }
@@ -2112,6 +2130,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, boolean parallelRead, String charset, TagProfile tagProfile) throws IOException, InterruptedException {
+        this(is, null, null, null, parallelRead, false, true, null, charset, true, tagProfile);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param parallelRead Use parallel threads?
      * @param lazy Do not parse all data, load it as necessary.
      * @throws IOException On I/O error
      * @throws InterruptedException On interrupt
@@ -2133,6 +2165,21 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public SWF(InputStream is, boolean parallelRead, boolean lazy, String charset) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, lazy, charset);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param parallelRead Use parallel threads?
+     * @param lazy Do not parse all data, load it as necessary.
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, boolean parallelRead, boolean lazy, String charset, TagProfile tagProfile) throws IOException, InterruptedException {
+        this(is, null, null, null, parallelRead, false, lazy, null, charset, true, tagProfile);
     }
 
     /**
@@ -2163,6 +2210,22 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public SWF(InputStream is, String file, String fileTitle, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, null, parallelRead, false, true, charset);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param parallelRead Use parallel threads?
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, String file, String fileTitle, boolean parallelRead, String charset, TagProfile tagProfile) throws IOException, InterruptedException {
+        this(is, file, fileTitle, null, parallelRead, false, true, null, charset, true, tagProfile);
     }
 
     /**
@@ -2221,6 +2284,23 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, false, true, charset);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param listener Progress listener
+     * @param parallelRead Use parallel threads?
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, String charset, TagProfile tagProfile) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, false, true, null, charset, true, tagProfile);
     }
 
     /**
@@ -2315,6 +2395,26 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
      * @param parallelRead Use parallel threads?
+     * @param checkOnly Only check file, do not parse
+     * @param lazy Do not parse all data, load it as necessary.
+     * @param resolver URL resolver for importAssets/2 tags
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, TagProfile tagProfile) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, charset, true, tagProfile);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param listener Progress listener
+     * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
      * @param lazy Do not parse all data, load it as necessary.
      * @param resolver URL resolver for importAssets/2 tags
@@ -2324,6 +2424,27 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * enabled
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, boolean allowRenameIdentifiers) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, charset, allowRenameIdentifiers, null);
+    }
+
+    /**
+     * Constructs SWF from stream.
+     *
+     * @param is Stream to read SWF from
+     * @param file Path to the file
+     * @param fileTitle Title of the SWF
+     * @param listener Progress listener
+     * @param parallelRead Use parallel threads?
+     * @param checkOnly Check only file validity
+     * @param lazy Do not parse all data, load it as necessary.
+     * @param resolver URL resolver for importAssets/2 tags
+     * @param charset Charset for SWFs with version 5 or lower
+     * @param allowRenameIdentifiers Allow auto renaming identifiers when enabled
+     * @param tagProfile Custom tag profile, or null for standard SWF tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, boolean allowRenameIdentifiers, TagProfile tagProfile) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
         this.charset = charset;
@@ -2333,6 +2454,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         encrypted = header.encrypted;
         compression = header.compression;
         lzmaProperties = header.lzmaProperties;
+        if (tagProfile != null && tagProfile.supportsSwf(this)) {
+            this.tagProfile = tagProfile;
+        }
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
 
@@ -2405,6 +2529,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         getASMs(true); // Add scriptNames to ASMs                     
+    }
+
+    /**
+     * Gets the custom tag profile used to parse this SWF.
+     *
+     * @return Custom tag profile, or null for standard SWF tags
+     */
+    public TagProfile getTagProfile() {
+        return tagProfile;
     }
 
     /**
@@ -3802,7 +3935,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(code.getCharset()), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool(), swf, new LinkedHashSet<>())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(code.getCharset(), code.version), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool(), swf, new LinkedHashSet<>())));
             }
             if (ins.isExit()) {
                 break;
@@ -4659,6 +4792,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     public void clearAbcListCache() {
         abcList = null;
+        localAbcIndex = null;
     }
 
     /**
@@ -4887,7 +5021,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 throw ex;
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Reading action list error in " + src.getSwf().getShortPathTitle() + ":" + src.getScriptName(), ex);
-                return new ActionList(src.getSwf().getCharset());
+                return new ActionList(src.getSwf().getCharset(), src.getSwf().version);
             }
         }
     }

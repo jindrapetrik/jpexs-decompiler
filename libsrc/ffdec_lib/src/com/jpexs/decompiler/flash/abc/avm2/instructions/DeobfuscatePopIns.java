@@ -26,7 +26,6 @@ import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
-import com.jpexs.decompiler.graph.model.TemporaryItem;
 import java.util.List;
 
 /**

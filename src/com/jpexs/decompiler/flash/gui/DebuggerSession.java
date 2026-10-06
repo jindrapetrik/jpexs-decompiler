@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.DebugMessageListener;
-import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
@@ -36,7 +35,6 @@ import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetSwf;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
-import com.jpexs.debugger.flash.messages.in.InOption;
 import com.jpexs.debugger.flash.messages.in.InPlaceObject;
 import com.jpexs.debugger.flash.messages.in.InProcessTag;
 import com.jpexs.debugger.flash.messages.in.InScript;
@@ -51,12 +49,12 @@ import com.jpexs.debugger.flash.messages.out.OutGetSwf;
 import com.jpexs.debugger.flash.messages.out.OutPlay;
 import com.jpexs.debugger.flash.messages.out.OutProcessedTag;
 import com.jpexs.debugger.flash.messages.out.OutRewind;
-import com.jpexs.debugger.flash.messages.out.OutSetOption;
 import com.jpexs.debugger.flash.messages.out.OutSwfInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -198,8 +196,8 @@ public class DebuggerSession {
 
         Map<Integer, String> moduleNames = new HashMap<>();
 
-        final Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$");
-        final Pattern patAS3PCode = Pattern.compile("^(?<hash>[0-9a-z_]+):#PCODE abc:(?<abc>[0-9]+),script:(?<script>[0-9]+),class:(?<class>-?[0-9]+),trait:(?<trait>-?[0-9]+),method:(?<method>[0-9]+),body:(?<body>[0-9]+);(.*)$");
+        final Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$", Pattern.DOTALL);
+        final Pattern patAS3PCode = Pattern.compile("^(?<hash>[0-9a-z_]+):#PCODE abc:(?<abc>[0-9]+),script:(?<script>[0-9]+),class:(?<class>-?[0-9]+),trait:(?<trait>-?[0-9]+),method:(?<method>[0-9]+),body:(?<body>[0-9]+);(.*)$", Pattern.DOTALL);
 
         //boolean isAS3 = Main.getRunningSWF().isAS3();
         try {
@@ -248,13 +246,13 @@ public class DebuggerSession {
                         Matcher m;
                         if ((m = patAS3.matcher(name)).matches()) {
                             String clsNameWithSuffix = m.group(3).replace("{{semicolon}}", ";");
-                            String pkg = m.group(2).replace("{{semicolon}}", ";").replace("\\", ".");
+                            String pkg = m.group(2).replace("{{semicolon}}", ";").replace(File.separator, ".");
                             m = patAS3PCode.matcher(name);
                             if (m.matches()) {
                                 moduleToClassIndex.put(file, Integer.parseInt(m.group("class")));
                                 moduleToTraitIndex.put(file, Integer.parseInt(m.group("trait")));
                                 moduleToMethodIndex.put(file, Integer.parseInt(m.group("method")));
-                                name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
+                                name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(new LinkedHashSet<>(), Main.getRunningSWF()/*???*/, con.isAS3);
                                 swfHash = m.group("hash");
                                 name = swfHash + ":" + "#PCODE abc:" + m.group("abc") + ",body:" + m.group("body") + ";" + name;
                             } else {
@@ -1208,7 +1206,7 @@ public class DebuggerSession {
                     for (String scriptName : toRemoveBPointMap.get(debuggedSwf).keySet()) {
                         if (scriptName.startsWith("#PCODE") != Main.isDebugPCode()) {
                             continue;
-                        }
+                        }                        
                         int file = moduleIdOf(hash + ":" + scriptName);
                         if (file > -1) {
                             for (int line : toRemoveBPointMap.get(debuggedSwf).get(scriptName)) {

@@ -68,6 +68,8 @@ public class ShapeExportSettings {
                 return ".webp";
             case SWF:
                 return ".swf";
+            case AS3:
+                return ".as";
             default:
                 throw new Error("Unsupported shape export mode: " + mode);
         }

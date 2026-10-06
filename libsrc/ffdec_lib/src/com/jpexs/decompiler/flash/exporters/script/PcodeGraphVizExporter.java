@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -88,7 +87,7 @@ public class PcodeGraphVizExporter {
      */
     public void exportAs12(ASMSource src, GraphTextWriter writer) throws InterruptedException {
         ActionList alist = src.getActions();
-        ActionGraph gr = new ActionGraph(false, new HashMap<>(), "", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName, 0);
+        ActionGraph gr = new ActionGraph(false, new HashMap<>(), "", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), src.getSourceTag().getVersion(), Utf8Helper.charsetName, 0);
         export(gr, writer);
     }
 

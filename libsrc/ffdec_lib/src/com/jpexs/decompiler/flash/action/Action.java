@@ -63,7 +63,6 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -1085,14 +1084,18 @@ public abstract class Action implements GraphSourceItem {
     public static List<GraphTargetItem> actionsToTree(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
-        try {
-            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, crippleActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
-        } catch (SecondPassException spe) {
+        ActionSecondPassContext currentContext = ActionSecondPassContext.current();
+        if (currentContext != null) {
+            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+        }
+        try (ActionSecondPassContext context = ActionSecondPassContext.open()) {
+            ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, crippleActionsClassHeader(actions, needsUninitializedClassFieldsDetection, charset, path), version, staticOperation, path, charset, 0);
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+            context.startRendering();
+            return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
         }
     }
     

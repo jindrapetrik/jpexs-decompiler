@@ -1071,4 +1071,11 @@ public abstract class StaticTextTag extends TextTag {
     public Dimension getFilterDimensions() {
         return new Dimension(0, 0);                
     }
+
+    /* NOT READY YET    
+    @Override
+    public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+        return staticTextToOutline(swf, textRecords, textMatrix, new HashMap<>(), transformation);
+    } 
+    */
 }

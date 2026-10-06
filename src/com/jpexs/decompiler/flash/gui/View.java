@@ -29,7 +29,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -68,7 +67,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -78,6 +76,7 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
+import javax.swing.PopupFactory;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -107,6 +106,7 @@ import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.fonts.FontPolicy;
 import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
+import org.pushingpixels.substance.internal.contrib.jgoodies.looks.common.FixedShadowPopupFactory;
 import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
 
 /**
@@ -182,7 +182,7 @@ public class View {
             if (!(oldLookAndFeel instanceof SubstanceOfficeBlue2007LookAndFeel)) {
                 UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
                 oldLookAndFeel.uninitialize();
-            }
+            }                        
 
             SubstanceSkin currentSkin = SubstanceLookAndFeel.getCurrentSkin();
             if (currentSkin != null) {
@@ -197,6 +197,11 @@ public class View {
             }
 
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999); //This works for not changing labels color and not changing Dialogs title
+            
+            UIManager.put("ToolTipUI", MySubstanceToolTipUI.class.getName());            
+            
+            //Fix for missing tooltips/popups            
+            PopupFactory.setSharedInstance(new FixedShadowPopupFactory(PopupFactory.getSharedInstance()));                
             
             if (Configuration.showHeapStatusWidget.get() && !heapWidgetInited) {
                 SubstanceLookAndFeel.setWidgetVisible(null, true, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
@@ -878,16 +883,22 @@ public class View {
     public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {
         try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             //method does not exist, we must be on Java8
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex.getCause());           
+            return 0;
         }
 
         //Try older method
         Point p = new Point((int) Math.round(pt.getX()), (int) Math.round(pt.getY()));
         try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex);
+            return 0;
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentViewToModel", ex.getCause());           
             return 0;
         }
     }
@@ -917,15 +928,29 @@ public class View {
     public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {
         try {
             return (Rectangle2D) JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            //method does not exist, we must be on Java8
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            //method does not exist, we must be on Java8                               
+        } catch (InvocationTargetException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BadLocationException) {
+                throw (BadLocationException) cause;
+            }
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentModelToView", cause);
+            return null;
         }
 
         //Try older method
         try {
             return (Rectangle) JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } catch (InvocationTargetException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BadLocationException) {
+                throw (BadLocationException) cause;
+            }
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textComponentModelToView", cause);
             return null;
         }
     }
@@ -943,15 +968,21 @@ public class View {
     public static Rectangle2D textUIModelToView(TextUI textUi, JTextComponent t, int pos, Position.Bias bias) throws BadLocationException {
         try {
             return (Rectangle2D) TextUI.class.getDeclaredMethod("modelToView2D", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
             //method does not exist, we must be on Java8
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textUIModelToView", ex.getCause());
+            return null;
         }
 
         //Try older method
         try {
             return (Rectangle) TextUI.class.getDeclaredMethod("modelToView", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE,  "Exception while calling textUIModelToView", ex);
+            return null;
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, "Exception while calling textUIModelToView", ex.getCause());
             return null;
         }
     }
@@ -999,16 +1030,7 @@ public class View {
         }
     }
 
-    public static JFileChooser getFileChooserWithIcon(String iconName) {
-        return new JFileChooser() {
-
-            @Override
-            protected JDialog createDialog(Component parent) throws HeadlessException {
-                JDialog dialog = super.createDialog(parent);
-                setWindowIcon(dialog, iconName);
-                dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-                return dialog;
-            }
-        };
+    public static FileChooser getFileChooserWithIcon(String iconName) {
+        return new FileChooser(iconName);
     }
 }

@@ -77,10 +77,9 @@ public class ActionSetTarget extends Action {
      *
      * @param actionLength Length of action
      * @param sis SWF input stream
-     * @param version SWF version
      * @throws IOException On I/O error
      */
-    public ActionSetTarget(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionSetTarget(int actionLength, SWFInputStream sis) throws IOException {
         super(0x8B, actionLength, sis.getCharset());
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);

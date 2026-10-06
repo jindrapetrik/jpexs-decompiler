@@ -101,6 +101,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -212,7 +213,6 @@ import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
-import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -662,6 +662,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 contextPopupMenu.update(items, false);
                 contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());
             }
+        }
+        if (items.size() == 1 && e.getKeyCode() == KeyEvent.VK_A && !e.isControlDown() && e.isAltDown()) {
+            TreeItem firstItem = items.get(0);
+            if ((firstItem instanceof CharacterTag)) {
+                contextPopupMenu.update(items, false);
+                CharacterTag cht = (CharacterTag) firstItem;
+                if (cht.getSwf().isAS3() && As3ClassLinkageDialog.getParentClassFromCharacter(cht) != null) {
+                    contextPopupMenu.setAs3ClassLinkageActionPerformed(null);
+                }
+                if (!cht.getSwf().isAS3()) {
+                    String ename = cht.getExportName();
+                    if (ename == null || !ename.startsWith("__Packages.")) {
+                        contextPopupMenu.setAsLinkageActionPerformed(null);
+                    }
+                }
+            }            
         }
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
             List<TreeItem> tagItems = new ArrayList<>();
@@ -2064,6 +2080,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         if (n.equals(oldName)) {
                             abc.renameMultiname(m, newName);
                             mulCount++;
+                            ((Tag) cnt).setModified(true);
                         }
                     }
                 }
@@ -3559,7 +3576,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
+        FileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3680,7 +3697,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser chooser = View.getFileChooserWithIcon("exportidea");
+        FileChooser chooser = View.getFileChooserWithIcon("exportidea");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3753,7 +3770,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        JFileChooser chooser = View.getFileChooserWithIcon("exportvscode");
+        FileChooser chooser = View.getFileChooserWithIcon("exportvscode");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3833,7 +3850,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         FLAVersion version = exportDialog.getFlaVersion();
         boolean compressed = exportDialog.isCompressed();
         
-        JFileChooser fc = View.getFileChooserWithIcon("exportfla");
+        FileChooser fc = View.getFileChooserWithIcon("exportfla");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3956,7 +3973,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importMovie(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importMovies2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportMovieInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importmovie");
+        FileChooser chooser = View.getFileChooserWithIcon("importmovie");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4016,7 +4033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSound(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSounds2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSoundInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importsound");
+        FileChooser chooser = View.getFileChooserWithIcon("importsound");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4076,7 +4093,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSprite(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSprites"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSpriteInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importsprite");
+        FileChooser chooser = View.getFileChooserWithIcon("importsprite");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4135,7 +4152,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importShape(final SWF swf, boolean noFill) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importshape");
+        FileChooser chooser = View.getFileChooserWithIcon("importshape");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4195,7 +4212,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importImage(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importimage");
+        FileChooser chooser = View.getFileChooserWithIcon("importimage");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4253,7 +4270,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importText(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
-        JFileChooser chooser = View.getFileChooserWithIcon("importtext");
+        FileChooser chooser = View.getFileChooserWithIcon("importtext");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4351,7 +4368,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
 
-        JFileChooser chooser = View.getFileChooserWithIcon("importscript");
+        FileChooser chooser = View.getFileChooserWithIcon("importscript");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4445,7 +4462,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void importSymbolClass(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSymbolClass").replace("%file%", SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSymbolClassInfo);
 
-        JFileChooser chooser = View.getFileChooserWithIcon("importsymbolclass");
+        FileChooser chooser = View.getFileChooserWithIcon("importsymbolclass");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4462,7 +4479,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private String selectExportDir(String icon) {
-        JFileChooser chooser = View.getFileChooserWithIcon(icon);
+        FileChooser chooser = View.getFileChooserWithIcon(icon);
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4530,7 +4547,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportXaml(SWF swf) {
-        JFileChooser fc = View.getFileChooserWithIcon("exportxml");
+        FileChooser fc = View.getFileChooserWithIcon("exportxml");
         fc.setDialogTitle(AppStrings.translate("menu.file.export.xaml"));
         String selDir = Configuration.lastExportDir.get();
         fc.setCurrentDirectory(new File(selDir));
@@ -4655,7 +4672,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return;
             }
         } else {
-            JFileChooser fc = View.getFileChooserWithIcon("exportxml");
+            FileChooser fc = View.getFileChooserWithIcon("exportxml");
             fc.setDialogTitle(AppStrings.translate("menu.file.export.xml"));
             String selDir = Configuration.lastExportDir.get();
             fc.setCurrentDirectory(new File(selDir));
@@ -5694,10 +5711,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public File showImportFileChooser(String filter, boolean imagePreview, String title, String icon) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
-        JFileChooser fc = View.getFileChooserWithIcon(icon);
+        FileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         if (imagePreview) {
-            fc.setAccessory(new FileChooserImagePreview(fc));
+            fc.setAccessory(new FileChooserImagePreview(fc.getSwingChooser()));
             Dimension preferredSize = new Dimension(fc.getPreferredSize());
             preferredSize.width += FileChooserImagePreview.PREVIEW_SIZE;
             fc.setPreferredSize(preferredSize);
@@ -5853,7 +5870,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (t instanceof Tag) {
                 t = dumpTree.getOriginalTag(t);
             }
-            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t));
+            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t), false);
         }
     }
 
@@ -6172,7 +6189,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.closeTag();
     }
 
-    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer) {
+    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer, boolean forceLoop) {
         previewPanel.clear();
         if (treeItem == null) {
             previewPanel.showEmpty();
@@ -6192,6 +6209,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof MorphShapeTag) {
             previewPanel.showDisplayEditTagPanel((MorphShapeTag) treeItem, 0);
             previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, !((Tag) treeItem).isReadOnly(), false);
+        } else if (treeItem instanceof ButtonTag) {
+            previewPanel.showDisplayEditTagPanel((ButtonTag) treeItem, 0);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, false);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
@@ -6245,11 +6265,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false, true);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
-            previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
+            previewPanel.showSoundPanel();
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((SoundTag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
             if (!(treeItem instanceof SoundStreamHeadTypeTag)) {
                 try {
-                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
+                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, forceLoop || Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                     if (!Configuration.autoPlaySounds.get()) {
                         soundThread.pause();
                     }
@@ -6637,62 +6657,62 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof FolderItem) {
             showFolderPreview((FolderItem) treeItem);
         } else if (treeItem instanceof SWF) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Scene) {
             showFolderPreviewList(treePath);
         } else if (treeItem instanceof MetadataTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Cookie) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof BinaryDataInterface) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof UnknownTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {
             getActionPanel().setSource((ASMSource) treeItem, !forceReload);
             showCard(CARDACTIONSCRIPTPANEL);
         } else if (treeItem instanceof ImageTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag))) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof FontTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof TextTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (frameTreeItem != null) {
-            showPreview(frameTreeItem, previewPanel, -1, null);
+            showPreview(frameTreeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ShowFrameTag) {
-            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem));
+            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem), false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof SoundTag)) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (frameTreeItem != null) {
-            showPreview(frameTreeItem, previewPanel, -1, null);
+            showPreview(frameTreeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof PlaceObjectTypeTag) {
-            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null);
+            showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ProductInfoTag) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);
         } else if (treeItem instanceof BUTTONRECORD) {
-            showPreview(treeItem, previewPanel, -1, null);
+            showPreview(treeItem, previewPanel, -1, null, false);
             showCard(CARDPREVIEWPANEL);
         } else if (!((treeItem instanceof ScriptPack) || ((treeItem instanceof AS3Package) && ((AS3Package) treeItem).isCompoundScript()))) {
             if (treePath == null) {

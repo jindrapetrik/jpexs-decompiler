@@ -222,6 +222,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
@@ -927,12 +928,39 @@ public class SWFInputStream implements AutoCloseable {
     public float readFLOAT16(String name) throws IOException {
         newDumpLevel(name, "FLOAT16");
         int val = readUI16Internal();
-        int sign = val >> 15;
-        int mantissa = val & 0x3FF;
-        int exp = (val >> 10) & 0x1F;
-        float ret = (sign == 1 ? -1 : 1) * (float) Math.pow(2, exp) * (1 + ((mantissa) / (float) (1 << 10)));
+        float ret = SWFInputStream.int16BitsToFloat(val);
         endDumpLevel(ret);
         return ret;
+    }
+    
+    /**
+     * Converts 16-bit int to FLOAT16
+     * @param val 16-bit int
+     * @return FLOAT16 value
+     */
+    public static float int16BitsToFloat(int val) {
+        int sign = (val & 0x8000) << 16;
+        int mantissa = val & 0x3FF;
+        int exp = (val >> 10) & 0x1F;
+        int floatBits;
+        if (exp == 0) {
+            if (mantissa == 0) {
+                floatBits = sign;
+            } else {
+                int unbiasedExp = -14;
+                while ((mantissa & 0x400) == 0) {
+                    mantissa <<= 1;
+                    unbiasedExp--;
+                }
+                mantissa &= 0x3FF;
+                floatBits = sign | ((unbiasedExp + 127) << 23) | (mantissa << 13);
+            }
+        } else if (exp == 0x1F) {
+            floatBits = sign | 0x7F800000 | (mantissa << 13);
+        } else {
+            floatBits = sign | ((exp + 127 - 15) << 23) | (mantissa << 13);
+        }
+        return Float.intBitsToFloat(floatBits);
     }
 
     /**
@@ -1166,27 +1194,27 @@ public class SWFInputStream implements AutoCloseable {
      */
     public long readEncodedU32(String name) throws IOException {
         newDumpLevel(name, "encodedU32");
-        int result = readEx();
+        long result = readEx();
         if ((result & 0x00000080) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0000007f) | (readEx()) << 7;
+        result = (result & 0x0000007fL) | ((long) readEx()) << 7;
         if ((result & 0x00004000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x00003fff) | (readEx()) << 14;
+        result = (result & 0x00003fffL) | ((long) readEx()) << 14;
         if ((result & 0x00200000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x001fffff) | (readEx()) << 21;
+        result = (result & 0x001fffffL) | ((long) readEx()) << 21;
         if ((result & 0x10000000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0fffffff) | (readEx()) << 28;
+        result = (result & 0x0fffffffL) | ((long) (readEx() & 0x0f)) << 28;
         endDumpLevel(result);
         return result;
     }
@@ -1809,6 +1837,11 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new PlaceObject4Tag(sis, data);
                     break;
                 default:
+                    TagProfile tagProfile = swf.getTagProfile();
+                    ret = tagProfile == null ? null : tagProfile.decodeTag(sis, tag.getId(), data);
+                    if (ret != null) {
+                        break;
+                    }
                     if (swf.gfx) { // GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
                         switch (tag.getId()) {
                             case 1000:
@@ -1993,7 +2026,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);
                 case 0x83:
-                    return new ActionGetURL(actionLength, this, swf.version);
+                    return new ActionGetURL(actionLength, this);
                 case 0x04:
                     return new ActionNextFrame();
                 case 0x05:
@@ -2007,14 +2040,14 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x09:
                     return new ActionStopSounds();
                 case 0x8A:
-                    return new ActionWaitForFrame(actionLength, this);
+                    return new ActionWaitForFrame(actionLength, this, swf.version);
                 case 0x8B:
-                    return new ActionSetTarget(actionLength, this, swf.version);
+                    return new ActionSetTarget(actionLength, this);
                 case 0x8C:
-                    return new ActionGoToLabel(actionLength, this, swf.version);
+                    return new ActionGoToLabel(actionLength, this);
                 // SWF4 Actions
                 case 0x96:
-                    return new ActionPush(actionLength, this, swf.version);
+                    return new ActionPush(actionLength, this);
                 case 0x17:
                     return new ActionPop();
                 case 0x0A:
@@ -2088,7 +2121,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x28:
                     return new ActionEndDrag();
                 case 0x8D:
-                    return new ActionWaitForFrame2(actionLength, this);
+                    return new ActionWaitForFrame2(actionLength, this, swf.version);
                 case 0x26:
                     return new ActionTrace();
                 case 0x34:
@@ -2101,9 +2134,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x52:
                     return new ActionCallMethod();
                 case 0x88:
-                    return new ActionConstantPool(actionLength, this, swf.version);
+                    return new ActionConstantPool(actionLength, this);
                 case 0x9B:
-                    return new ActionDefineFunction(actionLength, this, swf.version);
+                    return new ActionDefineFunction(actionLength, this);
                 case 0x3C:
                     return new ActionDefineLocal();
                 case 0x41:
@@ -2181,7 +2214,7 @@ public class SWFInputStream implements AutoCloseable {
                     return new ActionStringGreater();
                 // SWF7 Actions
                 case 0x8E:
-                    return new ActionDefineFunction2(actionLength, this, swf.version);
+                    return new ActionDefineFunction2(actionLength, this);
                 case 0x69:
                     return new ActionExtends(getCharset());
                 case 0x2B:
@@ -3626,8 +3659,8 @@ public class SWFInputStream implements AutoCloseable {
     public ZONEDATA readZONEDATA(String name) throws IOException {
         ZONEDATA ret = new ZONEDATA();
         newDumpLevel(name, "ZONEDATA");
-        ret.alignmentCoordinate = readUI16("alignmentCoordinate");
-        ret.range = readUI16("range");
+        ret.alignmentCoordinate = readFLOAT16("alignmentCoordinate");
+        ret.range = readFLOAT16("range");
         endDumpLevel();
         return ret;
     }

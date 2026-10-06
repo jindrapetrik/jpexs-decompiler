@@ -30,13 +30,13 @@ public class ZONEDATA implements Serializable {
      * Alignment coordinate
      */
     @SWFType(BasicType.FLOAT16)
-    public int alignmentCoordinate;
+    public float alignmentCoordinate;
 
     /**
      * Range
      */
     @SWFType(BasicType.FLOAT16)
-    public int range;
+    public float range;
 
     @Override
     public String toString() {

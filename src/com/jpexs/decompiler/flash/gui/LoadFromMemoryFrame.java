@@ -490,7 +490,7 @@ public class LoadFromMemoryFrame extends AppFrame {
 
         int[] selected = tableRes.getSelectedRows();
         if (selected.length > 0) {
-            JFileChooser fc = new JFileChooser();
+            FileChooser fc = new FileChooser();
             fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
             if (selected.length > 1) {
                 fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

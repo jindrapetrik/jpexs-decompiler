@@ -114,7 +114,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private final List<Runnable> changeListeners = new ArrayList<>();
 
-    public Set<Point> cursor = new LinkedHashSet<>();
+    public Set<Point> cursor = new LinkedHashSet<>();        
     private final EasySwfPanel swfPanel;
 
     /*private int frame = 0;
@@ -572,6 +572,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             newCursor.add(new Point(frame, 0));
         }
 
+        /*if (cursor.equals(newCursor)) {
+            return;
+        }*/
+        
         cursor.clear();
         cursor.addAll(newCursor);
 
@@ -933,7 +937,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                 refresh();
                 fireChanged();
-                repaint();
+                repaint();                
             }
 
             @Override
@@ -965,6 +969,13 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
                 if (!(timelined instanceof ButtonTag) && fframe >= timelined.getFrameCount()) {
                     int lastFrame = timelined.getFrameCount() - 1;
+                    if (lastFrame == -1) {
+                        lastFrame = 0;   
+                        ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
+                        sf.setTimelined(timelined);
+                        timelined.addTag(sf);
+                        timelined.setFrameCount(1);
+                    }
                     for (int d = 1; d <= timeline.maxDepth; d++) {
                         ds = timeline.getDepthState(lastFrame, d);
                         if (ds != null && ds.getCharacter() != null) {

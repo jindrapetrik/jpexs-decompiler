@@ -45,6 +45,10 @@ public enum ShapeExportMode {
      */
     WEBP,
     /**
+     * AS3 - Graphics commands
+     */
+    AS3,
+    /**
      * SWF - Shockwave Flash
      */
     SWF;

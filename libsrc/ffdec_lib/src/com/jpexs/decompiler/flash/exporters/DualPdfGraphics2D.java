@@ -573,6 +573,9 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         int x = 0;
         int y = 0;
         int textColor = 0;
+        Map<Integer, Character> glyphToPuaChar = new LinkedHashMap<>();
+        Map<Character, String> puaCharToOrigChar = new LinkedHashMap<>();
+                
         for (TEXTRECORD rec : textRecords) {
 
             if (rec.styleFlagsHasColor) {
@@ -594,6 +597,9 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                     font = normalizedFonts.get(fontId);
                 }
                 textHeight = rec.textHeight;
+                glyphToPuaChar = new LinkedHashMap<>();
+                puaCharToOrigChar = new LinkedHashMap<>();                
+                font.getCharactersPuaMap(glyphToPuaChar, puaCharToOrigChar);
             }
             if (rec.styleFlagsHasXOffset) {
                 int offsetX = rec.xOffset;
@@ -620,14 +626,16 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                     int calcAdvance = StaticTextTag.getAdvance(font, entry.glyphIndex, textHeight, currentChar, nextChar);
                     int spacing = entry.glyphAdvance - calcAdvance;
                     char ch = font.glyphToChar(entry.glyphIndex);
+                    if (glyphToPuaChar.containsKey(entry.glyphIndex)) {
+                        ch = glyphToPuaChar.get(entry.glyphIndex);
+                    }
+                    text.append(ch);
                     if (spacing != 0) {
-                        text.append(currentChar);
                         drawText(swf, x, y, trans, textColor, existingFonts, fontId, font, text.toString(), textHeight, pdfGraphics);
                         text = new StringBuilder();
                         x = x + deltaX + entry.glyphAdvance;
                         deltaX = 0;
                     } else {
-                        text.append(ch);
                         deltaX += entry.glyphAdvance;
                     }
 
@@ -672,10 +680,14 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
                 File tempFile = null;
                 try {
                     tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
+                    Map<Integer, Character> glyphToPuaChar = new LinkedHashMap<>();
+                    Map<Character, String> puaCharToOrigChar = new LinkedHashMap<>();
+                    font.getCharactersPuaMap(glyphToPuaChar, puaCharToOrigChar);
+                    
                     fe.exportFont(font, FontExportMode.TTF, tempFile);
                     Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
                     existingFonts.put(fontId, f);
-                    g.setTtfFont(f, tempFile);
+                    g.setTtfFont(f, tempFile, puaCharToOrigChar);
                 } catch (IOException ex) {
                     Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -689,8 +701,19 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, 
         Color textColor2 = new Color(textColor, true);
         g.setColor(textColor2);
         
-        text = text.replaceAll("\\p{Cc}", " "); //Replace control characters with space
-        
+        //Replace control characters with space only when the font has no glyph for them;
+        //otherwise the code (e.g. DEL 0x7F) is a real font code and must be drawn as is
+        StringBuilder cleaned = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isISOControl(c) && !font.containsChar(c)) {
+                cleaned.append(' ');
+            } else {
+                cleaned.append(c);
+            }
+        }
+        text = cleaned.toString();
+
         g.drawString(text, (float) x, (float) y);
     }
 

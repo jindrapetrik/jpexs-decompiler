@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
@@ -54,10 +55,12 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -65,16 +68,17 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHFOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -83,18 +87,26 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
@@ -109,6 +121,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,9 +130,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -128,6 +143,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -171,6 +187,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String CARDFONTPANEL = "Font card";
 
+    private static final String IMAGE_PREVIEW_CARD = "Image preview";
+
+    private static final String SOUND_PREVIEW_CARD = "Sound preview";
+
     private static final String DISPLAYEDIT_TAG_CARD = "PLACETAG";
 
     private final MainPanel mainPanel;
@@ -181,9 +201,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private ImagePanel imagePanel;
 
+    private JPanel mediaPreviewCards;
+
+    private SoundWaveformPanel soundWaveformPanel;
+
     private PlayerControls imagePlayControls;
 
+    private PlayerControls displayEditPlayerControls;
+
     private MediaDisplay media;
+
+    private MediaDisplay activeEmbeddedMedia;
 
     private BinaryPanel binaryPanel;
 
@@ -198,6 +226,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private GenericTagPanel genericTagPanel;
 
     private GenericTagPanel displayEditGenericPanel;
+
+    private DepthStateTreePanel effectivePlaceObjectPanel;
+
+    private JPanel effectivePlaceObjectContainer;
+
+    private JPanel displayEditEditButtonsPanel;
+
+    private JPanel displayEditPropertiesPanel;
 
     private JSplitPane displayEditSplitPane;
 
@@ -254,6 +290,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton displayEditCancelButton;
 
+    private JCheckBox displayEditAutoPreviewCheckBox;
+
+    private JButton displayEditOperationSaveButton;
+
+    private JButton displayEditOperationCancelButton;
+
+    private MATRIX displayEditAttributeMatrix;
+
+    private javax.swing.tree.TreePath displayEditAttributeMatrixPath;
+
+    private Matrix displayEditAttributeMatrixBase;
+
     private JButton displayEditEditPointsButton;
 
     private JPanel morphShowPanel;
@@ -291,6 +339,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private final int dividerSize;
 
     private Tag displayEditTag;
+
+    private int displayEditFrame;
 
     private HexView unknownHexView;
 
@@ -345,6 +395,36 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setDividerSize(this.readOnly ? 0 : dividerSize);
         if (readOnly) {
             parametersPanel.setVisible(false);
+        }
+    }
+
+    public void prepareEmbeddedAssetPreview() {
+        setReadOnly(true);
+        binaryPanel.setEmbeddedPreviewMode();
+        hideEmbeddedAssetPreviewChrome(this);
+        imagePanel.setTopPanelVisible(false);
+        displayEditImagePanel.setTopPanelVisible(false);
+        imagePanel.zoomFit();
+        displayEditImagePanel.zoomFit();
+        imagePanel.setLoop(true);        
+    }
+
+    private void hideEmbeddedAssetPreviewChrome(Component component) {
+        if (component instanceof PlayerControls || component instanceof ButtonsPanel || component instanceof AbstractButton) {
+            component.setVisible(false);
+            return;
+        }
+        if (component instanceof HeaderLabel) {
+            String text = ((HeaderLabel) component).getText();
+            if (mainPanel.translate("swfpreview").equals(text)
+                    || mainPanel.translate("swfpreview.internal").equals(text)) {
+                component.setVisible(false);
+            }
+        }
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                hideEmbeddedAssetPreviewChrome(child);
+            }
         }
     }
 
@@ -612,11 +692,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel.setLoop(Configuration.loopMedia.get());
 
         imageTransformPanel = new TransformPanel(imagePanel);
-        previewCnt.add(imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
+        imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
                 imageTransformScrollPane = new FasterScrollPane(imageTransformPanel),
-                Configuration.guiSplitPaneTransform2DividerLocationPercent)
+                Configuration.guiSplitPaneTransform2DividerLocationPercent
         );
         imageTransformScrollPane.setVisible(false);
+
+        mediaPreviewCards = new JPanel(new CardLayout());
+        mediaPreviewCards.add(imageTransformSplitPane, IMAGE_PREVIEW_CARD);
+        soundWaveformPanel = new SoundWaveformPanel();
+        mediaPreviewCards.add(soundWaveformPanel, SOUND_PREVIEW_CARD);
+        previewCnt.add(mediaPreviewCards, BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
@@ -909,6 +995,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createGenericTagCard() {
         JPanel genericTagCard = new JPanel(new BorderLayout());
         genericTagPanel = new GenericTagTreePanel(mainPanel);
+        JLabel attributesLabel = new HeaderLabel(mainPanel.translate("attributes"));
+        attributesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        genericTagCard.add(attributesLabel, BorderLayout.NORTH);
         genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
         genericTagCard.add(createGenericTagButtonsPanel(), BorderLayout.SOUTH);
         addGenericListener();
@@ -922,6 +1011,48 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         displayEditImagePanel = new ImagePanel();
+
+        displayEditImagePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!SwingUtilities.isLeftMouseButton(e) || displayEditMode != EDIT_RAW) {
+                    return;
+                }
+                Point2D shapePoint = displayEditImagePanel.toTimelinedPoint(e.getPoint());
+                GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+                if (e.isAltDown() && displayEditTag instanceof ShapeTag) {
+                    int fillStyleIndex = getFillStyleIndexAt((ShapeTag) displayEditTag, shapePoint);
+                    if (fillStyleIndex > 0) {
+                        treePanel.selectShapeFillStyle(fillStyleIndex);
+                    }
+                } else if (e.isAltDown() && displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShapeTag = (MorphShapeTag) displayEditTag;
+                    int fillStyleIndex = getMorphFillStyleIndexAt(
+                            morphShapeTag,
+                            displayEditImagePanel.getCurrentShapeRatio(),
+                            shapePoint
+                    );
+                    if (fillStyleIndex > 0) {
+                        treePanel.selectMorphShapeFillStyle(fillStyleIndex);
+                    }
+                } else if (e.isControlDown() && displayEditTag instanceof ShapeTag) {
+                    int lineStyleIndex = getLineStyleIndexAt((ShapeTag) displayEditTag, shapePoint);
+                    if (lineStyleIndex > 0) {
+                        treePanel.selectShapeLineStyle(lineStyleIndex);
+                    }
+                } else if (e.isControlDown() && displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShapeTag = (MorphShapeTag) displayEditTag;
+                    int lineStyleIndex = getMorphLineStyleIndexAt(
+                            morphShapeTag,
+                            displayEditImagePanel.getCurrentShapeRatio(),
+                            shapePoint
+                    );
+                    if (lineStyleIndex > 0) {
+                        treePanel.selectMorphShapeLineStyle(lineStyleIndex);
+                    }
+                }
+            }
+        });
 
         displayEditImagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
@@ -937,12 +1068,29 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditImagePanel.addBoundsChangeListener(new BoundsChangeListener() {
                 @Override
                 public void boundsChanged(Rectangle2D newBounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
-                    if (displayEditSaveButton.isVisible()) {
+                    if (displayEditMode == EDIT_TRANSFORM && displayEditOperationSaveButton.isVisible()) {
+                        displayEditOperationSaveButton.setEnabled(true);
+                    } else if (displayEditSaveButton.isVisible()) {
                         displayEditSaveButton.setEnabled(true);
                     }
                 }
             });
         }
+
+        displayEditImagePanel.addTransformChangeListener(new Runnable() {
+            @Override
+            public void run() {
+                if (displayEditMode != EDIT_RAW
+                        || displayEditAttributeMatrix == null
+                        || displayEditAttributeMatrixPath == null
+                        || displayEditAttributeMatrixBase == null) {
+                    return;
+                }
+                Matrix matrix = displayEditImagePanel.getNewMatrix().concatenate(displayEditAttributeMatrixBase);
+                copyMatrix(matrix.toMATRIX(), displayEditAttributeMatrix);
+                ((GenericTagTreePanel) displayEditGenericPanel).notifyNodeChanged(displayEditAttributeMatrixPath);
+            }
+        });
 
         displayEditImagePanel.addPointUpdateListener(new PointUpdateListener() {
             @Override
@@ -1375,33 +1523,84 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 displayEditImagePanel,
                 displayEditTransformScrollPane = new FasterScrollPane(displayEditTransformPanel),
                 Configuration.guiSplitPaneTransform1DividerLocationPercent));
-        PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, displayEditImagePanel, null);
-        previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
+        displayEditPlayerControls = new PlayerControls(mainPanel, displayEditImagePanel, null);
+        previewCnt.add(displayEditPlayerControls, BorderLayout.SOUTH);
         Dimension transDimension = displayEditTransformPanel.getPreferredSize();
         displayEditTransformScrollPane.setPreferredSize(new Dimension(transDimension.width + UIManager.getInt("ScrollBar.width") + 2, transDimension.height));
         displayEditTransformScrollPane.setVisible(false);
-        placeImagePlayControls.setMedia(displayEditImagePanel);
+        displayEditPlayerControls.setMedia(displayEditImagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
 
         displayEditGenericPanel = new GenericTagTreePanel(mainPanel);
+        effectivePlaceObjectPanel = new DepthStateTreePanel();
         addPlaceGenericListener();
-        displayEditSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPanel, displayEditGenericPanel, Configuration.guiSplitPanePlaceDividerLocationPercent);
+
+        JPanel displayEditValuesPanel = new JPanel(new BorderLayout());
+        JLabel attributesLabel = new HeaderLabel(mainPanel.translate("attributes"));
+        attributesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        displayEditValuesPanel.add(attributesLabel, BorderLayout.NORTH);
+        displayEditValuesPanel.add(displayEditGenericPanel, BorderLayout.CENTER);
+        JPanel displayEditActionsPanel = createDisplayEditTagButtonsPanel();
+        displayEditValuesPanel.add(displayEditEditButtonsPanel, BorderLayout.SOUTH);
+
+        effectivePlaceObjectContainer = new JPanel(new BorderLayout());
+        JLabel effectiveValuesLabel = new HeaderLabel(mainPanel.translate("depthstate.afterPlace"));
+        effectiveValuesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        effectivePlaceObjectContainer.add(effectiveValuesLabel, BorderLayout.NORTH);
+        effectivePlaceObjectContainer.add(effectivePlaceObjectPanel, BorderLayout.CENTER);
+
+        displayEditPropertiesPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints propertiesConstraints = new GridBagConstraints();
+        propertiesConstraints.gridx = 0;
+        propertiesConstraints.gridy = 0;
+        propertiesConstraints.weightx = 1;
+        propertiesConstraints.weighty = 0.5;
+        propertiesConstraints.fill = GridBagConstraints.BOTH;
+        displayEditPropertiesPanel.add(displayEditValuesPanel, propertiesConstraints);
+        propertiesConstraints.gridy = 1;
+        propertiesConstraints.insets = new Insets(4, 0, 0, 0);
+        displayEditPropertiesPanel.add(effectivePlaceObjectContainer, propertiesConstraints);
+
+        displayEditSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPanel, displayEditPropertiesPanel, Configuration.guiSplitPanePlaceDividerLocationPercent);
 
         displayEditTagCard.add(displayEditSplitPane, BorderLayout.CENTER);
         //placeSplitPane.setDividerLocation(800);
-        displayEditTagCard.add(createDisplayEditTagButtonsPanel(), BorderLayout.SOUTH);
+        displayEditTagCard.add(displayEditActionsPanel, BorderLayout.SOUTH);
 
         ((GenericTagTreePanel) displayEditGenericPanel).addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
+                    displayEditImagePanel.clearGradientTransform();
+                    updateSelectedButtonRecordPreview(null);
+                    clearSelectedAttributeMatrixTransform();
                     displayEditImagePanel.setStatus("");
                     displayEditImagePanel.setHilightedEdge(null);
                     return;
                 }
+                updateSelectedButtonRecordPreview(e.getNewLeadSelectionPath());
+                updateSelectedAttributeMatrixTransform(e.getNewLeadSelectionPath());
+                updateSelectedFillTransform(e.getNewLeadSelectionPath());
+                if (highlightSelectedMorphFillStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedMorphLineStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedFillStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                if (highlightSelectedLineStyle(e.getPath())) {
+                    displayEditImagePanel.setStatus("");
+                    return;
+                }
+                displayEditImagePanel.setHilightedFill(null);
                 JTree tree = (JTree) e.getSource();
                 Object obj = e.getPath().getLastPathComponent();
                 if (obj instanceof GenericTagTreePanel.FieldNode) {
@@ -1549,6 +1748,889 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return displayEditTagCard;
     }
 
+    private BUTTONRECORD getSelectedButtonRecord(javax.swing.tree.TreePath path) {
+        if (path == null) {
+            return null;
+        }
+        BUTTONRECORD buttonRecord = null;
+        for (Object pathComponent : path.getPath()) {
+            if (pathComponent instanceof GenericTagTreePanel.FieldNode) {
+                Object pathValue = ((GenericTagTreePanel.FieldNode) pathComponent).getValue(0);
+                if (pathValue instanceof BUTTONRECORD) {
+                    buttonRecord = (BUTTONRECORD) pathValue;
+                }
+            }
+        }
+        return buttonRecord;
+    }
+
+    private int getButtonRecordFrame(BUTTONRECORD buttonRecord) {
+        if (buttonRecord.buttonStateUp) {
+            return ButtonTag.FRAME_UP;
+        }
+        if (buttonRecord.buttonStateOver) {
+            return ButtonTag.FRAME_OVER;
+        }
+        if (buttonRecord.buttonStateDown) {
+            return ButtonTag.FRAME_DOWN;
+        }
+        if (buttonRecord.buttonStateHitTest) {
+            return ButtonTag.FRAME_HITTEST;
+        }
+        return -1;
+    }
+
+    private void updateSelectedButtonRecordPreview(javax.swing.tree.TreePath path) {
+        if (!(displayEditTag instanceof ButtonTag)) {
+            return;
+        }
+
+        BUTTONRECORD buttonRecord = getSelectedButtonRecord(path);
+        int buttonFrame = buttonRecord == null ? -1 : getButtonRecordFrame(buttonRecord);
+        if (buttonFrame < 0) {
+            displayEditPlayerControls.setPlaybackControlsEnabled(true);
+            if (displayEditImagePanel.getTimelined() instanceof ButtonTag) {
+                ButtonTag previewButton = (ButtonTag) displayEditTag;
+                GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+                if (treePanel.isEditMode() && displayEditAutoPreviewCheckBox.isSelected()) {
+                    Tag editedTag = treePanel.getEditedTagForPreview();
+                    if (editedTag instanceof ButtonTag) {
+                        previewButton = (ButtonTag) editedTag;
+                    }
+                }
+                refreshDisplayEditButtonPreview(previewButton);
+            }
+            return;
+        }
+
+        if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+            ButtonTag previewButton = (ButtonTag) displayEditTag;
+            GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+            if (treePanel.isEditMode()) {
+                Tag editedTag = treePanel.getEditedTagForPreview();
+                if (editedTag instanceof ButtonTag) {
+                    previewButton = (ButtonTag) editedTag;
+                }
+            }
+            refreshDisplayEditButtonPreview(previewButton);
+            // TimelinedMaker wraps the button at depth 1.
+            displayEditImagePanel.openDepth(0, 1);
+        }
+        if (displayEditImagePanel.getTimelined() instanceof ButtonTag) {
+            displayEditPlayerControls.setPlaybackControlsEnabled(false);
+            displayEditImagePanel.setFrozenButtons(true);
+            displayEditImagePanel.gotoFrame(buttonFrame + 1);
+            displayEditImagePanel.setIsolatedDepth(buttonRecord.placeDepth);
+        }
+    }
+
+    private void clearSelectedAttributeMatrixTransform() {
+        displayEditAttributeMatrix = null;
+        displayEditAttributeMatrixPath = null;
+        displayEditAttributeMatrixBase = null;
+        if (displayEditMode == EDIT_RAW && displayEditTag instanceof PlaceObjectTypeTag) {
+            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        } else if (displayEditMode == EDIT_RAW && displayEditTag instanceof ButtonTag) {
+            displayEditImagePanel.selectDepth(-1);
+        }
+    }
+
+    private void updateSelectedAttributeMatrixTransform(javax.swing.tree.TreePath path) {
+        clearSelectedAttributeMatrixTransform();
+        if (displayEditMode != EDIT_RAW) {
+            return;
+        }
+
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        if (!treePanel.isEditMode()) {
+            return;
+        }
+
+        Object component = path.getLastPathComponent();
+        if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+            return;
+        }
+        GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+        Object value = fieldNode.getValue(0);
+        if (!(value instanceof MATRIX)) {
+            return;
+        }
+
+        int depth;
+        if (displayEditTag instanceof PlaceObjectTypeTag && "matrix".equals(fieldNode.getName(0))) {
+            depth = ((PlaceObjectTypeTag) displayEditTag).getDepth();
+        } else if (displayEditTag instanceof ButtonTag && "placeMatrix".equals(fieldNode.getName(0))) {
+            BUTTONRECORD buttonRecord = getSelectedButtonRecord(path);
+            if (buttonRecord == null) {
+                return;
+            }
+            if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+                displayEditImagePanel.openDepth(0, 1);
+            }
+            if (!(displayEditImagePanel.getTimelined() instanceof ButtonTag)) {
+                return;
+            }
+            depth = buttonRecord.placeDepth;
+            int buttonFrame = getButtonRecordFrame(buttonRecord);
+            if (buttonFrame < 0) {
+                return;
+            }
+            displayEditImagePanel.setFrozenButtons(true);
+            displayEditImagePanel.gotoFrame(buttonFrame + 1);
+            displayEditImagePanel.setIsolatedDepth(depth);
+        } else {
+            return;
+        }
+
+        displayEditAttributeMatrix = (MATRIX) value;
+        displayEditAttributeMatrixPath = path;
+        displayEditAttributeMatrixBase = new Matrix(displayEditAttributeMatrix);
+        displayEditImagePanel.freeTransformDepth(depth);
+    }
+
+    private void refreshSelectedAttributeMatrixTransform() {
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        javax.swing.tree.TreePath selectedPath = treePanel.getSelectionPath();
+        if (selectedPath == null) {
+            clearSelectedAttributeMatrixTransform();
+            return;
+        }
+        updateSelectedButtonRecordPreview(selectedPath);
+        updateSelectedAttributeMatrixTransform(selectedPath);
+    }
+
+    private void updateSelectedFillTransform(javax.swing.tree.TreePath path) {
+        displayEditImagePanel.clearGradientTransform();
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        boolean transformEditable = treePanel.isEditMode();
+
+        FILLSTYLE selectedFillStyle = null;
+        MORPHFILLSTYLE selectedMorphFillStyle = null;
+        ShapeTag shapeTag = null;
+        MorphShapeTag morphShapeTag = null;
+        boolean gradientMatrixSelected = false;
+        boolean bitmapMatrixSelected = false;
+        boolean fillStyleSelected = false;
+        boolean morphFillStyleSelected = false;
+        String selectedMatrixName = null;
+        for (Object component : path.getPath()) {
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if ("gradientMatrix".equals(fieldNode.getName(0))) {
+                gradientMatrixSelected = true;
+            }
+            if ("bitmapMatrix".equals(fieldNode.getName(0))) {
+                bitmapMatrixSelected = true;
+            }
+            String fieldName = fieldNode.getName(0);
+            if ("startGradientMatrix".equals(fieldName)
+                    || "endGradientMatrix".equals(fieldName)
+                    || "startBitmapMatrix".equals(fieldName)
+                    || "endBitmapMatrix".equals(fieldName)) {
+                selectedMatrixName = fieldName;
+            }
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof FILLSTYLE) {
+                selectedFillStyle = (FILLSTYLE) value;
+            }
+            if (value instanceof MORPHFILLSTYLE) {
+                selectedMorphFillStyle = (MORPHFILLSTYLE) value;
+            }
+            if (component == path.getLastPathComponent() && value instanceof FILLSTYLE) {
+                fillStyleSelected = true;
+            }
+            if (component == path.getLastPathComponent() && value instanceof MORPHFILLSTYLE) {
+                morphFillStyleSelected = true;
+            }
+        }
+
+        if (selectedMorphFillStyle != null && morphShapeTag != null) {
+            if (selectedMatrixName == null && morphFillStyleSelected && morphDisplayMode != MORPH_ANIMATE) {
+                boolean gradientFill = selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT
+                        || selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT
+                        || selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT;
+                boolean bitmapFill = selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.REPEATING_BITMAP
+                        || selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.CLIPPED_BITMAP
+                        || selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                        || selectedMorphFillStyle.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP;
+                if (gradientFill) {
+                    selectedMatrixName = morphDisplayMode == MORPH_START ? "startGradientMatrix" : "endGradientMatrix";
+                } else if (bitmapFill) {
+                    selectedMatrixName = morphDisplayMode == MORPH_START ? "startBitmapMatrix" : "endBitmapMatrix";
+                }
+            }
+            if (selectedMatrixName == null) {
+                return;
+            }
+            updateSelectedMorphFillTransform(
+                    treePanel,
+                    path,
+                    morphShapeTag,
+                    selectedMorphFillStyle,
+                    selectedMatrixName,
+                    transformEditable
+            );
+            return;
+        }
+
+        if (selectedFillStyle == null) {
+            return;
+        }
+
+        final FILLSTYLE fillStyle = selectedFillStyle;
+        final javax.swing.tree.TreePath selectedPath = path;
+        if ((gradientMatrixSelected || fillStyleSelected) && fillStyle.gradientMatrix != null
+                && (fillStyle.fillStyleType == FILLSTYLE.LINEAR_GRADIENT
+                || fillStyle.fillStyleType == FILLSTYLE.RADIAL_GRADIENT
+                || fillStyle.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
+            if (fillStyle.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT
+                    && fillStyle.gradient instanceof FOCALGRADIENT) {
+                FOCALGRADIENT focalGradient = (FOCALGRADIENT) fillStyle.gradient;
+                displayEditImagePanel.setFocalGradientTransform(
+                        fillStyle.gradientMatrix,
+                        focalGradient.focalPoint,
+                        transformEditable ? updatedMatrix -> {
+                            copyMatrix(updatedMatrix, fillStyle.gradientMatrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null,
+                        transformEditable ? updatedFocalPoint -> {
+                            focalGradient.focalPoint = updatedFocalPoint;
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null
+                );
+            } else {
+                displayEditImagePanel.setGradientTransform(
+                        fillStyle.gradientMatrix,
+                        fillStyle.fillStyleType == FILLSTYLE.LINEAR_GRADIENT,
+                        transformEditable ? updatedMatrix -> {
+                            copyMatrix(updatedMatrix, fillStyle.gradientMatrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null
+                );
+            }
+            return;
+        }
+
+        if ((!bitmapMatrixSelected && !fillStyleSelected) || fillStyle.bitmapMatrix == null || shapeTag == null
+                || (fillStyle.fillStyleType != FILLSTYLE.REPEATING_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.CLIPPED_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                && fillStyle.fillStyleType != FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+            return;
+        }
+        ImageTag imageTag = shapeTag.getSwf().getImage(fillStyle.bitmapId);
+        if (imageTag == null) {
+            return;
+        }
+        Dimension imageDimension = imageTag.getImageDimension();
+        if (imageDimension == null || imageDimension.width <= 0 || imageDimension.height <= 0) {
+            return;
+        }
+        displayEditImagePanel.setBitmapTransform(
+                fillStyle.bitmapMatrix,
+                imageDimension.width,
+                imageDimension.height,
+                transformEditable ? updatedMatrix -> {
+                    copyMatrix(updatedMatrix, fillStyle.bitmapMatrix);
+                    treePanel.notifyNodeChanged(selectedPath);
+                } : null
+        );
+    }
+
+    private void refreshSelectedFillTransform() {
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        javax.swing.tree.TreePath selectedPath = treePanel.getSelectionPath();
+        if (selectedPath == null) {
+            displayEditImagePanel.clearGradientTransform();
+            return;
+        }
+        updateSelectedFillTransform(selectedPath);
+    }
+
+    private void updateSelectedMorphFillTransform(
+            GenericTagTreePanel treePanel,
+            javax.swing.tree.TreePath selectedPath,
+            MorphShapeTag morphShapeTag,
+            MORPHFILLSTYLE fillStyle,
+            String matrixName,
+            boolean transformEditable
+    ) {
+        boolean startMatrix = matrixName.startsWith("start");
+        boolean gradientMatrix = matrixName.endsWith("GradientMatrix");
+        MATRIX matrix;
+        if (gradientMatrix) {
+            matrix = startMatrix ? fillStyle.startGradientMatrix : fillStyle.endGradientMatrix;
+        } else {
+            matrix = startMatrix ? fillStyle.startBitmapMatrix : fillStyle.endBitmapMatrix;
+        }
+        if (matrix == null) {
+            return;
+        }
+
+        if (gradientMatrix) {
+            if (fillStyle.fillStyleType != MORPHFILLSTYLE.LINEAR_GRADIENT
+                    && fillStyle.fillStyleType != MORPHFILLSTYLE.RADIAL_GRADIENT
+                    && fillStyle.fillStyleType != MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+                return;
+            }
+            if (fillStyle.fillStyleType == MORPHFILLSTYLE.FOCAL_RADIAL_GRADIENT
+                    && fillStyle.gradient instanceof MORPHFOCALGRADIENT) {
+                MORPHFOCALGRADIENT focalGradient = (MORPHFOCALGRADIENT) fillStyle.gradient;
+                float focalPoint = startMatrix ? focalGradient.startFocalPoint : focalGradient.endFocalPoint;
+                displayEditImagePanel.setFocalGradientTransform(
+                        matrix,
+                        focalPoint,
+                        transformEditable ? updatedMatrix -> {
+                            copyMatrix(updatedMatrix, matrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null,
+                        transformEditable ? updatedFocalPoint -> {
+                            if (startMatrix) {
+                                focalGradient.startFocalPoint = updatedFocalPoint;
+                            } else {
+                                focalGradient.endFocalPoint = updatedFocalPoint;
+                            }
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null
+                );
+            } else {
+                displayEditImagePanel.setGradientTransform(
+                        matrix,
+                        fillStyle.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT,
+                        transformEditable ? updatedMatrix -> {
+                            copyMatrix(updatedMatrix, matrix);
+                            treePanel.notifyNodeChanged(selectedPath);
+                        } : null
+                );
+            }
+            return;
+        }
+
+        if (fillStyle.fillStyleType != MORPHFILLSTYLE.REPEATING_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.CLIPPED_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                && fillStyle.fillStyleType != MORPHFILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP) {
+            return;
+        }
+        ImageTag imageTag = morphShapeTag.getSwf().getImage(fillStyle.bitmapId);
+        if (imageTag == null) {
+            return;
+        }
+        Dimension imageDimension = imageTag.getImageDimension();
+        if (imageDimension == null || imageDimension.width <= 0 || imageDimension.height <= 0) {
+            return;
+        }
+        displayEditImagePanel.setBitmapTransform(
+                matrix,
+                imageDimension.width,
+                imageDimension.height,
+                transformEditable ? updatedMatrix -> {
+                    copyMatrix(updatedMatrix, matrix);
+                    treePanel.notifyNodeChanged(selectedPath);
+                } : null
+        );
+    }
+
+    private void copyMatrix(MATRIX source, MATRIX target) {
+        target.hasScale = source.hasScale;
+        target.scaleX = source.scaleX;
+        target.scaleY = source.scaleY;
+        target.hasRotate = source.hasRotate;
+        target.rotateSkew0 = source.rotateSkew0;
+        target.rotateSkew1 = source.rotateSkew1;
+        target.translateX = source.translateX;
+        target.translateY = source.translateY;
+    }
+
+    private boolean highlightSelectedFillStyle(javax.swing.tree.TreePath path) {
+        FILLSTYLE selectedFillStyle = null;
+        ShapeTag shapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof FILLSTYLE) {
+                selectedFillStyle = (FILLSTYLE) value;
+                break;
+            }
+        }
+        if (selectedFillStyle == null || shapeTag == null) {
+            return false;
+        }
+
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int fillStyleIndex = getFillStyleIndex(shapes, selectedFillStyle);
+        if (fillStyleIndex < 1) {
+            return false;
+        }
+        GeneralPath fillPath = PathExporter.exportFillStyle(
+                shapeTag.getWindingRule(),
+                shapeTag.getShapeNum(),
+                shapeTag.getSwf(),
+                shapes,
+                fillStyleIndex
+        );
+        displayEditImagePanel.setHilightedFill(fillPath.getCurrentPoint() == null ? null : fillPath);
+        return true;
+    }
+
+    private int getFillStyleIndex(SHAPEWITHSTYLE shapes, FILLSTYLE selectedFillStyle) {
+        int fillStyleIndex = 0;
+        for (FILLSTYLE fillStyle : shapes.fillStyles.fillStyles) {
+            fillStyleIndex++;
+            if (fillStyle == selectedFillStyle) {
+                return fillStyleIndex;
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            for (FILLSTYLE fillStyle : styleChangeRecord.fillStyles.fillStyles) {
+                fillStyleIndex++;
+                if (fillStyle == selectedFillStyle) {
+                    return fillStyleIndex;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private int getFillStyleIndexAt(ShapeTag shapeTag, Point2D point) {
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int fillStyleCount = shapes.fillStyles.fillStyles.length;
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            fillStyleCount += styleChangeRecord.fillStyles.fillStyles.length;
+        }
+        for (int fillStyleIndex = fillStyleCount; fillStyleIndex >= 1; fillStyleIndex--) {
+            GeneralPath fillPath = PathExporter.exportFillStyle(
+                    shapeTag.getWindingRule(),
+                    shapeTag.getShapeNum(),
+                    shapeTag.getSwf(),
+                    shapes,
+                    fillStyleIndex
+            );
+            if (fillPath.contains(point)) {
+                return fillStyleIndex;
+            }
+        }
+        return -1;
+    }
+
+    private int getMorphFillStyleIndexAt(MorphShapeTag morphShapeTag, int ratio, Point2D point) {
+        SHAPEWITHSTYLE shape = morphShapeTag.getShapeAtRatio(ratio);
+        for (int fillStyleIndex = morphShapeTag.morphFillStyles.fillStyles.length;
+                fillStyleIndex >= 1;
+                fillStyleIndex--) {
+            GeneralPath fillPath = PathExporter.exportFillStyle(
+                    ShapeTag.WIND_EVEN_ODD,
+                    getMorphShapeNum(morphShapeTag),
+                    null,
+                    shape,
+                    fillStyleIndex
+            );
+            if (fillPath.contains(point)) {
+                return fillStyleIndex;
+            }
+        }
+        return -1;
+    }
+
+    private int getLineStyleIndexAt(ShapeTag shapeTag, Point2D point) {
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int shapeNum = shapeTag.getShapeNum();
+        List<ILINESTYLE> lineStyles = new ArrayList<>();
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                lineStyles.add(lineStyle);
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                lineStyles.add(lineStyle);
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    lineStyles.add(lineStyle);
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    lineStyles.add(lineStyle);
+                }
+            }
+        }
+        return getNearestLineStyleIndex(
+                shapeTag.getWindingRule(),
+                shapeNum,
+                shapeTag.getSwf(),
+                shapes,
+                lineStyles,
+                point
+        );
+    }
+
+    private int getMorphLineStyleIndexAt(MorphShapeTag morphShapeTag, int ratio, Point2D point) {
+        SHAPEWITHSTYLE shape = morphShapeTag.getShapeAtRatio(ratio);
+        int shapeNum = getMorphShapeNum(morphShapeTag);
+        List<ILINESTYLE> lineStyles = new ArrayList<>();
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shape.lineStyles.lineStyles) {
+                lineStyles.add(lineStyle);
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shape.lineStyles.lineStyles2) {
+                lineStyles.add(lineStyle);
+            }
+        }
+        return getNearestLineStyleIndex(
+                ShapeTag.WIND_EVEN_ODD,
+                shapeNum,
+                null,
+                shape,
+                lineStyles,
+                point
+        );
+    }
+
+    private int getNearestLineStyleIndex(
+            int windingRule,
+            int shapeNum,
+            SWF swf,
+            SHAPEWITHSTYLE shape,
+            List<ILINESTYLE> lineStyles,
+            Point2D point
+    ) {
+        int nearestIndex = -1;
+        double nearestDistance = Double.POSITIVE_INFINITY;
+        for (int lineStyleIndex = lineStyles.size(); lineStyleIndex >= 1; lineStyleIndex--) {
+            GeneralPath linePath = PathExporter.exportLineStyle(
+                    windingRule,
+                    shapeNum,
+                    swf,
+                    shape,
+                    lineStyleIndex
+            );
+            double distance = getPathDistance(linePath, point);
+            if (Double.isInfinite(distance)) {
+                continue;
+            }
+            distance = Math.max(0, distance - lineStyles.get(lineStyleIndex - 1).getWidth() / 2.0);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestIndex = lineStyleIndex;
+            }
+        }
+        return nearestIndex;
+    }
+
+    private double getPathDistance(GeneralPath path, Point2D point) {
+        PathIterator iterator = path.getPathIterator(null, 1.0);
+        double[] coordinates = new double[6];
+        double startX = 0;
+        double startY = 0;
+        double lastX = 0;
+        double lastY = 0;
+        boolean hasLastPoint = false;
+        double minimumDistance = Double.POSITIVE_INFINITY;
+        while (!iterator.isDone()) {
+            int segmentType = iterator.currentSegment(coordinates);
+            if (segmentType == PathIterator.SEG_MOVETO) {
+                startX = coordinates[0];
+                startY = coordinates[1];
+                lastX = startX;
+                lastY = startY;
+                hasLastPoint = true;
+            } else if (segmentType == PathIterator.SEG_LINETO && hasLastPoint) {
+                minimumDistance = Math.min(minimumDistance, Line2D.ptSegDist(
+                        lastX,
+                        lastY,
+                        coordinates[0],
+                        coordinates[1],
+                        point.getX(),
+                        point.getY()
+                ));
+                lastX = coordinates[0];
+                lastY = coordinates[1];
+            } else if (segmentType == PathIterator.SEG_CLOSE && hasLastPoint) {
+                minimumDistance = Math.min(minimumDistance, Line2D.ptSegDist(
+                        lastX,
+                        lastY,
+                        startX,
+                        startY,
+                        point.getX(),
+                        point.getY()
+                ));
+                lastX = startX;
+                lastY = startY;
+            }
+            iterator.next();
+        }
+        return minimumDistance;
+    }
+
+    private boolean highlightSelectedLineStyle(javax.swing.tree.TreePath path) {
+        Object selectedLineStyle = null;
+        ShapeTag shapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (shapeTag == null && fieldNode.getTag() instanceof ShapeTag) {
+                shapeTag = (ShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof LINESTYLE || value instanceof LINESTYLE2) {
+                selectedLineStyle = value;
+                break;
+            }
+        }
+        if (selectedLineStyle == null || shapeTag == null) {
+            return false;
+        }
+
+        SHAPEWITHSTYLE shapes = shapeTag.getShapes();
+        int lineStyleIndex = getLineStyleIndex(shapes, shapeTag.getShapeNum(), selectedLineStyle);
+        if (lineStyleIndex < 1) {
+            return false;
+        }
+        GeneralPath linePath = PathExporter.exportLineStyle(
+                shapeTag.getWindingRule(),
+                shapeTag.getShapeNum(),
+                shapeTag.getSwf(),
+                shapes,
+                lineStyleIndex
+        );
+        ILINESTYLE lineStyle = (ILINESTYLE) selectedLineStyle;
+        Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, lineStyle);
+        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle.getWidth());
+        return true;
+    }
+
+    private int getLineStyleIndex(SHAPEWITHSTYLE shapes, int shapeNum, Object selectedLineStyle) {
+        int lineStyleIndex = 0;
+        if (shapeNum <= 3) {
+            for (LINESTYLE lineStyle : shapes.lineStyles.lineStyles) {
+                lineStyleIndex++;
+                if (lineStyle == selectedLineStyle) {
+                    return lineStyleIndex;
+                }
+            }
+        } else {
+            for (LINESTYLE2 lineStyle : shapes.lineStyles.lineStyles2) {
+                lineStyleIndex++;
+                if (lineStyle == selectedLineStyle) {
+                    return lineStyleIndex;
+                }
+            }
+        }
+        for (SHAPERECORD shapeRecord : shapes.shapeRecords) {
+            if (!(shapeRecord instanceof StyleChangeRecord)) {
+                continue;
+            }
+            StyleChangeRecord styleChangeRecord = (StyleChangeRecord) shapeRecord;
+            if (!styleChangeRecord.stateNewStyles) {
+                continue;
+            }
+            if (shapeNum <= 3) {
+                for (LINESTYLE lineStyle : styleChangeRecord.lineStyles.lineStyles) {
+                    lineStyleIndex++;
+                    if (lineStyle == selectedLineStyle) {
+                        return lineStyleIndex;
+                    }
+                }
+            } else {
+                for (LINESTYLE2 lineStyle : styleChangeRecord.lineStyles.lineStyles2) {
+                    lineStyleIndex++;
+                    if (lineStyle == selectedLineStyle) {
+                        return lineStyleIndex;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean highlightSelectedMorphFillStyle(javax.swing.tree.TreePath path) {
+        MORPHFILLSTYLE selectedFillStyle = null;
+        MorphShapeTag morphShapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof MORPHFILLSTYLE) {
+                selectedFillStyle = (MORPHFILLSTYLE) value;
+                break;
+            }
+        }
+        if (selectedFillStyle == null || morphShapeTag == null) {
+            return false;
+        }
+
+        int fillStyleIndex = -1;
+        for (int i = 0; i < morphShapeTag.morphFillStyles.fillStyles.length; i++) {
+            if (morphShapeTag.morphFillStyles.fillStyles[i] == selectedFillStyle) {
+                fillStyleIndex = i + 1;
+                break;
+            }
+        }
+        if (fillStyleIndex < 1) {
+            return false;
+        }
+
+        final MorphShapeTag selectedMorphShape = morphShapeTag;
+        final int selectedFillStyleIndex = fillStyleIndex;
+        final int shapeNum = getMorphShapeNum(morphShapeTag);
+        Map<Integer, GeneralPath> pathsByRatio = new HashMap<>();
+        displayEditImagePanel.setHilightedFillProvider(ratio -> pathsByRatio.computeIfAbsent(ratio, currentRatio ->
+                PathExporter.exportFillStyle(
+                        ShapeTag.WIND_EVEN_ODD,
+                        shapeNum,
+                        null,
+                        selectedMorphShape.getShapeAtRatio(currentRatio),
+                        selectedFillStyleIndex
+                )
+        ));
+        return true;
+    }
+
+    private boolean highlightSelectedMorphLineStyle(javax.swing.tree.TreePath path) {
+        Object selectedLineStyle = null;
+        MorphShapeTag morphShapeTag = null;
+        Object[] pathComponents = path.getPath();
+        for (int i = pathComponents.length - 1; i >= 0; i--) {
+            Object component = pathComponents[i];
+            if (!(component instanceof GenericTagTreePanel.FieldNode)) {
+                continue;
+            }
+            GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) component;
+            if (morphShapeTag == null && fieldNode.getTag() instanceof MorphShapeTag) {
+                morphShapeTag = (MorphShapeTag) fieldNode.getTag();
+            }
+            Object value = fieldNode.getValue(0);
+            if (value instanceof MORPHLINESTYLE || value instanceof MORPHLINESTYLE2) {
+                selectedLineStyle = value;
+                break;
+            }
+        }
+        if (selectedLineStyle == null || morphShapeTag == null) {
+            return false;
+        }
+
+        int lineStyleIndex = -1;
+        if (morphShapeTag.getShapeNum() == 1) {
+            for (int i = 0; i < morphShapeTag.morphLineStyles.lineStyles.length; i++) {
+                if (morphShapeTag.morphLineStyles.lineStyles[i] == selectedLineStyle) {
+                    lineStyleIndex = i + 1;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < morphShapeTag.morphLineStyles.lineStyles2.length; i++) {
+                if (morphShapeTag.morphLineStyles.lineStyles2[i] == selectedLineStyle) {
+                    lineStyleIndex = i + 1;
+                    break;
+                }
+            }
+        }
+        if (lineStyleIndex < 1) {
+            return false;
+        }
+
+        final MorphShapeTag selectedMorphShape = morphShapeTag;
+        final int selectedLineStyleIndex = lineStyleIndex;
+        final int shapeNum = getMorphShapeNum(morphShapeTag);
+        Map<Integer, ImagePanel.LineHilight> pathsByRatio = new HashMap<>();
+        displayEditImagePanel.setHilightedLineProvider(ratio -> pathsByRatio.computeIfAbsent(ratio, currentRatio -> {
+            SHAPEWITHSTYLE currentShape = selectedMorphShape.getShapeAtRatio(currentRatio);
+            GeneralPath linePath = PathExporter.exportLineStyle(
+                    ShapeTag.WIND_EVEN_ODD,
+                    shapeNum,
+                    null,
+                    currentShape,
+                    selectedLineStyleIndex
+            );
+            ILINESTYLE currentLineStyle = shapeNum <= 3
+                    ? currentShape.lineStyles.lineStyles[selectedLineStyleIndex - 1]
+                    : currentShape.lineStyles.lineStyles2[selectedLineStyleIndex - 1];
+            return new ImagePanel.LineHilight(
+                    createLineStyleArea(linePath, currentLineStyle),
+                    linePath,
+                    currentLineStyle.getWidth()
+            );
+        }));
+        return true;
+    }
+
+    private Shape createLineStyleArea(GeneralPath linePath, ILINESTYLE lineStyle) {
+        int cap = BasicStroke.CAP_ROUND;
+        int join = BasicStroke.JOIN_ROUND;
+        float miterLimit = 10f;
+        if (lineStyle instanceof LINESTYLE2) {
+            LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
+            cap = lineStyle2.startCapStyle == LINESTYLE2.NO_CAP
+                    ? BasicStroke.CAP_BUTT
+                    : lineStyle2.startCapStyle == LINESTYLE2.SQUARE_CAP
+                            ? BasicStroke.CAP_SQUARE
+                            : BasicStroke.CAP_ROUND;
+            join = lineStyle2.joinStyle == LINESTYLE2.BEVEL_JOIN
+                    ? BasicStroke.JOIN_BEVEL
+                    : lineStyle2.joinStyle == LINESTYLE2.MITER_JOIN
+                            ? BasicStroke.JOIN_MITER
+                            : BasicStroke.JOIN_ROUND;
+            miterLimit = Math.max(1f, lineStyle2.miterLimitFactor);
+        }
+        float width = Math.max(1f, lineStyle.getWidth());
+        return new BasicStroke(width, cap, join, miterLimit).createStrokedShape(linePath);
+    }
+
+    private int getMorphShapeNum(MorphShapeTag morphShapeTag) {
+        return morphShapeTag.getShapeNum() == 2 ? 4 : 1;
+    }
+
     private JPanel createDisplayEditTagButtonsPanel() {
 
         displayEditTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
@@ -1563,6 +2645,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
+        displayEditAutoPreviewCheckBox = new JCheckBox(mainPanel.translate("checkbox.autoPreview"));
+        displayEditAutoPreviewCheckBox.setSelected(true);
+        displayEditAutoPreviewCheckBox.addActionListener(this::displayEditAutoPreviewActionPerformed);
+
+        displayEditOperationSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        displayEditOperationSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditOperationSaveButton.addActionListener(this::saveDisplayEditTagButtonActionPerformed);
+        displayEditOperationSaveButton.setVisible(false);
+        displayEditOperationCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        displayEditOperationCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditOperationCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
+        displayEditOperationCancelButton.setVisible(false);
 
         displayEditEditPointsButton = new JButton(mainPanel.translate("button.edit.points"), View.getIcon("pointsedit16"));
         displayEditEditPointsButton.setMargin(new Insets(3, 3, 3, 10));
@@ -1642,10 +2736,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
         } else {
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         /*JButton fixPathsButton = new JButton("Fix paths");
@@ -1678,12 +2774,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 refreshHilightedPoints();
             }            
         });*/
+        displayEditEditButtonsPanel = new ButtonsPanel();
+        displayEditEditButtonsPanel.add(displayEditEditButton);
+        displayEditEditButtonsPanel.add(displayEditSaveButton);
+        displayEditEditButtonsPanel.add(displayEditCancelButton);
+        displayEditEditButtonsPanel.add(displayEditAutoPreviewCheckBox);
+
         ButtonsPanel displayEditButtonsPanel = new ButtonsPanel();
         displayEditButtonsPanel.add(displayEditTransformButton);
-        displayEditButtonsPanel.add(displayEditEditButton);
-        displayEditButtonsPanel.add(displayEditSaveButton);
-        displayEditButtonsPanel.add(displayEditCancelButton);
         displayEditButtonsPanel.add(displayEditEditPointsButton);
+        displayEditButtonsPanel.add(displayEditOperationSaveButton);
+        displayEditButtonsPanel.add(displayEditOperationCancelButton);
         //displayEditButtonsPanel.add(fixPathsButton);
         displayEditButtonsPanel.add(replaceShapeButton);
         displayEditButtonsPanel.add(replaceShapeUpdateBoundsButton);
@@ -1722,14 +2823,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(IMAGE_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
+        activeEmbeddedMedia = imagePanel;
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(true);
         imageTransformButton.setVisible(allowFreeTransform);
         if ((timelined instanceof Tag) && ((Tag) timelined).isReadOnly()) {
             imageTransformButton.setVisible(false);
         }
         imageTransformSaveButton.setVisible(false);
         imageTransformCancelButton.setVisible(false);
+        imagePanel.setAltSelectionEnabled(true);
         imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom, frozenButtons, canHaveRuler);
         if (canHaveRuler) {
             if (timelined instanceof Tag) {
@@ -1742,10 +2848,30 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(SerializableImage image) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(IMAGE_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
+        activeEmbeddedMedia = imagePanel;
         imageTransformButton.setVisible(false);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(true);
         imagePanel.setImage(image);
+    }
+
+    public void showSoundPanel() {
+        showCardLeft(DRAW_PREVIEW_CARD);
+        showMediaPreviewCard(SOUND_PREVIEW_CARD);
+        soundWaveformPanel.setPlayer(null);
+        activeEmbeddedMedia = imagePanel;
+        parametersPanel.setVisible(false);
+        imagePlayControls.setMedia(imagePanel);
+        imagePlayControls.setProgressVisible(false);
+        imageTransformButton.setVisible(false);
+    }
+
+    private void showMediaPreviewCard(String card) {
+        CardLayout layout = (CardLayout) mediaPreviewCards.getLayout();
+        layout.show(mediaPreviewCards, card);
     }
 
     public void showTextComparePanel(TextTag textTag, TextTag newTextTag) {
@@ -1754,7 +2880,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void setMedia(MediaDisplay media) {
         this.media = media;
+        activeEmbeddedMedia = media;
         imagePlayControls.setMedia(media);
+        if (media instanceof SoundTagPlayer) {
+            soundWaveformPanel.setPlayer((SoundTagPlayer) media);
+            showMediaPreviewCard(SOUND_PREVIEW_CARD);
+        }
     }
 
     public void showFontPanel(FontTag fontTag) {
@@ -1776,6 +2907,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false, true, false);
+        imagePanel.setAltSelectionEnabled(false);
     }
 
     public static int getFontPageCount(FontTag fontTag) {
@@ -1793,6 +2925,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true, true, true);
+        imagePanel.setAltSelectionEnabled(false);
 
         showCardRight(CARDTEXTPANEL);
         if (!readOnly) {
@@ -1808,6 +2941,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void clear() {
         imagePanel.clearAll();
         displayEditImagePanel.clearAll();
+        soundWaveformPanel.setPlayer(null);
         if (media != null) {
             try {
                 media.close();
@@ -1815,10 +2949,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 // ignore
             }
         }
+        activeEmbeddedMedia = null;
 
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
         displayEditGenericPanel.clear();
+        effectivePlaceObjectPanel.clear();
         fontPanel.clear();
     }
 
@@ -1968,6 +3104,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     replaceMorphShapeButton.setVisible(false);
                     replaceMorphShapeUpdateBoundsButton.setVisible(false);
                 }
+                if (displayEditAutoPreviewCheckBox.isSelected()) {
+                    applyDisplayEditAutoPreview();
+                }
             }
 
             @Override
@@ -2042,9 +3181,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showDisplayEditTagPanel(Tag tag, int frame) {
         showCardLeft(DISPLAYEDIT_TAG_CARD);
+        activeEmbeddedMedia = displayEditImagePanel;
         displayEditTag = tag;
+        displayEditFrame = frame;
+        displayEditMode = EDIT_RAW;
+        displayEditImagePanel.clearGradientTransform();
+        displayEditPlayerControls.setPlaybackControlsEnabled(true);
+        setDisplayEditPropertiesVisible(true);
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
+        displayEditOperationSaveButton.setVisible(false);
+        displayEditOperationCancelButton.setVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditGenericPanel.setEditMode(!tag.isReadOnly(), tag);
@@ -2053,14 +3200,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(!tag.isReadOnly());
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(!tag.isReadOnly() && !readOnly);
         } else {
             displayEditGenericPanel.setEditMode(false, tag);
             displayEditEditButton.setVisible(!tag.isReadOnly() && !readOnly);
             displayEditEditButton.setEnabled(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
+        displayEditImagePanel.setAltSelectionEnabled(tag instanceof PlaceObjectTypeTag);
         displayEditImagePanel.selectDepth(-1);
         if (tag instanceof ShapeTag) {
             Timelined tim = TimelinedMaker.makeTimelined(tag);
@@ -2074,6 +3224,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             morphDisplayMode = MORPH_ANIMATE;
             displayEditShowAnimationButton.setSelected(true);
         }
+        if (tag instanceof ButtonTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(tag);
+            displayEditImagePanel.setTimelined(tim, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
+            displayEditImagePanel.setGuidesCharacter(tag.getSwf(), ((CharacterTag) tag).getCharacterId());
+        }
         if (tag instanceof PlaceObjectTypeTag) {
             displayEditImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true, true);
             Timelined tim = ((Tag) tag).getTimelined();
@@ -2085,9 +3240,136 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             PlaceObjectTypeTag place = (PlaceObjectTypeTag) tag;
             displayEditImagePanel.selectDepth(place.getDepth());
+            updateEffectivePlaceObjectPanel();
+            setEffectivePlaceObjectVisible(readOnly || tag.isReadOnly() || !Configuration.editorMode.get());
+        } else {
+            effectivePlaceObjectPanel.clear();
+            setEffectivePlaceObjectVisible(false);
+        }
+        if (tag instanceof ButtonTag) {
+            refreshSelectedAttributeMatrixTransform();
         }
         parametersPanel.setVisible(false);
         displayEditTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
+    }
+
+    private void displayEditAutoPreviewActionPerformed(ActionEvent evt) {
+        if (displayEditAutoPreviewCheckBox.isSelected()) {
+            applyDisplayEditAutoPreview();
+        } else if (displayEditTag instanceof ButtonTag) {
+            refreshDisplayEditPreview();
+        } else if (((GenericTagTreePanel) displayEditGenericPanel).restorePreview()) {
+            refreshDisplayEditPreview();
+        }
+        if (displayEditTag instanceof ButtonTag && !displayEditAutoPreviewCheckBox.isSelected()) {
+            refreshSelectedAttributeMatrixTransform();
+        }
+    }
+
+    private void applyDisplayEditAutoPreview() {
+        GenericTagTreePanel treePanel = (GenericTagTreePanel) displayEditGenericPanel;
+        if (displayEditTag instanceof ButtonTag) {
+            Tag previewTag = treePanel.getEditedTagForPreview();
+            if (previewTag instanceof ButtonTag) {
+                refreshDisplayEditButtonPreview((ButtonTag) previewTag);
+            }
+        } else if (treePanel.preview()) {
+            refreshDisplayEditPreview();
+        }
+        refreshSelectedAttributeMatrixTransform();
+    }
+
+    private void refreshDisplayEditButtonPreview(ButtonTag buttonTag) {
+        SWF swf = buttonTag.getSwf();
+        swf.clearImageCache();
+        swf.clearShapeCache();
+        buttonTag.resetTimeline();
+        boolean previewDisplayed = displayEditImagePanel.isDisplayed();
+        Timelined tim = TimelinedMaker.makeTimelined(buttonTag);
+        displayEditImagePanel.setTimelined(tim, swf, -1, true, previewDisplayed, false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
+        displayEditImagePanel.setGuidesCharacter(swf, buttonTag.getCharacterId());
+        displayEditImagePanel.repaint();
+    }
+
+    private void refreshDisplayEditPreview() {
+        if (displayEditTag == null) {
+            return;
+        }
+        SWF swf = displayEditTag.getSwf();
+        swf.clearImageCache();
+        swf.clearShapeCache();
+        displayEditTag.getTimelined().resetTimeline();
+        if (displayEditTag instanceof ButtonTag) {
+            ((ButtonTag) displayEditTag).resetTimeline();
+        }
+
+        if (displayEditTag instanceof ShapeTag) {
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            shape.shapes.clearCachedOutline();
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            displayEditImagePanel.setTimelined(tim, swf, 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof MorphShapeTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            int frame = morphDisplayMode == MORPH_START ? 0 : morphDisplayMode == MORPH_END ? tim.getFrameCount() - 1 : -1;
+            displayEditImagePanel.setTimelined(tim, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof ButtonTag) {
+            Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
+            displayEditImagePanel.setTimelined(tim, swf, -1, true, Configuration.autoPlayPreviews.get(), false, false, !Configuration.playFrameSounds.get(), true, true, false, true);
+            displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) displayEditTag).getCharacterId());
+        } else if (displayEditTag instanceof PlaceObjectTypeTag) {
+            displayEditImagePanel.setTimelined(displayEditTag.getTimelined(), swf, displayEditFrame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true, true);
+            Timelined tim = displayEditTag.getTimelined();
+            if (tim instanceof Tag) {
+                displayEditImagePanel.setGuidesCharacter(swf, ((CharacterTag) tim).getCharacterId());
+            } else {
+                displayEditImagePanel.setGuidesCharacter(swf, -1);
+            }
+            displayEditImagePanel.selectDepth(((PlaceObjectTypeTag) displayEditTag).getDepth());
+        }
+        displayEditImagePanel.repaint();
+    }
+
+    private void updateEffectivePlaceObjectPanel() {
+        if (!(displayEditTag instanceof PlaceObjectTypeTag)) {
+            effectivePlaceObjectPanel.clear();
+            return;
+        }
+        PlaceObjectTypeTag place = (PlaceObjectTypeTag) displayEditTag;
+        DepthState depthState = displayEditTag.getTimelined().getTimeline().getDepthState(displayEditFrame, place.getDepth());
+        if (depthState == null) {
+            effectivePlaceObjectPanel.clear();
+            return;
+        }
+        effectivePlaceObjectPanel.setDepthState(depthState);
+    }
+
+    private void setEffectivePlaceObjectVisible(boolean visible) {
+        effectivePlaceObjectContainer.setVisible(visible && displayEditTag instanceof PlaceObjectTypeTag);
+        effectivePlaceObjectContainer.getParent().revalidate();
+        effectivePlaceObjectContainer.getParent().repaint();
+    }
+
+    private void setDisplayEditPropertiesVisible(boolean visible) {
+        if (visible) {
+            if (displayEditSplitPane.getRightComponent() != displayEditPropertiesPanel) {
+                displayEditSplitPane.setRightComponent(displayEditPropertiesPanel);
+                displayEditSplitPane.setDividerLocation(0.6);
+            }
+        } else if (displayEditSplitPane.getRightComponent() != null) {
+            displayEditSplitPane.setRightComponent(null);
+        }
+    }
+
+    private void setDisplayEditOperationButtonsVisible(boolean visible) {
+        displayEditOperationSaveButton.setVisible(visible);
+        displayEditOperationCancelButton.setVisible(visible);
+    }
+
+    private void reloadDisplayEditAttributes() {
+        boolean edit = Configuration.editorMode.get() && !readOnly && !displayEditTag.isReadOnly();
+        displayEditGenericPanel.setEditMode(edit, displayEditTag);
     }
 
     public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie, boolean showMorphShape, boolean showSprite) {
@@ -2333,6 +3615,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveDisplayEditTag(boolean refreshTree) {
+        boolean operationMode = displayEditMode == EDIT_TRANSFORM || displayEditMode == EDIT_POINTS;
         if (displayEditMode == EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
             if (displayEditTag instanceof PlaceObjectTypeTag) {
@@ -2527,6 +3810,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 hilightTag = tag;
             }
             displayEditGenericPanel.setEditMode(false, null);
+            refreshDisplayEditPreview();
         }
 
         if (displayEditTag instanceof ShapeTag) {
@@ -2557,11 +3841,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
             displayEditTransformButton.setVisible(true);
         } else {
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         if (displayEditMode == EDIT_RAW && refreshTree && swf != null) {
@@ -2572,9 +3858,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (hilightTag != null) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
         }
-        if (displayEditMode == EDIT_TRANSFORM) {
+        if (operationMode) {
             displayEditMode = EDIT_RAW;
+            reloadDisplayEditAttributes();
+            displayEditGenericPanel.setVisible(true);
+            setDisplayEditOperationButtonsVisible(false);
+            setDisplayEditPropertiesVisible(true);
         }
+        updateEffectivePlaceObjectPanel();
+        setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
     }
 
     private void saveDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -2583,11 +3875,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void editDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         displayEditMode = EDIT_RAW;
+        setDisplayEditOperationButtonsVisible(false);
+        setDisplayEditPropertiesVisible(true);
+        setEffectivePlaceObjectVisible(false);
         displayEditGenericPanel.setEditMode(true, displayEditTag);
         displayEditEditButton.setVisible(false);
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
+        displayEditAutoPreviewCheckBox.setVisible(true);        
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
@@ -2601,6 +3897,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
         displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
         displayEditImagePanel.setGuidesCharacter(displayEditTag.getSwf(), ((CharacterTag) displayEditTag).getCharacterId());
+        refreshSelectedFillTransform();
     }
 
     private void showStartDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -2608,6 +3905,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
         displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
         displayEditImagePanel.setGuidesCharacter(displayEditTag.getSwf(), ((CharacterTag) displayEditTag).getCharacterId());
+        refreshSelectedFillTransform();
     }
 
     private void showEndDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -2615,23 +3913,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
         displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), tim.getFrameCount() - 1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true, true);
         displayEditImagePanel.setGuidesCharacter(displayEditTag.getSwf(), ((CharacterTag) displayEditTag).getCharacterId());
+        refreshSelectedFillTransform();
     }
 
     private void editPointsDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         displayEditMode = EDIT_POINTS;
+        setDisplayEditPropertiesVisible(false);
         displayEditGenericPanel.setVisible(false);
-        displayEditEditButton.setVisible(false);
         displayEditTransformButton.setVisible(false);
-        displayEditSaveButton.setVisible(true);
-        displayEditCancelButton.setVisible(true);
+        setDisplayEditOperationButtonsVisible(true);
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
         replaceMorphShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
 
-        displayEditSaveButton.setEnabled(true);
-        displayEditCancelButton.setEnabled(true);
+        displayEditOperationSaveButton.setEnabled(true);
+        displayEditOperationCancelButton.setEnabled(true);
 
         if ((displayEditTag instanceof MorphShapeTag) && (morphDisplayMode == MORPH_ANIMATE)) {
             displayEditShowStartButton.setSelected(true);
@@ -2732,15 +4030,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             return;
         }
         displayEditMode = EDIT_TRANSFORM;
+        setDisplayEditPropertiesVisible(false);
+        setEffectivePlaceObjectVisible(false);
         displayEditGenericPanel.setVisible(false);
         displayEditImagePanel.selectDepth(-1);
 
         displayEditTransformScrollPane.setVisible(true);
 
-        displayEditEditButton.setVisible(false);
         displayEditTransformButton.setVisible(false);
-        displayEditSaveButton.setVisible(true);
-        displayEditCancelButton.setVisible(true);
+        setDisplayEditOperationButtonsVisible(true);
 
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
@@ -2756,11 +4054,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
 
         if (Configuration.editorMode.get()) {
-            displayEditSaveButton.setEnabled(false);
+            displayEditOperationSaveButton.setEnabled(false);
         } else {
-            displayEditSaveButton.setEnabled(true);
+            displayEditOperationSaveButton.setEnabled(true);
         }
-        displayEditCancelButton.setEnabled(true);
+        displayEditOperationCancelButton.setEnabled(true);
         mainPanel.setEditingStatus();
 
         Timer t = new Timer();
@@ -3011,6 +4309,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void cancelDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        boolean operationMode = displayEditMode == EDIT_TRANSFORM || displayEditMode == EDIT_POINTS;
         if (displayEditMode == EDIT_TRANSFORM) {
             if (displayEditTag instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) displayEditTag;
@@ -3054,19 +4353,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (Configuration.editorMode.get()) {
             if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(true, null);
+                refreshDisplayEditPreview();
             }
             displayEditEditButton.setVisible(false);
             displayEditSaveButton.setVisible(true);
             displayEditSaveButton.setEnabled(false);
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
+            displayEditAutoPreviewCheckBox.setVisible(true);
         } else {
             if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(false, null);
+                refreshDisplayEditPreview();
             }
             displayEditEditButton.setVisible(true);
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
+            displayEditAutoPreviewCheckBox.setVisible(false);
         }
 
         if (displayEditTag instanceof ShapeTag) {
@@ -3085,9 +4388,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mainPanel.clearEditingStatus();
         displayEditTransformButton.setVisible(true);
 
-        if (displayEditMode == EDIT_TRANSFORM) {
+        if (operationMode) {
             displayEditMode = EDIT_RAW;
+            reloadDisplayEditAttributes();
+            displayEditGenericPanel.setVisible(true);
+            setDisplayEditOperationButtonsVisible(false);
+            setDisplayEditPropertiesVisible(true);
         }
+        updateEffectivePlaceObjectPanel();
+        setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
     }
 
     private void prevFontsButtonActionPerformed(ActionEvent evt) {
@@ -3117,6 +4426,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             saveDisplayEditTag(false);
             ok = ok && !(displayEditSaveButton.isVisible() && displayEditSaveButton.isEnabled());
         }
+        if (displayEditOperationSaveButton.isVisible() && displayEditOperationSaveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveDisplayEditTag(false);
+            ok = ok && !(displayEditOperationSaveButton.isVisible() && displayEditOperationSaveButton.isEnabled());
+        }
         if (genericSaveButton.isVisible() && genericSaveButton.isEnabled()) {
             saveGenericTag(false);
             ok = ok && !(genericSaveButton.isVisible() && genericSaveButton.isEnabled());
@@ -3139,6 +4452,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
                 || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled())
                 || (displayEditSaveButton.isVisible() && displayEditSaveButton.isEnabled())
+                || (displayEditOperationSaveButton.isVisible() && displayEditOperationSaveButton.isEnabled())
                 || (cookieSaveButton.isVisible() && cookieSaveButton.isEnabled())
                 || fontPanel.isEditing()
                 || imageTransformSaveButton.isVisible();
@@ -3179,5 +4493,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void pauseImage() {
         imagePanel.pause();
+    }
+
+    public void setEmbeddedAssetPreviewPlaying(boolean playing, boolean freeze) {
+        if (activeEmbeddedMedia == null) {
+            return;
+        }
+        if (freeze) {
+            activeEmbeddedMedia.setFrozen(!playing);
+        }
+        if (playing) {
+            activeEmbeddedMedia.play();
+        } else {
+            activeEmbeddedMedia.pause();
+        }
     }
 }

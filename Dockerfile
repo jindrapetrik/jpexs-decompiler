@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxi6 \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version26.2.1/ffdec_26.2.1.zip /opt/ffdec.zip
+ADD https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version26.3.0/ffdec_26.3.0.zip /opt/ffdec.zip
 RUN cd /opt && unzip ffdec.zip -d ffdec && rm ffdec.zip
 
 WORKDIR /work

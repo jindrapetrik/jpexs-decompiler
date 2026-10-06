@@ -60,11 +60,13 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -112,6 +114,22 @@ public class Graph {
      */
     protected int startIp = 0;
 
+    private static final int MAX_REACHABILITY_CACHE_ROWS = 1 << 12;
+
+    private static final int MAX_REACHABILITY_CONTEXTS = 1 << 10;
+
+    private final Map<ReachabilityContext, ReachabilityCache> reachabilityCaches = new HashMap<>();
+
+    private ReachabilityCache reachabilityCache;
+
+    private final IdentityHashMap<GraphPart, Integer> reachabilityPartIndices = new IdentityHashMap<>();
+
+    private ReachabilityContext reachabilityContext;
+
+    private boolean reachabilityCacheFull;
+
+    private int reachabilityCacheRows;
+
     /**
      * Debug flag to print all parts
      */
@@ -145,6 +163,212 @@ public class Graph {
      */
     public GraphSource getGraphCode() {
         return code;
+    }
+
+    BitSet getCachedReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        BitSet result = reachabilityCache == null ? null
+                : reachabilityCache.reachableBySource.get(new ReachabilitySourceKey(from, firstCanBeLoopContinue));
+        return result;
+    }
+
+    boolean shouldCacheReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        if (reachabilityCacheFull || reachabilityCache == null) {
+            return false;
+        }
+        ReachabilitySourceKey key = new ReachabilitySourceKey(from, firstCanBeLoopContinue);
+        return !reachabilityCache.queriedSources.add(key);
+    }
+
+    void cacheReachability(BaseLocalData localData, GraphPart from,
+            List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue, BitSet reachableParts) {
+        prepareReachabilityCache(localData, loops, throwStates);
+        if (reachabilityCacheFull || reachabilityCache == null) {
+            return;
+        }
+        BitSet oldResult = reachabilityCache.reachableBySource.put(
+                new ReachabilitySourceKey(from, firstCanBeLoopContinue), reachableParts);
+        if (oldResult == null) {
+            reachabilityCacheRows++;
+        }
+        if (reachabilityCacheRows >= MAX_REACHABILITY_CACHE_ROWS) {
+            reachabilityCacheFull = true;
+        }
+    }
+
+    int getReachabilityPartIndex(GraphPart part) {
+        Integer index = reachabilityPartIndices.get(part);
+        if (index == null) {
+            index = reachabilityPartIndices.size();
+            reachabilityPartIndices.put(part, index);
+        }
+        return index;
+    }
+
+    protected final void invalidateReachabilityCache() {
+        reachabilityContext = null;
+        reachabilityCache = null;
+        reachabilityCaches.clear();
+        reachabilityPartIndices.clear();
+        reachabilityCacheFull = false;
+        reachabilityCacheRows = 0;
+    }
+
+    private void prepareReachabilityCache(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+        if (reachabilityContext == null || !reachabilityContext.matches(localData, loops, throwStates)) {
+            reachabilityContext = new ReachabilityContext(localData, loops, throwStates);
+            reachabilityCache = reachabilityCaches.get(reachabilityContext);
+            if (reachabilityCache == null && !reachabilityCacheFull
+                    && reachabilityCaches.size() < MAX_REACHABILITY_CONTEXTS) {
+                reachabilityCache = new ReachabilityCache();
+                reachabilityCaches.put(reachabilityContext, reachabilityCache);
+            }
+        }
+    }
+
+    private static final class ReachabilityCache {
+
+        private final Map<ReachabilitySourceKey, BitSet> reachableBySource = new HashMap<>();
+        private final Set<ReachabilitySourceKey> queriedSources = new HashSet<>();
+    }
+
+    private static final class ReachabilitySourceKey {
+
+        private final GraphPart from;
+        private final boolean firstCanBeLoopContinue;
+
+        ReachabilitySourceKey(GraphPart from, boolean firstCanBeLoopContinue) {
+            this.from = from;
+            this.firstCanBeLoopContinue = firstCanBeLoopContinue;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 59 * hash + System.identityHashCode(from);
+            hash = 59 * hash + (firstCanBeLoopContinue ? 1 : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ReachabilitySourceKey)) {
+                return false;
+            }
+            ReachabilitySourceKey other = (ReachabilitySourceKey) obj;
+            return from == other.from && firstCanBeLoopContinue == other.firstCanBeLoopContinue;
+        }
+    }
+
+    private static final class ReachabilityContext {
+
+        private final BaseLocalData localData;
+        private final List<Loop> loopObjects;
+        private final int[] loopPhases;
+        private final GraphPart[] loopContinues;
+        private final GraphPart[] loopPreContinues;
+        private final List<ThrowState> throwStateObjects;
+        private final int[] throwStateValues;
+        private final GraphPart[] throwTargets;
+        private final List<Set<GraphPart>> throwingParts;
+
+        ReachabilityContext(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+            this.localData = localData;
+            loopObjects = new ArrayList<>(loops);
+            loopPhases = new int[loops.size()];
+            loopContinues = new GraphPart[loops.size()];
+            loopPreContinues = new GraphPart[loops.size()];
+            for (int i = 0; i < loops.size(); i++) {
+                Loop loop = loops.get(i);
+                loopPhases[i] = loop.phase;
+                loopContinues[i] = loop.loopContinue;
+                loopPreContinues[i] = loop.loopPreContinue;
+            }
+
+            throwStateObjects = new ArrayList<>(throwStates);
+            throwStateValues = new int[throwStates.size()];
+            throwTargets = new GraphPart[throwStates.size()];
+            throwingParts = new ArrayList<>(throwStates.size());
+            for (int i = 0; i < throwStates.size(); i++) {
+                ThrowState throwState = throwStates.get(i);
+                throwStateValues[i] = throwState.state;
+                throwTargets[i] = throwState.targetPart;
+                throwingParts.add(new HashSet<>(throwState.throwingParts));
+            }
+        }
+
+        boolean matches(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+            if (this.localData != localData || loops.size() != loopObjects.size()
+                    || throwStates.size() != throwStateObjects.size()) {
+                return false;
+            }
+            for (int i = 0; i < loops.size(); i++) {
+                Loop loop = loops.get(i);
+                if (loop != loopObjects.get(i) || loop.phase != loopPhases[i]
+                        || loop.loopContinue != loopContinues[i]
+                        || loop.loopPreContinue != loopPreContinues[i]) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < throwStates.size(); i++) {
+                ThrowState throwState = throwStates.get(i);
+                if (throwState != throwStateObjects.get(i) || throwState.state != throwStateValues[i]
+                        || throwState.targetPart != throwTargets[i]
+                        || !throwState.throwingParts.equals(throwingParts.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = System.identityHashCode(localData);
+            for (int i = 0; i < loopObjects.size(); i++) {
+                hash = 31 * hash + System.identityHashCode(loopObjects.get(i));
+                hash = 31 * hash + loopPhases[i];
+                hash = 31 * hash + System.identityHashCode(loopContinues[i]);
+                hash = 31 * hash + System.identityHashCode(loopPreContinues[i]);
+            }
+            for (int i = 0; i < throwStateObjects.size(); i++) {
+                hash = 31 * hash + System.identityHashCode(throwStateObjects.get(i));
+                hash = 31 * hash + throwStateValues[i];
+                hash = 31 * hash + System.identityHashCode(throwTargets[i]);
+                hash = 31 * hash + throwingParts.get(i).hashCode();
+            }
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ReachabilityContext)) {
+                return false;
+            }
+            ReachabilityContext other = (ReachabilityContext) obj;
+            if (localData != other.localData || loopObjects.size() != other.loopObjects.size()
+                    || throwStateObjects.size() != other.throwStateObjects.size()) {
+                return false;
+            }
+            for (int i = 0; i < loopObjects.size(); i++) {
+                if (loopObjects.get(i) != other.loopObjects.get(i) || loopPhases[i] != other.loopPhases[i]
+                        || loopContinues[i] != other.loopContinues[i]
+                        || loopPreContinues[i] != other.loopPreContinues[i]) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < throwStateObjects.size(); i++) {
+                if (throwStateObjects.get(i) != other.throwStateObjects.get(i)
+                        || throwStateValues[i] != other.throwStateValues[i]
+                        || throwTargets[i] != other.throwTargets[i]
+                        || !throwingParts.get(i).equals(other.throwingParts.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /**
@@ -182,6 +406,7 @@ public class Graph {
             return;
         }
         heads = makeGraph(code, new ArrayList<>(), exceptions);
+        invalidateReachabilityCache();
     }
 
     /**
@@ -967,7 +1192,7 @@ public class Graph {
         if (localData.secondPassData == null) {
             SecondPassData secondPassData = prepareSecondPass(localData, loops, throwStates, ret);
             if (secondPassData != null) {
-                throw new SecondPassException(secondPassData);
+                throw new SecondPassException(secondPassData, ret);
             }
         }
 
@@ -996,7 +1221,7 @@ public class Graph {
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
 
-        if (!hasEmptyStackPops.getVal()) {
+        if (!hasEmptyStackPops.getVal() || !containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
         }
 
@@ -1004,6 +1229,29 @@ public class Graph {
         //fixSwitchEnds(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    private boolean containsPopItems(List<GraphTargetItem> list) {
+        Reference<Boolean> containsPopItem = new Reference<>(false);
+        for (GraphTargetItem item : list) {
+            if (item instanceof PopItem) {
+                return true;
+            }
+            item.visitRecursively(new AbstractGraphTargetVisitor() {
+                @Override
+                public boolean visit(GraphTargetItem item) {
+                    if (item instanceof PopItem) {
+                        containsPopItem.setVal(true);
+                        return false;
+                    }
+                    return true;
+                }
+            });
+            if (containsPopItem.getVal()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void promotePushItemsToCommands(List<GraphTargetItem> list) {
@@ -1585,6 +1833,35 @@ public class Graph {
                             ContinueItem cnt = (ContinueItem) commands.get(commands.size() - 1);
                             if (cnt.loopId == lastLoopId) {
                                 hasContinues = true;
+                            }
+                        }
+                    }
+                }
+                if (hasContinues && !supportsLabeledBreaksAndContinues()) {
+                    boolean loopControlMoved = false;
+                    if (breakCaseIndex > -1 && isDefaultOnlyCase(swi, breakCaseIndex)) {
+                        List<GraphTargetItem> defaultCommands = swi.caseCommands.get(breakCaseIndex);
+                        if (!defaultCommands.isEmpty()) {
+                            GraphTargetItem lastCommand = defaultCommands.get(defaultCommands.size() - 1);
+                            if (isLoopControl(lastCommand, lastLoopId)) {
+                                defaultCommands.remove(defaultCommands.size() - 1);
+                                fixSwitchEnd(swi);
+                                list.add(i + 1, lastCommand);
+                                loopControlMoved = true;
+                            }
+                        }
+                    }
+                    if (loopControlMoved) {
+                        continue loopi;
+                    }
+                }
+                if (hasContinues) {
+                    for (int c = 0; c < swi.caseCommands.size(); c++) {
+                        List<GraphTargetItem> commands = swi.caseCommands.get(c);
+                        if (!commands.isEmpty()) {
+                            GraphTargetItem lastCommand = commands.get(commands.size() - 1);
+                            if (lastCommand instanceof ContinueItem
+                                    && ((ContinueItem) lastCommand).loopId == lastLoopId) {
                                 commands.set(commands.size() - 1, new BreakItem(dialect, null, null, swi.loop.id));
                             }
                         }
@@ -1593,7 +1870,8 @@ public class Graph {
                 if (hasContinues && breakCaseIndex > -1 && i + 1 < list.size()) {
                     List<GraphTargetItem> toAdd = new ArrayList<>();
                     boolean continueOnEnd = list.get(list.size() - 1) instanceof ContinueItem;
-                    for (int j = i + 1; j < list.size() - (continueOnEnd ? 1 : 0); j++) {
+                    int size = list.size();
+                    for (int j = i + 1; j < size - (continueOnEnd ? 1 : 0); j++) {
                         toAdd.add(list.remove(i + 1));
                     }
                     List<GraphTargetItem> targetCommands = swi.caseCommands.get(breakCaseIndex);
@@ -1611,6 +1889,35 @@ public class Graph {
                 processSwitches(((IfItem) item).onFalse, lastLoopId);
             }
         }
+    }
+
+    /**
+     * Checks whether the target language supports labeled break and continue
+     * statements.
+     *
+     * @return True when labeled loop control is supported
+     */
+    protected boolean supportsLabeledBreaksAndContinues() {
+        return true;
+    }
+
+    private boolean isDefaultOnlyCase(SwitchItem switchItem, int commandsIndex) {
+        boolean hasDefault = false;
+        for (int i = 0; i < switchItem.valuesMapping.size(); i++) {
+            if (switchItem.valuesMapping.get(i) == commandsIndex) {
+                if (switchItem.caseValues.get(i) instanceof DefaultItem) {
+                    hasDefault = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return hasDefault;
+    }
+
+    private boolean isLoopControl(GraphTargetItem item, long loopId) {
+        return (item instanceof BreakItem && ((BreakItem) item).loopId == loopId)
+                || (item instanceof ContinueItem && ((ContinueItem) item).loopId == loopId);
     }
 
     /**
@@ -1845,6 +2152,264 @@ public class Graph {
                         if (processSubBlk(b, (GraphTargetItem) e)) {
                             list.remove(list.size() - 1);
                         }
+                    }
+                }
+            }
+        }
+        // Compilers often merge "break" from an inner search loop with the
+        // outer loop's continue target. That yields either:
+        //   while (true) { if (fail) continue outer; ... if (match) break; }
+        // or:
+        //   while (true) { if (cond) { ... } increment; continue outer; }
+        //   after; // only reached via break
+        // Recover while (cond) and move "after" back before breaks so labels
+        // are not required.
+        restructureWhileTrueContinueOuter(list);
+        if (level == 0) {
+            eliminateRedundantLabeledBreaks(list, new HashSet<>(), null, new HashSet<>());
+        }
+    }
+
+    /**
+     * Replaces breaks to an outer loop with breaks to the nearest switch when
+     * leaving that switch reaches the same destination without executing code.
+     * A case that can fall through does not inherit the switch's exit targets.
+     * Real loop bodies and other blocks are conservatively treated as barriers.
+     *
+     * @param commands Commands in the current block
+     * @param endTargets Break destinations equivalent to reaching the block's end
+     * @param loopId Nearest enclosing loop or switch id, or null
+     * @param exitTargets Break destinations equivalent to leaving that loop or switch
+     */
+    private void eliminateRedundantLabeledBreaks(List<GraphTargetItem> commands,
+            Set<Long> endTargets, Long loopId, Set<Long> exitTargets) {
+        Set<Long> continuationTargets = new HashSet<>(endTargets);
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = commands.get(i);
+            if (item instanceof BreakItem) {
+                BreakItem breakItem = (BreakItem) item;
+                if (loopId != null && exitTargets.contains(breakItem.loopId)) {
+                    breakItem.loopId = loopId;
+                }
+                continuationTargets = new HashSet<>();
+                continuationTargets.add(breakItem.loopId);
+                if (loopId != null && breakItem.loopId == loopId.longValue()) {
+                    continuationTargets.addAll(exitTargets);
+                }
+                continue;
+            }
+            if (item instanceof SwitchItem) {
+                SwitchItem switchItem = (SwitchItem) item;
+                Set<Long> switchExitTargets = new HashSet<>(continuationTargets);
+                for (int c = 0; c < switchItem.caseCommands.size(); c++) {
+                    Set<Long> caseEndTargets = new HashSet<>();
+                    if (c == switchItem.caseCommands.size() - 1) {
+                        caseEndTargets.add(switchItem.loop.id);
+                        caseEndTargets.addAll(switchExitTargets);
+                    }
+                    eliminateRedundantLabeledBreaks(switchItem.caseCommands.get(c),
+                            caseEndTargets, switchItem.loop.id, switchExitTargets);
+                }
+                fixSwitchEnd(switchItem);
+            } else if (item instanceof IfItem) {
+                IfItem ifItem = (IfItem) item;
+                eliminateRedundantLabeledBreaks(ifItem.onTrue, continuationTargets, loopId, exitTargets);
+                eliminateRedundantLabeledBreaks(ifItem.onFalse, continuationTargets, loopId, exitTargets);
+            } else if (item instanceof Block) {
+                Long nestedLoopId = item instanceof LoopItem ? ((LoopItem) item).loop.id : null;
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    eliminateRedundantLabeledBreaks(sub, new HashSet<>(), nestedLoopId, new HashSet<>());
+                }
+            }
+            // Any statement may have effects or fall through to another case.
+            continuationTargets = new HashSet<>();
+        }
+    }
+
+    /**
+     * Restructures an inner {@code while (true)} whose condition is expressed
+     * by a continue of an outer loop. Break-only trailing statements are moved
+     * before the inner break and the outer-loop continuation stays after the
+     * recovered conditional while, so no multilevel continue is needed.
+     *
+     * @param list Commands in the current block
+     */
+    private void restructureWhileTrueContinueOuter(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (!(item instanceof WhileItem)) {
+                continue;
+            }
+            WhileItem whi = (WhileItem) item;
+            if (whi.expression.isEmpty() || !(whi.expression.get(whi.expression.size() - 1) instanceof TrueItem)) {
+                continue;
+            }
+            if (whi.commands.isEmpty() || !(whi.commands.get(0) instanceof IfItem)) {
+                continue;
+            }
+            IfItem ifi = (IfItem) whi.commands.get(0);
+            ContinueItem outerContinue = null;
+            boolean invertCond = false;
+            List<GraphTargetItem> bodyFromIf = null;
+            List<GraphTargetItem> outerContinuation = null;
+
+            if (ifi.onFalse.isEmpty()
+                    && ifi.onTrue.size() == 1
+                    && ifi.onTrue.get(0) instanceof ContinueItem) {
+                outerContinue = (ContinueItem) ifi.onTrue.get(0);
+                invertCond = true;
+            } else if (ifi.onTrue.isEmpty()
+                    && ifi.onFalse.size() == 1
+                    && ifi.onFalse.get(0) instanceof ContinueItem) {
+                outerContinue = (ContinueItem) ifi.onFalse.get(0);
+                invertCond = false;
+            } else if (ifi.onTrue.size() == 1
+                    && ifi.onTrue.get(0) instanceof ContinueItem
+                    && !ifi.onFalse.isEmpty()) {
+                outerContinue = (ContinueItem) ifi.onTrue.get(0);
+                invertCond = true;
+                bodyFromIf = ifi.onFalse;
+            } else if (ifi.onFalse.size() == 1
+                    && ifi.onFalse.get(0) instanceof ContinueItem
+                    && !ifi.onTrue.isEmpty()) {
+                outerContinue = (ContinueItem) ifi.onFalse.get(0);
+                invertCond = false;
+                bodyFromIf = ifi.onTrue;
+            } else if (whi.commands.size() > 1
+                    && whi.commands.get(whi.commands.size() - 1) instanceof ContinueItem) {
+                ContinueItem trailingContinue = (ContinueItem) whi.commands.get(whi.commands.size() - 1);
+                if (trailingContinue.loopId != whi.loop.id) {
+                    if (ifi.onFalse.isEmpty() && !ifi.onTrue.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = false;
+                        bodyFromIf = ifi.onTrue;
+                    } else if (ifi.onTrue.isEmpty() && !ifi.onFalse.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = true;
+                        bodyFromIf = ifi.onFalse;
+                    }
+                    if (outerContinue != null) {
+                        outerContinuation = new ArrayList<>(whi.commands.subList(1, whi.commands.size() - 1));
+                    }
+                }
+            }
+
+            if (outerContinue == null || outerContinue.loopId == whi.loop.id) {
+                continue;
+            }
+
+            List<GraphTargetItem> after = new ArrayList<>();
+            for (int j = i + 1; j < list.size(); j++) {
+                after.add(list.get(j));
+            }
+            while (!after.isEmpty()
+                    && after.get(after.size() - 1) instanceof ContinueItem
+                    && ((ContinueItem) after.get(after.size() - 1)).loopId == outerContinue.loopId) {
+                after.remove(after.size() - 1);
+            }
+
+            if (outerContinuation == null) {
+                whi.commands.remove(0);
+                if (bodyFromIf != null) {
+                    whi.commands.addAll(0, bodyFromIf);
+                }
+            } else {
+                whi.commands.clear();
+                whi.commands.addAll(bodyFromIf);
+            }
+
+            // Continues to the same outer target are equivalent to breaking
+            // this while once trailing "after" is only on the break path.
+            changeContinueToBreak(whi.commands, outerContinue.loopId, whi.loop.id);
+
+            int breakCount = countBreaksOfLoop(whi.commands, whi.loop.id);
+            if (!after.isEmpty()) {
+                if (breakCount == 0) {
+                    // Unreachable after the while in this pattern.
+                    after.clear();
+                } else if (breakCount == 1) {
+                    insertBeforeBreaksOfLoop(whi.commands, whi.loop.id, after, false);
+                } else {
+                    insertBeforeBreaksOfLoop(whi.commands, whi.loop.id, after, true);
+                }
+            }
+
+            GraphTargetItem expr = ifi.expression;
+            if (invertCond) {
+                if (expr instanceof LogicalOpItem) {
+                    expr = ((LogicalOpItem) expr).invert(null);
+                } else {
+                    expr = expr.invert(null);
+                }
+            }
+            List<GraphTargetItem> newExpr = new ArrayList<>();
+            newExpr.add(expr);
+            whi.expression = newExpr;
+
+            while (list.size() > i + 1) {
+                list.remove(list.size() - 1);
+            }
+            if (outerContinuation != null) {
+                list.addAll(outerContinuation);
+            }
+        }
+    }
+
+    /**
+     * Counts {@link BreakItem}s that target {@code loopId} in {@code commands}.
+     *
+     * @param commands Commands
+     * @param loopId Loop id
+     * @return Number of matching breaks
+     */
+    private int countBreaksOfLoop(List<GraphTargetItem> commands, long loopId) {
+        int count = 0;
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
+                count++;
+            }
+            if (ti instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
+                    count += countBreaksOfLoop(sub, loopId);
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Inserts {@code toInsert} immediately before each break of {@code loopId}.
+     *
+     * @param commands Commands
+     * @param loopId Loop id
+     * @param toInsert Statements to insert
+     * @param cloneItems When true, clone items for each break; otherwise move once
+     */
+    private void insertBeforeBreaksOfLoop(List<GraphTargetItem> commands, long loopId, List<GraphTargetItem> toInsert, boolean cloneItems) {
+        boolean insertedCodeExits = !toInsert.isEmpty()
+                && toInsert.get(toInsert.size() - 1) instanceof ExitItem;
+        for (int i = 0; i < commands.size(); i++) {
+            GraphTargetItem ti = commands.get(i);
+            if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
+                for (int j = 0; j < toInsert.size(); j++) {
+                    GraphTargetItem ins = toInsert.get(j);
+                    commands.add(i + j, cloneItems ? ins.clone() : ins);
+                }
+                if (insertedCodeExits) {
+                    commands.remove(i + toInsert.size());
+                    i += toInsert.size() - 1;
+                } else {
+                    i += toInsert.size();
+                }
+                if (!cloneItems) {
+                    return;
+                }
+            } else if (ti instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
+                    insertBeforeBreaksOfLoop(sub, loopId, toInsert, cloneItems);
+                    if (!cloneItems && countBreaksOfLoop(sub, loopId) > 0) {
+                        // Moved into this sublist already.
+                        return;
                     }
                 }
             }
@@ -5190,6 +5755,20 @@ public class Graph {
                                     int vm = valuesMapping.get(k);
                                     if (vm > m) {
                                         valuesMapping.set(k, vm - 1);
+                                    }
+                                }
+                                
+                                if (j > 0) {
+                                    int mp = valuesMapping.get(j - 1);
+                                    GraphTargetItem last = null;
+                                    if (!caseCommands.get(mp).isEmpty()) {
+                                        last = caseCommands.get(mp).get(caseCommands.get(mp).size() - 1);
+                                    }
+                                    if (
+                                            last == null 
+                                            || (!(last instanceof BreakItem || last instanceof ContinueItem || last instanceof ExitItem))
+                                    ) {
+                                        caseCommands.get(mp).add(new BreakItem(br.dialect, null, null, loopId));
                                     }
                                 }
                             }

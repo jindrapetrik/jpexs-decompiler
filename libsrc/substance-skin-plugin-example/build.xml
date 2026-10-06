@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="substance-skin-plugin-example" default="jar" basedir=".">
+    <description>Example skin plugin for Substance 6.2.</description>
+
+    <property name="src.dir" location="src"/>
+    <property name="build.dir" location="build"/>
+    <property name="classes.dir" location="${build.dir}/classes"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="dist.jar" location="${dist.dir}/substance-skin-plugin-example.jar"/>
+    <property name="substance.jar" location="../../lib/substance-6.2.jar"/>
+    <property name="trident.jar" location="../../lib/trident-6.2.jar"/>
+
+    <path id="project.classpath">
+        <pathelement location="${substance.jar}"/>
+        <pathelement location="${trident.jar}"/>
+    </path>
+
+    <target name="check-dependencies">
+        <available file="${substance.jar}" property="substance.available"/>
+        <available file="${trident.jar}" property="trident.available"/>
+        <fail unless="substance.available"
+              message="Missing ${substance.jar}. Build this project inside the FFDec libsrc directory."/>
+        <fail unless="trident.available"
+              message="Missing ${trident.jar}. Build this project inside the FFDec libsrc directory."/>
+    </target>
+
+    <target name="compile" depends="check-dependencies">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               source="1.8"
+               target="1.8"
+               encoding="UTF-8"
+               includeantruntime="false"
+               classpathref="project.classpath"/>
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+        <jar destfile="${dist.jar}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Implementation-Title" value="Substance 6.2 example skin plugin"/>
+                <attribute name="Implementation-Version" value="1.0"/>
+            </manifest>
+        </jar>
+        <echo message="Created ${dist.jar}"/>
+    </target>
+
+    <target name="verify" depends="jar">
+        <java classname="com.jpexs.examples.substance.SampleSkinDemo" fork="true" failonerror="true">
+            <arg value="--verify"/>
+            <jvmarg value="-Djava.awt.headless=true"/>
+            <classpath>
+                <pathelement location="${dist.jar}"/>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run" depends="jar">
+        <java classname="com.jpexs.examples.substance.SampleSkinDemo" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="${dist.jar}"/>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+</project>

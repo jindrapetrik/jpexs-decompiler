@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
@@ -91,7 +90,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
             forinret.add(new ActionNot());
             ActionIf aforinif = new ActionIf(0, charset);
             forinret.add(aforinif);
-            aforinif.setJumpOffset(-Action.actionsToBytes(forinret, false, SWF.DEFAULT_VERSION).length);
+            aforinif.setJumpOffset(-Action.actionsToBytes(forinret, false, asGenerator.getSwfVersion()).length);
             ret.addAll(forinret);
         }
         if (value == null) {

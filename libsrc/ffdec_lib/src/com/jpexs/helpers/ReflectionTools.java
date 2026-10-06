@@ -228,8 +228,10 @@ public class ReflectionTools {
         }
         try {
             return cls.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalArgumentException ex) {
             Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex.getCause());
         }
         return null;
     }

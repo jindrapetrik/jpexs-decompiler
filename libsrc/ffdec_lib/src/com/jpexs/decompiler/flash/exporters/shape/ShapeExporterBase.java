@@ -82,8 +82,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         this.colorTransform = colorTransform;
         this.windingRule = windingRule;
 
-        Cache<SHAPE, ShapeExportData> cache = swf.getShapeExportDataCache();
-        ShapeExportData cachedData = cache.get(shape);
+        Cache<SHAPE, ShapeExportData> cache = swf == null ? null : swf.getShapeExportDataCache();
+        ShapeExportData cachedData = cache == null ? null : cache.get(shape);
         if (cachedData == null) {
             List<FillStyle> fillStyles = new ArrayList<>();
             List<LineStyle> lineStyles = new ArrayList<>();
@@ -125,7 +125,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             cachedData.linePaths = linePaths;
             cachedData.fillStyles = fillStyles;
             cachedData.lineStyles = lineStyles;
-            cache.put(shape, cachedData);
+            if (cache != null) {
+                cache.put(shape, cachedData);
+            }
         }
 
         _fillStyles = cachedData.fillStyles;
@@ -138,6 +140,14 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     
     protected void handleFillPaths(List<List<IEdge>> fillPaths) {
         
+    }
+
+    protected List<List<IEdge>> getFillPaths() {
+        return _fillPaths;
+    }
+
+    protected List<List<IEdge>> getLinePaths() {
+        return _linePaths;
     }
 
     /**

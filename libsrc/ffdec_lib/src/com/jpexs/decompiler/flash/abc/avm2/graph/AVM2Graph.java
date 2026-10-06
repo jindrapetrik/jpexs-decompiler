@@ -132,7 +132,6 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -516,6 +515,7 @@ public class AVM2Graph extends Graph {
                         finallyThrowPart = switchPart.nextParts.get(1 + finallyThrowPushByte);
                     }
                     localData.finallyThrowParts.put(e, finallyThrowPart);
+                    invalidateReachabilityCache();
                 }
 
                 for (GraphPart r : finallyPart.refs) {
@@ -1796,6 +1796,21 @@ public class AVM2Graph extends Graph {
                         break;
                     }
 
+                    if (part.nextParts.size() == branchCount) {
+                        GraphPart possibleNextDispatchPart = part.nextParts.get(branchNum);
+                        boolean reachedFromCaseBody = false;
+                        for (GraphPart caseBodyPart : caseBodyParts) {
+                            if (caseBodyPart == possibleNextDispatchPart
+                                    || caseBodyPart.leadsTo(localData, this, code, possibleNextDispatchPart, loops, throwStates, false)) {
+                                reachedFromCaseBody = true;
+                                break;
+                            }
+                        }
+                        if (reachedFromCaseBody) {
+                            break;
+                        }
+                    }
+
                     //Special: In Flex (not air) there are these blocks sometimes:
                     // if(false) {
                     //    §§push(5);
@@ -1858,6 +1873,33 @@ public class AVM2Graph extends Graph {
                 }
             } catch (GraphPartChangeException gpc) {
                 //ignore
+            }
+
+            // Non-integer switches first use strict comparisons
+            // to select an index and then dispatch through a shared lookupswitch.
+            // Leave that pattern for the real switch handler below instead of
+            // mistaking the index-selection comparisons for the source switch.
+            GraphPart lookupSwitchPart = getLinearLookupSwitchTarget(part.nextParts.get(branchNum));
+            if (lookupSwitchPart != null) {
+                for (GraphPart caseBodyPart : caseBodyParts) {
+                    if (getLinearLookupSwitchTarget(caseBodyPart) != lookupSwitchPart) {
+                        lookupSwitchPart = null;
+                        break;
+                    }
+                }
+                if (lookupSwitchPart != null) {
+                    boolean lookupSwitchIsInLoop = false;
+                    for (Loop loop : loops) {
+                        if (loop.loopBody.contains(lookupSwitchPart)) {
+                            lookupSwitchIsInLoop = true;
+                            break;
+                        }
+                    }
+                    if (lookupSwitchIsInLoop) {
+                        stack.push(firstSet);
+                        return ret;
+                    }
+                }
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
 
@@ -3308,6 +3350,20 @@ public class AVM2Graph extends Graph {
         return avm2code.code.get(part.end).definition instanceof LookupSwitchIns;
     }
 
+    private GraphPart getLinearLookupSwitchTarget(GraphPart part) {
+        Set<GraphPart> visited = new HashSet<>();
+        while (visited.add(part)) {
+            if (partIsSwitch(part)) {
+                return part;
+            }
+            if (part.nextParts.size() != 1) {
+                return null;
+            }
+            part = part.nextParts.get(0);
+        }
+        return null;
+    }
+
     /**
      * Gets throw states.
      *
@@ -3483,6 +3539,7 @@ public class AVM2Graph extends Graph {
                 }
                 if (ip < part.end && !isFinally) {
                     //split part into half
+                    invalidateReachabilityCache();
                     GraphPart secondPart = new GraphPart(ip + 1, part.end);
                     part.end = ip;
                     for (GraphPart n : part.nextParts) {

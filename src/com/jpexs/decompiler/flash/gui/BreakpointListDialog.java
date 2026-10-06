@@ -204,10 +204,13 @@ public class BreakpointListDialog extends AppDialog {
             for (int line : breakpoints.get(scriptName)) {
                 newBreakpointList.add(new Breakpoint(scriptName, line));
                 String status = "unknown";
-                if (Main.getCurrentDebugSession().isBreakpointInvalid(swf, scriptName, line)) {
-                    status = "invalid";
-                } else if (Main.getCurrentDebugSession().isBreakpointConfirmed(swf, scriptName, line)) {
-                    status = "confirmed";
+                DebuggerSession debugSession = Main.getCurrentDebugSession();
+                if (debugSession != null) {
+                    if (debugSession.isBreakpointInvalid(swf, scriptName, line)) {
+                        status = "invalid";
+                    } else if (debugSession.isBreakpointConfirmed(swf, scriptName, line)) {
+                        status = "confirmed";
+                    }
                 }
                 defaultTableModel.addRow(new Object[]{scriptName, line, translate("breakpoint.status." + status)});
             }

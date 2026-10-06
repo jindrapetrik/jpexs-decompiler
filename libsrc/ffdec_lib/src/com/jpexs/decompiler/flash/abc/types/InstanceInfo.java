@@ -177,11 +177,8 @@ public class InstanceInfo {
                 if (ct != null) {
                     String fileName = ct.getCharacterExportFileName();
                     if (Configuration.as3ExportNamesUseClassNamesOnly.get()) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
-                        } else {
-                            fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toRawString();
-                        }
+                        // Always printable so embed $md5-int stems match asset files
+                        fileName = getName(abc.constants).getNameWithNamespace(usedDeobfuscations, abc, abc.constants, false).toPrintableString(new LinkedHashSet<>(), abc.getSwf(), true);
                     }
 
                     String ext = "";

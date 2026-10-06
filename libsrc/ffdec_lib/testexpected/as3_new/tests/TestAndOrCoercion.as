@@ -87,11 +87,11 @@ package tests
                   code
                      getlocal0
                      pushscope
-                     debug 1, "x", 0, 26
-                     debug 1, "y", 1, 27
-                     debug 1, "z", 2, 28
-                     debug 1, "a", 3, 30
-                     debug 1, "b", 4, 31
+                     debug 1, "x", 0, 27
+                     debug 1, "y", 1, 28
+                     debug 1, "z", 2, 29
+                     debug 1, "a", 3, 31
+                     debug 1, "b", 4, 32
                      getlocal0
                      getproperty QName(PrivateNamespace("tests:TestAndOrCoercion"),"ti")
                      coerce QName(PackageNamespace("tests_classes.mypackage1"),"TestInterface")

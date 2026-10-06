@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -64,13 +63,16 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SecondPassData;
+import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
@@ -93,8 +95,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * ActionScript 1/2 graph
@@ -102,6 +102,11 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class ActionGraph extends Graph {
+
+    /**
+     * Labels whose unreachable goto was removed.
+     */
+    private final Set<String> labelsOfRemovedGotos = new HashSet<>();
 
     /**
      * Inside DoInitAction
@@ -187,7 +192,7 @@ public class ActionGraph extends Graph {
                 List<Integer> startIps = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
-                        outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
+                        outs.add(new ActionList(((ActionGraphSource) code).getCharset(), ((ActionGraphSource) code).version));
                         startIps.add(0);
                         continue;
                     }
@@ -201,7 +206,7 @@ public class ActionGraph extends Graph {
                     ActionList al = outs.get(i);
                     int startIp = startIps.get(i);
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
+                            new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), ((ActionGraphSource) code).version, ((ActionGraphSource) getGraphCode()).getCharset(), startIp)
                     );
                 }
             }
@@ -251,6 +256,41 @@ public class ActionGraph extends Graph {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+        ActionSecondPassContext context = ActionSecondPassContext.current();
+        if (context != null && secondPassData == null) {
+            ActionSecondPassContext.GraphKey key = context.getKey(code, startIp, path);
+            if (context.isCollecting()) {
+                try {
+                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                } catch (SecondPassException spe) {
+                    context.put(key, spe.getData());
+                    return spe.getFirstPassResult();
+                }
+            }
+
+            SecondPassData collectedData = context.get(key);
+            if (collectedData == null) {
+                HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
+                HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
+                context.startCollecting();
+                try {
+                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                } finally {
+                    context.startRendering();
+                }
+                variables.clear();
+                variables.putAll(variablesBackup);
+                functions.clear();
+                functions.putAll(functionsBackup);
+                collectedData = context.get(key);
+            }
+            secondPassData = collectedData;
+        }
+
+        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+    }
+
+    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
         ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits, usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
         g.init(localData);
@@ -619,7 +659,56 @@ public class ActionGraph extends Graph {
 
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
+        removeUnreachableGotosAfterTerminalControl(list);
 
+    }
+
+    private void removeUnreachableGotosAfterTerminalControl(List<GraphTargetItem> list) {
+        for (int i = 1; i < list.size(); i++) {
+            GraphTargetItem previous = list.get(i - 1);
+            if (list.get(i) instanceof GotoItem
+                    && (previous instanceof BreakItem
+                    || previous instanceof ContinueItem
+                    || previous instanceof ExitItem)) {
+                String labelName = ((GotoItem) list.get(i)).labelName;
+                if (labelName != null) {
+                    labelsOfRemovedGotos.add(labelName);
+                }
+                list.remove(i);
+                i--;
+            }
+        }
+    }
+
+    @Override
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
+        super.finalProcessAfter(list, level, localData, path);
+        Set<String> usedLabels = new HashSet<>();
+        collectUsedLabels(list, usedLabels);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof LabelItem
+                    && labelsOfRemovedGotos.contains(((LabelItem) item).labelName)
+                    && !usedLabels.contains(((LabelItem) item).labelName)) {
+                list.remove(i);
+            }
+        }
+    }
+
+    private void collectUsedLabels(List<GraphTargetItem> list, Set<String> usedLabels) {
+        for (GraphTargetItem item : list) {
+            if (item instanceof GotoItem) {
+                String labelName = ((GotoItem) item).labelName;
+                if (labelName != null) {
+                    usedLabels.add(labelName);
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    collectUsedLabels(sub, usedLabels);
+                }
+            }
+        }
     }
 
     /**
@@ -953,6 +1042,11 @@ public class ActionGraph extends Graph {
             }
         }
         return ret;
+    }
+
+    @Override
+    protected boolean supportsLabeledBreaksAndContinues() {
+        return false;
     }
 
     private int ipAfterJumps(int nip) {

@@ -85,7 +85,8 @@
                 WorkingDirectory="INSTALLFOLDER"
                 Icon="FFDecIcon" />
       <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
-      <RegistryValue Root="HKCU" Key="Software/JPEXS/FFDec" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      <RegistryValue Root="HKCU" Key="Software\JPEXS\FFDec" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      <RegistryValue Root="HKCU" Key="Software\JPEXS\FFDec" Name="installDir" Type="string" Value="[INSTALLFOLDER]" />
     </Component>
 
     <!-- Desktop Shortcut -->
@@ -96,7 +97,7 @@
                 Target="[INSTALLFOLDER]ffdec.exe"
                 WorkingDirectory="INSTALLFOLDER"
                 Icon="FFDecIcon" />
-      <RegistryValue Root="HKCU" Key="Software/JPEXS/FFDec" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      <RegistryValue Root="HKCU" Key="Software\JPEXS\FFDec" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes" />
     </Component>
     
     <Property Id="VERB" Value="ffdec" />

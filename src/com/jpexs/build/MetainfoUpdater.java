@@ -131,7 +131,7 @@ public class MetainfoUpdater {
             prevMatchEnd = changelogVersionMatcher.end();
         }
 
-        metainfo = metainfo.replaceAll("<releases>", ("<releases>" + newline + releases).trim());
+        metainfo = metainfo.replace("<releases>", ("<releases>" + newline + releases).trim());
 
         try (FileOutputStream fos = new FileOutputStream(METAINFO_FILENAME)) {
             fos.write(metainfo.getBytes("UTF-8"));

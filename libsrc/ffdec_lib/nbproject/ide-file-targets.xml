@@ -37,7 +37,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify"/>
+            <!--<jvmarg value="-noverify"/>-->
             <classfileset dir="${compile.test.dir}" includes="${test.file}"/>
         </testng>
     </target>
@@ -59,7 +59,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify"/>
+            <!--<jvmarg value="-noverify"/>-->
             <classfileset dir="${compile.test.dir}" includes="${test.file}" />
         </testng>
     </target>
@@ -90,7 +90,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify"/>
+            <!--<jvmarg value="-noverify"/>-->
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <classfileset dir="${compile.test.dir}" includes="${debug.file}"/>
@@ -123,7 +123,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify"/>
+            <!--<jvmarg value="-noverify"/>-->
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <classfileset dir="${compile.test.dir}" includes="${debug.file}"/>

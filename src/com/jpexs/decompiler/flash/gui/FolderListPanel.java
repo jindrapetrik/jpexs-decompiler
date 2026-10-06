@@ -257,6 +257,8 @@ public class FolderListPanel extends JPanel {
                         ScriptPack sp = (ScriptPack) treeItem;            
                         if (sp.isDocumentClass()) {
                             icon = View.getIcon("asclassmain32");                            
+                        } else if (type == TreeNodeType.AS_CLASS && AbstractTagTree.isLinkedAs3Class(sp)) {
+                            icon = View.getIcon("asclasslink32");
                         }
                     }
                     

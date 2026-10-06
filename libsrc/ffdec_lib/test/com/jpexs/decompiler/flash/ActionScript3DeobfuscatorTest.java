@@ -211,6 +211,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
 
     private String recompile(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         str = "package { public class Test {  public static function trace(s){ } public static function test(){ " + str + " }   }  }";
+        return recompileSource(str);
+    }
+
+    private String recompileSource(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         final ABC abc = new ABC(new ABCContainerTag() {
             @Override
             public ABC getABC() {
@@ -532,7 +536,271 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         }\n"
                 + "         else if(_loc2_ == \"C\")\n"
                 + "         {\n"
+                 + "         }\n");
+    }
+
+    @Test
+    public void testSequentialStrictComparisonsNotSwitch() throws Exception {
+        decompilePCode("getlocal1\n"
+                + "            pushstring \"A\"\n"
+                + "            ifstrictne checkB\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"first\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   checkB:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"B\"\n"
+                + "            ifstrictne checkC\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"second\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   checkC:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"C\"\n"
+                + "            ifstrictne finish\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"third\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   finish:\n",
+                "         if(param1 === \"A\")\n"
+                + "         {\n"
+                + "            trace(\"first\");\n"
+                + "         }\n"
+                + "         if(param1 === \"B\")\n"
+                + "         {\n"
+                + "            trace(\"second\");\n"
+                + "         }\n"
+                + "         if(param1 === \"C\")\n"
+                + "         {\n"
+                + "            trace(\"third\");\n"
                 + "         }\n");
+    }
+
+    @Test
+    public void testSwitchWithInterleavedCaseBodies() throws Exception {
+        decompilePCode("getlocal1\n"
+                + "            pushstring \"A\"\n"
+                + "            ifstrictne checkB\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"first\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump finish\n"
+                + "   checkB:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"B\"\n"
+                + "            ifstrictne checkC\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"second\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump finish\n"
+                + "   checkC:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"C\"\n"
+                + "            ifstrictne finish\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"third\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   finish:\n",
+                "         switch(param1)\n"
+                + "         {\n"
+                + "            case \"A\":\n"
+                + "               trace(\"first\");\n"
+                + "               break;\n"
+                + "            case \"B\":\n"
+                + "               trace(\"second\");\n"
+                + "               break;\n"
+                + "            case \"C\":\n"
+                + "               trace(\"third\");\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testSwitchFollowedByStrictComparison() throws Exception {
+        decompilePCode("getlocal1\n"
+                + "            pushstring \"A\"\n"
+                + "            ifstrictne checkB\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"first\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump afterSwitch\n"
+                + "   checkB:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"B\"\n"
+                + "            ifstrictne afterSwitch\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"second\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   afterSwitch:\n"
+                + "            getlocal1\n"
+                + "            pushstring \"C\"\n"
+                + "            ifstrictne finish\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   finish:\n",
+                "         switch(param1)\n"
+                + "         {\n"
+                + "            case \"A\":\n"
+                + "               trace(\"first\");\n"
+                + "               break;\n"
+                + "            case \"B\":\n"
+                + "               trace(\"second\");\n"
+                + "         }\n"
+                + "         if(param1 === \"C\")\n"
+                + "         {\n"
+                + "            trace(\"after\");\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testLoopBreakUsesMostCommonExit() throws Exception {
+        decompilePCode("            pushbyte 0\n"
+                + "            setlocal2\n"
+                + "            pushbyte 0\n"
+                + "            setlocal3\n"
+                + "   condition:\n"
+                + "            getlocal2\n"
+                + "            pushbyte 10\n"
+                + "            ifge after\n"
+                + "            getlocal1\n"
+                + "            pushstring \"A\"\n"
+                + "            ifstricteq found\n"
+                + "            getlocal1\n"
+                + "            pushstring \"B\"\n"
+                + "            ifstricteq found\n"
+                + "            inclocal_i 2\n"
+                + "            jump condition\n"
+                + "   found:\n"
+                + "            pushbyte 1\n"
+                + "            setlocal3\n"
+                + "            jump after\n"
+                + "   after:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal3\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         var _loc2_:int = 0;\n"
+                + "         var _loc3_:int = 0;\n"
+                + "         loop0:\n"
+                + "         while(_loc2_ < 10)\n"
+                + "         {\n"
+                + "            switch(param1)\n"
+                + "            {\n"
+                + "               case \"A\":\n"
+                + "               case \"B\":\n"
+                + "                  _loc3_ = 1;\n"
+                + "                  break loop0;\n"
+                + "            }\n"
+                + "            _loc2_++;\n"
+                + "         }\n"
+                + "         trace(_loc3_);\n");
+    }
+
+    @Test
+    public void testNestedLoopOuterContinueDoesNotBecomeInnerBreak() throws Exception {
+        decompilePCode("            pushbyte 0\n"
+                + "            setlocal2\n"
+                + "   outer_condition:\n"
+                + "            getlocal2\n"
+                + "            pushbyte 3\n"
+                + "            ifge done\n"
+                + "            pushbyte 0\n"
+                + "            setlocal3\n"
+                + "   inner_condition:\n"
+                + "            getlocal3\n"
+                + "            pushbyte 3\n"
+                + "            ifge after_inner\n"
+                + "            getlocal1\n"
+                + "            iftrue outer_continue\n"
+                + "            inclocal_i 3\n"
+                + "            jump inner_condition\n"
+                + "   after_inner:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after inner\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   outer_continue:\n"
+                + "            inclocal_i 2\n"
+                + "            jump outer_condition\n"
+                + "   done:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"done\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         var _loc2_:int = 0;\n"
+                + "         loop0:\n"
+                + "         for(; _loc2_ < 3; _loc2_++)\n"
+                + "         {\n"
+                + "            var _loc3_:int = 0;\n"
+                + "            while(_loc3_ < 3)\n"
+                + "            {\n"
+                + "               if(!param1)\n"
+                + "               {\n"
+                + "                  _loc3_++;\n"
+                + "                  continue;\n"
+                + "               }\n"
+                + "               continue loop0;\n"
+                + "            }\n"
+                + "            trace(\"after inner\");\n"
+                + "         }\n"
+                + "         trace(\"done\");\n");
+    }
+
+    @Test
+    public void testOuterContinuePrefixIsNotLoopBreak() throws Exception {
+        decompilePCode("            pushbyte 0\n"
+                + "            setlocal2\n"
+                + "   outer_condition:\n"
+                + "            getlocal2\n"
+                + "            pushbyte 3\n"
+                + "            ifge done\n"
+                + "            pushbyte 0\n"
+                + "            setlocal3\n"
+                + "   inner_condition:\n"
+                + "            getlocal3\n"
+                + "            pushbyte 3\n"
+                + "            ifge after_inner\n"
+                + "            getlocal1\n"
+                + "            iftrue before_outer_continue\n"
+                + "            getlocal3\n"
+                + "            pushbyte 1\n"
+                + "            ifeq before_outer_continue\n"
+                + "            inclocal_i 3\n"
+                + "            jump inner_condition\n"
+                + "   before_outer_continue:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"before outer continue\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump outer_continue\n"
+                + "   after_inner:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after inner\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   outer_continue:\n"
+                + "            inclocal_i 2\n"
+                + "            jump outer_condition\n"
+                + "   done:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"done\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         var _loc2_:int = 0;\n"
+                + "         loop0:\n"
+                + "         for(; _loc2_ < 3; _loc2_++)\n"
+                + "         {\n"
+                + "            var _loc3_:int = 0;\n"
+                + "            while(_loc3_ < 3)\n"
+                + "            {\n"
+                + "               if(!param1)\n"
+                + "               {\n"
+                + "                  if(_loc3_ != 1)\n"
+                + "                  {\n"
+                + "                     _loc3_++;\n"
+                + "                     continue;\n"
+                + "                  }\n"
+                + "               }\n"
+                + "               trace(\"before outer continue\");\n"
+                + "               continue loop0;\n"
+                + "            }\n"
+                + "            trace(\"after inner\");\n"
+                + "         }\n"
+                + "         trace(\"done\");\n");
     }
 
     @Test
@@ -913,6 +1181,33 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "               this.test();\n"
                 + "         }\n"
                 + "         this.testX = 0;\n");
+    }
+
+    @Test
+    public void testStringSwitchCasesContinuingOuterLoop() throws Exception {
+        String res = recompileSource("package { public class Test { public function testLoop() {"
+                + "var result = 0;"
+                + "while (true) {"
+                + "switch (this.getValue()) {"
+                + "case \"a\":"
+                + "result = 1;"
+                + "continue;"
+                + "case \"b\":"
+                + "result = 2;"
+                + "continue;"
+                + "case \"c\":"
+                + "result = 3;"
+                + "continue;"
+                + "}"
+                + "break;"
+                + "}"
+                + "return result;"
+                + "} } }");
+        Assert.assertTrue(res.contains("function testLoop()"), res);
+        Assert.assertTrue(res.contains("case \"a\":"), res);
+        Assert.assertTrue(res.contains("case \"b\":"), res);
+        Assert.assertTrue(res.contains("case \"c\":"), res);
+        Assert.assertFalse(res.contains("§§goto"), res);
     }
 
     // TODO: JPEXS @Test

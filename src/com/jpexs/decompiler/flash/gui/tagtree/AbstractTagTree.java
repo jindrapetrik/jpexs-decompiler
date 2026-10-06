@@ -135,6 +135,7 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -148,6 +149,7 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -234,6 +236,9 @@ public abstract class AbstractTagTree extends JTree {
             if (sp.isDocumentClass()) {
                 return View.getIcon("asclassmain16");
             }
+            if (type == TreeNodeType.AS_CLASS && isLinkedAs3Class(sp)) {
+                return View.getIcon("asclasslink16");
+            }
         }
         
         if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
@@ -246,6 +251,11 @@ public abstract class AbstractTagTree extends JTree {
             return getIconForType(type);
         }
         return null;
+    }
+
+    public static boolean isLinkedAs3Class(ScriptPack scriptPack) {
+        SWF swf = scriptPack.abc.getSwf();
+        return swf != null && swf.getCharacterByClass(scriptPack.getClassPath().toRawString()) != null;
     }
 
     public AbstractTagTree(AbstractTagTreeModel treeModel, MainPanel mainPanel) {
@@ -267,7 +277,7 @@ public abstract class AbstractTagTree extends JTree {
             @Override
             protected MouseListener createMouseListener() {
                 MouseListener handler = super.createMouseListener();
-                return new MouseListener() {
+                return new MouseInputAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         handler.mouseClicked(e);
@@ -292,6 +302,20 @@ public abstract class AbstractTagTree extends JTree {
                     public void mouseExited(MouseEvent e) {
                         handler.mouseReleased(e); //crucial to properly free nodes
                         handler.mouseExited(e);
+                    }
+
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        if (handler instanceof MouseMotionListener) {
+                            ((MouseMotionListener) handler).mouseDragged(e);
+                        }
+                    }
+
+                    @Override
+                    public void mouseMoved(MouseEvent e) {
+                        if (handler instanceof MouseMotionListener) {
+                            ((MouseMotionListener) handler).mouseMoved(e);
+                        }
                     }
                     
                 };

@@ -101,9 +101,7 @@ public class MovieExporter {
                 Set<String> classNames = videoStream.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
-                        if (Configuration.autoDeobfuscateIdentifiers.get()) {
-                            className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), videoStream.getSwf(), true);
-                        }
+                        className = DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), videoStream.getSwf(), true);
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ".flv"));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
-import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -63,7 +61,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -83,9 +80,7 @@ public class SwfXmlExporter {
     /**
      * XML export version major.
      */
-    public static final int XML_EXPORT_VERSION_MAJOR = 2;
-
-    public static final int XML_EXPORT_VERSION_MAJOR_WITH_EXTERNAL_FILES = 3;
+    public static final int XML_EXPORT_VERSION_MAJOR = 4;
 
     /**
      * XML export version minor.
@@ -167,13 +162,13 @@ public class SwfXmlExporter {
             Map<Tag, String> tagExternalFiles = new IdentityHashMap<>();
             List<Tag> imagesList = new ArrayList<>();
             if (settings.imageExportMode != null) {
-                ImageExportSettings imageExportSetttings = new ImageExportSettings(settings.imageExportMode);
+                ImageExportSettings imageExportSettings = new ImageExportSettings(settings.imageExportMode);
                 Map<Integer, CharacterTag> chars = swf.getCharacters(false);
                 for (int charId : chars.keySet()) {
                     CharacterTag ch = chars.get(charId);
                     if (ch instanceof ImageTag) {
                         ImageTag imageTag = (ImageTag) ch;
-                        tagExternalFiles.put(imageTag, assetsDirName + "/images/" + Helper.makeFileName(imageTag.getCharacterExportFileName()) + "." + ImageExporter.getExportExtension(imageTag, imageExportSetttings));
+                        tagExternalFiles.put(imageTag, assetsDirName + "/images/" + Helper.makeFileName(imageTag.getCharacterExportFileName()) + "." + ImageExporter.getExportExtension(imageTag, imageExportSettings));
                         imagesList.add(imageTag);
                     }
                 }
@@ -181,13 +176,13 @@ public class SwfXmlExporter {
 
             List<SoundTag> soundList = new ArrayList<>();
             if (settings.defineSoundExportMode != null) {
-                SoundExportSettings soundExportSetttings = new SoundExportSettings(settings.defineSoundExportMode);
+                SoundExportSettings soundExportSettings = new SoundExportSettings(settings.defineSoundExportMode);
                 Map<Integer, CharacterTag> chars = swf.getCharacters(false);
                 for (int charId : chars.keySet()) {
                     CharacterTag ch = chars.get(charId);
                     if (ch instanceof DefineSoundTag) {
                         DefineSoundTag soundTag = (DefineSoundTag) ch;
-                        tagExternalFiles.put(soundTag, assetsDirName + "/sounds/" + Helper.makeFileName(soundTag.getCharacterExportFileName()) + "." + SoundExporter.getExportExtension(soundTag, soundExportSetttings));
+                        tagExternalFiles.put(soundTag, assetsDirName + "/sounds/" + Helper.makeFileName(soundTag.getCharacterExportFileName()) + "." + SoundExporter.getExportExtension(soundTag, soundExportSettings));
                         soundList.add(soundTag);
                     }
                 }
@@ -258,7 +253,7 @@ public class SwfXmlExporter {
             XMLStreamWriter writer
     ) throws IOException, XMLStreamException {
         generateXml(
-                asmExternalFiles.isEmpty() && tagExternalFiles.isEmpty() ? XML_EXPORT_VERSION_MAJOR : XML_EXPORT_VERSION_MAJOR_WITH_EXTERNAL_FILES,
+                XML_EXPORT_VERSION_MAJOR,
                 asmExternalFiles,
                 tagExternalFiles,
                 swf,
