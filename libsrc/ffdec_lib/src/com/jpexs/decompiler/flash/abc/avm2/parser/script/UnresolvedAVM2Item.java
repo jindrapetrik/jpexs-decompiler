@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -395,6 +396,34 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     }
 
     /**
+     * Cross-call scratch state for resolve loops - caches variables list, constant-pool indices,
+     * AbcIndexing/ABC identity. will be invalid if any of those change while using accelerator.
+     */
+    public static class ResolveAccelerator {
+        public HashMap<String, NameAVM2Item> definitionNameIndex = new HashMap<>();
+        public PropertyAVM2Item.ResolveAccelerator propertyResolveAccelerator = new PropertyAVM2Item.ResolveAccelerator();
+
+        public ResolveAccelerator(List<AssignableAVM2Item> variables) {
+            for (AssignableAVM2Item an : variables) {
+                if (an instanceof NameAVM2Item) {
+                    NameAVM2Item n = (NameAVM2Item) an;
+                    // first-wins ordering as in original loop code
+                    if (n.isDefinition() && !definitionNameIndex.containsKey(n.getVariableName())) {
+                        definitionNameIndex.put(n.getVariableName(), n);
+                    }
+                }
+            }
+        }
+    }
+
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {        
+        ResolveAccelerator accelerator = new ResolveAccelerator(variables);
+
+        return resolve(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+    }
+
+
+    /**
      * Resolves.
      * @param localData Local data
      * @param currentClassFullName Current class full name
@@ -404,61 +433,142 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
      * @param abc ABC
      * @param callStack Call stack
      * @param variables Variables
+     * @param accelerator Resolve accelerator
      * @return Resolved item
      * @throws CompilationException On compilation error
      */
-    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {        
-        if (scopeStack.isEmpty()) { //Everything is multiname property in with command
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
+        boolean isResolved = false;
 
-            //search for variable
-            for (AssignableAVM2Item a : variables) {
-                if (a instanceof NameAVM2Item) {
-                    NameAVM2Item n = (NameAVM2Item) a;
-                    if (n.isDefinition() && name.get(0).equals(n.getVariableName())) {
-                        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
-                        ret.setSlotScope(n.getSlotScope());
-                        ret.setSlotNumber(n.getSlotNumber());
-                        ret.setRegNumber(n.getRegNumber());
-                        resolved = ret;
-                        for (int i = 1; i < name.size(); i++) {
-                            resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                            if (i == name.size() - 1) {
-                                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                            }
-                        }
-                        if (name.size() == 1) {
-                            ret.setAssignedValue(assignedValue);
-                        }
-                        ret.setNs(n.getNs());
-                        return resolvedRoot = ret;
-                    }
-                }
+        if (scopeStack.isEmpty()) { //Everything is multiname property in with command
+            isResolved = resolveLocalVariable(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+            if (isResolved) {
+                return resolvedRoot;
             }
         }
 
         if ((paramNames.contains(name.get(0)) || name.get(0).equals("arguments"))) {
-            int ind = paramNames.indexOf(name.get(0));
-            GraphTargetItem t = TypeItem.UNBOUNDED;
-            if (ind == -1) {
-                //empty
-            } else if (ind < paramTypes.size()) {
-                t = paramTypes.get(ind);
-            } //else rest parameter
+            isResolved = resolveParameter(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
 
-            GraphTargetItem ret = new NameAVM2Item(t, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
+        boolean isProperty = isScopeProperty(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables, accelerator);
+
+        //search same package classes
+        if (currentClassFullName != null && !isProperty) {
+            isResolved = resolveSamePackageClass(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
+
+        //Search toplevel classes
+        if (currentClassFullName != null && !isProperty) {
+            isResolved = resolveTopLevelClass(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
+
+        //Search for types in imported classes
+        if (!isProperty) {
+            isResolved = resolveImport(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
+
+        //Search all fully qualified types
+        if (!isProperty) {
+            isResolved = resolveFullyQualifiedType(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+
+            isResolved = resolveInOpenedNamespaces(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
+
+        if (!isProperty && (name.get(0).equals("this") || name.get(0).equals("super"))) {
+            if (thisType == null) {
+                throw new CompilationException("Cannot use this in that context", line);
+            }
+
+            isResolved = resolveThisOrSuper(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+            if (isResolved) {
+                return resolvedRoot;
+            }
+        }
+
+        if (!isProperty && (name.size() == 1 && name.get(0).equals("Vector"))) {
+            TypeItem ret = new TypeItem(InitVectorAVM2Item.VECTOR_FQN);
             resolved = ret;
-            for (int i = 1; i < name.size(); i++) {
-                resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                if (i == name.size() - 1) {
-                    ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                }
-            }
-            if (name.size() == 1) {
-                ((NameAVM2Item) ret).setAssignedValue(assignedValue);
-            }
             return resolvedRoot = ret;
         }
 
+        if (mustBeType) {
+            throw new CompilationException(name.toPrintableString(new LinkedHashSet<>(), abcIndex.getSelectedAbc().getSwf(), true) + " is not an existing type", line);
+        }
+
+        resolveAsMultinameProperty(localData, currentClassFullName, thisType, paramTypes, paramNames, abc, callStack, variables);
+        return resolvedRoot;
+    }
+
+    private boolean resolveLocalVariable(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
+        //search for variable
+        NameAVM2Item n = accelerator.definitionNameIndex.get(name.get(0));
+        if (n == null) {
+            return false;
+        }
+
+        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
+        ret.setSlotScope(n.getSlotScope());
+        ret.setSlotNumber(n.getSlotNumber());
+        ret.setRegNumber(n.getRegNumber());
+        resolved = ret;
+        for (int i = 1; i < name.size(); i++) {
+            resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+            if (i == name.size() - 1) {
+                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+            }
+        }
+        if (name.size() == 1) {
+            ret.setAssignedValue(assignedValue);
+        }
+        ret.setNs(n.getNs());
+        resolvedRoot = ret;
+        return true;
+    }
+
+    private boolean resolveParameter(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        int ind = paramNames.indexOf(name.get(0));
+        GraphTargetItem t = TypeItem.UNBOUNDED;
+        if (ind == -1) {
+            //empty
+        } else if (ind < paramTypes.size()) {
+            t = paramTypes.get(ind);
+        } //else rest parameter
+
+        GraphTargetItem ret = new NameAVM2Item(t, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
+        resolved = ret;
+        for (int i = 1; i < name.size(); i++) {
+            resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+            if (i == name.size() - 1) {
+                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+            }
+        }
+        if (name.size() == 1) {
+            ((NameAVM2Item) ret).setAssignedValue(assignedValue);
+        }
+        resolvedRoot = ret;
+        return true;
+    }
+
+    private boolean isScopeProperty(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         boolean isProperty = false;
         if (localData != null) { //resolve can be called without localData
             PropertyAVM2Item resolvedx = new PropertyAVM2Item(null, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), abc, openedNamespaces, callStack, false, null, line, this.thisType);
@@ -472,50 +582,25 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             Reference<Boolean> isType = new Reference<>(false);
             Reference<Trait> outPropTrait = new Reference<>(null);
 
-            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC, outPropTrait);
+            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC, outPropTrait, accelerator.propertyResolveAccelerator);
 
             if (objectType.getVal() != null && !isType.getVal()) {
                 isProperty = true;
             }
         }
 
-        //search same package classes
-        if (currentClassFullName != null && !isProperty) {
-            DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
-            DottedChain pkg = classChain.getWithoutLast();
+        return isProperty;
+    }
 
-            if (!pkg.isTopLevel()) { //toplevel in next step
-                TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
-                AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
+    private boolean resolveSamePackageClass(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
+        DottedChain pkg = classChain.getWithoutLast();
 
-                if (ci != null) {
-                    resolved = ti;
-                    for (int i = 1; i < name.size(); i++) {
-                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                        if (i == name.size() - 1) {
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                        }
-                    }
-                    return resolvedRoot = ti;
-                }
-            }
-        }
-
-        //Search toplevel classes
-        if (currentClassFullName != null && !isProperty) {
-            DottedChain pkg = DottedChain.TOPLEVEL;
-
+        if (!pkg.isTopLevel()) { //toplevel in next step
             TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
             if (ci != null) {
-                for (DottedChain imp : importedClasses) {
-                    String impName = imp.getLast();
-
-                    if (impName.equals(name.get(0))) {
-                        throw new CompilationException("The type \"" + name.get(0) + "\" exists on toplevel package and also as an import from different package. Please make it fully qualified so it matches the desired import.", line);
-                    }
-                }
                 resolved = ti;
                 for (int i = 1; i < name.size(); i++) {
                     resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
@@ -523,157 +608,186 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
                 }
-                return resolvedRoot = ti;
+                resolvedRoot = ti;
+                return true;
             }
         }
+        return false;
+    }
 
-        //Search for types in imported classes
-        if (!isProperty) {
+
+    private boolean resolveTopLevelClass(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        DottedChain pkg = DottedChain.TOPLEVEL;
+
+        TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
+        AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
+
+        if (ci != null) {
             for (DottedChain imp : importedClasses) {
-                if (imp.equals(name)) {
-                    TypeItem importedItem = new TypeItem(imp);
-                    AbcIndexing.ClassIndex ci = abc.findClass(importedItem, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
-                    if (ci == null) {
-                        AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
-                        if (ti != null) {
-                            ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(importedItem);
-                            ret.assignedValue = assignedValue;
-                            resolved = ret;
-                            return resolvedRoot = ret;
-                        }
-                    }
-                }
-
                 String impName = imp.getLast();
 
                 if (impName.equals(name.get(0))) {
-                    TypeItem ret = new TypeItem(imp);
-                    
-                    resolved = ret;
-                    for (int i = 1; i < name.size(); i++) {
-                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                        if (i == name.size() - 1) {
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                        }
-                    }
-
-                    if (name.size() == 1) {                        
-                        AbcIndexing.ClassIndex ci = abc.findClass(ret, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
-                        if (ci == null) {
-                            AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
-                            if (ti != null) {
-                                resolved = new ScriptPropertyAVM2Item(ret);
-                                if (assignedValue != null) {
-                                    ((ScriptPropertyAVM2Item) resolved).assignedValue = assignedValue;
-                                }
-                                return resolvedRoot = resolved;
-                            }
-                        }                                                
-                    }
-
-                    return resolvedRoot = ret;
+                    throw new CompilationException("The type \"" + name.get(0) + "\" exists on toplevel package and also as an import from different package. Please make it fully qualified so it matches the desired import.", line);
                 }
             }
-        }
-
-        //Search all fully qualified types
-        if (!isProperty) {
-            for (int i = 0; i < name.size(); i++) {
-                DottedChain fname = name.subChain(i + 1);
-                AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), localData != null ? abc.getSelectedAbc() : null, localData != null ? localData.scriptIndex : null);
-                if (ci != null) {
-                    if (!subtypes.isEmpty() && name.size() > i + 1) {
-                        continue;
-                    }
-                    TypeItem ret = new TypeItem(fname);
-                    resolved = ret;
-                    for (int j = i + 1; j < name.size(); j++) {
-                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(j), name.get(j), name.getNamespaceSuffix(j), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                        if (j == name.size() - 1) {
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                        }
-                    }
-                    if (name.size() == i + 1 && assignedValue != null) {
-                        throw new CompilationException("Cannot assign type", line);
-                    }
-
-                    return resolvedRoot = ret;
-                }
-            }
-
-            DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
-            DottedChain pkg = classChain.getWithoutLast();
-
-            //Search for types in opened namespaces
-            for (NamespaceItem n : openedNamespaces) {
-                n.resolveCustomNs(abcIndex, importedClasses, pkg, openedNamespaces, localData);
-                Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc));
-                TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).addWithSuffix(name.get(0)));
-                AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
-                if (ci != null) {
-                    if (!subtypes.isEmpty() && name.size() > 1) {
-                        continue;
-                    }
-                    TypeItem ret = ti;
-                    resolved = ret;
-                    for (int i = 1; i < name.size(); i++) {
-                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
-                        if (i == name.size() - 1) {
-                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                        }
-                    }
-                    if (name.size() == 1 && assignedValue != null) {
-                        throw new CompilationException("Cannot assign type", line);
-                    }
-
-                    return resolvedRoot = ret;
-                }
-            }
-        }
-
-        if (!isProperty && (name.get(0).equals("this") || name.get(0).equals("super"))) {
-            if (thisType == null) {
-                throw new CompilationException("Cannot use this in that context", line);
-            }
-
-            boolean isSuper = name.get(0).equals("super");
-            GraphTargetItem ntype = thisType;
-            if (isSuper) {
-                AbcIndexing.ClassIndex ci = abc.findClass(thisType, null, null/*FIXME?*/);
-                if (ci == null) {
-                    throw new CompilationException("This class not found", line);
-                }
-                ci = ci.parent;
-                if (ci == null) {
-                    ntype = new TypeItem("Object");
-                } else {
-                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(new LinkedHashSet<>(), ci.abc, ci.abc.constants, true));
-                }
-            }
-
-            NameAVM2Item ret = new NameAVM2Item(ntype, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
-            resolved = ret;
+            resolved = ti;
             for (int i = 1; i < name.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
                 if (i == name.size() - 1) {
                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                 }
             }
-            if (name.size() == 1) {
-                ret.setAssignedValue(assignedValue);
+            resolvedRoot = ti;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean resolveImport(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        for (DottedChain imp : importedClasses) {
+            if (imp.equals(name)) {
+                TypeItem importedItem = new TypeItem(imp);
+                AbcIndexing.ClassIndex ci = abc.findClass(importedItem, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
+                if (ci == null) {
+                    AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                    if (ti != null) {
+                        ScriptPropertyAVM2Item ret = new ScriptPropertyAVM2Item(importedItem);
+                        ret.assignedValue = assignedValue;
+                        resolved = ret;
+                        resolvedRoot = ret;
+                        return true;
+                    }
+                }
             }
-            return resolvedRoot = ret;
+
+            String impName = imp.getLast();
+
+            if (impName.equals(name.get(0))) {
+                TypeItem ret = new TypeItem(imp);
+                
+                resolved = ret;
+                for (int i = 1; i < name.size(); i++) {
+                    resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+                    if (i == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                    }
+                }
+
+                if (name.size() == 1) {                        
+                    AbcIndexing.ClassIndex ci = abc.findClass(ret, abc.getSelectedAbc(), localData == null ? null : localData.scriptIndex);
+                    if (ci == null) {
+                        AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                        if (ti != null) {
+                            resolved = new ScriptPropertyAVM2Item(ret);
+                            if (assignedValue != null) {
+                                ((ScriptPropertyAVM2Item) resolved).assignedValue = assignedValue;
+                            }
+                            resolvedRoot = resolved;
+                            return true;
+                        }
+                    }                                                
+                }
+
+                resolvedRoot = ret;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean resolveFullyQualifiedType(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        for (int i = 0; i < name.size(); i++) {
+            DottedChain fname = name.subChain(i + 1);
+            AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), localData != null ? abc.getSelectedAbc() : null, localData != null ? localData.scriptIndex : null);
+            if (ci != null) {
+                if (!subtypes.isEmpty() && name.size() > i + 1) {
+                    continue;
+                }
+                TypeItem ret = new TypeItem(fname);
+                resolved = ret;
+                for (int j = i + 1; j < name.size(); j++) {
+                    resolved = new PropertyAVM2Item(resolved, name.isAttribute(j), name.get(j), name.getNamespaceSuffix(j), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+                    if (j == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                    }
+                }
+                if (name.size() == i + 1 && assignedValue != null) {
+                    throw new CompilationException("Cannot assign type", line);
+                }
+
+                resolvedRoot = ret;
+                return true;
+            }
         }
 
-        if (!isProperty && (name.size() == 1 && name.get(0).equals("Vector"))) {
-            TypeItem ret = new TypeItem(InitVectorAVM2Item.VECTOR_FQN);
-            resolved = ret;
-            return resolvedRoot = ret;
+        return false;
+    }
+    
+    private boolean resolveInOpenedNamespaces(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
+        DottedChain pkg = classChain.getWithoutLast();
+
+        //Search for types in opened namespaces
+        for (NamespaceItem n : openedNamespaces) {
+            n.resolveCustomNs(abcIndex, importedClasses, pkg, openedNamespaces, localData);
+            Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc));
+            TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).addWithSuffix(name.get(0)));
+            AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
+            if (ci != null) {
+                if (!subtypes.isEmpty() && name.size() > 1) {
+                    continue;
+                }
+                TypeItem ret = ti;
+                resolved = ret;
+                for (int i = 1; i < name.size(); i++) {
+                    resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+                    if (i == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                    }
+                }
+                if (name.size() == 1 && assignedValue != null) {
+                    throw new CompilationException("Cannot assign type", line);
+                }
+
+                resolvedRoot = ret;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean resolveThisOrSuper(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+        boolean isSuper = name.get(0).equals("super");
+        GraphTargetItem ntype = thisType;
+        if (isSuper) {
+            AbcIndexing.ClassIndex ci = abc.findClass(thisType, null, null/*FIXME?*/);
+            if (ci == null) {
+                throw new CompilationException("This class not found", line);
+            }
+            ci = ci.parent;
+            if (ci == null) {
+                ntype = new TypeItem("Object");
+            } else {
+                ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(new LinkedHashSet<>(), ci.abc, ci.abc.constants, true));
+            }
         }
 
-        if (mustBeType) {
-            throw new CompilationException(name.toPrintableString(new LinkedHashSet<>(), abcIndex.getSelectedAbc().getSwf(), true) + " is not an existing type", line);
+        NameAVM2Item ret = new NameAVM2Item(ntype, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
+        resolved = ret;
+        for (int i = 1; i < name.size(); i++) {
+            resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>(), false, null, line, this.thisType);
+            if (i == name.size() - 1) {
+                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+            }
         }
+        if (name.size() == 1) {
+            ret.setAssignedValue(assignedValue);
+        }
+        resolvedRoot = ret;
+        return true;
+    }
+
+    private boolean resolveAsMultinameProperty(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         resolved = null;
         GraphTargetItem ret = null;
         for (int i = 0; i < name.size(); i++) {
@@ -686,7 +800,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ((PropertyAVM2Item) resolved).setAssignedValue(assignedValue);
             }
         }
-        return resolvedRoot = ret;
+        resolvedRoot = ret;
+        return true;
     }
 
     @Override
