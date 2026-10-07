@@ -55,14 +55,29 @@ final class FilterTweenDetector {
             Element element = (Element) node;
             Filter filter = new Filter();
             switch (element.getNodeName()) {
-                case "BlurFilter": filter.prefix = "Blur"; break;
-                case "GlowFilter": filter.prefix = "Glow"; break;
-                case "DropShadowFilter": filter.prefix = "DropShadow"; break;
-                case "BevelFilter": filter.prefix = "Bevel"; break;
-                case "GradientGlowFilter": filter.prefix = "GradientGlow"; break;
-                case "GradientBevelFilter": filter.prefix = "GradientBevel"; break;
-                case "AdjustColorFilter": filter.prefix = "AdjustColor"; break;
-                default: return null;
+                case "BlurFilter":
+                    filter.prefix = "Blur";
+                    break;
+                case "GlowFilter":
+                    filter.prefix = "Glow";
+                    break;
+                case "DropShadowFilter":
+                    filter.prefix = "DropShadow";
+                    break;
+                case "BevelFilter":
+                    filter.prefix = "Bevel";
+                    break;
+                case "GradientGlowFilter":
+                    filter.prefix = "GradientGlow";
+                    break;
+                case "GradientBevelFilter":
+                    filter.prefix = "GradientBevel";
+                    break;
+                case "AdjustColorFilter":
+                    filter.prefix = "AdjustColor";
+                    break;
+                default:
+                    return null;
             }
             // Native containers are identified by type, not stack index. Do not
             // collapse duplicate types until their native addressing is known.
@@ -359,7 +374,8 @@ final class FilterTweenDetector {
         for (int f = start; f <= (changing ? end : start); f++) {
             ClassicTweenDetector.Sample sample = samples.get(f);
             int last = f == end || !changing ? sample.index : sample.index + sample.duration - 1;
-            StringBuilder colors = new StringBuilder(), indexes = new StringBuilder();
+            StringBuilder colors = new StringBuilder();
+            StringBuilder indexes = new StringBuilder();
             for (int stop = 0; stop < filter.gradientStops; stop++) {
                 if (stop > 0) {
                     colors.append(',');

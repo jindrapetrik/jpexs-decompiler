@@ -503,6 +503,7 @@ final class MotionTweenDetector {
     private static String decimal(double value) {
         return java.math.BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
     }
+
     private static final class Segment {
         final double start;
         final double end;
@@ -612,8 +613,10 @@ final class MotionTweenDetector {
             // Only strengths independently measured in native CS6 are enabled.
             for (int strength : new int[]{1, 2, 3, 4, 5, 6, 8}) {
                 NativeTimeMap map = new NativeTimeMap(type, strength, intervals);
-                double lower = Double.NEGATIVE_INFINITY, upper = Double.POSITIVE_INFINITY;
-                double sumPV = 0, sumPP = 0;
+                double lower = Double.NEGATIVE_INFINITY;
+                double upper = Double.POSITIVE_INFINITY;
+                double sumPV = 0;
+                double sumPP = 0;
                 boolean valid = true;
                 for (int f = start; f <= end && valid; f++) {
                     ClassicTweenDetector.Sample sample = samples.get(f);
@@ -623,12 +626,19 @@ final class MotionTweenDetector {
                     for (int frame = sample.index; frame <= lastFrame; frame++) {
                         double p = map.progress((frame - firstFrame) / (double) intervals);
                         if (Math.abs(p) < 1e-12) {
-                            if (Math.abs(value) > error) { valid = false; break; }
+                            if (Math.abs(value) > error) {
+                                valid = false;
+                                break;
+                            }
                         } else {
-                            double a = (value - error) / p, b = (value + error) / p;
+                            double a = (value - error) / p;
+                            double b = (value + error) / p;
                             lower = Math.max(lower, Math.min(a, b));
                             upper = Math.min(upper, Math.max(a, b));
-                            if (lower > upper) { valid = false; break; }
+                            if (lower > upper) {
+                                valid = false;
+                                break;
+                            }
                         }
                         sumPV += p * value;
                         sumPP += p * p;
@@ -641,7 +651,9 @@ final class MotionTweenDetector {
                     double unit = component < 2 ? 20 : component < 4 ? 65536 : 0;
                     if (unit != 0) {
                         double rounded = Math.rint((begin + delta) * unit) / unit - begin;
-                        if (rounded >= lower && rounded <= upper) { delta = rounded; }
+                        if (rounded >= lower && rounded <= upper) {
+                            delta = rounded;
+                        }
                     }
                     return new NativeCurve(map, delta);
                 }
@@ -668,7 +680,8 @@ final class MotionTweenDetector {
                 // Intersect the permitted blend amounts, including every held
                 // SWF frame. Strength is continuous here: output stores samples,
                 // rather than guessing an Adobe TimeMap name or strength scale.
-                double lower = 0.01, upper = 1;
+                double lower = 0.01;
+                double upper = 1;
                 boolean matches = true;
                 for (int f = start; f <= end && matches; f++) {
                     ClassicTweenDetector.Sample sample = samples.get(f);
@@ -760,8 +773,10 @@ final class MotionTweenDetector {
         int right = start + 2 * (end - start) / 3;
         double ta = (samples.get(left).index - firstFrame) / duration;
         double tb = (samples.get(right).index - firstFrame) / duration;
-        double aa = ta * (1 - ta), ab = aa * (2 * ta - 1);
-        double ba = tb * (1 - tb), bb = ba * (2 * tb - 1);
+        double aa = ta * (1 - ta);
+        double ab = aa * (2 * ta - 1);
+        double ba = tb * (1 - tb);
+        double bb = ba * (2 * tb - 1);
         double det = aa * bb - ab * ba;
         double ya = channelValue(samples.get(left), component) - begin - (finish - begin) * ta;
         double yb = channelValue(samples.get(right), component) - begin - (finish - begin) * tb;
@@ -777,12 +792,17 @@ final class MotionTweenDetector {
                 }
             }
         }
-        double sumAA = 0, sumBB = 0, sumAB = 0, sumAY = 0, sumBY = 0;
+        double sumAA = 0;
+        double sumBB = 0;
+        double sumAB = 0;
+        double sumAY = 0;
+        double sumBY = 0;
         for (int f = start; f < end; f++) {
             ClassicTweenDetector.Sample sample = samples.get(f);
             for (int frame = sample.index; frame < sample.index + sample.duration; frame++) {
                 double t = (frame - firstFrame) / duration;
-                double a = t * (1 - t), b = a * (2 * t - 1);
+                double a = t * (1 - t);
+                double b = a * (2 * t - 1);
                 double residual = channelValue(sample, component) - begin - (finish - begin) * t;
                 sumAA += a * a;
                 sumBB += b * b;
@@ -822,6 +842,7 @@ final class MotionTweenDetector {
         }
         writer.writeEndElement();
     }
+
     private static double channelValue(ClassicTweenDetector.Sample sample, int component) {
         // Canonical decomposition: rotation is the X axis angle, Skew_X is
         // the difference between the Y and X axis angles; Skew_Y stays zero.
@@ -859,7 +880,10 @@ final class MotionTweenDetector {
         }
         int firstFrame = samples.get(start).index;
         int duration = samples.get(end).index - firstFrame;
-        double lower = -100, upper = 100, sumHH = 0, sumHY = 0;
+        double lower = -100;
+        double upper = 100;
+        double sumHH = 0;
+        double sumHY = 0;
         for (int f = start; f <= end; f++) {
             ClassicTweenDetector.Sample sample = samples.get(f);
             int last = f == end ? sample.index : sample.index + sample.duration - 1;
@@ -874,7 +898,8 @@ final class MotionTweenDetector {
                     }
                     continue;
                 }
-                double a = (residual - error) / h, b = (residual + error) / h;
+                double a = (residual - error) / h;
+                double b = (residual + error) / h;
                 lower = Math.max(lower, Math.min(a, b));
                 upper = Math.min(upper, Math.max(a, b));
                 if (lower > upper) {
@@ -884,7 +909,8 @@ final class MotionTweenDetector {
                 sumHY += h * residual;
             }
         }
-        int minimum = (int) Math.ceil(lower), maximum = (int) Math.floor(upper);
+        int minimum = (int) Math.ceil(lower);
+        int maximum = (int) Math.floor(upper);
         if (minimum > maximum || sumHH == 0) {
             return null;
         }
@@ -940,6 +966,7 @@ final class MotionTweenDetector {
         double[] curve = {begin, begin + (finish - begin) / 3, begin + 2 * (finish - begin) / 3, finish};
         return matchesChannel(samples, start, end, component, curve, strength) ? strength : null;
     }
+
     private static double tolerance(int component, ClassicTweenDetector.Sample sample) {
         if (component < 2) {
             return POSITION_TOLERANCE;
@@ -1097,7 +1124,8 @@ final class MotionTweenDetector {
             if (wholeEndpointsFit) {
                 intercept = roundedBegin;
                 slope = roundedFinish - roundedBegin;
-            }            double error = 0;
+            }
+            double error = 0;
             for (int f = 0; f < count; f++) {
                 double value = intercept + slope * progress[f];
                 // Verify the actual two-stage Flash alpha quantization.
@@ -1172,6 +1200,7 @@ final class MotionTweenDetector {
         writer.writeEndElement();
         return writer.toString();
     }
+
     private static void writeProperty(XFLXmlWriter writer, String id, double[] curve, int lastTime) throws XMLStreamException {
         writeProperty(writer, id, curve, lastTime, 0);
     }
