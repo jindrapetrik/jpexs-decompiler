@@ -48,7 +48,11 @@ public enum ImageFormat {
     /**
      * WEBP
      */
-    WEBP(".webp");
+    WEBP(".webp"),
+    /**
+     * JPEG-XR
+     */
+    JXR(".jxr");
 
     private final String extension;
 

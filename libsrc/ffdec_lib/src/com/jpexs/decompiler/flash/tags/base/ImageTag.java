@@ -160,6 +160,16 @@ public abstract class ImageTag extends DrawableTag {
             ) {
             return ImageFormat.GIF;
         }
+        
+        if (
+                data.getLength() > 4
+                && ((data.get(0) & 0xff) == 0x49)
+                && ((data.get(1) & 0xff) == 0x49)
+                && ((data.get(2) & 0xff) == 0xBC)
+                && ((data.get(3) & 0xff) == 0x01)
+            ) {
+            return ImageFormat.JXR;
+        }
                 
         if (data.getLength() > 8 && ((data.get(0) & 0xff) == 0x89) && ((data.get(1) & 0xff) == 0x50) && ((data.get(2) & 0xff) == 0x4e) && ((data.get(3) & 0xff) == 0x47) && ((data.get(4) & 0xff) == 0x0d) && ((data.get(5) & 0xff) == 0x0a) && ((data.get(6) & 0xff) == 0x1a) && ((data.get(7) & 0xff) == 0x0a)) {
             return ImageFormat.PNG;

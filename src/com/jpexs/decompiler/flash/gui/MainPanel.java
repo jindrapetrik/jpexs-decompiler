@@ -5360,7 +5360,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             //}
         }
         if (ti0 instanceof ImageTag) {
-            String filters = "*.jpg;*.jpeg;*.gif;*.png;*.bmp";
+            String filters = "*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.jxr";
             if (ImageFormat.WEBP.available()) {
                 filters += ";*.webp";
             }

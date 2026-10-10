@@ -104,14 +104,15 @@ public class ImageImporter extends TagImporter {
             }
         }
         if (tagType == -1) {
-            if (newData.length >= 4
-                    && newData[0] == (byte) 0xff
-                    && newData[1] == (byte) 0xd8
-                    && newData[2] == (byte) 0xff
-                    && newData[3] == (byte) 0xe0) {
-                tagType = DefineBitsJPEG2Tag.ID;
-            } else {
-                tagType = DefineBitsLossless2Tag.ID;
+            ImageFormat format = ImageTag.getImageFormat(newData);
+            switch (format) {
+                case PNG:
+                case GIF:
+                case BMP:
+                    tagType = DefineBitsLossless2Tag.ID;
+                    break;
+                default:
+                    tagType = DefineBitsJPEG2Tag.ID;
             }
         }
 
@@ -249,7 +250,7 @@ public class ImageImporter extends TagImporter {
     public int bulkImport(File imagesDir, SWF swf, boolean printOut) {
         int count = 0;
         Map<Integer, CharacterTag> characters = swf.getCharacters(false);
-        List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+        List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "jxr");
         List<String> alphaExtensions = Arrays.asList("png");
         File[] allFiles = imagesDir.listFiles(new FilenameFilter() {
             @Override
