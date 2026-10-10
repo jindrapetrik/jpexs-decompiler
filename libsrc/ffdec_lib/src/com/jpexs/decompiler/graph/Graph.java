@@ -2167,6 +2167,34 @@ public class Graph {
         restructureWhileTrueContinueOuter(list);
         if (level == 0) {
             eliminateRedundantLabeledBreaks(list, new HashSet<>(), null, new HashSet<>());
+            removeTrailingContinues(list);
+        }
+    }
+
+    /**
+     * Removes redundant continues after loop bodies and their continuation
+     * commands have been reconstructed. Only the base body ends at the loop's
+     * continue target; conditions, for headers and switch cases do not.
+     *
+     * @param commands Commands
+     */
+    private void removeTrailingContinues(List<GraphTargetItem> commands) {
+        for (GraphTargetItem item : commands) {
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeTrailingContinues(sub);
+                }
+            }
+            if (item instanceof LoopItem) {
+                LoopItem loopItem = (LoopItem) item;
+                if (loopItem.hasBaseBody()) {
+                    List<GraphTargetItem> body = loopItem.getBaseBodyCommands();
+                    if (!body.isEmpty() && body.get(body.size() - 1) instanceof ContinueItem
+                            && ((ContinueItem) body.get(body.size() - 1)).loopId == loopItem.loop.id) {
+                        body.remove(body.size() - 1);
+                    }
+                }
+            }
         }
     }
 
