@@ -4469,6 +4469,8 @@ public class Graph {
                                 Deque<GraphPart> s = new ArrayDeque<>();
                                 s.push(next);
                                 Set<GraphPart> v = new HashSet<>();
+                                //Reachability from part, valid until loops change
+                                BitSet partReachable = null;
                                 loops:
                                 while (!s.isEmpty()) {
                                     GraphPart p = s.poll();
@@ -4477,13 +4479,16 @@ public class Graph {
                                         continue;
                                     }
                                     for (GraphPart r : p.refs) {
-                                        // #2636                                                                                
+                                        // #2636
                                         GraphPartEdge edge = new GraphPartEdge(r, p);
                                         if (backEdges.contains(edge)) {
                                             continue;
                                         }
                                         // also #2636
-                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates, true /*IMPORTANT*/)) {
+                                        if (partReachable == null) {
+                                            partReachable = part.getReachableParts(localData, this, code, loops, throwStates, true /*IMPORTANT*/);
+                                        }
+                                        if (!partReachable.get(getReachabilityPartIndex(r))) {
                                             continue;
                                         }
 
@@ -4512,6 +4517,7 @@ public class Graph {
                                                     Loop el = new Loop(loops.size(), part, n2);
                                                     el.phase = 1;
                                                     loops.add(el);
+                                                    partReachable = null;
 
                                                     ig.add(n2);
                                                     List<GraphTargetItem> commands = new GraphPartMarkedArrayList<>();
