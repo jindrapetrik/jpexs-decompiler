@@ -102,7 +102,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
         characterID = sis.readUI16("characterID");
         long alphaDataOffset = sis.readUI32("alphaDataOffset");
         deblockParam = sis.readUI16("deblockParam");
-        imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
+        imageData = sis.readByteRangeEx(alphaDataOffset - 2, "imageData");
         bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData", DumpInfoSpecialType.ZLIB_DATA, null);
     }
 
@@ -115,7 +115,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(characterID);
-        sos.writeUI32(imageData.getLength());
+        sos.writeUI32(imageData.getLength() + 2);
         sos.writeUI16(deblockParam);
         sos.write(imageData);
         sos.write(bitmapAlphaData);
