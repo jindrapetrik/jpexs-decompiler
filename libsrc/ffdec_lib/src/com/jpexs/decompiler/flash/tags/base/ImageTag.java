@@ -149,10 +149,18 @@ public abstract class ImageTag extends DrawableTag {
             return ImageFormat.JPEG;
         }
 
-        if (data.getLength() > 6 && ((data.get(0) & 0xff) == 0x47) && ((data.get(1) & 0xff) == 0x49) && ((data.get(2) & 0xff) == 0x46) && ((data.get(3) & 0xff) == 0x38) && ((data.get(4) & 0xff) == 0x39) && ((data.get(5) & 0xff) == 0x61)) {
+        if (
+                data.getLength() > 6 
+                && ((data.get(0) & 0xff) == 0x47) //G
+                && ((data.get(1) & 0xff) == 0x49) //I
+                && ((data.get(2) & 0xff) == 0x46) //F
+                && ((data.get(3) & 0xff) == 0x38) //8
+                && ((data.get(4) & 0xff) == 0x37 || (data.get(4) & 0xff) == 0x39) //7/9
+                && ((data.get(5) & 0xff) == 0x61) //a
+            ) {
             return ImageFormat.GIF;
         }
-
+                
         if (data.getLength() > 8 && ((data.get(0) & 0xff) == 0x89) && ((data.get(1) & 0xff) == 0x50) && ((data.get(2) & 0xff) == 0x4e) && ((data.get(3) & 0xff) == 0x47) && ((data.get(4) & 0xff) == 0x0d) && ((data.get(5) & 0xff) == 0x0a) && ((data.get(6) & 0xff) == 0x1a) && ((data.get(7) & 0xff) == 0x0a)) {
             return ImageFormat.PNG;
         }
