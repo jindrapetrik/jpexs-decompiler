@@ -268,6 +268,7 @@ bcx
 bdctx
 bdff
 bdt
+bduration
 beaninfo
 Beanshell
 bechtold
@@ -299,6 +300,7 @@ biasdist
 bic
 bigs
 bilerp
+bioshock
 bimg
 binarydata
 binaryexcludes
@@ -1856,7 +1858,7 @@ jsa
 Jscroll
 JScrollable
 jsep
-JSFL
+jsfl
 jslike
 jso
 jsondatafile
@@ -3661,6 +3663,7 @@ ths
 timelined
 TIMERNOFG
 timesroman
+timevalue
 tina
 titem
 tlb

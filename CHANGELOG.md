@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - add substance skin plugin example ([#2757])
 
 ### Bug Fixes
-- respect font codeoffset, correct GFX font strip ([#2726])
+- respect font codeOffset, correct GFX font strip ([#2726])
 - correct missing break in switch statement ([#2722])
 - correct switch break inside loop ([#2723])
 - use clipped fill for image shapes ([#2721])
@@ -50,7 +50,7 @@ All notable changes to this project will be documented in this file.
 - as3: preserve convert/coerce types on for-each and for-in vars ([PR280])
 - as3: keep ctor assigns that read unset instance slots ([PR278])
 - as1/2: avoid simplifying getTimer function ([#2752])
-- add +X permission to translator and soledir.sh on Linux zip ([#623])
+- add +X permission to translator and soledit.sh on Linux zip ([#623])
 - aero snap: fix working on multiple monitors ([#2756], [#2523])
 
 ### Performance Improvements

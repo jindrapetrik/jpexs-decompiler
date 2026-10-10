@@ -135,3 +135,4 @@ Lexer\.java$
 (?:^|/)build\.xml$
 ^Dockerfile$
 (?:^|/)DoAction\.as$
+^libsrc/ffdec_lib/testdata/motion_object/
