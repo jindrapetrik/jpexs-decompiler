@@ -1082,6 +1082,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> actionsToTree(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        actions = cleanDefineFunctionRegistersForDecompilation(actions, version, path, charset);
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         ActionSecondPassContext currentContext = ActionSecondPassContext.current();
@@ -1096,6 +1097,63 @@ public abstract class Action implements GraphSourceItem {
             functions.putAll(functionsBackup);
             context.startRendering();
             return ActionGraph.translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset, 0);
+        }
+    }
+
+    private static List<Action> cleanDefineFunctionRegistersForDecompilation(List<Action> actions, int version, String path, String charset) throws InterruptedException {
+        boolean hasDefineFunction = false;
+        for (Action action : actions) {
+            if (action instanceof ActionDefineFunction) {
+                hasDefineFunction = true;
+                break;
+            }
+        }
+        if (!hasDefineFunction) {
+            return actions;
+        }
+        // The cleaner changes instruction fields as well as the list. Keep the
+        // cached actions intact for P-code display and editing.
+        ActionList copy = new ActionList(charset, version);
+        copy.addAll(actions);
+        copy = Helper.deepCopy(copy);
+        if (copy == null) {
+            return actions;
+        }
+        for (int i = 0; i < copy.size(); i++) {
+            Action action = copy.get(i);
+            if (action instanceof ActionPush) {
+                ActionPush original = (ActionPush) actions.get(i);
+                ActionPush cloned = (ActionPush) action;
+                preserveImmutablePushValues(original.values, cloned.values);
+                preserveImmutablePushValues(original.replacement, cloned.replacement);
+            }
+            if (action.getVirtualAddress() == -1) {
+                action.setVirtualAddress(action.getAddress());
+            }
+        }
+        try {
+            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(copy, null);
+            return copy;
+        } catch (ThreadDeath | InterruptedException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
+            return actions;
+        }
+    }
+
+    private static void preserveImmutablePushValues(List<Object> original, List<Object> copy) {
+        if (original == null) {
+            return;
+        }
+        // Serialization does not preserve singleton null/undefined or cached
+        // boxed numbers. Decompilation recognizes some values by identity.
+        for (int i = 0; i < original.size(); i++) {
+            Object value = original.get(i);
+            if (value instanceof String || value instanceof Number || value instanceof Boolean
+                    || value instanceof Null || value instanceof Undefined) {
+                copy.set(i, value);
+            }
         }
     }
     

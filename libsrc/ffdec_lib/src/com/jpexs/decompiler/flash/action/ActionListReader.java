@@ -183,14 +183,6 @@ public class ActionListReader {
             System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
             p++;
         }*/
-        try {
-            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, null);
-        } catch (ThreadDeath | InterruptedException ex) {
-            //ignored
-        } catch (Throwable ex) {
-            Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
-        }          
-        
         return actions;
     }
 
