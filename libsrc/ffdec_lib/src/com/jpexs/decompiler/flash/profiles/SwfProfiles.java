@@ -35,7 +35,8 @@ import java.util.Map;
 public final class SwfProfiles {
 
     private static final List<SwfProfile> PROFILES = Collections.unmodifiableList(Arrays.asList(
-            new BioshockSwfProfile()
+            new BioshockSwfProfile(),
+            new CastleCrashersSwfProfile()
     ));
 
     private static final Map<String, SwfProfile> PROFILES_BY_ID = new LinkedHashMap<>();

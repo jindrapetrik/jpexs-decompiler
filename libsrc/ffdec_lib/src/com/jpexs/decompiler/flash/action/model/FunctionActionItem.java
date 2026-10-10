@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -431,6 +432,14 @@ public class FunctionActionItem extends ActionItem {
         boolean needsFun2 = false;
         
         boolean canFun2 = asGenerator.getSwfVersion() >= 7;
+        
+        SwfProfile profile = asGenerator.getProfile();
+        if (profile != null) {
+            if (profile.prefersAvm1DefineFunction2()) {
+                canFun2 = true;
+                needsFun2 = true;
+            }
+        }
         
         List<String> registerNames = new ArrayList<>();
         if (canFun2) {

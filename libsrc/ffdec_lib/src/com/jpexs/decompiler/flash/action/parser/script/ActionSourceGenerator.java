@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
 import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -98,6 +99,8 @@ public class ActionSourceGenerator implements SourceGenerator {
     private final String charset;
 
     private long uniqLast = 0;
+    
+    private final SwfProfile profile;
 
     /**
      * Constructor.
@@ -106,12 +109,14 @@ public class ActionSourceGenerator implements SourceGenerator {
      * @param constantPool Constant pool
      * @param constantPoolLength Constant pool length
      * @param charset Charset
+     * @param profile SWF profile
      */
-    public ActionSourceGenerator(int swfVersion, List<String> constantPool, int constantPoolLength, String charset) {
+    public ActionSourceGenerator(int swfVersion, List<String> constantPool, int constantPoolLength, String charset, SwfProfile profile) {
         this.constantPool = constantPool;
         this.swfVersion = swfVersion;
         this.constantPoolLength = constantPoolLength;
-        this.charset = charset;
+        this.charset = charset;        
+        this.profile = profile;
     }
 
     /**
@@ -133,6 +138,14 @@ public class ActionSourceGenerator implements SourceGenerator {
         return charset;
     }       
 
+    /**
+     * Gets SWF profile
+     * @return SWF profile
+     */
+    public SwfProfile getProfile() {
+        return profile;
+    }   
+    
     private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {
         return toActionList(generate(localData, commands));
     }

@@ -139,6 +139,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -267,6 +268,11 @@ public class ActionScript2Parser {
      * SWF
      */
     private SWF swf;
+    
+    /**
+     * SWF profile
+     */
+    private SwfProfile profile;
 
     /**
      * Obfuscation identifiers replacements
@@ -285,6 +291,7 @@ public class ActionScript2Parser {
         parseSwfClasses(swf);
         this.targetSource = targetSource;
         this.swf = swf;
+        this.profile = swf.getSwfProfile();
     }
 
     private long uniqLast = 0;
@@ -2783,7 +2790,7 @@ public class ActionScript2Parser {
     }
 
     private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool, boolean secondRun) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, constantPoolLength, charset);
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, constantPoolLength, charset, profile);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
         localData.secondRun = secondRun;
         return gen.generate(localData, tree);

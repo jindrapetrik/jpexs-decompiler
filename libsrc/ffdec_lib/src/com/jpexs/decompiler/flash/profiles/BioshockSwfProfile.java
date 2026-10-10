@@ -89,5 +89,9 @@ public class BioshockSwfProfile implements SwfProfile {
     public boolean supportsSwf(SWF swf) {
         return !swf.gfx;
     }
-    
+
+    @Override
+    public boolean prefersAvm1DefineFunction2() {
+        return false;
+    }        
 }

@@ -2453,10 +2453,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         gfx = header.gfx;
         encrypted = header.encrypted;
         compression = header.compression;
-        lzmaProperties = header.lzmaProperties;
-        if (swfProfile != null && swfProfile.supportsSwf(this)) {
-            this.swfProfile = swfProfile;
-        }
+        lzmaProperties = header.lzmaProperties;        
         uncompressedData = baos.toByteArray();
         originalUncompressedData = uncompressedData;
 
@@ -2485,6 +2482,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         displayRect = sis.readRECT("displayRect");
         frameRate = sis.readUFIXED8("frameRate");
         frameCount = sis.readUI16("frameCount");
+        
+        if (swfProfile != null && swfProfile.supportsSwf(this)) {
+            this.swfProfile = swfProfile;
+        }
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, lazy);
         if (tags.size() > 0 && tags.get(tags.size() - 1).getId() == EndTag.ID) {
             tags.remove(tags.size() - 1);

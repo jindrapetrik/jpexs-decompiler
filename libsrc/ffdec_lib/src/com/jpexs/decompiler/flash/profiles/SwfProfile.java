@@ -77,4 +77,10 @@ public interface SwfProfile {
      * @return True when supports
      */
     public boolean supportsSwf(SWF swf);
+    
+    /**
+     * Whether the profile prefers DefineFunction2 Action instead of DefineFunction
+     * @return True when prefers
+     */
+    public boolean prefersAvm1DefineFunction2();
 }
