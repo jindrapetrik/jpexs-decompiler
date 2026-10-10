@@ -103,10 +103,12 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
         reserved = (int) sis.readUB(6, "reserved");
         usesNonScalingStrokes = sis.readUB(1, "usesNonScalingStrokes") == 1;
         usesScalingStrokes = sis.readUB(1, "usesScalingStrokes") == 1;
-        long offset = sis.readUI32("offset"); // ignore
+        long offset = sis.readUI32("offset");
+        long edgesPos = sis.getPos() + offset;
         morphFillStyles = sis.readMORPHFILLSTYLEARRAY("morphFillStyles");
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(2, "morphLineStyles");
         startEdges = sis.readSHAPE(2, true, "startEdges");
+        sis.seek(edgesPos);
         endEdges = sis.readSHAPE(2, true, "endEdges");
     }
 
