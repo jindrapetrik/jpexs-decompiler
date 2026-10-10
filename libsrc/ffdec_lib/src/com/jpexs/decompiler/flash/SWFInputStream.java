@@ -127,6 +127,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
@@ -222,7 +223,6 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
@@ -1837,8 +1837,8 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new PlaceObject4Tag(sis, data);
                     break;
                 default:
-                    TagProfile tagProfile = swf.getTagProfile();
-                    ret = tagProfile == null ? null : tagProfile.decodeTag(sis, tag.getId(), data);
+                    SwfProfile swfProfile = swf.getSwfProfile();
+                    ret = swfProfile == null ? null : swfProfile.decodeTag(sis, tag.getId(), data);
                     if (ret != null) {
                         break;
                     }

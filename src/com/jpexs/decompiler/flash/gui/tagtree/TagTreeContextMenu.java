@@ -72,6 +72,8 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.packers.Packer;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfiles;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
@@ -133,8 +135,6 @@ import com.jpexs.decompiler.flash.tags.converters.TextTypeConverter;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -384,13 +384,13 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenu changeCharsetMenu;
 
-    private JMenu customTagProfileMenu;
+    private JMenu customSwfProfileMenu;
 
-    private final Map<String, JRadioButtonMenuItem> customTagProfileMenuItems = new LinkedHashMap<>();
+    private final Map<String, JRadioButtonMenuItem> customSwfProfileMenuItems = new LinkedHashMap<>();
 
-    private JMenu interpretCustomTagProfileMenu;
+    private JMenu interpretCustomSwfProfileMenu;
 
-    private final Map<String, JMenuItem> interpretCustomTagProfileMenuItems = new LinkedHashMap<>();
+    private final Map<String, JMenuItem> interpretCustomSwfProfileMenuItems = new LinkedHashMap<>();
 
     private JMenuItem pinMenuItem;
 
@@ -503,38 +503,38 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         add(changeCharsetMenu);
 
-        customTagProfileMenu = new JMenu(mainPanel.translate("contextmenu.customTagProfile"));
-        customTagProfileMenu.setIcon(View.getIcon("tagprofile16"));
-        ButtonGroup customTagProfileGroup = new ButtonGroup();
-        JRadioButtonMenuItem standardTagProfileMenuItem = new JRadioButtonMenuItem(mainPanel.translate("contextmenu.customTagProfile.standard"));
-        standardTagProfileMenuItem.setActionCommand("");
-        standardTagProfileMenuItem.setIcon(View.getIcon("flash16"));
-        standardTagProfileMenuItem.addActionListener(this::changeCustomTagProfileActionPerformed);
-        customTagProfileGroup.add(standardTagProfileMenuItem);
-        customTagProfileMenu.add(standardTagProfileMenuItem);
-        customTagProfileMenuItems.put("", standardTagProfileMenuItem);
-        for (TagProfile profile : TagProfiles.getProfiles()) {
+        customSwfProfileMenu = new JMenu(mainPanel.translate("contextmenu.customSwfProfile"));
+        customSwfProfileMenu.setIcon(View.getIcon("swfprofile16"));
+        ButtonGroup customSwfProfileGroup = new ButtonGroup();
+        JRadioButtonMenuItem standardSwfProfileMenuItem = new JRadioButtonMenuItem(mainPanel.translate("contextmenu.customSwfProfile.standard"));
+        standardSwfProfileMenuItem.setActionCommand("");
+        standardSwfProfileMenuItem.setIcon(View.getIcon("flash16"));
+        standardSwfProfileMenuItem.addActionListener(this::changeCustomSwfProfileActionPerformed);
+        customSwfProfileGroup.add(standardSwfProfileMenuItem);
+        customSwfProfileMenu.add(standardSwfProfileMenuItem);
+        customSwfProfileMenuItems.put("", standardSwfProfileMenuItem);
+        for (SwfProfile profile : SwfProfiles.getProfiles()) {
             JRadioButtonMenuItem profileMenuItem = new JRadioButtonMenuItem(profile.getName());
-            profileMenuItem.setIcon(View.getIcon("tagprofile_" + profile.getId() + "16"));
+            profileMenuItem.setIcon(View.getIcon("swfprofile_" + profile.getId() + "16"));
             profileMenuItem.setActionCommand(profile.getId());
-            profileMenuItem.addActionListener(this::changeCustomTagProfileActionPerformed);
-            customTagProfileGroup.add(profileMenuItem);
-            customTagProfileMenu.add(profileMenuItem);
-            customTagProfileMenuItems.put(profile.getId(), profileMenuItem);
+            profileMenuItem.addActionListener(this::changeCustomSwfProfileActionPerformed);
+            customSwfProfileGroup.add(profileMenuItem);
+            customSwfProfileMenu.add(profileMenuItem);
+            customSwfProfileMenuItems.put(profile.getId(), profileMenuItem);
         }
-        add(customTagProfileMenu);
+        add(customSwfProfileMenu);
 
-        interpretCustomTagProfileMenu = new JMenu(mainPanel.translate("contextmenu.interpretCustomTagsAs"));
-        interpretCustomTagProfileMenu.setIcon(View.getIcon("tagprofile16"));
-        for (TagProfile profile : TagProfiles.getProfiles()) {
+        interpretCustomSwfProfileMenu = new JMenu(mainPanel.translate("contextmenu.interpretCustomTagsAs"));
+        interpretCustomSwfProfileMenu.setIcon(View.getIcon("swfprofile16"));
+        for (SwfProfile profile : SwfProfiles.getProfiles()) {
             JMenuItem profileMenuItem = new JMenuItem(profile.getName());
-            profileMenuItem.setIcon(View.getIcon("tagprofile_" + profile.getId() + "16"));
+            profileMenuItem.setIcon(View.getIcon("swfprofile_" + profile.getId() + "16"));
             profileMenuItem.setActionCommand(profile.getId());
-            profileMenuItem.addActionListener(this::changeCustomTagProfileActionPerformed);
-            interpretCustomTagProfileMenu.add(profileMenuItem);
-            interpretCustomTagProfileMenuItems.put(profile.getId(), profileMenuItem);
+            profileMenuItem.addActionListener(this::changeCustomSwfProfileActionPerformed);
+            interpretCustomSwfProfileMenu.add(profileMenuItem);
+            interpretCustomSwfProfileMenuItems.put(profile.getId(), profileMenuItem);
         }
-        add(interpretCustomTagProfileMenu);
+        add(interpretCustomSwfProfileMenu);
 
         configurePathResolvingMenuItem = new JMenuItem(mainPanel.translate("contextmenu.configurePathResolving"));
         configurePathResolvingMenuItem.addActionListener(this::configurePathResolvingActionPerformed);
@@ -1592,8 +1592,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         addFramesAfterMenuItem.setVisible(false);
 
         changeCharsetMenu.setVisible(false);
-        customTagProfileMenu.setVisible(false);
-        interpretCustomTagProfileMenu.setVisible(false);
+        customSwfProfileMenu.setVisible(false);
+        interpretCustomSwfProfileMenu.setVisible(false);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -1743,13 +1743,13 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof UnknownTag) {
                 UnknownTag unknownTag = (UnknownTag) firstItem;
                 boolean hasMatchingProfile = false;
-                for (Map.Entry<String, JMenuItem> entry : interpretCustomTagProfileMenuItems.entrySet()) {
-                    TagProfile profile = TagProfiles.getProfile(entry.getKey());
+                for (Map.Entry<String, JMenuItem> entry : interpretCustomSwfProfileMenuItems.entrySet()) {
+                    SwfProfile profile = SwfProfiles.getProfile(entry.getKey());
                     boolean matches = profile.supportsSwf(unknownTag.getSwf()) && profile.supportsTagId(unknownTag.getId());
                     entry.getValue().setVisible(matches);
                     hasMatchingProfile |= matches;
                 }
-                interpretCustomTagProfileMenu.setVisible(hasMatchingProfile);
+                interpretCustomSwfProfileMenu.setVisible(hasMatchingProfile);
             }
 
             if (mainPanel.isPinned(firstItem)) {
@@ -2029,13 +2029,13 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof SWF) {
                 SWF firstSwf = (SWF) firstItem;
-                customTagProfileMenu.setVisible(true);
-                TagProfile selectedTagProfile = firstSwf.getTagProfile();
-                String selectedTagProfileId = selectedTagProfile == null ? "" : selectedTagProfile.getId();
-                for (Map.Entry<String, JRadioButtonMenuItem> entry : customTagProfileMenuItems.entrySet()) {
-                    TagProfile profile = TagProfiles.getProfile(entry.getKey());
+                customSwfProfileMenu.setVisible(true);
+                SwfProfile selectedSwfProfile = firstSwf.getSwfProfile();
+                String selectedSwfProfileId = selectedSwfProfile == null ? "" : selectedSwfProfile.getId();
+                for (Map.Entry<String, JRadioButtonMenuItem> entry : customSwfProfileMenuItems.entrySet()) {
+                    SwfProfile profile = SwfProfiles.getProfile(entry.getKey());
                     entry.getValue().setEnabled(profile == null || profile.supportsSwf(firstSwf));
-                    entry.getValue().setSelected(entry.getKey().equals(selectedTagProfileId));
+                    entry.getValue().setSelected(entry.getKey().equals(selectedSwfProfileId));
                 }
                 if (firstSwf.version <= 5) {
                     changeCharsetMenu.setText(mainPanel.translate("contextmenu.changeCharset").replace("%charset%", firstSwf.getCharset()));
@@ -6963,11 +6963,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         Main.reloadFile(item.openableList);
     }
 
-    public void changeCustomTagProfileActionPerformed(ActionEvent evt) {
+    public void changeCustomSwfProfileActionPerformed(ActionEvent evt) {
         TreeItem currentItem = getCurrentItem();
         SWF item = currentItem instanceof SWF ? (SWF) currentItem : (SWF) currentItem.getOpenable();
         String newProfileId = ((JMenuItem) evt.getSource()).getActionCommand();
-        TagProfile currentProfile = item.getTagProfile();
+        SwfProfile currentProfile = item.getSwfProfile();
         String currentProfileId = currentProfile == null ? "" : currentProfile.getId();
         if (Objects.equals(currentProfileId, newProfileId)) {
             return;
@@ -6982,12 +6982,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (modified
                 && Configuration.showCloseConfirmation.get()
                 && ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), mainPanel.translate("message.confirm.reload"), mainPanel.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            customTagProfileMenuItems.get(currentProfileId).setSelected(true);
+            customSwfProfileMenuItems.get(currentProfileId).setSelected(true);
             return;
         }
 
         SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(item.getShortPathTitle());
-        conf.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, newProfileId);
+        conf.setCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, newProfileId);
         Main.reloadFile(rootSwf.openableList);
     }
 

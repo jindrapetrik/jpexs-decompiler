@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags.profiles;
+package com.jpexs.decompiler.flash.profiles;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -26,10 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Bioshock 1 or 2 game tag profile.
+ * Bioshock 1 or 2 game SWF profile.
  * @author JPEXS
  */
-public class BioshockTagProfile implements TagProfile {
+public class BioshockSwfProfile implements SwfProfile {
     
     public static final String ID = "bioshock";
     
@@ -42,7 +42,7 @@ public class BioshockTagProfile implements TagProfile {
         SUPPORTED_TAGS.put(BioshockImage.ID, BioshockImage.class);
     }
     
-    public BioshockTagProfile() {
+    public BioshockSwfProfile() {
     }
 
     @Override

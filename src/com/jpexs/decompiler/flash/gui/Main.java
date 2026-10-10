@@ -62,6 +62,8 @@ import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfiles;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -72,8 +74,6 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -1330,11 +1330,11 @@ public class Main {
         return parseOpenable(sourceInfo, null, false);
     }
 
-    public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile tagProfile) throws Exception {
-        return parseOpenable(sourceInfo, tagProfile, true);
+    public static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, SwfProfile swfProfile) throws Exception {
+        return parseOpenable(sourceInfo, swfProfile, true);
     }
 
-    private static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, TagProfile requestedTagProfile, boolean tagProfileSpecified) throws Exception {
+    private static OpenableList parseOpenable(OpenableSourceInfo sourceInfo, SwfProfile requestedSwfProfile, boolean swfProfileSpecified) throws Exception {
         OpenableList result = new OpenableList();
 
         InputStream inputStream = sourceInfo.getInputStream();
@@ -1411,7 +1411,7 @@ public class Main {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
 
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                            TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
+                            SwfProfile swfProfile = swfProfileSpecified ? requestedSwfProfile : conf == null ? null : SwfProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, ""));
                             SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
@@ -1424,7 +1424,7 @@ public class Main {
                                         startWork(AppStrings.translate("work.renaming.identifiers"), worker, true);
                                     }
                                 }
-                            }, Configuration.parallelSpeedUp.get(), charset, tagProfile);
+                            }, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                             return swf;
                         }
                     };
@@ -1491,7 +1491,7 @@ public class Main {
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
                         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
-                        TagProfile tagProfile = tagProfileSpecified ? requestedTagProfile : conf == null ? null : TagProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, ""));
+                        SwfProfile swfProfile = swfProfileSpecified ? requestedSwfProfile : conf == null ? null : SwfProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, ""));
                         List<String> loadedUrls = new ArrayList<>();
                         List<String> loadedStatus = new ArrayList<>();
 
@@ -1699,7 +1699,7 @@ public class Main {
                                 });
                                 return ret.getVal();
                             }
-                        }, charset, tagProfile);
+                        }, charset, swfProfile);
 
                         if (!loadedUrls.isEmpty()) {
                             SwfSpecificCustomConfiguration cc2 = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
@@ -2169,7 +2169,7 @@ public class Main {
                     executeAfterOpen.opened(fopenable);
                 }
 
-                SwingUtilities.invokeLater(() -> offerCustomTagProfiles(openableLists));
+                SwingUtilities.invokeLater(() -> offerCustomSwfProfiles(openableLists));
             });
 
             return true;
@@ -2470,7 +2470,7 @@ public class Main {
         }
     }
 
-    private static void offerCustomTagProfiles(List<OpenableList> openableLists) {
+    private static void offerCustomSwfProfiles(List<OpenableList> openableLists) {
         Set<OpenableList> openableListsToReload = new LinkedHashSet<>();
         for (OpenableList openableList : openableLists) {
             for (Openable openable : openableList) {
@@ -2480,29 +2480,29 @@ public class Main {
 
                 SWF swf = (SWF) openable;
                 SwfSpecificCustomConfiguration configuration = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
-                if (configuration != null && configuration.getAllCustomData().containsKey(CustomConfigurationKeys.KEY_TAG_PROFILE)) {
+                if (configuration != null && configuration.getAllCustomData().containsKey(CustomConfigurationKeys.KEY_SWF_PROFILE)) {
                     continue;
                 }
 
-                List<TagProfile> matchingProfiles = TagProfiles.getMatchingProfiles(swf);
+                List<SwfProfile> matchingProfiles = SwfProfiles.getMatchingProfiles(swf);
                 if (matchingProfiles.isEmpty()) {
                     continue;
                 }
 
                 configuration = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
-                configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, "");
+                configuration.setCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, "");
 
                 Object[] options = new Object[matchingProfiles.size() + 1];
                 for (int i = 0; i < matchingProfiles.size(); i++) {
                     options[i] = matchingProfiles.get(i).getName();
                 }
-                options[matchingProfiles.size()] = AppStrings.translate("contextmenu.customTagProfile.standard");
+                options[matchingProfiles.size()] = AppStrings.translate("contextmenu.customSwfProfile.standard");
 
-                String message = AppStrings.translate("message.customTagProfile.detected").replace("{swfName}", swf.getTitleOrShortFileName());
+                String message = AppStrings.translate("message.customSwfProfile.detected").replace("{swfName}", swf.getTitleOrShortFileName());
                 int selectedOption = ViewMessages.showOptionDialog(
                         getDefaultMessagesComponent(),
                         message,
-                        AppStrings.translate("contextmenu.customTagProfile"),
+                        AppStrings.translate("contextmenu.customSwfProfile"),
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.QUESTION_MESSAGE,
                         null,
@@ -2510,7 +2510,7 @@ public class Main {
                         options[0]
                 );
                 if (selectedOption >= 0 && selectedOption < matchingProfiles.size()) {
-                    configuration.setCustomData(CustomConfigurationKeys.KEY_TAG_PROFILE, matchingProfiles.get(selectedOption).getId());
+                    configuration.setCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, matchingProfiles.get(selectedOption).getId());
                     openableListsToReload.add(openableList);
                 }
             }

@@ -19,10 +19,10 @@ package com.jpexs.decompiler.flash;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.jpexs.decompiler.flash.profiles.BioshockSwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfiles;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.profiles.BioshockTagProfile;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfile;
-import com.jpexs.decompiler.flash.tags.profiles.TagProfiles;
 import com.jpexs.decompiler.flash.tags.profiles.bioshock.BioshockImage;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
@@ -32,35 +32,35 @@ import java.util.UUID;
 import org.testng.annotations.Test;
 
 /**
- * Tests custom tag profile selection during SWF parsing.
+ * Tests custom SWF profile selection during SWF parsing.
  *
  * @author JPEXS
  */
-public class TagProfileTest {
+public class SwfProfileTest {
 
     @Test
     public void testBioshockTagIsDecodedOnlyWithProfile() throws Exception {
         byte[] swfData = createSwfWithTag512();
-        String titlePrefix = "tag-profile-test-" + UUID.randomUUID();
+        String titlePrefix = "swf-profile-test-" + UUID.randomUUID();
 
         SWF standardSwf = new SWF(new ByteArrayInputStream(swfData), titlePrefix + "-standard.swf", titlePrefix + "-standard.swf", false);
         assertTrue(standardSwf.getTags().get(0) instanceof UnknownTag);
-        List<TagProfile> matchingProfiles = TagProfiles.getMatchingProfiles(standardSwf);
+        List<SwfProfile> matchingProfiles = SwfProfiles.getMatchingProfiles(standardSwf);
         assertEquals(matchingProfiles.size(), 1);
-        assertEquals(matchingProfiles.get(0).getId(), BioshockTagProfile.ID);
+        assertEquals(matchingProfiles.get(0).getId(), BioshockSwfProfile.ID);
 
         String profiledTitle = titlePrefix + "-bioshock.swf";
-        SWF profiledSwf = new SWF(new ByteArrayInputStream(swfData), profiledTitle, profiledTitle, false, "WINDOWS-1252", TagProfiles.getProfile(BioshockTagProfile.ID));
-        assertEquals(profiledSwf.getTagProfile().getId(), BioshockTagProfile.ID);
+        SWF profiledSwf = new SWF(new ByteArrayInputStream(swfData), profiledTitle, profiledTitle, false, "WINDOWS-1252", SwfProfiles.getProfile(BioshockSwfProfile.ID));
+        assertEquals(profiledSwf.getSwfProfile().getId(), BioshockSwfProfile.ID);
         assertTrue(profiledSwf.getTags().get(0) instanceof BioshockImage);
     }
 
     @Test
     public void testNullProfileUsesStandardTags() throws Exception {
         byte[] swfData = createSwfWithTag512();
-        String title = "tag-profile-null-test-" + UUID.randomUUID() + ".swf";
+        String title = "swf-profile-null-test-" + UUID.randomUUID() + ".swf";
         SWF standardSwf = new SWF(new ByteArrayInputStream(swfData), title, title, false, "WINDOWS-1252", null);
-        assertEquals(standardSwf.getTagProfile(), null);
+        assertEquals(standardSwf.getSwfProfile(), null);
         assertTrue(standardSwf.getTags().get(0) instanceof UnknownTag);
     }
 

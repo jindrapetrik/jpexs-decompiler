@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.tags.profiles;
+package com.jpexs.decompiler.flash.profiles;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -24,19 +24,19 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Profile for reading custom tags
+ * Profile for reading SWF files with custom tags
  * 
  * @author JPEXS
  */
-public interface TagProfile {
+public interface SwfProfile {
     /**
-     * Gets tag profile unique identifier
+     * Gets SWF profile unique identifier
      * @return 
      */
     public String getId();        
     
     /**
-     * Gets tag profile name for display
+     * Gets SWF profile name for display
      * @return 
      */
     public String getName();

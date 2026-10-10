@@ -309,9 +309,9 @@ alias /?
     List all available configuration keys and current values.
     These keys can be used in -config pre-option.
 
--listTagProfiles
-    List all available tag profile identifiers and display names.
-    These identifiers can be used in -tagprofile pre-option.
+-listSwfProfiles
+    List all available SWF profile identifiers and display names.
+    These identifiers can be used in -swfProfile pre-option.
 
 -storeConfigFile [-comments] [-all] <file>
     Stores current configuration to a file <file>.
@@ -499,11 +499,11 @@ Pre-options:
     Set desired character set for reading/writing SWF files with
     SWF version <= 5.
 
--tagProfile <profileId>
+-swfProfile <profileId>
     Applies to: *
-    Use a tag profile when reading SWF files.
+    Use an SWF profile when reading SWF files.
     Use "standard" for standard SWF tag interpretation.
-    Use -listtagprofiles to list available profile identifiers.
+    Use -listSwfProfiles to list available profile identifiers.
 
 -air
     Applies to: -replace, -importScript
