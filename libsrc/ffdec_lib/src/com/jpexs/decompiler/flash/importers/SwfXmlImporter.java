@@ -429,6 +429,28 @@ public class SwfXmlImporter {
                 throw new RuntimeException("The XML file was exported with newer XML format (major " + xmlExportMajor + ", minor " + xmlExportMinor + "). Please download newer version of FFDec to correctly parse it.");
             }
         }
+        
+        if ("FileAttributesTag".equals(attributes.get("type"))) {
+            if (attributes.containsKey("reserved1")) {
+                attributes.put("reservedA", attributes.get("reserved1"));
+                attributes.remove("reserved1");
+            }
+            if (attributes.containsKey("reserved2")) {
+                attributes.put("swfRelativeUrls", attributes.get("reserved2"));
+                attributes.remove("reserved2");
+            }
+            if (attributes.containsKey("reserved3")) {
+                attributes.put("reservedB", attributes.get("reserved3"));
+                attributes.remove("reserved3");
+            }
+            if (attributes.containsKey("reservedB")) {
+                int reservedB = Integer.parseInt(attributes.get("reservedB"));
+                attributes.put("brokerProductManager", (reservedB & 0x800000) != 0 ? "1" : "0");
+                attributes.put("brokerLocalConnection", (reservedB & 0x400000) != 0 ? "1" : "0");
+                attributes.put("reservedC", "" + (reservedB & 0x3FFFFF));
+                attributes.remove("reservedB");
+            }            
+        }
 
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
             String name = entry.getKey();
@@ -446,17 +468,7 @@ public class SwfXmlImporter {
             if ("SWF".equals(attributes.get("type")) && name.startsWith("_")) {
                 continue;
             }
-
-            //backwards compatibility
-            if (name.equals("reserved1") && "FileAttributesTag".equals(attributes.get("type"))) {
-                name = "reservedA";
-            }
-            if (name.equals("reserved2") && "FileAttributesTag".equals(attributes.get("type"))) {
-                name = "swfRelativeUrls";
-            }
-            if (name.equals("reserved3") && "FileAttributesTag".equals(attributes.get("type"))) {
-                name = "reservedB";
-            }
+           
             if (
                     (name.equals("alignmentCoordinate") || name.equals("range")) 
                     && "ZONEDATA".equals(attributes.get("type"))
