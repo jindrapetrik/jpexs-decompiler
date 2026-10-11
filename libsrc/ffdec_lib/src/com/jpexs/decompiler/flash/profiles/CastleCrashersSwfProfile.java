@@ -12,10 +12,11 @@ import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetVar
 import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushSetMember;
 import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionToBoolean;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.profiles.castlecrashers.PixlImage;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,13 @@ public class CastleCrashersSwfProfile implements SwfProfile {
     public static final String ID = "castle_crashers";
 
     public static final String NAME = "Castle Crashers";
+
+    private static final Map<Integer, Class<? extends Tag>> SUPPORTED_TAGS = new LinkedHashMap<>();
+
+    static {
+        SUPPORTED_TAGS.put(PixlImage.ID, PixlImage.class);
+        SUPPORTED_TAGS.put(PixlImage.ID_INTERNAL, PixlImage.class);
+    }
 
     public CastleCrashersSwfProfile() {
     }
@@ -45,22 +53,25 @@ public class CastleCrashersSwfProfile implements SwfProfile {
 
     @Override
     public Tag decodeTag(SWFInputStream sis, int tagId, ByteArrayRange data) throws IOException {
+        if ((tagId == PixlImage.ID || tagId == PixlImage.ID_INTERNAL) && sis.available() > 0) {
+            return new PixlImage(tagId, sis, data);
+        }
         return null;
     }
 
     @Override
     public Map<Integer, Class<? extends Tag>> getSupportedTags() {
-        return new HashMap<>();
+        return SUPPORTED_TAGS;
     }
 
     @Override
     public boolean supportsTagId(int tagId) {
-        return false;
+        return SUPPORTED_TAGS.containsKey(tagId);
     }
 
     @Override
     public Class<? extends Tag> getTagIdClass(int tagId) {
-        return null;
+        return SUPPORTED_TAGS.get(tagId);
     }
 
     @Override
