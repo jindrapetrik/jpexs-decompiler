@@ -2243,7 +2243,7 @@ public class SWFInputStream implements AutoCloseable {
                      //skip(actionLength);
                      }*/
                     //throw new UnknownActionException(actionCode);
-                    Action r = new ActionUnknown(actionCode, actionLength, getCharset());
+                    Action r = new ActionUnknown(actionCode, actionLength, this, getCharset());
                     if (Configuration.useDetailedLogging.get()) {
                         logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
                     }

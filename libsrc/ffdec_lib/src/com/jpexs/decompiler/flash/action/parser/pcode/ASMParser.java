@@ -370,7 +370,7 @@ public class ASMParser {
             //profile worked
         } else if (instructionName.length() == 10 && instructionName.substring(0, 8).compareToIgnoreCase("Unknown_") == 0) {
             int actionCode = Integer.parseInt(instructionName.substring(8), 16);
-            a = new ActionUnknown(actionCode, 0, charset);
+            a = new ActionUnknown(actionCode, lexer, charset);
         } else {
             throw new ActionParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
