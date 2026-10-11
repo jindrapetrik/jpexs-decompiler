@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ConstantPoolAwareAction;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.SkipNextAction;
 import com.jpexs.decompiler.flash.action.as2.Trait;
+import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
@@ -147,19 +149,16 @@ public class ActionPushDefineLocal extends Action implements ConstantPoolAwareAc
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         DirectValueActionItem valueDirectVal = new DirectValueActionItem(this, lineStartAction, 0, value, constantPool);
-        stack.push(valueDirectVal);
-
         DirectValueActionItem nameDirectVal = new DirectValueActionItem(this, lineStartAction, 0, name, constantPool);
-
-        String nameStr = nameDirectVal.toStringNoQuotes(LocalData.empty);
-        GraphTargetItem computedVal = variables.get(nameStr);
-        if (nameDirectVal.value.equals("/:$version")) {
-            stack.push(new GetVersionActionItem(this, lineStartAction));
+        
+        String nameStr;
+        if (name instanceof DirectValueActionItem) {
+            nameStr = nameDirectVal.toStringNoQuotes(LocalData.empty);
         } else {
-            GetVariableActionItem gvt = new GetVariableActionItem(this, lineStartAction, nameDirectVal);
-            gvt.setComputedValue(computedVal);
-            stack.push(gvt);
+            nameStr = EcmaScript.toString(nameDirectVal.getResult());
         }
+        variables.put(nameStr, valueDirectVal);
+        stack.addToOutput(new DefineLocalActionItem(this, lineStartAction, nameDirectVal, valueDirectVal));
     }
 
     @Override
