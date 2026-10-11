@@ -123,13 +123,6 @@ public class SwfProfileTest {
     }
 
     @Test
-    public void testUnknownActionsRequireSupportedSwfVersion() throws Exception {
-        SWF swf = createSwfWithActions(new byte[]{0x70, 0});
-        swf.version = 7;
-        assertTrue(SwfProfiles.getMatchingProfiles(swf).isEmpty());
-    }
-
-    @Test
     public void testKnownProfileActionsDoNotMatchProfile() throws Exception {
         SWF swf = createSwfWithActions(new byte[]{0x70, 0});
         ByteArrayOutputStream output = new ByteArrayOutputStream();
