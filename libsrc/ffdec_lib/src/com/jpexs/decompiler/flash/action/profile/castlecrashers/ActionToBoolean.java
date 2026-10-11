@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.profile.castlecrashers;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.SkipNextAction;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.profile.castlecrashers.ToBooleanActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -36,7 +37,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class ActionToBoolean extends Action {
+public class ActionToBoolean extends Action implements SkipNextAction {
 
     /**
      * Constructor.

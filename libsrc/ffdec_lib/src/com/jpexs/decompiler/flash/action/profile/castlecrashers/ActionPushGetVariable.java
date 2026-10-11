@@ -64,7 +64,10 @@ public class ActionPushGetVariable extends Action implements ConstantPoolAwareAc
         if (symb.type != ASMParsedSymbol.TYPE_STRING) {
             throw new ActionParseException("String expected", lexer.yyline());
         }
-        name = symb.value;
+        name = symb.value;         
+        if (constantPool != null && constantPool.contains((String) name)) {
+            name = new ConstantIndex(constantPool.indexOf(name));
+        }
     }
 
     public ActionPushGetVariable(int actionLength, SWFInputStream sis, String charset) throws IOException {
@@ -118,10 +121,10 @@ public class ActionPushGetVariable extends Action implements ConstantPoolAwareAc
         if (name instanceof ConstantIndex) {
             ConstantIndex constantIndex = (ConstantIndex) name;
             if (constantIndex.index <= 255) {
-                sos.writeUI8(1);
+                sos.writeUI8(8);
                 sos.writeUI8(constantIndex.index);
             } else {
-                sos.writeUI8(2);
+                sos.writeUI8(9);
                 sos.writeUI16(constantIndex.index);
             }
         } else if (name instanceof String) {

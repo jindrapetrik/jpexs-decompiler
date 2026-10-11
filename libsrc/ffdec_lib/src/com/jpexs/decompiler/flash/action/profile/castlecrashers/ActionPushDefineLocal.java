@@ -25,8 +25,6 @@ import com.jpexs.decompiler.flash.action.SkipNextAction;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -132,10 +130,10 @@ public class ActionPushDefineLocal extends Action implements ConstantPoolAwareAc
         if (name instanceof ConstantIndex) {
             ConstantIndex constantIndex = (ConstantIndex) name;
             if (constantIndex.index <= 255) {
-                sos.writeUI8(1);
+                sos.writeUI8(8);
                 sos.writeUI8(constantIndex.index);
             } else {
-                sos.writeUI8(2);
+                sos.writeUI8(9);
                 sos.writeUI16(constantIndex.index);
             }
         } else if (name instanceof String) {

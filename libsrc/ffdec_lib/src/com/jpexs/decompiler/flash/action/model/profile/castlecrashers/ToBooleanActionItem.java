@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.model.profile.castlecrashers;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
+import com.jpexs.decompiler.flash.action.SkipNextAction;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionToBoolean;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -26,7 +28,10 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.LogicalOpItem;
+import com.jpexs.decompiler.graph.model.NotItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,4 +135,17 @@ public class ToBooleanActionItem extends ActionItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public GraphTargetItem returnType() {
+        return TypeItem.BOOLEAN;
+    }        
+
+    @Override
+    public GraphTargetItem invert(GraphSourceItem src) {
+        if (value instanceof LogicalOpItem) {
+            return ((LogicalOpItem) value).invert(value.getSrc());
+        }
+        return new NotItem(ActionGraphTargetDialect.INSTANCE, src, lineStartItem, value);
+    }        
 }
