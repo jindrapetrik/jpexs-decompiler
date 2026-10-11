@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.CharacterSetTag;
@@ -217,6 +218,13 @@ public abstract class AbstractTagTree extends JTree {
         }
         
         
+        if (val instanceof SWF) {
+            SWF swf = (SWF) val;
+            SwfProfile profile = swf.getSwfProfile();
+            if (profile != null) {
+                return View.getIcon("swfprofile_" + profile.getId() + "16");
+            }
+        }
         
         TreeNodeType type = getTreeNodeType(val);
 

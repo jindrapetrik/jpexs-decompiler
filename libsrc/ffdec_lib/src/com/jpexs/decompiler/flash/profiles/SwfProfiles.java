@@ -17,15 +17,24 @@
 package com.jpexs.decompiler.flash.profiles;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
+import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Registry of custom SWF profiles.
@@ -70,7 +79,7 @@ public final class SwfProfiles {
     }
 
     /**
-     * Gets profiles which can decode at least one unknown tag in an SWF.
+     * Gets profiles which can decode at least one unknown tag or action in an SWF.
      *
      * @param swf SWF to inspect
      * @return Matching profiles
@@ -78,7 +87,8 @@ public final class SwfProfiles {
     public static List<SwfProfile> getMatchingProfiles(SWF swf) {
         List<SwfProfile> result = new ArrayList<>();
         for (SwfProfile profile : PROFILES) {
-            if (profile.supportsSwf(swf) && containsSupportedUnknownTag(swf, profile)) {
+            if (profile.supportsSwf(swf) && (containsSupportedUnknownTag(swf, profile)
+                    || containsSupportedUnknownAction(swf, profile))) {
                 result.add(profile);
             }
         }
@@ -93,6 +103,57 @@ public final class SwfProfiles {
             if (tag instanceof Timelined && containsSupportedUnknownTag((Timelined) tag, profile)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    private static boolean containsSupportedUnknownAction(SWF swf, SwfProfile profile) {
+        List<Integer> supportedActions = profile.getSupportedActions();
+        if (supportedActions.isEmpty()) {
+            return false;
+        }
+        for (ASMSource source : swf.getASMs(false).values()) {
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, source.getActionBytes().getRangeData());
+                if (containsSupportedUnknownAction(sis, sis.available(), supportedActions)) {
+                    return true;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SwfProfiles.class.getName()).log(Level.FINE, "Cannot inspect actions for SWF profiles", ex);
+            }
+        }
+        return false;
+    }
+
+    private static boolean containsSupportedUnknownAction(SWFInputStream sis, long end, List<Integer> supportedActions) throws IOException {
+        while (sis.getPos() < end) {
+            long pos = sis.getPos();
+            // Read the original bytecode: ActionListReader replaces long unknown actions with jumps.
+            Action action = sis.readAction();
+            if (action == null || action instanceof ActionEnd) {
+                return false;
+            }
+            long nextPos = pos + action.getTotalActionLength();
+            if (nextPos > end) {
+                return false;
+            }
+            if (action instanceof ActionUnknown && supportedActions.contains(action.getActionCode())) {
+                return true;
+            }
+            if (action instanceof GraphSourceItemContainer) {
+                for (long size : ((GraphSourceItemContainer) action).getContainerSizes()) {
+                    long containerEnd = nextPos + size;
+                    if (containerEnd > end) {
+                        return false;
+                    }
+                    sis.seek(nextPos);
+                    if (containsSupportedUnknownAction(sis, containerEnd, supportedActions)) {
+                        return true;
+                    }
+                    nextPos = containerEnd;
+                }
+            }
+            sis.seek(nextPos);
         }
         return false;
     }

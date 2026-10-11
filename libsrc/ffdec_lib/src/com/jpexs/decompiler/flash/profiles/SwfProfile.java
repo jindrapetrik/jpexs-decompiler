@@ -18,13 +18,17 @@ package com.jpexs.decompiler.flash.profiles;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Profile for reading SWF files with custom tags
+ * Profile for reading SWF files with custom tags and actions
  * 
  * @author JPEXS
  */
@@ -83,4 +87,31 @@ public interface SwfProfile {
      * @return True when prefers
      */
     public boolean prefersAvm1DefineFunction2();
+    
+    /**
+     * Parses Action
+     * @param instructionName
+     * @param lexer
+     * @param constantPool
+     * @param version
+     * @param charset
+     * @return 
+     */
+    public Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException;
+    
+    /**
+     * Reads action
+     * @param actionCode
+     * @param actionLength
+     * @param sis
+     * @param charset
+     * @return Read action
+     */
+    public Action readAction(int actionCode, int actionLength, SWFInputStream sis, String charset) throws IOException;
+    
+    /**
+     * Gets supported action ids
+     * @return List of supported actions
+     */
+    public List<Integer> getSupportedActions();
 }

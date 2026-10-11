@@ -617,7 +617,7 @@ public class PreviewExporter {
                             + "Push \"start\"\n"
                             + "CallMethod\n"
                             + "Pop\n"
-                            + "Stop", swf.version, false, swf.getCharset());
+                            + "Stop", swf.version, false, swf.getCharset(), swf.getSwfProfile());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);

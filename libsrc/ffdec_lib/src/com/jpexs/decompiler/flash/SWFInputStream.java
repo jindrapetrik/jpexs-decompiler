@@ -19,6 +19,12 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushDefineLocal;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetMember;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetVariable;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetVariable2;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushSetMember;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionToBoolean;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf1.ActionGetURL;
@@ -2224,8 +2230,15 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x8F:
                     return new ActionTry(actionLength, this, swf.version);
                 case 0x2A:
-                    return new ActionThrow();
+                    return new ActionThrow();               
                 default:
+                    SwfProfile profile = swf == null ? null : swf.getSwfProfile();
+                    if (profile != null) {
+                        Action profileAction = profile.readAction(actionCode, actionLength, this, getCharset());
+                        if (profileAction != null) {
+                            return profileAction;
+                        }
+                    }
                     /*if (actionLength > 0) {
                      //skip(actionLength);
                      }*/

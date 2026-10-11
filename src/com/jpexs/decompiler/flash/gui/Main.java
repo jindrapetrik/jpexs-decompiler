@@ -155,6 +155,8 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -2492,23 +2494,32 @@ public class Main {
                 configuration = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
                 configuration.setCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, "");
 
-                Object[] options = new Object[matchingProfiles.size() + 1];
+                JButton[] options = new JButton[matchingProfiles.size() + 1];
                 for (int i = 0; i < matchingProfiles.size(); i++) {
-                    options[i] = matchingProfiles.get(i).getName();
+                    SwfProfile profile = matchingProfiles.get(i);
+                    options[i] = new JButton(profile.getName(), View.getIcon("swfprofile_" + profile.getId() + "16"));
                 }
-                options[matchingProfiles.size()] = AppStrings.translate("contextmenu.customSwfProfile.standard");
+                options[matchingProfiles.size()] = new JButton(AppStrings.translate("contextmenu.customSwfProfile.standard"), View.getIcon("flash16"));
 
                 String message = AppStrings.translate("message.customSwfProfile.detected").replace("{swfName}", swf.getTitleOrShortFileName());
-                int selectedOption = ViewMessages.showOptionDialog(
-                        getDefaultMessagesComponent(),
+                JOptionPane optionPane = new JOptionPane(
                         message,
-                        AppStrings.translate("contextmenu.customSwfProfile"),
-                        JOptionPane.DEFAULT_OPTION,
                         JOptionPane.QUESTION_MESSAGE,
+                        JOptionPane.DEFAULT_OPTION,
                         null,
                         options,
                         options[0]
                 );
+                for (int i = 0; i < options.length; i++) {
+                    final int optionIndex = i;
+                    options[i].addActionListener(e -> optionPane.setValue(optionIndex));
+                }
+                JDialog dialog = optionPane.createDialog(getDefaultMessagesComponent(), AppStrings.translate("contextmenu.customSwfProfile"));
+                dialog.getRootPane().setDefaultButton(options[0]);
+                dialog.setVisible(true);
+                dialog.dispose();
+                Object selectedValue = optionPane.getValue();
+                int selectedOption = selectedValue instanceof Integer ? (Integer) selectedValue : JOptionPane.CLOSED_OPTION;
                 if (selectedOption >= 0 && selectedOption < matchingProfiles.size()) {
                     configuration.setCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, matchingProfiles.get(selectedOption).getId());
                     openableListsToReload.add(openableList);

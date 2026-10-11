@@ -71,7 +71,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testRemoveActionNormal(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             for (int i : actionsToRemove) {
                 actions.removeAction(i);
@@ -95,7 +95,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testRemoveActionFast(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
             FastActionList fastActions = new FastActionList(actions);
 
             for (int i : actionsToRemove) {
@@ -127,7 +127,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testAddActionNormal(String actionsString, String expectedResult, Action action, int index) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             actions.addAction(index, action);
 
@@ -149,7 +149,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testAddActionFast(String actionsString, String expectedResult, Action action, int index) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
             FastActionList fastActions = new FastActionList(actions);
 
             fastActions.insertItemBefore(fastActions.get(index), action);

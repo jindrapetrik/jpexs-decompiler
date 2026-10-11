@@ -18,11 +18,15 @@ package com.jpexs.decompiler.flash.profiles;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.profiles.bioshock.BioshockImage;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,5 +97,20 @@ public class BioshockSwfProfile implements SwfProfile {
     @Override
     public boolean prefersAvm1DefineFunction2() {
         return false;
+    }        
+
+    @Override
+    public List<Integer> getSupportedActions() {
+        return new ArrayList<>();
+    }        
+
+    @Override
+    public Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) {
+        return null;
+    }
+
+    @Override
+    public Action readAction(int actionCode, int actionLength, SWFInputStream sis, String charset) throws IOException {
+        return null;
     }        
 }

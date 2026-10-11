@@ -72,7 +72,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     }
 
     private String decompilePCode(String str) throws Exception {
-        List<Action> actions = ASMParser.parse(0, true, str, swf.version, false, swf.getCharset());
+        List<Action> actions = ASMParser.parse(0, true, str, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
         DoActionTag doa = getFirstActionTag();
         doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -267,7 +267,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Jump loc0084\n"
                 + "loc0084:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -293,7 +293,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Trace\n"
                 + "loc2:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -325,7 +325,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "loc2:Jump loc4\n"
                 + "loc5:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -353,7 +353,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Trace\n"
                 + "loc2:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -386,7 +386,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "loc2:Jump loc4\n"
                 + "loc5:\n";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -425,7 +425,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "loc0058:Push \"c\"\n"
                 + "Trace";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -460,7 +460,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Push 1\n"
                 + "Trace\n";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset(), swf.getSwfProfile());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));

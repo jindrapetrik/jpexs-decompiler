@@ -4346,7 +4346,7 @@ public class CommandLineArgumentParser {
             src.setActionBytes(Helper.getBytesFromHexaText(text));
         } else {
             try {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset()));
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset(), src.getSwf().getSwfProfile()));
             } catch (ActionParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
                 System.exit(1);

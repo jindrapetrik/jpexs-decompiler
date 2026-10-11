@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.SkipNextAction;
 import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
@@ -600,7 +601,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             if (item.isExcluded()) {
                 break;
             }
-
+            
             if (instructionsProcessed > executionLimit) {
                 break;
             }
@@ -743,6 +744,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     jumpedHere = true;
                     localData.jump = null;
                 } else {
+                    if (item.action instanceof SkipNextAction) {
+                        item = item.next;
+                    }            
                     item = item.next;
                     jumpedHere = false;
                 }

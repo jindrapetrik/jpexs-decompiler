@@ -1324,9 +1324,15 @@ public abstract class Action implements GraphSourceItem {
         boolean isForIn = false;
         GraphTargetItem inItem = null;
         int loopStart = 0;
+        boolean skipNext = false;
         loopip:
         while (ip <= end) {
 
+            if (skipNext) {
+                ip++;
+                skipNext = false;
+            }
+            
             long addr = ip2adr(actions, ip);
             if (ip > end) {
                 break;
@@ -1338,10 +1344,13 @@ public abstract class Action implements GraphSourceItem {
             if (Configuration.simplifyExpressions.get()) {
                 stack.simplify();
             }
-            Action action = actions.get(ip);
+            Action action = actions.get(ip);            
             if (action.isIgnored()) {
                 ip++;
                 continue;
+            }
+            if (action instanceof SkipNextAction) {
+                skipNext = true;
             }
             
             //FunctionActionItem after DefineFunction(/2) are left on the stack. For linestart offsets we consider this kind of stack empty.
@@ -1502,9 +1511,9 @@ public abstract class Action implements GraphSourceItem {
      */
     public static void setConstantPool(List<? extends GraphSourceItem> actions, ConstantPool cpool) {
         for (GraphSourceItem a : actions) {
-            if (a instanceof ActionPush) {
+            if (a instanceof ConstantPoolAwareAction) {
                 if (cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
+                    ((ConstantPoolAwareAction) a).setConstantPool(cpool.constants);
                 }
             }
             if (a instanceof ActionDefineFunction) {

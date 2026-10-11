@@ -867,8 +867,8 @@ public class ActionListReader {
 
                 a.setAddress(ip);
 
-                if (a instanceof ActionPush && cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
+                if (a instanceof ConstantPoolAwareAction && cpool != null) {
+                    ((ConstantPoolAwareAction) a).setConstantPool(cpool.constants);
                 } else if (a instanceof ActionConstantPool) {
                     cpool = new ConstantPool(((ActionConstantPool) a).constantPool);
                 } else if (a instanceof ActionIf) {
@@ -999,11 +999,11 @@ public class ActionListReader {
                     ret = true;
                 }
 
-                if (a instanceof ActionPush && cpool != null) {
-                    ActionPush push = (ActionPush) a;
-                    if (push.constantPool != cpool.constants) {
-                        push.constantPool = cpool.constants.isEmpty() ? null : cpool.constants;
-                        if (push.constantPool != null) {
+                if (a instanceof ConstantPoolAwareAction && cpool != null) {
+                    ConstantPoolAwareAction push = (ConstantPoolAwareAction) a;
+                    if (push.getConstantPool() != cpool.constants) {
+                        push.setConstantPool(cpool.constants.isEmpty() ? null : cpool.constants);
+                        if (push.getConstantPool() != null) {
                             ret = true;
                         }
                     }
