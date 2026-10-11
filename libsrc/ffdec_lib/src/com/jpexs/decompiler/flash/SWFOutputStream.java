@@ -1314,12 +1314,12 @@ public class SWFOutputStream extends OutputStream {
         writeMatrix(value.placeMatrix);
         if (inDefineButton2) {
             writeCXFORMWITHALPHA(value.colorTransform);
-            if (value.buttonHasFilterList) {
-                writeFILTERLIST(value.filterList);
-            }
-            if (value.buttonHasBlendMode) {
-                writeUI8(value.blendMode);
-            }
+        }
+        if (value.buttonHasFilterList) {
+            writeFILTERLIST(value.filterList);
+        }
+        if (value.buttonHasBlendMode) {
+            writeUI8(value.blendMode);
         }
     }
 

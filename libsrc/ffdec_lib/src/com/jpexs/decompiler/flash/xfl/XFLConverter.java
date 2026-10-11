@@ -1776,12 +1776,12 @@ public class XFLConverter {
                                     List<FILTER> filters = new ArrayList<>();
                                     if (button instanceof DefineButton2Tag) {
                                         colorTransformAlpha = rec.colorTransform;
-                                        if (rec.buttonHasBlendMode) {
-                                            blendMode = rec.blendMode;
-                                        }
-                                        if (rec.buttonHasFilterList) {
-                                            filters = rec.filterList;
-                                        }
+                                    }
+                                    if (rec.buttonHasBlendMode) {
+                                        blendMode = rec.blendMode;
+                                    }
+                                    if (rec.buttonHasFilterList) {
+                                        filters = rec.filterList;
                                     }
                                     CharacterTag character = button.getSwf().getCharacter(rec.characterId);
                                     if (character != null) {

@@ -2842,12 +2842,12 @@ public class SWFInputStream implements AutoCloseable {
         ret.placeMatrix = readMatrix("placeMatrix");
         if (tag instanceof DefineButton2Tag) {
             ret.colorTransform = readCXFORMWITHALPHA("colorTransform");
-            if (ret.buttonHasFilterList) {
-                ret.filterList = readFILTERLIST("filterList");
-            }
-            if (ret.buttonHasBlendMode) {
-                ret.blendMode = readUI8("blendMode");
-            }
+        }
+        if (ret.buttonHasFilterList) {
+            ret.filterList = readFILTERLIST("filterList");
+        }
+        if (ret.buttonHasBlendMode) {
+            ret.blendMode = readUI8("blendMode");
         }
         endDumpLevel();
         return ret;

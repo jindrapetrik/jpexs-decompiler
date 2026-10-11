@@ -109,18 +109,17 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public CXFORMWITHALPHA colorTransform;
 
     /**
-     * If within DefineButton2Tag and buttonHasFilterList: List of filters on
-     * this button
+     * If buttonHasFilterList: List of filters on this button
      */
     @SWFArray("filter")
-    @Conditional(value = "buttonHasFilterList", tags = {DefineButton2Tag.ID})
+    @Conditional("buttonHasFilterList")
     public List<FILTER> filterList;
 
     /**
-     * If within DefineButton2Tag and buttonHasBlendMode: Blend mode
+     * If buttonHasBlendMode: Blend mode
      */
     @SWFType(BasicType.UI8)
-    @Conditional(value = "buttonHasBlendMode", tags = {DefineButton2Tag.ID})
+    @Conditional("buttonHasBlendMode")
     @EnumValue(value = 0, text = "normal")
     @EnumValue(value = BlendMode.NORMAL, text = "normal")
     @EnumValue(value = BlendMode.LAYER, text = "layer")
