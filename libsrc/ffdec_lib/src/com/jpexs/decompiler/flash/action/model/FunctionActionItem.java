@@ -318,7 +318,15 @@ public class FunctionActionItem extends ActionItem {
         }
         writer.append(")").startBlock();
 
-        Graph.graphToString(actions, writer, localData);        
+        As2ClassMemberScope previousScope = localData.as2ClassMemberScope;
+        if (previousScope != null) {
+            localData.as2ClassMemberScope = previousScope.forFunction(this);
+        }
+        try {
+            Graph.graphToString(actions, writer, localData);
+        } finally {
+            localData.as2ClassMemberScope = previousScope;
+        }
 
         writer.endBlock();
         writer.endMethod();
@@ -596,6 +604,9 @@ public class FunctionActionItem extends ActionItem {
         for (VariableActionItem v : variables) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
+            if (v.boxResolvedMember()) {
+                continue;
+            }
             /*if (needsFun2 && !hasEval) {
                 if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
                     registerNames.add(varName);

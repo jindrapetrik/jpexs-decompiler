@@ -98,22 +98,26 @@ public class CallMethodActionItem extends ActionItem {
             }
 
             if (!blankMethod) {
-                if (scriptObject.getPrecedence() > this.precedence
-                        || ((scriptObject instanceof DirectValueActionItem) && (((DirectValueActionItem) scriptObject).value instanceof Long))) {
-                    writer.append("(");
-                    scriptObject.toString(writer, localData);
-                    writer.append(")");
-                } else {
-                    scriptObject.toString(writer, localData);
-                }
-                if (!(((DirectValueActionItem) methodName).value instanceof RegisterNumber)
-                        && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
-                    writer.allowWrapHere().append(".");
+                if (As2ClassMemberScope.canShorten(scriptObject, methodName, localData)) {
                     methodName.toStringNoQuotes(writer, localData);
                 } else {
-                    writer.append("[");
-                    methodName.toString(writer, localData);
-                    writer.append("]");
+                    if (scriptObject.getPrecedence() > this.precedence
+                            || ((scriptObject instanceof DirectValueActionItem) && (((DirectValueActionItem) scriptObject).value instanceof Long))) {
+                        writer.append("(");
+                        scriptObject.toString(writer, localData);
+                        writer.append(")");
+                    } else {
+                        scriptObject.toString(writer, localData);
+                    }
+                    if (!(((DirectValueActionItem) methodName).value instanceof RegisterNumber)
+                            && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
+                        writer.allowWrapHere().append(".");
+                        methodName.toStringNoQuotes(writer, localData);
+                    } else {
+                        writer.append("[");
+                        methodName.toString(writer, localData);
+                        writer.append("]");
+                    }
                 }
                 //writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
             } else {

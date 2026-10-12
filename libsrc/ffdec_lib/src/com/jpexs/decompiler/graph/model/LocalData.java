@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.As2ClassMemberScope;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.HashMap;
@@ -105,6 +106,11 @@ public class LocalData {
      * Class index
      */
     public int classIndex;
+
+    /**
+     * Current AS2 class and names shadowed by function locals.
+     */
+    public As2ClassMemberScope as2ClassMemberScope;
 
     private LocalData() {
     }

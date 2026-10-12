@@ -453,6 +453,12 @@ public class ActionScript2Parser {
                 expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
             }
         }
+        s = lex();
+        if (s.type == SymbolType.COLON) {
+            type(new ArrayList<>());
+        } else {
+            lexer.pushback(s);
+        }
         List<GraphTargetItem> body = null;
         List<VariableActionItem> subvariables = new ArrayList<>();
         List<FunctionActionItem> subfunctions = new ArrayList<>();
@@ -632,6 +638,7 @@ public class ActionScript2Parser {
         ParsedSymbol s;
         List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
         List<Boolean> traitsStatic = new ArrayList<>();
+        Set<String> staticMembers = new HashSet<>();
 
         String classNameStr = "";
         if (nameStr instanceof GetMemberActionItem) {
@@ -672,6 +679,9 @@ public class ActionScript2Parser {
 
                     expectedIdentifier(s, lexer.yyline());
                     String fname = s.value.toString();
+                    if (isStatic) {
+                        staticMembers.add(fname);
+                    }
                     if (fname.equals(classNameStr)) { //constructor
                         //actually there's no difference, it's instance trait
                     }
@@ -726,6 +736,9 @@ public class ActionScript2Parser {
                     s = lex();
                     expectedIdentifier(s, lexer.yyline());
                     String ident = s.value.toString();
+                    if (isStatic) {
+                        staticMembers.add(ident);
+                    }
                     s = lex();
                     if (s.type == SymbolType.COLON) {
                         type(variables);
@@ -749,6 +762,7 @@ public class ActionScript2Parser {
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> it : traits) {
             GraphTargetItem val = it.getValue();
+            resolveStaticMembers(val, nameStr, staticMembers, new HashSet<>());
             Set<GraphTargetItem> subItems = val.getAllSubItemsRecursively();
             subItems.add(val);
             for (GraphTargetItem si : subItems) {
@@ -858,6 +872,82 @@ public class ActionScript2Parser {
             return new InterfaceActionItem(nameStr, implementsStr);
         } else {
             return new ClassActionItem(nameStr, extendsStr, implementsStr, traits, traitsStatic);
+        }
+    }
+
+    private void resolveStaticMembers(GraphTargetItem item, GraphTargetItem className, Set<String> staticMembers, Set<String> shadowed) throws IOException, ActionParseException {
+        if (item == null) {
+            return;
+        }
+        if (item instanceof TryActionItem) {
+            TryActionItem tryItem = (TryActionItem) item;
+            for (GraphTargetItem command : tryItem.tryCommands) {
+                resolveStaticMembers(command, className, staticMembers, shadowed);
+            }
+            for (int i = 0; i < tryItem.catchCommands.size(); i++) {
+                Set<String> catchScope = new HashSet<>(shadowed);
+                GraphTargetItem catchName = tryItem.catchExceptionNames.get(i);
+                if (catchName instanceof DirectValueActionItem) {
+                    catchScope.add(((DirectValueActionItem) catchName).getAsString());
+                }
+                for (GraphTargetItem command : tryItem.catchCommands.get(i)) {
+                    resolveStaticMembers(command, className, staticMembers, catchScope);
+                }
+            }
+            if (tryItem.finallyCommands != null) {
+                for (GraphTargetItem command : tryItem.finallyCommands) {
+                    resolveStaticMembers(command, className, staticMembers, shadowed);
+                }
+            }
+            return;
+        }
+        if (item instanceof FunctionActionItem) {
+            FunctionActionItem function = (FunctionActionItem) item;
+            shadowed = new HashSet<>(shadowed);
+            shadowed.addAll(function.paramNames);
+            for (VariableActionItem variable : function.getVariables()) {
+                if (variable.isDefinition()) {
+                    shadowed.add(variable.getVariableName());
+                }
+            }
+            for (FunctionActionItem inner : function.getInnerFunctions()) {
+                if (!inner.functionName.isEmpty()) {
+                    shadowed.add(inner.functionName);
+                }
+            }
+        }
+        if (item instanceof VariableActionItem) {
+            VariableActionItem variable = (VariableActionItem) item;
+            if (!variable.isDefinition() && staticMembers.contains(variable.getVariableName())
+                    && !shadowed.contains(variable.getVariableName())) {
+                variable.setResolvedMember(new GetMemberActionItem(null, null, className, pushConst(variable.getVariableName())));
+            }
+        }
+        if (item instanceof DeleteActionItem) {
+            DeleteActionItem delete = (DeleteActionItem) item;
+            if (delete.object == null && delete.propertyName instanceof DirectValueActionItem
+                    && ((DirectValueActionItem) delete.propertyName).isString()) {
+                String name = ((DirectValueActionItem) delete.propertyName).getAsString();
+                if (staticMembers.contains(name) && !shadowed.contains(name)) {
+                    delete.object = className;
+                }
+            }
+        }
+        if (item instanceof CallFunctionActionItem) {
+            resolveStaticMembers(((CallFunctionActionItem) item).functionName, className, staticMembers, shadowed);
+        }
+        if (item instanceof NewObjectActionItem) {
+            NewObjectActionItem constructor = (NewObjectActionItem) item;
+            if (constructor.objectName instanceof DirectValueActionItem
+                    && ((DirectValueActionItem) constructor.objectName).isString()) {
+                String name = ((DirectValueActionItem) constructor.objectName).getAsString();
+                if (staticMembers.contains(name) && !shadowed.contains(name)) {
+                    constructor.resolvedObject = className;
+                }
+            }
+        }
+        for (GraphTargetItem child : item.getAllSubItems()) {
+            resolveStaticMembers(child, className, staticMembers, shadowed);
         }
     }
 
@@ -2735,6 +2825,9 @@ public class ActionScript2Parser {
         Reference<Boolean> hasEval = new Reference<>(false);
         retTree.addAll(commands(false, false, false, 0, false, vars, functions, hasEval));
         for (VariableActionItem v : vars) {
+            if (v.boxResolvedMember()) {
+                continue;
+            }
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
             int propIndex = -1;

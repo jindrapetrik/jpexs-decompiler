@@ -189,6 +189,10 @@ public class CallFunctionActionItem extends ActionItem {
 
         if (functionName instanceof VariableActionItem) {
             VariableActionItem varItem = (VariableActionItem) functionName;
+            if (varItem.getBoxedValue() instanceof GetMemberActionItem) {
+                GetMemberActionItem member = (GetMemberActionItem) varItem.getBoxedValue();
+                return new CallMethodActionItem(getSrc(), getLineStartItem(), member.object, member.memberName, arguments).toSource(localData, generator);
+            }
             if (varItem.getBoxedValue() instanceof DirectValueActionItem) {
                 if (((DirectValueActionItem) varItem.getBoxedValue()).value instanceof RegisterNumber) {
                     return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), varItem.getBoxedValue(), new DirectValueActionItem(Undefined.INSTANCE), new ActionCallMethod());

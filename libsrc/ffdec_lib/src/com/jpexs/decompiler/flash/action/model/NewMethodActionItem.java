@@ -96,24 +96,28 @@ public class NewMethodActionItem extends ActionItem {
             }
         }
         writer.append("new ");
-        scriptObject.toString(writer, localData);
-        if (!blankMethod) {
-            if (methodName instanceof DirectValueActionItem) {
-                if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
-                    //empty
-                } else if ((((DirectValueActionItem) methodName).value instanceof String)
-                        && (IdentifiersDeobfuscation.isValidName(false, (String) ((DirectValueActionItem) methodName).value))) {
-                    writer.append(".");
-                    ((DirectValueActionItem) methodName).toStringNoQuotes(writer, localData);
+        if (As2ClassMemberScope.canShorten(scriptObject, methodName, localData)) {
+            methodName.toStringNoQuotes(writer, localData);
+        } else {
+            scriptObject.toString(writer, localData);
+            if (!blankMethod) {
+                if (methodName instanceof DirectValueActionItem) {
+                    if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
+                        //empty
+                    } else if ((((DirectValueActionItem) methodName).value instanceof String)
+                            && (IdentifiersDeobfuscation.isValidName(false, (String) ((DirectValueActionItem) methodName).value))) {
+                        writer.append(".");
+                        ((DirectValueActionItem) methodName).toStringNoQuotes(writer, localData);
+                    } else {
+                        writer.append("[");
+                        methodName.toString(writer, localData);
+                        writer.append("]");
+                    }
                 } else {
                     writer.append("[");
                     methodName.toString(writer, localData);
                     writer.append("]");
                 }
-            } else {
-                writer.append("[");
-                methodName.toString(writer, localData);
-                writer.append("]");
             }
         }
         writer.spaceBeforeCallParenthesis(arguments.size());

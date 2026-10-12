@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.As2ClassMemberScope;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -82,7 +83,13 @@ public class WithActionItem extends ActionItem {
         writer.append("(");
         scope.toString(writer, localData);
         writer.append(")");
-        appendBlock(null, writer, localData, items);
+        As2ClassMemberScope previousScope = localData.as2ClassMemberScope;
+        localData.as2ClassMemberScope = null;
+        try {
+            appendBlock(null, writer, localData, items);
+        } finally {
+            localData.as2ClassMemberScope = previousScope;
+        }
 
         return writer;
     }
