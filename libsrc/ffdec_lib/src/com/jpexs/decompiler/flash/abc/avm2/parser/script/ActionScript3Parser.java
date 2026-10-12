@@ -687,6 +687,31 @@ public class ActionScript3Parser {
         return metadata;
     }
     
+    private void checkDuplicateClassField(Map<NamespaceItem, Set<String>> fields, NamespaceItem namespace, String name, int line) throws AVM2ParseException, CompilationException {
+        if (namespace.isResolved()) {
+            Namespace ns = abcIndex.getSelectedAbc().constants.getNamespace(namespace.getCpoolIndex(abcIndex));
+            namespace = new NamespaceItem(ns.getName(abcIndex.getSelectedAbc().constants), ns.kind, line);
+        }
+        switch (namespace.kind) {
+            case Namespace.KIND_PACKAGE:
+            case Namespace.KIND_PACKAGE_INTERNAL:
+            case Namespace.KIND_PRIVATE:
+            case Namespace.KIND_PROTECTED:
+            case Namespace.KIND_STATIC_PROTECTED:
+                // Access modifiers do not allow redeclaring a field in the same class.
+                namespace = null;
+                break;
+        }
+        Set<String> names = fields.get(namespace);
+        if (names == null) {
+            names = new HashSet<>();
+            fields.put(namespace, names);
+        }
+        if (!names.add(name)) {
+            throw new AVM2ParseException("Duplicate class field \"" + name + "\"", line);
+        }
+    }
+
     private void classTraits(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, List<AssignableAVM2Item> cinitVariables, Reference<Boolean> cinitNeedsActivation, List<GraphTargetItem> cinit, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, NamespaceItem pkg, String classNameStr, boolean isInterface, List<GraphTargetItem> traits, List<AssignableAVM2Item> iinitVariables, Reference<Boolean> iinitNeedsActivation, Reference<GraphTargetItem> iinit, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
 
         NamespaceItem publicNs = new NamespaceItem("", Namespace.KIND_PACKAGE, -1);
@@ -710,6 +735,8 @@ public class ActionScript3Parser {
         Stack<Loop> cinitLoops = new Stack<>();
         Map<Loop, String> cinitLoopLabels = new HashMap<>();
         HashMap<String, Integer> cinitRegisterVars = new HashMap<>();
+        Map<NamespaceItem, Set<String>> instanceFields = new HashMap<>();
+        Map<NamespaceItem, Set<String>> staticFields = new HashMap<>();
 
         looptraits:
         while (true) {
@@ -985,12 +1012,15 @@ public class ActionScript3Parser {
                     s = lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String vcname = s.value.toString();
+                    int fieldLine = lexer.yyline();
                     s = lex();
 
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
                         namespace = new NamespaceItem((Integer) s.value);
                         s = lex();
                     }
+
+                    checkDuplicateClassField(isStatic ? staticFields : instanceFields, namespace, vcname, fieldLine);
 
                     GraphTargetItem type;
                     if (s.type == SymbolType.COLON) {
