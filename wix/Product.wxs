@@ -729,10 +729,10 @@
           <File Id="jpexs_apng.license.txt" Source="../dist/lib/jpexs-apng.license.txt" KeyPath="yes" />
       </Component>
       <Component Id="jpexs_jxr" Guid="5F65B99C-E03F-4212-91C9-322AA7C681A0">
-          <File Id="jpexs-jxr-1.0.0.jar" Source="../dist/lib/jpexs-jxr-1.0.0.jar" KeyPath="yes" />
+          <File Id="jpexs_jxr_1.0.0.jar" Source="../dist/lib/jpexs-jxr-1.0.0.jar" KeyPath="yes" />
       </Component>
       <Component Id="jpexs_jxr_license" Guid="A84386C7-0EB2-461A-ADDE-DFC4337220B7">
-          <File Id="jpexs-jxr.license.txt" Source="../dist/lib/jpexs-jxr.license.txt" KeyPath="yes" />
+          <File Id="jpexs_jxr.license.txt" Source="../dist/lib/jpexs-jxr.license.txt" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
