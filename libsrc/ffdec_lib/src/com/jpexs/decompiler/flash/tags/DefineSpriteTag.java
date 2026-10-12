@@ -149,6 +149,16 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
             sos.writeUI16(0);
         }
     }
+
+    @Override
+    public boolean isPositionDependent() {
+        for (Tag tag : getTags()) {
+            if (tag.isPositionDependent()) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     @Override
     public void getDataNoScript(SWFOutputStream sos) throws IOException {

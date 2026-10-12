@@ -116,6 +116,11 @@ public class SWFOutputStream extends OutputStream {
     private long pos = 0;
 
     /**
+     * Start offset in the uncompressed SWF, or -1 for standalone data.
+     */
+    private final long absoluteOffset;
+
+    /**
      * Current bit position in the stream
      */
     private int bitPos = 0;
@@ -140,15 +145,35 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
+     * Gets the current position in the uncompressed SWF.
+     * @return Absolute position, or -1 when no file position is available
+     */
+    public long getAbsolutePos() {
+        return absoluteOffset < 0 ? -1 : absoluteOffset + pos;
+    }
+
+    /**
      * Constructs new SWFOutputStream.
      *
      * @param os OutputStream for writing data
      * @param version Version of SWF
      */
     public SWFOutputStream(OutputStream os, int version, String charset) {
+        this(os, version, charset, -1);
+    }
+
+    /**
+     * Constructs a stream with a known position in an uncompressed SWF.
+     * @param os Output stream
+     * @param version SWF version
+     * @param charset Charset
+     * @param absoluteOffset Start offset, or -1 for standalone data
+     */
+    public SWFOutputStream(OutputStream os, int version, String charset, long absoluteOffset) {
         this.version = version;
         this.os = os;
         this.charset = charset;
+        this.absoluteOffset = absoluteOffset;
     }
 
     /**

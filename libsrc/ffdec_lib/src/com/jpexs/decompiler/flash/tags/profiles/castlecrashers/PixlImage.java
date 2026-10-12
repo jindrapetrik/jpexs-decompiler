@@ -150,6 +150,11 @@ public class PixlImage extends ImageTag {
     }
 
     @Override
+    public boolean isPositionDependent() {
+        return true;
+    }
+
+    @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(characterID);
         sos.writeUI16(reserved);
@@ -157,7 +162,19 @@ public class PixlImage extends ImageTag {
         sos.writeSI32(bounds.Xmax);
         sos.writeSI32(bounds.Ymin);
         sos.writeSI32(bounds.Ymax);
-        sos.write(padding);
+        if (sos.getAbsolutePos() < 0) {
+            sos.write(padding);
+        } else {
+            // The Steam loader rounds payload + 20 up to a 32-byte boundary.
+            int paddingLength = (int) (-sos.getAbsolutePos() & 31);
+            if (paddingLength == padding.getLength()) {
+                sos.write(padding);
+            } else {
+                for (int i = 0; i < paddingLength; i++) {
+                    sos.writeUI8(0xcd);
+                }
+            }
+        }
         sos.write(headerBeforeDimensions);
         sos.writeUI32(width);
         sos.writeUI32(height);

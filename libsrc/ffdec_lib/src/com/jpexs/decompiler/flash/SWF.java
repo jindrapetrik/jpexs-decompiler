@@ -1996,7 +1996,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     private byte[] saveToByteArray(boolean gfx, boolean includeImported) throws IOException {
         byte[] data;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); SWFOutputStream sos = new SWFOutputStream(baos, version, charset, 0)) {
             sos.write(getHeaderBytes(SWFCompression.NONE, gfx));
             sos.writeUI8(version);
             sos.writeUI32(0); // placeholder for file length
