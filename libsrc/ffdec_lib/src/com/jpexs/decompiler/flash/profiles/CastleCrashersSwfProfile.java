@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class CastleCrashersSwfProfile implements SwfProfile {
+public class CastleCrashersSwfProfile extends AbstractSwfProfile {
 
     public static final String ID = "castle_crashers";
 
@@ -39,16 +39,7 @@ public class CastleCrashersSwfProfile implements SwfProfile {
     }
 
     public CastleCrashersSwfProfile() {
-    }
-
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
+        super(ID, NAME);
     }
 
     @Override
@@ -73,12 +64,7 @@ public class CastleCrashersSwfProfile implements SwfProfile {
     public Class<? extends Tag> getTagIdClass(int tagId) {
         return SUPPORTED_TAGS.get(tagId);
     }
-
-    @Override
-    public boolean supportsSwf(SWF swf) {
-        return true;
-    }
-
+   
     @Override
     public boolean prefersAvm1DefineFunction2() {
         return true;
@@ -129,5 +115,10 @@ public class CastleCrashersSwfProfile implements SwfProfile {
                 return new ActionPushDefineLocal(actionLength, sis, charset);
         }
         return null;
+    }
+
+    @Override
+    public boolean prefersNoVariablesInAvm1Functions() {
+        return true;
     }
 }

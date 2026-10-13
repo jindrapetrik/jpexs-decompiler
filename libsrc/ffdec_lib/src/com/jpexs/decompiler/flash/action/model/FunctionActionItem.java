@@ -441,11 +441,16 @@ public class FunctionActionItem extends ActionItem {
         
         boolean canFun2 = asGenerator.getSwfVersion() >= 7;
         
+        boolean canVariables = true;
+        
         SwfProfile profile = asGenerator.getProfile();
         if (profile != null) {
             if (profile.prefersAvm1DefineFunction2()) {
                 canFun2 = true;
                 needsFun2 = true;
+            }
+            if (profile.prefersNoVariablesInAvm1Functions()) {
+                canVariables = false;
             }
         }
         
@@ -517,15 +522,15 @@ public class FunctionActionItem extends ActionItem {
         for (FunctionActionItem fun : innerFunctions) {
             getDeeplyUsedVariableNames(topLevelVariableNames, fun, deeplyUsedVariableNames);
         }
-
+        
         for (int i = 0; i < paramNames.size(); i++) {
             paramRegs.add(0); //0 = use variable, no reg
         }
         
-        if (needsFun2 && !hasEval) {
+        if (needsFun2 && (!hasEval || !canVariables)) {
             String registerNameMask = Configuration.registerNameFormat.get();
             Pattern registerNamePattern = Pattern.compile(registerNameMask.replace("%d", "(?<regnum>[0-9]+)"));
-            
+
             List<String> newRegisterNames = new ArrayList<>();
             for (VariableActionItem v : variables) {
                 String varName = v.getVariableName();
@@ -541,7 +546,7 @@ public class FunctionActionItem extends ActionItem {
                     }
                 }
             }
-            
+
             for (int i = 0; i < paramNames.size(); i++) {    
                 String varName = paramNames.get(i);
                 if (newRegisterNames.contains(varName)) {
@@ -550,21 +555,21 @@ public class FunctionActionItem extends ActionItem {
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
                     int regNum = Integer.parseInt(m.group("regnum"));  
-                    
+
                     while (registerNames.size() <= regNum) {
                         registerNames.add("**EMPTY**");
                     }                   
                     registerNames.set(regNum, varName);
-                    
+
                     paramNames.set(i, "");
                     paramRegs.set(i, regNum);
                 }
             }
-            
+
             newRegisterNames.sort(new NaturalOrderComparator());
-            
+
             int numRegistersBeforeParams = registerNames.size();
-            
+
             for (String varName : newRegisterNames) {
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
@@ -575,7 +580,7 @@ public class FunctionActionItem extends ActionItem {
                     registerNames.set(regNum, varName);
                 }
             }
-            
+
             int posReg = numRegistersBeforeParams;
             for (int i = 0; i < paramNames.size(); i++) {                
                 if (paramRegs.get(i) != 0) {
@@ -607,11 +612,21 @@ public class FunctionActionItem extends ActionItem {
             if (v.boxResolvedMember()) {
                 continue;
             }
-            /*if (needsFun2 && !hasEval) {
-                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
-                    registerNames.add(varName);
+            if (needsFun2 && (!hasEval || !canVariables)) {                
+                if (v.isDefinition() && !registerNames.contains(varName) && (!canVariables || !deeplyUsedVariableNames.contains(varName))) {
+                    boolean found = false;
+                    for (int i = 0; i < registerNames.size(); i++) {
+                        if ("**EMPTY**".equals(registerNames.get(i))) {
+                            registerNames.set(i, varName);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        registerNames.add(varName);
+                    }
                 }
-            }*/
+            }
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {

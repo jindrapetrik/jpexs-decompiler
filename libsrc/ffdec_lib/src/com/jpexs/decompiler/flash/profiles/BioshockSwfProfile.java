@@ -33,7 +33,7 @@ import java.util.Map;
  * Bioshock 1 or 2 game SWF profile.
  * @author JPEXS
  */
-public class BioshockSwfProfile implements SwfProfile {
+public class BioshockSwfProfile extends AbstractSwfProfile {
     
     public static final String ID = "bioshock";
     
@@ -47,16 +47,7 @@ public class BioshockSwfProfile implements SwfProfile {
     }
     
     public BioshockSwfProfile() {
-    }
-
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
+        super(ID, NAME);
     }
 
     @Override
@@ -92,25 +83,5 @@ public class BioshockSwfProfile implements SwfProfile {
     @Override
     public boolean supportsSwf(SWF swf) {
         return !swf.gfx;
-    }
-
-    @Override
-    public boolean prefersAvm1DefineFunction2() {
-        return false;
-    }        
-
-    @Override
-    public List<Integer> getSupportedActions() {
-        return new ArrayList<>();
-    }        
-
-    @Override
-    public Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) {
-        return null;
-    }
-
-    @Override
-    public Action readAction(int actionCode, int actionLength, SWFInputStream sis, String charset) throws IOException {
-        return null;
-    }        
+    }   
 }

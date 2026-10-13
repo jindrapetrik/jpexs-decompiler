@@ -89,6 +89,12 @@ public interface SwfProfile {
     public boolean prefersAvm1DefineFunction2();
     
     /**
+     * Disallows using variables in AVM1 functions
+     * @return True when no variables are preferred
+     */
+    public boolean prefersNoVariablesInAvm1Functions();
+    
+    /**
      * Parses Action
      * @param instructionName
      * @param lexer
