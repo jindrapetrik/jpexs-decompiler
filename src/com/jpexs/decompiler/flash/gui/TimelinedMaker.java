@@ -67,6 +67,7 @@ public class TimelinedMaker {
 
     public static SWF makeTimelinedImage(ImageTag imageTag) {
         SWF swf = new SWF();
+        swf.setOpenableList(imageTag.getSwf().getOpenableList()); //For Iggy external image
         swf.gfx = imageTag.getSwf().gfx;
         swf.version = imageTag.getSwf().version;
         int w = (int) (imageTag.getImageDimension().getWidth() * SWF.unitDivisor);

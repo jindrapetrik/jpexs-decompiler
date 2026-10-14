@@ -405,6 +405,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, DefineSubImage.ID, DefineSubImage.class, DefineSubImage.NAME);
                     addTagInfo(map, map2, ExporterInfo.ID, ExporterInfo.class, ExporterInfo.NAME);
                     addTagInfo(map, map2, FontTextureInfo.ID, FontTextureInfo.class, FontTextureInfo.NAME);
+                    addTagInfo(map, map2, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.ID, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.class, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.NAME);
                     
                     addTagInfo(map, map2, DefineVideoTag.ID, DefineVideoTag.class, DefineVideoTag.NAME);
                     addTagInfo(map, map2, GenCommandTag.ID, GenCommandTag.class, GenCommandTag.NAME);

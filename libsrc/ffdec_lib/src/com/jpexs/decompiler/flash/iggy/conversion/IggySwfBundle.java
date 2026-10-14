@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
+import com.jpexs.decompiler.flash.profiles.IggySwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfiles;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -58,6 +61,11 @@ public class IggySwfBundle implements Bundle {
             Helper.saveStream(is, filename);
         }
         iggyFile = new IggyFile(filename);
+    }
+
+    @Override
+    public SwfProfile getImplicitSwfProfile() {
+        return SwfProfiles.getProfile(IggySwfProfile.ID);
     }
 
     @Override
@@ -114,8 +122,8 @@ public class IggySwfBundle implements Bundle {
     @Override
     public boolean putOpenable(String key, InputStream is) throws IOException {
         try {
-            SWF swf = new SWF(is, false, false);
-            SwfToIggyConvertor.updateIggy(iggyFile.getSwf(), swf);
+            SWF swf = new SWF(is, false, false, "UTF-8", getImplicitSwfProfile());
+            SwfToIggyConvertor.updateIggy(iggyFile, swf);
             iggyFile.saveChanges();
             return true;
         } catch (InterruptedException ex) {

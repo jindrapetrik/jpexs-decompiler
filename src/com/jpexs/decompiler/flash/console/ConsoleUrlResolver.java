@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
+import com.jpexs.decompiler.flash.profiles.IggySwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,7 +79,7 @@ public class ConsoleUrlResolver implements UrlResolver {
 
     @Override
     public SWF resolveUrl(String basePath, String url) {
-        ignoredUrls.add(url);
+        ignoredUrls.add(basePath + "|" + url);
         Character choice = toAll;
         String currentUrl = url;
 
@@ -135,15 +138,16 @@ public class ConsoleUrlResolver implements UrlResolver {
                         //ignore
                     }
                 }
-                // try .gfx if .swf failed
-                if (currentUrl.endsWith(".swf")) {
-                    File gfx = new File(new File(basePath).getParentFile(), url.substring(0, url.length() - 4) + ".gfx");
-                    if (gfx.exists()) {
-                        try {
-                            SWF ret = open(new FileInputStream(gfx), gfx.getAbsolutePath(), gfx.getName());
-                            return ret;
-                        } catch (Exception ex) {
-                            //ignore
+                // Try alternative container extensions after the requested SWF.
+                if (currentUrl.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
+                    for (String extension : new String[]{".gfx", ".iggy"}) {
+                        File alternative = new File(new File(basePath).getParentFile(), currentUrl.substring(0, currentUrl.length() - 4) + extension);
+                        if (alternative.exists()) {
+                            try {
+                                return open(new FileInputStream(alternative), alternative.getAbsolutePath(), alternative.getName());
+                            } catch (Exception ex) {
+                                //ignore
+                            }
                         }
                     }
                 }
@@ -161,7 +165,16 @@ public class ConsoleUrlResolver implements UrlResolver {
 
     private SWF open(InputStream is, String file, String fileTitle) throws Exception {
         OpenableSourceInfo sourceInfo = new OpenableSourceInfo(is, file, fileTitle);
-        return new SWF(new BufferedInputStream(is), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, this, null /*??*/);
+        SwfProfile profile = null;
+        String sourceName = file != null ? file : fileTitle;
+        if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".iggy")) {
+            try (InputStream source = is) {
+                IggySwfBundle bundle = file == null ? new IggySwfBundle(source) : new IggySwfBundle(new File(file));
+                is = bundle.getOpenable(bundle.getKeys().iterator().next());
+            }
+            profile = new IggySwfProfile();
+        }
+        return new SWF(new BufferedInputStream(is), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, this, null, profile);
     }
 
     private String prompt() {

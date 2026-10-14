@@ -72,6 +72,24 @@ alias /?
     Decrypt HARMAN Air encrypted file.
     Decrypt HARMAN Air encrypted file <infile> and saves it to <outfile>.
 
+-swf2iggy <infile> <outfile> [(32_legacy|32|64)]
+    Convert SWF to a new Iggy file.
+    Convert the <infile> SWF to <outfile>.
+    The optional layout is 32_legacy, 32, or 64 (default).
+    The 32_legacy layout requires 24 FPS and does not support
+    AS3, SymbolClass, or library imports.
+    Unsupported tags are skipped with a warning, including inside sprites.
+    Unsupported visible and opaqueBackground attributes are omitted with
+    warnings; their PlaceObject tags and supported attributes are retained.
+    References to skipped definitions are omitted with warnings as well.
+    Invalid data and unsupported movie properties still cause an error.
+
+-iggy2swf <infile> <outfile>
+    Convert Iggy to SWF.
+    Convert the <infile> Iggy to <outfile> SWF; the layout is detected.
+    External textures remain IggyExternalImage references in the SWF.
+    Use -swfProfile iggy when reading that SWF with FFDec CLI.
+
 -swf2xml [-external <formats>] <infile> <outfile>
     Convert SWF to XML.
     Convert the <infile> SWF to <outfile> XML file.

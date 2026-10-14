@@ -48,6 +48,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Sets older offset to this position.
+     *
      * @param savedPos Saved position
      * @throws IOException On I/O error
      */
@@ -55,6 +56,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Sets older offset to this position check.
+     *
      * @param savedPos Saved position
      * @param expected Expected value
      * @throws IOException On I/O error
@@ -89,7 +91,17 @@ public interface WriteDataStreamInterface extends AutoCloseable {
     public boolean writeUI32(long val) throws IOException;
 
     /**
+     * Writes a signed 32-bit integer in little-endian order.
+     *
+     * @param val Value to write
+     * @return True if successful, false if not enough space
+     * @throws IOException On I/O error
+     */
+    public boolean writeSI32(long val) throws IOException;
+
+    /**
      * Writes unsigned 16-bit integer.
+     *
      * @param val Unsigned 16-bit integer
      * @return True if successful, false if not enough space
      * @throws IOException On I/O error
@@ -97,7 +109,17 @@ public interface WriteDataStreamInterface extends AutoCloseable {
     public boolean writeUI16(int val) throws IOException;
 
     /**
+     * Writes a signed 16-bit integer in little-endian order.
+     *
+     * @param val Value to write
+     * @return True if successful, false if not enough space
+     * @throws IOException On I/O error
+     */
+    public boolean writeSI16(int val) throws IOException;
+
+    /**
      * Writes UTF-8 string.
+     *
      * @param val UTF-8 string
      * @return True if successful, false if not enough space
      * @throws IOException On I/O error
@@ -106,12 +128,14 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Pads 8 bytes.
+     *
      * @throws IOException On I/O error
      */
     public void pad8bytes() throws IOException;
 
     /**
      * Writes unsigned 8-bit integer.
+     *
      * @param val Unsigned 8-bit integer
      * @return True if successful, false if not enough space
      * @throws IOException On I/O error
@@ -120,6 +144,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Write byte.
+     *
      * @param val Byte
      * @throws IOException On I/O error
      */
@@ -127,6 +152,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Writes byte array.
+     *
      * @param data Byte array
      * @throws IOException On I/O error
      */
@@ -134,6 +160,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Writes float.
+     *
      * @param val Float
      * @return True if successful, false if not enough space
      * @throws IOException On I/O error
@@ -142,6 +169,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Seeks to specified position.
+     *
      * @param pos Position
      * @param mode Seek mode
      * @throws IOException On I/O error
@@ -150,6 +178,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Gets all bytes.
+     *
      * @return All bytes
      * @throws IOException On I/O error
      */
@@ -163,12 +192,14 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     /**
      * Sets indexing.
+     *
      * @param indexing Indexing
      */
     public void setIndexing(IggyIndexBuilder indexing);
 
     /**
      * Gets indexing.
+     *
      * @return Indexing
      */
     public IggyIndexBuilder getIndexing();

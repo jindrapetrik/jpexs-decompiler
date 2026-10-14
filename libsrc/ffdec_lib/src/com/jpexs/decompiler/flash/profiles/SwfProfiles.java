@@ -45,7 +45,8 @@ public final class SwfProfiles {
 
     private static final List<SwfProfile> PROFILES = Collections.unmodifiableList(Arrays.asList(
             new BioshockSwfProfile(),
-            new CastleCrashersSwfProfile()
+            new CastleCrashersSwfProfile(),
+            new IggySwfProfile()
     ));
 
     private static final Map<String, SwfProfile> PROFILES_BY_ID = new LinkedHashMap<>();

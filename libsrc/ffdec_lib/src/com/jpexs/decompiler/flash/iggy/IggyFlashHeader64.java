@@ -33,22 +33,22 @@ import java.lang.reflect.Field;
 public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint64_t)
-    long off_base; // 0 Relative offset to first section (matches sizeof header);
+    long off_base; // 0x00: dictionary slot array
 
     @IggyFieldType(DataType.uint64_t)
-    long off_sequence_end; // 8  Relative offset to as3 file names table...
+    long off_sequence_end; // 0x08: zero-terminated 8-bit source name/path
 
     @IggyFieldType(DataType.uint64_t)
-    long off_font_end; // 0x10   relative offset to something
+    long off_font_end; // 0x10: root timeline
 
     @IggyFieldType(DataType.uint64_t)
     long off_sequence_start1; // 0x18  relative offset to something
 
     @IggyFieldType(DataType.uint64_t)
-    long off_sequence_start2; //  0x20 relative offset to something
+    long off_sequence_start2; // 0x20: frame labels
 
     @IggyFieldType(DataType.uint64_t)
-    long off_sequence_start3; // 0x28 names_offset; 0x50 relative pointer to the names/import section of the file
+    long off_sequence_start3; // 0x28: scenes
 
     @IggyFieldType(DataType.uint32_t)
     long xmin; // 0x30 in pixels
@@ -63,22 +63,22 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     long ymax; // 0x3C in pixels
 
     @IggyFieldType(DataType.uint32_t)
-    long unk_40; // probably number of blocks/objects after header
+    long unk_40; // dictionary slot count, including null slots
 
     @IggyFieldType(DataType.uint32_t)
-    long unk_44;
+    long unk_44; // frame count
 
     @IggyFieldType(DataType.uint32_t)
     long unk_48;
 
     @IggyFieldType(DataType.uint32_t)
-    long unk_4C;
+    long unk_4C; // frame-label count
 
     @IggyFieldType(DataType.uint32_t)
-    long unk_50;
+    long unk_50; // scene count
 
     @IggyFieldType(DataType.uint32_t)
-    long unk_54;
+    long unk_54; // background RGB in its first three bytes
 
     @IggyFieldType(DataType.float_t)
     float frame_rate;
@@ -93,41 +93,36 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     long my_guid; // same for some fonts (eng + chinese)
 
     @IggyFieldType(DataType.uint64_t)
-    long off_names; // 0x70 relative offset to the names/import section of the file  - end of fonts
+    long off_names; // 0x70: library imports
 
     @IggyFieldType(DataType.uint64_t)
     long off_unk78; // 0x78 relative offset to something
 
     @IggyFieldType(DataType.uint64_t)
-    long unk80;
+    long unk80; // import count (low UI32), then a preserved word
 
     @IggyFieldType(DataType.uint64_t)
-    long off_last_section;
+    long off_last_section; // 0x88: dictionary-ID fixups
 
     @IggyFieldType(DataType.uint64_t)
-    long off_flash_filename;
+    long off_flash_filename; // 0x90: default UTF-16 library name
 
     @IggyFieldType(DataType.uint64_t)
-    long off_decl_strings;
+    long off_decl_strings; // 0x98: ABC linked-list head
 
     @IggyFieldType(DataType.uint64_t)
-    long off_type_of_fonts;
+    long off_type_of_fonts; // 0xA0: SymbolClass bindings
 
     @IggyFieldType(DataType.uint64_t)
-    long flags;
+    long flags; // AS3 flag in first byte; remaining bytes preserved
 
     @IggyFieldType(DataType.uint32_t)
-    long font_count;
+    long font_count; // SymbolClass count (legacy field name)
 
     @IggyFieldType(DataType.uint32_t)
     long zero2;
 
-    // Offset 0xB8 (outside header): there are *unk_40* relative offsets that point to flash objects.
-    // The flash objects are in a format different to swf but there is probably a way to convert between them.
-    // After the offsets, the bodies of objects pointed above, which apparently have a code like 0xFFXX to identify the type of object, followed by a (unique?) identifier
-    // for the object.
-    // A DefineEditText-like object can be easily spotted and apparently uses type code 0x06 (or 0xFF06) but as stated above,
-    // it is written in a different way.
+    //Dictionary location is defined by off_base; neither its position nor its size is fixed.
     public IggyFlashHeader64(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
@@ -332,12 +327,12 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         off_sequence_start3 = stream.readUI64();
         sequence_start_address3 = off_sequence_start3 == 1 ? 0 : off_sequence_start3 + stream.position() - 8;
 
-        xmin = stream.readUI32();
-        ymin = stream.readUI32();
-        xmax = stream.readUI32();
-        ymax = stream.readUI32();
+        xmin = (int) stream.readUI32();
+        ymin = (int) stream.readUI32();
+        xmax = (int) stream.readUI32();
+        ymax = (int) stream.readUI32();
 
-        unk_40 = stream.readUI32(); // probably number of blocks/objects after header
+        unk_40 = stream.readUI32(); // dictionary slot count
         unk_44 = stream.readUI32();
         unk_48 = stream.readUI32();
         unk_4C = stream.readUI32();
@@ -367,11 +362,11 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         flash_filename_address = off_flash_filename == 1 ? 0 : off_flash_filename + stream.position() - 8;
 
         decl_strings_ofs_pos = stream.position();
-        off_decl_strings = stream.readUI64(); //relative offset to as3 code (16 bytes header + abc blob)
+        off_decl_strings = stream.readUI64(); //relative offset to ABC list (12-byte node header)
         decl_strings_address = off_decl_strings == 1 ? 0 : off_decl_strings + stream.position() - 8;
 
         type_fonts_ofs_pos = stream.position();
-        off_type_of_fonts = stream.readUI64(); //relative offset to as3 file names table (or classes names or whatever)
+        off_type_of_fonts = stream.readUI64(); //relative offset to SymbolClass bindings
         type_fonts_address = off_type_of_fonts == 1 ? 0 : off_type_of_fonts + stream.position() - 8;
 
         flags = stream.readUI64();
@@ -426,6 +421,80 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
         stream.getIndexing().writeLengthCustom(184, new int[]{0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x34, 0x38, 0x3C, 0x40, 0x44, 0x48, 0x4C, 0x50, 0x58, 0x70, 0x78, 0x80, 0x84, 0x88, 0x90, 0x98, 0xA0, 0xB0}, new int[]{2, 2, 2, 2, 2, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 5, 5, 2, 2, 2, 2, 5});
 
+    }
+
+    public long getDictionarySize() {
+        return unk_40;
+    }
+
+    public long getFrameCount() {
+        return unk_44;
+    }
+
+    public long getFrameLabelCount() {
+        return unk_4C;
+    }
+
+    public long getSceneCount() {
+        return unk_50;
+    }
+
+    public long getBackgroundColor() {
+        return unk_54;
+    }
+
+    public long getImportCount() {
+        return unk80 & 0xffffffffL;
+    }
+
+    public long getSymbolClassCount() {
+        return font_count;
+    }
+
+    public long getTimelineAddress() {
+        return font_end_address;
+    }
+
+    public long getSourceNameAddress() {
+        return sequence_end_address;
+    }
+
+    public long getFrameLabelsAddress() {
+        return sequence_start_address2;
+    }
+
+    public long getScenesAddress() {
+        return sequence_start_address3;
+    }
+
+    public long getImportsAddress() {
+        return names_address;
+    }
+
+    public long getDictionaryFixupsAddress() {
+        return last_section_address;
+    }
+
+    public long getAbcAddress() {
+        return decl_strings_address;
+    }
+
+    public long getSymbolClassesAddress() {
+        return type_fonts_address;
+    }
+
+    public boolean hasAS3() {
+        return (flags & 255) != 0;
+    }
+
+    public void setMovieProperties(long xMin, long yMin, long xMax, long yMax, float fps, long frames, long color) {
+        xmin = xMin;
+        ymin = yMin;
+        xmax = xMax;
+        ymax = yMax;
+        frame_rate = fps;
+        unk_44 = frames;
+        unk_54 = color;
     }
 
     @Override

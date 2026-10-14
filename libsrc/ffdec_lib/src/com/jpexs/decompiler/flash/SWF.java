@@ -2541,6 +2541,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return swfProfile;
     }
 
+    /** Selects a profile for a programmatically constructed SWF. Existing tags are retained. */
+    public void setSwfProfile(SwfProfile profile) {
+        if (profile != null && !profile.supportsSwf(this)) {
+            throw new IllegalArgumentException("Unsupported SWF profile");
+        }
+        this.swfProfile = profile;
+    }
+
     /**
      * Loads all SWFs embedded in DefineBinaryData tags
      */

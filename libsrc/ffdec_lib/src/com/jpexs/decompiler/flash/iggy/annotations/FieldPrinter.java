@@ -40,6 +40,7 @@ public class FieldPrinter {
                             break;
                         case uint8_t:
                         case uint16_t:
+                        case int16_t:
                             sb.append(f.getInt(val));
                             break;
                         case uint32_t:
@@ -75,6 +76,9 @@ public class FieldPrinter {
                         break;
                     case uint16_t:
                         sb.append("UI16");
+                        break;
+                    case int16_t:
+                        sb.append("SI16");
                         break;
                     case uint32_t:
                         sb.append("UI32");

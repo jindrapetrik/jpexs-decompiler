@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import java.io.IOException;
 
 /**
  * Flash header interface.
@@ -34,4 +35,67 @@ public interface IggyFlashHeaderInterface extends StructureInterface {
     public long getYMax();
 
     public float getFrameRate();
+
+    public long getBaseAddress();
+
+    public long getDictionarySize();
+
+    public long getFrameCount();
+
+    public long getBackgroundColor();
+
+    public long getSourceNameAddress();
+
+    public long getTimelineAddress();
+
+    public long getFrameLabelsAddress();
+
+    public long getFrameLabelCount();
+
+    public long getScenesAddress();
+
+    public long getSceneCount();
+
+    public void setMovieProperties(long xMin, long yMin, long xMax, long yMax,
+            float fps, long frames, long color) throws IOException;
+
+    default int getHeaderSize() {
+        return 184;
+    }
+
+    default long getFlashFilenameAddress() {
+        return 0;
+    }
+
+    default long getImportsAddress() {
+        return 0;
+    }
+
+    default long getImportCount() {
+        return 0;
+    }
+
+    default long getDictionaryFixupsAddress() {
+        return 0;
+    }
+
+    default long getAbcAddress() {
+        return 0;
+    }
+
+    default int getAbcPointerOffset() {
+        return 0x98;
+    }
+
+    default long getSymbolClassesAddress() {
+        return 0;
+    }
+
+    default long getSymbolClassCount() {
+        return 0;
+    }
+
+    default boolean hasAS3() {
+        return false;
+    }
 }

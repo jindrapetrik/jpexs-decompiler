@@ -36,15 +36,15 @@ import java.util.List;
  */
 public class IggyShapeToSwfConvertor {
 
-    private static int makeLengthsEmX(double val) {
-        return (int) (val * 1024.0);
-    }
-
-    private static int makeLengthsEmY(double val) {
-        return (int) (val * 1024.0);
-    }
-
     public static SHAPE convertCharToShape(IggyShape igchar) {
+        return convertCharToShape(igchar, 1024);
+    }
+
+    /**
+     * Use the source font's em square without rounding via an intermediate
+     * Font2.
+     */
+    public static SHAPE convertCharToShape(IggyShape igchar, int unitsPerEm) {
         SHAPE shape = new SHAPE();
         List<SHAPERECORD> retList = new ArrayList<>();
         List<IggyShapeNode> ignodes = igchar.getNodes();
@@ -56,19 +56,19 @@ public class IggyShapeToSwfConvertor {
             if (ign.getNodeType() == IggyShapeNode.NODE_TYPE_MOVE) {
                 StyleChangeRecord scr = new StyleChangeRecord();
                 scr.stateMoveTo = true;
-                prevX = scr.moveDeltaX = makeLengthsEmX(ign.getTargetX());
-                prevY = scr.moveDeltaY = makeLengthsEmY(ign.getTargetY());
+                prevX = scr.moveDeltaX = (int) Math.round(ign.getTargetX() * (double) unitsPerEm);
+                prevY = scr.moveDeltaY = (int) Math.round(ign.getTargetY() * (double) unitsPerEm);
                 scr.fillStyles = new FILLSTYLEARRAY();
                 scr.lineStyles = new LINESTYLEARRAY();
                 scr.calculateBits();
                 retList.add(scr);
             } else {
 
-                int curX1 = makeLengthsEmX(ign.getTargetX());
-                int curY1 = makeLengthsEmY(ign.getTargetY());
+                int curX1 = (int) Math.round(ign.getTargetX() * (double) unitsPerEm);
+                int curY1 = (int) Math.round(ign.getTargetY() * (double) unitsPerEm);
 
-                int curX2 = makeLengthsEmX(ign.getControlX());
-                int curY2 = makeLengthsEmY(ign.getControlY());
+                int curX2 = (int) Math.round(ign.getControlX() * (double) unitsPerEm);
+                int curY2 = (int) Math.round(ign.getControlY() * (double) unitsPerEm);
 
                 if (ign.getNodeType() == IggyShapeNode.NODE_TYPE_LINE_TO) {
                     StraightEdgeRecord ser = new StraightEdgeRecord();

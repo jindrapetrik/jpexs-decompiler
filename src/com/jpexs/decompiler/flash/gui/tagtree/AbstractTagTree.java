@@ -222,7 +222,12 @@ public abstract class AbstractTagTree extends JTree {
             SWF swf = (SWF) val;
             SwfProfile profile = swf.getSwfProfile();
             if (profile != null) {
-                return View.getIcon("swfprofile_" + profile.getId() + "16");
+                OpenableList openableList = swf.getOpenableList();
+                SwfProfile implicitProfile = openableList != null && openableList.isBundle()
+                        ? openableList.bundle.getImplicitSwfProfile() : null;
+                if (implicitProfile == null || !profile.getId().equals(implicitProfile.getId())) {
+                    return View.getIcon("swfprofile_" + profile.getId() + "16");
+                }
             }
         }
         

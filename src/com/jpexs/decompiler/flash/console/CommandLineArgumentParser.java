@@ -116,6 +116,10 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.iggy.IggyFile;
+import com.jpexs.decompiler.flash.iggy.conversion.IggyToSwfConvertor;
+import com.jpexs.decompiler.flash.iggy.conversion.SwfToIggyConvertor;
+import com.jpexs.decompiler.flash.iggy.streams.MemoryDataStream;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
@@ -448,6 +452,18 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter == null || filter.equals("swf2iggy")) {
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy");
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy 32");
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy \"32 legacy\"");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("iggy2swf")) {
+            out.println(PREFIX + "-iggy2swf myfile.iggy result.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("header")) {
             out.println(PREFIX + "-header myfile.swf");
             out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
@@ -705,6 +721,12 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("decrypt")) {
             parseDecrypt(args);
+            System.exit(0);
+        } else if (command.equals("swf2iggy")) {
+            parseSwf2Iggy(args, charset, swfProfile);
+            System.exit(0);
+        } else if (command.equals("iggy2swf")) {
+            parseIggy2Swf(args);
             System.exit(0);
         } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args, charset, swfProfile, handler);
@@ -2723,6 +2745,64 @@ public class CommandLineArgumentParser {
         }
 
         System.exit(result ? 0 : 1);
+    }
+
+    private static void parseSwf2Iggy(Stack<String> args, String charset, SwfProfile swfProfile) {
+        if (args.size() < 2 || args.size() > 3) {
+            badArguments("swf2iggy");
+        }
+        File input = new File(args.pop());
+        File output = new File(args.pop());
+        IggyFile.Variant variant = IggyFile.Variant.X64;
+        if (!args.isEmpty()) {
+            try {
+                variant = IggyFile.Variant.fromString(args.pop());
+            } catch (IOException ex) {
+                System.err.println(ex.getMessage());
+                badArguments("swf2iggy");
+            }
+        }
+        String name = input.getName();
+        if (StdInAwareFileInputStream.STDIN_PATH.equals(input.getPath().replace('\\', '/'))) {
+            name = output.getName();
+            int dot = name.lastIndexOf('.');
+            name = (dot < 0 ? name : name.substring(0, dot)) + ".swf";
+        }
+        final IggyFile.Variant targetVariant = variant;
+        final String movieName = name;
+        processReadSWF(input, null, (SWF swf, OutputStream stdout) -> {
+            SwfToIggyConvertor.exportIggyToFile(swf, output, targetVariant, movieName,
+                    warning -> System.err.println("Warning: " + warning));
+            System.out.println("OK");
+        }, charset, swfProfile);
+    }
+
+    private static void parseIggy2Swf(Stack<String> args) {
+        if (args.size() != 2) {
+            badArguments("iggy2swf");
+        }
+        String input = args.pop();
+        File output = new File(args.pop());
+        try {
+            IggyFile file;
+            if (StdInAwareFileInputStream.STDIN_PATH.equals(input.replace('\\', '/'))) {
+                try (InputStream stream = new StdInAwareFileInputStream(input)) {
+                    ByteArrayOutputStream inputBytes = new ByteArrayOutputStream();
+                    Helper.copyStreamEx(stream, inputBytes);
+                    file = new IggyFile(new MemoryDataStream(inputBytes.toByteArray()));
+                }
+            } else {
+                file = new IggyFile(new File(input));
+            }
+            // Finish conversion before opening the output, including when paths match.
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            IggyToSwfConvertor.exportSwf(file, bytes);
+            Files.write(output.toPath(), bytes.toByteArray());
+            System.out.println("OK");
+        } catch (IOException | IllegalArgumentException ex) {
+            logger.log(Level.SEVERE, "Error converting Iggy to SWF", ex);
+            System.exit(1);
+        }
     }
 
     private static void parseSwf2Xml(Stack<String> args, String charset, SwfProfile swfProfile, AbortRetryIgnoreHandler handler) {

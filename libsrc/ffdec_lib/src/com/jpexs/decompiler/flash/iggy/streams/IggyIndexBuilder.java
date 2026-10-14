@@ -73,7 +73,7 @@ public class IggyIndexBuilder {
     private long position = 0;
 
     public IggyIndexBuilder() throws IOException {
-        indexStream = new TemporaryDataStream();
+        indexStream = new MemoryDataStream();
 
         addConst(CONST_VAL_SHAPE_NODE_SIZE, new int[]{0, 4, 8, 0xC, 0x12, 0x14, 0x16}, new int[]{5, 5, 5, 5, 4, 4, 4});
         addConst(CONST_VAL_KERNING_RECORD_SIZE, new int[]{0, 2, 4}, new int[]{4, 4, 4});
@@ -194,27 +194,44 @@ public class IggyIndexBuilder {
     }
 
     public long writePointerArray(boolean is64, long cnt) {
-        return writeIndex(0xD0 + 0x2, is64, cnt - 1);
+        return writeArray(2, is64, cnt);
     }
 
     public long write64bitPointerArray(long cnt) {
-        return writeIndex(0xD0 + 0x2, true, cnt - 1);
+        return writeArray(2, true, cnt);
     }
 
     public long write32bitPointerArray(long cnt) {
-        return writeIndex(0xD0 + 0x2, false, cnt - 1);
+        return writeArray(2, false, cnt);
     }
 
     public long write16bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x4, false, cnt - 1);
+        return writeArray(4, false, cnt);
     }
 
     public long write32bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x5, false, cnt - 1);
+        return writeArray(5, false, cnt);
     }
 
     public long write64bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x6, false, cnt - 1);
+        return writeArray(6, false, cnt);
+    }
+
+    private long writeArray(int operation, boolean is64, long count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("Negative Iggy array size");
+        }
+        long result = 0;
+        while (count > 0) {
+            int batch = (int) Math.min(256, count);
+            result += writeIndex(0xD0 + operation, is64, batch - 1);
+            count -= batch;
+        }
+        return result;
+    }
+
+    public long getPosition() {
+        return position;
     }
 
     public long skipOneInIndex() {
@@ -357,7 +374,7 @@ public class IggyIndexBuilder {
                 LOGGER.finest(String.format("0xFC: skip 1 "));
                 //indexStream.seek(1, SeekMode.CUR);
                 indexStream.write(0); //??
-                return 1; //seek 1
+                return 0; //only the instruction stream advances
             } else if (code == CODE_FD_OFS8_SKIP_TWICE8) {
                 LOGGER.finest(String.format("0xFD: 0..255, skip 2 * 0..255 "));
                 int n;

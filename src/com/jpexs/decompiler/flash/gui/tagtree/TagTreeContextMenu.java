@@ -1740,7 +1740,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
 
-            if (firstItem instanceof UnknownTag) {
+            if (firstItem instanceof UnknownTag && canChangeCustomSwfProfile(((UnknownTag) firstItem).getSwf())) {
                 UnknownTag unknownTag = (UnknownTag) firstItem;
                 boolean hasMatchingProfile = false;
                 for (Map.Entry<String, JMenuItem> entry : interpretCustomSwfProfileMenuItems.entrySet()) {
@@ -2029,7 +2029,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof SWF) {
                 SWF firstSwf = (SWF) firstItem;
-                customSwfProfileMenu.setVisible(true);
+                customSwfProfileMenu.setVisible(canChangeCustomSwfProfile(firstSwf));
                 SwfProfile selectedSwfProfile = firstSwf.getSwfProfile();
                 String selectedSwfProfileId = selectedSwfProfile == null ? "" : selectedSwfProfile.getId();
                 for (Map.Entry<String, JRadioButtonMenuItem> entry : customSwfProfileMenuItems.entrySet()) {
@@ -6963,9 +6963,18 @@ public class TagTreeContextMenu extends JPopupMenu {
         Main.reloadFile(item.openableList);
     }
 
+    private static boolean canChangeCustomSwfProfile(SWF swf) {
+        OpenableList openableList = swf.getOpenableList();
+        return openableList == null || !openableList.isBundle()
+                || openableList.bundle.getImplicitSwfProfile() == null;
+    }
+
     public void changeCustomSwfProfileActionPerformed(ActionEvent evt) {
         TreeItem currentItem = getCurrentItem();
         SWF item = currentItem instanceof SWF ? (SWF) currentItem : (SWF) currentItem.getOpenable();
+        if (!canChangeCustomSwfProfile(item)) {
+            return;
+        }
         String newProfileId = ((JMenuItem) evt.getSource()).getActionCommand();
         SwfProfile currentProfile = item.getSwfProfile();
         String currentProfileId = currentProfile == null ? "" : currentProfile.getId();
