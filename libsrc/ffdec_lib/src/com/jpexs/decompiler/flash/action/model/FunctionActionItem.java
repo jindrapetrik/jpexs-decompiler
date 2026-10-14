@@ -129,7 +129,7 @@ public class FunctionActionItem extends ActionItem {
      * Inner functions
      */
     private List<FunctionActionItem> innerFunctions;
-    
+
     /**
      * Parameter positions in the code
      */
@@ -139,7 +139,7 @@ public class FunctionActionItem extends ActionItem {
      * Parameter registers
      */
     private List<Integer> paramRegisters;
-    
+
     /**
      * Register - this
      */
@@ -169,10 +169,6 @@ public class FunctionActionItem extends ActionItem {
      * Register - global
      */
     public static final int REGISTER_GLOBAL = 6;
-    
-    
-    
-    
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -186,6 +182,7 @@ public class FunctionActionItem extends ActionItem {
 
     /**
      * Adds variable.
+     *
      * @param variable Variable
      */
     public void addVariable(VariableActionItem variable) {
@@ -201,6 +198,7 @@ public class FunctionActionItem extends ActionItem {
 
     /**
      * Constructor.
+     *
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param functionName Function name
@@ -301,7 +299,7 @@ public class FunctionActionItem extends ActionItem {
                     pname = new RegisterNumber(paramRegisters.get(p)).translate();
                 } else {
                     pname = new RegisterNumber(regStart + p).translate();
-                }                
+                }
             }
             HighlightData d = getSrcData();
             d.localName = pname;
@@ -380,7 +378,7 @@ public class FunctionActionItem extends ActionItem {
 
     public List<VariableActionItem> getVariables() {
         return variables;
-    }        
+    }
 
     private Set<String> getDefinedVariableNames(List<VariableActionItem> variables) {
         Set<String> ret = new HashSet<>();
@@ -408,10 +406,10 @@ public class FunctionActionItem extends ActionItem {
 
     public List<FunctionActionItem> getInnerFunctions() {
         return innerFunctions;
-    }        
+    }
 
     @Override
-    @SuppressWarnings("unchecked")            
+    @SuppressWarnings("unchecked")
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
@@ -438,11 +436,11 @@ public class FunctionActionItem extends ActionItem {
         boolean suppressThisFlag = false;
 
         boolean needsFun2 = false;
-        
+
         boolean canFun2 = asGenerator.getSwfVersion() >= 7;
-        
+
         boolean canVariables = true;
-        
+
         SwfProfile profile = asGenerator.getProfile();
         if (profile != null) {
             if (profile.prefersAvm1DefineFunction2()) {
@@ -453,7 +451,7 @@ public class FunctionActionItem extends ActionItem {
                 canVariables = false;
             }
         }
-        
+
         List<String> registerNames = new ArrayList<>();
         if (canFun2) {
             registerNames.add("***** ZERO *****");
@@ -494,7 +492,7 @@ public class FunctionActionItem extends ActionItem {
                 preloadGlobalFlag = true;
                 registerNames.add("_global");
             }
-        
+
             //int preloadedNumber = registerNames.size();
             if (!paramNames.isEmpty()) {
                 needsFun2 = true;
@@ -504,7 +502,7 @@ public class FunctionActionItem extends ActionItem {
             }
             if (localData.inFunction > 1) {
                 needsFun2 = true;
-            }        
+            }
         }
 
         //If the function parameter or local variable is used in inner function, 
@@ -522,11 +520,11 @@ public class FunctionActionItem extends ActionItem {
         for (FunctionActionItem fun : innerFunctions) {
             getDeeplyUsedVariableNames(topLevelVariableNames, fun, deeplyUsedVariableNames);
         }
-        
+
         for (int i = 0; i < paramNames.size(); i++) {
             paramRegs.add(0); //0 = use variable, no reg
         }
-        
+
         if (needsFun2 && (!hasEval || !canVariables)) {
             String registerNameMask = Configuration.registerNameFormat.get();
             Pattern registerNamePattern = Pattern.compile(registerNameMask.replace("%d", "(?<regnum>[0-9]+)"));
@@ -534,31 +532,30 @@ public class FunctionActionItem extends ActionItem {
             List<String> newRegisterNames = new ArrayList<>();
             for (VariableActionItem v : variables) {
                 String varName = v.getVariableName();
-                if (v.isDefinition() 
-                        && !registerNames.contains(varName) 
+                if (v.isDefinition()
+                        && !registerNames.contains(varName)
                         && !paramNames.contains(varName)
                         && !newRegisterNames.contains(varName)
-                        && !deeplyUsedVariableNames.contains(varName)                        
-                    ) {
+                        && !deeplyUsedVariableNames.contains(varName)) {
                     Matcher m = registerNamePattern.matcher(varName);
                     if (m.matches()) {
-                        newRegisterNames.add(varName);                                                  
+                        newRegisterNames.add(varName);
                     }
                 }
             }
 
-            for (int i = 0; i < paramNames.size(); i++) {    
+            for (int i = 0; i < paramNames.size(); i++) {
                 String varName = paramNames.get(i);
                 if (newRegisterNames.contains(varName)) {
                     continue;
                 }
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
-                    int regNum = Integer.parseInt(m.group("regnum"));  
+                    int regNum = Integer.parseInt(m.group("regnum"));
 
                     while (registerNames.size() <= regNum) {
                         registerNames.add("**EMPTY**");
-                    }                   
+                    }
                     registerNames.set(regNum, varName);
 
                     paramNames.set(i, "");
@@ -573,21 +570,21 @@ public class FunctionActionItem extends ActionItem {
             for (String varName : newRegisterNames) {
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
-                    int regNum = Integer.parseInt(m.group("regnum"));                    
+                    int regNum = Integer.parseInt(m.group("regnum"));
                     while (registerNames.size() <= regNum) {
                         registerNames.add("**EMPTY**");
-                    }                   
+                    }
                     registerNames.set(regNum, varName);
                 }
             }
 
             int posReg = numRegistersBeforeParams;
-            for (int i = 0; i < paramNames.size(); i++) {                
+            for (int i = 0; i < paramNames.size(); i++) {
                 if (paramRegs.get(i) != 0) {
                     continue;
                 }
                 if (!deeplyUsedVariableNames.contains(paramNames.get(i))) {
-                    while (posReg < registerNames.size() 
+                    while (posReg < registerNames.size()
                             && !registerNames.get(posReg).equals("**EMPTY**")) {
                         posReg++;
                     }
@@ -595,29 +592,26 @@ public class FunctionActionItem extends ActionItem {
                         registerNames.add("**EMPTY**");
                     }
 
-                    paramRegs.set(i, posReg);                                        
+                    paramRegs.set(i, posReg);
                     registerNames.set(posReg, paramNames.get(i));
                 }
             }
         }
 
         int regCount = 0;
-        
+
         localDataCopy.inFunction++;
 
-        
         for (VariableActionItem v : variables) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
             if (v.boxResolvedMember()) {
                 continue;
             }
-            if (
-                needsFun2 
-                && !canVariables
-                && v.isDefinition()
-                && !registerNames.contains(varName)
-                ) {
+            if (needsFun2
+                    && !canVariables
+                    && v.isDefinition()
+                    && !registerNames.contains(varName)) {
                 boolean found = false;
                 for (int i = 0; i < registerNames.size(); i++) {
                     if ("**EMPTY**".equals(registerNames.get(i))) {
@@ -629,7 +623,7 @@ public class FunctionActionItem extends ActionItem {
                 if (!found) {
                     registerNames.add(varName);
                 }
-            }            
+            }
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {
@@ -668,7 +662,7 @@ public class FunctionActionItem extends ActionItem {
                     }
                 }
             }
-        }        
+        }
         if (!needsFun2) {
             ret = preserveRegisters(asGenerator.toActionList(ret), asGenerator.getSwfVersion(), charset);
         }
