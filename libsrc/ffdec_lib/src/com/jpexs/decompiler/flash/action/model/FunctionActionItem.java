@@ -612,21 +612,24 @@ public class FunctionActionItem extends ActionItem {
             if (v.boxResolvedMember()) {
                 continue;
             }
-            if (needsFun2 && (!hasEval || !canVariables)) {                
-                if (v.isDefinition() && !registerNames.contains(varName) && (!canVariables || !deeplyUsedVariableNames.contains(varName))) {
-                    boolean found = false;
-                    for (int i = 0; i < registerNames.size(); i++) {
-                        if ("**EMPTY**".equals(registerNames.get(i))) {
-                            registerNames.set(i, varName);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        registerNames.add(varName);
+            if (
+                needsFun2 
+                && !canVariables
+                && v.isDefinition()
+                && !registerNames.contains(varName)
+                ) {
+                boolean found = false;
+                for (int i = 0; i < registerNames.size(); i++) {
+                    if ("**EMPTY**".equals(registerNames.get(i))) {
+                        registerNames.set(i, varName);
+                        found = true;
+                        break;
                     }
                 }
-            }
+                if (!found) {
+                    registerNames.add(varName);
+                }
+            }            
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {
