@@ -16,16 +16,36 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import static org.testng.Assert.assertEquals;
+
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 public class SoundWaveformPanelTest {
+
+    @Test
+    public void keepsQuietUnsignedPcm8WaveformAtItsActualAmplitude() throws Exception {
+        DefineSoundTag tag = new DefineSoundTag(new SWF());
+        tag.soundFormat = 3;
+        tag.soundRate = 1;
+        tag.soundSize = false;
+        tag.soundData = new ByteArrayRange(new byte[]{125, (byte) 128, (byte) 131});
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        tag.getSoundFormat().createWav(null, tag.getRawSoundData(), output, 0);
+
+        SoundWaveformPanel.WaveformData data = SoundWaveformPanel.WaveformData.create(output.toByteArray(), 1);
+
+        assertEquals(data.getMinimum(0, 0), -3f / 128f, 0.0001f);
+        assertEquals(data.getMaximum(0, 0), 3f / 128f, 0.0001f);
+    }
 
     @Test
     public void mapsWaveformPositionToSoundFrame() {

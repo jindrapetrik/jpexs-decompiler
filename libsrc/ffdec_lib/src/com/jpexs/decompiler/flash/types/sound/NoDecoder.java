@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Sound decoder that does nothing, just copies the data.
+ * Uncompressed PCM decoder that converts unsigned 8-bit input to signed 16-bit output.
  *
  * @author JPEXS
  */
@@ -33,6 +33,15 @@ public class NoDecoder extends SoundDecoder {
 
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
-        os.write(sis.readBytesEx(sis.available(), "soundStream"));
+        byte[] data = sis.readBytesEx(sis.available(), "soundStream");
+        if (soundFormat.sample16bit) {
+            os.write(data);
+        } else {
+            for (byte sample : data) {
+                // PCM8 silence is 128. All decoder consumers expect signed PCM16.
+                os.write(0);
+                os.write((sample & 0xff) - 128);
+            }
+        }
     }
 }

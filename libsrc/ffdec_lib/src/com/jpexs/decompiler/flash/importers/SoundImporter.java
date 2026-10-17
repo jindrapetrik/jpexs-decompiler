@@ -410,11 +410,10 @@ public class SoundImporter {
 
                 newSoundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
 
-                //16bit<>8bit does not match, convert to 16bit
-                if (newSoundSize && !streamHead.getSoundSize()) {
-                    wholeStreamUncompressedData = to16bit(wholeStreamUncompressedData);
-                } else if (streamHead.getSoundSize() && !newSoundSize) {
-                    uncompressedSoundData = to16bit(uncompressedSoundData);;
+                // Existing decoded data is already PCM16, including PCM8 sources.
+                // Only imported raw 8-bit PCM still needs conversion.
+                if (!newSoundSize) {
+                    uncompressedSoundData = to16bit(uncompressedSoundData);
                     newSoundSize = true;
                 }
 

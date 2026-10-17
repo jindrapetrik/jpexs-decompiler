@@ -249,7 +249,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public SoundFormat getSoundFormat() {
         final int[] rateMap = {5512, 11025, 22050, 44100};
-        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
+        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType(), getSoundSize());
     }
 
     @Override
