@@ -215,6 +215,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
         tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
         tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
         tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
+        tagInfo.addInfo("general", "bitsPerSample", getSoundSize() ? 16 : 8);
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", soundSampleCount);
     }
