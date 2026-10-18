@@ -5530,17 +5530,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public boolean replaceSpriteWithGif(TreeItem item) {
+    public boolean replaceSpriteWithImage(TreeItem item) {
         if (item == null) {
             return false;
         }
         if (item instanceof DefineSpriteTag) {
-            String filter = "filter.images|*.gif";
+            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.apng;*.bmp;*.svg";
+            if (ImageFormat.WEBP.available()) {
+                filter += ";*.webp";
+            }
             File selectedFile = showImportFileChooser(filter, false, "importsprite");
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 DefineSpriteTag sprite = (DefineSpriteTag) item;
                 SWF swf = sprite.getSwf();
+                if (".svg".equals(Path.getExtension(selfile))) {
+                    showSvgImportWarning();
+                }
                 try (FileInputStream fis = new FileInputStream(selfile)) {
                     SpriteImporter spriteImporter = new SpriteImporter();
                     spriteImporter.importSprite((DefineSpriteTag) item, fis);
@@ -5559,8 +5565,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return false;
     }
 
-    public void replaceSpriteWithGifButtonActionPerformed(TreeItem item) {
-        replaceSpriteWithGif(item);
+    public void replaceSpriteWithImageButtonActionPerformed(TreeItem item) {
+        replaceSpriteWithImage(item);
     }
 
     public void replaceNoFillButtonActionPerformed(List<TreeItem> items) {
@@ -7165,7 +7171,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         boolean remove;
         switch (createNodeType) {
             case SPRITE:
-                remove = !replaceSpriteWithGif(tag);
+                remove = !replaceSpriteWithImage(tag);
                 break;
             case SHAPE:
                 remove = !replaceNoFill(tag);

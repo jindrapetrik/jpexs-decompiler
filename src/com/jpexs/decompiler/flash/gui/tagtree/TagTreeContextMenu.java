@@ -404,7 +404,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem cleanAbcMenuItem;
 
-    private JMenuItem replaceWithGifMenuItem;
+    private JMenuItem replaceWithImageMenuItem;
 
     private JMenuItem collectDepthAsSpritesMenuItem;
 
@@ -716,15 +716,15 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceWithTagMenuItem);
 
-        replaceWithGifMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithGif"));
-        replaceWithGifMenuItem.addActionListener(new ActionListener() {
+        replaceWithImageMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithImage"));
+        replaceWithImageMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceSpriteWithGifButtonActionPerformed(getCurrentItem());
+                mainPanel.replaceSpriteWithImageButtonActionPerformed(getCurrentItem());
             }
         });
-        replaceWithGifMenuItem.setIcon(View.getIcon("replacesprite16"));
-        add(replaceWithGifMenuItem);
+        replaceWithImageMenuItem.setIcon(View.getIcon("replacesprite16"));
+        add(replaceWithImageMenuItem);
 
         replaceRefsWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceRefs"));
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
@@ -1514,7 +1514,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportABCMenuItem.setVisible(false);
         replaceMenuItem.setVisible(false);
         replaceNoFillMenuItem.setVisible(false);
-        replaceWithGifMenuItem.setVisible(false);
+        replaceWithImageMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
         replaceRefsWithTagMenuItem.setVisible(false);
         convertShapeTypeMenuItem.setVisible(false);
@@ -1772,7 +1772,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (firstItem instanceof DefineSpriteTag) {
-                replaceWithGifMenuItem.setVisible(true);
+                replaceWithImageMenuItem.setVisible(true);
             }
 
             TreePath thisPath = tree.getFullModel().getTreePath(firstItem);

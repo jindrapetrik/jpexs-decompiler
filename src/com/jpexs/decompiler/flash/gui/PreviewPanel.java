@@ -509,12 +509,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageAlphaButton.addActionListener(mainPanel::replaceAlphaButtonActionPerformed);
         replaceImageAlphaButton.setVisible(false);
 
-        replaceSpriteButton = new JButton(mainPanel.translate("button.replaceWithGif"), View.getIcon("replacesprite16"));
+        replaceSpriteButton = new JButton(mainPanel.translate("button.replaceWithImage"), View.getIcon("replacesprite16"));
         replaceSpriteButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSpriteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceSpriteWithGifButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
+                mainPanel.replaceSpriteWithImageButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
             }
         });
         replaceSpriteButton.setVisible(false);
