@@ -112,7 +112,7 @@ public class AddMultipleTagsDialog extends AppDialog {
         setModal(true);
         setResizable(false);
         pack();
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "addtagmulti");
         View.centerScreen(this);
     }
 
