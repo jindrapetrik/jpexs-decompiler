@@ -330,6 +330,9 @@ public class View {
      */
     public static BufferedImage loadImage(String name) {
         URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
+        if (imageURL == null) {
+            throw new NullPointerException("Icon " + name + " does not exist!");
+        }
         try {
             return ImageIO.read(imageURL);
         } catch (IOException ex) {
