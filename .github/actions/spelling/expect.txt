@@ -2746,7 +2746,6 @@ pathsource
 pathvar
 Pawel
 pbit
-PBits
 pblend
 pbmi
 pbstr

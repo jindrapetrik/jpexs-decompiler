@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.filters.*;
 import java.io.*;
-import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
 import org.testng.Assert;
@@ -73,7 +72,7 @@ public class IggyTimelineTest {
         f.u32(f.place+p+4,2);f.u16(f.place+(w?40:36),3);f.ref(f.place+(w?48:40),f.sprite);
         int m=w?16:12;for(int i=0;i<6;i++)f.f32(f.place+m+4*i,new float[]{1,0.25f,-0.5f,1.5f,1.25f,-2.5f}[i]);
         if(classFlags!=0)f.ref(f.place+(w?80:56),f.string("ui.MyClass"));
-        long label=f.node(5,w?24:12);f.put(label+p+1,1,1,0);f.ref(label+(w?16:8),f.string("zaÄŤĂˇtek"));f.ref(f.place,label);
+        long label=f.node(5,w?24:12);f.put(label+p+1,1,1,0);f.ref(label+(w?16:8),f.string("beginning"));f.ref(f.place,label);
         long show=f.node(1,w?16:8);f.ref(label,show);
         long ratio=f.node(4,w?24:16);f.u16(ratio+p+4,3);f.u16(ratio+p+6,12345);f.u32(ratio+p+8,2);f.ref(show,ratio);
         f.importPlace=f.node(2,w?64:48);f.put(f.importPlace+p+1,4,1,3);f.put(f.importPlace+p+2,127,1,0);f.put(f.importPlace+p+3,15,1,0);
@@ -108,7 +107,7 @@ public class IggyTimelineTest {
         Assert.assertEquals(p.characterId,2);Assert.assertEquals(p.depth,3);Assert.assertTrue(p.placeFlagHasMatrix);
         Assert.assertEquals(p.matrix.scaleX,1f);Assert.assertEquals(p.matrix.scaleY,1.5f);Assert.assertEquals(p.matrix.rotateSkew0,-0.5f);Assert.assertEquals(p.matrix.rotateSkew1,0.25f);
         Assert.assertEquals(p.matrix.translateX,25);Assert.assertEquals(p.matrix.translateY,-50);
-        FrameLabelTag label=(FrameLabelTag)tags.get(1);Assert.assertEquals(label.name,"zaÄŤĂˇtek");Assert.assertTrue(label.namedAnchor);
+        FrameLabelTag label=(FrameLabelTag)tags.get(1);Assert.assertEquals(label.name,"beginning");Assert.assertTrue(label.namedAnchor);
         PlaceObject3Tag ratio=(PlaceObject3Tag)tags.get(3);Assert.assertTrue(ratio.placeFlagMove);Assert.assertEquals(ratio.ratio,12345);
         Assert.assertEquals(((PlaceObject3Tag)tags.get(4)).characterId,layout==0?1:3);
         SOUNDINFO sound=((StartSoundTag)tags.get(5)).soundInfo;Assert.assertEquals(sound.inPoint,10L);Assert.assertEquals(sound.outPoint,1000L);Assert.assertEquals(sound.loopCount,3);Assert.assertTrue(sound.syncNoMultiple);Assert.assertEquals(sound.envelopeRecords[0].pos44,123L);
