@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
@@ -182,11 +183,15 @@ public class As12PCodeDocs extends AbstractDocs {
      * @return Documentation for given instruction
      */
     public static String getDocsForIns(String insName, boolean ui, boolean standalone, boolean nightMode, int argumentToHilight) {
-        insName = insName.toLowerCase();
-        if (!allInstructionNames.contains(insName)) {
+        String originalName = insName;
+        insName = insName.toLowerCase(Locale.ENGLISH);
+        boolean unknown = insName.matches("unknown_[0-9a-f]{2}");
+        boolean unknownWithoutOperands = unknown && Integer.parseInt(insName.substring(8), 16) < 0x80;
+        if (!unknown && !allInstructionNames.contains(insName)) {
             return null;
         }
-        final String cacheKey = insName + "|" + (ui ? 1 : 0) + "|" + (standalone ? 1 : 0);
+        final String cacheKey = "as12|" + (unknown ? originalName : insName)
+                + "|" + (ui ? 1 : 0) + "|" + (standalone ? 1 : 0) + "|" + (nightMode ? 1 : 0);
         String v = docsCache.get(cacheKey);
         if (v != null) {
             return hilightArgument(v, argumentToHilight);
@@ -197,13 +202,14 @@ public class As12PCodeDocs extends AbstractDocs {
             sb.append(htmlHeader("", getStyle(), nightMode));
         }
 
-        String insShortDescription = getProperty("action." + insName + ".shortDescription");
-        String insDescription = getProperty("action." + insName + ".description");
-        String stackBefore = getProperty("action." + insName + ".stackBefore");
-        String stackAfter = getProperty("action." + insName + ".stackAfter");
-        String instructionCode = getProperty("action." + insName + ".code");
-        String swfVersion = getProperty("action." + insName + ".swfVersion");
-        String insRealName = getProperty("action." + insName + ".name");
+        String propertyName = unknown ? "unknown" : insName;
+        String insShortDescription = getProperty("action." + propertyName + ".shortDescription");
+        String insDescription = getProperty("action." + propertyName + ".description" + (unknownWithoutOperands ? ".noOperands" : ""));
+        String stackBefore = unknown ? getProperty("ui.unknown") : getProperty("action." + insName + ".stackBefore");
+        String stackAfter = unknown ? getProperty("ui.unknown") : getProperty("action." + insName + ".stackAfter");
+        String instructionCode = unknown ? "0x" + insName.substring(8) : getProperty("action." + insName + ".code");
+        String swfVersion = unknown ? getProperty("ui.unknown") : getProperty("action." + insName + ".swfVersion");
+        String insRealName = unknown ? originalName : getProperty("action." + insName + ".name");
 
         if (stackBefore.trim().isEmpty()) {
             stackBefore = getProperty("ui.stack.before.empty");
@@ -219,7 +225,7 @@ public class As12PCodeDocs extends AbstractDocs {
         stackAfter = "<span class=\"stack-after\">" + stackAfter + "</span>";
 
         String stack = stackBefore + "<span class=\"stack-to\">" + getProperty("ui.stack.to") + "</span>" + stackAfter;
-        String operandsDoc = getProperty("action." + insName + ".operands");
+        String operandsDoc = unknownWithoutOperands ? "" : getProperty("action." + propertyName + ".operands");
 
         if (standalone) {
             sb.append("<body class=\"");

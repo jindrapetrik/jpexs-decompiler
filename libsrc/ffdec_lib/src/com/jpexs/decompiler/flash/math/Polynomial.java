@@ -363,8 +363,13 @@ public class Polynomial {
      * @param tolerance Tolerance
      */
     public void simplifyEquals(double tolerance) {
+        double scale = 0;
+        for (double coef : this.coefs) {
+            scale = Math.max(scale, Math.abs(coef));
+        }
+        double threshold = tolerance * scale;
         for (int i = this.getDegree(); i >= 0; i--) {
-            if (Math.abs(this.coefs[i]) <= tolerance) {
+            if (Math.abs(this.coefs[i]) <= threshold) {
                 double[] newc = new double[this.coefs.length - 1];
                 for (int j = 0; j < newc.length; j++) {
                     newc[j] = this.coefs[j];

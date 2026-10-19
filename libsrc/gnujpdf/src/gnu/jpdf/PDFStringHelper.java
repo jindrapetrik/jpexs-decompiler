@@ -39,13 +39,18 @@ import java.util.logging.Logger;
 public class PDFStringHelper {
 
     /**
-     * This converts a string into PDF. It prefixes ( or ) with \ and wraps the
-     * string in a ( ) pair.
+     * This converts a string into PDF. It prefixes \ with \, prefixes ( or )
+     * with \ and wraps the string in a ( ) pair.
      *
      * @param s String to convert
      * @return String that can be placed in a PDF (or Postscript) stream
      */
     public static String makePDFString(String s) {
+        //escape backslashes first, otherwise backslashes inserted below would be escaped again
+        if (s.indexOf("\\") > -1) {
+            s = replace(s, "\\", "\\\\");
+        }
+
         if (s.indexOf("(") > -1) {
             s = replace(s, "(", "\\(");
         }
@@ -62,17 +67,20 @@ public class PDFStringHelper {
             byte[] utf16be = s.getBytes("UTF-16BE");
             List<Byte> bytes = new ArrayList<>();
             for (int i = 0; i < utf16be.length; i++) {
-                switch (utf16be[i]) {
-                    case '\r':
-                        bytes.add((byte) '\\');
-                        bytes.add((byte) 'r');
-                        break;
-                    case '(':
-                    case ')':
-                    case '\\':
-                        bytes.add((byte) '\\');
-                    default:
-                        bytes.add(utf16be[i]);
+                int b = utf16be[i] & 0xFF;
+                if (b == '(' || b == ')' || b == '\\') {
+                    bytes.add((byte) '\\');
+                    bytes.add((byte) b);
+                } else if (b < 0x20 || b == 0x7F) {
+                    //Escape control bytes as octal so they are not misread inside
+                    //the PDF literal string (CR/LF are end-of-line markers there)
+                    //and always decode back to the exact original byte
+                    bytes.add((byte) '\\');
+                    bytes.add((byte) ('0' + (b >> 6)));
+                    bytes.add((byte) ('0' + ((b >> 3) & 7)));
+                    bytes.add((byte) ('0' + (b & 7)));
+                } else {
+                    bytes.add((byte) b);
                 }
             }
             byte[] ret = new byte[bytes.size()];

@@ -1,0 +1,5 @@
+# Native polynomial exports
+
+Six actual SWF -> XFL exports for Cubic, Quartic, Quintic, DualCubic, DualQuartic and DualQuintic at the measured strength 50. 366 serialized X positions match the captured references within one twip after rounding. Other strengths are not enabled as native polynomial maps.
+
+Run [publish_native_polynomial_exports.jsfl](../publish_native_polynomial_exports.jsfl) in CS6. It checks map assignments and two base keys, saves/reopens native FLA files and publishes each <id>_compiled.swf in its example folder. Original references remain untouched. Native CS6 recompilation and full frame comparison passed all six cases in native-polynomial-roundtrip-1791323831469. See [ROUNDTRIP.md](ROUNDTRIP.md) and [NATIVE_STATUS.txt](NATIVE_STATUS.txt): all 366 positions match within one twip. The pre-existing Quadratic -40 X-scale channel differs by one fixed16 unit in two frames per case; metadata, Y, other matrix fields, colors, filters and instance flags match exactly. Imported/persisted native maps and per-frame differences are retained in each case folder.

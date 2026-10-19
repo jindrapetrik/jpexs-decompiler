@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.translator;
 
 import com.jpexs.decompiler.flash.configuration.AppDirectoryProvider;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FileChooser;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
@@ -640,7 +641,7 @@ public class Translator extends JFrame implements ItemListener {
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser();
+                FileChooser fc = new FileChooser();
                 FileFilter jptFilter = new FileFilter() {
                     @Override
                     public boolean accept(File f) {
@@ -687,7 +688,7 @@ public class Translator extends JFrame implements ItemListener {
             public void actionPerformed(ActionEvent e) {
                 if (ViewMessages.showConfirmDialog(Translator.this, AppStrings.translate("dialog.importJpt.text"), AppStrings.translate("dialog.importJpt.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
 
-                    JFileChooser fc = new JFileChooser();
+                    FileChooser fc = new FileChooser();
                     FileFilter jptFilter = new FileFilter() {
                         @Override
                         public boolean accept(File f) {

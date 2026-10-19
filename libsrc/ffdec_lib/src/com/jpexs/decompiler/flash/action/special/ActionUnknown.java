@@ -16,13 +16,22 @@
  */
 package com.jpexs.decompiler.flash.action.special;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +42,12 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class ActionUnknown extends ActionNop {
+public class ActionUnknown extends Action {
+
+    /**
+     * Raw action data.
+     */
+    public ByteArrayRange unknownData;
 
     /**
      * Constructor.
@@ -42,13 +56,79 @@ public class ActionUnknown extends ActionNop {
      * @param charset Charset
      */
     public ActionUnknown(int actionCode, int actionLength, String charset) {
-        super(actionCode, charset);
-        this.actionLength = actionLength;
+        super(actionCode, actionLength, charset);
+        unknownData = new ByteArrayRange(new byte[actionLength]);
+    }
+
+    /**
+     * Constructor.
+     * @param actionCode Action code
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param charset Charset
+     * @throws IOException On I/O error
+     */
+    public ActionUnknown(int actionCode, int actionLength, SWFInputStream sis, String charset) throws IOException {
+        super(actionCode, actionLength, charset);
+        unknownData = sis.readByteRangeEx(actionLength, "unknownData");
+    }
+
+    /**
+     * Constructor from p-code.
+     * @param actionCode Action code
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On invalid data
+     */
+    public ActionUnknown(int actionCode, FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(actionCode, 0, charset);
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        ASMParsedSymbol symbol = lexer.lex();
+        while (symbol.type == ASMParsedSymbol.TYPE_INTEGER) {
+            long value = (Long) symbol.value;
+            if (actionCode < 0x80) {
+                throw new ActionParseException("Short actions cannot have data", lexer.yyline());
+            }
+            if (value < 0 || value > 0xff) {
+                throw new ActionParseException("Byte value expected", lexer.yyline());
+            }
+            data.write((int) value);
+            symbol = lexer.lex();
+            if (symbol.type == ASMParsedSymbol.TYPE_COMMA) {
+                symbol = lexer.lex();
+                if (symbol.type != ASMParsedSymbol.TYPE_INTEGER) {
+                    throw new ActionParseException("Byte value expected", lexer.yyline());
+                }
+            }
+        }
+        lexer.pushback(symbol);
+        unknownData = new ByteArrayRange(data.toByteArray());
+        updateLength();
+    }
+
+    @Override
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.write(unknownData);
+    }
+
+    @Override
+    protected int getContentBytesLength() {
+        return unknownData.getLength();
     }
 
     @Override
     public String toString() {
-        return "Unknown_" + Helper.byteToHex((byte) getActionCode());
+        byte[] data = unknownData.getRangeData();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Unknown_").append(Helper.byteToHex((byte) getActionCode()));
+        for (int i = 0; i < data.length; i++) {
+            sb.append(i == 0 ? " " : ", ");
+            sb.append("0x");
+            sb.append(Helper.byteToHex(data[i]));
+        }
+        return sb.toString();
     }
 
     @Override

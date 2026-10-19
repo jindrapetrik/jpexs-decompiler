@@ -110,7 +110,7 @@ public class ActionScript2UninitializedFieldsTest extends ActionScript2TestBase 
                 + "   }\n"
                 + "   static function getSV2()\n"
                 + "   {\n"
-                + "      return com.jpexs.MyClass.sv2;\n"
+                + "      return sv2;\n"
                 + "   }\n"
                 + "   function callF()\n"
                 + "   {\n"
@@ -134,16 +134,16 @@ public class ActionScript2UninitializedFieldsTest extends ActionScript2TestBase 
                 + "   }\n"
                 + "   static function set sv3(val)\n"
                 + "   {\n"
-                + "      com.jpexs.MyClass._sv3 = val;\n"
+                + "      _sv3 = val;\n"
                 + "   }\n"
                 + "   static function get sv3()\n"
                 + "   {\n"
-                + "      return com.jpexs.MyClass._sv3;\n"
+                + "      return _sv3;\n"
                 + "   }\n"
                 + "   function setV3()\n"
                 + "   {\n"
                 + "      this.v = this.v3;\n"
-                + "      com.jpexs.MyClass.sv = com.jpexs.MyClass.sv3;\n"
+                + "      sv = sv3;\n"
                 + "   }");
     }
 }

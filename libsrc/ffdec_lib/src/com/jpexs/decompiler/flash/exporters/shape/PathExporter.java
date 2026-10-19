@@ -71,6 +71,75 @@ public class PathExporter extends ShapeExporterBase {
         strokes.addAll(exporter.strokes);
         return exporter.paths;
     }
+    
+    @Override
+    public void export() {
+        super.export();
+    }
+
+    /**
+     * Exports the filled area which uses the specified one-based fill style
+     * index. The index includes fill styles introduced by style change
+     * records.
+     *
+     * @param windingRule GeneralPath winding rule
+     * @param shapeNum Shape number (1 for DefineShape, 2 for DefineShape2, etc.)
+     * @param swf SWF
+     * @param shape Shape
+     * @param fillStyleIndex One-based global fill style index
+     * @return Filled area for the requested style
+     */
+    public static GeneralPath exportFillStyle(int windingRule, int shapeNum, SWF swf, SHAPE shape, int fillStyleIndex) {
+        PathExporter exporter = new PathExporter(windingRule, shapeNum, swf, shape, null);
+        GeneralPath result = new GeneralPath(windingRule == 0 ? GeneralPath.WIND_EVEN_ODD : GeneralPath.WIND_NON_ZERO);
+        appendStylePath(result, exporter.getFillPaths(), fillStyleIndex, true);
+        return result;
+    }
+
+    /**
+     * Exports the center line which uses the specified one-based line style
+     * index. The index includes line styles introduced by style change
+     * records.
+     *
+     * @param windingRule GeneralPath winding rule
+     * @param shapeNum Shape number (1 for DefineShape, 2 for DefineShape2, etc.)
+     * @param swf SWF
+     * @param shape Shape
+     * @param lineStyleIndex One-based global line style index
+     * @return Center line for the requested style
+     */
+    public static GeneralPath exportLineStyle(int windingRule, int shapeNum, SWF swf, SHAPE shape, int lineStyleIndex) {
+        PathExporter exporter = new PathExporter(windingRule, shapeNum, swf, shape, null);
+        GeneralPath result = new GeneralPath();
+        appendStylePath(result, exporter.getLinePaths(), lineStyleIndex, false);
+        return result;
+    }
+
+    private static void appendStylePath(GeneralPath result, List<List<IEdge>> paths, int styleIndex, boolean fillStyle) {
+        int posX = Integer.MAX_VALUE;
+        int posY = Integer.MAX_VALUE;
+        for (List<IEdge> path : paths) {
+            for (IEdge edge : path) {
+                int edgeStyleIndex = fillStyle ? edge.getFillStyleIdx() : edge.getLineStyleIdx();
+                if (edgeStyleIndex != styleIndex) {
+                    continue;
+                }
+                if (posX != edge.getFromX() || posY != edge.getFromY()) {
+                    result.moveTo(edge.getFromX(), edge.getFromY());
+                }
+                if (edge instanceof CurvedEdge) {
+                    CurvedEdge curvedEdge = (CurvedEdge) edge;
+                    result.quadTo(curvedEdge.getControlX(), curvedEdge.getControlY(), curvedEdge.getToX(), curvedEdge.getToY());
+                } else {
+                    result.lineTo(edge.getToX(), edge.getToY());
+                }
+                posX = edge.getToX();
+                posY = edge.getToY();
+            }
+            posX = Integer.MAX_VALUE;
+            posY = Integer.MAX_VALUE;
+        }
+    }
 
     /**
      * Constructor.
@@ -82,12 +151,7 @@ public class PathExporter extends ShapeExporterBase {
      */
     protected PathExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
-    }
-
-    @Override
-    public void export() {
-        super.export();
-    }
+    }   
 
     @Override
     public void beginShape() {

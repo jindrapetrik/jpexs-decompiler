@@ -34,43 +34,40 @@ import java.util.List;
  */
 public class SwfShapeToIggyConvertor {
 
-    private static float normalizeLengths(int val) {
-        return (val / 1024f);
+    public static IggyShape convertShape(int shapeNum, SHAPE swfShape) {
+        return convertShape(shapeNum, swfShape, 1024);
     }
 
-    public static IggyShape convertShape(int shapeNum, SHAPE swfShape) {
-        /*if (swfShape.shapeRecords.size() == 1) { //no glyphs, maybe space
-            return null;
-        }*/
+    public static IggyShape convertShape(int shapeNum, SHAPE swfShape, int unitsPerEm) {
         List<IggyShapeNode> nodes = new ArrayList<>();
         RECT bounds = swfShape.getBounds(shapeNum);
         boolean first = true;
-        float curX = 0f;
-        float curY = 0f;
+        int curX = 0;
+        int curY = 0;
         for (SHAPERECORD rec : swfShape.shapeRecords) {
             if (rec instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) rec;
-                curX += normalizeLengths(ser.deltaX);
-                curY += normalizeLengths(ser.deltaY);
-                nodes.add(new IggyShapeNode(curX, curY, 0f, 0f, IggyShapeNode.NODE_TYPE_LINE_TO, 0, first));
+                curX += ser.deltaX;
+                curY += ser.deltaY;
+                nodes.add(new IggyShapeNode(curX / (float) unitsPerEm, curY / (float) unitsPerEm, 0f, 0f, IggyShapeNode.NODE_TYPE_LINE_TO, 0, first));
             } else if (rec instanceof CurvedEdgeRecord) {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
-                float controlX = curX + normalizeLengths(cer.controlDeltaX);
-                float controlY = curY + normalizeLengths(cer.controlDeltaY);
-                curX = curX + normalizeLengths(cer.controlDeltaX + cer.anchorDeltaX);
-                curY = curY + normalizeLengths(cer.controlDeltaY + cer.anchorDeltaY);
-                nodes.add(new IggyShapeNode(curX, curY, controlX, controlY, IggyShapeNode.NODE_TYPE_CURVE_POINT, 0, first));
+                int controlX = curX + cer.controlDeltaX;
+                int controlY = curY + cer.controlDeltaY;
+                curX = curX + cer.controlDeltaX + cer.anchorDeltaX;
+                curY = curY + cer.controlDeltaY + cer.anchorDeltaY;
+                nodes.add(new IggyShapeNode(curX / (float) unitsPerEm, curY / (float) unitsPerEm, controlX / (float) unitsPerEm, controlY / (float) unitsPerEm, IggyShapeNode.NODE_TYPE_CURVE_POINT, 0, first));
             } else if (rec instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) rec;
                 if (scr.stateMoveTo) {
-                    curX = normalizeLengths(scr.moveDeltaX);
-                    curY = normalizeLengths(scr.moveDeltaY);
-                    nodes.add(new IggyShapeNode(curX, curY, 0f, 0f, IggyShapeNode.NODE_TYPE_MOVE, 0, first));
+                    curX = scr.moveDeltaX;
+                    curY = scr.moveDeltaY;
+                    nodes.add(new IggyShapeNode(curX / (float) unitsPerEm, curY / (float) unitsPerEm, 0f, 0f, IggyShapeNode.NODE_TYPE_MOVE, 0, first));
                 }
             }
             first = false;
         }
-        IggyShape ret = new IggyShape(normalizeLengths(bounds.Xmin), normalizeLengths(bounds.Ymin), normalizeLengths(bounds.Xmax), normalizeLengths(bounds.Ymax), nodes);
+        IggyShape ret = new IggyShape(bounds.Xmin / (float) unitsPerEm, bounds.Ymin / (float) unitsPerEm, bounds.Xmax / (float) unitsPerEm, bounds.Ymax / (float) unitsPerEm, nodes);
         return ret;
     }
 }

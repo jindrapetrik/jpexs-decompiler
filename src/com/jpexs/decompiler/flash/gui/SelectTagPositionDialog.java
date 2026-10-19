@@ -488,7 +488,7 @@ public class SelectTagPositionDialog extends AppDialog {
         }
         MyTreeNode tnode = (MyTreeNode) selection.getLastPathComponent();
         if (tnode.getData() instanceof Tag) {
-            MainPanel.showPreview((TreeItem) tnode.getData(), previewPanel, getCurrentSelectedFrame() - 1, getCurrentSelectedTimelined());
+            MainPanel.showPreview((TreeItem) tnode.getData(), previewPanel, getCurrentSelectedFrame() - 1, getCurrentSelectedTimelined(), false);
         } else if (tnode.getData() instanceof MyFrame) {
             int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();

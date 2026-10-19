@@ -41,6 +41,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Gets current position in the stream.
+     *
      * @return Position
      */
     public long position();
@@ -70,14 +71,32 @@ public interface ReadDataStreamInterface extends AutoCloseable {
     public long readUI32() throws IOException;
 
     /**
+     * Reads a signed 32-bit integer in little-endian order.
+     *
+     * @return Signed 32-bit integer, sign-extended to long
+     * @throws IOException On I/O error or truncated input
+     */
+    public long readSI32() throws IOException;
+
+    /**
      * Reads unsigned 16-bit integer.
+     *
      * @return Unsigned 16-bit integer
      * @throws IOException On I/O error
      */
     public int readUI16() throws IOException;
 
     /**
+     * Reads signed 16-bit integer.
+     *
+     * @return Signed 16-bit integer
+     * @throws IOException On I/O error
+     */
+    public int readSI16() throws IOException;
+
+    /**
      * Reads unsigned 8-bit integer.
+     *
      * @return Unsigned 8-bit integer
      * @throws IOException On I/O error
      */
@@ -85,6 +104,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Reads unsigned 8-bit integer from specified address.
+     *
      * @param addr Address
      * @return Unsigned 8-bit integer
      * @throws IOException On I/O error
@@ -93,6 +113,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Reads byte.
+     *
      * @return Byte
      * @throws IOException On I/O error
      */
@@ -100,6 +121,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Reads byte array.
+     *
      * @param numBytes Number of bytes to read
      * @return Byte array
      * @throws IOException On I/O error
@@ -108,6 +130,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Reads float.
+     *
      * @return Float
      * @throws IOException On I/O error
      */
@@ -115,6 +138,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Seeks to specified position.
+     *
      * @param pos Position
      * @param mode Seek mode
      * @throws IOException On I/O error
@@ -123,6 +147,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Gets all bytes.
+     *
      * @return All bytes
      * @throws IOException On I/O error
      */
@@ -130,6 +155,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Reads UTF-8 string.
+     *
      * @return UTF-8 string
      * @throws IOException On I/O error
      */
@@ -137,6 +163,7 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     /**
      * Pads 8 bytes.
+     *
      * @throws IOException On I/O error
      */
     public void pad8bytes() throws IOException;

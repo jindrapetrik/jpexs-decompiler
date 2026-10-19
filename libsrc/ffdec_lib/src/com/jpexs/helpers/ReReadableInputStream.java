@@ -56,11 +56,19 @@ public class ReReadableInputStream extends SeekableInputStream {
 
     @Override
     public void seek(long pos) throws IOException {
-        if (pos > count) {
-            this.pos = count;
-            skip(pos - count);
+        if (pos < 0) {
+            throw new IOException("Seek to negative position");
         }
-        this.pos = pos;
+        if (pos <= count) {
+            this.pos = pos;
+            return;
+        }
+        this.pos = count;
+        while (this.pos < pos) {
+            if (read() < 0) {
+                throw new IOException("Seek beyond end of stream");
+            }
+        }
     }
 
     @Override
@@ -83,15 +91,17 @@ public class ReReadableInputStream extends SeekableInputStream {
             baos.write(i);
             count++;
         }
-        pos++;
-        converted = null;
+        if (i > -1) {
+            pos++;
+            converted = null;
+        }
 
         return i;
     }
 
     @Override
     public int available() throws IOException {
-        return (count + is.available()) - (int) pos;
+        return Math.max(0, (count + is.available()) - (int) pos);
     }
 
     public long length() throws IOException {

@@ -32,6 +32,7 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
     private File file;
     private RandomAccessFile raf;
     private IggyIndexBuilder indexing;
+    private boolean readOnly;
 
     protected File getFile() {
         return file;
@@ -43,8 +44,13 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
     }
 
     public RandomAccessFileDataStream(File file) throws FileNotFoundException {
+        this(file, false);
+    }
+
+    public RandomAccessFileDataStream(File file, boolean readOnly) throws FileNotFoundException {
         this.file = file;
-        raf = new RandomAccessFile(file, "rw");
+        this.readOnly = readOnly;
+        raf = new RandomAccessFile(file, readOnly ? "r" : "rw");
     }
 
     @Override
@@ -98,6 +104,9 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
         } else if (mode == SeekMode.END) {
             newpos = raf.length() - pos;
         }
+        if (readOnly && newpos > raf.length()) {
+            throw new EOFException("Iggy seek outside file");
+        }
         if (newpos > raf.length()) {
             raf.seek(raf.length());
             long curpos = raf.length();
@@ -137,7 +146,11 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
 
     @Override
     public void pad8bytes() throws IOException {
-        super.pad8bytes();
+        if (readOnly) {
+            seek((-position()) & 7, SeekMode.CUR);
+        } else {
+            super.pad8bytes();
+        }
     }
 
 }

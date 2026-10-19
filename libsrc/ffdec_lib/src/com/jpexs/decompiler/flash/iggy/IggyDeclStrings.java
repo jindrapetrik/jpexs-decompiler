@@ -16,81 +16,86 @@
  */
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
-import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
-import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- * Declared strings.
- *
- * @author JPEXS
+ * One node of the AS3/ABC linked list. ABC includes its four version bytes.
  */
 public class IggyDeclStrings implements StructureInterface {
 
-    @IggyFieldType(DataType.uint64_t)
-    long one;
-    //@IggyFieldType(DataType.uint32_t)
-    //long size;
-    @IggyArrayFieldType(value = DataType.uint8_t, count = 3)
-    byte[] xxx;
-    @IggyArrayFieldType(value = DataType.uint8_t, countField = "size")
-    byte[] data;
-    byte[] padd;
-    @IggyFieldType(DataType.uint64_t)
-    long one2;
-    @IggyFieldType(DataType.uint64_t)
-    long zero;
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
+    private long address;
+    private long nextAddress;
+    private byte[] data;
+    private boolean is64 = true;
 
     public IggyDeclStrings(ReadDataStreamInterface stream) throws IOException {
+        this(stream, true);
+    }
+
+    public IggyDeclStrings(ReadDataStreamInterface stream, boolean is64) throws IOException {
+        this.is64 = is64;
         readFromDataStream(stream);
     }
 
-    @Override
-    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
-        one = s.readUI64();
-        long size = s.readUI32();
-        xxx = s.readBytes(3);
-        data = s.readBytes((int) size);
-        if ((15 + size) % 8 != 0) {
-            padd = s.readBytes((int) (((15 + size) / 8 + 1) * 8 - 15 - size));
-        } else {
-            padd = new byte[0];
-        }
-        one = s.readUI64();
-        if (one != 1) {
-            throw new IOException("Wrong iggy font format (declend)!");
-        }
-        zero = s.readUI64();
+    public IggyDeclStrings(byte[] abc) {
+        data = abc.clone();
+    }
+
+    public byte[] getData() {
+        return data.clone();
+    }
+
+    public void setData(byte[] abc) {
+        data = abc.clone();
+    }
+
+    public long getAddress() {
+        return address;
+    }
+
+    public long getNextAddress() {
+        return nextAddress;
+    }
+
+    public void setNextAddress(long next) {
+        nextAddress = next;
     }
 
     @Override
-    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
-        IggyIndexBuilder ib = s.getIndexing();
-        s.writeUI64(one);
-        s.writeUI32(data.length);
-        ib.writeLengthCustom(15, new int[]{0x00, 0x08}, new int[]{2, 5});
-        s.writeBytes(xxx);
-        s.writeBytes(data);
-        ib.writeLengthUI32(data.length);
-        if ((15 + data.length) % 8 != 0) {
-            byte[] padd = new byte[((int) (((15 + data.length) / 8 + 1) * 8 - 15 - data.length))];
-            s.writeBytes(padd);
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
+        address = stream.position();
+        nextAddress = IggyLayout.readPointer(stream, is64);
+        long size = stream.readUI32();
+        if (size < 4 || size > Integer.MAX_VALUE || size > stream.available()) {
+            throw new IOException("Invalid Iggy ABC length");
         }
-        ib.writeConstLength(IggyIndexBuilder.CONST_SEQUENCE_SIZE);
-        s.writeUI64(one);
-        s.writeUI64(zero);
+        data = stream.readBytes((int) size);
+        validate();
     }
 
+    public void validate() throws IOException {
+        if (data.length < 4) {
+            throw new IOException("Truncated Iggy ABC header");
+        }
+        int minor = (data[0] & 255) | (data[1] & 255) << 8;
+        int major = (data[2] & 255) | (data[3] & 255) << 8;
+        if (major != 46 || minor != 16 && minor != 18) {
+            throw new IOException("Unsupported Iggy ABC version: " + major + "." + minor);
+        }
+    }
+
+    @Override
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
+        validate();
+        IggyLayout.writePointer(stream, is64, nextAddress);
+        stream.writeUI32(data.length);
+        stream.getIndexing().writeLengthCustom(is64 ? 12 : 8, new int[]{0, is64 ? 8 : 4}, new int[]{2, 5});
+        stream.writeBytes(data);
+        stream.getIndexing().writeLengthUI32(data.length);
+        stream.pad8bytes();
+        stream.getIndexing().writeLengthUI32((-stream.getIndexing().getPosition()) & 7);
+    }
 }

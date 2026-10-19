@@ -166,6 +166,11 @@ Constant= constant{PositiveNumberLiteral}
 
   /* numeric literals */
 
+  "0" [xX] {HexDigit}+       { try {
+                                  return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_INTEGER, Long.parseLong(yytext().substring(2), 16));
+                              } catch (NumberFormatException ex) {
+                                  throw new ActionParseException("Hexadecimal integer is too large", yyline());
+                              } }
   {NumberLiteral}            { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));  }
   {FloatLiteral} "f"         { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_FLOAT, Float.parseFloat(yytext().substring(0, yytext().length() - 1))); }
   {FloatLiteral}             { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_DOUBLE, Double.parseDouble((yytext())));  }

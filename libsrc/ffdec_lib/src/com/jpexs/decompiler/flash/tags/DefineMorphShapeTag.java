@@ -79,10 +79,12 @@ public class DefineMorphShapeTag extends MorphShapeTag {
         characterId = sis.readUI16("characterId");
         startBounds = sis.readRECT("startBounds");
         endBounds = sis.readRECT("endBounds");
-        long offset = sis.readUI32("offset"); // ignore
+        long offset = sis.readUI32("offset");
+        long edgesPos = sis.getPos() + offset;
         morphFillStyles = sis.readMORPHFILLSTYLEARRAY("morphFillStyles");
         morphLineStyles = sis.readMORPHLINESTYLEARRAY(1, "morphLineStyles");
         startEdges = sis.readSHAPE(1, true, "startEdges");
+        sis.seek(edgesPos);
         endEdges = sis.readSHAPE(1, true, "endEdges");
     }
 

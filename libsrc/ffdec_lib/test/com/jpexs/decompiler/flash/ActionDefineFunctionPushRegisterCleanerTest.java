@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -53,9 +54,17 @@ public class ActionDefineFunctionPushRegisterCleanerTest extends ActionScript2Te
     private void compareSrc(String testClassName, String expectedClassContents) {
         DoInitActionTag dia = getClassSource(testClassName);
         assertNotNull(dia);
+        HighlightedTextWriter pcodeBefore = new HighlightedTextWriter(new CodeFormatting(), false);
+        byte[] bytesBefore;
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
+            dia.getASMSource(ScriptExportMode.PCODE, pcodeBefore, null);
+            bytesBefore = Action.actionsToBytes(dia.getActions(), true, swf.version);
             Action.actionsToSource(new HashMap<>(),dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
+            HighlightedTextWriter pcodeAfter = new HighlightedTextWriter(new CodeFormatting(), false);
+            dia.getASMSource(ScriptExportMode.PCODE, pcodeAfter, null);
+            assertEquals(pcodeAfter.toString(), pcodeBefore.toString());
+            assertEquals(Action.actionsToBytes(dia.getActions(), true, swf.version), bytesBefore);
         } catch (InterruptedException ex) {
             fail();
         }

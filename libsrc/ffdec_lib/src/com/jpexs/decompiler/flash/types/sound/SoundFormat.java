@@ -44,6 +44,11 @@ public class SoundFormat {
 
     public boolean stereo;
 
+    /**
+     * Whether uncompressed input samples are 16 bit (otherwise unsigned 8 bit).
+     */
+    public boolean sample16bit = true;
+
     //int[] rateMap = {5512, 11025, 22050, 44100};
     public static final int FORMAT_UNCOMPRESSED_NATIVE_ENDIAN = 0;
 
@@ -84,6 +89,18 @@ public class SoundFormat {
     }
 
     public SoundFormat(int formatId, int samplingRate, boolean stereo) {
+        this(formatId, samplingRate, stereo, true);
+    }
+
+    /**
+     * Constructs a sound format with the input PCM sample size.
+     * @param formatId Compression format
+     * @param samplingRate Sampling rate in Hz
+     * @param stereo Whether the sound has two channels
+     * @param sample16bit Whether uncompressed samples are 16 bit
+     */
+    public SoundFormat(int formatId, int samplingRate, boolean stereo, boolean sample16bit) {
+        this.sample16bit = sample16bit;
         this.formatId = formatId;
         this.samplingRate = samplingRate;
         this.stereo = stereo;

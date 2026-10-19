@@ -1,0 +1,5 @@
+<filters>
+                                                  <BlurFilter blurX="4" blurY="6" quality="2"/>
+                                                  <AdjustColorFilter brightness="40" contrast="30" saturation="40" hue="90"/>
+                                                  <GlowFilter alpha="0.627451" blurX="5" blurY="5" color="#4080e0" quality="2" strength="1"/>
+                                             </filters>

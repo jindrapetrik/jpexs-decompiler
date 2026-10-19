@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FileChooser;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.helpers.ByteArrayRange;
@@ -105,7 +106,7 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
         if (value == null) {
             return;
         }
-        JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());

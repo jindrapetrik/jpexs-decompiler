@@ -19,6 +19,12 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushDefineLocal;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetMember;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetVariable;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushGetVariable2;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushSetMember;
+import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionToBoolean;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf1.ActionGetURL;
@@ -127,6 +133,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.flash.tags.CSMSettingsTag;
 import com.jpexs.decompiler.flash.tags.CharacterSetTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
@@ -927,12 +934,39 @@ public class SWFInputStream implements AutoCloseable {
     public float readFLOAT16(String name) throws IOException {
         newDumpLevel(name, "FLOAT16");
         int val = readUI16Internal();
-        int sign = val >> 15;
-        int mantissa = val & 0x3FF;
-        int exp = (val >> 10) & 0x1F;
-        float ret = (sign == 1 ? -1 : 1) * (float) Math.pow(2, exp) * (1 + ((mantissa) / (float) (1 << 10)));
+        float ret = SWFInputStream.int16BitsToFloat(val);
         endDumpLevel(ret);
         return ret;
+    }
+    
+    /**
+     * Converts 16-bit int to FLOAT16
+     * @param val 16-bit int
+     * @return FLOAT16 value
+     */
+    public static float int16BitsToFloat(int val) {
+        int sign = (val & 0x8000) << 16;
+        int mantissa = val & 0x3FF;
+        int exp = (val >> 10) & 0x1F;
+        int floatBits;
+        if (exp == 0) {
+            if (mantissa == 0) {
+                floatBits = sign;
+            } else {
+                int unbiasedExp = -14;
+                while ((mantissa & 0x400) == 0) {
+                    mantissa <<= 1;
+                    unbiasedExp--;
+                }
+                mantissa &= 0x3FF;
+                floatBits = sign | ((unbiasedExp + 127) << 23) | (mantissa << 13);
+            }
+        } else if (exp == 0x1F) {
+            floatBits = sign | 0x7F800000 | (mantissa << 13);
+        } else {
+            floatBits = sign | ((exp + 127 - 15) << 23) | (mantissa << 13);
+        }
+        return Float.intBitsToFloat(floatBits);
     }
 
     /**
@@ -1166,27 +1200,27 @@ public class SWFInputStream implements AutoCloseable {
      */
     public long readEncodedU32(String name) throws IOException {
         newDumpLevel(name, "encodedU32");
-        int result = readEx();
+        long result = readEx();
         if ((result & 0x00000080) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0000007f) | (readEx()) << 7;
+        result = (result & 0x0000007fL) | ((long) readEx()) << 7;
         if ((result & 0x00004000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x00003fff) | (readEx()) << 14;
+        result = (result & 0x00003fffL) | ((long) readEx()) << 14;
         if ((result & 0x00200000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x001fffff) | (readEx()) << 21;
+        result = (result & 0x001fffffL) | ((long) readEx()) << 21;
         if ((result & 0x10000000) == 0) {
             endDumpLevel(result);
             return result;
         }
-        result = (result & 0x0fffffff) | (readEx()) << 28;
+        result = (result & 0x0fffffffL) | ((long) (readEx() & 0x0f)) << 28;
         endDumpLevel(result);
         return result;
     }
@@ -1809,6 +1843,11 @@ public class SWFInputStream implements AutoCloseable {
                     ret = new PlaceObject4Tag(sis, data);
                     break;
                 default:
+                    SwfProfile swfProfile = swf.getSwfProfile();
+                    ret = swfProfile == null ? null : swfProfile.decodeTag(sis, tag.getId(), data);
+                    if (ret != null) {
+                        break;
+                    }
                     if (swf.gfx) { // GFX tags only in GFX files. There may be incorrect GFX tags in non GFX files
                         switch (tag.getId()) {
                             case 1000:
@@ -2191,13 +2230,20 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x8F:
                     return new ActionTry(actionLength, this, swf.version);
                 case 0x2A:
-                    return new ActionThrow();
+                    return new ActionThrow();               
                 default:
+                    SwfProfile profile = swf == null ? null : swf.getSwfProfile();
+                    if (profile != null) {
+                        Action profileAction = profile.readAction(actionCode, actionLength, this, getCharset());
+                        if (profileAction != null) {
+                            return profileAction;
+                        }
+                    }
                     /*if (actionLength > 0) {
                      //skip(actionLength);
                      }*/
                     //throw new UnknownActionException(actionCode);
-                    Action r = new ActionUnknown(actionCode, actionLength, getCharset());
+                    Action r = new ActionUnknown(actionCode, actionLength, this, getCharset());
                     if (Configuration.useDetailedLogging.get()) {
                         logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
                     }
@@ -2796,12 +2842,12 @@ public class SWFInputStream implements AutoCloseable {
         ret.placeMatrix = readMatrix("placeMatrix");
         if (tag instanceof DefineButton2Tag) {
             ret.colorTransform = readCXFORMWITHALPHA("colorTransform");
-            if (ret.buttonHasFilterList) {
-                ret.filterList = readFILTERLIST("filterList");
-            }
-            if (ret.buttonHasBlendMode) {
-                ret.blendMode = readUI8("blendMode");
-            }
+        }
+        if (ret.buttonHasFilterList) {
+            ret.filterList = readFILTERLIST("filterList");
+        }
+        if (ret.buttonHasBlendMode) {
+            ret.blendMode = readUI8("blendMode");
         }
         endDumpLevel();
         return ret;
@@ -3626,8 +3672,8 @@ public class SWFInputStream implements AutoCloseable {
     public ZONEDATA readZONEDATA(String name) throws IOException {
         ZONEDATA ret = new ZONEDATA();
         newDumpLevel(name, "ZONEDATA");
-        ret.alignmentCoordinate = readUI16("alignmentCoordinate");
-        ret.range = readUI16("range");
+        ret.alignmentCoordinate = readFLOAT16("alignmentCoordinate");
+        ret.range = readFLOAT16("range");
         endDumpLevel();
         return ret;
     }

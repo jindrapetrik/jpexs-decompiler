@@ -36,7 +36,7 @@ public class IggyHeader implements StructureInterface {
 
     public static int STRUCT_SIZE = 32;
 
-    public static long MAGIC = 0xED0A6749;
+    public static long MAGIC = 0xED0A6749L;
 
     //Must be 0xED0A6749
     @IggyFieldType(DataType.uint32_t)
@@ -46,7 +46,7 @@ public class IggyHeader implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     private long version;
 
-    //Assuming: 1
+    //Payload endianness: 1 little-endian, 2 big-endian
     @IggyFieldType(value = DataType.uint8_t)
     private int platform1;
 
@@ -54,17 +54,17 @@ public class IggyHeader implements StructureInterface {
     @IggyFieldType(value = DataType.uint8_t)
     private int platform2;
 
-    //Assuming: 1
+    //Bitfield packing: 1 native, 2 reversed
     @IggyFieldType(value = DataType.uint8_t)
     private int platform3;
 
-    //Usually: 3
+    //Fixup availability: bit 0 endian, bit 1 bitfield packing
     @IggyFieldType(value = DataType.uint8_t)
     private int platform4;
 
-    //flags for platform 64?
+    //Original SWF version; read by the x64 1.2.56 runtime. Zero means unknown.
     @IggyFieldType(DataType.uint32_t)
-    private long unk_0C;
+    private long swfVersion;
 
     @IggyArrayFieldType(value = DataType.uint8_t, count = 12)
     private byte[] reserved;
@@ -72,7 +72,16 @@ public class IggyHeader implements StructureInterface {
     @IggyFieldType(value = DataType.uint32_t)
     private long numSubfiles;
 
+    // 32 legacy files also store the descriptor table in payload byte order.
+    // x86 version 1.2.56 and x64 always keep the outer table little-endian.
+    private boolean legacy32Table = true;
+
     public IggyHeader(ReadDataStreamInterface stream) throws IOException {
+        this(stream, true);
+    }
+
+    IggyHeader(ReadDataStreamInterface stream, boolean legacy32Table) throws IOException {
+        this.legacy32Table = legacy32Table;
         readFromDataStream(stream);
     }
 
@@ -84,17 +93,17 @@ public class IggyHeader implements StructureInterface {
      * @param platform2 Platform 2 (32/64)
      * @param platform3 Platform 3
      * @param platform4 Platform 4
-     * @param unk_0C Unknown 0C
+     * @param swfVersion Original SWF version, or zero if unknown
      * @param reserved Reserved
      * @param num_subfiles Number of subfiles
      */
-    public IggyHeader(long version, int platform1, int platform2, int platform3, int platform4, long unk_0C, byte[] reserved, long num_subfiles) {
+    public IggyHeader(long version, int platform1, int platform2, int platform3, int platform4, long swfVersion, byte[] reserved, long num_subfiles) {
         this.version = version;
         this.platform1 = platform1;
         this.platform2 = platform2;
         this.platform3 = platform3;
         this.platform4 = platform4;
-        this.unk_0C = unk_0C;
+        this.swfVersion = swfVersion;
         this.reserved = reserved;
         this.numSubfiles = num_subfiles;
     }
@@ -105,7 +114,7 @@ public class IggyHeader implements StructureInterface {
         sb.append("[");
         sb.append("version: ").append(version).append(", ");
         sb.append("platform: ").append(platform1).append(" ").append(platform2).append(" ").append(platform3).append(" ").append(platform4).append(", ");
-        sb.append("unk_0C: ").append(String.format("%08X", unk_0C)).append(", ");
+        sb.append("swfVersion: ").append(swfVersion).append(", ");
         sb.append("reserved: 12 bytes").append(", ");
         sb.append("num_subfiles: ").append(numSubfiles);
         sb.append("]");
@@ -119,13 +128,28 @@ public class IggyHeader implements StructureInterface {
             throw new IOException("Invalid Iggy file");
         }
         version = stream.readUI32();
+        if (version != 0x900) {
+            throw new IOException("Unsupported Iggy version: " + version);
+        }
         platform1 = stream.readUI8();
         platform2 = stream.readUI8(); //32/64
         platform3 = stream.readUI8();
         platform4 = stream.readUI8();
-        unk_0C = stream.readUI32();
+        if (platform2 != 32 && platform2 != 64) {
+            throw new IOException("Invalid Iggy pointer width");
+        }
+        if (platform1 != 1 && platform1 != 2 || platform3 != 1 && platform3 != 2) {
+            throw new IOException("Invalid Iggy data platform");
+        }
+        if (is64()) {
+            requirePlatformFixups();
+        }
+        swfVersion = stream.readUI32();
         reserved = stream.readBytes(12);
         numSubfiles = stream.readUI32();
+        if (legacy32Table && !is64() && platform1 == 2) {
+            numSubfiles = Integer.reverseBytes((int) numSubfiles) & 0xffffffffL;
+        }
     }
 
     @Override
@@ -136,13 +160,31 @@ public class IggyHeader implements StructureInterface {
         s.writeUI8(platform2);
         s.writeUI8(platform3);
         s.writeUI8(platform4);
-        s.writeUI32(unk_0C);
+        s.writeUI32(swfVersion);
         s.writeBytes(reserved);
-        s.writeUI32(numSubfiles);
+        s.writeUI32(legacy32Table && !is64() && platform1 == 2 ? Integer.reverseBytes((int) numSubfiles) & 0xffffffffL : numSubfiles);
+    }
+
+    /**
+     * Validate the platform flags used by the 32-bit and 64-bit readers.
+     */
+    void requirePlatformFixups() throws IOException {
+        if (platform1 != 1 && (platform4 & 1) == 0 || platform3 != 1 && (platform4 & 2) == 0) {
+            throw new IOException("Iggy platform has no required fixup data");
+        }
     }
 
     public boolean is64() {
         return platform2 == 64;
+    }
+
+    public void setNumSubfiles(long count) {
+        numSubfiles = count;
+    }
+
+    public void setNativePayload() {
+        platform1 = 1;
+        platform3 = 1;
     }
 
     public long getMagic() {
@@ -169,8 +211,36 @@ public class IggyHeader implements StructureInterface {
         return platform4;
     }
 
+    /**
+     * Get the original SWF version stored at header offset 0x0C.
+     *
+     * @return The preserved unsigned word; zero means unknown
+     */
+    public long getSwfVersion() {
+        return swfVersion;
+    }
+
+    /**
+     * Set the original SWF version, or zero for an unknown version.
+     *
+     * @param swfVersion Original SWF version
+     */
+    public void setSwfVersion(long swfVersion) {
+        if (swfVersion < 0 || swfVersion > 0xffffffffL) {
+            throw new IllegalArgumentException("Iggy SWF version must fit an unsigned 32-bit word");
+        }
+        this.swfVersion = swfVersion;
+    }
+
+    /**
+     * Get the preserved word at offset 0x0C.
+     *
+     * @return Original SWF version
+     * @deprecated Use {@link #getSwfVersion()}
+     */
+    @Deprecated
     public long getUnk_0C() {
-        return unk_0C;
+        return getSwfVersion();
     }
 
     public byte[] getReserved() {

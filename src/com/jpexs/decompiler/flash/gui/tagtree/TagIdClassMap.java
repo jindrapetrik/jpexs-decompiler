@@ -201,6 +201,7 @@ public class TagIdClassMap {
         addTag(DefineSubImage.ID, DefineSubImage.class);
         addTag(ExporterInfo.ID, ExporterInfo.class);
         addTag(FontTextureInfo.ID, FontTextureInfo.class);
+        addTag(com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.ID, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.class);
         
         addTag(DefineVideoTag.ID, DefineVideoTag.class);
         addTag(GenCommandTag.ID, GenCommandTag.class);

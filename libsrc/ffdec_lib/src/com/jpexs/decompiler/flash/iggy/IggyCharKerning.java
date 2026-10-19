@@ -76,7 +76,7 @@ public class IggyCharKerning implements StructureInterface {
         for (int i = 0; i < kernCount; i++) {
             charsA.add((char) stream.readUI16());
             charsB.add((char) stream.readUI16());
-            kerningOffsets.add((short) stream.readUI16());
+            kerningOffsets.add((short) stream.readSI16());
         }
     }
 
@@ -85,7 +85,7 @@ public class IggyCharKerning implements StructureInterface {
         for (int i = 0; i < kernCount; i++) {
             stream.writeUI16(charsA.get(i));
             stream.writeUI16(charsB.get(i));
-            stream.writeUI16(kerningOffsets.get(i));
+            stream.writeSI16(kerningOffsets.get(i));
         }
     }
 

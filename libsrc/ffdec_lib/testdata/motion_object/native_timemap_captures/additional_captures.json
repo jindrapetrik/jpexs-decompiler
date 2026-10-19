@@ -1,0 +1,225 @@
+[
+  {
+    "capture": "native-timemap-capture-1791120981686",
+    "folder": "quintic_50",
+    "uiName": null,
+    "type": "Quintic",
+    "strength": 50,
+    "mapIndex": 5,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "Quintic",
+      "strength": 50,
+      "description": "50% ease-out polynomial blend",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05229669495884082
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121086285",
+    "folder": "dual_quadratic_50",
+    "uiName": null,
+    "type": "DualQuadratic",
+    "strength": 50,
+    "mapIndex": 6,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "DualQuadratic",
+      "strength": 50,
+      "description": "50% out/in polynomial blend",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121102242",
+    "folder": "dual_cubic_50",
+    "uiName": null,
+    "type": "DualCubic",
+    "strength": 50,
+    "mapIndex": 7,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "DualCubic",
+      "strength": 50,
+      "description": "50% out/in polynomial blend",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05259259259255487
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121114661",
+    "folder": "dual_quartic_50",
+    "uiName": null,
+    "type": "DualQuartic",
+    "strength": 50,
+    "mapIndex": 8,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "DualQuartic",
+      "strength": 50,
+      "description": "50% out/in polynomial blend",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121129905",
+    "folder": "dual_quintic_50",
+    "uiName": "Stop and Start (Fastest)",
+    "type": "DualQuintic",
+    "strength": 50,
+    "mapIndex": 9,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "DualQuintic",
+      "strength": 50,
+      "description": "50% out/in polynomial blend",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.07080000000000837
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121142477",
+    "folder": "bounce_4",
+    "uiName": "Bounce",
+    "type": "Bounce",
+    "strength": 4,
+    "mapIndex": 10,
+    "minProgress": 0,
+    "maxProgress": 0.9986538461538461,
+    "firstProgress": 0,
+    "lastProgress": 0,
+    "formulaCheck": null
+  },
+  {
+    "capture": "native-timemap-capture-1791121154284",
+    "folder": "bounce_in_4",
+    "uiName": "Bounce In",
+    "type": "BounceIn",
+    "strength": 4,
+    "mapIndex": 11,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": null
+  },
+  {
+    "capture": "native-timemap-capture-1791121167965",
+    "folder": "spring_5",
+    "uiName": "Spring",
+    "type": "Spring",
+    "strength": 5,
+    "mapIndex": 12,
+    "minProgress": 0,
+    "maxProgress": 0.9926923076923077,
+    "firstProgress": 0,
+    "lastProgress": 0.7019230769230769,
+    "formulaCheck": null
+  },
+  {
+    "capture": "native-timemap-capture-1791121178422",
+    "folder": "sine_wave_3",
+    "uiName": "Sine Wave",
+    "type": "SineWave",
+    "strength": 3,
+    "mapIndex": 13,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "SineWave",
+      "strength": 3,
+      "description": "3 half-cycles of cosine-derived wave",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.050515722632098914
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121189098",
+    "folder": "sawtooth_wave_3",
+    "uiName": "Sawtooth Wave",
+    "type": "SawtoothWave",
+    "strength": 3,
+    "mapIndex": 14,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "SawtoothWave",
+      "strength": 3,
+      "description": "3 half-cycles of triangular wave",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05000000000009095
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121200410",
+    "folder": "square_wave_3",
+    "uiName": "Square Wave",
+    "type": "SquareWave",
+    "strength": 3,
+    "mapIndex": 15,
+    "minProgress": 0,
+    "maxProgress": 1,
+    "firstProgress": 0,
+    "lastProgress": 1,
+    "formulaCheck": {
+      "type": "SquareWave",
+      "strength": 3,
+      "description": "binary steps at t=1/3 and 2/3",
+      "maxRoundedXErrorTwips": 0,
+      "maxUnroundedXErrorPixels": 0
+    }
+  },
+  {
+    "capture": "native-timemap-capture-1791121212434",
+    "folder": "random_square_wave_3",
+    "uiName": "Random",
+    "type": "RandomSquareWave",
+    "strength": 3,
+    "mapIndex": 16,
+    "minProgress": 0,
+    "maxProgress": 0.31653846153846155,
+    "firstProgress": 0,
+    "lastProgress": 0,
+    "formulaCheck": null
+  },
+  {
+    "capture": "native-timemap-capture-1791121224390",
+    "folder": "damped_wave_3",
+    "uiName": "Damped Wave",
+    "type": "DampedWave",
+    "strength": 3,
+    "mapIndex": 17,
+    "minProgress": 0,
+    "maxProgress": 0.8471153846153846,
+    "firstProgress": 0,
+    "lastProgress": 0.4998076923076923,
+    "formulaCheck": {
+      "type": "DampedWave",
+      "strength": 3,
+      "description": "3 full cycles with quadratic decay about 0.5",
+      "maxRoundedXErrorTwips": 1,
+      "maxUnroundedXErrorPixels": 0.05192158063009629
+    }
+  }
+]

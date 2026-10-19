@@ -1,0 +1,4 @@
+frameIndex,instance,property,original,recompiled,delta
+33,name:Demo,matrix.tx.twips,5930,5929,-1
+46,name:Demo,matrix.a.fixed16,88313,88312,-1
+58,name:Demo,matrix.a.fixed16,96789,96788,-1

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,16 @@ import java.util.Set;
  * @author JPEXS
  */
 public interface Bundle {
+
+    /**
+     * Gets the profile automatically assigned to SWF files in this bundle.
+     * A non-null profile is required by the bundle and cannot be changed by the user.
+     *
+     * @return Implicit SWF profile, or null if the bundle does not specify one
+     */
+    default SwfProfile getImplicitSwfProfile() {
+        return null;
+    }
 
     /**
      * Gets number of openable files in the bundle.

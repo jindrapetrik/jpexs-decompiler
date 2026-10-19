@@ -21,21 +21,30 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
+import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
+import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -44,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import natorder.NaturalOrderComparator;
@@ -119,7 +129,7 @@ public class FunctionActionItem extends ActionItem {
      * Inner functions
      */
     private List<FunctionActionItem> innerFunctions;
-    
+
     /**
      * Parameter positions in the code
      */
@@ -129,7 +139,7 @@ public class FunctionActionItem extends ActionItem {
      * Parameter registers
      */
     private List<Integer> paramRegisters;
-    
+
     /**
      * Register - this
      */
@@ -159,10 +169,6 @@ public class FunctionActionItem extends ActionItem {
      * Register - global
      */
     public static final int REGISTER_GLOBAL = 6;
-    
-    
-    
-    
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -176,6 +182,7 @@ public class FunctionActionItem extends ActionItem {
 
     /**
      * Adds variable.
+     *
      * @param variable Variable
      */
     public void addVariable(VariableActionItem variable) {
@@ -191,6 +198,7 @@ public class FunctionActionItem extends ActionItem {
 
     /**
      * Constructor.
+     *
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param functionName Function name
@@ -291,7 +299,7 @@ public class FunctionActionItem extends ActionItem {
                     pname = new RegisterNumber(paramRegisters.get(p)).translate();
                 } else {
                     pname = new RegisterNumber(regStart + p).translate();
-                }                
+                }
             }
             HighlightData d = getSrcData();
             d.localName = pname;
@@ -308,7 +316,15 @@ public class FunctionActionItem extends ActionItem {
         }
         writer.append(")").startBlock();
 
-        Graph.graphToString(actions, writer, localData);        
+        As2ClassMemberScope previousScope = localData.as2ClassMemberScope;
+        if (previousScope != null) {
+            localData.as2ClassMemberScope = previousScope.forFunction(this);
+        }
+        try {
+            Graph.graphToString(actions, writer, localData);
+        } finally {
+            localData.as2ClassMemberScope = previousScope;
+        }
 
         writer.endBlock();
         writer.endMethod();
@@ -362,7 +378,7 @@ public class FunctionActionItem extends ActionItem {
 
     public List<VariableActionItem> getVariables() {
         return variables;
-    }        
+    }
 
     private Set<String> getDefinedVariableNames(List<VariableActionItem> variables) {
         Set<String> ret = new HashSet<>();
@@ -390,10 +406,10 @@ public class FunctionActionItem extends ActionItem {
 
     public List<FunctionActionItem> getInnerFunctions() {
         return innerFunctions;
-    }        
+    }
 
     @Override
-    @SuppressWarnings("unchecked")            
+    @SuppressWarnings("unchecked")
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
@@ -420,9 +436,22 @@ public class FunctionActionItem extends ActionItem {
         boolean suppressThisFlag = false;
 
         boolean needsFun2 = false;
-        
+
         boolean canFun2 = asGenerator.getSwfVersion() >= 7;
-        
+
+        boolean canVariables = true;
+
+        SwfProfile profile = asGenerator.getProfile();
+        if (profile != null) {
+            if (profile.prefersAvm1DefineFunction2()) {
+                canFun2 = true;
+                needsFun2 = true;
+            }
+            if (profile.prefersNoVariablesInAvm1Functions()) {
+                canVariables = false;
+            }
+        }
+
         List<String> registerNames = new ArrayList<>();
         if (canFun2) {
             registerNames.add("***** ZERO *****");
@@ -463,7 +492,7 @@ public class FunctionActionItem extends ActionItem {
                 preloadGlobalFlag = true;
                 registerNames.add("_global");
             }
-        
+
             //int preloadedNumber = registerNames.size();
             if (!paramNames.isEmpty()) {
                 needsFun2 = true;
@@ -473,7 +502,7 @@ public class FunctionActionItem extends ActionItem {
             }
             if (localData.inFunction > 1) {
                 needsFun2 = true;
-            }        
+            }
         }
 
         //If the function parameter or local variable is used in inner function, 
@@ -495,68 +524,67 @@ public class FunctionActionItem extends ActionItem {
         for (int i = 0; i < paramNames.size(); i++) {
             paramRegs.add(0); //0 = use variable, no reg
         }
-        
-        if (needsFun2 && !hasEval) {
+
+        if (needsFun2 && (!hasEval || !canVariables)) {
             String registerNameMask = Configuration.registerNameFormat.get();
             Pattern registerNamePattern = Pattern.compile(registerNameMask.replace("%d", "(?<regnum>[0-9]+)"));
-            
+
             List<String> newRegisterNames = new ArrayList<>();
             for (VariableActionItem v : variables) {
                 String varName = v.getVariableName();
-                if (v.isDefinition() 
-                        && !registerNames.contains(varName) 
+                if (v.isDefinition()
+                        && !registerNames.contains(varName)
                         && !paramNames.contains(varName)
                         && !newRegisterNames.contains(varName)
-                        && !deeplyUsedVariableNames.contains(varName)                        
-                    ) {
+                        && !deeplyUsedVariableNames.contains(varName)) {
                     Matcher m = registerNamePattern.matcher(varName);
                     if (m.matches()) {
-                        newRegisterNames.add(varName);                                                  
+                        newRegisterNames.add(varName);
                     }
                 }
             }
-            
-            for (int i = 0; i < paramNames.size(); i++) {    
+
+            for (int i = 0; i < paramNames.size(); i++) {
                 String varName = paramNames.get(i);
                 if (newRegisterNames.contains(varName)) {
                     continue;
                 }
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
-                    int regNum = Integer.parseInt(m.group("regnum"));  
-                    
+                    int regNum = Integer.parseInt(m.group("regnum"));
+
                     while (registerNames.size() <= regNum) {
                         registerNames.add("**EMPTY**");
-                    }                   
+                    }
                     registerNames.set(regNum, varName);
-                    
+
                     paramNames.set(i, "");
                     paramRegs.set(i, regNum);
                 }
             }
-            
+
             newRegisterNames.sort(new NaturalOrderComparator());
-            
+
             int numRegistersBeforeParams = registerNames.size();
-            
+
             for (String varName : newRegisterNames) {
                 Matcher m = registerNamePattern.matcher(varName);
                 if (m.matches()) {
-                    int regNum = Integer.parseInt(m.group("regnum"));                    
+                    int regNum = Integer.parseInt(m.group("regnum"));
                     while (registerNames.size() <= regNum) {
                         registerNames.add("**EMPTY**");
-                    }                   
+                    }
                     registerNames.set(regNum, varName);
                 }
             }
-            
+
             int posReg = numRegistersBeforeParams;
-            for (int i = 0; i < paramNames.size(); i++) {                
+            for (int i = 0; i < paramNames.size(); i++) {
                 if (paramRegs.get(i) != 0) {
                     continue;
                 }
                 if (!deeplyUsedVariableNames.contains(paramNames.get(i))) {
-                    while (posReg < registerNames.size() 
+                    while (posReg < registerNames.size()
                             && !registerNames.get(posReg).equals("**EMPTY**")) {
                         posReg++;
                     }
@@ -564,25 +592,38 @@ public class FunctionActionItem extends ActionItem {
                         registerNames.add("**EMPTY**");
                     }
 
-                    paramRegs.set(i, posReg);                                        
+                    paramRegs.set(i, posReg);
                     registerNames.set(posReg, paramNames.get(i));
                 }
             }
         }
 
         int regCount = 0;
-        
+
         localDataCopy.inFunction++;
 
-        
         for (VariableActionItem v : variables) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
-            /*if (needsFun2 && !hasEval) {
-                if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
+            if (v.boxResolvedMember()) {
+                continue;
+            }
+            if (needsFun2
+                    && !canVariables
+                    && v.isDefinition()
+                    && !registerNames.contains(varName)) {
+                boolean found = false;
+                for (int i = 0; i < registerNames.size(); i++) {
+                    if ("**EMPTY**".equals(registerNames.get(i))) {
+                        registerNames.set(i, varName);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
                     registerNames.add(varName);
                 }
-            }*/
+            }
 
             if (registerNames.contains(varName)) {
                 if (stored != null) {
@@ -621,7 +662,10 @@ public class FunctionActionItem extends ActionItem {
                     }
                 }
             }
-        }        
+        }
+        if (!needsFun2) {
+            ret = preserveRegisters(asGenerator.toActionList(ret), asGenerator.getSwfVersion(), charset);
+        }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, asGenerator.getSwfVersion()).length;
         if (len > 0xFFFF) {
             throw new CompilationException("Function body is too large to fit into UI16.", line);
@@ -643,6 +687,146 @@ public class FunctionActionItem extends ActionItem {
         }
 
         return ret;
+    }
+
+    /**
+     * DefineFunction shares the four global registers with its caller. Keep
+     * their original values below the function's operand stack, including
+     * register zero, and restore them without overwriting the return value.
+     */
+    private List<GraphSourceItem> preserveRegisters(List<Action> body, int version, String charset) throws CompilationException {
+        Set<Integer> registers = new TreeSet<>();
+        Set<Action> returns = new HashSet<>();
+        boolean hasTry = false;
+        long offset = 0;
+        long nestedFunctionEnd = -1;
+        for (Action action : body) {
+            if (offset >= nestedFunctionEnd) {
+                if (action instanceof ActionDefineFunction || action instanceof ActionDefineFunction2) {
+                    GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+                    nestedFunctionEnd = offset + container.getHeaderSize() + container.getContainerSizes().get(0);
+                } else if (action instanceof ActionStoreRegister) {
+                    registers.add(((ActionStoreRegister) action).registerNumber);
+                } else if (action instanceof ActionTry) {
+                    hasTry = true;
+                    if (((ActionTry) action).catchInRegisterFlag) {
+                        registers.add(((ActionTry) action).catchRegister);
+                    }
+                } else if (action instanceof ActionReturn) {
+                    returns.add(action);
+                }
+            }
+            offset += action.getBytesLength();
+        }
+        if (registers.isEmpty()) {
+            return new ArrayList<>(body);
+        }
+
+        List<Integer> savedRegisters = new ArrayList<>(registers);
+        List<GraphSourceItem> result = new ArrayList<>();
+        Object[] pushedRegisters = new Object[savedRegisters.size()];
+        for (int i = 0; i < savedRegisters.size(); i++) {
+            pushedRegisters[i] = new RegisterNumber(savedRegisters.get(i));
+        }
+        ActionPush save = new ActionPush(pushedRegisters, charset);
+        result.add(save);
+
+        if (hasTry) {
+            // A return inside Try is followed by its Finally block. Restore
+            // only after those blocks have finished, including returns in Finally.
+            int cleanupLength = savedRegisters.size() * 5;
+            if (offset > 0xFFFF) {
+                throw new CompilationException("Try body is too large to fit into UI16.", line);
+            }
+            result.add(new ActionTry(false, true, false, null, 0, offset, 0, cleanupLength, version, charset));
+            result.addAll(body);
+            restoreRegisters(result, savedRegisters, false, charset);
+            return result;
+        }
+
+        Map<Long, Long> relocatedOffsets = new HashMap<>();
+        List<Integer> relocatedIndexes = new ArrayList<>();
+        offset = 0;
+        long newOffset = save.getBytesLength();
+        for (Action action : body) {
+            relocatedOffsets.put(offset, newOffset);
+            relocatedIndexes.add(result.size());
+            if (returns.contains(action)) {
+                newOffset += restoreRegisters(result, savedRegisters, true, charset);
+            }
+            result.add(action);
+            offset += action.getBytesLength();
+            newOffset += action.getBytesLength();
+        }
+        // Branches to the original end must execute the fall-through cleanup.
+        relocatedOffsets.put(offset, newOffset);
+        relocatedIndexes.add(result.size());
+        restoreRegisters(result, savedRegisters, false, charset);
+
+        offset = 0;
+        int index = 0;
+        for (Action action : body) {
+            int length = action.getBytesLength();
+            if (action instanceof ActionStore) {
+                ActionStore store = (ActionStore) action;
+                int start = relocatedIndexes.get(index) + 1;
+                int end = relocatedIndexes.get(index + 1 + store.getStoreSize());
+                if (end - start > 0xFF) {
+                    throw new CompilationException("Frame-loaded skip count is too large after preserving function registers.", line);
+                }
+                List<Action> skipped = new ArrayList<>();
+                for (int i = start; i < end; i++) {
+                    skipped.add((Action) result.get(i));
+                }
+                store.setStore(skipped);
+            }
+            if (action instanceof ActionJump || action instanceof ActionIf) {
+                int jumpOffset = action instanceof ActionJump
+                        ? ((ActionJump) action).getJumpOffset() : ((ActionIf) action).getJumpOffset();
+                long target = offset + length + jumpOffset;
+                long relocatedJump = relocatedOffsets.get(target) - relocatedOffsets.get(offset) - length;
+                if (relocatedJump < Short.MIN_VALUE || relocatedJump > Short.MAX_VALUE) {
+                    throw new CompilationException("Jump offset is too large after preserving function registers.", line);
+                }
+                if (action instanceof ActionJump) {
+                    ((ActionJump) action).setJumpOffset((int) relocatedJump);
+                } else {
+                    ((ActionIf) action).setJumpOffset((int) relocatedJump);
+                }
+            }
+            if (action instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+                long start = offset + container.getHeaderSize();
+                List<Long> sizes = container.getContainerSizes();
+                for (int i = 0; i < sizes.size(); i++) {
+                    long end = start + sizes.get(i);
+                    long size = relocatedOffsets.get(end) - relocatedOffsets.get(start);
+                    if (size > 0xFFFF) {
+                        throw new CompilationException("Container body is too large after preserving function registers.", line);
+                    }
+                    container.setContainerSize(i, size);
+                    start = end;
+                }
+            }
+            offset += length;
+            index++;
+        }
+        return result;
+    }
+
+    private int restoreRegisters(List<GraphSourceItem> result, List<Integer> registers, boolean returning, String charset) {
+        int length = 0;
+        for (int i = registers.size() - 1; i >= 0; i--) {
+            if (returning) {
+                result.add(new ActionStackSwap());
+                length++;
+            }
+            ActionStoreRegister store = new ActionStoreRegister(registers.get(i), charset);
+            result.add(store);
+            result.add(new ActionPop());
+            length += store.getBytesLength() + 1;
+        }
+        return length;
     }
 
     @Override

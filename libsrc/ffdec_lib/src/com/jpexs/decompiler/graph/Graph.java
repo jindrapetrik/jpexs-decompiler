@@ -2156,19 +2156,109 @@ public class Graph {
                 }
             }
         }
-        // ASC often merges "break" from an inner search loop with the outer
-        // for/for-each continue target. That yields:
+        // Compilers often merge "break" from an inner search loop with the
+        // outer loop's continue target. That yields either:
         //   while (true) { if (fail) continue outer; ... if (match) break; }
+        // or:
+        //   while (true) { if (cond) { ... } increment; continue outer; }
         //   after; // only reached via break
         // Recover while (cond) and move "after" back before breaks so labels
         // are not required.
         restructureWhileTrueContinueOuter(list);
+        if (level == 0) {
+            eliminateRedundantLabeledBreaks(list, new HashSet<>(), null, new HashSet<>());
+            removeTrailingContinues(list);
+        }
     }
 
     /**
-     * Restructures {@code while (true) { if (cond) continue outer; ... }}
-     * followed by break-only trailing statements into
-     * {@code while (!cond) { ... trailing before break; }}.
+     * Removes redundant continues after loop bodies and their continuation
+     * commands have been reconstructed. Only the base body ends at the loop's
+     * continue target; conditions, for headers and switch cases do not.
+     *
+     * @param commands Commands
+     */
+    private void removeTrailingContinues(List<GraphTargetItem> commands) {
+        for (GraphTargetItem item : commands) {
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeTrailingContinues(sub);
+                }
+            }
+            if (item instanceof LoopItem) {
+                LoopItem loopItem = (LoopItem) item;
+                if (loopItem.hasBaseBody()) {
+                    List<GraphTargetItem> body = loopItem.getBaseBodyCommands();
+                    if (!body.isEmpty() && body.get(body.size() - 1) instanceof ContinueItem
+                            && ((ContinueItem) body.get(body.size() - 1)).loopId == loopItem.loop.id) {
+                        body.remove(body.size() - 1);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Replaces breaks to an outer loop with breaks to the nearest switch when
+     * leaving that switch reaches the same destination without executing code.
+     * A case that can fall through does not inherit the switch's exit targets.
+     * Real loop bodies and other blocks are conservatively treated as barriers.
+     *
+     * @param commands Commands in the current block
+     * @param endTargets Break destinations equivalent to reaching the block's end
+     * @param loopId Nearest enclosing loop or switch id, or null
+     * @param exitTargets Break destinations equivalent to leaving that loop or switch
+     */
+    private void eliminateRedundantLabeledBreaks(List<GraphTargetItem> commands,
+            Set<Long> endTargets, Long loopId, Set<Long> exitTargets) {
+        Set<Long> continuationTargets = new HashSet<>(endTargets);
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = commands.get(i);
+            if (item instanceof BreakItem) {
+                BreakItem breakItem = (BreakItem) item;
+                if (loopId != null && exitTargets.contains(breakItem.loopId)) {
+                    breakItem.loopId = loopId;
+                }
+                continuationTargets = new HashSet<>();
+                continuationTargets.add(breakItem.loopId);
+                if (loopId != null && breakItem.loopId == loopId.longValue()) {
+                    continuationTargets.addAll(exitTargets);
+                }
+                continue;
+            }
+            if (item instanceof SwitchItem) {
+                SwitchItem switchItem = (SwitchItem) item;
+                Set<Long> switchExitTargets = new HashSet<>(continuationTargets);
+                for (int c = 0; c < switchItem.caseCommands.size(); c++) {
+                    Set<Long> caseEndTargets = new HashSet<>();
+                    if (c == switchItem.caseCommands.size() - 1) {
+                        caseEndTargets.add(switchItem.loop.id);
+                        caseEndTargets.addAll(switchExitTargets);
+                    }
+                    eliminateRedundantLabeledBreaks(switchItem.caseCommands.get(c),
+                            caseEndTargets, switchItem.loop.id, switchExitTargets);
+                }
+                fixSwitchEnd(switchItem);
+            } else if (item instanceof IfItem) {
+                IfItem ifItem = (IfItem) item;
+                eliminateRedundantLabeledBreaks(ifItem.onTrue, continuationTargets, loopId, exitTargets);
+                eliminateRedundantLabeledBreaks(ifItem.onFalse, continuationTargets, loopId, exitTargets);
+            } else if (item instanceof Block) {
+                Long nestedLoopId = item instanceof LoopItem ? ((LoopItem) item).loop.id : null;
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    eliminateRedundantLabeledBreaks(sub, new HashSet<>(), nestedLoopId, new HashSet<>());
+                }
+            }
+            // Any statement may have effects or fall through to another case.
+            continuationTargets = new HashSet<>();
+        }
+    }
+
+    /**
+     * Restructures an inner {@code while (true)} whose condition is expressed
+     * by a continue of an outer loop. Break-only trailing statements are moved
+     * before the inner break and the outer-loop continuation stays after the
+     * recovered conditional while, so no multilevel continue is needed.
      *
      * @param list Commands in the current block
      */
@@ -2189,6 +2279,7 @@ public class Graph {
             ContinueItem outerContinue = null;
             boolean invertCond = false;
             List<GraphTargetItem> bodyFromIf = null;
+            List<GraphTargetItem> outerContinuation = null;
 
             if (ifi.onFalse.isEmpty()
                     && ifi.onTrue.size() == 1
@@ -2212,6 +2303,23 @@ public class Graph {
                 outerContinue = (ContinueItem) ifi.onFalse.get(0);
                 invertCond = false;
                 bodyFromIf = ifi.onTrue;
+            } else if (whi.commands.size() > 1
+                    && whi.commands.get(whi.commands.size() - 1) instanceof ContinueItem) {
+                ContinueItem trailingContinue = (ContinueItem) whi.commands.get(whi.commands.size() - 1);
+                if (trailingContinue.loopId != whi.loop.id) {
+                    if (ifi.onFalse.isEmpty() && !ifi.onTrue.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = false;
+                        bodyFromIf = ifi.onTrue;
+                    } else if (ifi.onTrue.isEmpty() && !ifi.onFalse.isEmpty()) {
+                        outerContinue = trailingContinue;
+                        invertCond = true;
+                        bodyFromIf = ifi.onFalse;
+                    }
+                    if (outerContinue != null) {
+                        outerContinuation = new ArrayList<>(whi.commands.subList(1, whi.commands.size() - 1));
+                    }
+                }
             }
 
             if (outerContinue == null || outerContinue.loopId == whi.loop.id) {
@@ -2228,9 +2336,14 @@ public class Graph {
                 after.remove(after.size() - 1);
             }
 
-            whi.commands.remove(0);
-            if (bodyFromIf != null) {
-                whi.commands.addAll(0, bodyFromIf);
+            if (outerContinuation == null) {
+                whi.commands.remove(0);
+                if (bodyFromIf != null) {
+                    whi.commands.addAll(0, bodyFromIf);
+                }
+            } else {
+                whi.commands.clear();
+                whi.commands.addAll(bodyFromIf);
             }
 
             // Continues to the same outer target are equivalent to breaking
@@ -2263,6 +2376,9 @@ public class Graph {
 
             while (list.size() > i + 1) {
                 list.remove(list.size() - 1);
+            }
+            if (outerContinuation != null) {
+                list.addAll(outerContinuation);
             }
         }
     }
@@ -2298,6 +2414,8 @@ public class Graph {
      * @param cloneItems When true, clone items for each break; otherwise move once
      */
     private void insertBeforeBreaksOfLoop(List<GraphTargetItem> commands, long loopId, List<GraphTargetItem> toInsert, boolean cloneItems) {
+        boolean insertedCodeExits = !toInsert.isEmpty()
+                && toInsert.get(toInsert.size() - 1) instanceof ExitItem;
         for (int i = 0; i < commands.size(); i++) {
             GraphTargetItem ti = commands.get(i);
             if (ti instanceof BreakItem && ((BreakItem) ti).loopId == loopId) {
@@ -2305,7 +2423,12 @@ public class Graph {
                     GraphTargetItem ins = toInsert.get(j);
                     commands.add(i + j, cloneItems ? ins.clone() : ins);
                 }
-                i += toInsert.size();
+                if (insertedCodeExits) {
+                    commands.remove(i + toInsert.size());
+                    i += toInsert.size() - 1;
+                } else {
+                    i += toInsert.size();
+                }
                 if (!cloneItems) {
                     return;
                 }
@@ -4374,6 +4497,8 @@ public class Graph {
                                 Deque<GraphPart> s = new ArrayDeque<>();
                                 s.push(next);
                                 Set<GraphPart> v = new HashSet<>();
+                                //Reachability from part, valid until loops change
+                                BitSet partReachable = null;
                                 loops:
                                 while (!s.isEmpty()) {
                                     GraphPart p = s.poll();
@@ -4382,13 +4507,16 @@ public class Graph {
                                         continue;
                                     }
                                     for (GraphPart r : p.refs) {
-                                        // #2636                                                                                
+                                        // #2636
                                         GraphPartEdge edge = new GraphPartEdge(r, p);
                                         if (backEdges.contains(edge)) {
                                             continue;
                                         }
                                         // also #2636
-                                        if (!part.leadsTo(localData, this, code, r, loops, throwStates, true /*IMPORTANT*/)) {
+                                        if (partReachable == null) {
+                                            partReachable = part.getReachableParts(localData, this, code, loops, throwStates, true /*IMPORTANT*/);
+                                        }
+                                        if (!partReachable.get(getReachabilityPartIndex(r))) {
                                             continue;
                                         }
 
@@ -4417,6 +4545,7 @@ public class Graph {
                                                     Loop el = new Loop(loops.size(), part, n2);
                                                     el.phase = 1;
                                                     loops.add(el);
+                                                    partReachable = null;
 
                                                     ig.add(n2);
                                                     List<GraphTargetItem> commands = new GraphPartMarkedArrayList<>();

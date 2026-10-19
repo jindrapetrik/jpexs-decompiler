@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.As2ClassMemberScope;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
@@ -185,6 +186,30 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        Set<String> staticMembers = new HashSet<>();
+        for (int i = 0; i < traits.size(); i++) {
+            if (traitsStatic.get(i)) {
+                String name = traits.get(i).getKey().toStringNoQuotes(localData);
+                staticMembers.add(name);
+                if (traits.get(i).getValue() instanceof FunctionActionItem) {
+                    FunctionActionItem function = (FunctionActionItem) traits.get(i).getValue();
+                    if ((function.isGetter && name.startsWith("__get__"))
+                            || (function.isSetter && name.startsWith("__set__"))) {
+                        staticMembers.add(name.substring(7));
+                    }
+                }
+            }
+        }
+        As2ClassMemberScope previousScope = localData.as2ClassMemberScope;
+        localData.as2ClassMemberScope = new As2ClassMemberScope(className, staticMembers);
+        try {
+            return appendClassTo(writer, localData);
+        } finally {
+            localData.as2ClassMemberScope = previousScope;
+        }
+    }
+
+    private GraphTextWriter appendClassTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         GraphTargetItem clsName = className;
         while (clsName instanceof GetMemberActionItem) {
             ((GetMemberActionItem) clsName).printObfuscatedMemberName = true;

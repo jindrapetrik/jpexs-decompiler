@@ -346,9 +346,12 @@ public class ColorMatrixConvertor {
                 / (195843847725.0 * a11 * a11 + 2685787805429.0 * a12 * a12 + 649044594452.0 * a12 * a13 - 36159802156.0 * a13 * a13
                 + 930 * a11 * (1835439833 * a12 + 219515602 * a13));
 
-        if (sameDouble(410 * a12, 1543 * a31) && sameDouble(410 * a12, 1543 * a32) && sameDouble(3047 * a12, 1543 * a21) && sameDouble(3047 * a12, 1543 * a23)
+        // Compare matrix-sized values. Multiplying float coefficients by the
+        // integer constants amplified their rounding error and missed hue=0,
+        // causing pure saturation matrices to alternate between +/-180 hues.
+        if (sameDouble(a12, 1543 * a31 / 410.) && sameDouble(a12, 1543 * a32 / 410.) && sameDouble(a21, 3047 * a12 / 1543.) && sameDouble(a23, 3047 * a12 / 1543.)
                 && sameDouble(a22, a11 + (1504 * a12) / 1543.) && sameDouble((1133 * a12) / 1543. + a33, a11)
-                && !sameDouble(a11, a12) && !sameDouble(1543 * a11 + 3457 * a12, 0)) {
+                && !sameDouble(a11, a12) && !sameDouble(a11 + 3457 * a12 / 1543., 0)) {
             h = 0;
         }
 

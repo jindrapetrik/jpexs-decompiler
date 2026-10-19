@@ -29,7 +29,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -68,7 +67,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -78,6 +76,7 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
+import javax.swing.PopupFactory;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -107,6 +106,7 @@ import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.fonts.FontPolicy;
 import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
+import org.pushingpixels.substance.internal.contrib.jgoodies.looks.common.FixedShadowPopupFactory;
 import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
 
 /**
@@ -182,7 +182,7 @@ public class View {
             if (!(oldLookAndFeel instanceof SubstanceOfficeBlue2007LookAndFeel)) {
                 UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
                 oldLookAndFeel.uninitialize();
-            }
+            }                        
 
             SubstanceSkin currentSkin = SubstanceLookAndFeel.getCurrentSkin();
             if (currentSkin != null) {
@@ -197,6 +197,11 @@ public class View {
             }
 
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999); //This works for not changing labels color and not changing Dialogs title
+            
+            UIManager.put("ToolTipUI", MySubstanceToolTipUI.class.getName());            
+            
+            //Fix for missing tooltips/popups            
+            PopupFactory.setSharedInstance(new FixedShadowPopupFactory(PopupFactory.getSharedInstance()));                
             
             if (Configuration.showHeapStatusWidget.get() && !heapWidgetInited) {
                 SubstanceLookAndFeel.setWidgetVisible(null, true, SubstanceConstants.SubstanceWidgetType.TITLE_PANE_HEAP_STATUS);
@@ -325,6 +330,9 @@ public class View {
      */
     public static BufferedImage loadImage(String name) {
         URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
+        if (imageURL == null) {
+            throw new NullPointerException("Icon " + name + " does not exist!");
+        }
         try {
             return ImageIO.read(imageURL);
         } catch (IOException ex) {
@@ -1025,16 +1033,7 @@ public class View {
         }
     }
 
-    public static JFileChooser getFileChooserWithIcon(String iconName) {
-        return new JFileChooser() {
-
-            @Override
-            protected JDialog createDialog(Component parent) throws HeadlessException {
-                JDialog dialog = super.createDialog(parent);
-                setWindowIcon(dialog, iconName);
-                dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-                return dialog;
-            }
-        };
+    public static FileChooser getFileChooserWithIcon(String iconName) {
+        return new FileChooser(iconName);
     }
 }

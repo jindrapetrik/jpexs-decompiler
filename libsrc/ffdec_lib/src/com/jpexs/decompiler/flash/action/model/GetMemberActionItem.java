@@ -84,6 +84,9 @@ public class GetMemberActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (As2ClassMemberScope.canShorten(object, memberName, localData)) {
+            return stripQuotes(memberName, localData, writer);
+        }
         object.toString(writer, localData);
         if ((memberName instanceof DirectValueActionItem) && printObfuscatedMemberName) {
             writer.allowWrapHere().append(".");

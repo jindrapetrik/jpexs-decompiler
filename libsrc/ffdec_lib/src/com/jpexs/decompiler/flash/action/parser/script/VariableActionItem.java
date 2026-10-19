@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -42,6 +44,24 @@ public class VariableActionItem extends ActionItem {
     private GraphTargetItem storeValue;
 
     private boolean definition;
+
+    private GetMemberActionItem resolvedMember;
+
+    public void setResolvedMember(GetMemberActionItem resolvedMember) {
+        this.resolvedMember = resolvedMember;
+    }
+
+    public boolean boxResolvedMember() {
+        if (resolvedMember == null) {
+            return false;
+        }
+        if (storeValue == null) {
+            setBoxedValue(resolvedMember);
+        } else {
+            setBoxedValue(new SetMemberActionItem(null, null, resolvedMember.object, resolvedMember.memberName, storeValue));
+        }
+        return true;
+    }
     
     /**
      * Position in code

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="FFDec Library" basedir="." default="build" xmlns:jacoco="antlib:org.jacoco.ant">
+<project name="FFDec Library" basedir="." default="build" xmlns:jacoco="antlib:org.jacoco.ant" xmlns:if="ant:if">
     <description>Builds project FFDec Library</description>  
     <!--
     TODO: Figure out how to make versioning which (not) depends(?) on GUI
@@ -39,6 +39,13 @@
         <include name="**/?*.zip"/>
     </patternset>
 
+    <condition property="javac.release" value="true">
+        <matches string="${ant.java.version}" pattern="^(9|1[0-9]|[2-9][0-9])"/>
+    </condition>
+
+    <condition property="javac.legacy" value="true">
+        <equals arg1="${ant.java.version}" arg2="1.8"/>
+    </condition>
     
    
     <target name="compile" depends="lexers">
@@ -49,8 +56,14 @@
                 <type type="file"/>
             </fileset>
         </copy>      
-        <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
+        <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
+            <compilerarg value="--release" if:set="javac.release"/>
+            <compilerarg value="${target.java.release}" if:set="javac.release"/>
+            <compilerarg value="-source" if:set="javac.legacy"/>
+            <compilerarg value="${target.java}" if:set="javac.legacy"/>
+            <compilerarg value="-target" if:set="javac.legacy"/>
+            <compilerarg value="${target.java}" if:set="javac.legacy"/>
             <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -67,7 +80,13 @@
     <target name="compile-tests">
         <delete dir="${compile.test.dir}"/>
         <mkdir dir="${compile.test.dir}"/>
-        <javac srcdir="${test.dir}" destdir="${compile.test.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true" includeantruntime="false" encoding="utf-8">                        
+        <javac srcdir="${test.dir}" destdir="${compile.test.dir}" includes="**/*.java" debug="true" includeantruntime="false" encoding="utf-8">                        
+            <compilerarg value="--release" if:set="javac.release"/>
+            <compilerarg value="${target.java.release}" if:set="javac.release"/>
+            <compilerarg value="-source" if:set="javac.legacy"/>
+            <compilerarg value="${target.java}" if:set="javac.legacy"/>
+            <compilerarg value="-target" if:set="javac.legacy"/>
+            <compilerarg value="${target.java}" if:set="javac.legacy"/>
             <classpath>
                 <pathelement path="${compile.dir}"/>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -102,7 +121,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-noverify" />
+            <!--<jvmarg value="-noverify" />-->
             <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
             
         </testng>      

@@ -407,7 +407,7 @@ public class FontEmbedDialog extends AppDialog {
     }
 
     private boolean loadFromDisk() {
-        JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter ttfFilter = new FileFilter() {
             @Override

@@ -405,6 +405,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, DefineSubImage.ID, DefineSubImage.class, DefineSubImage.NAME);
                     addTagInfo(map, map2, ExporterInfo.ID, ExporterInfo.class, ExporterInfo.NAME);
                     addTagInfo(map, map2, FontTextureInfo.ID, FontTextureInfo.class, FontTextureInfo.NAME);
+                    addTagInfo(map, map2, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.ID, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.class, com.jpexs.decompiler.flash.tags.profiles.iggy.IggyExternalImage.NAME);
                     
                     addTagInfo(map, map2, DefineVideoTag.ID, DefineVideoTag.class, DefineVideoTag.NAME);
                     addTagInfo(map, map2, GenCommandTag.ID, GenCommandTag.class, GenCommandTag.NAME);
@@ -568,7 +569,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @throws IOException On I/O error
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
-        if (Configuration._debugCopy.get() || isModified() || isImported()) {
+        if (sos.getAbsolutePos() >= 0 && isPositionDependent()) {
+            writePositionDependentTag(sos, false);
+        } else if (Configuration._debugCopy.get() || isModified() || isImported()) {
             byte[] newData = getData();
             byte[] newHeaderData = getHeader(newData.length);
             sos.write(newHeaderData);
@@ -584,11 +587,43 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @throws IOException On I/O error
      */
     public void writeTagNoScripts(SWFOutputStream sos) throws IOException {
+        if (sos.getAbsolutePos() >= 0 && isPositionDependent()) {
+            writePositionDependentTag(sos, true);
+            return;
+        }
         byte[] newData = getDataNoScript();
         byte[] newHeaderData = getHeader(newData.length);
         sos.write(newHeaderData);
         sos.write(newData);
     }        
+
+    /**
+     * Checks whether this tag or its children need the output file position.
+     * Such tags must be serialized even when their fields are unmodified.
+     * @return Whether serialization depends on the position in the SWF
+     */
+    public boolean isPositionDependent() {
+        return false;
+    }
+
+    private void writePositionDependentTag(SWFOutputStream sos, boolean noScripts) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // Always use a long header so the payload position is known before
+        // serializing it. PIXL and sprites containing PIXL already require it.
+        try (SWFOutputStream dataStream = new SWFOutputStream(baos, getVersion(), getCharset(), sos.getAbsolutePos() + 6)) {
+            if (noScripts) {
+                getDataNoScript(dataStream);
+            } else {
+                getData(dataStream);
+            }
+            if (remainingData != null) {
+                dataStream.write(remainingData);
+            }
+        }
+        byte[] newData = baos.toByteArray();
+        sos.write(getTagHeader((getId() << 6) | 63, newData.length, true, getVersion()));
+        sos.write(newData);
+    }
 
     /**
      * Clones the tag.
@@ -598,13 +633,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      */
     public Tag cloneTag() throws InterruptedException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] data = getData();
+        byte[] data = getData();        
         byte[] headerData = getHeader(data.length);
         baos.write(headerData);
         baos.write(data);
         
         byte[] dataWithHeader = baos.toByteArray();
-        SWFInputStream tagDataStream = new SWFInputStream(swf, data, 0, data.length);
+        SWFInputStream tagDataStream = new SWFInputStream(swf, dataWithHeader, 0, dataWithHeader.length);
+        tagDataStream.skipBytes(headerData.length);
         TagStub copy = new TagStub(swf, getId(), "Unresolved", new ByteArrayRange(dataWithHeader), tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
         return SWFInputStream.resolveTag(copy, 0, false, true, false, false);

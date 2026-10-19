@@ -98,4 +98,25 @@ public class ActionScript2GraphTest {
         Assert.assertFalse(Pattern.compile("\\b(?:break|continue)\\s+\\w+").matcher(result).find(), result);
         Assert.assertFalse(result.contains("§§goto"), result);
     }
+
+    @Test
+    public void testNestedSwitchBreaksInForIn() throws Exception {
+        // Compilation merges the inner and outer breaks into the same jump target.
+        String source = "var t = {}; trace(\"A\"); for (var i in t) {"
+                + "trace(\"b\"); switch (i) {"
+                + "case \"string\": case \"number\": case \"boolean\":"
+                + "switch (i) { case null: case \"inherit\": case \"\": break;"
+                + "default: trace(\"B\"); break; } break; } } trace(\"finish\");";
+        String expected = "var t = {};\ntrace(\"A\");\nfor(var i in t)\n{\n"
+                + "   trace(\"b\");\n   switch(i)\n   {\n"
+                + "      case \"string\":\n      case \"number\":\n      case \"boolean\":\n"
+                + "         switch(i)\n         {\n            case null:\n"
+                + "            case \"inherit\":\n            case \"\":\n"
+                + "               break;\n            default:\n               trace(\"B\");\n"
+                + "         }\n   }\n}\ntrace(\"finish\");";
+        String result = compileAndDecompile(source);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
 }

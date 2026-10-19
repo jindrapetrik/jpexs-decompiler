@@ -116,6 +116,11 @@ public class SWFOutputStream extends OutputStream {
     private long pos = 0;
 
     /**
+     * Start offset in the uncompressed SWF, or -1 for standalone data.
+     */
+    private final long absoluteOffset;
+
+    /**
      * Current bit position in the stream
      */
     private int bitPos = 0;
@@ -140,15 +145,35 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
+     * Gets the current position in the uncompressed SWF.
+     * @return Absolute position, or -1 when no file position is available
+     */
+    public long getAbsolutePos() {
+        return absoluteOffset < 0 ? -1 : absoluteOffset + pos;
+    }
+
+    /**
      * Constructs new SWFOutputStream.
      *
      * @param os OutputStream for writing data
      * @param version Version of SWF
      */
     public SWFOutputStream(OutputStream os, int version, String charset) {
+        this(os, version, charset, -1);
+    }
+
+    /**
+     * Constructs a stream with a known position in an uncompressed SWF.
+     * @param os Output stream
+     * @param version SWF version
+     * @param charset Charset
+     * @param absoluteOffset Start offset, or -1 for standalone data
+     */
+    public SWFOutputStream(OutputStream os, int version, String charset, long absoluteOffset) {
         this.version = version;
         this.os = os;
         this.charset = charset;
+        this.absoluteOffset = absoluteOffset;
     }
 
     /**
@@ -420,15 +445,66 @@ public class SWFOutputStream extends OutputStream {
      * @param value FLOAT16 value
      * @throws IOException On I/O error
      */
-    public void writeFLOAT16(float value) throws IOException {
-        int bits = Float.floatToRawIntBits(value);
-        int sign = bits >> 31;
-        int exponent = (bits >> 22) & 0xff;
-        int mantissa = bits & 0x3FFFFF;
-        mantissa >>= 13;
-        writeUI16((sign << 15) + (exponent << 10) + mantissa);
+    public void writeFLOAT16(float value) throws IOException {        
+        writeUI16(floatToRawInt16Bits(value));
     }
 
+    /**
+     * Converts float to 16-bit int
+     * @param value FLOAT16 value
+     * @return 16-bit int
+     */
+    public static int floatToRawInt16Bits(float value) {
+        int bits = Float.floatToRawIntBits(value);
+        int sign = (bits >>> 16) & 0x8000;
+        int exponent = (bits >>> 23) & 0xFF;
+        int mantissa = bits & 0x7FFFFF;
+        int halfBits;
+
+        if (exponent == 0xFF) {
+            if (mantissa == 0) {
+                halfBits = sign | 0x7C00;
+            } else {
+                int halfMantissa = mantissa >>> 13;
+                halfBits = sign | 0x7C00 | (halfMantissa == 0 ? 1 : halfMantissa);
+            }
+        } else {
+            int halfExponent = exponent - 127 + 15;
+            if (halfExponent >= 0x1F) {
+                halfBits = sign | 0x7C00;
+            } else if (halfExponent <= 0) {
+                if (halfExponent < -10) {
+                    halfBits = sign;
+                } else {
+                    mantissa |= 0x800000;
+                    int shift = 14 - halfExponent;
+                    int halfMantissa = mantissa >>> shift;
+                    int remainder = mantissa & ((1 << shift) - 1);
+                    int halfway = 1 << (shift - 1);
+                    if (remainder > halfway || (remainder == halfway && (halfMantissa & 1) != 0)) {
+                        halfMantissa++;
+                    }
+                    halfBits = sign | halfMantissa;
+                }
+            } else {
+                int halfMantissa = mantissa >>> 13;
+                int remainder = mantissa & 0x1FFF;
+                if (remainder > 0x1000 || (remainder == 0x1000 && (halfMantissa & 1) != 0)) {
+                    halfMantissa++;
+                    if (halfMantissa == 0x400) {
+                        halfMantissa = 0;
+                        halfExponent++;
+                        if (halfExponent == 0x1F) {
+                            return sign | 0x7C00;
+                        }
+                    }
+                }
+                halfBits = sign | (halfExponent << 10) | halfMantissa;
+            }
+        }
+        return halfBits;
+    }
+    
     /**
      * Writes EncodedU32 (Encoded unsigned 32bit value) value to the stream.
      *
@@ -437,7 +513,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeEncodedU32(long value) throws IOException {
         boolean loop = true;
-        value &= 0xFFFFFFFF;
+        value &= 0xFFFFFFFFL;
         do {
             int ret = (int) (value & 0x7F);
             if (value < 0x80) {
@@ -447,7 +523,7 @@ public class SWFOutputStream extends OutputStream {
                 ret += 0x80;
             }
             write(ret);
-            value >>= 7;
+            value >>>= 7;
         } while (loop);
     }
 
@@ -1263,12 +1339,12 @@ public class SWFOutputStream extends OutputStream {
         writeMatrix(value.placeMatrix);
         if (inDefineButton2) {
             writeCXFORMWITHALPHA(value.colorTransform);
-            if (value.buttonHasFilterList) {
-                writeFILTERLIST(value.filterList);
-            }
-            if (value.buttonHasBlendMode) {
-                writeUI8(value.blendMode);
-            }
+        }
+        if (value.buttonHasFilterList) {
+            writeFILTERLIST(value.filterList);
+        }
+        if (value.buttonHasBlendMode) {
+            writeUI8(value.blendMode);
         }
     }
 
@@ -2005,8 +2081,8 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException On I/O error
      */
     public void writeZONEDATA(ZONEDATA value) throws IOException {
-        writeUI16(value.alignmentCoordinate);
-        writeUI16(value.range);
+        writeFLOAT16(value.alignmentCoordinate);
+        writeFLOAT16(value.range);
     }
 
     /**

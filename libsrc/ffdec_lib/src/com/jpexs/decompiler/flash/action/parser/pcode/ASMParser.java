@@ -126,6 +126,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
 import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
@@ -153,7 +154,7 @@ public class ASMParser {
     public ASMParser() {
     }
 
-    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
+    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset, SwfProfile profile) throws IOException, ActionParseException {
         Action a = null;
         if (instructionName.compareToIgnoreCase("GetURL") == 0) {
             a = new ActionGetURL(lexer, charset);
@@ -365,9 +366,11 @@ public class ASMParser {
             a = new ActionDeobfuscatePop();
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscateJump") == 0) {
             a = new ActionDeobfuscateJump(lexer, charset);
+        } else if (profile != null && (a = profile.parseAction(instructionName, lexer, constantPool, version, charset)) != null) {
+            //profile worked
         } else if (instructionName.length() == 10 && instructionName.substring(0, 8).compareToIgnoreCase("Unknown_") == 0) {
             int actionCode = Integer.parseInt(instructionName.substring(8), 16);
-            a = new ActionUnknown(actionCode, 0, charset);
+            a = new ActionUnknown(actionCode, lexer, charset);
         } else {
             throw new ActionParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
@@ -376,7 +379,7 @@ public class ASMParser {
         return a;
     }
 
-    private static List<Action> parseAllActions(FlasmLexer lexer, int version, String charset) throws IOException, ActionParseException {
+    private static List<Action> parseAllActions(FlasmLexer lexer, int version, String charset, SwfProfile profile) throws IOException, ActionParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
         List<String> emptyList = new ArrayList<>();
@@ -397,7 +400,7 @@ public class ASMParser {
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = (String) symb.value;
-                Action a = parseAction(instructionName, lexer, emptyList, version, charset);
+                Action a = parseAction(instructionName, lexer, emptyList, version, charset, profile);
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
                 } else if (a != null) {
@@ -431,7 +434,7 @@ public class ASMParser {
      * @throws IOException On I/O error
      * @throws ActionParseException On parse error
      */
-    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset, SwfProfile profile) throws IOException, ActionParseException {
         ActionList list = new ActionList(charset, version);
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
@@ -477,7 +480,7 @@ public class ASMParser {
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = (String) symb.value;
-                Action a = parseAction(instructionName, lexer, constantPool, version, charset);
+                Action a = parseAction(instructionName, lexer, constantPool, version, charset, profile);
                 if (ignoreNops && a instanceof ActionNop) {
                     a = null;
                 }
@@ -527,9 +530,9 @@ public class ASMParser {
      * @throws IOException On I/O error
      * @throws ActionParseException On parse error
      */
-    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError, String charset) throws IOException, ActionParseException {
+    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError, String charset, SwfProfile profile) throws IOException, ActionParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
-        List<Action> list = parseAllActions(lexer, version, charset);
+        List<Action> list = parseAllActions(lexer, version, charset, profile);
 
         List<String> constantPool = new ArrayList<>();
         for (Action a : list) {
@@ -541,7 +544,7 @@ public class ASMParser {
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
         Map<Action, Integer> lineMap = new HashMap<>();
-        ActionList ret = parse(ignoreNops, labels, lineMap, address, lexer, constantPool, version, charset);
+        ActionList ret = parse(ignoreNops, labels, lineMap, address, lexer, constantPool, version, charset, profile);
         //Action.setActionsAddresses(ret, address, version);
         for (Action link : ret) {
             if (!(link instanceof ActionIf || link instanceof ActionJump)) {

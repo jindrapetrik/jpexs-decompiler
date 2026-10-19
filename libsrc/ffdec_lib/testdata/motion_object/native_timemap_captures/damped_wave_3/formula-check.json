@@ -1,0 +1,7 @@
+{
+  "type": "DampedWave",
+  "strength": 3,
+  "description": "3 full cycles with quadratic decay about 0.5",
+  "maxRoundedXErrorTwips": 1,
+  "maxUnroundedXErrorPixels": 0.05192158063009629
+}

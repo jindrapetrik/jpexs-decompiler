@@ -87,6 +87,7 @@ FLit2    = \. [0-9]+
 FLit3    = [0-9]+ 
 Exponent = [eE] [+-]? [0-9]+
 
+HexDigit          = [0-9a-fA-F]
 OctDigit          = [0-7]
 
 /* string and character literals */
@@ -128,7 +129,7 @@ Constant= constant{NumberLiteral}
                                  }
 
   /* numeric literals */
-
+  "0" [xX] {HexDigit}+       { return token(TokenType.NUMBER);  }
   {NumberLiteral}            { return token(TokenType.NUMBER);  }
   {FloatLiteral} "f"         { return token(TokenType.NUMBER);  }
   {FloatLiteral}             { return token(TokenType.NUMBER);  }

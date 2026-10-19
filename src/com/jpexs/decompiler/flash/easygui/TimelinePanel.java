@@ -72,7 +72,7 @@ public class TimelinePanel extends JPanel {
             public void run() {
                 timeline = timelined.getTimeline();
                 depthPanel.setTimeline(timeline);
-                timePanel.setTimeline(timeline);
+                timePanel.setTimeline(timeline);                
             }
         });
 

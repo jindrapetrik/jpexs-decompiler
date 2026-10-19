@@ -1,0 +1,295 @@
+<DOMDocument xmlns="http://ns.adobe.com/xfl/2008/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" currentTimeline="1" xflVersion="2.2" creatorInfo="FFDec" platform="Windows" versionInfo="Saved by FFDec" majorVersion="1" buildNumber="" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true" backgroundColor="#f0f0f0" frameRate="30" width="640" height="360">
+     <symbols>
+          <Include href="Symbol 2.xml" itemID="6ac23280-00000001" loadImmediate="false" lastModified="1791111871"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer animationType="motion object" name="Layer 1" color="#9fe08c" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame tweenType="motion object" isMotionObject="true" visibleAnimationKeyframes="2097151" motionTweenRotate="none" motionTweenScale="false" duration="61" index="0" keyMode="8195">
+                                   <motionObjectXML>
+                                        <AnimationCore TimeScale="30000" Version="1" duration="61000">
+                                             <TimeMap strength="0" type="Quadratic"/>
+                                             <metadata>
+                                                  <names>
+                                                       <name langID="en_US" value=""/>
+                                                  </names>
+                                                  <Settings orientToPath="0" xformPtXOffsetPct="0.0" xformPtYOffsetPct="0.0" xformPtZOffsetPixels="0"/>
+                                             </metadata>
+                                             <PropertyContainer id="headContainer">
+                                                  <PropertyContainer id="Basic_Motion">
+                                                       <Property id="Motion_X" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            <Keyframe timevalue="1000" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            <Keyframe timevalue="2000" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            <Keyframe timevalue="3000" roving="0" anchor="0,0.04999999999999716" previous="0,0.04999999999999716" next="0,0.04999999999999716"/>
+                                                            <Keyframe timevalue="4000" roving="0" anchor="0,0.09999999999999432" previous="0,0.09999999999999432" next="0,0.09999999999999432"/>
+                                                            <Keyframe timevalue="5000" roving="0" anchor="0,0.15000000000000568" previous="0,0.15000000000000568" next="0,0.15000000000000568"/>
+                                                            <Keyframe timevalue="6000" roving="0" anchor="0,0.29999999999999716" previous="0,0.29999999999999716" next="0,0.29999999999999716"/>
+                                                            <Keyframe timevalue="7000" roving="0" anchor="0,0.5" previous="0,0.5" next="0,0.5"/>
+                                                            <Keyframe timevalue="8000" roving="0" anchor="0,0.7000000000000028" previous="0,0.7000000000000028" next="0,0.7000000000000028"/>
+                                                            <Keyframe timevalue="9000" roving="0" anchor="0,1" previous="0,1" next="0,1"/>
+                                                            <Keyframe timevalue="10000" roving="0" anchor="0,1.4000000000000057" previous="0,1.4000000000000057" next="0,1.4000000000000057"/>
+                                                            <Keyframe timevalue="11000" roving="0" anchor="0,1.8499999999999943" previous="0,1.8499999999999943" next="0,1.8499999999999943"/>
+                                                            <Keyframe timevalue="12000" roving="0" anchor="0,2.4000000000000057" previous="0,2.4000000000000057" next="0,2.4000000000000057"/>
+                                                            <Keyframe timevalue="13000" roving="0" anchor="0,3.049999999999997" previous="0,3.049999999999997" next="0,3.049999999999997"/>
+                                                            <Keyframe timevalue="14000" roving="0" anchor="0,3.799999999999997" previous="0,3.799999999999997" next="0,3.799999999999997"/>
+                                                            <Keyframe timevalue="15000" roving="0" anchor="0,4.700000000000003" previous="0,4.700000000000003" next="0,4.700000000000003"/>
+                                                            <Keyframe timevalue="16000" roving="0" anchor="0,5.700000000000003" previous="0,5.700000000000003" next="0,5.700000000000003"/>
+                                                            <Keyframe timevalue="17000" roving="0" anchor="0,6.799999999999997" previous="0,6.799999999999997" next="0,6.799999999999997"/>
+                                                            <Keyframe timevalue="18000" roving="0" anchor="0,8.099999999999994" previous="0,8.099999999999994" next="0,8.099999999999994"/>
+                                                            <Keyframe timevalue="19000" roving="0" anchor="0,9.549999999999997" previous="0,9.549999999999997" next="0,9.549999999999997"/>
+                                                            <Keyframe timevalue="20000" roving="0" anchor="0,11.099999999999994" previous="0,11.099999999999994" next="0,11.099999999999994"/>
+                                                            <Keyframe timevalue="21000" roving="0" anchor="0,12.849999999999994" previous="0,12.849999999999994" next="0,12.849999999999994"/>
+                                                            <Keyframe timevalue="22000" roving="0" anchor="0,14.799999999999997" previous="0,14.799999999999997" next="0,14.799999999999997"/>
+                                                            <Keyframe timevalue="23000" roving="0" anchor="0,16.900000000000006" previous="0,16.900000000000006" next="0,16.900000000000006"/>
+                                                            <Keyframe timevalue="24000" roving="0" anchor="0,19.200000000000003" previous="0,19.200000000000003" next="0,19.200000000000003"/>
+                                                            <Keyframe timevalue="25000" roving="0" anchor="0,21.700000000000003" previous="0,21.700000000000003" next="0,21.700000000000003"/>
+                                                            <Keyframe timevalue="26000" roving="0" anchor="0,24.400000000000006" previous="0,24.400000000000006" next="0,24.400000000000006"/>
+                                                            <Keyframe timevalue="27000" roving="0" anchor="0,27.349999999999994" previous="0,27.349999999999994" next="0,27.349999999999994"/>
+                                                            <Keyframe timevalue="28000" roving="0" anchor="0,30.5" previous="0,30.5" next="0,30.5"/>
+                                                            <Keyframe timevalue="29000" roving="0" anchor="0,33.849999999999994" previous="0,33.849999999999994" next="0,33.849999999999994"/>
+                                                            <Keyframe timevalue="30000" roving="0" anchor="0,37.5" previous="0,37.5" next="0,37.5"/>
+                                                            <Keyframe timevalue="31000" roving="0" anchor="0,41.400000000000006" previous="0,41.400000000000006" next="0,41.400000000000006"/>
+                                                            <Keyframe timevalue="32000" roving="0" anchor="0,45.5" previous="0,45.5" next="0,45.5"/>
+                                                            <Keyframe timevalue="33000" roving="0" anchor="0,49.900000000000006" previous="0,49.900000000000006" next="0,49.900000000000006"/>
+                                                            <Keyframe timevalue="34000" roving="0" anchor="0,54.599999999999994" previous="0,54.599999999999994" next="0,54.599999999999994"/>
+                                                            <Keyframe timevalue="35000" roving="0" anchor="0,59.55000000000001" previous="0,59.55000000000001" next="0,59.55000000000001"/>
+                                                            <Keyframe timevalue="36000" roving="0" anchor="0,64.80000000000001" previous="0,64.80000000000001" next="0,64.80000000000001"/>
+                                                            <Keyframe timevalue="37000" roving="0" anchor="0,70.35" previous="0,70.35" next="0,70.35"/>
+                                                            <Keyframe timevalue="38000" roving="0" anchor="0,76.19999999999999" previous="0,76.19999999999999" next="0,76.19999999999999"/>
+                                                            <Keyframe timevalue="39000" roving="0" anchor="0,82.4" previous="0,82.4" next="0,82.4"/>
+                                                            <Keyframe timevalue="40000" roving="0" anchor="0,88.9" previous="0,88.9" next="0,88.9"/>
+                                                            <Keyframe timevalue="41000" roving="0" anchor="0,95.69999999999999" previous="0,95.69999999999999" next="0,95.69999999999999"/>
+                                                            <Keyframe timevalue="42000" roving="0" anchor="0,102.9" previous="0,102.9" next="0,102.9"/>
+                                                            <Keyframe timevalue="43000" roving="0" anchor="0,110.44999999999999" previous="0,110.44999999999999" next="0,110.44999999999999"/>
+                                                            <Keyframe timevalue="44000" roving="0" anchor="0,118.30000000000001" previous="0,118.30000000000001" next="0,118.30000000000001"/>
+                                                            <Keyframe timevalue="45000" roving="0" anchor="0,126.55000000000001" previous="0,126.55000000000001" next="0,126.55000000000001"/>
+                                                            <Keyframe timevalue="46000" roving="0" anchor="0,135.2" previous="0,135.2" next="0,135.2"/>
+                                                            <Keyframe timevalue="47000" roving="0" anchor="0,144.2" previous="0,144.2" next="0,144.2"/>
+                                                            <Keyframe timevalue="48000" roving="0" anchor="0,153.6" previous="0,153.6" next="0,153.6"/>
+                                                            <Keyframe timevalue="49000" roving="0" anchor="0,163.4" previous="0,163.4" next="0,163.4"/>
+                                                            <Keyframe timevalue="50000" roving="0" anchor="0,173.6" previous="0,173.6" next="0,173.6"/>
+                                                            <Keyframe timevalue="51000" roving="0" anchor="0,184.25" previous="0,184.25" next="0,184.25"/>
+                                                            <Keyframe timevalue="52000" roving="0" anchor="0,195.3" previous="0,195.3" next="0,195.3"/>
+                                                            <Keyframe timevalue="53000" roving="0" anchor="0,206.75" previous="0,206.75" next="0,206.75"/>
+                                                            <Keyframe timevalue="54000" roving="0" anchor="0,218.7" previous="0,218.7" next="0,218.7"/>
+                                                            <Keyframe timevalue="55000" roving="0" anchor="0,231.10000000000002" previous="0,231.10000000000002" next="0,231.10000000000002"/>
+                                                            <Keyframe timevalue="56000" roving="0" anchor="0,243.89999999999998" previous="0,243.89999999999998" next="0,243.89999999999998"/>
+                                                            <Keyframe timevalue="57000" roving="0" anchor="0,257.2" previous="0,257.2" next="0,257.2"/>
+                                                            <Keyframe timevalue="58000" roving="0" anchor="0,271" previous="0,271" next="0,271"/>
+                                                            <Keyframe timevalue="59000" roving="0" anchor="0,285.25" previous="0,285.25" next="0,285.25"/>
+                                                            <Keyframe timevalue="60000" roving="0" anchor="0,300" previous="0,300" next="0,300"/>
+                                                       </Property>
+                                                       <Property id="Motion_Y" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            <Keyframe timevalue="1000" roving="0" anchor="0,0.04999999999999716" previous="0,0.04999999999999716" next="0,0.04999999999999716"/>
+                                                            <Keyframe timevalue="2000" roving="0" anchor="0,0.09999999999999432" previous="0,0.09999999999999432" next="0,0.09999999999999432"/>
+                                                            <Keyframe timevalue="3000" roving="0" anchor="0,0.25" previous="0,0.25" next="0,0.25"/>
+                                                            <Keyframe timevalue="4000" roving="0" anchor="0,0.45000000000000284" previous="0,0.45000000000000284" next="0,0.45000000000000284"/>
+                                                            <Keyframe timevalue="5000" roving="0" anchor="0,0.7000000000000028" previous="0,0.7000000000000028" next="0,0.7000000000000028"/>
+                                                            <Keyframe timevalue="6000" roving="0" anchor="0,1" previous="0,1" next="0,1"/>
+                                                            <Keyframe timevalue="7000" roving="0" anchor="0,1.3499999999999943" previous="0,1.3499999999999943" next="0,1.3499999999999943"/>
+                                                            <Keyframe timevalue="8000" roving="0" anchor="0,1.7999999999999972" previous="0,1.7999999999999972" next="0,1.7999999999999972"/>
+                                                            <Keyframe timevalue="9000" roving="0" anchor="0,2.25" previous="0,2.25" next="0,2.25"/>
+                                                            <Keyframe timevalue="10000" roving="0" anchor="0,2.799999999999997" previous="0,2.799999999999997" next="0,2.799999999999997"/>
+                                                            <Keyframe timevalue="11000" roving="0" anchor="0,3.3499999999999943" previous="0,3.3499999999999943" next="0,3.3499999999999943"/>
+                                                            <Keyframe timevalue="12000" roving="0" anchor="0,4" previous="0,4" next="0,4"/>
+                                                            <Keyframe timevalue="13000" roving="0" anchor="0,4.700000000000003" previous="0,4.700000000000003" next="0,4.700000000000003"/>
+                                                            <Keyframe timevalue="14000" roving="0" anchor="0,5.450000000000003" previous="0,5.450000000000003" next="0,5.450000000000003"/>
+                                                            <Keyframe timevalue="15000" roving="0" anchor="0,6.25" previous="0,6.25" next="0,6.25"/>
+                                                            <Keyframe timevalue="16000" roving="0" anchor="0,7.099999999999994" previous="0,7.099999999999994" next="0,7.099999999999994"/>
+                                                            <Keyframe timevalue="17000" roving="0" anchor="0,8.049999999999997" previous="0,8.049999999999997" next="0,8.049999999999997"/>
+                                                            <Keyframe timevalue="18000" roving="0" anchor="0,9" previous="0,9" next="0,9"/>
+                                                            <Keyframe timevalue="19000" roving="0" anchor="0,10.049999999999997" previous="0,10.049999999999997" next="0,10.049999999999997"/>
+                                                            <Keyframe timevalue="20000" roving="0" anchor="0,11.099999999999994" previous="0,11.099999999999994" next="0,11.099999999999994"/>
+                                                            <Keyframe timevalue="21000" roving="0" anchor="0,12.25" previous="0,12.25" next="0,12.25"/>
+                                                            <Keyframe timevalue="22000" roving="0" anchor="0,13.450000000000003" previous="0,13.450000000000003" next="0,13.450000000000003"/>
+                                                            <Keyframe timevalue="23000" roving="0" anchor="0,14.700000000000003" previous="0,14.700000000000003" next="0,14.700000000000003"/>
+                                                            <Keyframe timevalue="24000" roving="0" anchor="0,16" previous="0,16" next="0,16"/>
+                                                            <Keyframe timevalue="25000" roving="0" anchor="0,17.349999999999994" previous="0,17.349999999999994" next="0,17.349999999999994"/>
+                                                            <Keyframe timevalue="26000" roving="0" anchor="0,18.799999999999997" previous="0,18.799999999999997" next="0,18.799999999999997"/>
+                                                            <Keyframe timevalue="27000" roving="0" anchor="0,20.25" previous="0,20.25" next="0,20.25"/>
+                                                            <Keyframe timevalue="28000" roving="0" anchor="0,21.799999999999997" previous="0,21.799999999999997" next="0,21.799999999999997"/>
+                                                            <Keyframe timevalue="29000" roving="0" anchor="0,23.349999999999994" previous="0,23.349999999999994" next="0,23.349999999999994"/>
+                                                            <Keyframe timevalue="30000" roving="0" anchor="0,25" previous="0,25" next="0,25"/>
+                                                            <Keyframe timevalue="31000" roving="0" anchor="0,26.700000000000003" previous="0,26.700000000000003" next="0,26.700000000000003"/>
+                                                            <Keyframe timevalue="32000" roving="0" anchor="0,28.44999999999999" previous="0,28.44999999999999" next="0,28.44999999999999"/>
+                                                            <Keyframe timevalue="33000" roving="0" anchor="0,30.25" previous="0,30.25" next="0,30.25"/>
+                                                            <Keyframe timevalue="34000" roving="0" anchor="0,32.099999999999994" previous="0,32.099999999999994" next="0,32.099999999999994"/>
+                                                            <Keyframe timevalue="35000" roving="0" anchor="0,34.05000000000001" previous="0,34.05000000000001" next="0,34.05000000000001"/>
+                                                            <Keyframe timevalue="36000" roving="0" anchor="0,36" previous="0,36" next="0,36"/>
+                                                            <Keyframe timevalue="37000" roving="0" anchor="0,38.05000000000001" previous="0,38.05000000000001" next="0,38.05000000000001"/>
+                                                            <Keyframe timevalue="38000" roving="0" anchor="0,40.099999999999994" previous="0,40.099999999999994" next="0,40.099999999999994"/>
+                                                            <Keyframe timevalue="39000" roving="0" anchor="0,42.25" previous="0,42.25" next="0,42.25"/>
+                                                            <Keyframe timevalue="40000" roving="0" anchor="0,44.44999999999999" previous="0,44.44999999999999" next="0,44.44999999999999"/>
+                                                            <Keyframe timevalue="41000" roving="0" anchor="0,46.69999999999999" previous="0,46.69999999999999" next="0,46.69999999999999"/>
+                                                            <Keyframe timevalue="42000" roving="0" anchor="0,49" previous="0,49" next="0,49"/>
+                                                            <Keyframe timevalue="43000" roving="0" anchor="0,51.349999999999994" previous="0,51.349999999999994" next="0,51.349999999999994"/>
+                                                            <Keyframe timevalue="44000" roving="0" anchor="0,53.80000000000001" previous="0,53.80000000000001" next="0,53.80000000000001"/>
+                                                            <Keyframe timevalue="45000" roving="0" anchor="0,56.25" previous="0,56.25" next="0,56.25"/>
+                                                            <Keyframe timevalue="46000" roving="0" anchor="0,58.80000000000001" previous="0,58.80000000000001" next="0,58.80000000000001"/>
+                                                            <Keyframe timevalue="47000" roving="0" anchor="0,61.349999999999994" previous="0,61.349999999999994" next="0,61.349999999999994"/>
+                                                            <Keyframe timevalue="48000" roving="0" anchor="0,64" previous="0,64" next="0,64"/>
+                                                            <Keyframe timevalue="49000" roving="0" anchor="0,66.69999999999999" previous="0,66.69999999999999" next="0,66.69999999999999"/>
+                                                            <Keyframe timevalue="50000" roving="0" anchor="0,69.44999999999999" previous="0,69.44999999999999" next="0,69.44999999999999"/>
+                                                            <Keyframe timevalue="51000" roving="0" anchor="0,72.25" previous="0,72.25" next="0,72.25"/>
+                                                            <Keyframe timevalue="52000" roving="0" anchor="0,75.1" previous="0,75.1" next="0,75.1"/>
+                                                            <Keyframe timevalue="53000" roving="0" anchor="0,78.05000000000001" previous="0,78.05000000000001" next="0,78.05000000000001"/>
+                                                            <Keyframe timevalue="54000" roving="0" anchor="0,81" previous="0,81" next="0,81"/>
+                                                            <Keyframe timevalue="55000" roving="0" anchor="0,84.05000000000001" previous="0,84.05000000000001" next="0,84.05000000000001"/>
+                                                            <Keyframe timevalue="56000" roving="0" anchor="0,87.1" previous="0,87.1" next="0,87.1"/>
+                                                            <Keyframe timevalue="57000" roving="0" anchor="0,90.25" previous="0,90.25" next="0,90.25"/>
+                                                            <Keyframe timevalue="58000" roving="0" anchor="0,93.44999999999999" previous="0,93.44999999999999" next="0,93.44999999999999"/>
+                                                            <Keyframe timevalue="59000" roving="0" anchor="0,96.69999999999999" previous="0,96.69999999999999" next="0,96.69999999999999"/>
+                                                            <Keyframe timevalue="60000" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                       </Property>
+                                                       <Property id="Rotation_Z" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                       </Property>
+                                                  </PropertyContainer>
+                                                  <PropertyContainer id="Transformation">
+                                                       <Property id="Skew_X" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                       </Property>
+                                                       <Property id="Scale_X" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                       </Property>
+                                                       <Property id="Scale_Y" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                       </Property>
+                                                       <Property id="Skew_Y" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                            <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                       </Property>
+                                                  </PropertyContainer>
+                                                  <PropertyContainer id="Colors">
+                                                       <PropertyContainer id="Advanced_ColorXform">
+                                                            <Property id="AdvClr_R_Pct" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_G_Pct" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_B_Pct" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_A_Pct" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,100" previous="0,100" next="0,100"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_R_Offset" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_G_Offset" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_B_Offset" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                            <Property id="AdvClr_A_Offset" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                       </PropertyContainer>
+                                                  </PropertyContainer>
+                                                  <PropertyContainer id="Filters">
+                                                       <PropertyContainer id="AdjustColor_Filter">
+                                                            <Property id="AdjColor_Brightness" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                            <Property id="AdjColor_Contrast" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="1000" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="2000" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="3000" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="4000" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="5000" roving="0" anchor="0,-30" previous="0,-30" next="0,-30"/>
+                                                                 <Keyframe timevalue="6000" roving="0" anchor="0,-29" previous="0,-29" next="0,-29"/>
+                                                                 <Keyframe timevalue="7000" roving="0" anchor="0,-29" previous="0,-29" next="0,-29"/>
+                                                                 <Keyframe timevalue="8000" roving="0" anchor="0,-29" previous="0,-29" next="0,-29"/>
+                                                                 <Keyframe timevalue="9000" roving="0" anchor="0,-29" previous="0,-29" next="0,-29"/>
+                                                                 <Keyframe timevalue="10000" roving="0" anchor="0,-28" previous="0,-28" next="0,-28"/>
+                                                                 <Keyframe timevalue="11000" roving="0" anchor="0,-28" previous="0,-28" next="0,-28"/>
+                                                                 <Keyframe timevalue="12000" roving="0" anchor="0,-28" previous="0,-28" next="0,-28"/>
+                                                                 <Keyframe timevalue="13000" roving="0" anchor="0,-27" previous="0,-27" next="0,-27"/>
+                                                                 <Keyframe timevalue="14000" roving="0" anchor="0,-27" previous="0,-27" next="0,-27"/>
+                                                                 <Keyframe timevalue="15000" roving="0" anchor="0,-26" previous="0,-26" next="0,-26"/>
+                                                                 <Keyframe timevalue="16000" roving="0" anchor="0,-26" previous="0,-26" next="0,-26"/>
+                                                                 <Keyframe timevalue="17000" roving="0" anchor="0,-25" previous="0,-25" next="0,-25"/>
+                                                                 <Keyframe timevalue="18000" roving="0" anchor="0,-25" previous="0,-25" next="0,-25"/>
+                                                                 <Keyframe timevalue="19000" roving="0" anchor="0,-24" previous="0,-24" next="0,-24"/>
+                                                                 <Keyframe timevalue="20000" roving="0" anchor="0,-23" previous="0,-23" next="0,-23"/>
+                                                                 <Keyframe timevalue="21000" roving="0" anchor="0,-23" previous="0,-23" next="0,-23"/>
+                                                                 <Keyframe timevalue="22000" roving="0" anchor="0,-22" previous="0,-22" next="0,-22"/>
+                                                                 <Keyframe timevalue="23000" roving="0" anchor="0,-21" previous="0,-21" next="0,-21"/>
+                                                                 <Keyframe timevalue="24000" roving="0" anchor="0,-20" previous="0,-20" next="0,-20"/>
+                                                                 <Keyframe timevalue="25000" roving="0" anchor="0,-20" previous="0,-20" next="0,-20"/>
+                                                                 <Keyframe timevalue="26000" roving="0" anchor="0,-19" previous="0,-19" next="0,-19"/>
+                                                                 <Keyframe timevalue="27000" roving="0" anchor="0,-18" previous="0,-18" next="0,-18"/>
+                                                                 <Keyframe timevalue="28000" roving="0" anchor="0,-17" previous="0,-17" next="0,-17"/>
+                                                                 <Keyframe timevalue="29000" roving="0" anchor="0,-16" previous="0,-16" next="0,-16"/>
+                                                                 <Keyframe timevalue="30000" roving="0" anchor="0,-15" previous="0,-15" next="0,-15"/>
+                                                                 <Keyframe timevalue="31000" roving="0" anchor="0,-14" previous="0,-14" next="0,-14"/>
+                                                                 <Keyframe timevalue="32000" roving="0" anchor="0,-13" previous="0,-13" next="0,-13"/>
+                                                                 <Keyframe timevalue="33000" roving="0" anchor="0,-12" previous="0,-12" next="0,-12"/>
+                                                                 <Keyframe timevalue="34000" roving="0" anchor="0,-11" previous="0,-11" next="0,-11"/>
+                                                                 <Keyframe timevalue="35000" roving="0" anchor="0,-10" previous="0,-10" next="0,-10"/>
+                                                                 <Keyframe timevalue="36000" roving="0" anchor="0,-8" previous="0,-8" next="0,-8"/>
+                                                                 <Keyframe timevalue="37000" roving="0" anchor="0,-7" previous="0,-7" next="0,-7"/>
+                                                                 <Keyframe timevalue="38000" roving="0" anchor="0,-6" previous="0,-6" next="0,-6"/>
+                                                                 <Keyframe timevalue="39000" roving="0" anchor="0,-5" previous="0,-5" next="0,-5"/>
+                                                                 <Keyframe timevalue="40000" roving="0" anchor="0,-3" previous="0,-3" next="0,-3"/>
+                                                                 <Keyframe timevalue="41000" roving="0" anchor="0,-2" previous="0,-2" next="0,-2"/>
+                                                                 <Keyframe timevalue="42000" roving="0" anchor="0,-1" previous="0,-1" next="0,-1"/>
+                                                                 <Keyframe timevalue="43000" roving="0" anchor="0,1" previous="0,1" next="0,1"/>
+                                                                 <Keyframe timevalue="44000" roving="0" anchor="0,2" previous="0,2" next="0,2"/>
+                                                                 <Keyframe timevalue="45000" roving="0" anchor="0,4" previous="0,4" next="0,4"/>
+                                                                 <Keyframe timevalue="46000" roving="0" anchor="0,5" previous="0,5" next="0,5"/>
+                                                                 <Keyframe timevalue="47000" roving="0" anchor="0,7" previous="0,7" next="0,7"/>
+                                                                 <Keyframe timevalue="48000" roving="0" anchor="0,8" previous="0,8" next="0,8"/>
+                                                                 <Keyframe timevalue="49000" roving="0" anchor="0,10" previous="0,10" next="0,10"/>
+                                                                 <Keyframe timevalue="50000" roving="0" anchor="0,12" previous="0,12" next="0,12"/>
+                                                                 <Keyframe timevalue="51000" roving="0" anchor="0,13" previous="0,13" next="0,13"/>
+                                                                 <Keyframe timevalue="52000" roving="0" anchor="0,15" previous="0,15" next="0,15"/>
+                                                                 <Keyframe timevalue="53000" roving="0" anchor="0,17" previous="0,17" next="0,17"/>
+                                                                 <Keyframe timevalue="54000" roving="0" anchor="0,19" previous="0,19" next="0,19"/>
+                                                                 <Keyframe timevalue="55000" roving="0" anchor="0,20" previous="0,20" next="0,20"/>
+                                                                 <Keyframe timevalue="56000" roving="0" anchor="0,22" previous="0,22" next="0,22"/>
+                                                                 <Keyframe timevalue="57000" roving="0" anchor="0,24" previous="0,24" next="0,24"/>
+                                                                 <Keyframe timevalue="58000" roving="0" anchor="0,26" previous="0,26" next="0,26"/>
+                                                                 <Keyframe timevalue="59000" roving="0" anchor="0,28" previous="0,28" next="0,28"/>
+                                                                 <Keyframe timevalue="60000" roving="0" anchor="0,30" previous="0,30" next="0,30"/>
+                                                            </Property>
+                                                            <Property id="AdjColor_Saturation" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                            <Property id="AdjColor_Hue" enabled="1" readonly="0" visible="1" ignoreTimeMap="1">
+                                                                 <Keyframe timevalue="0" roving="0" anchor="0,0" previous="0,0" next="0,0"/>
+                                                            </Property>
+                                                       </PropertyContainer>
+                                                  </PropertyContainer>
+                                             </PropertyContainer>
+                                        </AnimationCore>
+                                   </motionObjectXML>
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 2" name="Demo" centerPoint3DX="120.0" centerPoint3DY="120.0" cacheAsBitmap="true">
+                                             <matrix>
+                                                  <Matrix tx="80.0" ty="100.0"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <color>
+                                                  <Color/>
+                                             </color>
+                                             <filters>
+                                                  <AdjustColorFilter brightness="0" contrast="-30" saturation="0" hue="0"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+</DOMDocument>

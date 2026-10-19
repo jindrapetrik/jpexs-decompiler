@@ -59,6 +59,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
+import com.jpexs.decompiler.flash.tags.profiles.castlecrashers.PixlImage;
 import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -104,7 +105,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 import org.w3c.dom.Element;
 
 /**
@@ -272,6 +272,9 @@ public class Timeline {
     public synchronized Frame getFrame(int index) {
         ensureInitialized();
         if (index >= frames.size()) {
+            return null;
+        }
+        if (index < 0) {
             return null;
         }
         return frames.get(index);
@@ -1433,7 +1436,7 @@ public class Timeline {
             
             if (clipDepth > -1 && !(drawable instanceof TextTag)) {
                 //nothing, outline is used
-            } else if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
+            } else if (!(drawable instanceof ImageTag) || drawable instanceof PixlImage || (swf.isAS3() && layer.hasImage)) {
                 drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, mergedColorTransform2, unzoom, sameImage, viewRect2, viewRectRaw, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing, aaScale);
             } else {
                 // todo: show one time warning

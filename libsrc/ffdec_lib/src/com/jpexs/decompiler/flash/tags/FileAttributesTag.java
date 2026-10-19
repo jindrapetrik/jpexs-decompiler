@@ -55,9 +55,13 @@ public class FileAttributesTag extends Tag {
 
     public boolean swfRelativeUrls;
 
-    @SWFType(value = BasicType.UB, count = 24)
+    public boolean brokerProductManager;
+    
+    public boolean brokerLocalConnection;
+    
+    @SWFType(value = BasicType.UB, count = 22)
     @Reserved
-    public int reservedB;
+    public int reservedC;
 
     /**
      * Constructor
@@ -77,20 +81,27 @@ public class FileAttributesTag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         reservedA = sis.readUB(1, "reservedA") == 1; // reserved
         // UB[1] == 0  (reserved)
-        useDirectBlit = sis.readUB(1, "useDirectBlit") != 0;
-        useGPU = sis.readUB(1, "useGPU") != 0;
-        hasMetadata = sis.readUB(1, "hasMetadata") != 0;
-        actionScript3 = sis.readUB(1, "actionScript3") != 0;
-        noCrossDomainCache = sis.readUB(1, "noCrossDomainCache") != 0;
+        useDirectBlit = sis.readUB(1, "useDirectBlit") == 1;
+        useGPU = sis.readUB(1, "useGPU") == 1;
+        hasMetadata = sis.readUB(1, "hasMetadata") == 1;
+        actionScript3 = sis.readUB(1, "actionScript3") == 1;
+        noCrossDomainCache = sis.readUB(1, "noCrossDomainCache") == 1;
         swfRelativeUrls = sis.readUB(1, "swfRelativeUrls") == 1;
-        useNetwork = sis.readUB(1, "useNetwork") != 0;
-        // UB[24] == 0 (reserved)
-        int bitCount = 24;
-        if (sis.available() * 8 < bitCount) {
-            bitCount = sis.available() * 8;
+        useNetwork = sis.readUB(1, "useNetwork")  == 1;
+            
+        if (sis.available() > 0) {
+            int availableBits = sis.available() * 8 - 2;            
+            
+            brokerProductManager = sis.readUB(1, "brokerProductManager") == 1;
+            brokerLocalConnection = sis.readUB(1, "brokerLocalConnection") == 1;
+            
+            // UB[22] == 0 (reserved)
+            int bitCount = 22;
+            if (bitCount > availableBits) {
+                bitCount = availableBits;
+            }            
+            reservedC = (int) sis.readUB(bitCount, "reservedB"); //reserved
         }
-
-        reservedB = (int) sis.readUB(bitCount, "reservedB"); //reserved
     }
 
     /**
@@ -109,6 +120,8 @@ public class FileAttributesTag extends Tag {
         sos.writeUB(1, noCrossDomainCache ? 1 : 0);
         sos.writeUB(1, swfRelativeUrls ? 1 : 0);
         sos.writeUB(1, useNetwork ? 1 : 0);
-        sos.writeUB(24, reservedB); //reserved
+        sos.writeUB(1, brokerProductManager ? 1 : 0);
+        sos.writeUB(1, brokerLocalConnection ? 1 : 0);
+        sos.writeUB(22, reservedC); //reserved
     }
 }

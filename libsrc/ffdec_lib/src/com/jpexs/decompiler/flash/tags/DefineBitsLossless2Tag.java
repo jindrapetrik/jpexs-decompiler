@@ -165,13 +165,14 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         int height = image.getHeight();
         bitmapData.bitmapPixelData = new int[width * height];
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        boolean hasAlpha = image.getColorModel().hasAlpha();
         for (int pos = 0; pos < pixels.length; pos++) {
             int argb = pixels[pos];
-            int a = (argb >> 24) & 0xff;
+            int a = hasAlpha ? ((argb >> 24) & 0xff) : 0xff;
             int r = (argb >> 16) & 0xff;
             int g = (argb >> 8) & 0xff;
             int b = argb & 0xff;
-
+                                    
             r = r * a / 255;
             g = g * a / 255;
             b = b * a / 255;

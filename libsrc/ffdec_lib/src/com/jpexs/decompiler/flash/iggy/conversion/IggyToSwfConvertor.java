@@ -19,32 +19,36 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
-import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyDeclStrings;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
-import com.jpexs.decompiler.flash.iggy.IggyShape;
+import com.jpexs.decompiler.flash.iggy.IggyNamedFrame;
 import com.jpexs.decompiler.flash.iggy.IggySwf;
+import com.jpexs.decompiler.flash.iggy.IggySymbolClass;
 import com.jpexs.decompiler.flash.iggy.IggyText;
+import com.jpexs.decompiler.flash.iggy.IggyTimeline;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.types.KERNINGRECORD;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Iggy to SWF convertor. WIP
@@ -74,10 +78,6 @@ public class IggyToSwfConvertor {
         swf.saveTo(output);
     }
 
-    private static int makeLengthsEm(double val) {
-        return (int) (val * 1024.0);
-    }
-
     private static int makeLengthsTwip(double val) {
         return (int) (val * SWF.unitDivisor);
     }
@@ -85,86 +85,53 @@ public class IggyToSwfConvertor {
     public static SWF getSwf(IggyFile file) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
-        swf.frameCount = 1; //FIXME!!        
+        swf.frameCount = (int) file.getSwf().getHdr().getFrameCount();
         swf.frameRate = file.getSwfFrameRate();
         swf.gfx = false;
+        swf.setSwfProfile(new com.jpexs.decompiler.flash.profiles.IggySwfProfile());
         swf.displayRect = new RECT(
                 makeLengthsTwip(file.getSwfXMin()),
                 makeLengthsTwip(file.getSwfXMax()),
                 makeLengthsTwip(file.getSwfYMin()),
                 makeLengthsTwip(file.getSwfYMax()));
-        swf.version = 10; //FIXME
+        swf.version = file.getSwfVersion();
 
         FileAttributesTag fat = new FileAttributesTag(swf);
-        fat.actionScript3 = true;
+        fat.actionScript3 = file.getSwf().hasAS3() || !file.getSwf().getAbcBlocks().isEmpty();
         fat.hasMetadata = false;
         fat.useNetwork = false;
         swf.addTag(fat);
         IggySwf iggySwf = file.getSwf();
 
-        int currentCharId = 0;
+        long color = iggySwf.getHdr().getBackgroundColor();
+        swf.addTag(new SetBackgroundColorTag(swf, new RGB((int) color & 255, (int) (color >>> 8) & 255, (int) (color >>> 16) & 255)));
+        DefineSceneAndFrameLabelDataTag labels = new DefineSceneAndFrameLabelDataTag(swf);
+        labels.sceneOffsets = new long[iggySwf.getScenes().size()];
+        labels.sceneNames = new String[labels.sceneOffsets.length];
+        for (int i = 0; i < labels.sceneOffsets.length; i++) {
+            IggyNamedFrame scene = iggySwf.getScenes().get(i);
+            labels.sceneOffsets[i] = scene.getFrame();
+            labels.sceneNames[i] = scene.getName();
+        }
+        labels.frameNums = new long[iggySwf.getFrameLabels().size()];
+        labels.frameNames = new String[labels.frameNums.length];
+        for (int i = 0; i < labels.frameNums.length; i++) {
+            IggyNamedFrame label = iggySwf.getFrameLabels().get(i);
+            labels.frameNums[i] = label.getFrame();
+            labels.frameNames[i] = label.getName();
+        }
+        if (labels.sceneOffsets.length > 0 || labels.frameNums.length > 0) {
+            swf.addTag(labels);
+        }
+        Set<Integer> exportedIds = new HashSet<>();
+        IggyImportConvertor.exportImports(swf, iggySwf, exportedIds);
         Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
 
         for (int fontIndex = 0; fontIndex < iggySwf.getFonts().size(); fontIndex++) {
             IggyFont iggyFont = iggySwf.getFonts().get(fontIndex);
-            DefineFont2Tag fontTag = new DefineFont2Tag(swf);
-            currentCharId++;
-            fontIndex2CharId.put(fontIndex, currentCharId);
-            fontTag.fontID = currentCharId;
-            /*System.out.println("===================");
-            System.out.println("xscale: " + iggyFont.getXscale());  //80
-            System.out.println("yscale: " + iggyFont.getYscale());  //19          
-
-            System.out.println("unk_float1: " + iggyFont.getUnk_float()[0]);
-            System.out.println("unk_float2: " + iggyFont.getUnk_float()[1]);
-            System.out.println("unk_float3: " + iggyFont.getUnk_float()[2]);
-            System.out.println("unk_float4: " + iggyFont.getUnk_float()[3]);
-            System.out.println("unk_float5: " + iggyFont.getUnk_float()[4]);
-            System.out.println("what_2: " + iggyFont.getWhat_2());
-            System.out.println("what_3: " + iggyFont.getWhat_3());*/
-
-            fontTag.fontKerningTable = new ArrayList<>();
-            IggyCharKerning ker = iggyFont.getCharKernings();
-            if (ker != null) {
-                for (int i = 0; i < ker.getKernCount(); i++) {
-                    int kerningCode1 = ker.getCharsA().get(i);
-                    int kerningCode2 = ker.getCharsA().get(i);
-                    int kerningOffset = ker.getKerningOffsets().get(i);
-                    fontTag.fontKerningTable.add(new KERNINGRECORD(kerningCode1, kerningCode2, kerningOffset));
-                }
-            }
-
-            fontTag.fontFlagsWideCodes = true;
-            fontTag.fontFlagsWideOffsets = true;
-            fontTag.fontAscent = iggyFont.getAscent();
-            fontTag.fontDescent = iggyFont.getDescent();
-            fontTag.fontLeading = iggyFont.getLeading();
-            fontTag.codeTable = new ArrayList<>();
-            fontTag.fontName = iggyFont.getName();
-            fontTag.glyphShapeTable = new ArrayList<>();
-            fontTag.fontBoundsTable = new ArrayList<>();
-            fontTag.fontAdvanceTable = new ArrayList<>();
-            fontTag.fontFlagsHasLayout = true;
-            IggyCharAdvances advanceValues = iggyFont.getCharAdvances();
-            for (int i = 0; i < iggyFont.getCharacterCount(); i++) {
-                int code = iggyFont.getCharIndices().getChars().get(i);
-                fontTag.codeTable.add(code);
-                IggyShape glyph = iggyFont.getChars().get(i);
-                SHAPE shp;
-                if (glyph != null) {
-                    shp = IggyShapeToSwfConvertor.convertCharToShape(glyph);
-                    fontTag.fontBoundsTable.add(shp.getBounds(1));
-                } else {
-                    shp = new SHAPE();
-                    shp.shapeRecords = new ArrayList<>();
-                    shp.shapeRecords.add(new EndShapeRecord());
-                    fontTag.fontBoundsTable.add(new RECT()); //??
-                }
-                fontTag.glyphShapeTable.add(shp);
-
-                fontTag.fontAdvanceTable.add(makeLengthsEm(advanceValues.getScales().get(i)));
-
-            }
+            com.jpexs.decompiler.flash.tags.base.FontTag fontTag = IggyFontConvertor.toSwf(swf, iggyFont);
+            fontIndex2CharId.put(fontIndex, fontTag.getCharacterId());
+            exportedIds.add(fontTag.getCharacterId());
             fontTag.setModified(true);
             swf.addTag(fontTag);
         }
@@ -173,56 +140,77 @@ public class IggyToSwfConvertor {
 
         for (int textIndex = 0; textIndex < iggySwf.getTexts().size(); textIndex++) {
             IggyText iggyText = iggySwf.getTexts().get(textIndex);
-            DefineEditTextTag textTag = new DefineEditTextTag(swf);
-            currentCharId++;
-            textIndex2CharId.put(textIndex, currentCharId);
-            textTag.characterID = currentCharId;
-            textTag.hasText = true;
-            textTag.initialText = iggyText.getInitialText();
-            textTag.html = true;
-            textTag.noSelect = true;
-            textTag.wasStatic = true;
-            textTag.hasFont = false;
-            textTag.hasFontClass = false;
-            textTag.hasMaxLength = false;
-            //textTag.multiline = true;
-            //textTag.wordWrap = true;
-            //textTag.hasTextColor = true;
-            //textTag.textColor = new RGBA(Color.black);
-            //textTag.fontHeight = 40; //??            
-            textTag.readOnly = true;
-            textTag.bounds = new RECT(
-                    makeLengthsTwip(iggyText.getPar1()),
-                    makeLengthsTwip(iggyText.getPar3()),
-                    makeLengthsTwip(iggyText.getPar2()),
-                    makeLengthsTwip(iggyText.getPar4())
-            );
-
-            //textTag.hasFont = true;
-            //textTag.fontId = fontIndex2CharId.get(iggyText.getFontIndex());
-            textTag.setModified(true);
+            DefineEditTextTag textTag = convertText(swf, iggyText);
+            textIndex2CharId.put(textIndex, textTag.characterID);
+            exportedIds.add(textTag.characterID);
             swf.addTag(textTag);
         }
 
-        IggyDeclStrings declStrings = iggySwf.getDeclStrings();
-        if (declStrings != null) {
-            byte[] abcData = declStrings.getData();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                baos.write(new byte[]{1, 0, 0, 0, 0, 0x10, 0, 0x2E});
-                baos.write(abcData);
-            } catch (IOException ex) {
-                //should not happen
-            }
-            byte[] fullAbcTagData = baos.toByteArray();
-            try {
-                DoABC2Tag nabc = new DoABC2Tag(new SWFInputStream(swf, fullAbcTagData), new ByteArrayRange(fullAbcTagData));
-                nabc.setModified(true);
-                swf.addTag(nabc);
-            } catch (IOException ex) {
-                //ignore
-            }
+        try {
+            IggyAssetConvertor.exportAssets(swf, file, exportedIds);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Invalid Iggy dictionary asset", ex);
+        }
 
+        for (Map.Entry<Integer, IggyTimeline> entry : iggySwf.getSpriteTimelines().entrySet()) {
+            DefineSpriteTag sprite = new DefineSpriteTag(swf);
+            sprite.spriteId = entry.getKey();
+            try {
+                sprite.frameCount = iggySwf.getTimelineFrameCount(sprite.spriteId);
+                for (Tag tag : IggyTimelineConvertor.toSwf(swf, iggySwf, entry.getValue(), sprite.frameCount)) {
+                    sprite.addTag(tag);
+                }
+            } catch (IOException ex) {
+                throw new IllegalArgumentException("Invalid Iggy sprite timeline", ex);
+            }
+            sprite.addTag(new EndTag(swf));
+            sprite.setModified(true);
+            swf.addTag(sprite);
+            exportedIds.add(sprite.spriteId);
+        }
+
+        try {
+            IggyMovieTagConvertor.exportScalingGrids(swf, iggySwf);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Invalid Iggy scaling grid", ex);
+        }
+
+        for (IggyDeclStrings abc : iggySwf.getAbcBlocks()) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            try {
+                bytes.write(new byte[]{1, 0, 0, 0, 0}); //DoABC flags and empty name
+                bytes.write(abc.getData());
+                byte[] payload = bytes.toByteArray();
+                DoABC2Tag tag = new DoABC2Tag(new SWFInputStream(swf, payload), new ByteArrayRange(payload));
+                tag.setModified(true);
+                swf.addTag(tag);
+            } catch (IOException ex) {
+                throw new IllegalArgumentException("Invalid ABC in Iggy movie", ex);
+            }
+        }
+        SymbolClassTag symbols = new SymbolClassTag(swf);
+        for (IggySymbolClass symbol : iggySwf.getSymbolClasses()) {
+            int id = (int) symbol.getCharacterId();
+            if (id == 0 || exportedIds.contains(id)) {
+                symbols.tags.add(id);
+                symbols.names.add(symbol.getName());
+            }
+        }
+        for (IggyText text : iggySwf.getTexts()) {
+            if (text.getSymbolClassName() != null && !symbols.tags.contains(text.getTextIndex())) {
+                symbols.tags.add(text.getTextIndex());
+                symbols.names.add(text.getSymbolClassName());
+            }
+        }
+        if (!symbols.tags.isEmpty()) {
+            swf.addTag(symbols);
+        }
+        try {
+            for (Tag tag : IggyTimelineConvertor.toSwf(swf, iggySwf, iggySwf.getTimeline(), swf.frameCount)) {
+                swf.addTag(tag);
+            }
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Invalid Iggy root timeline", ex);
         }
 
         swf.addTag(
@@ -231,6 +219,52 @@ public class IggyToSwfConvertor {
                 true);
 
         return swf;
+    }
+
+    /**
+     * Convert the editable text properties shared by the x64 and x86 layouts.
+     */
+    public static DefineEditTextTag convertText(SWF swf, IggyText text) {
+        DefineEditTextTag tag = new DefineEditTextTag(swf);
+        tag.characterID = text.getTextIndex();
+        tag.bounds = new RECT(
+                (int) Math.round(text.getPar1() * SWF.unitDivisor),
+                (int) Math.round(text.getPar3() * SWF.unitDivisor),
+                (int) Math.round(text.getPar2() * SWF.unitDivisor),
+                (int) Math.round(text.getPar4() * SWF.unitDivisor));
+        int flags = text.getEnum_hex();
+        tag.wordWrap = (flags & IggyText.FLAG_WORD_WRAP) != 0;
+        tag.multiline = (flags & IggyText.FLAG_MULTILINE) != 0;
+        tag.password = (flags & IggyText.FLAG_PASSWORD) != 0;
+        tag.readOnly = (flags & IggyText.FLAG_READ_ONLY) != 0;
+        tag.autoSize = (flags & IggyText.FLAG_AUTO_SIZE) != 0;
+        tag.noSelect = (flags & IggyText.FLAG_NO_SELECT) != 0;
+        tag.border = (flags & IggyText.FLAG_BORDER) != 0;
+        tag.wasStatic = (flags & IggyText.FLAG_WAS_STATIC) != 0;
+        tag.html = (flags & IggyText.FLAG_HTML) != 0;
+        tag.useOutlines = (flags & IggyText.FLAG_USE_OUTLINES) != 0;
+        tag.hasText = text.getInitialText() != null;
+        tag.initialText = text.getInitialText();
+        tag.hasFont = text.getFontIndex() != 0;
+        tag.fontId = text.getFontIndex();
+        tag.hasFontClass = text.getFontClassName() != null;
+        tag.fontClass = text.getFontClassName();
+        tag.fontHeight = text.getFontHeight(); // Already in twips.
+        byte[] rgba = text.getTextColorRgba();
+        tag.hasTextColor = true;
+        tag.textColor = new RGBA(rgba[0] & 255, rgba[1] & 255, rgba[2] & 255, rgba[3] & 255);
+        tag.hasMaxLength = text.getMaxLength() != 0;
+        tag.maxLength = text.getMaxLength();
+        tag.hasLayout = true;
+        tag.align = text.getAlign();
+        tag.leftMargin = text.getLeftMargin();
+        tag.rightMargin = text.getRightMargin();
+        tag.indent = text.getIndent();
+        tag.leading = text.getLeading();
+        // The DLL consumes and discards the SWF variable name.
+        tag.variableName = "";
+        tag.setModified(true);
+        return tag;
     }
 
     public static void main(String[] args) {

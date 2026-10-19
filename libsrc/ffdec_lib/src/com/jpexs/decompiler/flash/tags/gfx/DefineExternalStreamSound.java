@@ -189,7 +189,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     @Override
     public SoundFormat getSoundFormat() {
         final int[] rateMap = {5512, 11025, 22050, 44100};
-        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
+        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType(), getSoundSize());
     }
 
     @Override
@@ -261,6 +261,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
         tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
         tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
         tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
+        tagInfo.addInfo("general", "bitsPerSample", getSoundSize() ? 16 : 8);
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", sampleCount);
     }

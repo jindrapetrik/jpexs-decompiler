@@ -39,6 +39,7 @@ public class TemporaryDataStream extends RandomAccessFileDataStream {
 
     @Override
     public void close() {
+        super.close();
         try {
             this.getFile().delete();
         } catch (Exception ex) {

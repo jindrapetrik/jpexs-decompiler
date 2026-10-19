@@ -1,0 +1,201 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <symbols>
+          <Include href="BlueRect.xml" loadImmediate="false" itemID="6ac14248-000001de" lastModified="1791050312"/>
+          <Include href="GreenRect.xml" loadImmediate="false" itemID="6ac141dc-000001d5" lastModified="1791050204"/>
+          <Include href="OrangeRect.xml" loadImmediate="false" itemID="6ac202d7-00000229" lastModified="1791099607"/>
+          <Include href="RedRect.xml" loadImmediate="false" itemID="6ac14209-000001da" lastModified="1791050249"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Shape" color="#4FFFFF" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#F.9F, #2.BC" startPointB="#19.B3, #5.28" strokeIndex1="0" strokeIndex2="1">
+                                                  <MorphCurves controlPointA="#10.FE, #2.BC" anchorPointA="#12.5D, #2.BC" controlPointB="#19.B3, #3.E5" anchorPointB="#1A.AC, 3"/>
+                                                  <MorphCurves controlPointA="#13.D, #2.BC" anchorPointA="#15.43, #2.BC" controlPointB="#1B.A5, #2.1C" anchorPointB="#1D.05, #2.1C"/>
+                                                  <MorphCurves controlPointA="#15.91, #2.BC" anchorPointA="#15.DF, #2.BC" controlPointB="#1D.4B, #2.1C" anchorPointB="#1D.8D, #2.25"/>
+                                                  <MorphCurves controlPointA="#15.DF, #3.E3" anchorPointA="#15.DF, #5.0A" controlPointB="#1E.97, #2.49" anchorPointB="#1F.5E, 3"/>
+                                                  <MorphCurves controlPointA="#15.DF, #6.6D" anchorPointA="#15.DF, #7.D" controlPointB="#20.57, #3.E5" anchorPointB="#20.57, #5.28"/>
+                                                  <MorphCurves controlPointA="20.5, #7.D" anchorPointA="#13.21, #7.D" controlPointB="#20.57, #6.6B" anchorPointB="#1F.5E, #7.4F"/>
+                                                  <MorphCurves controlPointA="#11.AD, #7.D" anchorPointA="#10.39, #7.D" controlPointB="#1E.65, #8.34" anchorPointB="#1D.05, #8.34"/>
+                                                  <MorphCurves controlPointA="#F.EC, #7.D" anchorPointA="#F.9F, #7.D" controlPointB="28.75, #8.34" anchorPointB="#1C.7F, #8.2B"/>
+                                                  <MorphCurves controlPointA="#F.9F, #6.A8" anchorPointA="#F.9F, 5.5" controlPointB="#1B.74, #8.07" anchorPointB="#1A.AC, #7.4F"/>
+                                                  <MorphCurves controlPointA="#F.9F, #4.1E" anchorPointA="#F.9F, #2.BC" controlPointB="#19.B3, #6.6B" anchorPointB="#19.B3, #5.28"/>
+                                             </MorphSegment>
+                                             <MorphSegment startPointA="#F.9F, #2.BC" startPointB="#19.B3, #5.28" strokeIndex1="0" strokeIndex2="1" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#10.FE, #2.BC" anchorPointA="#12.5D, #2.BC" controlPointB="#19.B3, #3.E5" anchorPointB="#1A.AC, 3"/>
+                                                  <MorphCurves controlPointA="#13.D, #2.BC" anchorPointA="#15.43, #2.BC" controlPointB="#1B.A5, #2.1C" anchorPointB="#1D.05, #2.1C"/>
+                                                  <MorphCurves controlPointA="#15.91, #2.BC" anchorPointA="#15.DF, #2.BC" controlPointB="#1D.4B, #2.1C" anchorPointB="#1D.8D, #2.25"/>
+                                                  <MorphCurves controlPointA="#15.DF, #3.E3" anchorPointA="#15.DF, #5.0A" controlPointB="#1E.97, #2.49" anchorPointB="#1F.5E, 3"/>
+                                                  <MorphCurves controlPointA="#15.DF, #6.6D" anchorPointA="#15.DF, #7.D" controlPointB="#20.57, #3.E5" anchorPointB="#20.57, #5.28"/>
+                                                  <MorphCurves controlPointA="20.5, #7.D" anchorPointA="#13.21, #7.D" controlPointB="#20.57, #6.6B" anchorPointB="#1F.5E, #7.4F"/>
+                                                  <MorphCurves controlPointA="#11.AD, #7.D" anchorPointA="#10.39, #7.D" controlPointB="#1E.65, #8.34" anchorPointB="#1D.05, #8.34"/>
+                                                  <MorphCurves controlPointA="#F.EC, #7.D" anchorPointA="#F.9F, #7.D" controlPointB="28.75, #8.34" anchorPointB="#1C.7F, #8.2B"/>
+                                                  <MorphCurves controlPointA="#F.9F, #6.A8" anchorPointA="#F.9F, 5.5" controlPointB="#1B.74, #8.07" anchorPointB="#1A.AC, #7.4F"/>
+                                                  <MorphCurves controlPointA="#F.9F, #4.1E" anchorPointA="#F.9F, #2.BC" controlPointB="#19.B3, #6.6B" anchorPointB="#19.B3, #5.28"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#9900CC" alpha="0.498039215686275"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!5599 700|5599 2000!5599 2000|3999 2000!3999 2000|3999 700!3999 700|5599 700"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#0000FF" alpha="0.498039215686275"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!8030 768[8279 997 8279 1320!8279 1320[8279 1643 8030 1871!8030 1871[7781 2100 7429 2100!7429 2100[7077 2100 6828 1871!6828 1871[6579 1643 6579 1320!6579 1320[6579 997 6828 768!6828 768[7077 540 7429 540!7429 540[7781 540 8030 768"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Motion object" color="#FF4FFF" autoNamed="false" animationType="motion object">
+                         <frames>
+                              <DOMFrame index="0" duration="20" tweenType="motion object" motionTweenRotate="none" motionTweenScale="false" isMotionObject="true" visibleAnimationKeyframes="2097151" keyMode="8195">
+                                   <motionObjectXML><AnimationCore TimeScale="24000" Version="1" duration="20000"><TimeMap strength="0" type="Quadratic"/><metadata><names><name langID="en_GB" value=""/></names><Settings orientToPath="0" xformPtXOffsetPct="0.5" xformPtYOffsetPct="0.5" xformPtZOffsetPixels="0"/></metadata><PropertyContainer id="headContainer"><PropertyContainer id="Basic_Motion"><Property enabled="1" id="Motion_X" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,0" next="6327,100.35" previous="0,0" roving="0" timevalue="0"/><Keyframe anchor="0,347.95" next="0,347.95" previous="-6326,216.35" roving="0" timevalue="19000"/></Property><Property enabled="1" id="Motion_Y" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,0" next="6327,68.65" previous="0,0" roving="0" timevalue="0"/><Keyframe anchor="0,-5" next="0,-5" previous="-6326,67" roving="0" timevalue="19000"/></Property><Property enabled="1" id="Rotation_Z" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,0" next="0,0" previous="0,0" roving="0" timevalue="0"/></Property></PropertyContainer><PropertyContainer id="Transformation"><Property enabled="1" id="Skew_X" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,0" next="0,0" previous="0,0" roving="0" timevalue="0"/></Property><Property enabled="1" id="Skew_Y" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,0" next="0,0" previous="0,0" roving="0" timevalue="0"/></Property><Property enabled="1" id="Scale_X" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,100" next="0,100" previous="0,100" roving="0" timevalue="0"/></Property><Property enabled="1" id="Scale_Y" ignoreTimeMap="0" readonly="0" visible="1"><Keyframe anchor="0,100" next="0,100" previous="0,100" roving="0" timevalue="0"/></Property></PropertyContainer><PropertyContainer id="Colors"/><PropertyContainer id="Filters"/></PropertyContainer></AnimationCore></motionObjectXML>
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="OrangeRect" centerPoint3DX="136" centerPoint3DY="310">
+                                             <matrix>
+                                                  <Matrix tx="92" ty="283"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="44" y="27"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Classic color" color="#FF800A" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="BlueRect" centerPoint3DX="133.95" centerPoint3DY="229.5">
+                                             <matrix>
+                                                  <Matrix tx="89" ty="202"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="44.95" y="27.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="15872">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="BlueRect" centerPoint3DX="133.95" centerPoint3DY="229.5">
+                                             <matrix>
+                                                  <Matrix tx="89" ty="202"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="44.95" y="27.5"/>
+                                             </transformationPoint>
+                                             <color>
+                                                  <Color redOffset="150" greenOffset="120"/>
+                                             </color>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Classic rotate" color="#9933CC" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="RedRect" centerPoint3DX="122" centerPoint3DY="67">
+                                             <matrix>
+                                                  <Matrix tx="86" ty="37"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="36" y="30"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="RedRect" centerPoint3DX="122.5" centerPoint3DY="67.45">
+                                             <matrix>
+                                                  <Matrix a="0" b="1" c="-1" d="0" tx="152" ty="31"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="36" y="30"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Classic move" color="#4FFF4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017" acceleration="50">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="GreenRect" centerPoint3DX="130" centerPoint3DY="152.5">
+                                             <matrix>
+                                                  <Matrix tx="89" ty="119"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="41" y="33.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="GreenRect" centerPoint3DX="480.95" centerPoint3DY="155.5">
+                                             <matrix>
+                                                  <Matrix tx="439.95" ty="122"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="41" y="33.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1297" publishTime="1791050579"/>
+     </publishHistory>
+</DOMDocument>

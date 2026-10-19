@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ConstantPoolAwareAction;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -63,7 +65,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 4)
-public class ActionPush extends Action {
+public class ActionPush extends Action implements ConstantPoolAwareAction {
 
     /**
      * Values to push
@@ -95,56 +97,98 @@ public class ActionPush extends Action {
      */
     public ActionPush(int actionLength, SWFInputStream sis) throws IOException {
         super(0x96, actionLength, sis.getCharset());
-        int type;
         values = new ArrayList<>();
         DumpInfo di = sis.dumpInfo;
         sis = sis.getLimitedStream(actionLength);
         sis.dumpInfo = di;
         try {
             while (sis.available() > 0) {
-                type = sis.readUI8("type");
-                switch (type) {
-                    case 0:
-                        values.add(sis.readString("string"));
-                        break;
-                    case 1:
-                        values.add(sis.readFLOAT("float"));
-                        break;
-                    case 2:
-                        values.add(Null.INSTANCE);
-                        break;
-                    case 3:
-                        values.add(Undefined.INSTANCE);
-                        break;
-                    case 4:
-                        values.add(new RegisterNumber(sis.readUI8("registerNumber")));
-                        break;
-                    case 5:
-                        int b = sis.readUI8("boolean");
-                        if (b == 0) {
-                            values.add((Boolean) false);
-                        } else {
-                            values.add((Boolean) true);
-                        }
-
-                        break;
-                    case 6:
-                        values.add(sis.readDOUBLE("double"));
-                        break;
-                    case 7:
-                        long el = sis.readSI32("integer");
-                        values.add((Long) el);
-                        break;
-                    case 8:
-                        values.add(new ConstantIndex(sis.readUI8("constantIndex")));
-                        break;
-                    case 9:
-                        values.add(new ConstantIndex(sis.readUI16("constantIndex")));
-                        break;
+                Object value = readSingleValue(sis);
+                if (value != null) {
+                    values.add(value);
                 }
             }
         } catch (EndOfStreamException ex) {
             //ignored
+        }
+    }
+
+    public static Object readSingleValue(SWFInputStream sis) throws IOException {
+        int type = sis.readUI8("type");
+        switch (type) {
+            case 0:
+                return sis.readString("string");
+            case 1:
+                return sis.readFLOAT("float");
+            case 2:
+                return Null.INSTANCE;
+            case 3:
+                return Undefined.INSTANCE;
+            case 4:
+                return new RegisterNumber(sis.readUI8("registerNumber"));
+            case 5:
+                int b = sis.readUI8("boolean");
+                if (b == 0) {
+                    return (Boolean) false;
+                } else {
+                    return (Boolean) true;
+                }
+            case 6:
+                return sis.readDOUBLE("double");
+            case 7:
+                long el = sis.readSI32("integer");
+                return (Long) el;
+            case 8:
+                return new ConstantIndex(sis.readUI8("constantIndex"));
+            case 9:
+                return new ConstantIndex(sis.readUI16("constantIndex"));
+        }
+        return null;
+    }
+
+    public static void getValueContentBytes(Object value, SWFOutputStream sos) throws IOException {
+        if (value instanceof String) {
+            sos.writeUI8(0);
+            sos.writeString((String) value);
+        } else if (value instanceof Float) {
+            sos.writeUI8(1);
+            sos.writeFLOAT((Float) value);
+        } else if (value == Null.INSTANCE) {
+            sos.writeUI8(2);
+        } else if (value == Undefined.INSTANCE) {
+            sos.writeUI8(3);
+        } else if (value instanceof RegisterNumber) {
+            sos.writeUI8(4);
+            sos.writeUI8(((RegisterNumber) value).number);
+        } else if (value instanceof Boolean) {
+            sos.writeUI8(5);
+            sos.writeUI8((Boolean) value ? 1 : 0);
+        } else if (value instanceof Number) {
+            if (value instanceof Long) {
+                long l = (Long) value;
+                if (l < -0x80000000 || l > 0x7fffffff) {
+                    value = (double) l;
+                }
+            }
+            if (value instanceof Float) {
+                sos.writeUI8(1);
+                sos.writeFLOAT((Float) value);
+            } else if (value instanceof Double) {
+                sos.writeUI8(6);
+                sos.writeDOUBLE((Double) value);
+            } else if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte) {
+                sos.writeUI8(7);
+                sos.writeSI32(((Number) value).longValue());
+            }
+        } else if (value instanceof ConstantIndex) {
+            int cIndex = ((ConstantIndex) value).index;
+            if (cIndex <= MAX_CONSTANT_INDEX_TYPE8) {
+                sos.writeUI8(8);
+                sos.writeUI8(cIndex);
+            } else {
+                sos.writeUI8(9);
+                sos.writeUI16(cIndex);
+            }
         }
     }
 
@@ -155,49 +199,7 @@ public class ActionPush extends Action {
             vals = replacement;
         }
         for (Object o : vals) {
-            if (o instanceof String) {
-                sos.writeUI8(0);
-                sos.writeString((String) o);
-            } else if (o instanceof Float) {
-                sos.writeUI8(1);
-                sos.writeFLOAT((Float) o);
-            } else if (o == Null.INSTANCE) {
-                sos.writeUI8(2);
-            } else if (o == Undefined.INSTANCE) {
-                sos.writeUI8(3);
-            } else if (o instanceof RegisterNumber) {
-                sos.writeUI8(4);
-                sos.writeUI8(((RegisterNumber) o).number);
-            } else if (o instanceof Boolean) {
-                sos.writeUI8(5);
-                sos.writeUI8((Boolean) o ? 1 : 0);
-            } else if (o instanceof Number) {
-                if (o instanceof Long) {
-                    long l = (Long) o;
-                    if (l < -0x80000000 || l > 0x7fffffff) {
-                        o = (double) l;
-                    }
-                }
-                if (o instanceof Float) {
-                    sos.writeUI8(1);
-                    sos.writeFLOAT((Float) o);
-                } else if (o instanceof Double) {
-                    sos.writeUI8(6);
-                    sos.writeDOUBLE((Double) o);
-                } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
-                    sos.writeUI8(7);
-                    sos.writeSI32(((Number) o).longValue());
-                }
-            } else if (o instanceof ConstantIndex) {
-                int cIndex = ((ConstantIndex) o).index;
-                if (cIndex <= MAX_CONSTANT_INDEX_TYPE8) {
-                    sos.writeUI8(8);
-                    sos.writeUI8(cIndex);
-                } else {
-                    sos.writeUI8(9);
-                    sos.writeUI16(cIndex);
-                }
-            }
+            getValueContentBytes(o, sos);
         }
     }
 
@@ -214,43 +216,44 @@ public class ActionPush extends Action {
         }
         int res = 0;
         for (Object o : vals) {
-            if (o instanceof String) {
-                res += Utf8Helper.getBytesLength((String) o, charset) + 2;
-            } else if (o instanceof Float) {
-                res += 5;
-            } else if (o == Null.INSTANCE) {
-                res++;
-            } else if (o == Undefined.INSTANCE) {
-                res++;
-            } else if (o instanceof RegisterNumber) {
-                res += 2;
-            } else if (o instanceof Boolean) {
-                res += 2;
-            } else if (o instanceof Number) {
-                if (o instanceof Long) {
-                    long l = (Long) o;
-                    if (l < -0x80000000 || l > 0x7fffffff) {
-                        o = (double) l;
-                    }
-                }
-                if (o instanceof Float) {
-                    res += 5;
-                } else if (o instanceof Double) {
-                    res += 9;
-                } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
-                    res += 5;
-                }
-            } else if (o instanceof ConstantIndex) {
-                int cIndex = ((ConstantIndex) o).index;
-                if (cIndex < 256) {
-                    res += 2;
-                } else {
-                    res += 3;
-                }
-            }
+            res += getValueContentBytesLength(o, charset);
         }
 
         return res;
+    }
+
+    /**
+     * Gets the encoded length of a single push value, including its type byte.
+     *
+     * @param value Value
+     * @param charset Charset
+     * @return Encoded length
+     */
+    public static int getValueContentBytesLength(Object value, String charset) {
+        if (value instanceof String) {
+            return Utf8Helper.getBytesLength((String) value, charset) + 2;
+        } else if (value instanceof Float) {
+            return 5;
+        } else if (value == Null.INSTANCE || value == Undefined.INSTANCE) {
+            return 1;
+        } else if (value instanceof RegisterNumber || value instanceof Boolean) {
+            return 2;
+        } else if (value instanceof Number) {
+            if (value instanceof Long) {
+                long l = (Long) value;
+                if (l < -0x80000000 || l > 0x7fffffff) {
+                    value = (double) l;
+                }
+            }
+            if (value instanceof Double) {
+                return 9;
+            } else if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte) {
+                return 5;
+            }
+        } else if (value instanceof ConstantIndex) {
+            return ((ConstantIndex) value).index < 256 ? 2 : 3;
+        }
+        return 0;
     }
 
     /**
@@ -321,43 +324,49 @@ public class ActionPush extends Action {
             boolean valueExpected = false;
             ASMParsedSymbol symb = lexer.lex();
             if (symb.type == ASMParsedSymbol.TYPE_COMMA) {
-                symb = lexer.lex();
                 valueExpected = true;
+            } else {
+                lexer.pushback(symb);
             }
-            switch (symb.type) {
-                case ASMParsedSymbol.TYPE_STRING:
-                    count++;
-                    if (constantPool.contains((String) symb.value)) {
-                        values.add(new ConstantIndex(constantPool.indexOf(symb.value)));
-                    } else {
-                        values.add(symb.value);
-                    }
-                    break;
-                case ASMParsedSymbol.TYPE_FLOAT:
-                case ASMParsedSymbol.TYPE_DOUBLE:
-                case ASMParsedSymbol.TYPE_NULL:
-                case ASMParsedSymbol.TYPE_UNDEFINED:
-                case ASMParsedSymbol.TYPE_REGISTER:
-                case ASMParsedSymbol.TYPE_BOOLEAN:
-                case ASMParsedSymbol.TYPE_INTEGER:
-                case ASMParsedSymbol.TYPE_CONSTANT:
-                    count++;
-                    values.add(symb.value);
-                    break;
-                case ASMParsedSymbol.TYPE_EOL:
-                case ASMParsedSymbol.TYPE_EOF:
-                    if (valueExpected) {
-                        throw new ActionParseException("Value expected", lexer.yyline());
-                    } else if (count == 0) {
-                        throw new ActionParseException("Arguments expected", lexer.yyline());
-                    } else {
-                        break loop;
-                    }
-                case ASMParsedSymbol.TYPE_COMMENT:
-                    break;
-                default:
-                    throw new ActionParseException("Arguments expected, " + symb.type + " " + symb.value + " found", lexer.yyline());
+            Object value = parseValue(lexer, constantPool, valueExpected, count);
+            if (value == null) {
+                break;
             }
+            count++;
+            values.add(value);            
+        }
+    }
+
+    public static Object parseValue(FlasmLexer lexer, List<String> constantPool, boolean valueExpected, int count) throws IOException, ActionParseException {
+        ASMParsedSymbol symb = lexer.lex();
+        switch (symb.type) {
+            case ASMParsedSymbol.TYPE_STRING:
+                if (constantPool.contains((String) symb.value)) {
+                    return new ConstantIndex(constantPool.indexOf(symb.value));
+                }
+                return symb.value;
+            case ASMParsedSymbol.TYPE_FLOAT:
+            case ASMParsedSymbol.TYPE_DOUBLE:
+            case ASMParsedSymbol.TYPE_NULL:
+            case ASMParsedSymbol.TYPE_UNDEFINED:
+            case ASMParsedSymbol.TYPE_REGISTER:
+            case ASMParsedSymbol.TYPE_BOOLEAN:
+            case ASMParsedSymbol.TYPE_INTEGER:
+            case ASMParsedSymbol.TYPE_CONSTANT:
+                return symb.value;
+            case ASMParsedSymbol.TYPE_EOL:
+            case ASMParsedSymbol.TYPE_EOF:
+                if (valueExpected) {
+                    throw new ActionParseException("Value expected", lexer.yyline());
+                } else if (count == 0) {
+                    throw new ActionParseException("Arguments expected", lexer.yyline());
+                } else {
+                    return null;
+                }
+            case ASMParsedSymbol.TYPE_COMMENT:
+                return parseValue(lexer, constantPool, valueExpected, count);
+            default:
+                throw new ActionParseException("Arguments expected, " + symb.type + " " + symb.value + " found", lexer.yyline());
         }
     }
 
@@ -429,6 +438,27 @@ public class ActionPush extends Action {
         }
         return writer;
     }
+    
+    public static String valueToString(Object value, List<String> constantPool) {
+        if (value instanceof ConstantIndex) {
+            return ((ConstantIndex) value).toString(constantPool, Configuration.resolveConstants.get());
+        } else if (value instanceof String) {
+            return "\"" + Helper.escapeActionScriptString((String) value) + "\"";
+        } else if (value instanceof RegisterNumber) {
+            return ((RegisterNumber) value).toStringNoName();
+        } else if ((value instanceof Float) || (value instanceof Double)) {
+            String fdString = EcmaScript.toString(value);
+            if (value instanceof Double && fdString.matches("^[0-9]+$")) {
+                fdString += ".0";
+            }
+            if (value instanceof Float) {
+                fdString += "f";
+            }
+            return fdString;
+        } else {
+            return value.toString();
+        }
+    }
 
     /**
      * Converts the parameter to string.
@@ -439,26 +469,8 @@ public class ActionPush extends Action {
     public String toString(int i) {
         String ret;
         Object value = values.get(i);
-        if (value instanceof ConstantIndex) {
-            ret = ((ConstantIndex) value).toString(constantPool, Configuration.resolveConstants.get());
-        } else if (value instanceof String) {
-            ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
-        } else if (value instanceof RegisterNumber) {
-            ret = ((RegisterNumber) value).toStringNoName();
-        } else if ((value instanceof Float) || (value instanceof Double)) {
-            String fdString = EcmaScript.toString(value);
-            if (value instanceof Double && fdString.matches("^[0-9]+$")) {
-                fdString += ".0";
-            }
-            if (value instanceof Float) {
-                fdString += "f";
-            }
-            ret = fdString;
-        } else {
-            ret = value.toString();
-        }
-        return ret;
-    }
+        return valueToString(value, constantPool);
+    }   
 
     @Override
     public String toString() {
@@ -559,5 +571,15 @@ public class ActionPush extends Action {
     @Override
     public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
         return values.size();
+    }
+
+    @Override
+    public void setConstantPool(List<String> constantPool) {
+        this.constantPool = constantPool;
+    }
+
+    @Override
+    public List<String> getConstantPool() {
+        return constantPool;
     }
 }

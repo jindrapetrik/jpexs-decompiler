@@ -389,8 +389,10 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                                 Point p = new Point(x, y);
 
-                                p.x = (int) Math.round(p.x / aeroSnapTransform.getScaleX());
-                                p.y = (int) Math.round(p.y / aeroSnapTransform.getScaleY());
+                                if (aeroSnapTransform != null) {
+                                    p.x = (int) Math.round(p.x / aeroSnapTransform.getScaleX());
+                                    p.y = (int) Math.round(p.y / aeroSnapTransform.getScaleY());
+                                }
 
                                 p.x -= posOnScreen.x;
                                 p.y -= posOnScreen.y;

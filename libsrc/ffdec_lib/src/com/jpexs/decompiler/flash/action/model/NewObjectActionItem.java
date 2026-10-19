@@ -38,6 +38,11 @@ import java.util.Objects;
 public class NewObjectActionItem extends ActionItem {
 
     /**
+     * Class owning an implicitly referenced static constructor.
+     */
+    public GraphTargetItem resolvedObject;
+
+    /**
      * Object name
      */
     public GraphTargetItem objectName;
@@ -94,6 +99,9 @@ public class NewObjectActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (resolvedObject != null) {
+            return new NewMethodActionItem(getSrc(), getLineStartItem(), resolvedObject, objectName, arguments).toSource(localData, generator);
+        }
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), objectName, new ActionNewObject());
     }
 

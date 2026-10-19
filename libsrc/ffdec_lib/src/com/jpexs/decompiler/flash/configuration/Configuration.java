@@ -1239,11 +1239,61 @@ public final class Configuration {
     
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
-    public static ConfigurationItem<Boolean> showLoadingSpinner = null;
+    public static ConfigurationItem<Boolean> showLoadingSpinner = null;   
     
     @ConfigurationDefaultString("")
     @ConfigurationName("xmlExport.formats")
     public static ConfigurationItem<String> lastSelectedXmlExportFormats = null;
+    
+    @ConfigurationDefaultString("flash.display.Sprite")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentSprite = null;
+
+    @ConfigurationDefaultString("flash.display.Bitmap")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentImage = null;
+
+    @ConfigurationDefaultString("flash.media.Sound")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentSound = null;
+
+    @ConfigurationDefaultString("flash.text.Font")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentFont = null;
+
+    @ConfigurationDefaultString("flash.utils.ByteArray")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentBinaryData = null;
+    
+    @ConfigurationDefaultString("flash.display.SimpleButton")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<String> as3ClassLinkageDefaultParentButton = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("gui.avm2.assetPreview.expanded")
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> guiAvm2AssetPreviewExpanded = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("gui.avm2.assetPreview.playing")
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> guiAvm2AssetPreviewPlaying = null;
+
+    @ConfigurationDefaultInt(0)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastTweenEasingMode = null;
+
+    @ConfigurationDefaultInt(0)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastTweenEasingValue = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationInternal
+    public static ConfigurationItem<String> lastTweenCustomEase = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> useNativeFileDialogs = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

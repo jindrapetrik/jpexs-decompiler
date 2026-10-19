@@ -61,6 +61,7 @@ actionscript
 actionscriptdoc
 actionscriptsyntaxkit
 activex
+Actl
 adata
 addclass
 addexport
@@ -69,6 +70,7 @@ additionalmodules
 additionalparam
 addressproperty
 addrfix
+addtagmulti
 addtocontextmenu
 addtrait
 adff
@@ -123,6 +125,7 @@ altglyph
 altsigner
 ames
 amf
+AMuch
 amxmlc
 aname
 ANDEQ
@@ -166,6 +169,7 @@ asasm
 ascentdescentleading
 asciitochar
 asclass
+asclasslink
 asclassmain
 asconfig
 asdec
@@ -260,6 +264,7 @@ bbff
 Bbits
 bca
 bcb
+bcdec
 bcdedit
 bcdfghjklmnpqrstvwz
 bcff
@@ -268,8 +273,10 @@ bcx
 bdctx
 bdff
 bdt
+bduration
 beaninfo
 Beanshell
+BEB
 bechtold
 beff
 beginbfchar
@@ -308,10 +315,11 @@ BINARYTAG
 binarytestincludes
 bindex
 bininfo
+bioshock
 bistream
 bitbuf
 bitdepth
-BITFIELDS
+bitfield
 bitindex
 bitlshift
 BITMAPDATA
@@ -391,6 +399,7 @@ bundleswc
 buttoncondaction
 buttonicon
 BUTTONRECORD
+buttonss
 Bval
 byacc
 byt
@@ -442,6 +451,7 @@ CASEINSENSITIVE
 caseoffsets
 casesensitive
 Casteljau
+castlecrashers
 castop
 catchparts
 CATID
@@ -580,6 +590,7 @@ cntp
 codegenop
 codehaus
 codelength
+codeoffset
 codetab
 coefs
 COERROR
@@ -745,7 +756,6 @@ debugpcode
 debugswf
 debugtool
 decimalsupport
-declend
 declocal
 declocalp
 decompilation
@@ -967,6 +977,7 @@ dxm
 dxns
 dxnslate
 dxs
+dxt
 dyat
 dyf
 dym
@@ -1104,7 +1115,6 @@ EXTENDEDKEY
 extitle
 Extrahandling
 EXTRALIGHT
-extraxtdir
 ezb
 fai
 failonerror
@@ -1121,7 +1131,9 @@ fcanvas
 fcc
 fcff
 fcode
+Fctl
 fctx
+Fdat
 FDE
 fdecompiled
 fdepth
@@ -1139,7 +1151,6 @@ ffile
 ffname
 fframe
 ffs
-FFXX
 FGlyph
 fgp
 fgrad
@@ -1301,6 +1312,7 @@ frest
 Friesen
 frm
 Frob
+fromsoft
 fromto
 fsb
 fscommand
@@ -1568,7 +1580,7 @@ iconinfo
 ict
 icting
 ictx
-IDAT
+idat
 idata
 IDCT
 Iddle
@@ -1579,7 +1591,7 @@ identifierdeobfuscation
 idscan
 Idtags
 IDTYPE
-iends
+iend
 ieport
 iex
 ifaces
@@ -1602,13 +1614,14 @@ ift
 iftrue
 ifup
 igchar
-iggi
 iggy
 iggyfile
+iggytex
 ignodes
 ignorebackground
 ignoreversion
 igv
+Ihdr
 ihnp
 iid
 iin
@@ -1768,7 +1781,6 @@ istep
 istrue
 istype
 istypelate
-itemj
 itemr
 itemtypes
 ITF
@@ -1856,7 +1868,7 @@ jsa
 Jscroll
 JScrollable
 jsep
-JSFL
+jsfl
 jslike
 jso
 jsondatafile
@@ -1875,6 +1887,7 @@ jvmarg
 JVMs
 jvnet
 jxar
+jxr
 kalip
 KARG
 KBDLLHOOKSTRUCT
@@ -1884,7 +1897,7 @@ Kein
 Keine
 ker
 KERNINGRECORD
-Kernings
+kernings
 kevin
 keyb
 KEYBDINPUT
@@ -1914,6 +1927,7 @@ Kratz
 Krbtgt
 ktm
 Kto
+Kudlai
 kupr
 kvals
 kweiner
@@ -1993,6 +2007,7 @@ linkreport
 linmax
 listconfigs
 Listswf
+listswfprofiles
 Liushui
 livedocs
 lix
@@ -2051,7 +2066,6 @@ loopk
 loopm
 loopn
 loopnext
-loopobj
 loopoff
 loopon
 loopopened
@@ -2238,6 +2252,7 @@ minscope
 MINUSEQ
 MINUSMINUS
 MINVALUE
+mip
 Miron
 miscompilation
 miterclip
@@ -2365,7 +2380,6 @@ myvarsetonly
 myvectorint
 myxml
 Naashorn
-nabc
 nai
 Namesmy
 namespacekind
@@ -2739,6 +2753,7 @@ pathpart
 pathsource
 pathvar
 Pawel
+pbit
 pblend
 pbmi
 pbstr
@@ -2782,6 +2797,7 @@ phk
 PIII
 pinnable
 pipename
+pixl
 placeobject
 PLACETAG
 plaf
@@ -3233,6 +3249,7 @@ semicoloned
 sendenter
 seproject
 serclose
+Sergii
 serh
 serl
 serr
@@ -3361,7 +3378,8 @@ SOFD
 SOFE
 SOFF
 softsound
-SOI
+soi
+soledit
 soleditor
 SOMECACHES
 somemethod
@@ -3503,6 +3521,7 @@ subloader
 submethod
 subout
 subref
+subspans
 subsprite
 Subtables
 subtag
@@ -3531,6 +3550,7 @@ swfitem
 swfmeta
 SWFNAME
 swfpreview
+swfprofile
 swfs
 swftext
 swftextsyntaxkit
@@ -3659,8 +3679,10 @@ thn
 throwpart
 ths
 timelined
+timemap
 TIMERNOFG
 timesroman
+timevalue
 tina
 titem
 tlb
@@ -3861,6 +3883,7 @@ unpremultiply
 unr
 Unreads
 Unregisters
+unrelocated
 unresize
 unser
 unshar
@@ -4064,6 +4087,7 @@ xelem
 XEnd
 XENROLL
 XEvent
+XFixed
 xfl
 XFloat
 Xfm
@@ -4124,6 +4148,7 @@ xstate
 xtaga
 xtagb
 XText
+XTwips
 XUpdate
 xval
 Xvfb

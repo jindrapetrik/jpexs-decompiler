@@ -47,6 +47,9 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     public long readUI64() throws IOException {
         long lsb = readUI32();
         long msb = readUI32();
+        if (lsb < 0 || msb < 0) {
+            throw new EOFException();
+        }
         long result = msb << 32 | lsb;
         return result & 0xffffffffffffffffL;
     }
@@ -55,6 +58,9 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     public long readSI64() throws IOException {
         long lsb = readUI32();
         long msb = readUI32();
+        if (lsb < 0 || msb < 0) {
+            throw new EOFException();
+        }
         return msb << 32 | lsb;
     }
 
@@ -89,10 +95,19 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     @Override
     public long readUI32() throws IOException {
         try {
-            return (readUI8() | (readUI8() << 8) | (readUI8() << 16) | (readUI8() << 24));
+            return (read() | (read() << 8) | (read() << 16) | (read() << 24)) & 0xffffffffL;
         } catch (EOFException ex) {
             return -1;
         }
+    }
+
+    @Override
+    public long readSI32() throws IOException {
+        long value = readUI32();
+        if (value < 0) {
+            throw new EOFException();
+        }
+        return (int) value;
     }
 
     @Override
@@ -105,12 +120,26 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     }
 
     @Override
+    public boolean writeSI32(long val) throws IOException {
+        return writeUI32(val);
+    }
+
+    @Override
     public int readUI16() throws IOException {
         try {
-            return (readUI8() | (readUI8() << 8)) & 0xffff;
+            return (read() | (read() << 8)) & 0xffff;
         } catch (EOFException ex) {
             return -1;
         }
+    }
+
+    @Override
+    public int readSI16() throws IOException {
+        int value = readUI16();
+        if (value < 0) {
+            throw new EOFException();
+        }
+        return (short) value;
     }
 
     @Override
@@ -118,6 +147,11 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         write(val & 0xff);
         write((val >> 8) & 0xff);
         return true;
+    }
+
+    @Override
+    public boolean writeSI16(int val) throws IOException {
+        return writeUI16(val);
     }
 
     @Override
@@ -207,7 +241,11 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     public String readWChar() throws IOException {
         StringBuilder strBuilder = new StringBuilder();
         do {
-            char c = (char) readUI16();
+            int value = readUI16();
+            if (value < 0) {
+                throw new EOFException("Unterminated Iggy UTF-16 string");
+            }
+            char c = (char) value;
             if (c == '\0') {
                 break;
             }

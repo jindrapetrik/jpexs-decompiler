@@ -157,7 +157,7 @@ public class ErrorLogFrame extends AppFrame {
         saveToFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = View.getFileChooserWithIcon("save");
+                FileChooser fc = View.getFileChooserWithIcon("save");
                 fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
 
                 FileFilter txtFilter = new FileFilter() {

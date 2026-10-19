@@ -1,0 +1,8 @@
+document=47_native_quadratic.xfl
+layer=0
+frame=0
+startFrame=0
+duration=61
+fps=30
+width=640
+height=360

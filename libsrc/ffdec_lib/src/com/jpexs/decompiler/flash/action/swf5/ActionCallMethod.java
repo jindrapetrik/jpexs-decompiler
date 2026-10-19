@@ -30,7 +30,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
-import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -183,14 +182,6 @@ public class ActionListReader {
             System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
             p++;
         }*/
-        try {
-            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, null);
-        } catch (ThreadDeath | InterruptedException ex) {
-            //ignored
-        } catch (Throwable ex) {
-            Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
-        }          
-        
         return actions;
     }
 
@@ -844,17 +835,6 @@ public class ActionListReader {
 
                 int actionLengthWithHeader = a.getTotalActionLength();
 
-                // unknown action, replace with jump
-                if (a instanceof ActionUnknown && a.getActionCode() >= 0x80) {
-                    ActionJump aJump = new ActionDeobfuscateJump(0, charset);
-                    int jumpLength = aJump.getTotalActionLength();
-                    aJump.setAddress(a.getAddress());
-                    //FIXME! This offset can be larger than SI16 value!
-                    aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
-                    a = aJump;
-                    actionLengthWithHeader = a.getTotalActionLength();
-                }
-
                 if (entryAction == null) {
                     entryAction = a;
                 }
@@ -875,8 +855,8 @@ public class ActionListReader {
 
                 a.setAddress(ip);
 
-                if (a instanceof ActionPush && cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
+                if (a instanceof ConstantPoolAwareAction && cpool != null) {
+                    ((ConstantPoolAwareAction) a).setConstantPool(cpool.constants);
                 } else if (a instanceof ActionConstantPool) {
                     cpool = new ConstantPool(((ActionConstantPool) a).constantPool);
                 } else if (a instanceof ActionIf) {
@@ -1007,11 +987,11 @@ public class ActionListReader {
                     ret = true;
                 }
 
-                if (a instanceof ActionPush && cpool != null) {
-                    ActionPush push = (ActionPush) a;
-                    if (push.constantPool != cpool.constants) {
-                        push.constantPool = cpool.constants.isEmpty() ? null : cpool.constants;
-                        if (push.constantPool != null) {
+                if (a instanceof ConstantPoolAwareAction && cpool != null) {
+                    ConstantPoolAwareAction push = (ConstantPoolAwareAction) a;
+                    if (push.getConstantPool() != cpool.constants) {
+                        push.setConstantPool(cpool.constants.isEmpty() ? null : cpool.constants);
+                        if (push.getConstantPool() != null) {
                             ret = true;
                         }
                     }

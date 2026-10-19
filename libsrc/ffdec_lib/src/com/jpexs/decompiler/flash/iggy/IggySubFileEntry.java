@@ -39,11 +39,38 @@ public class IggySubFileEntry implements StructureInterface {
 
     @SWFType(BasicType.UI32)
     long type;
+    int copyFlag;
+    int targetIndex;
+    int metadata;
+
+    public int getType() {
+        return (int) type;
+    }
+
+    public int getCopyFlag() {
+        return copyFlag;
+    }
+
+    public int getTargetIndex() {
+        return targetIndex;
+    }
+
+    public int getMetadata() {
+        return metadata;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
 
     @SWFType(BasicType.UI32)
     long size;
 
-    //apparently same as size, maybe (un)compressed (?)
+    //Preserved descriptor word at +8; its semantics are not known.
     @SWFType(BasicType.UI32)
     long size2;
 
@@ -56,7 +83,10 @@ public class IggySubFileEntry implements StructureInterface {
     }
 
     public IggySubFileEntry(long type, long size, long size2, long offset) {
-        this.type = type;
+        this.type = type & 255;
+        this.copyFlag = (int) (type >>> 8) & 255;
+        this.targetIndex = (int) (type >>> 16) & 255;
+        this.metadata = (int) (type >>> 24) & 255;
         this.size = size;
         this.size2 = size2;
         this.offset = offset;
@@ -76,7 +106,10 @@ public class IggySubFileEntry implements StructureInterface {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
-        type = stream.readUI32();
+        type = stream.readUI8();
+        copyFlag = stream.readUI8();
+        targetIndex = stream.readUI8();
+        metadata = stream.readUI8();
         size = stream.readUI32();
         size2 = stream.readUI32();
         offset = stream.readUI32();
@@ -84,7 +117,10 @@ public class IggySubFileEntry implements StructureInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
-        stream.writeUI32(type);
+        stream.writeUI8((int) type);
+        stream.writeUI8(copyFlag);
+        stream.writeUI8(targetIndex);
+        stream.writeUI8(metadata);
         stream.writeUI32(size);
         stream.writeUI32(size2);
         stream.writeUI32(offset);

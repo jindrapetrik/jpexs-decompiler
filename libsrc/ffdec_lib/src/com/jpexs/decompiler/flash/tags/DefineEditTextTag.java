@@ -1430,7 +1430,7 @@ public class DefineEditTextTag extends TextTag {
                 ge.glyphAdvance += lastStyle.letterSpacing * SWF.unitDivisor;
                 if (useOutlines && lastStyle.kerning && font != null && font.hasLayout()) {
                     if (nextChar != null) {
-                        ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider();
+                        ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider() * lastStyle.fontHeight / 1024;
                     }
                 }
                 textModel.addGlyph(c, ge, cs.htmlSourcePosition);

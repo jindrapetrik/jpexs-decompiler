@@ -222,7 +222,7 @@ public class Amf0InputStream extends InputStream {
         int b3 = readInternal();
         int b4 = readInternal();
 
-        return ((b1 << 24) + (b2 << 16) + (b3 << 8) + b4) & 0xffffffff;
+        return ((long) b1 << 24) | ((long) b2 << 16) | ((long) b3 << 8) | b4;
     }
 
     /**
@@ -277,7 +277,7 @@ public class Amf0InputStream extends InputStream {
 
     private long signExtend(long val, int size) {
         if (((val >> (size - 1)) & 1) == 1) { //has sign bit
-            long mask = size == 32 ? 0xFFFFFFFF : (1 << size) - 1; // 111111...up to size
+            long mask = size == 32 ? 0xFFFFFFFFL : (1L << size) - 1; // 111111...up to size
             long positiveVal = (~(val - 1)) & mask;
             long negativeVal = -positiveVal;
             return negativeVal;

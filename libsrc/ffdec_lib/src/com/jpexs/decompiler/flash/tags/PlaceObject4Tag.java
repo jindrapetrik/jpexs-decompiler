@@ -158,7 +158,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * If PlaceFlagHasCharacter, ID of character to place
      */
     @SWFType(BasicType.UI16)
-    @Conditional("placeFlagHasCharacter")
+    @Conditional("placeFlagHasCharacter && !placeFlagHasClassName")
     public int characterId;
 
     /**
@@ -335,8 +335,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         depth = sis.readUI16("depth");
         if (placeFlagHasClassName) {
             className = sis.readString("className");
-        }
-        if (placeFlagHasCharacter) {
+        } else if (placeFlagHasCharacter) {
             characterId = sis.readUI16("characterId");
         }
         if (placeFlagHasMatrix) {
@@ -418,8 +417,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
         if (placeFlagHasClassName) {
             sos.writeString(className);
-        }
-        if (placeFlagHasCharacter) {
+        } else if (placeFlagHasCharacter) {
             sos.writeUI16(characterId);
         }
         if (placeFlagHasMatrix) {
@@ -488,8 +486,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
         if (placeFlagHasClassName) {
             sos.writeString(className);
-        }
-        if (placeFlagHasCharacter) {
+        } else if (placeFlagHasCharacter) {
             sos.writeUI16(characterId);
         }
         if (placeFlagHasMatrix) {
@@ -591,7 +588,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     @Override
     public int getCharacterId() {
-        if (placeFlagHasCharacter) {
+        if (placeFlagHasCharacter && !placeFlagHasClassName) {
             return characterId;
         } else {
             return -1;
@@ -602,6 +599,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public void setCharacterId(int characterId) {
         if (characterId >= 0) {
             placeFlagHasCharacter = true;
+            placeFlagHasClassName = false;
             this.characterId = characterId;
         } else {
             placeFlagHasCharacter = false;

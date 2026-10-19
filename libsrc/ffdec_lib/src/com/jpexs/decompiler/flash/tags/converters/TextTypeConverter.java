@@ -2,23 +2,39 @@ package com.jpexs.decompiler.flash.tags.converters;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.shapes.ShapeTransformer;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.xfl.XFLXmlWriter;
+import com.jpexs.helpers.Helper;
 import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +43,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 /**
- * Converts between text types (DefineText, DefineText2, DefineEditText)
+ * Converts between text types (DefineText, DefineText2, DefineEditText) and to shapes
  *
  * @author JPEXS
  */
@@ -36,6 +52,7 @@ public class TextTypeConverter {
     public static int TEXT_TYPE_DEFINE_TEXT = 1;
     public static int TEXT_TYPE_DEFINE_TEXT2 = 2;
     public static int TEXT_TYPE_DEFINE_EDIT_TEXT = 3;
+    public static int TEXT_TYPE_SHAPE = 4;
 
     /**
      * Converts static text version
@@ -280,6 +297,135 @@ public class TextTypeConverter {
         return det;
     }
 
+    /**
+     * Converts the current text content to glyph outlines.
+     *
+     * @param tag Source text
+     * @param targetSWF Target SWF
+     * @return DefineShape, or DefineShape3 when a fill has transparency
+     */
+    public ShapeTag convertToShape(TextTag tag, SWF targetSWF) {
+        List<TEXTRECORD> records;
+        Matrix textMatrix;
+        if (tag instanceof StaticTextTag) {
+            StaticTextTag text = (StaticTextTag) tag;
+            records = text.textRecords;
+            textMatrix = new Matrix(text.textMatrix);
+        } else {
+            DefineEditTextTag text = (DefineEditTextTag) tag;
+            records = text.getTextRecords(tag.getSwf(), new HashMap<>());
+            textMatrix = Matrix.getTranslateInstance(text.bounds.Xmin + 40, text.bounds.Ymin + 40);
+        }
+        ShapeTag result = new DefineShape3Tag(targetSWF);
+        result.shapes.shapeRecords = new ArrayList<>();
+        List<FILLSTYLE> fills = new ArrayList<>();
+        Map<Integer, Integer> colorStyles = new HashMap<>();
+        boolean transparent = false;
+        if (tag instanceof DefineEditTextTag && ((DefineEditTextTag) tag).border) {
+            DefineEditTextTag editText = (DefineEditTextTag) tag;
+            SHAPEWITHSTYLE border = (SHAPEWITHSTYLE) TextTag.getBorderShape(new RGBA(Color.BLACK), new RGBA(Color.WHITE), editText.bounds);
+            result.shapes.lineStyles = border.lineStyles;
+            FILLSTYLE fill = new FILLSTYLE();
+            fill.fillStyleType = FILLSTYLE.SOLID;
+            fill.color = new RGBA(Color.WHITE);
+            fills.add(fill);
+            colorStyles.put(fill.color.toInt(), 1);
+            appendShape(result, border, Matrix.getTranslateInstance(editText.bounds.Xmin, editText.bounds.Ymin), 1, 1);
+        }
+        FontTag font = null;
+        int textHeight = 0;
+        int x = 0;
+        int y = 0;
+        RGBA color = new RGBA(Color.BLACK);
+        for (TEXTRECORD rec : records) {
+            if (rec.styleFlagsHasFont) {
+                font = rec.getFont(tag.getSwf());
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasColor) {
+                color = rec.textColorA != null ? rec.textColorA : new RGBA(rec.textColor);
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+            double divider = font == null ? 1 : font.getDivider();
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                SHAPE glyph = null;
+                if (entry.glyphIndex >= 0 && font != null && entry.glyphIndex < font.getGlyphShapeTable().size()) {
+                    glyph = font.getGlyphShapeTable().get(entry.glyphIndex);
+                } else if (entry instanceof DynamicTextGlyphEntry) {
+                    DynamicTextGlyphEntry dynamic = (DynamicTextGlyphEntry) entry;
+                    String face = dynamic.fontFace == null ? FontTag.getDefaultFontName() : dynamic.fontFace;
+                    glyph = SHAPERECORD.fontCharacterToSHAPE(new Font(face, dynamic.fontStyle, 12),
+                            (float) (1024 * divider), dynamic.character);
+                }
+                if (glyph != null) {
+                    Integer fillIndex = colorStyles.get(color.toInt());
+                    if (fillIndex == null) {
+                        FILLSTYLE fill = new FILLSTYLE();
+                        fill.fillStyleType = FILLSTYLE.SOLID;
+                        fill.color = new RGBA(color);
+                        fills.add(fill);
+                        fillIndex = fills.size();
+                        colorStyles.put(color.toInt(), fillIndex);
+                    }
+                    transparent |= color.alpha != 255;
+                    Matrix matrix = textMatrix
+                            .concatenate(Matrix.getTranslateInstance(x, y))
+                            .concatenate(Matrix.getScaleInstance(textHeight / 1024.0 / divider));
+                    appendShape(result, glyph, matrix, fillIndex, 0);
+                }
+                x += entry.glyphAdvance;
+            }
+        }
+        result.shapes.shapeRecords.add(new EndShapeRecord());
+        result.shapes.fillStyles.fillStyles = fills.toArray(new FILLSTYLE[0]);
+        result.shapeBounds = result.shapes.getBounds(3);
+        if (!transparent) {
+            ShapeTag opaque = new DefineShapeTag(targetSWF);
+            opaque.shapes = result.shapes;
+            opaque.shapes.fillStyles = opaque.shapes.fillStyles.toShapeNum(1);
+            opaque.shapes.lineStyles = opaque.shapes.lineStyles.toShapeNum(3, 1);
+            opaque.shapeBounds = result.shapeBounds;
+            result = opaque;
+        }
+        return result;
+    }
+
+    private void appendShape(ShapeTag result, SHAPE source, Matrix matrix, int fillIndex, int lineIndex) {
+        SHAPE shape = Helper.deepCopy(source);
+        // Every glyph starts at its own origin and resets styles inherited from the preceding glyph.
+        StyleChangeRecord start = new StyleChangeRecord();
+        start.stateMoveTo = true;
+        start.stateFillStyle0 = true;
+        start.stateFillStyle1 = true;
+        start.stateLineStyle = true;
+        shape.shapeRecords.add(0, start);
+        new ShapeTransformer().transformSHAPE(matrix, shape, 1);
+        for (SHAPERECORD record : shape.shapeRecords) {
+            if (record instanceof EndShapeRecord) {
+                continue;
+            }
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord style = (StyleChangeRecord) record;
+                if (style.stateFillStyle0 && style.fillStyle0 != 0) {
+                    style.fillStyle0 = fillIndex;
+                }
+                if (style.stateFillStyle1 && style.fillStyle1 != 0) {
+                    style.fillStyle1 = fillIndex;
+                }
+                if (style.stateLineStyle && style.lineStyle != 0) {
+                    style.lineStyle = lineIndex;
+                }
+            }
+            record.calculateBits();
+            result.shapes.shapeRecords.add(record);
+        }
+    }
+
     private static double twipToPixel(double tw) {
         return tw / SWF.unitDivisor;
     }
@@ -297,7 +443,7 @@ public class TextTypeConverter {
      *
      * @param swf SWF
      * @param characterId Character id
-     * @param targetTextNum 1 = DefineText, 2 = DefineText2, 3 = DefineEditText
+     * @param targetTextNum 1 = DefineText, 2 = DefineText2, 3 = DefineEditText, 4 = shape
      */
     public void convertCharacter(SWF swf, int characterId, int targetTextNum) {
         CharacterTag ct = swf.getCharacter(characterId);
@@ -306,11 +452,14 @@ public class TextTypeConverter {
         }
         TextTag t = (TextTag) ct;
         Timelined tim = t.getTimelined();
-        TextTag converted = convertTagType(t, swf, targetTextNum);
+        CharacterTag converted = targetTextNum == TEXT_TYPE_SHAPE
+                ? convertToShape(t, swf) : convertTagType(t, swf, targetTextNum);
         converted.setCharacterId(characterId);
         swf.replaceTag(ct, converted);
         converted.setTimelined(tim);
         swf.updateCharacters();
+        swf.clearShapeCache();
+        swf.clearImageCache();
         swf.assignClassesToSymbols();
         swf.assignExportNamesToSymbols();
         tim.resetTimeline();

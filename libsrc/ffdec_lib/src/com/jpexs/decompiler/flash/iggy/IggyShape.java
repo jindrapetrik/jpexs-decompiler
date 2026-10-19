@@ -78,6 +78,9 @@ public class IggyShape implements StructureInterface {
 
     List<IggyShapeNode> nodes;
 
+    protected IggyShape() {
+    }
+
     public IggyShape(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
@@ -87,7 +90,7 @@ public class IggyShape implements StructureInterface {
         this.miny = miny;
         this.maxx = maxx;
         this.maxy = maxy;
-        this.unk = 0; //??
+        this.unk = nodes.isEmpty() ? 1 : STRUCT_SIZE - 16; // Relative node pointer.
         this.one = 1;
         this.one2 = 1;
         this.one3 = 1;

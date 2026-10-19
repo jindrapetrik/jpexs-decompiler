@@ -36,6 +36,8 @@ public final class BinaryPanel extends JPanel {
 
     public HexView hexEditor = new HexView();
 
+    private final FasterScrollPane scrollPane;
+
     private byte[] data;
 
     private JPanel swfOrPackedDataInsidePanel;
@@ -46,11 +48,14 @@ public final class BinaryPanel extends JPanel {
 
     private final JLabel swfOrPackedDataInsideLabel;
 
+    private boolean embeddedPreviewMode;
+
     public BinaryPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
         this.mainPanel = mainPanel;
 
-        add(new FasterScrollPane(hexEditor), BorderLayout.CENTER);
+        scrollPane = new FasterScrollPane(hexEditor);
+        add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -89,6 +94,14 @@ public final class BinaryPanel extends JPanel {
         swfOrPackedDataInsidePanel.setVisible(false);
     }
 
+    public void setEmbeddedPreviewMode() {
+        embeddedPreviewMode = true;
+        setBorder(null);
+        scrollPane.setBorder(null);
+        hexEditor.showAsciiOnly();
+        swfOrPackedDataInsidePanel.setVisible(false);
+    }
+
     public void setBinaryData(BinaryDataInterface binaryData) {
         this.binaryData = binaryData;
         data = binaryData == null ? null : binaryData.getDataBytes().getRangeData();
@@ -103,9 +116,9 @@ public final class BinaryPanel extends JPanel {
                     swfOrPackedDataInsideLabel.setText(AppStrings.translate("binarydata.dataInside.packer").replace("%packer%", binaryData.getUsedPacker().getName()));
                 }
             }
-            swfOrPackedDataInsidePanel.setVisible(
+            swfOrPackedDataInsidePanel.setVisible(!embeddedPreviewMode && (
                     (binaryData.getSub() == null && binaryData.getUsedPacker() != null)
-                    || (isSwfData && binaryData.getInnerSwf() == null));
+                    || (isSwfData && binaryData.getInnerSwf() == null)));
         } else {
             hexEditor.setData(new byte[0], null, null);
             swfOrPackedDataInsidePanel.setVisible(false);

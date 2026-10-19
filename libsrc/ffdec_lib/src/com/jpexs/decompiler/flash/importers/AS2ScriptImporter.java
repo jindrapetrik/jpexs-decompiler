@@ -170,7 +170,7 @@ public class AS2ScriptImporter {
 
                 boolean errored = false;
                 try {
-                    asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false, asm.getSwf().getCharset()));
+                    asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false, asm.getSwf().getCharset(), asm.getSwf().getSwfProfile()));
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                     errored = true;

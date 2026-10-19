@@ -51,11 +51,10 @@ public class ConvertTextTypeDialog extends AppDialog {
 
         JButton okButton = new JButton(translate("button.ok"));
         
-        String[] names = new String[]{"DefineText", "DefineText2", "DefineEditText"};
+        String[] names = new String[]{"DefineText", "DefineText2", "DefineEditText", "shape"};
 
-        for (int i = 0; i < 3; i++) {
-            String text = names[i];
-            text += " - " + translate("text." + names[i]);
+        for (int i = 0; i < names.length; i++) {
+            String text = translate("text." + names[i]);
             JRadioButton radio = new JRadioButton(text);
             radio.setAlignmentX(Component.LEFT_ALIGNMENT);
             if (i == currentTextType - 1) {

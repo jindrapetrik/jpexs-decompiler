@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,13 +30,16 @@ public class FakeMemoryInputStream extends MemoryInputStream {
 
     private long pos;
 
-    private final int maxLength;
-
     private final InputStream is;
+
+    private final ByteArrayOutputStream readBuffer = new ByteArrayOutputStream();
+
+    private byte[] bufferedBytes;
+
+    private int count;
 
     public FakeMemoryInputStream(InputStream is) throws IOException {
         super(new byte[0]);
-        this.maxLength = Integer.MAX_VALUE;
         this.is = is;
     }
 
@@ -54,7 +58,19 @@ public class FakeMemoryInputStream extends MemoryInputStream {
         if (pos < 0) {
             throw new IOException("Seek to negative position");
         }
-        this.pos = pos;
+        if (pos <= count) {
+            this.pos = pos;
+            return;
+        }
+        this.pos = count;
+        byte[] skipBuffer = new byte[8192];
+        while (this.pos < pos) {
+            int toRead = (int) Math.min(skipBuffer.length, pos - this.pos);
+            int readCount = read(skipBuffer, 0, toRead);
+            if (readCount < 0) {
+                throw new IOException("Seek beyond end of stream");
+            }
+        }
     }
 
     @Override
@@ -64,27 +80,67 @@ public class FakeMemoryInputStream extends MemoryInputStream {
 
     @Override
     public int read() throws IOException {
-        if (pos < maxLength) {
-            pos++;
-            return is.read();
+        if (pos < count) {
+            if (bufferedBytes == null) {
+                bufferedBytes = readBuffer.toByteArray();
+            }
+            return bufferedBytes[(int) pos++] & 0xff;
         }
-
-        return -1;
+        int value = is.read();
+        if (value >= 0) {
+            readBuffer.write(value);
+            bufferedBytes = null;
+            count++;
+            pos++;
+        }
+        return value;
     }
 
     @Override
     public int read(byte[] bytes) throws IOException {
-        if (pos < maxLength) {
-            int readCount = is.read(bytes);
-            pos += readCount;
-            return readCount;
+        return read(bytes, 0, bytes.length);
+    }
+
+    @Override
+    public int read(byte[] bytes, int offset, int length) throws IOException {
+        if (bytes == null) {
+            throw new NullPointerException();
+        }
+        if (offset < 0 || length < 0 || length > bytes.length - offset) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (length == 0) {
+            return 0;
         }
 
-        return -1;
+        int totalRead = 0;
+        if (pos < count) {
+            if (bufferedBytes == null) {
+                bufferedBytes = readBuffer.toByteArray();
+            }
+            int bufferedCount = (int) Math.min(length, count - pos);
+            System.arraycopy(bufferedBytes, (int) pos, bytes, offset, bufferedCount);
+            pos += bufferedCount;
+            totalRead += bufferedCount;
+        }
+
+        if (totalRead < length && pos == count) {
+            int readCount = is.read(bytes, offset + totalRead, length - totalRead);
+            if (readCount > 0) {
+                readBuffer.write(bytes, offset + totalRead, readCount);
+                bufferedBytes = null;
+                count += readCount;
+                pos += readCount;
+                totalRead += readCount;
+            }
+        }
+
+        return totalRead == 0 ? -1 : totalRead;
     }
 
     @Override
     public int available() throws IOException {
-        return is.available();
+        long available = count - pos + (long) is.available();
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0, available));
     }
 }

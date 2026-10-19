@@ -119,6 +119,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -814,6 +815,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         int cinit_index = method(null, true, str(""), false, false, false, new ArrayList<>(), pkg, cinitNeedsActivation, cinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : baseClassName, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), commands, TypeItem.UNBOUNDED);
         MethodBody cinitBody = abcIndex.getSelectedAbc().findBody(cinit_index);
 
+        UnresolvedAVM2Item.ResolveAccelerator accelerator = new UnresolvedAVM2Item.ResolveAccelerator(cinitVariables);
+        
         for (int i = 0; i < cinitVariables.size(); i++) {
             AssignableAVM2Item an = cinitVariables.get(i);
             if (an instanceof UnresolvedAVM2Item) {
@@ -822,7 +825,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     String fullClass = localData.getFullClass();
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(cinitBody);
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, callStack, cinitVariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, callStack, cinitVariables, accelerator);
                     if (res instanceof AssignableAVM2Item) {
                         cinitVariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1194,13 +1197,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         localData.activationReg = 0;
 
+        UnresolvedAVM2Item.ResolveAccelerator accelerator = new UnresolvedAVM2Item.ResolveAccelerator(subvariables);
+
         for (int i = 0; i < subvariables.size(); i++) {
             AssignableAVM2Item an = subvariables.get(i);
             if (an instanceof UnresolvedAVM2Item) {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1217,7 +1222,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables, accelerator);
                     paramTypes.set(t, res);
                 }
             }
@@ -2536,56 +2541,108 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param outPropValue Out property value
      * @param outPropValueAbc Out property value ABC
      * @param isType Is type
+     * @param accelerator Resolve accelerator
      * @return True if found
      */
-    public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
-        
+    public static boolean searchPrototypeChain(String nsKeyword, Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, int staticProtectedNs, int internalNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait, PropertyAVM2Item.ResolveAccelerator accelerator) {
         AVM2ConstantPool constants = abc.getSelectedAbc().constants;
         int publicNs = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, false);
         
         if (nsKeyword != null) {
             switch (nsKeyword) {
                 case "public":
-                    return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);            
+                    return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);            
                 case "protected":
-                    if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+                    if (searchPrototypeChain(staticProtectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                         return true;
                     }
-                    return searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                    
+                    return searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                    
                 case "private":
-                    return searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                               
+                    return searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                                               
                 case "internal":
-                    return searchPrototypeChain(internalNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);                                                               
+                    return searchPrototypeChain(internalNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);                                                               
             }            
         }
         // private and protected namespaces first so we find overriding functions before overridden functions
         if (namespaceSuffix != null) {
-            if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+            if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                 return true;
             }
         }
-        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
             return true;
         }
-        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
             return true;
         }
 
         for (int ns : otherNs) {
-            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
+            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator)) {
                 return true;
             }
         }
 
-        return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait);
+        return searchPrototypeChain(publicNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait, accelerator);
     }
 
-    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait) {
+    public static class AbcFindPropertyKey {
+        public AbcIndexing abc;
+        public String propertyName;
+        public DottedChain pkg;
+        public String obj;
+        public ABC selectedAbc;
+        public int selectedNs;
+        public boolean instanceOnly;
+
+        public AbcFindPropertyKey(AbcIndexing abc, String propertyName, DottedChain pkg, String obj, ABC selectedAbc, int selectedNs, boolean instanceOnly) {
+            this.abc = abc;
+            this.propertyName = propertyName;
+            this.pkg = pkg;
+            this.obj = obj;
+            this.selectedAbc = selectedAbc;
+            this.selectedNs = selectedNs;
+            this.instanceOnly = instanceOnly;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            AbcFindPropertyKey that = (AbcFindPropertyKey) o;
+            return this.abc == that.abc
+                    && this.selectedAbc == that.selectedAbc
+                    && this.selectedNs == that.selectedNs
+                    && this.instanceOnly == that.instanceOnly
+                    && Objects.equals(this.propertyName, that.propertyName)
+                    && Objects.equals(this.pkg, that.pkg)
+                    && Objects.equals(this.obj, that.obj);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(abc, propertyName, pkg, obj, selectedAbc, selectedNs, instanceOnly);
+        }
+    }
+
+    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType, Reference<Trait> outPropTrait, PropertyAVM2Item.ResolveAccelerator accelerator) {
         isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
+
         if (sp == null) {
-            Reference<Boolean> foundStatic = new Reference<>(null);               
-            sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
+            AbcFindPropertyKey key = new AbcFindPropertyKey(abc, propertyName, pkg, obj, abc.getSelectedAbc(), selectedNs, instanceOnly);
+
+            if (accelerator.abcFindPropertyCache.containsKey(key)) {
+                sp = accelerator.abcFindPropertyCache.get(key);
+            } else {
+                Reference<Boolean> foundStatic = new Reference<>(null);
+
+                sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true, true, foundStatic);
+                accelerator.abcFindPropertyCache.put(key, sp);
+            }
         }
         if (sp != null) {
             if (sp.trait instanceof TraitClass) {

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import java.io.IOException;
@@ -214,6 +215,23 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
                     if (mat != null) {
                         r2 = mat.apply(r2);
                     }
+                    double deltaXMax = 0;
+                    double deltaYMax = 0;
+                    if (r.buttonHasFilterList && r.filterList != null && !r.filterList.isEmpty()) {
+                        for (FILTER filter : r.filterList) {
+                            if (!filter.enabled) {
+                                continue;
+                            }
+                            double x = filter.getDeltaX();
+                            double y = filter.getDeltaY();
+                            deltaXMax += x;
+                            deltaYMax += y;
+                        }
+                    }
+                    r2.Xmin -= Math.ceil(deltaXMax) * SWF.unitDivisor;
+                    r2.Ymin -= Math.ceil(deltaYMax) * SWF.unitDivisor;
+                    r2.Xmax += Math.ceil(deltaXMax) * SWF.unitDivisor;
+                    r2.Ymax += Math.ceil(deltaYMax) * SWF.unitDivisor;
                     rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
                     rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
                     rect.Xmax = Math.max(r2.Xmax, rect.Xmax);

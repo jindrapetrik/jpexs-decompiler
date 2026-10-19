@@ -84,6 +84,7 @@ public class MovieBinDataGenerator {
         boolean stereo = false;
         int videoCodec = 0;
         boolean hasAudio = false;
+        boolean sample16bit = true;
         long maxTimestamp = 0L;
         for (FLVTAG tag : flvTags) {
             if (tag.timeStamp > maxTimestamp) {
@@ -99,6 +100,7 @@ public class MovieBinDataGenerator {
                 soundFormat = ad.soundFormat;
                 samplingRate = ad.soundRate;
                 stereo = ad.soundType;
+                sample16bit = ad.soundSize;
                 hasAudio = true;
             }
         }
@@ -192,7 +194,7 @@ public class MovieBinDataGenerator {
 
         df.writeUI32(1);
         if (hasAudio) {
-            SoundFormat sf = new SoundFormat(soundFormat, samplingRate, stereo);
+            SoundFormat sf = new SoundFormat(soundFormat, samplingRate, stereo, sample16bit);
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             sf.decode(new SWFInputStream(new ByteArrayInputStream(baos.toByteArray())), baos2);
             df.writeUI32(1);

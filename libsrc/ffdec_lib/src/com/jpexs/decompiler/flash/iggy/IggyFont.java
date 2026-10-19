@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
+import com.jpexs.decompiler.flash.iggy.streams.MemoryDataStream;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
@@ -47,7 +48,7 @@ public class IggyFont extends IggyTag {
     int ascent;
     @IggyFieldType(value = DataType.uint16_t)
     int descent;
-    @IggyFieldType(value = DataType.uint16_t)
+    @IggyFieldType(value = DataType.int16_t)
     int leading;
     @IggyFieldType(DataType.uint64_t)
     long flags;
@@ -164,8 +165,30 @@ public class IggyFont extends IggyTag {
         this.charKernings = charKernings;
     }
 
+    protected IggyFont() {
+    }
+
     public IggyFont(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
+    }
+
+    /** Create a native font header for a new dictionary definition. */
+    public static IggyFont create(boolean wide, boolean extended32, int id) throws IOException {
+        MemoryDataStream data = new MemoryDataStream();
+        data.writeBytes(new byte[wide ? 352 : extended32 ? 216 : 208]);
+        data.seek(0, SeekMode.SET);
+        data.writeUI16(ID);
+        data.writeUI16(id);
+        for (int offset : wide ? new int[]{16, 48, 56, 64, 96, 128} : new int[]{8, 28, 32, 36, 60, 76}) {
+            data.seek(offset, SeekMode.SET);
+            if (wide) {
+                data.writeUI64(1);
+            } else {
+                data.writeUI32(1);
+            }
+        }
+        data.seek(0, SeekMode.SET);
+        return wide ? new IggyFont(data) : new IggyFont32(data, extended32);
     }
 
     private long readAbsoluteOffset(ReadDataStreamInterface stream) throws IOException {
@@ -208,7 +231,7 @@ public class IggyFont extends IggyTag {
         char_count2 = s.readUI16();
         ascent = s.readUI16();
         descent = s.readUI16();
-        leading = s.readUI16();
+        leading = s.readSI16();
         flags = s.readUI64();
         long start_of_char_struct = s.readUI64();
         long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
@@ -322,7 +345,7 @@ public class IggyFont extends IggyTag {
         s.writeUI16(char_count2);
         s.writeUI16(ascent);
         s.writeUI16(descent);
-        s.writeUI16(leading);
+        s.writeSI16(leading);
         s.writeUI64(flags);
         long start_of_char_struct_ofs_pos = s.position();
         s.writeUI64(FILL_LATER_IF_AVAILABLE);
@@ -448,6 +471,54 @@ public class IggyFont extends IggyTag {
         return flags;
     }
 
+    /**
+     * Original SWF font format: 1 = DefineFont, 2 = DefineFont2, 3 =
+     * DefineFont3.
+     */
+    public int getFontType() {
+        return (int) flags & 255;
+    }
+
+    public int getLanguageCode() {
+        return (int) (flags >>> 8) & 255;
+    }
+
+    public boolean hasLayout() {
+        return (flags & 0xff0000L) != 0;
+    }
+
+    public boolean isShiftJIS() {
+        return (flags & 0x01000000L) != 0;
+    }
+
+    public boolean isSmallText() {
+        return (flags & 0x02000000L) != 0;
+    }
+
+    public boolean isAnsi() {
+        return (flags & 0x04000000L) != 0;
+    }
+
+    public boolean isBold() {
+        return (zero_padd_3 & 0xff00000000L) != 0;
+    }
+
+    public boolean isItalic() {
+        return (zero_padd_3 & 0xff0000000000L) != 0;
+    }
+
+    /**
+     * Set the decoded SWF flags, retaining the other native header bytes.
+     */
+    public void setFontFlags(int fontType, int language, boolean layout,
+            boolean shiftJIS, boolean smallText, boolean ansi, boolean bold, boolean italic) {
+        flags = (flags & ~0x07ffffffL) | (fontType & 255) | (long) (language & 255) << 8
+                | (layout ? 0x10000L : 0) | (shiftJIS ? 0x1000000L : 0)
+                | (smallText ? 0x2000000L : 0) | (ansi ? 0x4000000L : 0);
+        zero_padd_3 = (zero_padd_3 & ~0xffff00000000L)
+                | (bold ? 0x100000000L : 0) | (italic ? 0x10000000000L : 0);
+    }
+
     public int getXscale() {
         return xscale;
     }
@@ -506,6 +577,10 @@ public class IggyFont extends IggyTag {
 
     public List<IggyCharOffset> getCharOffsets() {
         return charOffsets;
+    }
+
+    public int getFontId() {
+        return fontId;
     }
 
     @Override
@@ -620,6 +695,7 @@ public class IggyFont extends IggyTag {
 
     public void setCharKernings(IggyCharKerning charKernings) {
         this.charKernings = charKernings;
+        this.kern_count = charKernings == null ? 0 : charKernings.getKernCount();
     }
 
 }

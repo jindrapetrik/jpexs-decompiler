@@ -116,6 +116,10 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.iggy.IggyFile;
+import com.jpexs.decompiler.flash.iggy.conversion.IggyToSwfConvertor;
+import com.jpexs.decompiler.flash.iggy.conversion.SwfToIggyConvertor;
+import com.jpexs.decompiler.flash.iggy.streams.MemoryDataStream;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
@@ -138,6 +142,8 @@ import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
+import com.jpexs.decompiler.flash.profiles.SwfProfile;
+import com.jpexs.decompiler.flash.profiles.SwfProfiles;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -187,7 +193,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
@@ -447,6 +452,18 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter == null || filter.equals("swf2iggy")) {
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy");
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy 32");
+            out.println(PREFIX + "-swf2iggy myfile.swf result.iggy \"32 legacy\"");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("iggy2swf")) {
+            out.println(PREFIX + "-iggy2swf myfile.iggy result.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("header")) {
             out.println(PREFIX + "-header myfile.swf");
             out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
@@ -511,6 +528,7 @@ public class CommandLineArgumentParser {
         Double morphDuration = PreviewExporter.MORPH_SHAPE_DEFAULT_DURATION;
         int morphNumFrames = 10;
         String charset = Charset.defaultCharset().name();
+        SwfProfile swfProfile = null;
         boolean cliMode = false;
         boolean air = false;
         boolean exportEmbed = false;
@@ -570,6 +588,9 @@ public class CommandLineArgumentParser {
                 case "-charset":
                     charset = parseCharset(args);
                     break;
+                case "-swfprofile":
+                    swfProfile = parseSwfProfile(args);
+                    break;
                 case "-config":
                     parseConfig(args);
                     if (args.isEmpty()) {
@@ -597,7 +618,7 @@ public class CommandLineArgumentParser {
                     parseStat(args);
                     break;
                 case "-info":
-                    parseInfo(args, charset);
+                    parseInfo(args, charset, swfProfile);
                     System.exit(0);
                     break;
                 case "-stdout":
@@ -649,28 +670,28 @@ public class CommandLineArgumentParser {
         } else if (command.equals("translator")) {
             Translator.main(new String[]{});
         } else if (command.equals("swf2exe")) {
-            parseSwf2Exe(args, charset);
+            parseSwf2Exe(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("abcclean")) {
-            parseAbcClean(args, charset);
+            parseAbcClean(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("abcmerge")) {
-            parseAbcMerge(args, charset);
+            parseAbcMerge(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("swf2swc")) {
-            parseSwf2Swc(args, charset);
+            parseSwf2Swc(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("linkreport")) {
-            parseLinkReport(selectionClasses, args, charset);
+            parseLinkReport(selectionClasses, args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("getinstancemetadata")) {
-            parseGetInstanceMetadata(args, charset);
+            parseGetInstanceMetadata(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("setinstancemetadata")) {
-            parseSetInstanceMetadata(args, charset);
+            parseSetInstanceMetadata(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("removeinstancemetadata")) {
-            parseRemoveInstanceMetadata(args, charset);
+            parseRemoveInstanceMetadata(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("removefromcontextmenu")) {
             if (!args.isEmpty()) {
@@ -687,7 +708,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, swfProfile, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -701,8 +722,14 @@ public class CommandLineArgumentParser {
         } else if (command.equals("decrypt")) {
             parseDecrypt(args);
             System.exit(0);
+        } else if (command.equals("swf2iggy")) {
+            parseSwf2Iggy(args, charset, swfProfile);
+            System.exit(0);
+        } else if (command.equals("iggy2swf")) {
+            parseIggy2Swf(args);
+            System.exit(0);
         } else if (command.equals("swf2xml")) {
-            parseSwf2Xml(args, charset, handler);
+            parseSwf2Xml(args, charset, swfProfile, handler);
             System.exit(0);
         } else if (command.equals("xml2swf")) {
             parseXml2Swf(args, charset);
@@ -714,80 +741,80 @@ public class CommandLineArgumentParser {
             parseMemorySearch(args);
             System.exit(0);
         } else if (command.equals("deobfuscate")) {
-            parseDeobfuscate(args, charset);
+            parseDeobfuscate(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
             System.exit(0);
         } else if (command.equals("dumpswf")) {
-            parseDumpSwf(args);
+            parseDumpSwf(args, swfProfile);
             System.exit(0);
         } else if (command.equals("dumpas2")) {
-            parseDumpAS2(args, charset);
+            parseDumpAS2(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("dumpas3")) {
-            parseDumpAS3(args, charset);
+            parseDumpAS3(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("enabledebugging")) {
-            parseEnableDebugging(args, charset);
+            parseEnableDebugging(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("flashpaper2pdf")) {
-            parseFlashPaperToPdf(selection, zoom, args, charset);
+            parseFlashPaperToPdf(selection, zoom, args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("replace")) {
-            parseReplace(args, charset, air);
+            parseReplace(args, charset, swfProfile, air);
             System.exit(0);
         } else if (command.equals("replacealpha")) {
-            parseReplaceAlpha(args, charset);
+            parseReplaceAlpha(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("replacecharacter")) {
-            parseReplaceCharacter(args, charset);
+            parseReplaceCharacter(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("replacecharacterid")) {
-            parseReplaceCharacterId(args, charset);
+            parseReplaceCharacterId(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("convert")) {
-            parseConvert(args, charset);
+            parseConvert(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("remove")) {
-            parseRemove(args, charset);
+            parseRemove(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("removecharacter")) {
-            parseRemoveCharacter(args, false, charset);
+            parseRemoveCharacter(args, false, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("removecharacterwithdependencies")) {
-            parseRemoveCharacter(args, true, charset);
+            parseRemoveCharacter(args, true, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("doc")) {
             parseDoc(args);
         } else if (command.equals("importsymbolclass")) {
-            parseImportSymbolClass(args, charset);
+            parseImportSymbolClass(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importmovies")) {
-            parseImportMovies(args, charset);
+            parseImportMovies(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importsounds")) {
-            parseImportSounds(args, charset);
+            parseImportSounds(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importshapes")) {
-            parseImportShapes(args, charset);
+            parseImportShapes(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importimages")) {
-            parseImportImages(args, charset);
+            parseImportImages(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importsprites")) {
-            parseImportSprites(args, charset);
+            parseImportSprites(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importtext")) {
-            parseImportText(args, charset);
+            parseImportText(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("importscript")) {
-            parseImportScript(args, charset, air, handler);
+            parseImportScript(args, charset, swfProfile, air, handler);
             System.exit(0);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {
-            parseDebugTool(args, charset);
+            parseDebugTool(args, charset, swfProfile);
         } else if (nextParam.equals("--compareresources")) {
             parseCompareResources(args);
             System.exit(0);
@@ -797,6 +824,13 @@ public class CommandLineArgumentParser {
         } else if (nextParam.equals("-listconfigs")) {
             printHeader();
             printConfigurationSettings();
+            System.exit(0);
+        } else if (nextParam.equals("-listswfprofiles")) {
+            if (!args.isEmpty()) {
+                badArguments("listswfprofiles");
+            }
+            printHeader();
+            printSwfProfiles();
             System.exit(0);
         } else if (nextParam.equals("-storeconfigfile")) {
             parseStoreConfigFile(args);
@@ -832,7 +866,7 @@ public class CommandLineArgumentParser {
             if (allParamIsAFile) {
                 String[] fileNamesArray = fileNames.toArray(new String[fileNames.size()]);
                 if (cliMode) {
-                    loadFiles(fileNamesArray);
+                    loadFiles(fileNamesArray, swfProfile);
                     return null;
                 } else {
                     return fileNamesArray;
@@ -1002,7 +1036,7 @@ public class CommandLineArgumentParser {
         System.out.println("Configuration loaded from the file \"" + configFile + "\"");
     }
 
-    private static void parseSwf2Exe(Stack<String> args, String charset) {
+    private static void parseSwf2Exe(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() != 3) {
             badArguments("swf2exe");
         }
@@ -1012,10 +1046,10 @@ public class CommandLineArgumentParser {
         ExeExportMode exportMode = enumFromStr(type, ExeExportMode.class);
         processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
             Main.saveFileToExe(swf, exportMode, outFile);
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseAbcMerge(Stack<String> args, String charset) {
+    private static void parseAbcMerge(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("abcmerge");
         }
@@ -1032,11 +1066,11 @@ public class CommandLineArgumentParser {
                     swf.removeTag((Tag) abcList.get(i));
                 }
             }
-        }, charset);
+        }, charset, swfProfile);
 
     }
 
-    private static void parseAbcClean(Stack<String> args, String charset) {
+    private static void parseAbcClean(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("abcclean");
         }
@@ -1049,10 +1083,10 @@ public class CommandLineArgumentParser {
                 ABCCleaner cleaner = new ABCCleaner();
                 cleaner.clean(abc);
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseSwf2Swc(Stack<String> args, String charset) {
+    private static void parseSwf2Swc(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("swf2swc");
         }
@@ -1065,10 +1099,10 @@ public class CommandLineArgumentParser {
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseLinkReport(List<String> selectionClasses, Stack<String> args, String charset) {
+    private static void parseLinkReport(List<String> selectionClasses, Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.isEmpty()) {
             badArguments("linkreport");
         }
@@ -1113,10 +1147,10 @@ public class CommandLineArgumentParser {
             } catch (InterruptedException ex) {
                 System.err.println("Report generation interrupted");
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseGetInstanceMetadata(Stack<String> args, String charset) {
+    private static void parseGetInstanceMetadata(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("getinstancemetadata");
         }
@@ -1255,10 +1289,10 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseSetInstanceMetadata(Stack<String> args, String charset) {
+    private static void parseSetInstanceMetadata(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("setinstancemetadata");
         }
@@ -1464,10 +1498,10 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
-    private static void parseRemoveInstanceMetadata(Stack<String> args, String charset) {
+    private static void parseRemoveInstanceMetadata(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("removeinstancemetadata");
         }
@@ -1592,7 +1626,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
+        }, charset, swfProfile);
     }
 
     private static class Range {
@@ -1995,7 +2029,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseDebugTool(Stack<String> args, String charset) {
+    private static void parseDebugTool(Stack<String> args, String charset, SwfProfile swfProfile) {
         String cmd = args.pop().toLowerCase(Locale.ENGLISH);
         switch (cmd) {
             case "findtag": {
@@ -2023,7 +2057,7 @@ public class CommandLineArgumentParser {
                 for (File file : files) {
                     OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, file.getAbsolutePath(), file.getName());
                     try {
-                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset);
+                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset, swfProfile);
                         swf.openableList = new OpenableList();
                         swf.openableList.sourceInfo = sourceInfo;
                         boolean found = false;
@@ -2065,7 +2099,7 @@ public class CommandLineArgumentParser {
                 for (File file : files) {
                     OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, file.getAbsolutePath(), file.getName());
                     try {
-                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset);
+                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset, swfProfile);
                         swf.openableList = new OpenableList();
                         swf.openableList.sourceInfo = sourceInfo;
                         boolean found = false;
@@ -2165,6 +2199,7 @@ public class CommandLineArgumentParser {
             Map<String, String> formats,
             double zoom,
             String charset,
+            SwfProfile swfProfile,
             boolean exportEmbed,
             boolean transparentBackground,
             ConsoleUrlResolver urlResolver,
@@ -2269,7 +2304,7 @@ public class CommandLineArgumentParser {
                 OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
-                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, urlResolver, charset);
+                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, urlResolver, charset, swfProfile);
                 } catch (FileNotFoundException | SwfOpenException ex) {
                     // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
@@ -2542,7 +2577,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseDeobfuscate(Stack<String> args, String charset) {
+    private static void parseDeobfuscate(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("deobfuscate");
         }
@@ -2581,7 +2616,7 @@ public class CommandLineArgumentParser {
             }
         }
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile); FileOutputStream fos = new FileOutputStream(outFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             if (!swf.isAS3()) {
                 System.out.println("Warning: The file is not AS3. Only AS3 deobfuscation from commandline is available.");
                 System.exit(0);
@@ -2712,7 +2747,65 @@ public class CommandLineArgumentParser {
         System.exit(result ? 0 : 1);
     }
 
-    private static void parseSwf2Xml(Stack<String> args, String charset, AbortRetryIgnoreHandler handler) {
+    private static void parseSwf2Iggy(Stack<String> args, String charset, SwfProfile swfProfile) {
+        if (args.size() < 2 || args.size() > 3) {
+            badArguments("swf2iggy");
+        }
+        File input = new File(args.pop());
+        File output = new File(args.pop());
+        IggyFile.Variant variant = IggyFile.Variant.X64;
+        if (!args.isEmpty()) {
+            try {
+                variant = IggyFile.Variant.fromString(args.pop());
+            } catch (IOException ex) {
+                System.err.println(ex.getMessage());
+                badArguments("swf2iggy");
+            }
+        }
+        String name = input.getName();
+        if (StdInAwareFileInputStream.STDIN_PATH.equals(input.getPath().replace('\\', '/'))) {
+            name = output.getName();
+            int dot = name.lastIndexOf('.');
+            name = (dot < 0 ? name : name.substring(0, dot)) + ".swf";
+        }
+        final IggyFile.Variant targetVariant = variant;
+        final String movieName = name;
+        processReadSWF(input, null, (SWF swf, OutputStream stdout) -> {
+            SwfToIggyConvertor.exportIggyToFile(swf, output, targetVariant, movieName,
+                    warning -> System.err.println("Warning: " + warning));
+            System.out.println("OK");
+        }, charset, swfProfile);
+    }
+
+    private static void parseIggy2Swf(Stack<String> args) {
+        if (args.size() != 2) {
+            badArguments("iggy2swf");
+        }
+        String input = args.pop();
+        File output = new File(args.pop());
+        try {
+            IggyFile file;
+            if (StdInAwareFileInputStream.STDIN_PATH.equals(input.replace('\\', '/'))) {
+                try (InputStream stream = new StdInAwareFileInputStream(input)) {
+                    ByteArrayOutputStream inputBytes = new ByteArrayOutputStream();
+                    Helper.copyStreamEx(stream, inputBytes);
+                    file = new IggyFile(new MemoryDataStream(inputBytes.toByteArray()));
+                }
+            } else {
+                file = new IggyFile(new File(input));
+            }
+            // Finish conversion before opening the output, including when paths match.
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            IggyToSwfConvertor.exportSwf(file, bytes);
+            Files.write(output.toPath(), bytes.toByteArray());
+            System.out.println("OK");
+        } catch (IOException | IllegalArgumentException ex) {
+            logger.log(Level.SEVERE, "Error converting Iggy to SWF", ex);
+            System.exit(1);
+        }
+    }
+
+    private static void parseSwf2Xml(Stack<String> args, String charset, SwfProfile swfProfile, AbortRetryIgnoreHandler handler) {
         if (args.size() < 2) {
             badArguments("swf2xml");
         }
@@ -2762,7 +2855,7 @@ public class CommandLineArgumentParser {
 
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(args.pop())) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 new SwfXmlExporter().exportXml(swf, new File(args.pop()), new XmlSwfExportSettings(scriptExportMode, imageExportMode, soundExportMode), null, handler);
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
@@ -3023,6 +3116,33 @@ public class CommandLineArgumentParser {
         return charsetName;
     }
 
+    private static SwfProfile parseSwfProfile(Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("swfprofile");
+        }
+
+        String profileId = args.pop().toLowerCase(Locale.ENGLISH);
+        if ("standard".equals(profileId)) {
+            return null;
+        }
+
+        SwfProfile profile = SwfProfiles.getProfile(profileId);
+        if (profile == null) {
+            System.err.println("Unknown SWF profile: " + profileId);
+            System.err.println("Use -listswfprofiles to list available profiles.");
+            badArguments("swfprofile");
+        }
+        return profile;
+    }
+
+    private static void printSwfProfiles() {
+        System.out.println("Available SWF profiles:");
+        System.out.println("standard - Standard SWF tags");
+        for (SwfProfile profile : SwfProfiles.getProfiles()) {
+            System.out.println(profile.getId() + " - " + profile.getName());
+        }
+    }
+
     private static Map<String, String> parseFormat(Stack<String> args) {
         if (args.size() < 1) {
             badArguments("format");
@@ -3052,7 +3172,7 @@ public class CommandLineArgumentParser {
         return ret;
     }
 
-    private static void parseFlashPaperToPdf(Selection selection, double zoom, Stack<String> args, String charset) {
+    private static void parseFlashPaperToPdf(Selection selection, double zoom, Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("flashpaper2pdf");
         }
@@ -3066,7 +3186,7 @@ public class CommandLineArgumentParser {
 
             PDFJob job = null;
 
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             int totalPages = 0;
 
             for (Tag t : swf.getTags()) {
@@ -3177,7 +3297,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseReplace(Stack<String> args, String charset, boolean air) {
+    private static void parseReplace(Stack<String> args, String charset, SwfProfile swfProfile, boolean air) {
         if (args.size() < 3) {
             badArguments("replace");
         }
@@ -3207,7 +3327,7 @@ public class CommandLineArgumentParser {
 
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 while (true) {
                     String objectToReplace = args.pop();
 
@@ -3492,7 +3612,7 @@ public class CommandLineArgumentParser {
         return res;
     }
 
-    private static void parseReplaceAlpha(Stack<String> args, String charset) {
+    private static void parseReplaceAlpha(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 4) {
             badArguments("replacealpha");
         }
@@ -3501,7 +3621,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 while (true) {
                     String objectToReplace = args.pop();
 
@@ -3548,7 +3668,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseReplaceCharacter(Stack<String> args, String charset) {
+    private static void parseReplaceCharacter(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 4) {
             badArguments("replacecharacter");
         }
@@ -3557,7 +3677,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 while (true) {
                     String objectToReplace = args.pop();
 
@@ -3610,7 +3730,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseReplaceCharacterId(Stack<String> args, String charset) {
+    private static void parseReplaceCharacterId(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("replacecharacterid");
         }
@@ -3619,7 +3739,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 String arg = args.pop().toLowerCase(Locale.ENGLISH);
                 if (arg.equals("pack")) {
                     swf.packCharacterIds();
@@ -3666,7 +3786,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseConvert(Stack<String> args, String charset) {
+    private static void parseConvert(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 4) {
             badArguments("convert");
         }
@@ -3675,7 +3795,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
 
                 String objectToConvert = args.pop();
 
@@ -3733,7 +3853,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseRemove(Stack<String> args, String charset) {
+    private static void parseRemove(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("remove");
         }
@@ -3742,7 +3862,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 List<Integer> tagNumbersToRemove = new ArrayList<>();
                 while (true) {
                     String tagNoToRemoveStr = args.pop();
@@ -3867,7 +3987,7 @@ public class CommandLineArgumentParser {
         outStream.print(doc);
     }
 
-    private static void parseRemoveCharacter(Stack<String> args, boolean removeDependencies, String charset) {
+    private static void parseRemoveCharacter(Stack<String> args, boolean removeDependencies, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("removecharacter");
         }
@@ -3876,7 +3996,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 while (true) {
                     String objectToRemove = args.pop();
 
@@ -3915,7 +4035,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportSymbolClass(Stack<String> args, String charset) {
+    private static void parseImportSymbolClass(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importsymbolclass");
         }
@@ -3924,7 +4044,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
 
             String selFile = args.pop();
             File importFile = new File(Path.combine(selFile, SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME));
@@ -3945,7 +4065,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseImportShapes(Stack<String> args, String charset) {
+    private static void parseImportShapes(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importshapes");
         }
@@ -3961,7 +4081,7 @@ public class CommandLineArgumentParser {
             }
         }
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             System.out.println("Source file opened");
             String selFile = args.pop();
 
@@ -3989,7 +4109,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportMovies(Stack<String> args, String charset) {
+    private static void parseImportMovies(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importmovies");
         }
@@ -3998,7 +4118,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             System.out.println("Source file opened");
             String selFile = args.pop();
 
@@ -4025,7 +4145,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportSounds(Stack<String> args, String charset) {
+    private static void parseImportSounds(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importsounds");
         }
@@ -4034,7 +4154,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             System.out.println("Source file opened");
             String selFile = args.pop();
 
@@ -4061,7 +4181,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportImages(Stack<String> args, String charset) {
+    private static void parseImportImages(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importimages");
         }
@@ -4070,7 +4190,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             System.out.println("Source file opened");
             String selFile = args.pop();
 
@@ -4097,7 +4217,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportSprites(Stack<String> args, String charset) {
+    private static void parseImportSprites(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importsprites");
         }
@@ -4106,7 +4226,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             System.out.println("Source file opened");
             String selFile = args.pop();
 
@@ -4133,7 +4253,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportText(Stack<String> args, String charset) {
+    private static void parseImportText(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 3) {
             badArguments("importtext");
         }
@@ -4142,7 +4262,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
 
             String selFile = args.pop();
             boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();
@@ -4222,7 +4342,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportScript(Stack<String> args, String charset, boolean air, AbortRetryIgnoreHandler errorHandler) {
+    private static void parseImportScript(Stack<String> args, String charset, SwfProfile swfProfile, boolean air, AbortRetryIgnoreHandler errorHandler) {
 
         String flexLocation = Configuration.flexSdkLocation.get();
         if (Configuration.useFlexAs3Compiler.get() && (flexLocation.isEmpty() || (!new File(flexLocation).exists()))) {
@@ -4238,7 +4358,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 String baseFolder = args.pop();
                 String scriptsFolder = Path.combine(baseFolder, ScriptExportSettings.EXPORT_FOLDER_NAME);
                 if (new File(scriptsFolder).exists()) {
@@ -4285,12 +4405,12 @@ public class CommandLineArgumentParser {
         SWFDecompilerPlugin.customParameters = customParameters;
     }
 
-    private static void loadFiles(String[] fileNames) {
+    private static void loadFiles(String[] fileNames, SwfProfile swfProfile) {
         boolean result = true;
         for (String fileName : fileNames) {
             try {
                 OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, fileName, null);
-                Main.parseOpenable(sourceInfo);
+                Main.parseOpenable(sourceInfo, swfProfile);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
                 result = false;
@@ -4306,7 +4426,7 @@ public class CommandLineArgumentParser {
             src.setActionBytes(Helper.getBytesFromHexaText(text));
         } else {
             try {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset()));
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset(), src.getSwf().getSwfProfile()));
             } catch (ActionParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
                 System.exit(1);
@@ -4427,7 +4547,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseInfo(Stack<String> args, String charset) throws FileNotFoundException {
+    private static void parseInfo(Stack<String> args, String charset, SwfProfile swfProfile) throws FileNotFoundException {
         File out;
         PrintWriter pw = new PrintWriter(System.out);
         boolean found = false;
@@ -4478,7 +4598,7 @@ public class CommandLineArgumentParser {
                                             @Override
                                             public void status(String status) {
                                             }
-                                        }, Configuration.parallelSpeedUp.get(), charset);
+                                        }, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                                         return swf;
                                     }
                                 };
@@ -4515,7 +4635,7 @@ public class CommandLineArgumentParser {
                                         @Override
                                         public void status(String status) {
                                         }
-                                    }, Configuration.parallelSpeedUp.get(), charset);
+                                    }, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                                     return swf;
                                 }
                             };
@@ -4615,21 +4735,21 @@ public class CommandLineArgumentParser {
         pw.flush();
     }
 
-    private static void parseDumpSwf(Stack<String> args) {
+    private static void parseDumpSwf(Stack<String> args, SwfProfile swfProfile) {
         if (args.isEmpty()) {
             badArguments("dumpswf");
         }
         Configuration.dumpTags.set(true);
         Configuration.parallelSpeedUp.set(false);
         try (InputStream is = new FileInputStream(args.pop())) {
-            SWF swf = new SWF(is, false, false);
+            SWF swf = new SWF(is, false, false, "WINDOWS-1252", swfProfile);
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
     }
 
-    private static void parseDumpAS2(Stack<String> args, String charset) {
+    private static void parseDumpAS2(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.isEmpty()) {
             badArguments("dumpas2");
         }
@@ -4646,7 +4766,7 @@ public class CommandLineArgumentParser {
         File file = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 Map<String, ASMSource> asms = swf.getASMs(useExportNames);
                 for (String as2 : asms.keySet()) {
                     System.out.println(as2);
@@ -4658,7 +4778,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseEnableDebugging(Stack<String> args, String charset) {
+    private static void parseEnableDebugging(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("enabledebugging");
         }
@@ -4692,7 +4812,7 @@ public class CommandLineArgumentParser {
         try {
             System.out.print("Working...");
             StdInAwareFileInputStream fis = new StdInAwareFileInputStream(file);
-            SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get(), charset);
+            SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get(), charset, swfProfile);
             fis.close();
             if (swf.isAS3()) {
                 swf.enableDebugging(injectas3, new File(outfile).getParentFile(), doPCode);
@@ -4705,7 +4825,7 @@ public class CommandLineArgumentParser {
             if (!swf.isAS3()) {
                 if (generateSwd) {
                     fis = new StdInAwareFileInputStream(outfile);
-                    swf = new SWF(fis, Configuration.parallelSpeedUp.get(), charset);
+                    swf = new SWF(fis, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                     fis.close();
                     String outSwd = outfile;
                     if (outSwd.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
@@ -4739,14 +4859,14 @@ public class CommandLineArgumentParser {
         System.out.println("Finished");
     }
 
-    private static void parseDumpAS3(Stack<String> args, String charset) {
+    private static void parseDumpAS3(Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.isEmpty()) {
             badArguments("dumpas3");
         }
         File file = new File(args.pop());
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 List<ScriptPack> packs = swf.getAS3Packs();
                 for (ScriptPack entry : packs) {
                     System.out.println(entry.getClassPath().toString() + " " + entry.scriptIndex);
@@ -5001,7 +5121,7 @@ public class CommandLineArgumentParser {
         public void abcAction(ABC abc, OutputStream stdout) throws IOException;
     }
 
-    private static void processReadSWF(File inFile, File stdOutFile, SwfAction action, String charset) {
+    private static void processReadSWF(File inFile, File stdOutFile, SwfAction action, String charset, SwfProfile swfProfile) {
         OutputStream stdout = null;
 
         try {
@@ -5017,7 +5137,7 @@ public class CommandLineArgumentParser {
             }
 
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 action.swfAction(swf, stdout);
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found: " + ex.getMessage());
@@ -5042,7 +5162,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void processModifySWF(File inFile, File outFile, File stdOutFile, SwfAction action, String charset) {
+    private static void processModifySWF(File inFile, File outFile, File stdOutFile, SwfAction action, String charset, SwfProfile swfProfile) {
 
         OutputStream stdout = null;
 
@@ -5069,7 +5189,7 @@ public class CommandLineArgumentParser {
                 }
             }
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile); FileOutputStream fos = new FileOutputStream(outFile)) {
-                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset, swfProfile);
                 action.swfAction(swf, stdout);
                 swf.saveTo(fos);
             } catch (FileNotFoundException ex) {
@@ -5114,7 +5234,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void processModifyAbc(File inFile, File outFile, File stdOutFile, AbcAction action, String charset) {
+    private static void processModifyAbc(File inFile, File outFile, File stdOutFile, AbcAction action, String charset, SwfProfile swfProfile) {
 
         //It does not have .abc extension, assuming its SWF - process all its ABC tags
         if (!inFile.getAbsolutePath().toLowerCase().endsWith(".abc")) {
@@ -5127,7 +5247,7 @@ public class CommandLineArgumentParser {
                     }
                 }
             };
-            processModifySWF(inFile, outFile, stdOutFile, swfAction, charset);
+            processModifySWF(inFile, outFile, stdOutFile, swfAction, charset, swfProfile);
             return;
         }
 

@@ -34,6 +34,8 @@ public class CLIPACTIONS implements Serializable {
 
     /**
      * Reserved
+     * - the player seems to read this as list of tags ending with tag End (0x00 0x00)
+     * - meaning of this tag list is unknown
      */
     @Reserved
     @SWFType(BasicType.UI16)

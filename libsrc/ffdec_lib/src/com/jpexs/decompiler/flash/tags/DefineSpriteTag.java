@@ -149,6 +149,16 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
             sos.writeUI16(0);
         }
     }
+
+    @Override
+    public boolean isPositionDependent() {
+        for (Tag tag : getTags()) {
+            if (tag.isPositionDependent()) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     @Override
     public void getDataNoScript(SWFOutputStream sos) throws IOException {
@@ -199,11 +209,10 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         this.spriteId = characterId;
     }
 
-    private RECT getCharacterBounds(Set<Integer> characters, Set<BoundedTag> added) {
+    private RECT getCharacterBounds(Set<CharacterTag> characters, Set<BoundedTag> added) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
-        for (int c : characters) {
-            Tag t = swf.getCharacter(c);
+        for (CharacterTag t : characters) {
             RECT r = null;
             if (t instanceof BoundedTag) {
                 BoundedTag bt = (BoundedTag) t;
@@ -307,12 +316,12 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         }
 
         ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
-        HashMap<Integer, Integer> depthMap = new HashMap<>();
+        HashMap<Integer, CharacterTag> depthMap = new HashMap<>();
         HashMap<Integer, MATRIX> depthMatrixMap = new HashMap<>();
         boolean foundSomething = false;
         for (Tag t : getTags()) {
             MATRIX m = null;
-            int characterId = -1;
+            CharacterTag character = null;
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 depthMap.remove(rt.getDepth());
@@ -338,30 +347,26 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                 depthMatrixMap.put(pot.getDepth(), m);
 
                 int charId = pot.getCharacterId();
-                if (charId > -1) {
-                    depthMap.put(pot.getDepth(), charId);
-                    characterId = charId;
-                } else {
-                    Integer chi = depthMap.get(pot.getDepth());
-                    if (chi != null) {
-                        characterId = chi;
+                String className = pot.getClassName();
+                if (className != null || charId > -1) {
+                    if (swf != null) {
+                        character = className != null ? swf.getCharacterByClass(className) : swf.getCharacter(charId);
                     }
+                    // Keep the resolved tag: an imported class belongs to another SWF's ID space.
+                    depthMap.put(pot.getDepth(), character);
+                } else {
+                    character = depthMap.get(pot.getDepth());
                 }
-                               
+
             } else {
                 continue;
             }
-            if (characterId != -1 && swf != null) {
-                //Do not handle Fonts as characters. TODO: make this better
-                if (swf.getCharacter(characterId) instanceof FontTag) {
-                    characterId = -1;
-                }
-            }
-            if (characterId == -1) {
+            // Do not handle fonts as display characters.
+            if (character == null || character instanceof FontTag) {
                 continue;
             }
-            Set<Integer> need = new HashSet<>();
-            need.add(characterId);
+            Set<CharacterTag> need = new HashSet<>();
+            need.add(character);
             RECT r = getCharacterBounds(need, added);
 
             if (m != null) {

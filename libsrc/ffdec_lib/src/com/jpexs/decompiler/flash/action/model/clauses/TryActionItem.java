@@ -16,10 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.As2ClassMemberScope;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -149,7 +149,15 @@ public class TryActionItem extends ActionItem implements Block {
             }
             writer.append(")");
             List<GraphTargetItem> commands = catchCommands.get(e);
-            appendBlock(null, writer, localData, commands);
+            As2ClassMemberScope previousScope = localData.as2ClassMemberScope;
+            if (previousScope != null) {
+                localData.as2ClassMemberScope = previousScope.withShadowedName(catchExceptionNames.get(e).toStringNoQuotes(localData));
+            }
+            try {
+                appendBlock(null, writer, localData, commands);
+            } finally {
+                localData.as2ClassMemberScope = previousScope;
+            }
         }
         if (catchExceptionNames.isEmpty() || finallyCommands.size() > 0) {
             writer.newLine();

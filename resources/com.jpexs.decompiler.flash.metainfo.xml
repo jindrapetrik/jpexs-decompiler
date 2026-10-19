@@ -119,7 +119,7 @@
 					<li>as3: preserve convert/coerce types on for-each and for-in vars (PR280)</li>
 					<li>as3: keep ctor assigns that read unset instance slots (PR278)</li>
 					<li>as1/2: avoid simplifying getTimer function (#2752)</li>
-					<li>add +X permission to translator and soledir.sh on Linux zip (#623)</li>
+					<li>add +X permission to translator and soledit.sh on Linux zip (#623)</li>
 					<li>aero snap: fix working on multiple monitors (#2756, #2523)</li>
 				</ul>
 				<p>Performance Improvements</p>

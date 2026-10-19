@@ -23,9 +23,13 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
+import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -125,6 +129,12 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
         }
         if (pushedRegisters.isEmpty()) {
             return false;
+        }
+        if (cleanTryFinallyRegisters(code, startIndex, count, pos, pushedRegisters)) {
+            return true;
+        }
+        if (cleanStackSwapReturns(code, startIndex, count, pushedRegisters)) {
+            return true;
         }
 
         /*
@@ -266,8 +276,12 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
         //replace jumps to return with returns
         for (Integer jp : jumpsToReturnPositions) {
             int index = jp;
+            Action jump = code.get(index);
+            ActionReturn ret = new ActionReturn();
+            ret.setVirtualAddress(jump.getVirtualAddress());
+            ret.fileOffset = jump.fileOffset;
             code.removeAction(index);
-            code.addAction(index, new ActionReturn());
+            code.addAction(index, ret);
         }
 
         //previous action (not jump) also leads to finishpart, we might add return there aswell
@@ -283,7 +297,10 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
                 //its jump to another location, we will not add return there
             } else { //might be another returned value
                 posBeforeFinishPart++;
-                code.addAction(posBeforeFinishPart, new ActionReturn());
+                ActionReturn ret = new ActionReturn();
+                ret.setVirtualAddress(code.get(posBeforeFinishPart).getVirtualAddress());
+                ret.fileOffset = code.get(posBeforeFinishPart).fileOffset;
+                code.addAction(posBeforeFinishPart, ret);
                 count++; //action added, but not removed, we increase total count
             }
         }
@@ -293,9 +310,98 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
         int removeCount = startIndex + count - removeStartIndex;
         code.removeAction(removeStartIndex, removeCount);
 
+        removeRegisterPushes(code, startIndex, pushedRegisters.size());
+        return true;
+    }
+
+    /**
+     * The compiler also preserves register zero. Its return cleanup uses
+     * StackSwap to keep the returned value on the stack instead of borrowing
+     * another global register. Returns inside With remain inside their block.
+     */
+    private boolean cleanStackSwapReturns(ActionList code, int startIndex, int count, List<Integer> registers) {
+        List<int[]> cleanupRanges = new ArrayList<>();
+        long nestedFunctionEnd = -1;
+        int endIndex = startIndex + count;
+        for (int i = startIndex; i < endIndex; i++) {
+            Action action = code.get(i);
+            if (action.getAddress() < nestedFunctionEnd) {
+                continue;
+            }
+            if (action instanceof ActionDefineFunction || action instanceof ActionDefineFunction2) {
+                GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+                nestedFunctionEnd = action.getAddress() + container.getHeaderSize() + container.getContainerSizes().get(0);
+                continue;
+            }
+            if (action instanceof ActionReturn) {
+                int cleanupStart = i - registers.size() * 3;
+                if (!matchesRestore(code, cleanupStart, startIndex, registers, true)) {
+                    return false;
+                }
+                cleanupRanges.add(new int[]{cleanupStart, registers.size() * 3});
+            }
+        }
+        if (cleanupRanges.isEmpty()) {
+            return false;
+        }
+        if (!(code.get(endIndex - 1) instanceof ActionReturn)) {
+            int cleanupStart = endIndex - registers.size() * 2;
+            if (!matchesRestore(code, cleanupStart, startIndex, registers, false)) {
+                return false;
+            }
+            cleanupRanges.add(new int[]{cleanupStart, registers.size() * 2});
+        }
+        for (int i = cleanupRanges.size() - 1; i >= 0; i--) {
+            int[] range = cleanupRanges.get(i);
+            code.removeAction(range[0], range[1]);
+        }
+        removeRegisterPushes(code, startIndex, registers.size());
+        return true;
+    }
+
+    private boolean matchesRestore(ActionList code, int pos, int startIndex, List<Integer> registers, boolean returning) {
+        if (pos <= startIndex) {
+            return false;
+        }
+        for (int i = registers.size() - 1; i >= 0; i--) {
+            if (returning && !(code.get(pos++) instanceof ActionStackSwap)) {
+                return false;
+            }
+            Action action = code.get(pos++);
+            if (!(action instanceof ActionStoreRegister)
+                    || ((ActionStoreRegister) action).registerNumber != registers.get(i)
+                    || !(code.get(pos++) instanceof ActionPop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean cleanTryFinallyRegisters(ActionList code, int startIndex, int count, int pos, List<Integer> registers) {
+        if (!(code.get(pos) instanceof ActionTry)) {
+            return false;
+        }
+        ActionTry action = (ActionTry) code.get(pos);
+        int endIndex = startIndex + count;
+        int cleanupStart = endIndex - registers.size() * 2;
+        Action last = code.get(endIndex - 1);
+        long end = last.getAddress() + last.getTotalActionLength();
+        if (action.catchBlockFlag || !action.finallyBlockFlag
+                || action.getContainerSizes().get(1) != registers.size() * 5
+                || action.getAddress() + action.getHeaderSize() + action.getTrySize() + action.getContainerSizes().get(1) != end
+                || !matchesRestore(code, cleanupStart, startIndex, registers, false)) {
+            return false;
+        }
+        code.removeAction(cleanupStart, registers.size() * 2);
+        code.removeAction(pos);
+        removeRegisterPushes(code, startIndex, registers.size());
+        return true;
+    }
+
+    private void removeRegisterPushes(ActionList code, int startIndex, int registerCount) {
         //remove pushes from beginning part
-        pos = startIndex;
-        int registersLeft = pushedRegisters.size();
+        int pos = startIndex;
+        int registersLeft = registerCount;
         loopregs2:
         while (code.get(pos) instanceof ActionPush) {
             ActionPush currentPush = (ActionPush) code.get(pos);
@@ -324,6 +430,5 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
             }
             pos++;
         }
-        return true;
     }
 }

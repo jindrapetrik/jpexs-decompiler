@@ -78,6 +78,9 @@ public class DeleteActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
+        if (As2ClassMemberScope.canShorten(object, propertyName, localData)) {
+            return propertyName.toStringNoQuotes(writer, localData);
+        }
         if (object != null) {
             object.toStringNoQuotes(writer, localData);
             if ((propertyName instanceof DirectValueActionItem) && ((DirectValueActionItem) propertyName).isString()

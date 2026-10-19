@@ -162,7 +162,20 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    private BitSet getReachableParts(BaseLocalData localData, Graph gr, GraphSource code,
+    /**
+     * Gets all parts reachable from this part. Test membership with
+     * Graph.getReachabilityPartIndex. Same semantics as leadsTo.
+     *
+     * @param localData Local data
+     * @param gr Graph
+     * @param code Code
+     * @param loops Loops
+     * @param throwStates Throw states
+     * @param firstCanBeLoopContinue Can entry point be loop continue?
+     * @return Reachable parts, indexed by Graph.getReachabilityPartIndex
+     * @throws InterruptedException On interrupt
+     */
+    BitSet getReachableParts(BaseLocalData localData, Graph gr, GraphSource code,
             List<Loop> loops, List<ThrowState> throwStates, boolean firstCanBeLoopContinue) throws InterruptedException {
         BitSet reachableParts = new BitSet();
         hasPathTo(localData, gr, code, null /*???*/, null, new VisitedGraphParts(code.size()),
