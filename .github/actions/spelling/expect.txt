@@ -260,6 +260,7 @@ bbff
 Bbits
 bca
 bcb
+bcdec
 bcdedit
 bcdfghjklmnpqrstvwz
 bcff
@@ -444,6 +445,7 @@ CASEINSENSITIVE
 caseoffsets
 casesensitive
 Casteljau
+castlecrashers
 castop
 catchparts
 CATID
@@ -1916,6 +1918,7 @@ Kratz
 Krbtgt
 ktm
 Kto
+Kudlai
 kupr
 kvals
 kweiner
@@ -2741,6 +2744,8 @@ pathpart
 pathsource
 pathvar
 Pawel
+pbit
+PBits
 pblend
 pbmi
 pbstr
@@ -3235,6 +3240,7 @@ semicoloned
 sendenter
 seproject
 serclose
+Sergii
 serh
 serl
 serr
