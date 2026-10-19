@@ -1088,22 +1088,31 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return true;
     }
 
-    private boolean updateGradientTransformCursor(MouseEvent e) {
-        if (gradientTransform == null) {
-            return false;
+    private Cursor getGradientTransformCursor(Point2D point) {
+        if (gradientTransform == null || !gradientTransformEditable) {
+            return null;
         }
-        if (!gradientTransformEditable) {
-            iconPanel.setCursor(defaultCursor);
-            return false;
+        int handle = activeGradientHandle;
+        if (handle == GRADIENT_HANDLE_NONE && point != null) {
+            handle = getGradientHandleAt(point);
         }
-        int handle = getGradientHandleAt(e.getPoint());
         if (handle == GRADIENT_HANDLE_NONE) {
-            iconPanel.setCursor(defaultCursor);
+            return null;
+        }
+        return handle == GRADIENT_HANDLE_CENTER
+                ? Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
+                : Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+    }
+
+    private boolean updateGradientTransformCursor(MouseEvent e) {
+        Cursor cursor = getGradientTransformCursor(e.getPoint());
+        if (cursor == null) {
+            if (gradientTransform != null) {
+                iconPanel.setCursor(defaultCursor);
+            }
             return false;
         }
-        iconPanel.setCursor(handle == GRADIENT_HANDLE_CENTER
-                ? Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
-                : Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        iconPanel.setCursor(cursor);
         return true;
     }
 
@@ -6628,6 +6637,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
                             } else {
                                 debugLabel.setText(ret.toString());
+                            }
+                            MouseEvent mouseEvent = ImagePanel.this.lastMouseEvent;
+                            Cursor gradientCursor = getGradientTransformCursor(mouseEvent == null ? null : mouseEvent.getPoint());
+                            if (gradientCursor != null) {
+                                if (iconPanel.getCursor() != gradientCursor) {
+                                    iconPanel.setCursor(gradientCursor);
+                                }
+                                return;
                             }
                             if (hilightedPoints != null) {
                                 Cursor newCursor;
