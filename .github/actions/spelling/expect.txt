@@ -61,7 +61,7 @@ actionscript
 actionscriptdoc
 actionscriptsyntaxkit
 activex
-actl
+Actl
 adata
 addclass
 addexport
@@ -70,6 +70,7 @@ additionalmodules
 additionalparam
 addressproperty
 addrfix
+addtagmulti
 addtocontextmenu
 addtrait
 adff
@@ -124,6 +125,7 @@ altglyph
 altsigner
 ames
 amf
+AMuch
 amxmlc
 aname
 ANDEQ
@@ -167,6 +169,7 @@ asasm
 ascentdescentleading
 asciitochar
 asclass
+asclasslink
 asclassmain
 asconfig
 asdec
@@ -273,6 +276,7 @@ bdt
 bduration
 beaninfo
 Beanshell
+BEB
 bechtold
 beff
 beginbfchar
@@ -302,7 +306,6 @@ biasdist
 bic
 bigs
 bilerp
-bioshock
 bimg
 binarydata
 binaryexcludes
@@ -312,10 +315,11 @@ BINARYTAG
 binarytestincludes
 bindex
 bininfo
+bioshock
 bistream
 bitbuf
 bitdepth
-bitfields
+bitfield
 bitindex
 bitlshift
 BITMAPDATA
@@ -395,6 +399,7 @@ bundleswc
 buttoncondaction
 buttonicon
 BUTTONRECORD
+buttonss
 Bval
 byacc
 byt
@@ -585,6 +590,7 @@ cntp
 codegenop
 codehaus
 codelength
+codeoffset
 codetab
 coefs
 COERROR
@@ -1125,9 +1131,9 @@ fcanvas
 fcc
 fcff
 fcode
-fctl
+Fctl
 fctx
-fdat
+Fdat
 FDE
 fdecompiled
 fdepth
@@ -1306,6 +1312,7 @@ frest
 Friesen
 frm
 Frob
+fromsoft
 fromto
 fsb
 fscommand
@@ -1614,7 +1621,7 @@ ignodes
 ignorebackground
 ignoreversion
 igv
-ihdr
+Ihdr
 ihnp
 iid
 iin
@@ -2000,6 +2007,7 @@ linkreport
 linmax
 listconfigs
 Listswf
+listswfprofiles
 Liushui
 livedocs
 lix
@@ -3370,6 +3378,8 @@ SOFD
 SOFE
 SOFF
 softsound
+soi
+soledit
 soleditor
 SOMECACHES
 somemethod
@@ -3511,6 +3521,7 @@ subloader
 submethod
 subout
 subref
+subspans
 subsprite
 Subtables
 subtag
@@ -3539,6 +3550,7 @@ swfitem
 swfmeta
 SWFNAME
 swfpreview
+swfprofile
 swfs
 swftext
 swftextsyntaxkit
@@ -3667,6 +3679,7 @@ thn
 throwpart
 ths
 timelined
+timemap
 TIMERNOFG
 timesroman
 timevalue
@@ -4074,6 +4087,7 @@ xelem
 XEnd
 XENROLL
 XEvent
+XFixed
 xfl
 XFloat
 Xfm
@@ -4134,6 +4148,7 @@ xstate
 xtaga
 xtagb
 XText
+XTwips
 XUpdate
 xval
 Xvfb
