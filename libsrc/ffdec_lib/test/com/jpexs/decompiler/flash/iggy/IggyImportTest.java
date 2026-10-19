@@ -88,7 +88,7 @@ public class IggyImportTest {
             f.ref(placeholder + (wide ? 16 : 8), 0); f.ref(dictionary + 2L * p, placeholder);
             long table = f.allocate(2 * stride), symbols = f.allocate(2 * stride);
             f.ref(wide ? 112 : 80, table); f.u32(wide ? 128 : 88, 2);
-            f.ref(table, f.string("../knihovna_ž.swf")); f.ref(table + p, symbols); f.u32(table + 2 * p, 2);
+            f.ref(table, f.string("../library_ž.swf")); f.ref(table + p, symbols); f.u32(table + 2 * p, 2);
             f.ref(table + stride, f.string("classes_only.swf")); f.ref(table + stride + p, 0); f.u32(table + stride + 2 * p, 0);
             if (wide) { f.u32(table + 20, 0x12345678); }
             for (int i = 0; i < 2; i++) {
@@ -154,7 +154,7 @@ public class IggyImportTest {
     public void exportsSymbolsEmptyLibrariesAndPreservesUnchangedBinary(int layout) throws Exception {
         byte[] original = fixture(layout, true, true); IggyFile file = load(original);
         SWF swf = reparse(IggyToSwfConvertor.getSwf(file)); List<ImportAssets2Tag> tags = imports(swf);
-        Assert.assertEquals(tags.size(), 2); Assert.assertEquals(tags.get(0).url, "../knihovna_ž.swf");
+        Assert.assertEquals(tags.size(), 2); Assert.assertEquals(tags.get(0).url, "../library_ž.swf");
         Assert.assertEquals(tags.get(0).tags, Arrays.asList(2, 3));
         Assert.assertEquals(tags.get(0).names, Arrays.asList("ui.Widget", "ui.Font"));
         Assert.assertEquals(tags.get(0).downloadNow, 1); Assert.assertEquals(tags.get(0).hasDigest, 0);
@@ -181,14 +181,14 @@ public class IggyImportTest {
     @Test(dataProvider = "layouts")
     public void editsNamesAddsEmptyDependencyAndExtendsDictionary(int layout) throws Exception {
         IggyFile file = load(fixture(layout, true, true)); SWF swf = IggyToSwfConvertor.getSwf(file);
-        List<ImportAssets2Tag> tags = imports(swf); tags.get(0).url = "../nová_knihovna.swf";
-        tags.get(0).names.set(0, "ui.JinýWidget"); tags.get(0).tags.add(500); tags.get(0).names.add("ui.NewSymbol");
+        List<ImportAssets2Tag> tags = imports(swf); tags.get(0).url = "../new_library.swf";
+        tags.get(0).names.set(0, "ui.OtherWidget"); tags.get(0).tags.add(500); tags.get(0).names.add("ui.NewSymbol");
         addImport(swf, 0); SwfToIggyConvertor.updateIggy(file.getSwf(), reparse(swf));
         byte[] saved = save(file); IggyFile result = load(saved);
         List<IggyImport> libraries = result.getSwf().getImports(); Assert.assertEquals(libraries.size(), 3);
         Assert.assertEquals(libraries.get(0).getLibrary(), "new_library.swf");
-        Assert.assertEquals(libraries.get(1).getLibrary(), "../nová_knihovna.swf");
-        Assert.assertEquals(libraries.get(1).getSymbols().get(0).getName(), "ui.JinýWidget");
+        Assert.assertEquals(libraries.get(1).getLibrary(), "../new_library.swf");
+        Assert.assertEquals(libraries.get(1).getSymbols().get(0).getName(), "ui.OtherWidget");
         Assert.assertEquals(libraries.get(1).getSymbols().get(2).getCharacterId(), 500L);
         Assert.assertEquals(result.getSwf().getDictionary().size(), 501); Assert.assertTrue(result.getSwf().getDictionary().get(500).isNull());
         if (layout == 2) { Assert.assertEquals(libraries.get(1).getSymbols().get(0).getReserved(), 0x87654321L); }

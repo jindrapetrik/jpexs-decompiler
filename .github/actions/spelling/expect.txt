@@ -61,6 +61,7 @@ actionscript
 actionscriptdoc
 actionscriptsyntaxkit
 activex
+actl
 adata
 addclass
 addexport
@@ -314,7 +315,7 @@ bininfo
 bistream
 bitbuf
 bitdepth
-BITFIELDS
+bitfields
 bitindex
 bitlshift
 BITMAPDATA
@@ -749,7 +750,6 @@ debugpcode
 debugswf
 debugtool
 decimalsupport
-declend
 declocal
 declocalp
 decompilation
@@ -971,6 +971,7 @@ dxm
 dxns
 dxnslate
 dxs
+dxt
 dyat
 dyf
 dym
@@ -1108,7 +1109,6 @@ EXTENDEDKEY
 extitle
 Extrahandling
 EXTRALIGHT
-extraxtdir
 ezb
 fai
 failonerror
@@ -1125,7 +1125,9 @@ fcanvas
 fcc
 fcff
 fcode
+fctl
 fctx
+fdat
 FDE
 fdecompiled
 fdepth
@@ -1143,7 +1145,6 @@ ffile
 ffname
 fframe
 ffs
-FFXX
 FGlyph
 fgp
 fgrad
@@ -1572,7 +1573,7 @@ iconinfo
 ict
 icting
 ictx
-IDAT
+idat
 idata
 IDCT
 Iddle
@@ -1583,7 +1584,7 @@ identifierdeobfuscation
 idscan
 Idtags
 IDTYPE
-iends
+iend
 ieport
 iex
 ifaces
@@ -1606,13 +1607,14 @@ ift
 iftrue
 ifup
 igchar
-iggi
 iggy
 iggyfile
+iggytex
 ignodes
 ignorebackground
 ignoreversion
 igv
+ihdr
 ihnp
 iid
 iin
@@ -1772,7 +1774,6 @@ istep
 istrue
 istype
 istypelate
-itemj
 itemr
 itemtypes
 ITF
@@ -1879,6 +1880,7 @@ jvmarg
 JVMs
 jvnet
 jxar
+jxr
 kalip
 KARG
 KBDLLHOOKSTRUCT
@@ -1888,7 +1890,7 @@ Kein
 Keine
 ker
 KERNINGRECORD
-Kernings
+kernings
 kevin
 keyb
 KEYBDINPUT
@@ -2056,7 +2058,6 @@ loopk
 loopm
 loopn
 loopnext
-loopobj
 loopoff
 loopon
 loopopened
@@ -2243,6 +2244,7 @@ minscope
 MINUSEQ
 MINUSMINUS
 MINVALUE
+mip
 Miron
 miscompilation
 miterclip
@@ -2370,7 +2372,6 @@ myvarsetonly
 myvectorint
 myxml
 Naashorn
-nabc
 nai
 Namesmy
 namespacekind
@@ -2789,6 +2790,7 @@ phk
 PIII
 pinnable
 pipename
+pixl
 placeobject
 PLACETAG
 plaf
@@ -3369,7 +3371,6 @@ SOFD
 SOFE
 SOFF
 softsound
-SOI
 soleditor
 SOMECACHES
 somemethod
@@ -3870,6 +3871,7 @@ unpremultiply
 unr
 Unreads
 Unregisters
+unrelocated
 unresize
 unser
 unshar
