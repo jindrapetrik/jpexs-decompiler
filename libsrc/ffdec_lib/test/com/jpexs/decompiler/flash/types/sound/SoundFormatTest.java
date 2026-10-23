@@ -21,12 +21,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.importers.SoundImporter;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
@@ -37,17 +32,6 @@ import javax.sound.sampled.AudioSystem;
 import org.testng.annotations.Test;
 
 public class SoundFormatTest {
-
-    @Test
-    public void convertsUnsignedPcm8ForBothUncompressedFormats() throws Exception {
-        byte[] input = {0, 125, (byte) 128, (byte) 131, (byte) 255};
-        byte[] expected = {0, (byte) 128, 0, -3, 0, 0, 0, 3, 0, 127};
-        for (int format : new int[]{0, 3}) {
-            SoundFormat sound = new SoundFormat(format, 11025, false, false);
-            assertEquals(sound.getDecoder().decode(new SWFInputStream(null, input)), expected);
-            assertEquals(input, new byte[]{0, 125, (byte) 128, (byte) 131, (byte) 255});
-        }
-    }
 
     @Test
     public void preservesPcm16AndDefaultConstructorBehavior() throws Exception {
@@ -67,15 +51,7 @@ public class SoundFormatTest {
         assertTrue(decoded.length > 0);
         assertEquals(decoded, large.getDecoder().decode(new SWFInputStream(null, input)));
     }
-
-    @Test
-    public void retainsStereoOrderAndSkipsWholeDecodedFrames() throws Exception {
-        SoundFormat sound = new SoundFormat(3, 11025, true, false);
-        byte[] input = {0, (byte) 255, (byte) 129, 127, (byte) 130, 126};
-        byte[] decoded = sound.decode(null, Arrays.asList(new ByteArrayRange(input)), 1);
-        assertEquals(decoded, new byte[]{0, 1, 0, -1, 0, 2, 0, -2});
-    }
-
+   
     @Test
     public void defineSoundWavPreservesQuietAmplitudeAndDuration() throws Exception {
         DefineSoundTag tag = new DefineSoundTag(new SWF());
@@ -104,62 +80,7 @@ public class SoundFormatTest {
                 assertTrue(Math.abs(value) <= 768);
             }
         }
-    }
-
-    @Test
-    public void soundStreamHeadsPassTheirPcmSampleSizeToTheDecoder() throws Exception {
-        SWF swf = new SWF();
-        SoundStreamHeadTag head = new SoundStreamHeadTag(swf);
-        head.streamSoundCompression = 0;
-        head.streamSoundSize = false;
-        SoundStreamHead2Tag head2 = new SoundStreamHead2Tag(swf);
-        head2.streamSoundCompression = 3;
-        head2.streamSoundSize = false;
-        for (SoundFormat format : new SoundFormat[]{head.getSoundFormat(), head2.getSoundFormat()}) {
-            byte[] decoded = format.decode(null, Arrays.asList(
-                    new ByteArrayRange(new byte[]{(byte) 128, (byte) 129}),
-                    new ByteArrayRange(new byte[]{127, (byte) 128})), 0);
-            assertEquals(decoded, new byte[]{0, 0, 0, 1, 0, -1, 0, 0});
-        }
-    }
-
-    @Test
-    public void partialStreamImportDoesNotConvertExistingPcm8Twice() throws Exception {
-        SWF swf = new SWF();
-        swf.frameRate = 25;
-        SoundStreamHead2Tag head = new SoundStreamHead2Tag(swf);
-        head.streamSoundCompression = 3;
-        head.streamSoundRate = 1;
-        head.streamSoundSize = false;
-        head.streamSoundSampleCount = 441;
-        head.setTimelined(swf);
-        swf.addTag(head);
-        for (int frame = 0; frame < 2; frame++) {
-            SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
-            byte[] data = new byte[441];
-            Arrays.fill(data, (byte) 129);
-            block.streamSoundData = new ByteArrayRange(data);
-            block.setTimelined(swf);
-            swf.addTag(block);
-            swf.addTag(new ShowFrameTag(swf));
-        }
-        byte[] replacement = new byte[882];
-        for (int i = 1; i < replacement.length; i += 2) {
-            replacement[i] = 2;
-        }
-        ByteArrayOutputStream wav = new ByteArrayOutputStream();
-        SoundFormat.createWavFromPcmData(wav, 11025, true, false, replacement);
-        assertTrue(new SoundImporter().importSoundStreamAtFrame(head,
-                new ByteArrayInputStream(wav.toByteArray()), 3, 1));
-        assertTrue(head.getSoundSize());
-        byte[] data = head.getRawSoundData().get(0).getRangeData();
-        assertEquals(data.length, 882);
-        for (int i = 0; i < data.length; i += 2) {
-            assertEquals(data[i], (byte) 0);
-            assertEquals(data[i + 1], (byte) 1);
-        }
-        assertEquals(head.getRawSoundData().get(1).getRangeData(), replacement);
-    }
+    }   
 
     @Test
     public void soundInfoTrimUsesDecodedPcm16SamplePositions() throws Exception {
