@@ -33,15 +33,6 @@ public class NoDecoder extends SoundDecoder {
 
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
-        byte[] data = sis.readBytesEx(sis.available(), "soundStream");
-        if (soundFormat.sample16bit) {
-            os.write(data);
-        } else {
-            for (byte sample : data) {
-                // PCM8 silence is 128. All decoder consumers expect signed PCM16.
-                os.write(0);
-                os.write((sample & 0xff) - 128);
-            }
-        }
+        os.write(sis.readBytesEx(sis.available(), "soundStream"));
     }
 }

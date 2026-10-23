@@ -90,7 +90,7 @@ public class SoundFormatTest {
         }
         tag.soundData = new ByteArrayRange(input);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        assertTrue(tag.getSoundFormat().createWav(null, tag.getRawSoundData(), output, 0));
+        assertTrue(tag.getSoundFormat().createWav(null, tag.getRawSoundData(), output, 0, true));
         try (AudioInputStream wav = AudioSystem.getAudioInputStream(new ByteArrayInputStream(output.toByteArray()))) {
             assertEquals(wav.getFormat().getSampleSizeInBits(), 16);
             assertEquals(wav.getFormat().getChannels(), 1);
@@ -171,7 +171,7 @@ public class SoundFormatTest {
         info.outPoint = 12;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         assertTrue(format.createWav(info, Arrays.asList(new ByteArrayRange(
-                new byte[]{(byte) 128, (byte) 129, (byte) 130, (byte) 131})), output, 0));
+                new byte[]{(byte) 128, (byte) 129, (byte) 130, (byte) 131})), output, 0, true));
         try (AudioInputStream wav = AudioSystem.getAudioInputStream(new ByteArrayInputStream(output.toByteArray()))) {
             assertEquals(wav.getFrameLength(), 2L);
             assertEquals(wav.getFormat().getChannels(), 2);

@@ -39,7 +39,7 @@ public class SoundWaveformPanelTest {
         tag.soundSize = false;
         tag.soundData = new ByteArrayRange(new byte[]{125, (byte) 128, (byte) 131});
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        tag.getSoundFormat().createWav(null, tag.getRawSoundData(), output, 0);
+        tag.getSoundFormat().createWav(null, tag.getRawSoundData(), output, 0, true);
 
         SoundWaveformPanel.WaveformData data = SoundWaveformPanel.WaveformData.create(output.toByteArray(), 1);
 

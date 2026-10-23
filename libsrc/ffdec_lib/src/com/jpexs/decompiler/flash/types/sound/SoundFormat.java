@@ -113,7 +113,8 @@ public class SoundFormat {
             return false;
         }
 
-        AudioFormat audioFormat = new AudioFormat(samplingRate, 16, stereo ? 2 : 1, true, false);
+        boolean decoded16bit = isDecoded16Bit();
+        AudioFormat audioFormat = new AudioFormat(samplingRate, decoded16bit ? 16 : 8, stereo ? 2 : 1, decoded16bit, false);
         DataLine.Info info = new DataLine.Info(SourceDataLine.class,
                 audioFormat);
         try (SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info)) {
@@ -126,6 +127,11 @@ public class SoundFormat {
         } catch (LineUnavailableException ex) {
             return false;
         }
+    }
+
+    private boolean isDecoded16Bit() {
+        return sample16bit || (formatId != FORMAT_UNCOMPRESSED_NATIVE_ENDIAN
+                && formatId != FORMAT_UNCOMPRESSED_LITTLE_ENDIAN);
     }
 
     private void ensureFormat() {
@@ -234,7 +240,7 @@ public class SoundFormat {
             if (data.length > 0) {
                 data = Arrays.copyOfRange(
                         data,
-                        skipSamples * 2 * (stereo ? 2 : 1),
+                        skipSamples * (isDecoded16Bit() ? 2 : 1) * (stereo ? 2 : 1),
                         data.length
                 );
             }
@@ -313,11 +319,33 @@ public class SoundFormat {
         return baosResampled.toByteArray();
     }
 
-    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os, int skipSamples) throws IOException {
+    /**
+     * Creates a WAV from decoded samples, optionally promoting unsigned PCM8 to signed PCM16.
+     *
+     * @param soundInfo Optional trimming and envelope settings
+     * @param dataRanges Encoded sound data
+     * @param os WAV destination
+     * @param skipSamples Initial sample frames to skip
+     * @param convert8bitTo16bit Whether PCM8 output should be promoted to PCM16
+     * @return Whether writing the WAV succeeded
+     * @throws IOException On decoding or I/O error
+     */
+    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os, int skipSamples, boolean convert8bitTo16bit) throws IOException {
 
         byte[] decodedData = decode(soundInfo, dataRanges, skipSamples);
         boolean convertedStereo = stereo;
+        boolean converted16bit = isDecoded16Bit();
+        boolean output16bit = converted16bit || convert8bitTo16bit;
 
+        if (!converted16bit && (convert8bitTo16bit || soundInfo != null)) {
+            // The envelope/filtering path operates on signed PCM16 samples.
+            byte[] pcm16 = new byte[decodedData.length * 2];
+            for (int i = 0; i < decodedData.length; i++) {
+                pcm16[i * 2 + 1] = (byte) ((decodedData[i] & 0xff) - 128);
+            }
+            decodedData = pcm16;
+            converted16bit = true;
+        }
         ByteArrayOutputStream baosFiltered;
         if (soundInfo == null) {
             baosFiltered = new ByteArrayOutputStream();
@@ -368,9 +396,17 @@ public class SoundFormat {
             convertedStereo = true;
         }
 
-        
+        byte[] outputData = baosFiltered.toByteArray();
+        if (converted16bit && !output16bit) {
+            // Filtering uses PCM16 internally; preserve PCM8 output when promotion was not requested.
+            byte[] pcm8 = new byte[outputData.length / 2];
+            for (int i = 0; i < pcm8.length; i++) {
+                pcm8[i] = (byte) (outputData[i * 2 + 1] + 128);
+            }
+            outputData = pcm8;
+        }
         try {
-            createWavFromPcmData(os, samplingRate, true, convertedStereo, baosFiltered.toByteArray());
+            createWavFromPcmData(os, samplingRate, output16bit, convertedStereo, outputData);
             return true;
         } catch (IOException ex) {
             return false;

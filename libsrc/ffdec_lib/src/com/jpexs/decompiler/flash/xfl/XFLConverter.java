@@ -2010,7 +2010,12 @@ public class XFLConverter {
             format += 4; //quality best
             try {
                 SWFInputStream sis = new SWFInputStream(swf, soundData);
-                MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                boolean streamSound = symbol instanceof SoundStreamFrameRange;
+                if (streamSound) {
+                    // Stream blocks start with a sample count and seek value, not DefineSound's latency.
+                    sis.skipBytes(4);
+                }
+                MP3SOUNDDATA s = new MP3SOUNDDATA(sis, streamSound);
                 if (s.seekSamples > 0) {
                     seekSamples = s.seekSamples;
                     exportFormat = "wav";
@@ -2079,9 +2084,11 @@ public class XFLConverter {
         byte[] decodedData = null;
         try {
             decodedData = st.getSoundFormat().decode(null, st.getRawSoundData(), seekSamples);
-            if (soundSampleCount == 0) {
-                soundSampleCount = decodedData.length / (2 * (st.getSoundType() ? 2 : 1));
-            }
+            // Compressed codecs decode to PCM16; uncompressed PCM retains its source bit depth.
+            soundSize = st.getSoundSize()
+                    || (soundFormat != SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN
+                    && soundFormat != SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN);
+            soundSampleCount = decodedData.length / ((soundSize ? 2 : 1) * (st.getSoundType() ? 2 : 1));
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

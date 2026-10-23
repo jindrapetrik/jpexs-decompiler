@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -274,7 +273,7 @@ public class SoundWaveformPanel extends JPanel implements MediaDisplayListener {
 
         static WaveformData create(byte[] wavData, int bucketCount)
                 throws IOException, UnsupportedAudioFileException {
-            AudioInputStream original = AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavData));
+            AudioInputStream original = SoundTagPlayer.createPlaybackStream(wavData);
             AudioInputStream decoded = original;
             try {
                 AudioFormat originalFormat = original.getFormat();
