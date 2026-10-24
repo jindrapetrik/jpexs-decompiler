@@ -581,8 +581,27 @@ public class LoopDetector {
             Set<GraphPart> localOutParts = new LinkedHashSet<>(outParts);
             localOutParts.removeAll(excludedTargets);
 
+            //An exit which only ends the method (return, throw) without code shared
+            //with other paths can be printed in place. It is not the break
+            //when the loop has another exit, otherwise the other exit is lost.
+            Set<GraphPart> deadEndOutParts = new LinkedHashSet<>();
+            for (GraphPart outPart : localOutParts) {
+                if (isDeadEnd(loop, outPart, backEdges, walker, ignoredEdges)) {
+                    deadEndOutParts.add(outPart);
+                }
+            }
+            if (!deadEndOutParts.isEmpty() && deadEndOutParts.size() < localOutParts.size()) {
+                localOutParts.removeAll(deadEndOutParts);
+                excludedTargets.addAll(deadEndOutParts);
+            } else {
+                deadEndOutParts.clear();
+            }
+
             for (GraphPartEdge edge : consideredOutsideEdges) {
                 GraphPart outPart = edge.to;
+                if (deadEndOutParts.contains(outPart)) {
+                    continue;
+                }
                 Set<GraphPart> reachable = getReachable(outPart, backEdges, parentBreaks, walker, ignoredEdges);
 
                 if (parentContinues.contains(outPart)) {
@@ -674,6 +693,32 @@ public class LoopDetector {
             }
             loop.loopBreak = candidateList.get(0).part;
         }
+    }
+
+    /**
+     * Checks whether the loop exit part only ends the method and its code is
+     * not shared with other paths.
+     *
+     * @param loop Loop
+     * @param outPart Exit part
+     * @param backEdges Back edges
+     * @param walker Walker
+     * @param ignoredEdges Ignored edges
+     * @return True if the part is a dead end
+     */
+    private boolean isDeadEnd(Loop loop, GraphPart outPart, Set<GraphPartEdge> backEdges, PrevNextWalker walker, Set<GraphPartEdge> ignoredEdges) {
+        Set<GraphPart> reachable = getReachable(outPart, backEdges, new HashSet<>(), walker, ignoredEdges);
+        for (GraphPart part : reachable) {
+            for (GraphPart prev : walker.getPrev(part)) {
+                if (prev.start < 0) {
+                    continue;
+                }
+                if (!loop.loopBody.contains(prev) && !reachable.contains(prev)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean leadsOnlyToAbruptTargets(
