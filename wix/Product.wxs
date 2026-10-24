@@ -578,11 +578,11 @@
       <Component Id="ffdec_lib_license" Guid="D9E0F1A2-B3C4-5D6E-7F8A-9B0C1D2E3F4A">
         <File Id="ffdec_lib.license.txt" Source="../dist/lib/ffdec_lib.license.txt" KeyPath="yes" />
       </Component>
-      <Component Id="flacomdoc" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A5B">
-        <File Id="flacomdoc.jar" Source="../dist/lib/flacomdoc.jar" KeyPath="yes" />
+      <Component Id="fla_convert" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A5B">
+        <File Id="fla_convert.jar" Source="../dist/lib/fla_convert.jar" KeyPath="yes" />
       </Component>
-      <Component Id="flacomdoc_license" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B6C">
-        <File Id="flacomdoc.license.txt" Source="../dist/lib/flacomdoc.license.txt" KeyPath="yes" />
+      <Component Id="fla_convert_license" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B6C">
+        <File Id="fla_convert.license.txt" Source="../dist/lib/fla_convert.license.txt" KeyPath="yes" />
       </Component>
       <Component Id="flamingo" Guid="A2B3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C7D">
         <File Id="flamingo.jar" Source="../dist/lib/flamingo-6.2.jar" KeyPath="yes" />
