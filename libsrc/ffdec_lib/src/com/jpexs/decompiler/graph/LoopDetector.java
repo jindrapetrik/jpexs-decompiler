@@ -491,7 +491,18 @@ public class LoopDetector {
                 }
                 parentLoop = parentLoop.parentLoop;
             }
-            
+
+            //The natural exit of this loop (from its continue part) leading to the precontinue
+            //of a parent loop is the code after this loop, not a continue of the parent loop
+            for (GraphPartEdge edge : loop.edgesOutside) {
+                if (edge.from == loop.loopContinue
+                        && !ignoredEdges.contains(edge)
+                        && parentContinues.contains(edge.to)
+                        && isParentPreContinueOnly(loop, edge.to)) {
+                    parentContinues.remove(edge.to);
+                }
+            }
+
             parentBreaks.addAll(switchBreaks); //these are not real parent, but should work(?)
 
             PrevNextWalker walker = loopWalkers.get(loop);
@@ -674,6 +685,27 @@ public class LoopDetector {
             }
             loop.loopBreak = candidateList.get(0).part;
         }
+    }
+
+    /**
+     * Checks whether the part is a precontinue of some parent loop and not a
+     * continue of any parent loop.
+     *
+     * @param loop Loop
+     * @param part Part
+     * @return True if the part is only a parent precontinue
+     */
+    private boolean isParentPreContinueOnly(Loop loop, GraphPart part) {
+        boolean isPreContinue = false;
+        for (Loop parentLoop = loop.parentLoop; parentLoop != null; parentLoop = parentLoop.parentLoop) {
+            if (parentLoop.loopContinue == part) {
+                return false;
+            }
+            if (parentLoop.loopPreContinue == part) {
+                isPreContinue = true;
+            }
+        }
+        return isPreContinue;
     }
 
     private boolean leadsOnlyToAbruptTargets(
