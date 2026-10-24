@@ -2732,13 +2732,24 @@ public class AVM2Graph extends Graph {
                         if (thisSwitch.additionalDefaultPosition != defaultIndex) {
                             int previousBodyIndex = thisSwitch.valuesMapping.get(thisSwitch.additionalDefaultPosition);
                             List<GraphTargetItem> defaultBody = thisSwitch.caseCommands.remove(defaultBodyIndex);
-                            thisSwitch.caseCommands.add(previousBodyIndex, defaultBody);
+                            //previousBodyIndex is an index before the removal
+                            int newDefaultBodyIndex = previousBodyIndex > defaultBodyIndex ? previousBodyIndex - 1 : previousBodyIndex;
+                            thisSwitch.caseCommands.add(newDefaultBodyIndex, defaultBody);
                             for (int p = 0; p < thisSwitch.valuesMapping.size(); p++) {
-                                if (thisSwitch.valuesMapping.get(p) >= previousBodyIndex) {
-                                    thisSwitch.valuesMapping.set(p, thisSwitch.valuesMapping.get(p) + 1);
+                                int bodyIndex = thisSwitch.valuesMapping.get(p);
+                                if (bodyIndex == defaultBodyIndex) {
+                                    bodyIndex = newDefaultBodyIndex;
+                                } else {
+                                    if (bodyIndex > defaultBodyIndex) {
+                                        bodyIndex--;
+                                    }
+                                    if (bodyIndex >= newDefaultBodyIndex) {
+                                        bodyIndex++;
+                                    }
                                 }
+                                thisSwitch.valuesMapping.set(p, bodyIndex);
                             }
-                            defaultBodyIndex = previousBodyIndex;
+                            defaultBodyIndex = newDefaultBodyIndex;
                             GraphTargetItem lastCmd = defaultBody.isEmpty() ? null : defaultBody.get(defaultBody.size() - 1);
                             if (lastCmd != null && !(lastCmd instanceof ExitItem) && !(lastCmd instanceof BreakItem) && !(lastCmd instanceof ContinueItem)) {
                                 defaultBody.add(new BreakItem(thisSwitch.dialect, null, null, thisSwitch.loop.id));

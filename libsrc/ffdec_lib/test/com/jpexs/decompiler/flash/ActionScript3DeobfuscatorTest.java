@@ -838,6 +838,51 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSwitchCasesWithOnlyBreak() throws Exception {
+        decompilePCode("jump checks\n"
+                + "   caseA:\n"
+                + "            label\n"
+                + "            jump finish\n"
+                + "   caseB:\n"
+                + "            label\n"
+                + "            jump finish\n"
+                + "   caseDefault:\n"
+                + "            label\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"play\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump finish\n"
+                + "   checks:\n"
+                + "            getlocal1\n"
+                + "            setlocal2\n"
+                + "            pushstring \"A\"\n"
+                + "            getlocal2\n"
+                + "            ifstrictne checkB\n"
+                + "            pushbyte 0\n"
+                + "            jump doSwitch\n"
+                + "   checkB:\n"
+                + "            pushstring \"B\"\n"
+                + "            getlocal2\n"
+                + "            ifstrictne noMatch\n"
+                + "            pushbyte 1\n"
+                + "            jump doSwitch\n"
+                + "   noMatch:\n"
+                + "            pushbyte 2\n"
+                + "   doSwitch:\n"
+                + "            kill 2\n"
+                + "            lookupswitch caseDefault, [caseA, caseB, caseDefault]\n"
+                + "   finish:\n",
+                "         switch(param1)\n"
+                + "         {\n"
+                + "            default:\n"
+                + "               trace(\"play\");\n"
+                + "               break;\n"
+                + "            case \"A\":\n"
+                + "            case \"B\":\n"
+                + "         }\n");
+    }
+
+    @Test
     public void testObfuscatedSwitch() throws Exception {
         decompilePCode("getlocal0\n"
                 + "            pushbyte 0\n"
