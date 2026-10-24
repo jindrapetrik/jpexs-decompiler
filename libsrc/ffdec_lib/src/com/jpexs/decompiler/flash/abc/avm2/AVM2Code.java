@@ -309,6 +309,7 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -2434,6 +2435,11 @@ public class AVM2Code implements Cloneable {
         }
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
+            if (currentItem instanceof ForItem) {
+                //The first commands run before the loop expression, declare their registers first,
+                //otherwise a register used in the expression (i--) is marked as declared without declaration
+                injectDeclarations(usedDeobfuscations, level + 1, paramNames, ((ForItem) currentItem).firstCommands, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
+            }
             List<GraphTargetItem> itemsOnLine = new ArrayList<>();
             itemsOnLine.add(currentItem);
             currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {

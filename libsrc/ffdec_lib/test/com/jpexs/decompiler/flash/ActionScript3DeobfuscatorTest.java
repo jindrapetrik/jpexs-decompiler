@@ -82,6 +82,24 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     private void decompilePCode(String pCode, String expected) throws Exception {
+        decompilePCode(pCode, expected, true);
+    }
+
+    /**
+     * Decompiles p-code without deobfuscation, keeping debugline instructions
+     * (line based structures like for loops need them).
+     */
+    private void decompilePCodeWithLines(String pCode, String expected) throws Exception {
+        boolean autoDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(false);
+        try {
+            decompilePCode(pCode, expected, false);
+        } finally {
+            Configuration.autoDeobfuscate.set(autoDeobfuscate);
+        }
+    }
+
+    private void decompilePCode(String pCode, String expected, boolean deobfuscate) throws Exception {
         pCode = "code\r\n"
                 + "getlocal0\r\n"
                 + "pushscope\r\n"
@@ -161,8 +179,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         ScriptInfo si = new ScriptInfo(new Traits());
         abc.script_info.add(si);
 
-        code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
-        code.removeLabelsAndDebugLine(b);
+        if (deobfuscate) {
+            code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
+            code.removeLabelsAndDebugLine(b);
+        }
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>(), -1);
         actual = actual.replace("\r\n", "\n");
@@ -1480,5 +1500,36 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         if (!res.contains("\"OK\"")) {
             fail("reachable if onTrue removed");
         }
+    }
+
+    @Test
+    public void testForFirstCommandDeclaration() throws Exception {
+        //var i:int = param1.length; while (i--) trace(i);
+        //the assignment and the condition are on the same line, so it is decompiled as for
+        decompilePCodeWithLines("debug 1, \"i\", 1, 10\n"
+                + "            debugline 10\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"length\")\n"
+                + "            convert_i\n"
+                + "            setlocal2\n"
+                + "            jump cond\n"
+                + "   body:\n"
+                + "            label\n"
+                + "            debugline 11\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal2\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   cond:\n"
+                + "            getlocal2\n"
+                + "            dup\n"
+                + "            decrement_i\n"
+                + "            convert_i\n"
+                + "            setlocal2\n"
+                + "            convert_b\n"
+                + "            iftrue body\n",
+                "         for(var i:int = int(param1.length); Boolean(i--); )\n"
+                + "         {\n"
+                + "            trace(i);\n"
+                + "         }\n");
     }
 }
