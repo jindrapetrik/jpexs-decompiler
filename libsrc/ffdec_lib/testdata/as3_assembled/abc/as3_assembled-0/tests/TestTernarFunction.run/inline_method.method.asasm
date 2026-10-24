@@ -1,0 +1,19 @@
+method
+ refid "tests:TestTernarFunction/instance/run/inline_method"
+ returns QName(PackageNamespace(""), "void")
+ body
+  maxstack 2
+  localcount 1
+  initscopedepth 5
+  maxscopedepth 6
+  code
+   getlocal0
+   pushscope
+
+   findpropstrict      QName(PackageNamespace(""), "trace")
+   pushstring          "f"
+   callpropvoid        QName(PackageNamespace(""), "trace"), 1
+   returnvoid
+  end ; code
+ end ; body
+end ; method

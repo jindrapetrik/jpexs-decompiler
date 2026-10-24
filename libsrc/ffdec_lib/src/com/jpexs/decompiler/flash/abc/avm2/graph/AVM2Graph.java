@@ -3584,6 +3584,25 @@ public class AVM2Graph extends Graph {
         super.makeAllCommands(commands, stack);
     }
 
+    /**
+     * Moves all stack items of if branch to commands. When both branches leave
+     * values on stack (ternar operator candidate), anonymous functions are kept,
+     * for example in: cond ? function():void {...} : null
+     *
+     * @param commands Commands
+     * @param stack Stack
+     * @param branchesLeaveValues Both branches leave the same number of values
+     * on stack (ternar operator candidate)
+     */
+    @Override
+    protected void makeAllBranchCommands(List<GraphTargetItem> commands, TranslateStack stack, boolean branchesLeaveValues) {
+        if (branchesLeaveValues) {
+            super.makeAllCommands(commands, stack);
+            return;
+        }
+        makeAllCommands(commands, stack);
+    }
+
     @Override
     protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
         GraphTargetItem result = stack.pop();

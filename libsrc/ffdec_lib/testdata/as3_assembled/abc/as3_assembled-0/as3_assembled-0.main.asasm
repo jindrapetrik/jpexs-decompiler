@@ -45,5 +45,7 @@ program
  #include "tests/TestSetGetLocalOnStack.script.asasm"
  #include "tests/TestFindPropertyTemp.script.asasm"
  #include "tests/TestObfusProperty.script.asasm"
+ #include "tests/TestTernarFunction.script.asasm"
+ #include "tests/TestTernarFunction.run/inline_method.method.asasm"
  ; place to add next
 end ; program

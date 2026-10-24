@@ -1,0 +1,77 @@
+class
+ refid "tests:TestTernarFunction"
+ instance QName(PackageNamespace("tests"), "TestTernarFunction")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestTernarFunction")
+  iinit
+   refid "tests:TestTernarFunction/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestTernarFunction/instance/run"
+    param QName(PackageNamespace(""), "Function")
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 3
+     localcount 2
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+      ; trace(param1 != null ? function():void { trace("f"); } : null);
+      ; coerce_a only on the null branch, as ASC2 compiles it
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      getlocal1
+      pushnull
+      ifeq                L1
+
+      newfunction         "tests:TestTernarFunction/instance/run/inline_method"
+      jump                L2
+
+L1:
+      pushnull
+      coerce_a
+
+L2:
+      callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestTernarFunction/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class
