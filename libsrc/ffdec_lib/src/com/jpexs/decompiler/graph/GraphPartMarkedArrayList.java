@@ -219,11 +219,11 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         GraphPartMarkedArrayList<E> ret = new GraphPartMarkedArrayList<E>(this);
-        for (int i = size(); i > toIndex; i--) {
+        for (int i = ret.size() - 1; i >= toIndex; i--) {
             ret.remove(i);
         }
         for (int i = 0; i < fromIndex; i++) {
-            ret.remove(i);
+            ret.remove(0);
         }
         return ret;
     }
