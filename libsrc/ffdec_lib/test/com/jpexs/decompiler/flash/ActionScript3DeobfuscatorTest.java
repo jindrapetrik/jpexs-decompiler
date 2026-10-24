@@ -988,6 +988,50 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testLoopExitWithReturnAndOtherExit() throws Exception {
+        //the return exit can be printed in place, the other exit is the break
+        decompilePCode("getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"done\")\n"
+                + "            iftrue after\n"
+                + "            jump head\n"
+                + "   back:\n"
+                + "            label\n"
+                + "   head:\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"available\")\n"
+                + "            iftrue body\n"
+                + "            returnvoid\n"
+                + "   body:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"body\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"more\")\n"
+                + "            iftrue back\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"S\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   after:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         if(!param1.done)\n"
+                + "         {\n"
+                + "            do\n"
+                + "            {\n"
+                + "               if(!param1.available)\n"
+                + "               {\n"
+                + "                  return;\n"
+                + "               }\n"
+                + "               trace(\"body\");\n"
+                + "            }\n"
+                + "            while(param1.more);\n"
+                + "            trace(\"S\");\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
     public void testObfuscatedSwitch() throws Exception {
         decompilePCode("getlocal0\n"
                 + "            pushbyte 0\n"
