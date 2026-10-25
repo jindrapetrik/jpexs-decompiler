@@ -220,7 +220,8 @@ public abstract class AVM2Item extends GraphTargetItem {
             
             if (isValidName) {
                 if (((FullMultinameAVM2Item) propertyName).name != null) {
-                    if (((FullMultinameAVM2Item) propertyName).namespace != null) {
+                    //x[name] needs no dot, but x.ns::[name] and x.@[name] do
+                    if (((FullMultinameAVM2Item) propertyName).namespace != null || isAttribute) {
                         writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
                     }                
                 } else {
