@@ -785,18 +785,30 @@ public class MotionTweenDetectorTest {
         Assert.assertEquals(swf.getTimeline().getFrame(30).layers.get(1).matrix.translateY, 2500);
         Assert.assertFalse(swf.getTimeline().getFrame(30).layers.get(1).placeObjectTag.flagMove());
     }
-    @Test
-    public void flaExportWritesMotionLayerAndFrame() throws Exception {
+    @org.testng.annotations.DataProvider(name = "motionLayerKinds")
+    public Object[][] motionLayerKinds() {
+        return new Object[][]{
+            {false, false, 100}, {true, false, 100}, {false, true, 100}, {true, true, 100},
+            {false, false, 75}, {true, false, 75}, {false, true, 75}, {true, true, 75}
+        };
+    }
+
+    @Test(dataProvider = "motionLayerKinds")
+    public void flaExportWritesMotionLayerAndFrame(boolean classicBefore, boolean classicAfter, int quality) throws Exception {
         com.jpexs.decompiler.flash.SWF swf = new com.jpexs.decompiler.flash.SWF();
-        swf.frameCount = 21;
+        int motionStart = classicBefore ? 6 : 0;
+        swf.frameCount = motionStart + 21 + (classicAfter ? 6 : 0);
         swf.frameRate = 30;
         com.jpexs.decompiler.flash.tags.DefineSpriteTag sprite = new com.jpexs.decompiler.flash.tags.DefineSpriteTag(swf);
         sprite.frameCount = 1;
         sprite.addTag(new com.jpexs.decompiler.flash.tags.ShowFrameTag(swf));
         swf.addTag(sprite);
-        for (int f = 0; f <= 20; f++) {
-            double t = f / 20.0;
+        for (int f = 0; f < swf.frameCount; f++) {
+            boolean classic = f < motionStart || f >= motionStart + 21;
+            int localFrame = f < motionStart ? f : classic ? f - motionStart - 21 : f - motionStart;
+            double t = classic ? 0 : localFrame / 20.0;
             com.jpexs.decompiler.flash.types.MATRIX matrix = new com.jpexs.decompiler.flash.types.MATRIX();
+            matrix.translateX = classic ? localFrame * 400 : 0;
             matrix.hasScale = true;
             matrix.scaleX = (float) (Math.round((1 + t * t * t) * 65536) / 65536.0);
             matrix.scaleY = (float) (Math.round((1 + 0.5 * t * t) * 65536) / 65536.0);
@@ -813,13 +825,17 @@ public class MotionTweenDetectorTest {
             color.blueAddTerm = (int) colors[6];
             color.alphaAddTerm = (int) colors[7];
             swf.addTag(new com.jpexs.decompiler.flash.tags.PlaceObject2Tag(swf,
-                    f != 0, 1, f == 0 ? sprite.spriteId : -1, matrix, color, -1, null, -1, null));
+                    localFrame != 0, 1, localFrame == 0 ? sprite.spriteId : -1, matrix, color, -1, null, -1, null));
             swf.addTag(new com.jpexs.decompiler.flash.tags.ShowFrameTag(swf));
         }
         java.nio.file.Path output = java.nio.file.Files.createTempDirectory("motion-tween-export");
         try {
             java.io.File fla = output.resolve("tween.fla").toFile();
-            swf.exportFla(new com.jpexs.decompiler.flash.AbortRetryIgnoreHandler() {
+            XFLExportSettings settings
+                    = new XFLExportSettings();
+            settings.compressed = true;
+            settings.tweenDetectionQuality = quality;
+            swf.exportXfl(new com.jpexs.decompiler.flash.AbortRetryIgnoreHandler() {
                 @Override
                 public int handle(Throwable thrown) {
                     throw new AssertionError(thrown);
@@ -828,16 +844,50 @@ public class MotionTweenDetectorTest {
                 public com.jpexs.decompiler.flash.AbortRetryIgnoreHandler getNewInstance() {
                     return this;
                 }
-            }, fla.toString(), "tween.swf", "test", "test", "1", false, FLAVersion.CS6, null);
+            }, fla.toString(), "tween.swf", "test", "test", "1", false, FLAVersion.CS6, settings, null);
             try (java.util.zip.ZipFile zip = new java.util.zip.ZipFile(fla)) {
                 Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                         .parse(zip.getInputStream(zip.getEntry("DOMDocument.xml")));
                 Assert.assertEquals(((Element) document.getElementsByTagName("DOMLayer").item(0))
-                        .getAttribute("animationType"), "motion object");
-                Assert.assertEquals(((Element) document.getElementsByTagName("DOMFrame").item(0))
-                        .getAttribute("duration"), "21");
-                Assert.assertEquals(document.getElementsByTagName("AnimationCore").getLength(), 1);
-                Assert.assertEquals(value(document, "Scale_X", 0.5), 112.5, 0.002);
+                        .getAttribute("animationType"), classicBefore || classicAfter ? "" : "motion object",
+                        "Flash discards classic tweens when the layer forces motion-object animation");
+                NodeList frames = document.getElementsByTagName("DOMFrame");
+                int classicTweens = 0;
+                int motionTweens = 0;
+                int covered = 0;
+                for (int f = 0; f < frames.getLength(); f++) {
+                    Element frame = (Element) frames.item(f);
+                    Assert.assertEquals(Integer.parseInt(frame.getAttribute("index")), covered);
+                    int duration = frame.hasAttribute("duration") ? Integer.parseInt(frame.getAttribute("duration")) : 1;
+                    covered += duration;
+                    if ("motion".equals(frame.getAttribute("tweenType"))) {
+                        classicTweens++;
+                        Assert.assertEquals(duration, 5);
+                    } else if ("motion object".equals(frame.getAttribute("tweenType"))) {
+                        motionTweens++;
+                        Assert.assertEquals(Integer.parseInt(frame.getAttribute("index")), motionStart);
+                        Assert.assertEquals(duration, 21);
+                    }
+                }
+                Assert.assertEquals(covered, swf.frameCount);
+                Assert.assertEquals(classicTweens, (classicBefore ? 1 : 0) + (classicAfter ? 1 : 0));
+                Assert.assertEquals(motionTweens, classicBefore || classicAfter ? 0 : 1);
+                Assert.assertEquals(document.getElementsByTagName("AnimationCore").getLength(), classicBefore || classicAfter ? 0 : 1);
+                if (!classicBefore && !classicAfter) {
+                    Assert.assertEquals(value(document, "Scale_X", 0.5), 112.5, 0.002);
+                } else {
+                    for (int f = 0; f < frames.getLength(); f++) {
+                        Element frame = (Element) frames.item(f);
+                        int index = Integer.parseInt(frame.getAttribute("index"));
+                        if (index < motionStart || index >= motionStart + 21) {
+                            continue;
+                        }
+                        double t = (index - motionStart) / 20.0;
+                        Element matrix = (Element) frame.getElementsByTagName("Matrix").item(0);
+                        double scale = matrix.hasAttribute("a") ? Double.parseDouble(matrix.getAttribute("a")) : 1;
+                        Assert.assertEquals(scale, 1 + t * t * t, 2.0 / 65536, "Preserve restored motion samples");
+                    }
+                }
             }
         } finally {
             try (java.util.stream.Stream<java.nio.file.Path> paths = java.nio.file.Files.walk(output)) {

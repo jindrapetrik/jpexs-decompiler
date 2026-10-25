@@ -38,6 +38,8 @@ import org.xml.sax.InputSource;
 final class ClassicTweenDetector {
 
     private static final Pattern FRAME = Pattern.compile("<DOMFrame\\b[^>]*>.*?</DOMFrame>", Pattern.DOTALL);
+    private static final Pattern INDEX = Pattern.compile("\\bindex=\"([0-9]+)\"");
+    private static final Pattern DURATION = Pattern.compile("\\bduration=\"([0-9]+)\"");
     private static final String[] COLOR_ATTRIBUTES = {"redMultiplier", "greenMultiplier",
         "blueMultiplier", "alphaMultiplier", "redOffset", "greenOffset", "blueOffset", "alphaOffset"};
     private static final double MATRIX_TOLERANCE = 2.0 / 65536;
@@ -172,7 +174,7 @@ final class ClassicTweenDetector {
                 for (int i = start; i < samples.size(); i++) {
                     result.append(samples.get(i).xml).append('\n');
                 }
-                return changed ? result.toString() : frames;
+                return changed ? compatibleLayerTweens(result.toString(), samples) : frames;
             }
             if (motion != null) {
                 changed = true;
@@ -216,7 +218,49 @@ final class ClassicTweenDetector {
                 start = end; // Keep the actual endpoint as a keyframe.
             }
         }
-        return changed ? result.toString() : frames;
+        return changed ? compatibleLayerTweens(result.toString(), samples) : frames;
+    }
+
+    private static String compatibleLayerTweens(String result, List<Sample> samples) {
+        if (!result.contains("tweenType=\"motion object\"")
+                || (!result.contains("tweenType=\"motion\"") && !result.contains("tweenType=\"shape\""))) {
+            return result;
+        }
+        // Flash treats motion-object animation as a layer-wide mode and drops
+        // classic/shape tweens, including after saving and reopening the FLA.
+        // Keep those tweens and restore the original samples for modern spans.
+        StringBuffer compatible = new StringBuffer();
+        Matcher frames = FRAME.matcher(result);
+        int source = 0;
+        while (frames.find()) {
+            String header = frames.group().substring(0, frames.group().indexOf('>'));
+            if (!header.contains("tweenType=\"motion object\"")) {
+                continue;
+            }
+            Matcher index = INDEX.matcher(header);
+            Matcher duration = DURATION.matcher(header);
+            if (!index.find() || !duration.find()) {
+                throw new IllegalStateException("Missing motion span bounds");
+            }
+            int start = Integer.parseInt(index.group(1));
+            int end = start + Integer.parseInt(duration.group(1));
+            while (source < samples.size() && samples.get(source).index < start) {
+                source++;
+            }
+            StringBuilder original = new StringBuilder();
+            while (source < samples.size() && samples.get(source).index < end) {
+                Sample sample = samples.get(source++);
+                String xml = sample.xml;
+                if (sample.index + sample.duration > end) {
+                    xml = xml.replaceFirst(" duration=\"[0-9]+\"", "")
+                            .replaceFirst("<DOMFrame", "<DOMFrame duration=\"" + (end - sample.index) + "\"");
+                }
+                original.append(xml).append('\n');
+            }
+            frames.appendReplacement(compatible, Matcher.quoteReplacement(original.toString()));
+        }
+        frames.appendTail(compatible);
+        return compatible.toString();
     }
 
     private static Sample readSample(Element frame, String xml) {
