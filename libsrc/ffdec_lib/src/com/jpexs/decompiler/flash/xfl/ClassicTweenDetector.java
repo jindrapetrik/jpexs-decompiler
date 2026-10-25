@@ -136,8 +136,8 @@ final class ClassicTweenDetector {
                 }
             }
         }
-        TweenDetectionBudget budget = quality == 100 ? null : new TweenDetectionBudget(quality, samples.size());
-        List<Sample> searchSamples = budget == null ? samples : budget.track(samples);
+        TweenDetectionBudget budget = new TweenDetectionBudget(quality, samples.size());
+        List<Sample> searchSamples = budget.track(samples);
         boolean changed = false;
         StringBuilder result = new StringBuilder();
         MotionTweenDetector.FitCache motionCache = null;
@@ -147,7 +147,7 @@ final class ClassicTweenDetector {
             int limit = runEnds[start];
             Integer acceleration = null;
             String motion = null;
-            int end = budget == null ? limit : budget.lastCandidate(samples, start, limit);
+            int end = budget.lastCandidate(samples, start, limit);
             if (limit != cachedRunEnd) {
                 motionCache = new MotionTweenDetector.FitCache(budget);
                 cachedRunEnd = limit;

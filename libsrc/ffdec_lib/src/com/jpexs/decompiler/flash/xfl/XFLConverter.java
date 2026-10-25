@@ -2836,7 +2836,7 @@ public class XFLConverter {
                 }
 
                 String elements = elementsWriter.toString();
-                if (flaVersion.ordinal() >= FLAVersion.CS5.ordinal() && character instanceof MorphShapeTag
+                if (character instanceof MorphShapeTag
                         && !morphShapeSymbols.contains(character.getCharacterId())) {
                     MorphShapeTween.Sample sample = MorphShapeTween.sample((MorphShapeTag) character,
                             ratio == -1 ? 0 : ratio, matrix, elements);
@@ -2844,8 +2844,7 @@ public class XFLConverter {
                         morphSamples.put(frame, sample);
                     }
                 }
-                if (tweenDetectionQuality > 0 && flaVersion.ordinal() >= FLAVersion.CS5.ordinal()
-                        && character instanceof BoundedTag && elements.contains("<DOMSymbolInstance")) {
+                if (tweenDetectionQuality > 0 && character instanceof BoundedTag && elements.contains("<DOMSymbolInstance")) {
                     String itemName = getSymbolName(lastImportedId, characterNameMap, swf, character);
                     if (!motionRegistrationPoints.containsKey(itemName)) {
                         RECT bounds = ((BoundedTag) character).getRect();
@@ -2879,7 +2878,7 @@ public class XFLConverter {
         if (writer2.length() > 0) {
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
-                    flaVersion.ordinal() >= FLAVersion.CS5.ordinal() ? swf.frameRate : 0, motionRegistrationPoints, tweenDetectionQuality);
+                    swf.frameRate, motionRegistrationPoints, tweenDetectionQuality);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
                     prevStr = prevStr.replaceFirst("<DOMLayer", "<DOMLayer animationType=\"motion object\"");

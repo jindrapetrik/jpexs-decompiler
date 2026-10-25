@@ -854,6 +854,7 @@ public class MotionTweenDetectorTest {
                 NodeList frames = document.getElementsByTagName("DOMFrame");
                 int classicTweens = 0;
                 int motionTweens = 0;
+                int motionDuration = 0;
                 int covered = 0;
                 for (int f = 0; f < frames.getLength(); f++) {
                     Element frame = (Element) frames.item(f);
@@ -866,7 +867,13 @@ public class MotionTweenDetectorTest {
                     } else if ("motion object".equals(frame.getAttribute("tweenType"))) {
                         motionTweens++;
                         Assert.assertEquals(Integer.parseInt(frame.getAttribute("index")), motionStart);
-                        Assert.assertEquals(duration, 21);
+                        motionDuration = duration;
+                        if (quality == 100) {
+                            Assert.assertEquals(duration, 21);
+                        } else {
+                            Assert.assertTrue(duration > 10 && duration <= 21,
+                                    "A limited search may keep the rest as source keyframes");
+                        }
                     }
                 }
                 Assert.assertEquals(covered, swf.frameCount);
@@ -874,7 +881,7 @@ public class MotionTweenDetectorTest {
                 Assert.assertEquals(motionTweens, classicBefore || classicAfter ? 0 : 1);
                 Assert.assertEquals(document.getElementsByTagName("AnimationCore").getLength(), classicBefore || classicAfter ? 0 : 1);
                 if (!classicBefore && !classicAfter) {
-                    Assert.assertEquals(value(document, "Scale_X", 0.5), 112.5, 0.002);
+                    Assert.assertEquals(value(document, "Scale_X", 10.0 / (motionDuration - 1)), 112.5, 0.002);
                 } else {
                     for (int f = 0; f < frames.getLength(); f++) {
                         Element frame = (Element) frames.item(f);

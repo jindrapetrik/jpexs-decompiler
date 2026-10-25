@@ -109,6 +109,18 @@ public class XflTweenQualityTest {
         Assert.assertEquals(covered, positions.length);
     }
 
+    @Test(dataProvider = "qualities")
+    public void shortRunsStillAllowAtLeastOneCandidate(int quality) throws Exception {
+        StringBuilder xml = new StringBuilder();
+        for (int f = 0; f < 4; f++) {
+            xml.append(frame(f, f * 10));
+        }
+        NodeList result = frames(detect(xml.toString(), quality));
+        Assert.assertEquals(result.getLength(), 2);
+        Assert.assertEquals(((Element) result.item(0)).getAttribute("tweenType"), "motion");
+        Assert.assertEquals(((Element) result.item(0)).getAttribute("duration"), "3");
+    }
+
     @Test
     public void windowsUseActualFrameIndicesRatherThanTheNumberOfKeyframes() {
         List<ClassicTweenDetector.Sample> samples = new ArrayList<>();
@@ -117,11 +129,68 @@ public class XflTweenQualityTest {
             sample.index = index;
             samples.add(sample);
         }
-        for (int quality = 1; quality < 100; quality++) {
+        for (int quality = 1; quality <= 100; quality++) {
             TweenDetectionBudget budget = new TweenDetectionBudget(quality, samples.size());
             Assert.assertEquals(budget.lastCandidate(samples, 0, 4), 2);
             Assert.assertFalse(budget.includes(0, 10000));
         }
+    }
+
+    @Test
+    public void maximumQualityStillLimitsLongTimelinesAndHeldEndpoints() {
+        List<ClassicTweenDetector.Sample> samples = new ArrayList<>();
+        for (int i = 0; i <= 10000; i++) {
+            ClassicTweenDetector.Sample sample = new ClassicTweenDetector.Sample();
+            sample.index = i;
+            sample.duration = i == 10000 ? 100000 : 1;
+            samples.add(sample);
+        }
+        TweenDetectionBudget budget = new TweenDetectionBudget(100, samples.size());
+        Assert.assertTrue(budget.lastCandidate(samples, 0, samples.size() - 1) < 1100,
+                "The maximum setting must not expand to the whole document");
+        Assert.assertFalse(budget.includes(0, 10000));
+        Assert.assertFalse(budget.includes(10000, 109999), "A long held endpoint must also respect the window");
+    }
+
+    @Test
+    public void enabledQualitiesHaveGradualFiniteWorkAndFrameLimits() {
+        List<ClassicTweenDetector.Sample> samples = new ArrayList<>();
+        for (int i = 0; i <= 10000; i++) {
+            ClassicTweenDetector.Sample sample = new ClassicTweenDetector.Sample();
+            sample.index = i;
+            sample.duration = 1;
+            samples.add(sample);
+        }
+        int previousLast = 0;
+        int previousReads = 0;
+        for (int quality = 1; quality <= 100; quality++) {
+            TweenDetectionBudget budget = new TweenDetectionBudget(quality, 1);
+            int last = budget.lastCandidate(samples, 0, samples.size() - 1);
+            Assert.assertTrue(last >= previousLast);
+            Assert.assertTrue(last - previousLast <= 21, "No special jump from 99 to 100");
+            List<ClassicTweenDetector.Sample> tracked = budget.track(samples);
+            int reads = 0;
+            try {
+                // More than the largest allowance: every enabled setting must stop.
+                while (reads < 20000) {
+                    tracked.get(0);
+                    reads++;
+                }
+                Assert.fail("Unbounded search at quality " + quality);
+            } catch (TweenDetectionBudget.Exhausted ex) {
+                Assert.assertTrue(reads > previousReads);
+                Assert.assertTrue(previousReads == 0 || reads - previousReads <= 200,
+                        "The highest settings must still grow gradually");
+            }
+            previousReads = reads;
+            previousLast = last;
+        }
+    }
+
+    @Test(expectedExceptions = TweenDetectionBudget.Exhausted.class)
+    public void maximumQualityAlsoChargesWorkInsideAnExpensiveFit() {
+        TweenDetectionBudget budget = new TweenDetectionBudget(100, 1);
+        budget.consume(20000);
     }
 
     @Test

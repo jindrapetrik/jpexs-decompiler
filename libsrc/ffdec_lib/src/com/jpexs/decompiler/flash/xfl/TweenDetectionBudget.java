@@ -22,10 +22,13 @@ import java.util.List;
 /** Deterministic search limits for one exported layer. */
 final class TweenDetectionBudget {
 
-    private final int maximumFrameSpan;
+    private final long maximumFrameSpan;
     private long remaining;
 
     TweenDetectionBudget(int quality, int sampleCount) {
+        // Every enabled quality, including 100, bounds both the searched frame
+        // span and the fitting work. Charge reads inside the fitting algorithms
+        // so a single expensive candidate can also exhaust the allowance.
         maximumFrameSpan = 3 + quality * quality / 10;
         remaining = 4096L + (long) sampleCount * (32 + quality * quality);
     }
@@ -76,4 +79,5 @@ final class TweenDetectionBudget {
             }
         };
     }
+
 }

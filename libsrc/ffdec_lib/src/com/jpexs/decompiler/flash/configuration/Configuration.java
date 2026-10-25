@@ -950,11 +950,7 @@ public final class Configuration {
     public static ConfigurationItem<String> lastFlaExportVersion = null;
 
     @ConfigurationDefaultBoolean(true)
-    public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;
-
-    @ConfigurationDefaultInt(50)
-    @ConfigurationInternal
-    public static ConfigurationItem<Integer> lastFlaExportTweenDetectionQuality = null;
+    public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;   
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
@@ -1298,6 +1294,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> useNativeFileDialogs = null;
+    
+    @ConfigurationDefaultInt(50)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastFlaExportTweenDetectionQuality = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

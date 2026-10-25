@@ -108,7 +108,7 @@ public class FlaExportDialog extends AppDialog {
         // Standalone labels avoid HiDPI clipping in the slider's label renderer.
         JPanel qualityEndpoints = new JPanel(new GridLayout(1, 2));
         qualityEndpoints.add(new JLabel(translate("tweenDetectionQuality.off"), SwingConstants.LEADING));
-        qualityEndpoints.add(new JLabel(translate("tweenDetectionQuality.full"), SwingConstants.TRAILING));
+        qualityEndpoints.add(new JLabel(translate("tweenDetectionQuality.high"), SwingConstants.TRAILING));
         tweenQualitySlider.addChangeListener(e -> qualityValue.setText(Integer.toString(tweenQualitySlider.getValue())));
         qualityValue.setText(Integer.toString(tweenQualitySlider.getValue()));
         qualityLabel.setLabelFor(tweenQualitySlider);
