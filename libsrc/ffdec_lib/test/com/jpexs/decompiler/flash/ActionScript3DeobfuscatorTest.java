@@ -55,6 +55,7 @@ import java.util.concurrent.TimeoutException;
 import macromedia.asc.util.Decimal128;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -1569,5 +1570,20 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "            getproperty MultinameL([PackageNamespace(\"\")])\n"
                 + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 3\n",
                 "         trace(param1..@[\"a\"],param1.@[\"b\"],param1[\"c\"]);\n");
+    }
+
+    @Test
+    public void testScriptInitializerImports() throws Exception {
+        //top-level code after the package block, with no other trait outside
+        //the package, lost the import of a name from another package
+        String res = recompileSource("package { public class Test { } }\n"
+                + "import flash.utils.getTimer;\n"
+                + "getTimer();");
+        res = res.replace("\r\n", "\n");
+        int packageEnd = res.lastIndexOf("\n}\n");
+        assertTrue(packageEnd != -1, res);
+        String afterPackage = res.substring(packageEnd);
+        assertTrue(afterPackage.contains("import flash.utils.getTimer;"), res);
+        assertTrue(afterPackage.indexOf("import flash.utils.getTimer;") < afterPackage.indexOf("getTimer();"), res);
     }
 }

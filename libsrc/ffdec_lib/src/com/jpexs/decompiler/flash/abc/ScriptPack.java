@@ -390,8 +390,12 @@ public class ScriptPack extends AS3ClassTreeItem {
         // file-private functions via newfunction there, and top-level script
         // code shares that initializer. writeImports then drops same-script
         // public self-imports that only come from class registration.
-        if (!traitList.isEmpty()) {
-            boolean needsScriptInitDeps = false;
+        //
+        // Top-level script code printed after the package block (the script
+        // initializer) needs its imports too, even with no trait left there.
+        boolean printsScriptInitializer = bodyIndex != -1 && (isSimple || traitIndices.isEmpty()) && !scriptInitializerIsEmpty && exportMode != ScriptExportMode.AS_METHOD_STUBS;
+        if (!traitList.isEmpty() || printsScriptInitializer) {
+            boolean needsScriptInitDeps = printsScriptInitializer;
             for (Trait t : traitList) {
                 if (t instanceof TraitSlotConst) {
                     needsScriptInitDeps = true;
