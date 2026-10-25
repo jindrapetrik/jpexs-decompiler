@@ -146,6 +146,15 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     /**
+     * Is attribute with runtime name (like x.@[name]).
+     * @param constants Constant pool
+     * @return Is attribute with runtime name
+     */
+    public boolean isRuntimeNameAttribute(AVM2ConstantPool constants) {
+        return name != null && multinameIndex > 0 && multinameIndex < constants.getMultinameCount() && constants.getMultiname(multinameIndex).isAttribute();
+    }
+
+    /**
      * Is top level.
      * @param tname Top level name
      * @param abc ABC
@@ -193,6 +202,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }    
     
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData, boolean afterDot, GraphTargetItem parentType, boolean isStatic) throws InterruptedException {
+        if (isRuntimeNameAttribute(localData.constantsAvm2)) {
+            writer.append("@");
+        }
         if (namespace != null) {
             namespace.toString(writer, localData);
             writer.append("::");

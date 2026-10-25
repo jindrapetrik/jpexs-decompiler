@@ -1553,4 +1553,21 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 4\n",
                 "         trace(new RegExp(\"\"),new RegExp(\"*a\"),new RegExp(\"a\\\\\"),/a+/);\n");
     }
+
+    @Test
+    public void testAttributeWithRuntimeName() throws Exception {
+        //x..@[name] and x.@[name] lost the @ and became x..[name] and x[name]
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal1\n"
+                + "            pushstring \"a\"\n"
+                + "            getdescendants MultinameLA([PackageNamespace(\"\")])\n"
+                + "            getlocal1\n"
+                + "            pushstring \"b\"\n"
+                + "            getproperty MultinameLA([PackageNamespace(\"\")])\n"
+                + "            getlocal1\n"
+                + "            pushstring \"c\"\n"
+                + "            getproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 3\n",
+                "         trace(param1..@[\"a\"],param1.@[\"b\"],param1[\"c\"]);\n");
+    }
 }
