@@ -151,6 +151,31 @@ public class ClassicTweenDetectorTest {
     }
 
     @Test
+    public void recoversCs6ClassicRotationWithNonuniformScale() throws Exception {
+        // Compiled CS6 matrices from graphics.swf frames 22-25. Fractional
+        // rotation follows Adobe's lookup, rather than mathematical sin/cos.
+        String[] matrices = {
+            "tx=\"250.0\" ty=\"150.0\"",
+            "tx=\"282.4\" ty=\"178.35\" a=\"0.86834716796875\" d=\"0.9083099365234375\" b=\"0.0731201171875\" c=\"-0.0764923095703125\"",
+            "tx=\"314.6\" ty=\"206.7\" a=\"0.7320404052734375\" d=\"0.8110504150390625\" b=\"0.126678466796875\" c=\"-0.140350341796875\"",
+            "tx=\"347.0\" ty=\"235.05\" a=\"0.5940399169921875\" d=\"0.7102813720703125\" b=\"0.1591644287109375\" c=\"-0.1903228759765625\""
+        };
+        StringBuilder xml = new StringBuilder();
+        for (int f = 0; f < matrices.length; f++) {
+            xml.append(frame(f, 1, "Symbol 53", matrices[f], ""));
+        }
+        NodeList frames = detect(xml.toString());
+        Assert.assertEquals(frames.getLength(), 2);
+        Element tween = (Element) frames.item(0);
+        Assert.assertEquals(tween.getAttribute("tweenType"), "motion");
+        Assert.assertEquals(tween.getAttribute("motionTweenRotate"), "auto");
+        Assert.assertEquals(tween.getAttribute("duration"), "3");
+        Assert.assertEquals(tween.getAttribute("acceleration"), "0");
+        String irregular = xml.toString().replace("0.0731201171875", "0.2");
+        Assert.assertEquals(ClassicTweenDetector.detect(irregular), irregular, "Do not relax matrix matching to force a rotating tween");
+    }
+
+    @Test
     public void preservesRotatedAndSkewedMatricesWithoutClassicFallback() throws Exception {
         for (boolean animated : new boolean[]{false, true}) {
             StringBuilder xml = new StringBuilder();

@@ -125,12 +125,18 @@ final class ClassicTweenDetector {
         }
         boolean changed = false;
         StringBuilder result = new StringBuilder();
+        MotionTweenDetector.FitCache motionCache = null;
+        int cachedRunEnd = -1;
         for (int start = 0; start < samples.size();) {
             Sample first = samples.get(start);
             int limit = runEnds[start];
             Integer acceleration = null;
             String motion = null;
             int end = limit;
+            if (limit != cachedRunEnd) {
+                motionCache = new MotionTweenDetector.FitCache();
+                cachedRunEnd = limit;
+            }
             // At least two intermediate samples are required to distinguish a
             // tween from an arbitrary change between adjacent keyframes.
             while (end >= start + 3) {
@@ -140,7 +146,7 @@ final class ClassicTweenDetector {
                 }
                 double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
                 if (motionFrameRate > 0 && registrationPoint != null) {
-                    motion = MotionTweenDetector.fit(samples, start, end, motionFrameRate, registrationPoint);
+                    motion = MotionTweenDetector.fit(samples, start, end, motionFrameRate, registrationPoint, motionCache);
                     if (motion != null) {
                         break;
                     }
@@ -181,7 +187,10 @@ final class ClassicTweenDetector {
                 String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_CLASSIC_TWEEN + "\"");
                 xml = xml.replaceFirst("<DOMFrame", "<DOMFrame tweenType=\"motion\" motionTweenScale=\"true\""
-                        + " acceleration=\"" + acceleration + "\" duration=\"" + duration + "\"");
+                        + " acceleration=\"" + acceleration + "\""
+                        + (first.matrix[1] != 0 || first.matrix[2] != 0 || samples.get(end).matrix[1] != 0 || samples.get(end).matrix[2] != 0
+                                ? " motionTweenRotate=\"auto\"" : "")
+                        + " duration=\"" + duration + "\"");
                 result.append(xml).append('\n');
                 start = end; // Keep the actual endpoint as a keyframe.
             }
@@ -264,7 +273,7 @@ final class ClassicTweenDetector {
         // explicit; rejecting only motion-object fitting is insufficient.
         for (int f = start; f <= end; f++) {
             if (samples.get(f).matrix[1] != 0 || samples.get(f).matrix[2] != 0) {
-                return null;
+                return fitRotated(samples, start, end);
             }
         }
         for (int f = start; f < end; f++) {
@@ -350,6 +359,71 @@ final class ClassicTweenDetector {
             }
         }
         return -ease; // XFL acceleration has the opposite sign to SWF progress easing.
+    }
+
+    private static Integer fitRotated(List<Sample> samples, int start, int end) {
+        Sample first = samples.get(start);
+        Sample last = samples.get(end);
+        double rotation = last.values[4] - first.values[4];
+        if (Math.abs(rotation) >= Math.PI) {
+            return null;
+        }
+        for (int f = start; f <= end; f++) {
+            Sample sample = samples.get(f);
+            if (sample.values[3] <= 0 || f < end && sample.duration != 1
+                    || Math.abs(sample.matrix[0] * sample.matrix[2] + sample.matrix[1] * sample.matrix[3])
+                    > 4.0 / 65536 * sample.values[2] * sample.values[3]) {
+                return null; // Reflections and independent skew axes need another model.
+            }
+        }
+        Integer best = null;
+        double bestError = Double.POSITIVE_INFINITY;
+        for (int ease = -100; ease <= 100; ease++) {
+            double error = 0;
+            boolean valid = true;
+            for (int f = start + 1; f < end && valid; f++) {
+                Sample sample = samples.get(f);
+                double t = (sample.index - first.index) / (double) (last.index - first.index);
+                double p = t + ease / 100.0 * t * (1 - t);
+                double sx = first.values[2] + (last.values[2] - first.values[2]) * p;
+                double sy = first.values[3] + (last.values[3] - first.values[3]) * p;
+                double degrees = Math.toDegrees(first.values[4] + rotation * p);
+                double sin = nativeSin(degrees);
+                double cos = nativeSin(90 - degrees);
+                double[] matrix = {sx * cos, sx * sin, -sy * sin, sy * cos};
+                for (int i = 0; i < matrix.length; i++) {
+                    double difference = matrix[i] - sample.matrix[i];
+                    valid &= Math.abs(difference) <= MATRIX_TOLERANCE;
+                    error += difference * difference / (MATRIX_TOLERANCE * MATRIX_TOLERANCE);
+                }
+                for (int i = 0; i < first.values.length; i++) {
+                    if (i >= 2 && i < 6) {
+                        continue;
+                    }
+                    double predicted = first.values[i] + (last.values[i] - first.values[i]) * p;
+                    double difference = i < 2 ? Math.round(predicted * 20) - Math.round(sample.values[i] * 20)
+                            : predicted - sample.values[i];
+                    double tolerance = i < 2 ? 1 : i < 10 ? MULTIPLIER_TOLERANCE : 1;
+                    valid &= Math.abs(difference) <= tolerance;
+                    error += difference * difference / (tolerance * tolerance);
+                }
+            }
+            if (valid && error < bestError) {
+                bestError = error;
+                best = -ease;
+            }
+        }
+        return best;
+    }
+
+    // CS6's classic interpolation uses quarter-degree sine entries but weights
+    // the next entry with the fractional degree, rather than four times that
+    // fraction. A mathematical sin/cos fit would reject its compiled matrices.
+    private static double nativeSin(double degrees) {
+        degrees = (degrees % 360 + 360) % 360;
+        double lower = Math.floor(degrees * 4) / 4;
+        double a = Math.sin(Math.toRadians(lower));
+        return a + (degrees - lower) * (Math.sin(Math.toRadians(lower + .25)) - a);
     }
 
     private static double number(Element element, String name, double defaultValue) {

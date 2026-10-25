@@ -17,7 +17,11 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -37,6 +41,50 @@ final class MotionTweenDetector {
 
     static String fit(List<ClassicTweenDetector.Sample> samples, int start, int end,
             double frameRate, double[] registrationPoint) throws XMLStreamException {
+        return fit(samples, start, end, frameRate, registrationPoint, new FitCache());
+    }
+
+    /** Cubic searches shared while shortening the same candidate tween. */
+    static final class FitCache {
+        private final Map<Integer, Map<Integer, SegmentSearch>> channels = new HashMap<>();
+
+        private SegmentSearch search(int component, int start) {
+            return channels.computeIfAbsent(component, key -> new HashMap<>())
+                    .computeIfAbsent(start, key -> new SegmentSearch());
+        }
+    }
+
+    private static final class SegmentSearch {
+        private final BitSet tested = new BitSet();
+        private final TreeMap<Integer, double[]> curves = new TreeMap<>();
+
+        Map.Entry<Integer, double[]> find(List<ClassicTweenDetector.Sample> samples, int start,
+                int component, int minimum, int maximum) {
+            if (maximum < minimum) {
+                return null;
+            }
+            Map.Entry<Integer, double[]> best = curves.floorEntry(maximum);
+            int next = tested.previousClearBit(maximum);
+            while (next >= minimum && (best == null || next > best.getKey())) {
+                double[] curve = fitCubicSegment(samples, start, next, component);
+                tested.set(next);
+                if (curve != null) {
+                    curves.put(next, curve);
+                    return curves.floorEntry(next);
+                }
+                next = tested.previousClearBit(next - 1);
+            }
+            return best != null && best.getKey() >= minimum ? best : null;
+        }
+    }
+
+    static String fit(List<ClassicTweenDetector.Sample> samples, int start, int end,
+            double frameRate, double[] registrationPoint, FitCache cache) throws XMLStreamException {
+        return fit(samples, start, end, frameRate, registrationPoint, cache, false);
+    }
+
+    private static String fit(List<ClassicTweenDetector.Sample> samples, int start, int end,
+            double frameRate, double[] registrationPoint, FitCache cache, boolean waveOnly) throws XMLStreamException {
         // Four points always define a cubic; require additional evidence.
         if (end - start < 5 || !Double.isFinite(frameRate) || frameRate <= 0) {
             return null;
@@ -54,7 +102,7 @@ final class MotionTweenDetector {
             last.index += endpoint.duration - 1;
             last.duration = 1;
             expanded.add(last);
-            String full = fit(expanded, start, end + 1, frameRate, registrationPoint);
+            String full = fit(expanded, start, end + 1, frameRate, registrationPoint, new FitCache(), true);
             if (full != null && (full.contains("type=\"Spring\"") || full.contains("type=\"Bounce\"")
                     || full.contains("type=\"BounceIn\""))) {
                 return full;
@@ -79,7 +127,28 @@ final class MotionTweenDetector {
         }
         AlphaCurve alpha = fitAlpha(samples, start, end);
         if (alpha != null && !sampledTransform) {
-            return writeAlphaMotion(samples, start, end, frameRate, registrationPoint, alpha);
+            return waveOnly ? null : writeAlphaMotion(samples, start, end, frameRate, registrationPoint, alpha);
+        }
+        NativeCurve[] waves = null;
+        if (waveOnly) {
+            // Extending a held endpoint is useful only for a native wave. Do not
+            // repeat the entire piecewise cubic search just to discard its XML.
+            waves = new NativeCurve[Math.min(14, samples.get(start).values.length)];
+            boolean hasWave = false;
+            for (int component = 0; component < waves.length; component++) {
+                boolean changing = false;
+                double begin = channelValue(samples.get(start), component);
+                for (int f = start + 1; f <= end && !changing; f++) {
+                    changing = channelValue(samples.get(f), component) != begin;
+                }
+                if (changing) {
+                    waves[component] = fitNativeWave(samples, start, end, component);
+                    hasWave |= waves[component] != null;
+                }
+            }
+            if (!hasWave) {
+                return null;
+            }
         }
         int firstFrame = samples.get(start).index;
         int frameCount = samples.get(end).index - firstFrame;
@@ -159,7 +228,7 @@ final class MotionTweenDetector {
                         begin + 2 * (finish - begin) / 3, finish};
                     continue;
                 }
-                NativeCurve nativeCurve = fitNativeWave(samples, start, end, component);
+                NativeCurve nativeCurve = waves == null ? fitNativeWave(samples, start, end, component) : waves[component];
                 if (nativeCurve != null) {
                     maps[property] = nativeCurve.map;
                     double delta = nativeCurve.delta;
@@ -172,7 +241,7 @@ final class MotionTweenDetector {
                 if (strength == null) {
                     List<Segment> segments = fitPreset(samples, start, end, component);
                     if (segments == null) {
-                        segments = fitSegments(samples, start, end, component);
+                        segments = fitSegments(samples, start, end, component, cache);
                     }
                     if (segments == null) {
                         return null;
@@ -219,7 +288,7 @@ final class MotionTweenDetector {
                 if (strength == null) {
                     List<Segment> segments = fitPreset(samples, start, end, component);
                     if (segments == null) {
-                        segments = fitSegments(samples, start, end, component);
+                        segments = fitSegments(samples, start, end, component, cache);
                     }
                     if (segments == null) {
                         return null;
@@ -730,7 +799,7 @@ final class MotionTweenDetector {
     }
 
     private static List<Segment> fitSegments(List<ClassicTweenDetector.Sample> samples, int start, int end,
-            int component) {
+            int component, FitCache cache) {
         // Each segment needs six distinct observations, including both ends.
         // Bound the number of segments to avoid turning arbitrary keyframes
         // into an almost one-key-per-frame motion object.
@@ -742,22 +811,20 @@ final class MotionTweenDetector {
         List<Segment> result = new ArrayList<>();
         int current = start;
         while (current < end && result.size() < 8) {
-            double[] best = null;
-            int finish = end;
-            for (; finish >= current + 5; finish--) {
-                if (finish != end && end - finish < 5) {
-                    continue;
-                }
-                best = fitCubicSegment(samples, current, finish, component);
-                if (best != null) {
-                    break;
-                }
+            SegmentSearch search = cache.search(component, current);
+            Map.Entry<Integer, double[]> best = search.find(samples, current, component,
+                    Math.max(current + 5, end), end);
+            if (best == null) {
+                // A nonterminal segment must leave five observations for the next one.
+                best = search.find(samples, current, component, current + 5, end - 5);
             }
             if (best == null) {
                 return null;
             }
+            int finish = best.getKey();
             result.add(new Segment((samples.get(current).index - firstFrame) / duration,
-                    (samples.get(finish).index - firstFrame) / duration, best));
+                    // XML conversion rescales these values; cached SWF curves must stay unchanged.
+                    (samples.get(finish).index - firstFrame) / duration, best.getValue().clone()));
             current = finish;
         }
         return current == end && result.size() > 1 ? result : null;
