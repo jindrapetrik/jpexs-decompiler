@@ -387,6 +387,11 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter.equals("tweenquality")) {
+            out.println(PREFIX + "-tweenQuality 50 -format xfl:cs6 -export xfl output input.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("cli")) {
             out.println(PREFIX + "-cli myfile.swf");
             exampleFound = true;
@@ -527,6 +532,7 @@ public class CommandLineArgumentParser {
         double zoom = 1;
         Double morphDuration = PreviewExporter.MORPH_SHAPE_DEFAULT_DURATION;
         int morphNumFrames = 10;
+        int tweenQuality = 0;
         String charset = Charset.defaultCharset().name();
         SwfProfile swfProfile = null;
         boolean cliMode = false;
@@ -581,6 +587,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-morphnumframes":
                     morphNumFrames = parseMorphNumFrames(args);
+                    break;
+                case "-tweenquality":
+                    tweenQuality = parseTweenQuality(args);
                     break;
                 case "-format":
                     format = parseFormat(args);
@@ -708,7 +717,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, swfProfile, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, swfProfile, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames, tweenQuality);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -1823,6 +1832,23 @@ public class CommandLineArgumentParser {
         return 2;
     }
 
+    private static int parseTweenQuality(Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("tweenquality");
+            return 0;
+        }
+        try {
+            int value = Integer.parseInt(args.pop());
+            if (value >= 0 && value <= 100) {
+                return value;
+            }
+        } catch (NumberFormatException ex) {
+            // The help topic below describes the required integer range.
+        }
+        badArguments("tweenquality");
+        return 0;
+    }
+
     private static int parseMorphNumFrames(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("number of frames parameter expected");
@@ -2205,7 +2231,8 @@ public class CommandLineArgumentParser {
             ConsoleUrlResolver urlResolver,
             int subFrameLength,
             double morphDuration,
-            int morphNumFrames
+            int morphNumFrames,
+            int tweenQuality
     ) {
         if (args.size() < 3) {
             badArguments("export");
@@ -2507,12 +2534,12 @@ public class CommandLineArgumentParser {
 
                 if (exportFormats.contains("fla")) {
                     System.out.println("Exporting FLA...");
-                    exportFla(true, outDir, inFile, swf, multipleExportTypes, formats, handler);
+                    exportFla(true, outDir, inFile, swf, multipleExportTypes, formats, handler, tweenQuality);
                 }
 
                 if (exportFormats.contains("xfl")) {
                     System.out.println("Exporting XFL...");
-                    exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler);
+                    exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler, tweenQuality);
                 }
 
                 if (!singleFile) {
@@ -2541,7 +2568,7 @@ public class CommandLineArgumentParser {
         System.exit(exportOK ? 0 : 1);
     }
 
-    private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler) throws IOException, InterruptedException {
+    private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler, int tweenQuality) throws IOException, InterruptedException {
         String exportFormat = compressed ? "fla" : "xfl";
         String format = formats.get(exportFormat);
         boolean exportScript = true;
@@ -2565,6 +2592,7 @@ public class CommandLineArgumentParser {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = exportScript;
+        settings.tweenDetectionQuality = tweenQuality;
 
         try {
             if (Configuration.setFFDecVersionInExportedFont.get()) {

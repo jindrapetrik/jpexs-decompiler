@@ -22,9 +22,12 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -34,6 +37,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -46,6 +51,8 @@ public class FlaExportDialog extends AppDialog {
     private JComboBox<FlaVersionItem> combo;
     
     private JCheckBox compressedCheckBox;
+
+    private JSlider tweenQualitySlider;
     
     public FlaExportDialog(Window owner) {
         super(owner);
@@ -85,6 +92,33 @@ public class FlaExportDialog extends AppDialog {
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(comboPanel);
         centerPanel.add(compressedCheckBox);
+
+        JPanel qualityPanel = new JPanel(new BorderLayout(8, 4));
+        qualityPanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
+        JPanel qualityLabelPanel = new JPanel(new FlowLayout());
+        JLabel qualityLabel = new JLabel(translate("tweenDetectionQuality"));
+        JLabel qualityValue = new JLabel();
+        qualityLabelPanel.add(qualityLabel);
+        qualityLabelPanel.add(qualityValue);
+        tweenQualitySlider = new JSlider(0, 100, Math.max(0, Math.min(100, Configuration.lastFlaExportTweenDetectionQuality.get())));
+        tweenQualitySlider.setMajorTickSpacing(25);
+        tweenQualitySlider.setMinorTickSpacing(5);
+        tweenQualitySlider.setPaintTicks(true);
+        tweenQualitySlider.setPreferredSize(new Dimension(360, tweenQualitySlider.getPreferredSize().height));
+        // Standalone labels avoid HiDPI clipping in the slider's label renderer.
+        JPanel qualityEndpoints = new JPanel(new GridLayout(1, 2));
+        qualityEndpoints.add(new JLabel(translate("tweenDetectionQuality.off"), SwingConstants.LEADING));
+        qualityEndpoints.add(new JLabel(translate("tweenDetectionQuality.full"), SwingConstants.TRAILING));
+        tweenQualitySlider.addChangeListener(e -> qualityValue.setText(Integer.toString(tweenQualitySlider.getValue())));
+        qualityValue.setText(Integer.toString(tweenQualitySlider.getValue()));
+        qualityLabel.setLabelFor(tweenQualitySlider);
+        qualityLabel.setToolTipText(translate("tweenDetectionQuality.tooltip"));
+        tweenQualitySlider.setToolTipText(translate("tweenDetectionQuality.tooltip"));
+        qualityPanel.add(qualityLabelPanel, BorderLayout.NORTH);
+        qualityPanel.add(tweenQualitySlider, BorderLayout.CENTER);
+        qualityPanel.add(qualityEndpoints, BorderLayout.SOUTH);
+        qualityPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(qualityPanel);
         
         cnt.add(centerPanel, BorderLayout.CENTER);
         
@@ -149,6 +183,10 @@ public class FlaExportDialog extends AppDialog {
         return compressedCheckBox.isSelected();
     }
     
+    public int getTweenDetectionQuality() {
+        return tweenQualitySlider.getValue();
+    }
+
     public FLAVersion getFlaVersion() {
         if (combo.getSelectedItem() == null) {
             return null;
@@ -156,7 +194,8 @@ public class FlaExportDialog extends AppDialog {
         return ((FlaVersionItem) combo.getSelectedItem()).flaVersion;
     }
 
-    private void okButtonActionPerformed(ActionEvent evt) {        
+    private void okButtonActionPerformed(ActionEvent evt) {
+        Configuration.lastFlaExportTweenDetectionQuality.set(getTweenDetectionQuality());
         result = OK_OPTION;
         setVisible(false);
     }
@@ -194,6 +233,7 @@ public class FlaExportDialog extends AppDialog {
             compressedCheckBox.setSelected(Configuration.lastFlaExportCompressed.get());
             comboActionPerformed(null);
         }
+        tweenQualitySlider.setValue(Math.max(0, Math.min(100, Configuration.lastFlaExportTweenDetectionQuality.get())));
         pack();
         setVisible(true);        
         return result;

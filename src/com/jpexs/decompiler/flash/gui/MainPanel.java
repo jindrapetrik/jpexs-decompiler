@@ -205,6 +205,7 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
@@ -3849,6 +3850,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         
         FLAVersion version = exportDialog.getFlaVersion();
         boolean compressed = exportDialog.isCompressed();
+        int tweenDetectionQuality = exportDialog.getTweenDetectionQuality();
         
         FileChooser fc = View.getFileChooserWithIcon("exportfla");
         String selDir = Configuration.lastOpenDir.get();
@@ -3931,11 +3933,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     try {
                         AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-                        if (compressed) {
-                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), version, prog);
-                        } else {
-                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), version, prog);
-                        }
+                        XFLExportSettings settings = new XFLExportSettings();
+                        settings.compressed = compressed;
+                        settings.tweenDetectionQuality = tweenDetectionQuality;
+                        swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), version, settings, prog);
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "FLA export error", ex);
                         ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);

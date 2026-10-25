@@ -952,6 +952,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;
 
+    @ConfigurationDefaultInt(50)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastFlaExportTweenDetectionQuality = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportSpriteInfo = null;

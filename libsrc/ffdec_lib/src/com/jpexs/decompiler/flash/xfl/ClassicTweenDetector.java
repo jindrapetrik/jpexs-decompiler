@@ -68,6 +68,17 @@ final class ClassicTweenDetector {
 
     static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
             Map<String, double[]> registrationPoints) throws XMLStreamException {
+        return detect(frames, instanceStarts, motionFrameRate, registrationPoints, 100);
+    }
+
+    static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
+            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        if (quality < 0 || quality > 100) {
+            throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
+        }
+        if (quality == 0) {
+            return frames;
+        }
         // Do not remove frames carrying clip actions, including script CDATA
         // which may itself contain XML-looking text.
         if (!frames.contains("<DOMSymbolInstance") || frames.contains("<Actionscript")) {
@@ -123,6 +134,8 @@ final class ClassicTweenDetector {
                 }
             }
         }
+        TweenDetectionBudget budget = quality == 100 ? null : new TweenDetectionBudget(quality, samples.size());
+        List<Sample> searchSamples = budget == null ? samples : budget.track(samples);
         boolean changed = false;
         StringBuilder result = new StringBuilder();
         MotionTweenDetector.FitCache motionCache = null;
@@ -132,26 +145,34 @@ final class ClassicTweenDetector {
             int limit = runEnds[start];
             Integer acceleration = null;
             String motion = null;
-            int end = limit;
+            int end = budget == null ? limit : budget.lastCandidate(samples, start, limit);
             if (limit != cachedRunEnd) {
-                motionCache = new MotionTweenDetector.FitCache();
+                motionCache = new MotionTweenDetector.FitCache(budget);
                 cachedRunEnd = limit;
             }
             // At least two intermediate samples are required to distinguish a
             // tween from an arbitrary change between adjacent keyframes.
-            while (end >= start + 3) {
-                acceleration = fit(samples, start, end);
-                if (acceleration != null) {
-                    break;
-                }
-                double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
-                if (motionFrameRate > 0 && registrationPoint != null) {
-                    motion = MotionTweenDetector.fit(samples, start, end, motionFrameRate, registrationPoint, motionCache);
-                    if (motion != null) {
+            try {
+                while (end >= start + 3) {
+                    acceleration = fit(searchSamples, start, end);
+                    if (acceleration != null) {
                         break;
                     }
+                    double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
+                    if (motionFrameRate > 0 && registrationPoint != null) {
+                        motion = MotionTweenDetector.fit(searchSamples, start, end, motionFrameRate, registrationPoint, motionCache);
+                        if (motion != null) {
+                            break;
+                        }
+                    }
+                    end--;
                 }
-                end--;
+            } catch (TweenDetectionBudget.Exhausted ex) {
+                // Discard the incomplete fit and keep every remaining source keyframe.
+                for (int i = start; i < samples.size(); i++) {
+                    result.append(samples.get(i).xml).append('\n');
+                }
+                return changed ? result.toString() : frames;
             }
             if (motion != null) {
                 changed = true;

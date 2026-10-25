@@ -247,6 +247,8 @@ public class XFLConverter {
 
     private final Random random = new Random(123); // predictable random
 
+    private int tweenDetectionQuality = 100;
+
     /**
      * Adds "(depth xxx)" to layer name
      */
@@ -2613,7 +2615,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
         Logger.getLogger(XFLConverter.class.getName()).log(Level.FINE, "Converting frames of {0}", symbolName);
         boolean lastIn = false;
         XFLXmlWriter writer2 = new XFLXmlWriter();
@@ -2842,8 +2844,8 @@ public class XFLConverter {
                         morphSamples.put(frame, sample);
                     }
                 }
-                if (flaVersion.ordinal() >= FLAVersion.CS5.ordinal() && character instanceof BoundedTag
-                        && elements.contains("<DOMSymbolInstance")) {
+                if (tweenDetectionQuality > 0 && flaVersion.ordinal() >= FLAVersion.CS5.ordinal()
+                        && character instanceof BoundedTag && elements.contains("<DOMSymbolInstance")) {
                     String itemName = getSymbolName(lastImportedId, characterNameMap, swf, character);
                     if (!motionRegistrationPoints.containsKey(itemName)) {
                         RECT bounds = ((BoundedTag) character).getRect();
@@ -2877,7 +2879,7 @@ public class XFLConverter {
         if (writer2.length() > 0) {
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
-                    flaVersion.ordinal() >= FLAVersion.CS5.ordinal() ? swf.frameRate : 0, motionRegistrationPoints);
+                    flaVersion.ordinal() >= FLAVersion.CS5.ordinal() ? swf.frameRate : 0, motionRegistrationPoints, tweenDetectionQuality);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
                     prevStr = prevStr.replaceFirst("<DOMLayer", "<DOMLayer animationType=\"motion object\"");
@@ -5506,6 +5508,10 @@ public class XFLConverter {
      * @throws InterruptedException On interrupt
      */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
+        if (settings.tweenDetectionQuality < 0 || settings.tweenDetectionQuality > 100) {
+            throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
+        }
+        tweenDetectionQuality = settings.tweenDetectionQuality;
         FlaFormatVersion cbfFlaVersion = null;
 
         String xflVersion = flaVersion.xflVersion();

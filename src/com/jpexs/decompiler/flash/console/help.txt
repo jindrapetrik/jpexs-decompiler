@@ -554,3 +554,11 @@ Pre-options:
     Applies to: -export
     Specifies number of frames for morphshape exporting.
 
+
+-tweenQuality <0-100>
+    Applies to: -export
+    Set motion/classic tween detection quality for FLA and XFL export.
+    0 disables detection (CLI default); 100 performs complete detection.
+    Values 1-99 limit the search; unmatched frames remain sampled keyframes.
+    Shape tween detection is unaffected.
+

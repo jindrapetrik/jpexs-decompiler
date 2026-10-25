@@ -47,6 +47,15 @@ final class MotionTweenDetector {
     /** Cubic searches shared while shortening the same candidate tween. */
     static final class FitCache {
         private final Map<Integer, Map<Integer, SegmentSearch>> channels = new HashMap<>();
+        private final TweenDetectionBudget budget;
+
+        FitCache() {
+            this(null);
+        }
+
+        FitCache(TweenDetectionBudget budget) {
+            this.budget = budget;
+        }
 
         private SegmentSearch search(int component, int start) {
             return channels.computeIfAbsent(component, key -> new HashMap<>())
@@ -90,7 +99,11 @@ final class MotionTweenDetector {
             return null;
         }
         ClassicTweenDetector.Sample endpoint = samples.get(end);
-        if (endpoint.duration > 1) {
+        if (cache.budget != null && !cache.budget.includes(samples.get(start).index, endpoint.index)) {
+            return null;
+        }
+        if (endpoint.duration > 1 && (cache.budget == null
+                || cache.budget.includes(samples.get(start).index, (long) endpoint.index + endpoint.duration - 1))) {
             // A quantized native wave may end in a coalesced flat tail. Its
             // full length affects frame-rounded Bounce widths. Try the entire
             // hold before shortening the native map; verify every held frame.
@@ -102,7 +115,10 @@ final class MotionTweenDetector {
             last.index += endpoint.duration - 1;
             last.duration = 1;
             expanded.add(last);
-            String full = fit(expanded, start, end + 1, frameRate, registrationPoint, new FitCache(), true);
+            if (cache.budget != null) {
+                expanded = cache.budget.track(expanded);
+            }
+            String full = fit(expanded, start, end + 1, frameRate, registrationPoint, new FitCache(cache.budget), true);
             if (full != null && (full.contains("type=\"Spring\"") || full.contains("type=\"Bounce\"")
                     || full.contains("type=\"BounceIn\""))) {
                 return full;
@@ -125,7 +141,7 @@ final class MotionTweenDetector {
                 }
             }
         }
-        AlphaCurve alpha = fitAlpha(samples, start, end);
+        AlphaCurve alpha = fitAlpha(samples, start, end, cache.budget);
         if (alpha != null && !sampledTransform) {
             return waveOnly ? null : writeAlphaMotion(samples, start, end, frameRate, registrationPoint, alpha);
         }
@@ -1061,7 +1077,8 @@ final class MotionTweenDetector {
      * multiplier. Recover the intervals of original percentages, including
      * held frames, rather than fitting already rounded multipliers exactly.
      */
-    private static AlphaCurve fitAlpha(List<ClassicTweenDetector.Sample> samples, int start, int end) {
+    private static AlphaCurve fitAlpha(List<ClassicTweenDetector.Sample> samples, int start, int end,
+            TweenDetectionBudget budget) {
         ClassicTweenDetector.Sample first = samples.get(start);
         int duration = samples.get(end).index - first.index;
         if (duration < 9 || end - start < 7) {
@@ -1130,6 +1147,9 @@ final class MotionTweenDetector {
             // tolerances which could silently alter the SWF alpha samples.
             boolean feasible = true;
             for (int i = 0; i < count && feasible; i++) {
+                if (budget != null) {
+                    budget.consume(count);
+                }
                 for (int j = 0; j < count; j++) {
                     double delta = progress[j] - progress[i];
                     double bound = upper[j] - lower[i];
