@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
+import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -35,12 +36,59 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Keeps independent SWF paints separate in the planar XFL shape model. */
 final class ShapePaints {
 
     private ShapePaints() {
+    }
+
+    // Coincident boundaries can carry different pairs of fills in SWF. FLA editor
+    // merges them in a single DOMShape and can discard an adjacent region.
+    static boolean hasCoincidentFillEdges(SHAPEWITHSTYLE shape) {
+        Set<BezierEdge> edges = new HashSet<>();
+        int x = 0;
+        int y = 0;
+        int fill0 = 0;
+        int fill1 = 0;
+        for (SHAPERECORD record : shape.shapeRecords) {
+            BezierEdge edge = null;
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord change = (StyleChangeRecord) record;
+                if (change.stateNewStyles) {
+                    edges.clear();
+                }
+                if (change.stateFillStyle0) {
+                    fill0 = change.fillStyle0;
+                }
+                if (change.stateFillStyle1) {
+                    fill1 = change.fillStyle1;
+                }
+            } else if (fill0 != fill1) {
+                if (record instanceof StraightEdgeRecord) {
+                    edge = new BezierEdge(x, y, record.changeX(x), record.changeY(y));
+                } else if (record instanceof CurvedEdgeRecord) {
+                    CurvedEdgeRecord curve = (CurvedEdgeRecord) record;
+                    edge = new BezierEdge(x, y, x + curve.controlDeltaX, y + curve.controlDeltaY,
+                            record.changeX(x), record.changeY(y));
+                    // A collinear curve has the same fill boundary as a line,
+                    // even if it briefly doubles back along that line.
+                    edge.shrinkToLine();
+                }
+            }
+            x = record.changeX(x);
+            y = record.changeY(y);
+            if (edge != null && !edge.isEmpty()) {
+                if (edges.contains(edge) || edges.contains(edge.reverse())) {
+                    return true;
+                }
+                edges.add(edge);
+            }
+        }
+        return false;
     }
 
     static boolean hasOverlappingFills(MorphShapeTag morph) {
@@ -58,6 +106,9 @@ final class ShapePaints {
     }
 
     static boolean hasOverlappingFills(SWF swf, int shapeNum, SHAPEWITHSTYLE shape, int windingRule) {
+        if (shape.fillStyles.fillStyles.length < 2) {
+            return false;
+        }
         List<Area> areas = new ArrayList<>();
         for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
             Area area = new Area(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1));

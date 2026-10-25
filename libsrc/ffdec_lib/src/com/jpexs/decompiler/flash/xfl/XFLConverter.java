@@ -737,16 +737,17 @@ public class XFLConverter {
             shapeTransformer.transformStyles(scale, fillStyles, lineStyles, shapeNum);
         }
 
-        if (!morphshape && fillStyles != null && fillStyles.fillStyles.length > 1
+        if (!morphshape && fillStyles != null && fillStyles.fillStyles.length > 0
                 && swf.getCharacter(characterId) instanceof ShapeTag && !shapeHasMultiLayers(shapeRecords)) {
             ShapeTag character = (ShapeTag) swf.getCharacter(characterId);
             SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
             source.shapeRecords = shapeRecords;
             source.fillStyles = fillStyles;
             source.lineStyles = lineStyles;
-            if (ShapePaints.hasOverlappingFills(swf, shapeNum, source, character.getWindingRule())) {
-                // Different SWF paints can overlap. A single planar DOMShape
-                // cannot represent both sides of their crossing consistently.
+            if (ShapePaints.hasCoincidentFillEdges(source)
+                    || ShapePaints.hasOverlappingFills(swf, shapeNum, source, character.getWindingRule())) {
+                // Overlapping paints and coincident boundaries need independent
+                // planes to keep FLA editor from discarding a fill when merging edges.
                 // Normalize after enlarging small shapes to retain fine details.
                 return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
                         characterId, false, character.getWindingRule());

@@ -39,15 +39,26 @@ public class XflStaticShapeExportTest {
 
     @DataProvider(name = "placement")
     public Object[][] placement() {
-        return new Object[][]{{false}, {true}};
+        String[] coat = {"#d90000", "#8c0000", "#bf0000", "#cc0000", "#aa0000", "#f0f0f0", "#e58508"};
+        String[] gift = {"#fcd4ee", "#000000", "#ffb4db", "#fe8dc5", "#ce907b", "#efc2bc",
+            "#f676a6", "#f5317b", "#ff57a5", "#ff68ab", "#ca9aa6"};
+        return new Object[][]{
+            {false, "overlapping-static-fills.swf", 113, coat, true},
+            {true, "overlapping-static-fills.swf", 113, coat, true},
+            {false, "coincident-static-fills.swf", 41, gift, false},
+            {true, "coincident-static-fills.swf", 41, gift, false}
+        };
     }
 
     @Test(dataProvider = "placement")
-    public void overlappingFillsKeepTheirOwnPlanesAndPaintOrder(boolean library) throws Exception {
+    public void problematicFillsKeepTheirOwnPlanesAndPaintOrder(boolean library, String fixture,
+            int characterId, String[] colors, boolean overlapping) throws Exception {
         SWF swf;
         // Shape 113 from 289.swf. The first red paint overlaps the third one
         // at the left contour; merging them makes CS6 drop its largest region.
-        try (InputStream in = Files.newInputStream(Paths.get("testdata/xfl/overlapping-static-fills.swf"))) {
+        // Shape 41 from ArtworkRoomsTown40.swf has no overlapping fills, but
+        // coincident boundaries cause CS6 to drop the brown ribbon rectangle.
+        try (InputStream in = Files.newInputStream(Paths.get("testdata/xfl", fixture))) {
             swf = new SWF(in, false);
         }
         if (library) {
@@ -63,8 +74,11 @@ public class XflStaticShapeExportTest {
         swf.saveTo(before);
         Path output = Files.createTempFile("ffdec-static-paints-", ".fla");
         try {
-            ShapeTag shape = (ShapeTag) swf.getCharacter(113);
-            assertTrue(ShapePaints.hasOverlappingFills(swf, shape.getShapeNum(), shape.getShapes(), shape.getWindingRule()));
+            ShapeTag shape = (ShapeTag) swf.getCharacter(characterId);
+            assertEquals(ShapePaints.hasOverlappingFills(swf, shape.getShapeNum(), shape.getShapes(), shape.getWindingRule()), overlapping);
+            if (!overlapping) {
+                assertTrue(ShapePaints.hasCoincidentFillEdges(shape.getShapes()));
+            }
             swf.exportFla(new AbortRetryIgnoreHandler() {
                 @Override
                 public int handle(Throwable error) {
@@ -78,14 +92,13 @@ public class XflStaticShapeExportTest {
             }, output.toString(), "coat.swf", "Test", "Test", "1", false, FLAVersion.CS6, null);
             try (ZipFile zip = new ZipFile(output.toFile())) {
                 Document document;
-                String path = library ? "LIBRARY/Symbol 113.xml" : "DOMDocument.xml";
+                String path = library ? "LIBRARY/Symbol " + characterId + ".xml" : "DOMDocument.xml";
                 try (InputStream in = zip.getInputStream(zip.getEntry(path))) {
                     document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
                 }
                 NodeList shapes = document.getElementsByTagName("DOMShape");
-                assertEquals(shapes.getLength(), 7, "Each overlapping SWF paint needs an independent XFL plane");
-                assertEquals(document.getElementsByTagName("DOMLayer").getLength(), library ? 7 : 1);
-                String[] colors = {"#d90000", "#8c0000", "#bf0000", "#cc0000", "#aa0000", "#f0f0f0", "#e58508"};
+                assertEquals(shapes.getLength(), colors.length, "Each SWF paint needs an independent XFL plane");
+                assertEquals(document.getElementsByTagName("DOMLayer").getLength(), library ? colors.length : 1);
                 for (int i = 0; i < shapes.getLength(); i++) {
                     Element paint = (Element) shapes.item(i);
                     assertEquals(paint.getAttribute("isFloating"), "true");
