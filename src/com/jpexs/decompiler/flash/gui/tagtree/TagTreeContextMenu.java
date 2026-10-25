@@ -5988,11 +5988,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (replace) {
-                timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), sprite);
+                swf.addTag(swf.indexOfTag(first.innerTags.get(0)), sprite);
             } else {
-                timelined.addTag(sprite);
+                swf.addTag(sprite);
             }
-            sprite.setTimelined(timelined);
+            sprite.setTimelined(swf);
             sprite.getTimeline();
             sprites.put(d, sprite);
         }
@@ -6082,12 +6082,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             swf.updateCharacters();
+            swf.resetTimelines(swf);
             if (replace) {
-                timelined.resetTimeline();
                 swf.computeDependentCharacters();
                 swf.computeDependentFrames();
             }
-            swf.resetTimelines(swf);
             mainPanel.refreshTree(swf);
         } catch (InterruptedException | IOException ex) {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
