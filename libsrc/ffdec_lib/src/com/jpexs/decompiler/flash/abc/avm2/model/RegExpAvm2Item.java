@@ -115,6 +115,10 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
             escape = false;
         }
 
+        if (escape) {
+            //trailing backslash would escape the closing / char
+            return null;
+        }
         return ret.toString();
     }
 
@@ -122,7 +126,8 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (Configuration.useRegExprLiteral.get()) {
             String escaped = escapeRegExpString(pattern);
-            if (escaped != null) {
+            //empty pattern would be the line comment //, pattern starting with * the block comment /*
+            if (escaped != null && !escaped.isEmpty() && !escaped.startsWith("*")) {
                 writer.append("/");
                 writer.append(escaped);
                 writer.append("/");

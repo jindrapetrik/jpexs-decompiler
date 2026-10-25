@@ -1532,4 +1532,25 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "            trace(i);\n"
                 + "         }\n");
     }
+
+    @Test
+    public void testRegExpLiteralIsNotComment() throws Exception {
+        //as literals, new RegExp("") would be the comment // and new RegExp("*a")
+        //the start of the comment /*; a trailing backslash would escape the closing /
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"*a\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"a\\\\\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"a+\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 4\n",
+                "         trace(new RegExp(\"\"),new RegExp(\"*a\"),new RegExp(\"a\\\\\"),/a+/);\n");
+    }
 }
