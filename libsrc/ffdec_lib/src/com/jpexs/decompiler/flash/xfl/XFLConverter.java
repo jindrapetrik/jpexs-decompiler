@@ -171,6 +171,7 @@ import com.jpexs.flash.fla.converter.streams.CfbOutputStorage;
 import com.jpexs.flash.fla.converter.streams.InputStorageInterface;
 import com.jpexs.flash.fla.converter.streams.OutputStorageInterface;
 import com.jpexs.flash.fla.converter.streams.ZippedInputStorage;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Path;
@@ -263,6 +264,12 @@ public class XFLConverter {
         EDGE_DECIMAL_FORMAT.setGroupingUsed(false);
     }
 
+    private static void checkInterrupted() throws InterruptedException {
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+    }
+
     private static class StatusStack {
 
         private final Stack<String> statuses = new Stack<>();
@@ -276,7 +283,8 @@ public class XFLConverter {
             return String.join(", ", statuses);
         }
 
-        private void update() {
+        private void update() throws InterruptedException {
+            checkInterrupted();
             if (progressListener == null) {
                 return;
             }
@@ -284,12 +292,12 @@ public class XFLConverter {
             progressListener.status(getStatusString());
         }
 
-        public void pushStatus(String status) {
+        public void pushStatus(String status) throws InterruptedException {
             statuses.push(status);
             update();
         }
 
-        public void popStatus() {
+        public void popStatus() throws InterruptedException {
             statuses.pop();
             update();
         }
@@ -1452,7 +1460,7 @@ public class XFLConverter {
         return (DEBUG_EXPORT_LAYER_DEPTHS ? "MaskedSymbol " : "Symbol ") + symbolId;
     }
 
-    private static void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame) throws XMLStreamException {
+    private static void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame) throws XMLStreamException, InterruptedException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1562,6 +1570,7 @@ public class XFLConverter {
         if (filters != null) {
             writer.writeStartElement("filters");
             for (FILTER f : filters) {
+                checkInterrupted();
                 convertFilter(f, writer);
             }
             writer.writeEndElement();
@@ -1592,6 +1601,7 @@ public class XFLConverter {
             writer.writeStartElement("script");
             StringBuilder sbActions = new StringBuilder();
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
+                checkInterrupted();
                 sbActions.append(convertActionScript12(rec));
             }
             writer.writeCData(sbActions.toString());
@@ -1649,18 +1659,14 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static String convertActionScript12(ASMSource as, List<ActionTreeOperation> treeOperations) {
+    private static String convertActionScript12(ASMSource as, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        try {
-            as.getActionScriptSource(writer, null, treeOperations);
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+        as.getActionScriptSource(writer, null, treeOperations);
         writer.finishHilights();
         return writer.toString();
     }
 
-    private static String convertActionScript12(ASMSource as) {
+    private static String convertActionScript12(ASMSource as) throws InterruptedException {
         return convertActionScript12(as, new ArrayList<>());
     }
 
@@ -1669,7 +1675,7 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private void convertLibrary(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Map<CharacterTag, ScriptPack> characterScriptPacks, List<CharacterTag> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertLibrary(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Map<CharacterTag, ScriptPack> characterScriptPacks, List<CharacterTag> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         statusStack.pushStatus("media");
         convertMedia(lastItemIdNumber, charactersExportedInFirstFrame, lastImportedId, characterNameMap, characterImportLinkageURL, characters, swf, characterVariables, characterClasses, tags, files, datfiles, writer, statusStack);
         statusStack.popStatus();
@@ -1678,12 +1684,13 @@ public class XFLConverter {
         statusStack.popStatus();
     }
 
-    private void convertSymbols(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Map<CharacterTag, ScriptPack> characterScriptPacks, List<CharacterTag> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<String, byte[]> files, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertSymbols(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Map<CharacterTag, ScriptPack> characterScriptPacks, List<CharacterTag> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<String, byte[]> files, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         //boolean hasSymbol = false;
         Reference<Integer> nextClipId = new Reference<>(-1);
         writer.writeStartElement("symbols");
 
         for (CharacterTag symbol : characters) {
+            checkInterrupted();
             if ((symbol instanceof ShapeTag) && nonLibraryShapes.contains(symbol)) {
                 continue; //shapes with 1 occurrence and single layer are not added to library
             }
@@ -2171,11 +2178,12 @@ public class XFLConverter {
         writer.writeAttribute("sampleCount", soundSampleCount);
     }
 
-    private void convertMedia(Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, ReadOnlyTagList tags, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException {
+    private void convertMedia(Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, ReadOnlyTagList tags, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException, InterruptedException {
         boolean mediaStarted = false;
 
         
         for (CharacterTag symbol : characters) {
+            checkInterrupted();
             if (symbol instanceof ImageTag) {
 
                 if (!mediaStarted) {
@@ -2392,6 +2400,7 @@ public class XFLConverter {
         }
 
         for (Tag t : tags) {
+            checkInterrupted();
             if (t instanceof SoundStreamHeadTypeTag) {
                 if (!mediaStarted) {
                     writer.writeStartElement("media");
@@ -2639,7 +2648,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, BitSet onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, BitSet onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         Logger.getLogger(XFLConverter.class.getName()).log(Level.FINE, "Converting frames of {0}", symbolName);
         boolean lastIn = false;
         XFLXmlWriter writer2 = new XFLXmlWriter();
@@ -2671,6 +2680,7 @@ public class XFLConverter {
         List<Tag> timTags = timelineTags.toArrayList();
         boolean needsFrameAdd = false;
         for (int i = timTags.size() - 1; i >= 0; i--) {
+            checkInterrupted();
             if (timTags.get(i) instanceof ShowFrameTag) {
                 break;
             }
@@ -2684,6 +2694,7 @@ public class XFLConverter {
         }
 
         for (Tag t : timTags) {
+            checkInterrupted();
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 if (po.getDepth() == depth) {
@@ -2916,10 +2927,11 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFonts(Reference<Integer> lastItemIdNumber, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Set<CharacterTag> characters, XFLXmlWriter writer, StatusStack statusStack, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL) throws XMLStreamException {
+    private static void convertFonts(Reference<Integer> lastItemIdNumber, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Set<CharacterTag> characters, XFLXmlWriter writer, StatusStack statusStack, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL) throws XMLStreamException, InterruptedException {
         boolean hasFont = false;
         int fontCounter = 0;
         for (CharacterTag t : characters) {
+            checkInterrupted();
             if (t instanceof FontTag) {
                 FontTag font = (FontTag) t;
                 if (font.getCharacterCount() > 0) {
@@ -2936,6 +2948,7 @@ public class XFLConverter {
         writer.writeStartElement("fonts");
 
         for (Tag ct : characters) {
+            checkInterrupted();
             if (ct instanceof FontTag) {
                 statusStack.pushStatus(ct.toString());
                 FontTag font = (FontTag) ct;
@@ -3041,7 +3054,7 @@ public class XFLConverter {
         return -1;
     }
 
-    private static Map<String, String> getRootAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+    private static Map<String, String> getRootAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
             swfVersion = ((SWF) pack.getOpenable()).version;
@@ -3119,7 +3132,7 @@ public class XFLConverter {
                     }
                 }
             } catch (InterruptedException ex) {
-                //ignore
+                throw ex;
             }
         }
         return ret;
@@ -3234,7 +3247,7 @@ public class XFLConverter {
 
     }
 
-    private static AccessibilityBag getAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+    private static AccessibilityBag getAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
             swfVersion = ((SWF) pack.getOpenable()).version;
@@ -3667,13 +3680,13 @@ public class XFLConverter {
                     }
                 }
             } catch (InterruptedException ex) {
-                //ignore
+                throw ex;
             }
         }
         return ret;
     }
 
-    private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+    private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
 
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
@@ -3789,13 +3802,13 @@ public class XFLConverter {
                 }
 
             } catch (InterruptedException ex) {
-                //ignore
+                throw ex;
             }
         }
         return ret;
     }
 
-    private boolean convertActionScriptLayer(Scene scene, String initClipScript, AbcIndexing abcIndex, ReadOnlyTagList timeLineTags, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private boolean convertActionScriptLayer(Scene scene, String initClipScript, AbcIndexing abcIndex, ReadOnlyTagList timeLineTags, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException, InterruptedException {
         boolean hasScript = false;
 
         String script = initClipScript;
@@ -3812,6 +3825,7 @@ public class XFLConverter {
         }
 
         for (Tag t : timeLineTags) {
+            checkInterrupted();
             if (t instanceof DoActionTag) {
                 DoActionTag da = (DoActionTag) t;
                 script += convertActionScript12(da);
@@ -4076,7 +4090,7 @@ public class XFLConverter {
             Map<CharacterTag, String> characterImportLinkageURL,
             Set<CharacterTag> characters,
             Set<ShapeTag> smallShapes
-    ) throws XMLStreamException {
+    ) throws XMLStreamException, InterruptedException {
         XFLXmlWriter symbolStr = new XFLXmlWriter();
 
         extractMultilevelClips(normalizedFonts, normalizedTexts, characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, timelineTags, spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
@@ -4133,9 +4147,10 @@ public class XFLConverter {
             Map<CharacterTag, String> characterImportLinkageURL,
             Set<CharacterTag> characters,
             Set<ShapeTag> smallShapes
-    ) throws XMLStreamException {
+    ) throws XMLStreamException, InterruptedException {
 
         for (int objectId : morphShapeSymbols) {
+            checkInterrupted();
             statusStack.pushStatus(swf.getCharacter(objectId).toString());
 
             String itemId = generateItemId(lastItemIdNumber);
@@ -4193,7 +4208,7 @@ public class XFLConverter {
             Map<CharacterTag, String> characterImportLinkageURL,
             Set<CharacterTag> characters,
             Set<ShapeTag> smallShapes
-    ) throws XMLStreamException {
+    ) throws XMLStreamException, InterruptedException {
         int f = 0;
 
         List<PlaceObjectTypeTag> clipPlaces = new ArrayList<>();
@@ -4218,6 +4233,7 @@ public class XFLConverter {
         int maxDepth = getMaxDepth(timelineTags);
         Tag lastTag = null;
         for (Tag t : timelineTags) {
+            checkInterrupted();
             if (t instanceof ShowFrameTag) {
                 clipPlacesInCurrentFrame.sort(placeComparator);
                 clipPlaces.addAll(clipPlacesInCurrentFrame);
@@ -4281,12 +4297,14 @@ public class XFLConverter {
 
         if (!depthToClipPlace.isEmpty()) {
             for (PlaceObjectTypeTag po : depthToClipPlace.values()) {
+                checkInterrupted();
                 clipFinishFrames.put(po, frameCount - 1);
             }
         }
 
         Map<Integer, BitSet> depthToFrames = new HashMap<>();
         for (int d = maxDepth; d >= 0; d--) {
+            checkInterrupted();
             BitSet frames = new BitSet(frameCount);
             frames.set(0, frameCount);
             depthToFrames.put(d, frames);
@@ -4295,7 +4313,9 @@ public class XFLConverter {
         Map<Integer, Map<Integer, List<PlaceObjectTypeTag>>> frameToDepthToClips = new TreeMap<>();
 
         for (f = 0; f < frameCount; f++) {
+            checkInterrupted();
             for (int d = 0; d < maxDepth; d++) {
+                checkInterrupted();
                 for (int p = 0; p < clipPlaces.size(); p++) {
                     PlaceObjectTypeTag po = clipPlaces.get(p);
                     int startFrame = clipStartFrames.get(po);
@@ -4318,7 +4338,9 @@ public class XFLConverter {
         Set<PlaceObjectTypeTag> delegatedPlaces = new HashSet<>();
 
         for (int fr : frameToDepthToClips.keySet()) {
+            checkInterrupted();
             for (int d : frameToDepthToClips.get(fr).keySet()) {
+                checkInterrupted();
                 List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
 
                 if (places.size() > 1) {
@@ -4426,7 +4448,7 @@ public class XFLConverter {
     }
 
     //Note: symbolId argument might be a virtual symbol like MaskedSymbol
-    private void convertTimelines(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Map<CharacterTag, ScriptPack> characterScriptPacks, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertTimelines(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Map<CharacterTag, ScriptPack> characterScriptPacks, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         timelineTags = MorphShapeEndings.restore(timelineTags, morphShapeSymbols);
         ScriptPack characterScriptPack = sprite == null ? null : characterScriptPacks.containsKey(sprite) ? characterScriptPacks.get(sprite) : null;
 
@@ -4438,6 +4460,8 @@ public class XFLConverter {
                     if (sps != null && !sps.isEmpty()) {
                         characterScriptPack = sps.get(0);
                     }
+                } catch (InterruptedException ex) {
+                    throw ex;
                 } catch (Exception ex) {
                     //ignore
                 }
@@ -4509,6 +4533,7 @@ public class XFLConverter {
         String initClipScript = "";
         if (sprite != null) {
             for (Tag t : tags) {
+                checkInterrupted();
                 if (t instanceof DoInitActionTag) {
                     DoInitActionTag dia = (DoInitActionTag) t;
                     if (dia.spriteId == sprite.getCharacterId()) {
@@ -4532,6 +4557,7 @@ public class XFLConverter {
         int fc = 0;
         boolean lastShowFrame = true;
         for (Tag t : timelineTags) {
+            checkInterrupted();
             if (t instanceof DefineSceneAndFrameLabelDataTag) {
                 sceneLabelTag = (DefineSceneAndFrameLabelDataTag) t;
             }
@@ -4609,6 +4635,7 @@ public class XFLConverter {
         }
 
         for (Scene scene : scenes) {
+            checkInterrupted();
             writer.writeStartElement("DOMTimeline", new String[]{"name", scene.name});
             writer.writeStartElement("layers");
 
@@ -4650,6 +4677,7 @@ public class XFLConverter {
             };
 
             for (Tag t : sceneTimelineTags) {
+                checkInterrupted();
                 if (t instanceof ShowFrameTag) {
                     clipPlacesInCurrentFrame.sort(placeComparator);
                     clipPlaces.addAll(clipPlacesInCurrentFrame);
@@ -4740,6 +4768,7 @@ public class XFLConverter {
             // membership compact and constant-time, even on long timelines.
             Map<Integer, BitSet> depthToFrames = new HashMap<>();
             for (int d = maxDepth; d >= 0; d--) {
+                checkInterrupted();
                 BitSet frames = new BitSet(frameCount);
                 frames.set(0, frameCount);
                 depthToFrames.put(d, frames);
@@ -4748,6 +4777,7 @@ public class XFLConverter {
             Map<Integer, Map<Integer, List<PlaceObjectTypeTag>>> frameToDepthToClips = new TreeMap<>();
 
             for (f = 0; f < frameCount; f++) {
+                checkInterrupted();
                 for (int d = 0; d < maxDepth; d++) {
                     for (int p = 0; p < clipPlaces.size() - 1; p++) {
                         PlaceObjectTypeTag po = clipPlaces.get(p);
@@ -4774,6 +4804,7 @@ public class XFLConverter {
             Set<PlaceObjectTypeTag> multiLevelsPlaces = new HashSet<>();
 
             for (int fr : frameToDepthToClips.keySet()) {
+                checkInterrupted();
                 for (int d : frameToDepthToClips.get(fr).keySet()) {
                     List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
                     if (places.size() > 1) {
@@ -4787,6 +4818,7 @@ public class XFLConverter {
 
             Set<PlaceObjectTypeTag> handledClips = new HashSet<>();
             for (int d = maxDepth; d >= 0; d--) {
+                checkInterrupted();
                 loopp:
                 for (int p = 0; p < clipPlaces.size() - 1; p++) {
                     PlaceObjectTypeTag po = clipPlaces.get(p);
@@ -4992,7 +5024,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, BitSet onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private boolean writeLayer(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, BitSet onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
@@ -5017,6 +5049,7 @@ public class XFLConverter {
     }
 
     private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException, InterruptedException {
+        checkInterrupted();
         new RetryTask(() -> {
             File fileObj = new File(file);
             File dir = fileObj.getParentFile();
@@ -5029,7 +5062,7 @@ public class XFLConverter {
         }, handler).run();
     }
 
-    private static Map<CharacterTag, ScriptPack> getCharacterScriptPacks(SWF swf, Map<CharacterTag, String> characterClasses) {
+    private static Map<CharacterTag, ScriptPack> getCharacterScriptPacks(SWF swf, Map<CharacterTag, String> characterClasses) throws InterruptedException {
         Map<CharacterTag, ScriptPack> ret = new HashMap<>();
 
         Map<String, CharacterTag> classToId = new HashMap<>();
@@ -5041,6 +5074,8 @@ public class XFLConverter {
         List<ScriptPack> packs = new ArrayList<>();
         try {
             packs = swf.getScriptPacksByClassNames(allClasses);
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Exception ex) {
             //ignore
         }
@@ -5526,6 +5561,7 @@ public class XFLConverter {
         if (settings.tweenDetectionQuality < 0 || settings.tweenDetectionQuality > 100) {
             throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
         }
+        checkInterrupted();
         tweenDetectionQuality = settings.tweenDetectionQuality;
         FlaFormatVersion cbfFlaVersion = null;
 
@@ -5646,6 +5682,7 @@ public class XFLConverter {
             Reference<Integer> lastItemIdNumber = new Reference<>(0);
             int frame = 1;
             for (Tag tag : swf.getTags()) {
+                checkInterrupted();
                 if (tag instanceof ImportTag) {
                     ImportTag it = (ImportTag) tag;
                     Map<Integer, String> assets = it.getAssets();
@@ -5684,6 +5721,7 @@ public class XFLConverter {
             }
 
             for (CharacterTag ct : characters) {
+                checkInterrupted();
                 String cls = characterClasses.get(ct);
                 if (cls != null) {
                     String sourceUrl = swf.getClassSourceUrl(cls);
@@ -5737,14 +5775,19 @@ public class XFLConverter {
             domDocument.writeEndElement();
         } catch (XMLStreamException ex) {
             logger.log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Throwable ex) {
+            checkInterrupted();
             logger.log(Level.SEVERE, null, ex);
         }
 
+        checkInterrupted();
         String domDocumentStr = prettyFormatXML(domDocument.toString());
 
         if (settings.exportScript) {
             for (Tag t : swf.getTags()) {
+                checkInterrupted();
                 if (t instanceof DoInitActionTag) {
                     DoInitActionTag dia = (DoInitActionTag) t;
                     int chid = dia.getCharacterId();
@@ -6145,6 +6188,7 @@ public class XFLConverter {
 
         String publishSettingsStr = publishSettings.toString();
 
+        checkInterrupted();
         String zipfile = outfile;
 
         if (settings.compressed || cbfFlaVersion != null) {
@@ -6158,6 +6202,7 @@ public class XFLConverter {
             final String outfileF = zipfile;
             final boolean fHasImport = hasImport;
             new RetryTask(() -> {
+                checkInterrupted();
                 try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
                     out.putNextEntry(new ZipEntry("DOMDocument.xml"));
                     out.write(Utf8Helper.getBytes(domDocumentF));
@@ -6168,10 +6213,12 @@ public class XFLConverter {
                         out.putNextEntry(new ZipEntry("LIBRARY/imported/"));
                     }
                     for (String fileName : files.keySet()) {
+                        checkInterrupted();
                         out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
                         out.write(files.get(fileName));
                     }
                     for (String fileName : datfiles.keySet()) {
+                        checkInterrupted();
                         byte[] data = datfiles.get(fileName);
                         if (data.length == 0) {
                             continue;
@@ -6195,9 +6242,11 @@ public class XFLConverter {
             File binDir = new File(xflDataDir.getAbsolutePath() + File.separator + "bin");
             binDir.mkdir();
             for (String fileName : files.keySet()) {
+                checkInterrupted();
                 writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
             }
             for (String fileName : datfiles.keySet()) {
+                checkInterrupted();
                 byte[] data = datfiles.get(fileName);
                 if (data.length == 0) {
                     continue;
@@ -6211,10 +6260,12 @@ public class XFLConverter {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, !Configuration.exportFlaAs3DisableScriptLayer.get(), false, true, "/_assets/", Configuration.linkAllClasses.get(), true);
                 swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
+                checkInterrupted();
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }
         }
 
+        checkInterrupted();
         if (cbfFlaVersion != null) {
             if (progressListener != null) {
                 progressListener.status("Converting to " + cbfFlaVersion + " ...");

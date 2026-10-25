@@ -137,7 +137,7 @@ public class TweenQualityCommandLineTest {
         try {
             Result result = quality == null ? run(directory, "-tweenquality") : run(directory, "-tweenquality", quality);
             Assert.assertEquals(result.exit, 1, result.text);
-            Assert.assertTrue(result.text.contains("-tweenquality"), result.text);
+            Assert.assertTrue(result.text.contains("-tweenQuality"), result.text);
             Assert.assertTrue(result.text.contains("0-100"), result.text);
         } finally {
             remove(directory);

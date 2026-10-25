@@ -1278,6 +1278,9 @@ public class Main {
     }
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker, boolean highPriority) {
+        if (worker != null && worker.isCancelled()) {
+            return;
+        }
         working = true;
         long nowTime = System.currentTimeMillis();
         if (!highPriority && mainFrame != null && nowTime < lastTimeStartWork + 1000) {
@@ -1286,6 +1289,9 @@ public class Main {
         }
         lastTimeStartWork = nowTime;
         View.execInEventDispatchLater(() -> {
+            if (worker != null && worker.isCancelled()) {
+                return;
+            }
             if (mainFrame != null) {
                 mainFrame.getPanel().setWorkStatus(name, worker);
                 if (percent == -1) {

@@ -65,9 +65,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     private CancellableWorker parentWorker;
 
-    private boolean canceled = false;
+    private volatile boolean canceled = false;
     
-    private boolean userCancelled = false;
+    private volatile boolean userCancelled = false;
 
     private List<Runnable> cancelListeners = new ArrayList<>();
 

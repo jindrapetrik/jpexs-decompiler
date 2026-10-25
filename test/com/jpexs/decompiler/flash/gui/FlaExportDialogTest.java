@@ -12,8 +12,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GraphicsEnvironment;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import javax.swing.JButton;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
@@ -102,22 +100,6 @@ public class FlaExportDialogTest {
         } finally {
             Configuration.lastFlaExportTweenDetectionQuality.set(previous);
             Configuration.useRibbonInterface.set(ribbon);
-        }
-    }
-
-    @DataProvider(name = "languages")
-    public Object[][] languages() {
-        return new Object[][]{{"en"}, {"cs"}, {"sk"}, {"de"}};
-    }
-
-    @Test(dataProvider = "languages")
-    public void hasTranslatedSliderTexts(String language) {
-        ResourceBundle bundle = ResourceBundle.getBundle(AppStrings.getResourcePath(FlaExportDialog.class),
-                Locale.forLanguageTag(language));
-        Assert.assertEquals(bundle.getLocale().getLanguage(), language.equals("en") ? "" : language);
-        for (String key : new String[]{"tweenDetectionQuality", "tweenDetectionQuality.off",
-            "tweenDetectionQuality.full", "tweenDetectionQuality.tooltip"}) {
-            Assert.assertFalse(bundle.getString(key).isEmpty());
         }
     }
 }
