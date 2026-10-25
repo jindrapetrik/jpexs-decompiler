@@ -192,6 +192,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -2638,7 +2639,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private void convertFrames(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, BitSet onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
         Logger.getLogger(XFLConverter.class.getName()).log(Level.FINE, "Converting frames of {0}", symbolName);
         boolean lastIn = false;
         XFLXmlWriter writer2 = new XFLXmlWriter();
@@ -2789,7 +2790,7 @@ public class XFLConverter {
 
             if (t instanceof ShowFrameTag) {
                 frame++;
-                if (frame < startFrame || frame > endFrame || (onlyFrames != null && !onlyFrames.contains(frame))) {
+                if (frame < startFrame || frame > endFrame || (onlyFrames != null && !onlyFrames.get(frame))) {
                     if (lastIn) {
                         if (!lastElements.isEmpty()) {
                             convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
@@ -2891,7 +2892,7 @@ public class XFLConverter {
         }
 
         if ((!lastElements.isEmpty() || writer2.length() > 0) && lastIn) {
-            if (frame >= startFrame && frame <= endFrame && (onlyFrames == null || onlyFrames.contains(frame))) {
+            if (frame >= startFrame && frame <= endFrame && (onlyFrames == null || onlyFrames.get(frame))) {
                 frame++;
                 convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
             }
@@ -4284,12 +4285,11 @@ public class XFLConverter {
             }
         }
 
-        Map<Integer, List<Integer>> depthToFramesList = new HashMap<>();
+        Map<Integer, BitSet> depthToFrames = new HashMap<>();
         for (int d = maxDepth; d >= 0; d--) {
-            depthToFramesList.put(d, new ArrayList<>());
-            for (int i = 0; i < frameCount; i++) {
-                depthToFramesList.get(d).add(i);
-            }
+            BitSet frames = new BitSet(frameCount);
+            frames.set(0, frameCount);
+            depthToFrames.put(d, frames);
         }
 
         Map<Integer, Map<Integer, List<PlaceObjectTypeTag>>> frameToDepthToClips = new TreeMap<>();
@@ -4322,7 +4322,7 @@ public class XFLConverter {
                 List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
 
                 if (places.size() > 1) {
-                    depthToFramesList.get(d).remove((Integer) fr);
+                    depthToFrames.get(d).clear(fr);
                     PlaceObjectTypeTag firstPlace = places.get(0);
                     PlaceObjectTypeTag secondPlace = places.get(1);
                     if (delegatedPlaces.contains(secondPlace)) {
@@ -4736,12 +4736,13 @@ public class XFLConverter {
             clipFrameSplitters.add(frameCount);
             clipPlaces.add(null);
 
-            Map<Integer, List<Integer>> depthToFramesList = new HashMap<>();
+            // Mask processing repeatedly tests and removes frame ranges. Keep
+            // membership compact and constant-time, even on long timelines.
+            Map<Integer, BitSet> depthToFrames = new HashMap<>();
             for (int d = maxDepth; d >= 0; d--) {
-                depthToFramesList.put(d, new ArrayList<>());
-                for (int i = 0; i < frameCount; i++) {
-                    depthToFramesList.get(d).add(i);
-                }
+                BitSet frames = new BitSet(frameCount);
+                frames.set(0, frameCount);
+                depthToFrames.put(d, frames);
             }
 
             Map<Integer, Map<Integer, List<PlaceObjectTypeTag>>> frameToDepthToClips = new TreeMap<>();
@@ -4776,7 +4777,7 @@ public class XFLConverter {
                 for (int d : frameToDepthToClips.get(fr).keySet()) {
                     List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
                     if (places.size() > 1) {
-                        //depthToFramesList.get(d).remove((Integer) fr);
+                        //depthToFrames.get(d).clear(fr);
                         for (int i = 1; i < places.size(); i++) {
                             multiLevelsPlaces.add(places.get(i));
                         }
@@ -4822,7 +4823,7 @@ public class XFLConverter {
                             "color", randomOutlineColor(),
                             "layerType", "mask",
                             "locked", "true"});
-                        convertFrames(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
+                        convertFrames(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, depthToFrames.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
                         writer.writeEndElement();
 
                         int parentIndex = index;
@@ -4830,7 +4831,7 @@ public class XFLConverter {
 
                         for (int fx = clipFrame; fx <= lastFrame; fx++) {
                             for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                                if (!depthToFramesList.containsKey(nd) || !depthToFramesList.get(nd).contains(fx)) {
+                                if (!depthToFrames.containsKey(nd) || !depthToFrames.get(nd).get(fx)) {
                                     continue;
                                 }
                                 if (frameToDepthToClips.containsKey(fx)
@@ -4844,10 +4845,8 @@ public class XFLConverter {
                                         handledClips.add(po2);
 
                                         for (int ndx = po.getClipDepth() - 1; ndx > po2.getClipDepth(); ndx--) {
-                                            boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
-                                            for (int i = clipFrame; i <= lastFrame; i++) {
-                                                depthToFramesList.get(ndx).remove((Integer) i);
-                                            }
+                                            boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFrames.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
+                                            depthToFrames.get(ndx).clear(clipFrame, lastFrame + 1);
                                             if (nonEmpty) {
                                                 index++;
                                             }
@@ -4912,9 +4911,7 @@ public class XFLConverter {
                                             index++;
 
                                             for (int nd2 = po2.getDepth(); nd2 <= po2.getClipDepth(); nd2++) {
-                                                for (int i = clipFrame2; i < clipFrame2 + mlc.numFrames; i++) {
-                                                    depthToFramesList.get(nd2).remove((Integer) i);
-                                                }
+                                                depthToFrames.get(nd2).clear(clipFrame2, clipFrame2 + mlc.numFrames);
                                             }
                                         }
                                     }
@@ -4923,10 +4920,8 @@ public class XFLConverter {
                         }
 
                         for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                            boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
-                            for (int i = clipFrame; i <= lastFrame; i++) {
-                                depthToFramesList.get(nd).remove((Integer) i);
-                            }
+                            boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFrames.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
+                            depthToFrames.get(nd).clear(clipFrame, lastFrame + 1);
                             if (nonEmpty) {
                                 index++;
                             }
@@ -4954,13 +4949,11 @@ public class XFLConverter {
                             writer.writeEndElement(); //DOMLayer 
                             index++;
                         }
-                        for (int i = clipFrame; i <= lastFrame; i++) {
-                            depthToFramesList.get(po.getDepth()).remove((Integer) i);
-                        }
+                        depthToFrames.get(po.getDepth()).clear(clipFrame, lastFrame + 1);
                     }
                 }
 
-                boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
+                boolean nonEmpty = writeLayer(normalizedFonts, normalizedTexts, accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFrames.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
                 if (nonEmpty) {
                     index++;
                 }
@@ -4999,7 +4992,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
+    private boolean writeLayer(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, BitSet onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
