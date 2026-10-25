@@ -395,6 +395,59 @@ public class XflMorphShapeExportTest {
     }
 
     @Test
+    public void narrowMorphStartsHintsAtDistinctCornerInBothEndpoints() throws Exception {
+        // With the original first
+        // vertex, CS6 reverses the endpoint contour despite all seven hints.
+        SWF swf;
+        try (InputStream in = Files.newInputStream(java.nio.file.Paths.get("testdata/xfl/narrow-morph.swf"))) {
+            swf = new SWF(in, false);
+        }
+        Path output = Files.createTempFile("ffdec-narrow-morph-", ".fla");
+        try {
+            swf.exportFla(new AbortRetryIgnoreHandler() {
+                @Override
+                public int handle(Throwable error) {
+                    throw new AssertionError(error);
+                }
+
+                @Override
+                public AbortRetryIgnoreHandler getNewInstance() {
+                    return this;
+                }
+            }, output.toString(), "narrow.swf", "Test", "Test", "1", false, FLAVersion.CS6, null);
+            try (ZipFile zip = new ZipFile(output.toFile()); InputStream xml = zip.getInputStream(zip.getEntry("DOMDocument.xml"))) {
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xml);
+                NodeList frames = document.getElementsByTagName("DOMFrame");
+                assertEquals(frames.getLength(), 2, "Retain an editable tween and its real partial endpoint");
+                Element first = (Element) frames.item(0);
+                assertEquals(first.getAttribute("tweenType"), "shape");
+                assertEquals(first.getAttribute("duration"), "6");
+                assertEquals(first.getAttribute("acceleration"), "100");
+                NodeList hints = first.getElementsByTagName("MorphHint");
+                assertEquals(hints.getLength(), 7);
+                assertEquals(((Element) hints.item(0)).getAttribute("startPoint"), "#12.8F, #E.B7");
+                String[] start = {"#12.69, #E.A8", "#12.71, #E.AC", "#12.8F, #E.B7",
+                    "#6.4A, #1B.EE", "#2.AA, #1F.D6", "#1.F2, #1F.1E", "#5.90, #1B.80"};
+                String[] end = {"#11.DA, #E.6E", "#12.3D, #E.78", "#13.AC, #E.A8",
+                    "#9.9B, #22.17", "#4.5E, #20.4F", "#3.5A, #1F.93", "#0.37, #1B.EB"};
+                for (int i = 0; i < hints.getLength(); i++) {
+                    Element hint = (Element) hints.item(i);
+                    int vertex = (i + 2) % hints.getLength();
+                    assertEquals(hint.getAttribute("key"), Integer.toString(i));
+                    assertEquals(hint.getAttribute("startPoint"), start[vertex]);
+                    assertEquals(hint.getAttribute("endPoint"), end[vertex], "Keep the SWF's original vertex pairing");
+                }
+                Element last = (Element) frames.item(1);
+                assertEquals(last.getAttribute("index"), "6");
+                assertTrue(((Element) first.getElementsByTagName("Edge").item(0)).getAttribute("edges").startsWith("! 4751 3767| "));
+                assertTrue(((Element) last.getElementsByTagName("Edge").item(0)).getAttribute("edges").startsWith("! 5036 3752| "));
+            }
+        } finally {
+            Files.deleteIfExists(output);
+        }
+    }
+
+    @Test
     public void reusedMorphInstancesKeepIndependentRatiosAndChangingColorEffects() throws Exception {
         SWF swf = new SWF();
         swf.frameRate = 24;

@@ -27,6 +27,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,7 +141,37 @@ final class MorphShapeTween {
             String line = strokes.group();
             styles += line;
         }
+        // CS6 can reverse its contour matching when the first hint lies on a
+        // short or nearly straight junction. Start at a distinct corner in both
+        // source endpoints, and keep that same cyclic order for every ratio.
+        Collections.rotate(pose, -hintStart(start, end));
         return new Sample(morph, ratio, matrix, pose, styles, fill, stroke);
+    }
+
+    private static int hintStart(List<Curve> start, List<Curve> end) {
+        int best = 0;
+        double strength = -1;
+        for (int i = 0; i < start.size(); i++) {
+            double candidate = Math.min(cornerStrength(start, i), cornerStrength(end, i));
+            if (candidate > strength) {
+                best = i;
+                strength = candidate;
+            }
+        }
+        return best;
+    }
+
+    private static double cornerStrength(List<Curve> curves, int index) {
+        Curve previous = curves.get((index + curves.size() - 1) % curves.size());
+        Curve current = curves.get(index);
+        double ax = current.x - (previous.line ? previous.x : previous.cx);
+        double ay = current.y - (previous.line ? previous.y : previous.cy);
+        double bx = (current.line ? current.ex : current.cx) - current.x;
+        double by = (current.line ? current.ey : current.cy) - current.y;
+        double chord = Math.hypot(ax + bx, ay + by);
+        // Distance from the junction to its tangent endpoints' chord. This
+        // penalizes both nearly collinear edges and tiny adjacent segments.
+        return chord == 0 ? 0 : Math.abs(ax * by - ay * bx) / chord;
     }
 
     private static List<Curve> contour(SHAPEWITHSTYLE shape) {
