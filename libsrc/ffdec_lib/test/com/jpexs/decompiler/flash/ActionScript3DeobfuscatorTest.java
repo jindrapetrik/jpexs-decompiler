@@ -1573,6 +1573,32 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSlotIncrementWithTempRegister() throws Exception {
+        //ASC compiles i++ of a script variable (a slot of the global scope)
+        //with a temporary register, killed at the end
+        decompilePCodeWithLines("getglobalscope\n"
+                + "            getslot 1\n"
+                + "            increment_i\n"
+                + "            setlocal2\n"
+                + "            getlocal2\n"
+                + "            getglobalscope\n"
+                + "            swap\n"
+                + "            setslot 1\n"
+                + "            kill 2\n"
+                + "            getglobalscope\n"
+                + "            getslot 1\n"
+                + "            decrement_i\n"
+                + "            setlocal2\n"
+                + "            getlocal2\n"
+                + "            getglobalscope\n"
+                + "            swap\n"
+                + "            setslot 1\n"
+                + "            kill 2\n",
+                "         global.§§slot[1]++;\n"
+                + "         global.§§slot[1]--;\n");
+    }
+
+    @Test
     public void testScriptInitializerImports() throws Exception {
         //top-level code after the package block, with no other trait outside
         //the package, lost the import of a name from another package
