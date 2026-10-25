@@ -650,8 +650,10 @@ public class XFLConverter {
     private static void convertShape(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer, int characterId, boolean small) throws XMLStreamException {
         List<String> layers = getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape, characterId, small);
         if (!useLayers) {
-            for (int l = layers.size() - 1; l >= 0; l--) {
-                writer.writeCharactersRaw(layers.get(l));
+            // Elements are painted in document order; timeline layers are
+            // listed in the opposite order, from front to back.
+            for (String layer : layers) {
+                writer.writeCharactersRaw(layer);
             }
         } else {
             int layer = 1;
@@ -703,16 +705,8 @@ public class XFLConverter {
             source.shapeRecords = shapeRecords;
             source.fillStyles = fillStyles;
             source.lineStyles = lineStyles;
-            List<String> paints = new ArrayList<>();
-            for (SHAPEWITHSTYLE paint : MorphShapePaints.paints(swf, shapeNum, source)) {
-                List<String> converted = getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                        paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small);
-                for (int i = converted.size() - 1; i >= 0; i--) {
-                    paints.add(converted.get(i));
-                }
-            }
-            java.util.Collections.reverse(paints);
-            return paints;
+            return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
+                    characterId, small, ShapeTag.WIND_EVEN_ODD);
         }
 
         if (mat == null) {
@@ -732,6 +726,22 @@ public class XFLConverter {
             fillStyles = Helper.deepCopy(fillStyles);
             lineStyles = Helper.deepCopy(lineStyles);
             shapeTransformer.transformStyles(scale, fillStyles, lineStyles, shapeNum);
+        }
+
+        if (!morphshape && fillStyles != null && fillStyles.fillStyles.length > 1
+                && swf.getCharacter(characterId) instanceof ShapeTag && !shapeHasMultiLayers(shapeRecords)) {
+            ShapeTag character = (ShapeTag) swf.getCharacter(characterId);
+            SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
+            source.shapeRecords = shapeRecords;
+            source.fillStyles = fillStyles;
+            source.lineStyles = lineStyles;
+            if (ShapePaints.hasOverlappingFills(swf, shapeNum, source, character.getWindingRule())) {
+                // Different SWF paints can overlap. A single planar DOMShape
+                // cannot represent both sides of their crossing consistently.
+                // Normalize after enlarging small shapes to retain fine details.
+                return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
+                        characterId, false, character.getWindingRule());
+            }
         }
 
         shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles, small);
@@ -948,6 +958,19 @@ public class XFLConverter {
             }
         }
         return layers;
+    }
+
+    private static List<String> getShapePaintLayers(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap,
+            SWF swf, MATRIX mat, int shapeNum, SHAPEWITHSTYLE source, int characterId, boolean small, int windingRule) throws XMLStreamException {
+        List<String> paints = new ArrayList<>();
+        for (SHAPEWITHSTYLE paint : ShapePaints.paints(swf, shapeNum, source, windingRule)) {
+            List<String> converted = getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum,
+                    paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small);
+            for (int i = converted.size() - 1; i >= 0; i--) {
+                paints.add(converted.get(i));
+            }
+        }
+        return paints;
     }
 
     private static int getMaxDepth(ReadOnlyTagList tags) {

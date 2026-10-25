@@ -97,7 +97,7 @@ public class XflMorphShapeExportTest {
             }
             morph.startEdges.shapeRecords = rectangles(false);
             morph.endEdges.shapeRecords = rectangles(true);
-            assertTrue(MorphShapePaints.hasOverlappingFills(morph));
+            assertTrue(ShapePaints.hasOverlappingFills(morph));
             swf.addTag(morph);
             ShapeTag endShape = morph.getEndShapeTag();
             endShape.setCharacterId(2);
@@ -204,7 +204,7 @@ public class XflMorphShapeExportTest {
             ShapeTag replacement = morph.getEndShapeTag();
             replacement.setCharacterId(2);
             swf.addTag(replacement);
-            assertFalse(MorphShapePaints.hasOverlappingFills(morph));
+            assertFalse(ShapePaints.hasOverlappingFills(morph));
             for (int f = 0; f < ratios.length; f++) {
                 PlaceObject2Tag place = new PlaceObject2Tag(swf);
                 place.depth = 1;
@@ -725,7 +725,7 @@ public class XflMorphShapeExportTest {
             edge.deltaY /= 4;
         }
         shape.shapeRecords.addAll(5, hole);
-        List<SHAPEWITHSTYLE> paints = MorphShapePaints.paints(swf, 3, shape);
+        List<SHAPEWITHSTYLE> paints = ShapePaints.paints(swf, 3, shape);
         assertEquals(paints.size(), 3);
         for (int i = 0; i < 2; i++) {
             Area expected = new Area(PathExporter.exportFillStyle(0, 3, swf, shape, i + 1));

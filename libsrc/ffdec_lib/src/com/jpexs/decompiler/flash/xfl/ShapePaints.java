@@ -38,9 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Keeps independent SWF paints separate in the planar XFL shape model. */
-final class MorphShapePaints {
+final class ShapePaints {
 
-    private MorphShapePaints() {
+    private ShapePaints() {
     }
 
     static boolean hasOverlappingFills(MorphShapeTag morph) {
@@ -50,24 +50,31 @@ final class MorphShapePaints {
         int shapeNum = morph.getShapeNum() == 1 ? 3 : 4;
         for (int ratio : new int[]{0, 32768, 65535}) {
             SHAPEWITHSTYLE shape = morph.getShapeAtRatio(ratio);
-            List<Area> areas = new ArrayList<>();
-            for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
-                Area area = new Area(PathExporter.exportFillStyle(ShapeTag.WIND_EVEN_ODD, shapeNum, morph.getSwf(), shape, i + 1));
-                if (area.isEmpty()) {
+            if (hasOverlappingFills(morph.getSwf(), shapeNum, shape, ShapeTag.WIND_EVEN_ODD)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean hasOverlappingFills(SWF swf, int shapeNum, SHAPEWITHSTYLE shape, int windingRule) {
+        List<Area> areas = new ArrayList<>();
+        for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
+            Area area = new Area(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1));
+            if (area.isEmpty()) {
+                continue;
+            }
+            for (Area previous : areas) {
+                if (!previous.getBounds2D().intersects(area.getBounds2D())) {
                     continue;
                 }
-                for (Area previous : areas) {
-                    if (!previous.getBounds2D().intersects(area.getBounds2D())) {
-                        continue;
-                    }
-                    Area intersection = new Area(previous);
-                    intersection.intersect(area);
-                    if (!intersection.isEmpty()) {
-                        return true;
-                    }
+                Area intersection = new Area(previous);
+                intersection.intersect(area);
+                if (!intersection.isEmpty()) {
+                    return true;
                 }
-                areas.add(area);
             }
+            areas.add(area);
         }
         return false;
     }
@@ -75,13 +82,17 @@ final class MorphShapePaints {
     // SWF paints fills in style order, followed by strokes. Each returned
     // shape has its own plane so an overlapping fill cannot erase another.
     static List<SHAPEWITHSTYLE> paints(SWF swf, int shapeNum, SHAPEWITHSTYLE shape) {
+        return paints(swf, shapeNum, shape, ShapeTag.WIND_EVEN_ODD);
+    }
+
+    static List<SHAPEWITHSTYLE> paints(SWF swf, int shapeNum, SHAPEWITHSTYLE shape, int windingRule) {
         List<SHAPEWITHSTYLE> result = new ArrayList<>();
         for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
             SHAPEWITHSTYLE paint = empty();
             paint.fillStyles.fillStyles = new FILLSTYLE[]{shape.fillStyles.fillStyles[i]};
-            // Area resolves SWF's even-odd fill rule into closed contours, including holes.
+            // Area resolves SWF's fill rule into closed contours, including holes.
             // Its outer contours are counterclockwise, so XFL fillStyle0 is the inside.
-            paint.shapeRecords = records(new Area(PathExporter.exportFillStyle(ShapeTag.WIND_EVEN_ODD, shapeNum, swf, shape, i + 1)), true);
+            paint.shapeRecords = records(new Area(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1)), true);
             result.add(paint);
         }
         int lineCount = shapeNum <= 3 ? shape.lineStyles.lineStyles.length : shape.lineStyles.lineStyles2.length;
@@ -92,7 +103,7 @@ final class MorphShapePaints {
             } else {
                 paint.lineStyles.lineStyles2 = new LINESTYLE2[]{shape.lineStyles.lineStyles2[i]};
             }
-            paint.shapeRecords = records(PathExporter.exportLineStyle(ShapeTag.WIND_EVEN_ODD, shapeNum, swf, shape, i + 1), false);
+            paint.shapeRecords = records(PathExporter.exportLineStyle(windingRule, shapeNum, swf, shape, i + 1), false);
             result.add(paint);
         }
         return result;
