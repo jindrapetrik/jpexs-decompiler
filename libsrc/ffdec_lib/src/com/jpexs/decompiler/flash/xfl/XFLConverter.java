@@ -709,6 +709,18 @@ public class XFLConverter {
     }
 
     private static List<String> getShapeLayers(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, int characterId, boolean small) throws XMLStreamException {
+        if (!morphshape && swf.getCharacter(characterId) instanceof ShapeTag && shapeHasMultiLayers(shapeRecords)) {
+            SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
+            source.shapeRecords = shapeRecords;
+            source.fillStyles = fillStyles;
+            source.lineStyles = lineStyles;
+            List<String> layers = new ArrayList<>();
+            for (SHAPEWITHSTYLE layer : ShapePaints.splitLayers(source, shapeNum)) {
+                layers.addAll(getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum,
+                        layer.shapeRecords, layer.fillStyles, layer.lineStyles, false, characterId, small));
+            }
+            return layers;
+        }
         if (morphshape && swf.getCharacter(characterId) instanceof MorphShapeTag) {
             SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
             source.shapeRecords = shapeRecords;
@@ -738,7 +750,7 @@ public class XFLConverter {
         }
 
         if (!morphshape && fillStyles != null && fillStyles.fillStyles.length > 0
-                && swf.getCharacter(characterId) instanceof ShapeTag && !shapeHasMultiLayers(shapeRecords)) {
+                && swf.getCharacter(characterId) instanceof ShapeTag) {
             ShapeTag character = (ShapeTag) swf.getCharacter(characterId);
             SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
             source.shapeRecords = shapeRecords;

@@ -42,11 +42,17 @@ public class XflStaticShapeExportTest {
         String[] coat = {"#d90000", "#8c0000", "#bf0000", "#cc0000", "#aa0000", "#f0f0f0", "#e58508"};
         String[] gift = {"#fcd4ee", "#000000", "#ffb4db", "#fe8dc5", "#ce907b", "#efc2bc",
             "#f676a6", "#f5317b", "#ff57a5", "#ff68ab", "#ca9aa6"};
+        String[] penguins = {"#000000", "#3399cc", "#66ccff", "#ff9900", "#ffffff", "#cccccc", "#fec643", "#993300",
+            "#99ffff", "#000000", "#fec643", "#ff9900", "#cccccc", "#ffffff", "#ffffff",
+            "#000000", "#3399cc", "#66ccff", "#ffffff", "#ff9900", "#cccccc",
+            "#000000", "#fec643", "#ff9900", "#cccccc", "#ffffff"};
         return new Object[][]{
             {false, "overlapping-static-fills.swf", 113, coat, true},
             {true, "overlapping-static-fills.swf", 113, coat, true},
             {false, "coincident-static-fills.swf", 41, gift, false},
-            {true, "coincident-static-fills.swf", 41, gift, false}
+            {true, "coincident-static-fills.swf", 41, gift, false},
+            {false, "multilayer-static-fills.swf", 15, penguins, true},
+            {true, "multilayer-static-fills.swf", 15, penguins, true}
         };
     }
 
@@ -58,6 +64,8 @@ public class XflStaticShapeExportTest {
         // at the left contour; merging them makes CS6 drop its largest region.
         // Shape 41 from ArtworkRoomsTown40.swf has no overlapping fills, but
         // coincident boundaries cause CS6 to drop the brown ribbon rectangle.
+        // Shape 15 from badshape.swf has four style groups. Selecting its right
+        // penguin in CS6 used to discard the blue fill.
         try (InputStream in = Files.newInputStream(Paths.get("testdata/xfl", fixture))) {
             swf = new SWF(in, false);
         }
@@ -92,21 +100,29 @@ public class XflStaticShapeExportTest {
             }, output.toString(), "coat.swf", "Test", "Test", "1", false, FLAVersion.CS6, null);
             try (ZipFile zip = new ZipFile(output.toFile())) {
                 Document document;
-                String path = library ? "LIBRARY/Symbol " + characterId + ".xml" : "DOMDocument.xml";
+                // Shapes with several style groups are automatically kept in a
+                // library symbol, even when the placement has no instance name.
+                boolean exportedAsSymbol = library || characterId == 15;
+                String path = exportedAsSymbol ? "LIBRARY/Symbol " + characterId + ".xml" : "DOMDocument.xml";
                 try (InputStream in = zip.getInputStream(zip.getEntry(path))) {
                     document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
                 }
                 NodeList shapes = document.getElementsByTagName("DOMShape");
                 assertEquals(shapes.getLength(), colors.length, "Each SWF paint needs an independent XFL plane");
-                assertEquals(document.getElementsByTagName("DOMLayer").getLength(), library ? colors.length : 1);
+                assertEquals(document.getElementsByTagName("DOMLayer").getLength(), exportedAsSymbol ? colors.length : 1);
                 for (int i = 0; i < shapes.getLength(); i++) {
                     Element paint = (Element) shapes.item(i);
                     assertEquals(paint.getAttribute("isFloating"), "true");
                     assertEquals(paint.getElementsByTagName("FillStyle").getLength(), 1);
                     Element color = (Element) paint.getElementsByTagName("SolidColor").item(0);
-                    assertEquals(color.getAttribute("color"), colors[library ? colors.length - 1 - i : i],
+                    assertEquals(color.getAttribute("color"), colors[exportedAsSymbol ? colors.length - 1 - i : i],
                             "Elements paint back to front, while timeline layers are listed front to back");
                     assertTrue(paint.getElementsByTagName("Edge").getLength() > 0, "Keep every paint's geometry");
+                    if (characterId == 15) {
+                        int sourcePaint = exportedAsSymbol ? colors.length - 1 - i : i;
+                        assertEquals(Double.parseDouble(color.getAttribute("alpha")), sourcePaint == 14 ? 0.4 : 1.0,
+                                "Keep the translucent white paint in its original group");
+                    }
                 }
             }
             ByteArrayOutputStream after = new ByteArrayOutputStream();

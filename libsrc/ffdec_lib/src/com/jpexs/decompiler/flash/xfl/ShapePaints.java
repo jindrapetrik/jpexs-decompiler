@@ -36,6 +36,8 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +46,153 @@ import java.util.Set;
 final class ShapePaints {
 
     private ShapePaints() {
+    }
+
+    // Keep each SWF style group on its own plane. Rebase style references
+    // before splitting, since a group can still use a style from an earlier bank.
+    static List<SHAPEWITHSTYLE> splitLayers(SHAPEWITHSTYLE source, int shapeNum) {
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>();
+        List<FILLSTYLE> fills = new ArrayList<>(Arrays.asList(source.fillStyles.fillStyles));
+        List<LINESTYLE> lines = new ArrayList<>();
+        List<LINESTYLE2> lines2 = new ArrayList<>();
+        if (shapeNum <= 3) {
+            lines.addAll(Arrays.asList(source.lineStyles.lineStyles));
+        } else {
+            lines2.addAll(Arrays.asList(source.lineStyles.lineStyles2));
+        }
+        int fillOffset = 0;
+        int lineOffset = 0;
+        int fill0 = 0;
+        int fill1 = 0;
+        int line = 0;
+        int x = 0;
+        int y = 0;
+        boolean hasEdges = false;
+        SHAPEWITHSTYLE layer = layerAt(x, y, fill0, fill1, line);
+        for (SHAPERECORD record : source.shapeRecords) {
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord change = (StyleChangeRecord) record.clone();
+                if (change.stateNewStyles) {
+                    if (hasEdges) {
+                        layer.shapeRecords.add(new EndShapeRecord());
+                        layers.add(layer);
+                    }
+                    layer = layerAt(x, y, fill0, fill1, line);
+                    hasEdges = false;
+                    fillOffset = fills.size();
+                    lineOffset = shapeNum <= 3 ? lines.size() : lines2.size();
+                    fills.addAll(Arrays.asList(change.fillStyles.fillStyles));
+                    if (shapeNum <= 3) {
+                        lines.addAll(Arrays.asList(change.lineStyles.lineStyles));
+                    } else {
+                        lines2.addAll(Arrays.asList(change.lineStyles.lineStyles2));
+                    }
+                    change.stateNewStyles = false;
+                }
+                if (change.stateFillStyle0) {
+                    fill0 = change.fillStyle0 = change.fillStyle0 == 0 ? 0 : change.fillStyle0 + fillOffset;
+                }
+                if (change.stateFillStyle1) {
+                    fill1 = change.fillStyle1 = change.fillStyle1 == 0 ? 0 : change.fillStyle1 + fillOffset;
+                }
+                if (change.stateLineStyle) {
+                    line = change.lineStyle = change.lineStyle == 0 ? 0 : change.lineStyle + lineOffset;
+                }
+                layer.shapeRecords.add(change);
+            } else if (!(record instanceof EndShapeRecord)) {
+                layer.shapeRecords.add(record);
+                hasEdges = true;
+            }
+            x = record.changeX(x);
+            y = record.changeY(y);
+        }
+        if (hasEdges) {
+            layer.shapeRecords.add(new EndShapeRecord());
+            layers.add(layer);
+        }
+        for (SHAPEWITHSTYLE part : layers) {
+            compactStyles(part, fills, lines, lines2, shapeNum);
+        }
+        return layers;
+    }
+
+    private static SHAPEWITHSTYLE layerAt(int x, int y, int fill0, int fill1, int line) {
+        SHAPEWITHSTYLE layer = empty();
+        layer.shapeRecords = new ArrayList<>();
+        StyleChangeRecord start = new StyleChangeRecord();
+        start.stateMoveTo = true;
+        start.moveDeltaX = x;
+        start.moveDeltaY = y;
+        start.stateFillStyle0 = true;
+        start.fillStyle0 = fill0;
+        start.stateFillStyle1 = true;
+        start.fillStyle1 = fill1;
+        start.stateLineStyle = true;
+        start.lineStyle = line;
+        layer.shapeRecords.add(start);
+        return layer;
+    }
+
+    private static void compactStyles(SHAPEWITHSTYLE layer, List<FILLSTYLE> fills,
+            List<LINESTYLE> lines, List<LINESTYLE2> lines2, int shapeNum) {
+        BitSet usedFills = new BitSet();
+        BitSet usedLines = new BitSet();
+        int fill0 = 0;
+        int fill1 = 0;
+        int line = 0;
+        for (SHAPERECORD record : layer.shapeRecords) {
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord change = (StyleChangeRecord) record;
+                if (change.stateFillStyle0) {
+                    fill0 = change.fillStyle0;
+                }
+                if (change.stateFillStyle1) {
+                    fill1 = change.fillStyle1;
+                }
+                if (change.stateLineStyle) {
+                    line = change.lineStyle;
+                }
+            } else if (record instanceof StraightEdgeRecord || record instanceof CurvedEdgeRecord) {
+                usedFills.set(fill0);
+                usedFills.set(fill1);
+                usedLines.set(line);
+            }
+        }
+        int[] fillMap = new int[fills.size() + 1];
+        List<FILLSTYLE> localFills = new ArrayList<>();
+        for (int i = usedFills.nextSetBit(1); i >= 0; i = usedFills.nextSetBit(i + 1)) {
+            localFills.add(fills.get(i - 1));
+            fillMap[i] = localFills.size();
+        }
+        int[] lineMap = new int[(shapeNum <= 3 ? lines.size() : lines2.size()) + 1];
+        List<LINESTYLE> localLines = new ArrayList<>();
+        List<LINESTYLE2> localLines2 = new ArrayList<>();
+        for (int i = usedLines.nextSetBit(1); i >= 0; i = usedLines.nextSetBit(i + 1)) {
+            if (shapeNum <= 3) {
+                localLines.add(lines.get(i - 1));
+                lineMap[i] = localLines.size();
+            } else {
+                localLines2.add(lines2.get(i - 1));
+                lineMap[i] = localLines2.size();
+            }
+        }
+        layer.fillStyles.fillStyles = localFills.toArray(new FILLSTYLE[0]);
+        layer.lineStyles.lineStyles = localLines.toArray(new LINESTYLE[0]);
+        layer.lineStyles.lineStyles2 = localLines2.toArray(new LINESTYLE2[0]);
+        for (SHAPERECORD record : layer.shapeRecords) {
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord change = (StyleChangeRecord) record;
+                if (change.stateFillStyle0) {
+                    change.fillStyle0 = fillMap[change.fillStyle0];
+                }
+                if (change.stateFillStyle1) {
+                    change.fillStyle1 = fillMap[change.fillStyle1];
+                }
+                if (change.stateLineStyle) {
+                    change.lineStyle = lineMap[change.lineStyle];
+                }
+            }
+        }
     }
 
     // Coincident boundaries can carry different pairs of fills in SWF. FLA editor
