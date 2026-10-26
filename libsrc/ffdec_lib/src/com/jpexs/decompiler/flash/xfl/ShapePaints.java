@@ -223,8 +223,7 @@ final class ShapePaints {
                     CurvedEdgeRecord curve = (CurvedEdgeRecord) record;
                     edge = new BezierEdge(x, y, x + curve.controlDeltaX, y + curve.controlDeltaY,
                             record.changeX(x), record.changeY(y));
-                    // A collinear curve has the same fill boundary as a line,
-                    // even if it briefly doubles back along that line.
+                    // Compare monotone collinear curves with straight boundaries.
                     edge.shrinkToLine();
                 }
             }
@@ -350,7 +349,11 @@ final class ShapePaints {
                 edge.generalLineFlag = true;
                 edge.deltaX = (int) Math.round(p[0]) - x;
                 edge.deltaY = (int) Math.round(p[1]) - y;
-                result.add(edge);
+                // Rounding a path to twips can collapse a tiny segment.
+                // Flash 4 can crash when selecting/deselecting such an empty edge.
+                if (edge.deltaX != 0 || edge.deltaY != 0) {
+                    result.add(edge);
+                }
                 x += edge.deltaX;
                 y += edge.deltaY;
             } else if (type == PathIterator.SEG_QUADTO) {
@@ -363,7 +366,10 @@ final class ShapePaints {
                 y = (int) Math.round(p[3]);
                 edge.anchorDeltaX = x - cx;
                 edge.anchorDeltaY = y - cy;
-                result.add(edge);
+                if (edge.controlDeltaX != 0 || edge.controlDeltaY != 0
+                        || edge.anchorDeltaX != 0 || edge.anchorDeltaY != 0) {
+                    result.add(edge);
+                }
             } else if (type == PathIterator.SEG_CLOSE) {
                 close(result, x, y, startX, startY);
                 x = startX;

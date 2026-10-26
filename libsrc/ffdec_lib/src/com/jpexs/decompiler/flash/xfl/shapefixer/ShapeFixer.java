@@ -447,11 +447,43 @@ public class ShapeFixer {
         handleBewList(strokesBewList, shapes, wasSmall);
         handleBewList(fillsBewList, shapes, wasSmall);
 
-        for (int i1 = 0; i1 < shapes.size(); i1++) {
-            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
-                BezierEdge be1 = shapes.get(i1).get(j1);
-                be1.shrinkToLine();
+        normalizeEdges(shapes);
+    }
+
+    private void normalizeEdges(List<List<BezierEdge>> shapes) {
+        for (int i = 0; i < shapes.size(); i++) {
+            List<BezierEdge> normalized = new ArrayList<>();
+            for (BezierEdge edge : shapes.get(i)) {
+                if (edge.isEmpty()) {
+                    continue;
+                }
+                if (edge.points.size() == 3) {
+                    Point2D start = edge.points.get(0);
+                    Point2D control = edge.points.get(1);
+                    Point2D end = edge.points.get(2);
+                    double dx = control.getX() - start.getX();
+                    double dy = control.getY() - start.getY();
+                    double ex = end.getX() - start.getX();
+                    double ey = end.getY() - start.getY();
+                    if (dx * ey - dy * ex == 0) {
+                        double denominator = dx != 0 ? 2 * dx - ex : 2 * dy - ey;
+                        double t = denominator == 0 ? 0 : (dx != 0 ? dx : dy) / denominator;
+                        if (t > 0 && t < 1) {
+                            // A collinear quadratic doubles back at its extremum.
+                            // Keep both traversals; a zero-length chord crashes Flash 4.
+                            double u = 1 - t;
+                            double x = u * u * start.getX() + 2 * u * t * control.getX() + t * t * end.getX();
+                            double y = u * u * start.getY() + 2 * u * t * control.getY() + t * t * end.getY();
+                            normalized.add(new BezierEdge(start.getX(), start.getY(), x, y));
+                            normalized.add(new BezierEdge(x, y, end.getX(), end.getY()));
+                            continue;
+                        }
+                    }
+                }
+                edge.shrinkToLine();
+                normalized.add(edge);
             }
+            shapes.set(i, normalized);
         }
     }
 
@@ -729,12 +761,7 @@ public class ShapeFixer {
             }
         }
 
-        for (int i1 = 0; i1 < shapes.size(); i1++) {
-            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
-                BezierEdge be1 = shapes.get(i1).get(j1);
-                be1.shrinkToLine();
-            }
-        }
+        normalizeEdges(shapes);
     }
 
     private void splitToLayers(

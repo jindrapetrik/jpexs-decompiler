@@ -19,6 +19,11 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -27,6 +32,8 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.geom.Area;
@@ -60,6 +67,101 @@ public class ShapePaintsTest {
             }
         }
         assertEquals(style, 27);
+    }
+
+    @DataProvider(name = "roundedShapes")
+    public Object[][] roundedShapes() {
+        return new Object[][]{{"rounded-static-fills.swf", 76}, {"rounded-static-strokes.swf", 98}};
+    }
+
+    @Test(dataProvider = "roundedShapes")
+    public void roundedContoursDoNotEmitEmptyEdges(String fixture, int characterId) throws Exception {
+        SWF swf;
+        // Shape 76 is frame 2 of Symbol 100 in bman.swf. Rounding its Area
+        // contours produced four empty lines which crash Flash 4 on deselection.
+        // Shape 98 is frame 28 and also produces empty stroked segments.
+        try (InputStream in = Files.newInputStream(Paths.get("testdata/xfl", fixture))) {
+            swf = new SWF(in, false);
+        }
+        SHAPEWITHSTYLE source;
+        int shapeNum;
+        int windingRule = ShapeTag.WIND_EVEN_ODD;
+        if (swf.getCharacter(characterId) instanceof MorphShapeTag) {
+            MorphShapeTag morph = (MorphShapeTag) swf.getCharacter(characterId);
+            source = morph.getShapeAtRatio(0);
+            shapeNum = morph.getShapeNum() == 1 ? 3 : 4;
+        } else {
+            ShapeTag shape = (ShapeTag) swf.getCharacter(characterId);
+            source = shape.getShapes();
+            shapeNum = shape.getShapeNum();
+            windingRule = shape.getWindingRule();
+        }
+        List<SHAPEWITHSTYLE> paints = ShapePaints.paints(swf, shapeNum, source, windingRule);
+        assertEquals(paints.size(), source.fillStyles.fillStyles.length
+                + source.lineStyles.lineStyles.length, "Keep every fill and stroke");
+        int edges = 0;
+        for (SHAPEWITHSTYLE paint : paints) {
+            for (SHAPERECORD record : paint.shapeRecords) {
+                if (record instanceof StraightEdgeRecord) {
+                    StraightEdgeRecord line = (StraightEdgeRecord) record;
+                    assertTrue(line.deltaX != 0 || line.deltaY != 0, "Do not emit collapsed line segments");
+                    edges++;
+                } else if (record instanceof CurvedEdgeRecord) {
+                    CurvedEdgeRecord curve = (CurvedEdgeRecord) record;
+                    assertTrue(curve.controlDeltaX != 0 || curve.controlDeltaY != 0
+                            || curve.anchorDeltaX != 0 || curve.anchorDeltaY != 0, "Do not emit collapsed curves");
+                    edges++;
+                }
+            }
+        }
+        for (SHAPEWITHSTYLE paint : paints) {
+            for (ShapeRecordAdvanced record : new ShapeFixer().fix(paint.shapeRecords, shapeNum, paint.fillStyles, paint.lineStyles, false)) {
+                if (record instanceof StraightEdgeRecordAdvanced) {
+                    StraightEdgeRecordAdvanced line = (StraightEdgeRecordAdvanced) record;
+                    assertTrue(line.deltaX != 0 || line.deltaY != 0, "Intersection rounding must not reintroduce empty lines");
+                } else if (record instanceof CurvedEdgeRecordAdvanced) {
+                    CurvedEdgeRecordAdvanced curve = (CurvedEdgeRecordAdvanced) record;
+                    assertTrue(curve.controlDeltaX != 0 || curve.controlDeltaY != 0
+                            || curve.anchorDeltaX != 0 || curve.anchorDeltaY != 0, "Intersection rounding must not reintroduce empty curves");
+                }
+            }
+        }
+        assertTrue(edges > 0, "Keep the nonempty geometry");
+    }
+
+    @Test
+    public void aReturningCurveWithADistinctControlPointIsRetained() {
+        SWF swf = new SWF();
+        SHAPEWITHSTYLE source = SHAPEWITHSTYLE.createEmpty(3);
+        source.shapeRecords.clear();
+        source.lineStyles = lines(3, new RGBA(0, 0, 0, 255));
+        StyleChangeRecord start = new StyleChangeRecord();
+        start.stateMoveTo = true;
+        start.stateLineStyle = true;
+        start.lineStyle = 1;
+        source.shapeRecords.add(start);
+        CurvedEdgeRecord curve = new CurvedEdgeRecord();
+        curve.controlDeltaX = 10;
+        curve.anchorDeltaX = -10;
+        source.shapeRecords.add(curve);
+        source.shapeRecords.add(new EndShapeRecord());
+        List<SHAPEWITHSTYLE> paints = ShapePaints.paints(swf, 3, source);
+        assertEquals(paints.size(), 1);
+        assertEquals(paints.get(0).shapeRecords.stream().filter(r -> r instanceof CurvedEdgeRecord).count(), 1L,
+                "Equal endpoints alone do not make a stroked curve empty");
+        SHAPEWITHSTYLE paint = paints.get(0);
+        List<ShapeRecordAdvanced> fixed = new ShapeFixer().fix(paint.shapeRecords, 3, paint.fillStyles, paint.lineStyles, false);
+        List<StraightEdgeRecordAdvanced> lines = new java.util.ArrayList<>();
+        for (ShapeRecordAdvanced record : fixed) {
+            if (record instanceof StraightEdgeRecordAdvanced) {
+                lines.add((StraightEdgeRecordAdvanced) record);
+            }
+        }
+        assertEquals(lines.size(), 2, "Split the returning curve at its extremum instead of emitting an empty chord");
+        assertEquals(lines.get(0).deltaX, 5.0);
+        assertEquals(lines.get(1).deltaX, -5.0);
+        assertEquals(lines.get(0).deltaY, 0.0);
+        assertEquals(lines.get(1).deltaY, 0.0);
     }
 
     @DataProvider(name = "shapeVersion")
