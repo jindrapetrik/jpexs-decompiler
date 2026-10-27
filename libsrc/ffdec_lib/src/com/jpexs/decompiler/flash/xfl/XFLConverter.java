@@ -165,12 +165,10 @@ import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
-import com.jpexs.flash.fla.converter.FlaConverter;
+import com.jpexs.flash.fla.converter.BinaryFlaConversionResult;
+import com.jpexs.flash.fla.converter.BinaryFlaConverter;
 import com.jpexs.flash.fla.converter.FlaFormatVersion;
-import com.jpexs.flash.fla.converter.streams.CfbOutputStorage;
-import com.jpexs.flash.fla.converter.streams.InputStorageInterface;
-import com.jpexs.flash.fla.converter.streams.OutputStorageInterface;
-import com.jpexs.flash.fla.converter.streams.ZippedInputStorage;
+import com.jpexs.flash.fla.converter.XflReader;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
@@ -189,6 +187,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -6204,100 +6204,106 @@ public class XFLConverter {
         checkInterrupted();
         String zipfile = outfile;
 
-        if (settings.compressed || cbfFlaVersion != null) {
-            final String domDocumentF = domDocumentStr;
-            final String publishSettingsF = publishSettingsStr;
+        try {
+            if (settings.compressed || cbfFlaVersion != null) {
+                final String domDocumentF = domDocumentStr;
+                final String publishSettingsF = publishSettingsStr;
 
-            if (cbfFlaVersion != null) {
-                zipfile = File.createTempFile("ffdec_fla_export", ".fla").getAbsolutePath();
-            }
+                if (cbfFlaVersion != null) {
+                    zipfile = File.createTempFile("ffdec_fla_export", ".fla").getAbsolutePath();
+                }
 
-            final String outfileF = zipfile;
-            final boolean fHasImport = hasImport;
-            new RetryTask(() -> {
-                checkInterrupted();
-                try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
-                    out.putNextEntry(new ZipEntry("DOMDocument.xml"));
-                    out.write(Utf8Helper.getBytes(domDocumentF));
-                    out.putNextEntry(new ZipEntry("PublishSettings.xml"));
-                    out.write(Utf8Helper.getBytes(publishSettingsF));
-                    out.putNextEntry(new ZipEntry("LIBRARY/"));
-                    if (fHasImport) {
-                        out.putNextEntry(new ZipEntry("LIBRARY/imported/"));
-                    }
-                    for (String fileName : files.keySet()) {
-                        checkInterrupted();
-                        out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
-                        out.write(files.get(fileName));
-                    }
-                    for (String fileName : datfiles.keySet()) {
-                        checkInterrupted();
-                        byte[] data = datfiles.get(fileName);
-                        if (data.length == 0) {
-                            continue;
+                final String outfileF = zipfile;
+                final boolean fHasImport = hasImport;
+                new RetryTask(() -> {
+                    checkInterrupted();
+                    try (FlaFileWriter output = new FlaFileWriter(new File(outfileF))) {
+                        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(output.getFile()))) {
+                            out.putNextEntry(new ZipEntry("DOMDocument.xml"));
+                            out.write(Utf8Helper.getBytes(domDocumentF));
+                            out.putNextEntry(new ZipEntry("PublishSettings.xml"));
+                            out.write(Utf8Helper.getBytes(publishSettingsF));
+                            out.putNextEntry(new ZipEntry("LIBRARY/"));
+                            if (fHasImport) {
+                                out.putNextEntry(new ZipEntry("LIBRARY/imported/"));
+                            }
+                            for (String fileName : files.keySet()) {
+                                checkInterrupted();
+                                out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
+                                out.write(files.get(fileName));
+                            }
+                            for (String fileName : datfiles.keySet()) {
+                                checkInterrupted();
+                                byte[] data = datfiles.get(fileName);
+                                if (data.length == 0) {
+                                    continue;
+                                }
+                                out.putNextEntry(new ZipEntry("bin/" + fileName));
+                                out.write(data);
+                            }
                         }
-                        out.putNextEntry(new ZipEntry("bin/" + fileName));
-                        out.write(data);
+                        output.commit();
                     }
-                }
-            }, handler).run();
+                }, handler).run();
 
-        } else {
-            Path.createDirectorySafe(xflDataDir);
-            writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
-            writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
-            File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
-            libraryDir.mkdir();
-            if (hasImport) {
-                File importedDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY" + File.separator + "imported");
-                importedDir.mkdir();
-            }
-            File binDir = new File(xflDataDir.getAbsolutePath() + File.separator + "bin");
-            binDir.mkdir();
-            for (String fileName : files.keySet()) {
-                checkInterrupted();
-                writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
-            }
-            for (String fileName : datfiles.keySet()) {
-                checkInterrupted();
-                byte[] data = datfiles.get(fileName);
-                if (data.length == 0) {
-                    continue;
+            } else {
+                Path.createDirectorySafe(xflDataDir);
+                writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
+                writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
+                File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
+                libraryDir.mkdir();
+                if (hasImport) {
+                    File importedDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY" + File.separator + "imported");
+                    importedDir.mkdir();
                 }
-                writeFile(handler, data, binDir.getAbsolutePath() + File.separator + fileName);
+                File binDir = new File(xflDataDir.getAbsolutePath() + File.separator + "bin");
+                binDir.mkdir();
+                for (String fileName : files.keySet()) {
+                    checkInterrupted();
+                    writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
+                }
+                for (String fileName : datfiles.keySet()) {
+                    checkInterrupted();
+                    byte[] data = datfiles.get(fileName);
+                    if (data.length == 0) {
+                        continue;
+                    }
+                    writeFile(handler, data, binDir.getAbsolutePath() + File.separator + fileName);
+                }
+                writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile);
             }
-            writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile);
-        }
-        if (useAS3 && settings.exportScript) {
-            try {
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, !Configuration.exportFlaAs3DisableScriptLayer.get(), false, true, "/_assets/", Configuration.linkAllClasses.get(), true);
-                swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
-            } catch (Exception ex) {
-                checkInterrupted();
-                logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
+            if (useAS3 && settings.exportScript) {
+                try {
+                    ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, !Configuration.exportFlaAs3DisableScriptLayer.get(), false, true, "/_assets/", Configuration.linkAllClasses.get(), true);
+                    swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
+                } catch (Exception ex) {
+                    checkInterrupted();
+                    logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
+                }
+            }
+
+            checkInterrupted();
+            if (cbfFlaVersion != null) {
+                if (progressListener != null) {
+                    progressListener.status("Converting to " + cbfFlaVersion + " ...");
+                }
+                convertToBinaryFla(new File(zipfile), new File(outfile), cbfFlaVersion, swf.getCharset());
+            }
+
+        } finally {
+            if (cbfFlaVersion != null && !zipfile.equals(outfile)) {
+                Files.deleteIfExists(new File(zipfile).toPath());
             }
         }
 
+    }
+
+    static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset) throws IOException, InterruptedException {
         checkInterrupted();
-        if (cbfFlaVersion != null) {
-            if (progressListener != null) {
-                progressListener.status("Converting to " + cbfFlaVersion + " ...");
-            }
-            try {
-                InputStorageInterface inputStorage = new ZippedInputStorage(new File(zipfile));
-                OutputStorageInterface outputStorage = new CfbOutputStorage(new File(outfile));
-
-                FlaConverter contentsGenerator = new FlaConverter(cbfFlaVersion, swf.getCharset());
-                contentsGenerator.convert(inputStorage, outputStorage);
-                inputStorage.close();
-                outputStorage.close();
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, "Error while converting to old format", ex);
-            } finally {
-                new File(zipfile).delete();
-            }
-        }
-
+        BinaryFlaConversionResult result = new BinaryFlaConverter(version, charset).convert(
+                new XflReader(Charset.forName(charset)).read(input));
+        checkInterrupted();
+        result.writeToFile(output);
     }
 
     private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, XFLXmlWriter writer) throws XMLStreamException {
